@@ -1,5 +1,5 @@
 /**
- * Figma variables read back as Oxygen token overrides.
+ * Figma variables read back as Zoblocks token overrides.
  *
  * The return shape is deliberately the one `importDtcg` already produces —
  * `{ matched, unmatched, discardedClinical }` — because a designer pulling
@@ -14,7 +14,7 @@ import type { SnapshotVariable, VariableSnapshot } from "./diff";
 export interface ImportReport {
   /** Token name to hex, for everything this accepts. */
   matched: Record<string, string>;
-  /** Variables that are not Oxygen tokens, by the label a designer sees. */
+  /** Variables that are not Zoblocks tokens, by the label a designer sees. */
   unmatched: string[];
   /**
    * Clinical tokens found and refused, by name.

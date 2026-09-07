@@ -13,7 +13,7 @@ import {
   resolveIdentity,
   type Identity,
   type IdentityState,
-} from "@oxygenui-design/identity-core";
+} from "@zoblocks/identity-core";
 import { render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { IdentityAvatar } from "../src/IdentityAvatar.js";
@@ -46,7 +46,7 @@ describe("no provider at all", () => {
   it("denies photographs by default, with no provider to say otherwise", () => {
     const { container } = render(<PatientBanner patient={F.withPhoto} context="navigation" />);
     expect(container.querySelector("img")).toBeNull();
-    expect(container.querySelector('[data-ox-photo="withheld"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-zb-photo="withheld"]')).toBeInTheDocument();
   });
 });
 
@@ -56,14 +56,14 @@ describe("IdentityAvatar — the remaining shapes", () => {
     // that does not exist, and an untinted circle looks like a loading state.
     const wide = resolveIdentity(F.amaraA, policy({ now: F.NOW, swatchCount: 24 }));
     const { container } = render(<IdentityAvatar identity={{ ...wide, swatch: 19 }} />);
-    expect((container.firstElementChild as HTMLElement).className).toMatch(/ox-avatar--sw[1-6]\b/);
+    expect((container.firstElementChild as HTMLElement).className).toMatch(/zb-avatar--sw[1-6]\b/);
   });
 
   it("accepts every documented size", () => {
     for (const size of [20, 24, 32, 40, 56, "auto"] as const) {
       const { container, unmount } = render(<IdentityAvatar identity={amara} size={size} />);
       const cls = (container.firstElementChild as HTMLElement).className;
-      expect(cls).toContain(size === "auto" ? "ox-avatar--auto" : `ox-avatar--${size}`);
+      expect(cls).toContain(size === "auto" ? "zb-avatar--auto" : `zb-avatar--${size}`);
       unmount();
     }
   });
@@ -72,7 +72,7 @@ describe("IdentityAvatar — the remaining shapes", () => {
     const { container } = render(<IdentityAvatar identity={amara} className="mine" />);
     const cls = (container.firstElementChild as HTMLElement).className;
     expect(cls).toContain("mine");
-    expect(cls).toContain("ox-avatar");
+    expect(cls).toContain("zb-avatar");
   });
 
   it("carries a caller style through", () => {
@@ -95,7 +95,7 @@ describe("PatientBanner — the remaining paths", () => {
     expect(img).toBeInTheDocument();
     img?.dispatchEvent(new Event("error"));
     await waitFor(() =>
-      expect(container.querySelector('[data-ox-photo="unavailable"]')).toBeInTheDocument(),
+      expect(container.querySelector('[data-zb-photo="unavailable"]')).toBeInTheDocument(),
     );
   });
 
@@ -108,7 +108,7 @@ describe("PatientBanner — the remaining paths", () => {
     const { container } = F.renderWithPolicy(
       <PatientBanner patient={F.amaraA} context="navigation" />,
     );
-    expect(container.querySelector('[data-ox-field="ward"]')).toBeNull();
+    expect(container.querySelector('[data-zb-field="ward"]')).toBeNull();
   });
 
   it("renders caller actions", () => {
@@ -193,7 +193,7 @@ describe("PatientBanner — the remaining paths", () => {
     const { container } = F.renderWithPolicy(
       <PatientBanner patient={F.amaraA} context="navigation" className="mine" />,
     );
-    expect(container.querySelector(".ox-banner.mine")).toBeInTheDocument();
+    expect(container.querySelector(".zb-banner.mine")).toBeInTheDocument();
   });
 
   it("falls back to the record's own identifiers when the requested kinds are absent", () => {
@@ -219,12 +219,12 @@ describe("PatientChip — the remaining paths", () => {
 
   it("keeps the caller className", () => {
     const { container } = F.renderWithPolicy(<PatientChip patient={F.amaraA} className="mine" />);
-    expect(container.querySelector(".ox-patient-chip.mine")).toBeInTheDocument();
+    expect(container.querySelector(".zb-patient-chip.mine")).toBeInTheDocument();
   });
 
   it("keeps the caller className on the loading skeleton too", () => {
     const { container } = F.renderWithPolicy(<PatientChip className="mine" />);
-    expect(container.querySelector(".ox-patient-chip--loading.mine")).toBeInTheDocument();
+    expect(container.querySelector(".zb-patient-chip--loading.mine")).toBeInTheDocument();
   });
 
   it("renders a mononym without an initial-and-dot", () => {
@@ -303,7 +303,7 @@ describe("IdentitySet — churn and idempotence", () => {
 
   it("renders no notice outside a set", () => {
     const { container } = F.renderWithPolicy(<IdentitySetNotice />);
-    expect(container.querySelector(".ox-identity-notice")).toBeNull();
+    expect(container.querySelector(".zb-identity-notice")).toBeNull();
   });
 
   it("renders no notice when the only collision is a shared swatch", async () => {
@@ -317,7 +317,7 @@ describe("IdentitySet — churn and idempotence", () => {
       </IdentitySet>,
     );
     await waitFor(() => expect(screen.getByText("A. Lovelace")).toBeInTheDocument());
-    expect(container.querySelector(".ox-identity-notice")).toBeNull();
+    expect(container.querySelector(".zb-identity-notice")).toBeNull();
   });
 });
 
@@ -339,10 +339,10 @@ describe("the last reachable branches", () => {
         <PatientChip patient={twin("z2")} />
       </IdentitySet>,
     );
-    await waitFor(() => expect(container.querySelectorAll("[data-ox-escalated]").length).toBe(2));
+    await waitFor(() => expect(container.querySelectorAll("[data-zb-escalated]").length).toBe(2));
     // The policy still denies photographs, so what it renders is the honest
     // "none on file" — a request, never an override of site policy.
-    expect(container.querySelectorAll('[data-ox-photo="none-on-file"]').length).toBe(2);
+    expect(container.querySelectorAll('[data-zb-photo="none-on-file"]').length).toBe(2);
   });
 
   it("renders a cancel button on the verification only when the caller wants one", async () => {
@@ -394,8 +394,8 @@ describe("disclosure reduces the fields, not only the identifiers", () => {
     );
     expect(container.textContent).not.toContain("08 Mar 1985");
     expect(container.textContent).not.toContain("female-typical");
-    expect(container.querySelector('[data-ox-field="dob"]')).toBeNull();
-    expect(container.querySelector('[data-ox-field="identifier"]')).toBeNull();
+    expect(container.querySelector('[data-zb-field="dob"]')).toBeNull();
+    expect(container.querySelector('[data-zb-field="identifier"]')).toBeNull();
   });
 
   it("withholds them from the accessible name too", () => {

@@ -1,5 +1,5 @@
 ---
-"@oxygenui-design/theme": patch
+"@zoblocks/theme": patch
 ---
 
 App screens for import, export, comparison and typography.

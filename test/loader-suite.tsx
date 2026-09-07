@@ -1,5 +1,5 @@
 /**
- * The behaviour every Oxygen loader shares, as one reusable suite.
+ * The behaviour every Zoblocks loader shares, as one reusable suite.
  *
  * Five loaders differ only in their art. Everything a reader hears, everything
  * a timing decision does, and every rule about motion is in the frame they all
@@ -19,14 +19,14 @@ import { itMeetsTheContract } from "./contract";
 export interface LoaderSuiteOptions {
   /** Display name used in the test titles. */
   name: string;
-  /** The value of `data-ox-loader` this component sets. */
+  /** The value of `data-zb-loader` this component sets. */
   variant: string;
   Loader: ComponentType<Record<string, unknown>>;
 }
 
 /** The root element the loader rendered, or null when it rendered nothing. */
 function root(container: HTMLElement): HTMLElement | null {
-  return container.querySelector<HTMLElement>("[data-ox-loader]");
+  return container.querySelector<HTMLElement>("[data-zb-loader]");
 }
 
 export function describeLoaderContract({ name, variant, Loader }: LoaderSuiteOptions): void {
@@ -39,7 +39,7 @@ export function describeLoaderContract({ name, variant, Loader }: LoaderSuiteOpt
 
     it("marks itself with its variant name", () => {
       const view = render(<Loader label="Loading results" />);
-      expect(root(view.container)).toHaveAttribute("data-ox-loader", variant);
+      expect(root(view.container)).toHaveAttribute("data-zb-loader", variant);
     });
 
     it("renders exactly one SVG, and hides it from assistive technology", () => {
@@ -48,7 +48,7 @@ export function describeLoaderContract({ name, variant, Loader }: LoaderSuiteOpt
       expect(svgs).toHaveLength(1);
       // The art sits inside an aria-hidden wrapper. A decorative mark that
       // announces itself is a second, meaningless label on every wait.
-      expect(view.container.querySelector(".ox-loader__art")).toHaveAttribute(
+      expect(view.container.querySelector(".zb-loader__art")).toHaveAttribute(
         "aria-hidden",
         "true",
       );
@@ -78,17 +78,17 @@ export function describeLoaderContract({ name, variant, Loader }: LoaderSuiteOpt
       // still a rendered label.
       const view = render(<Loader label="Loading your results" showLabel={false} />);
       expect(view.container.textContent).toContain("Loading your results");
-      expect(view.container.querySelector(".ox-loader__sr")).not.toBeNull();
+      expect(view.container.querySelector(".zb-loader__sr")).not.toBeNull();
     });
 
     it("shows the label as text when asked", () => {
       render(<Loader label="Loading your results" showLabel />);
-      expect(screen.getByText("Loading your results")).toHaveClass("ox-loader__label");
+      expect(screen.getByText("Loading your results")).toHaveClass("zb-loader__label");
     });
 
     it("shows the label by default in page and overlay modes", () => {
       const view = render(<Loader label="Loading your results" mode="page" />);
-      expect(view.container.querySelector(".ox-loader__label")).not.toBeNull();
+      expect(view.container.querySelector(".zb-loader__label")).not.toBeNull();
     });
 
     it("can be silenced for a region that is already live", () => {
@@ -114,9 +114,9 @@ export function describeLoaderContract({ name, variant, Loader }: LoaderSuiteOpt
     /* ---------------------------------------------------------------- */
 
     it.each([
-      ["inline", "ox-loader--inline"],
-      ["overlay", "ox-loader--overlay"],
-      ["page", "ox-loader--page"],
+      ["inline", "zb-loader--inline"],
+      ["overlay", "zb-loader--overlay"],
+      ["page", "zb-loader--page"],
     ])("places itself for mode=%s", (mode, expected) => {
       const view = render(<Loader label="Loading" mode={mode} />);
       expect(root(view.container)).toHaveClass(expected);
@@ -124,19 +124,19 @@ export function describeLoaderContract({ name, variant, Loader }: LoaderSuiteOpt
 
     it("draws a scrim behind overlay and page, and never inline", () => {
       const overlay = render(<Loader label="Loading" mode="overlay" />);
-      expect(root(overlay.container)).toHaveAttribute("data-ox-scrim", "true");
+      expect(root(overlay.container)).toHaveAttribute("data-zb-scrim", "true");
 
       const off = render(<Loader label="Loading" mode="overlay" scrim={false} />);
-      expect(root(off.container)).toHaveAttribute("data-ox-scrim", "false");
+      expect(root(off.container)).toHaveAttribute("data-zb-scrim", "false");
 
       const inline = render(<Loader label="Loading" mode="inline" />);
-      expect(root(inline.container)).not.toHaveAttribute("data-ox-scrim");
+      expect(root(inline.container)).not.toHaveAttribute("data-zb-scrim");
     });
 
     it("merges a caller's className instead of replacing its own", () => {
       const view = render(<Loader label="Loading" className="my-8" />);
       const element = root(view.container);
-      expect(element).toHaveClass("ox-loader");
+      expect(element).toHaveClass("zb-loader");
       expect(element).toHaveClass("my-8");
     });
 
@@ -152,7 +152,7 @@ export function describeLoaderContract({ name, variant, Loader }: LoaderSuiteOpt
 
     it.each(["auto", "reduced", "full"])("records motion=%s for CSS to act on", (motion) => {
       const view = render(<Loader label="Loading" motion={motion} />);
-      expect(root(view.container)).toHaveAttribute("data-ox-motion", motion);
+      expect(root(view.container)).toHaveAttribute("data-zb-motion", motion);
     });
 
     /* ---------------------------------------------------------------- */
@@ -167,12 +167,12 @@ export function describeLoaderContract({ name, variant, Loader }: LoaderSuiteOpt
       expect(markup).not.toMatch(/#[0-9a-f]{3,8}\b/i);
       expect(markup).not.toMatch(/\brgba?\(/);
       expect(markup).not.toMatch(/\bhsla?\(/);
-      expect(markup).not.toMatch(/--ox-ref-/);
+      expect(markup).not.toMatch(/--zb-ref-/);
     });
 
     it("sizes itself through a custom property rather than a hard-coded width", () => {
       const view = render(<Loader label="Loading" size={64} />);
-      expect(root(view.container)?.style.getPropertyValue("--ox-loader-size")).toBe("64px");
+      expect(root(view.container)?.style.getPropertyValue("--zb-loader-size")).toBe("64px");
     });
 
     it.each([
@@ -182,12 +182,12 @@ export function describeLoaderContract({ name, variant, Loader }: LoaderSuiteOpt
       ["xl", "88px"],
     ])("resolves the %s size step to %s", (size, expected) => {
       const view = render(<Loader label="Loading" size={size} />);
-      expect(root(view.container)?.style.getPropertyValue("--ox-loader-size")).toBe(expected);
+      expect(root(view.container)?.style.getPropertyValue("--zb-loader-size")).toBe(expected);
     });
 
     it("clamps an absurd size rather than rendering it", () => {
       const view = render(<Loader label="Loading" size={9000} />);
-      expect(root(view.container)?.style.getPropertyValue("--ox-loader-size")).toBe("480px");
+      expect(root(view.container)?.style.getPropertyValue("--zb-loader-size")).toBe("480px");
     });
 
     /* ---------------------------------------------------------------- */
@@ -311,7 +311,7 @@ export function describeLoaderContract({ name, variant, Loader }: LoaderSuiteOpt
           <Loader label="Loading" showLabel actions={<button type="button">Go back</button>} />,
         );
         expect(screen.getByRole("button", { name: "Go back" })).toBeInTheDocument();
-        expect(view.container.querySelector(".ox-loader__actions")).not.toBeNull();
+        expect(view.container.querySelector(".zb-loader__actions")).not.toBeNull();
       });
     });
   });

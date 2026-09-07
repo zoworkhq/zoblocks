@@ -7,7 +7,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/chart-command-palette/chart-command-palette.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/chart-command-palette/chart-command-palette.tsx. Edit that file, not this one.
 /**
  * ChartCommandPalette — a palette for a place where search is a regulated act.
  *
@@ -33,7 +33,7 @@
  *   confirmation happens inside the palette, because handing off to a modal
  *   loses the keyboard user the palette was built for.
  *
- * Styling lives in `styles/oxygen-palette.css`, installed alongside.
+ * Styling lives in `styles/zoblocks-palette.css`, installed alongside.
  */
 
 import * as React from "react";
@@ -238,12 +238,12 @@ export function ChartCommandPalette({
   };
 
   return (
-    <div className={cn("ox-palette", className)} data-ox-palette="" role="presentation">
-      <div className="ox-palette__panel">
+    <div className={cn("zb-palette", className)} data-zb-palette="" role="presentation">
+      <div className="zb-palette__panel">
         <input
           ref={input}
           type="text"
-          className="ox-palette__input"
+          className="zb-palette__input"
           value={term}
           placeholder={placeholder}
           onChange={(event) => setTerm(event.target.value)}
@@ -266,16 +266,16 @@ export function ChartCommandPalette({
           pretending to be options, which is what `role="presentation"` inside
           a listbox amounts to.
         */}
-        <div className="ox-palette__results">
-          <div id={listId} className="ox-palette__list" role="listbox" aria-label="Results">
+        <div className="zb-palette__results">
+          <div id={listId} className="zb-palette__list" role="listbox" aria-label="Results">
             {grouped.map((entry) => (
               <div
                 key={entry.kind}
-                className="ox-palette__group"
+                className="zb-palette__group"
                 role="group"
                 aria-label={ITEM_KIND_LABEL[entry.kind]}
               >
-                <p className="ox-palette__group-label" aria-hidden="true">
+                <p className="zb-palette__group-label" aria-hidden="true">
                   {ITEM_KIND_LABEL[entry.kind]}
                 </p>
                 {entry.items.map(({ item }) => {
@@ -294,12 +294,12 @@ export function ChartCommandPalette({
                       role="option"
                       aria-selected={isActive}
                       aria-disabled={item.unavailable ? true : undefined}
-                      className="ox-palette__option"
-                      data-ox-kind={item.kind}
-                      data-ox-active={isActive ? "" : undefined}
-                      data-ox-significant={item.significant ? "" : undefined}
-                      data-ox-armed={armed ? "" : undefined}
-                      data-ox-unavailable={item.unavailable ? "" : undefined}
+                      className="zb-palette__option"
+                      data-zb-kind={item.kind}
+                      data-zb-active={isActive ? "" : undefined}
+                      data-zb-significant={item.significant ? "" : undefined}
+                      data-zb-armed={armed ? "" : undefined}
+                      data-zb-unavailable={item.unavailable ? "" : undefined}
                       onMouseDown={(event) => {
                         // Mousedown rather than click: click would blur the
                         // input first and the combobox would lose its own
@@ -309,12 +309,12 @@ export function ChartCommandPalette({
                         activate(item);
                       }}
                     >
-                      <span className="ox-palette__label">{item.label}</span>
+                      <span className="zb-palette__label">{item.label}</span>
                       {item.detail ? (
-                        <span className="ox-palette__detail">{item.detail}</span>
+                        <span className="zb-palette__detail">{item.detail}</span>
                       ) : null}
                       {item.argument ? (
-                        <span className="ox-palette__argument">↹ {item.argument.label}</span>
+                        <span className="zb-palette__argument">↹ {item.argument.label}</span>
                       ) : null}
                       {/*
                         An unavailable action is shown with its reason rather
@@ -322,10 +322,10 @@ export function ChartCommandPalette({
                         does not exist; showing it teaches them to reconnect.
                       */}
                       {item.unavailable ? (
-                        <span className="ox-palette__unavailable">{item.unavailable.reason}</span>
+                        <span className="zb-palette__unavailable">{item.unavailable.reason}</span>
                       ) : null}
                       {armed ? (
-                        <span className="ox-palette__confirm">Press Enter again to confirm</span>
+                        <span className="zb-palette__confirm">Press Enter again to confirm</span>
                       ) : null}
                     </div>
                   );
@@ -339,24 +339,24 @@ export function ChartCommandPalette({
             A row, not a footnote: a reader who does not see it concludes the
             search was empty, which is the one wrong conclusion available.
           */}
-          {withheld ? <p className="ox-palette__withheld">{withheld}</p> : null}
+          {withheld ? <p className="zb-palette__withheld">{withheld}</p> : null}
 
           {/* Before anything is typed there is no search and nothing to
               report — including nothing to count, which matters: a withheld
               total on an empty input discloses the size of the index. */}
           {!term.trim() ? (
-            <p className="ox-palette__empty">
+            <p className="zb-palette__empty">
               Type to search, or start with a verb — “start”, “order”, “open”.
             </p>
           ) : null}
 
           {term.trim() && !flat.length && !withheld ? (
-            <p className="ox-palette__empty">Nothing matches “{term}”.</p>
+            <p className="zb-palette__empty">Nothing matches “{term}”.</p>
           ) : null}
         </div>
 
         {/* Debounced, so typing is not a running commentary. */}
-        <p className="ox-palette__sr" aria-live="polite">
+        <p className="zb-palette__sr" aria-live="polite">
           {announced}
         </p>
       </div>

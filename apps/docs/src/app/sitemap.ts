@@ -15,7 +15,7 @@ import { shelf } from "@/lib/marketplace";
  * that is the URL the canonical tag on the page points at. Two different URLs
  * for the same page is the specific mistake a sitemap is supposed to prevent.
  */
-const SITE = "https://oxygenui.design";
+const SITE = "https://zoblocks.design";
 
 const STATIC_ROUTES: ReadonlyArray<{ path: string; priority: number }> = [
   { path: "", priority: 1 },

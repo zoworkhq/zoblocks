@@ -1,11 +1,11 @@
 /**
- * @oxygenui-design/recorder-core — the engine behind Oxygen's Recorder.
+ * @zoblocks/recorder-core — the engine behind Zoblocks's Recorder.
  *
  * No React, no Ant Design, no DOM, no dependencies. It accepts an analyser
  * and a delta and returns a level, a bucket and a phase — including every
  * case where the microphone is open and nothing is arriving.
  *
- *     import { createSignal, PeakBuffer, createRecorderMachine } from "@oxygenui-design/recorder-core";
+ *     import { createSignal, PeakBuffer, createRecorderMachine } from "@zoblocks/recorder-core";
  *
  *     const signal = createSignal({ source: analyser });
  *     const peaks = new PeakBuffer();
@@ -23,7 +23,7 @@
  * — because a perfectly flat waveform and a quiet room look identical, and
  * only one of them is a fault.
  *
- * The React surface, the five arts and the stylesheet live in the Oxygen
+ * The React surface, the five arts and the stylesheet live in the Zoblocks
  * registry. This package is what stays the same whichever way that goes.
  */
 

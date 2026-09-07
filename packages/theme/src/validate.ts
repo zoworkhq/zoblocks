@@ -1,7 +1,7 @@
 /**
  * A customer theme, judged by the same gate the build uses.
  *
- * There is exactly one validator. It lives in `@oxygenui-design/tokens/validate`
+ * There is exactly one validator. It lives in `@zoblocks/tokens/validate`
  * as pure functions so that the build, the app's live preview, and the
  * server-side publish check all call identical code — because a customer whose
  * palette passed in the browser and failed in CI has been told two different
@@ -19,8 +19,8 @@ import {
   type Brand,
   type TokenProblem,
   type TokenSource,
-} from "@oxygenui-design/tokens/validate";
-import { surfaceEntry } from "@oxygenui-design/tokens/surface";
+} from "@zoblocks/tokens/validate";
+import { surfaceEntry } from "@zoblocks/tokens/surface";
 import {
   withTierDefaults,
   type ThemeDocument,
@@ -97,7 +97,7 @@ export function sourceWithOverrides(source: TokenSource, tokens: ThemeTokensInpu
  * Component overrides the manifest refuses, or that are the wrong sort of value.
  *
  * Two checks the schema cannot do on its own: it does not have the manifest, so
- * it cannot tell `--ox-badge-critical-bg` (real) from `--ox-badge-critcal-bg`
+ * it cannot tell `--zb-badge-critical-bg` (real) from `--zb-badge-critcal-bg`
  * (a typo that would silently style nothing), and it cannot tell that a token
  * declared `kind: "color"` was given `3px`.
  */
@@ -173,7 +173,7 @@ export function validateTheme(
    * changes the *base* palette the gate walks, and the gate reports those
    * without a brand prefix — so filtering on the prefix alone would have let a
    * customer move `text-muted` to something unreadable and publish it, with the
-   * failure attributed to Oxygen and shown to nobody.
+   * failure attributed to Zoblocks and shown to nobody.
    *
    * Base problems are therefore included whenever the theme overrides anything
    * semantic, and only then: with no overrides the base palette is ours, it

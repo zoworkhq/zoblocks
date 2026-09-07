@@ -15,7 +15,7 @@
 
 import { describe, expect, it } from "vitest";
 import { loadTokenSource } from "../../../scripts/gen/tokens/load";
-import type { TokenSource } from "@oxygenui-design/tokens/validate";
+import type { TokenSource } from "@zoblocks/tokens/validate";
 import { ThemeError, createTheme, publishTheme, setThemeArchived, versionCss } from "@/lib/themes";
 import { twoOrgs } from "./harness";
 

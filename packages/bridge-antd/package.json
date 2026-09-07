@@ -1,12 +1,12 @@
 {
-  "name": "@oxygenui-design/bridge-antd",
+  "name": "@zoblocks/bridge-antd",
   "version": "0.1.0",
-  "description": "Theme bridge for Ant Design: reads a host's resolved antd theme and writes Oxygen's component token surface, so Oxygen components take the host's design language without importing antd.",
+  "description": "Theme bridge for Ant Design: reads a host's resolved antd theme and writes Zoblocks's component token surface, so Zoblocks components take the host's design language without importing antd.",
   "license": "MIT",
-  "homepage": "https://oxygenui.design",
+  "homepage": "https://zoblocks.design",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zoworkhq/oxygenui.git",
+    "url": "git+https://github.com/zoworkhq/zoblocks.git",
     "directory": "packages/bridge-antd"
   },
   "keywords": [
@@ -61,14 +61,14 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@oxygenui-design/bridge-core": "workspace:*"
+    "@zoblocks/bridge-core": "workspace:*"
   },
   "peerDependencies": {
     "antd": "^6.0.0",
     "react": "^18.2.0 || ^19.0.0"
   },
   "devDependencies": {
-    "@oxygenui-design/tsconfig": "workspace:*",
+    "@zoblocks/tsconfig": "workspace:*",
     "@testing-library/react": "^16",
     "@types/react": "^19.0.2",
     "@vitest/coverage-v8": "^4.1.10",

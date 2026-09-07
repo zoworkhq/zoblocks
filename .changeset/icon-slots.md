@@ -1,7 +1,7 @@
 ---
-"@oxygenui-design/theme": minor
-"@oxygenui-design/copilot-react": minor
-"@oxygenui-design/copilot": minor
+"@zoblocks/theme": minor
+"@zoblocks/copilot-react": minor
+"@zoblocks/copilot": minor
 ---
 
 Customer icon overrides, for the twenty-nine glyphs that are actually swappable
@@ -21,7 +21,7 @@ locked with the reason attached — a refusal nobody can see reads as a missing
 feature — and the schema will not accept them.
 
 **The mechanism is a CSS mask, not a React provider.** Every glyph is now a
-span whose shape comes from `mask-image: var(--ox-icon-{slot}, <built-in>)`, so
+span whose shape comes from `mask-image: var(--zb-icon-{slot}, <built-in>)`, so
 an unset property draws what shipped and a set one draws the customer's. A
 provider was the obvious design and the wrong one: the Tailwind skin is a file
 copied _into_ the customer's tree and does not import our context, and a

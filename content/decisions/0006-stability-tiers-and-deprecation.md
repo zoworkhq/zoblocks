@@ -27,7 +27,7 @@ what semver promises about it.**
 
 | Status         | Export path                    | Breaking-change policy                       |
 | -------------- | ------------------------------ | -------------------------------------------- |
-| `experimental` | `@oxygenui/react/experimental` | may break in any minor                       |
+| `experimental` | `@zoblocks/react/experimental` | may break in any minor                       |
 | `beta`         | main barrel, flagged in docs   | may break in a minor, noted in the changeset |
 | `stable`       | main barrel                    | breaks only in a major                       |
 | `deprecated`   | main barrel, dev-time warning  | removed in the next major                    |
@@ -42,7 +42,7 @@ does not make the package's semver a lie.
    the metadata.
 2. A development-only `console.warn` naming the replacement, stripped from
    production builds.
-3. A codemod shipped in `@oxygenui/codemod` **in the same release** as the
+3. A codemod shipped in `@zoblocks/codemod` **in the same release** as the
    deprecation, not later.
 4. Minimum two minor versions of overlap.
 5. Removal in the next major, listed in the migration guide.

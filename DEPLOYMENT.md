@@ -57,7 +57,7 @@ hq is a **separate Vercel project** on the same repository:
    user **scoped to the `hq` database** — see below. hq always opens the
    database named `hq` inside that cluster, never the site's, so the two cannot
    collide.
-3. Move the `hq.oxygenui.design` domain onto it. It is currently attached to the
+3. Move the `hq.zoblocks.design` domain onto it. It is currently attached to the
    docs project, which would serve the marketing site from that hostname.
 4. Add `VERCEL_PROJECT_ID_HQ` and `HQ_DATABASE_URL` to the repository.
 5. Run `hq-indexes` once, then merge to `main`.
@@ -119,11 +119,11 @@ A 200 response is not evidence that a deploy worked. Both production jobs check
 the thing that would actually be broken:
 
 - **docs** — fetches the deployed registry and fails unless it references
-  `@oxygenui-design/fhir` _and_ the dependency is version-pinned. A stale or
+  `@zoblocks/fhir` _and_ the dependency is version-pinned. A stale or
   malformed registry is a broken install for every customer, and it is precisely
   what went unnoticed for three merges.
 - **hq** — requests `/tasks` signed out and fails unless it redirects. A wrong
-  Root Directory would serve the marketing site from `hq.oxygenui.design`, and
+  Root Directory would serve the marketing site from `hq.zoblocks.design`, and
   that redirect is what distinguishes them.
 
 The release job inspects the tarball before publishing: entry points present,

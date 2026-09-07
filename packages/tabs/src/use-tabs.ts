@@ -4,7 +4,7 @@
  * `useTabs` — the headless layer.
  *
  * Returns prop getters, so a team whose design bears no resemblance to any of
- * the eleven skins can still have Oxygen's keyboard model and accessibility
+ * the eleven skins can still have Zoblocks's keyboard model and accessibility
  * tree rather than reinventing both badly. This is the escape hatch that stops
  * a customer forking the package.
  *
@@ -30,7 +30,7 @@ import {
   type Orientation,
   type SemanticMode,
   type TabItem,
-} from "@oxygenui-design/tabs-core";
+} from "@zoblocks/tabs-core";
 import { useControllableValue, useTabsKeyboard, useValidateConfig } from "./internal.js";
 
 export interface UseTabsOptions {
@@ -58,7 +58,7 @@ export interface TriggerProps {
   "aria-current"?: "page" | undefined;
   "aria-controls"?: string | undefined;
   "aria-disabled"?: true | undefined;
-  "data-ox-value": string;
+  "data-zb-value": string;
   href?: string | undefined;
 }
 
@@ -101,7 +101,7 @@ export function useTabs(options: UseTabsOptions): UseTabsApi {
   } = options;
 
   const generatedId = React.useId();
-  const base = idPrefix ?? `ox-tabs-${generatedId.replace(/:/g, "")}`;
+  const base = idPrefix ?? `zb-tabs-${generatedId.replace(/:/g, "")}`;
   const roles = rolesFor(mode);
   const elements = React.useRef<(HTMLElement | null)[]>([]);
   const [pending, setPending] = React.useState(false);
@@ -204,7 +204,7 @@ export function useTabs(options: UseTabsOptions): UseTabsApi {
         onClick: () => {
           void gate.request(item.value, "pointer", item);
         },
-        "data-ox-value": item.value,
+        "data-zb-value": item.value,
         ...(item.disabled ? { "aria-disabled": true as const } : {}),
       };
 

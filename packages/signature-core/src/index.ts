@@ -1,11 +1,11 @@
 /**
- * @oxygenui-design/signature-core — the engine behind Oxygen's Signature.
+ * @zoblocks/signature-core — the engine behind Zoblocks's Signature.
  *
  * No React, no Ant Design, no DOM. It accepts plain samples and returns a
  * stroke model, SVG, and a value that says what actually happened — including
  * the cases where nobody signed.
  *
- *     import { SignatureCapture, toInk, toFhirBundle } from "@oxygenui-design/signature-core";
+ *     import { SignatureCapture, toInk, toFhirBundle } from "@zoblocks/signature-core";
  *
  *     const pad = new SignatureCapture();
  *     pad.down({ x: 10, y: 40, t: 0, pointerType: "pen" });
@@ -16,7 +16,7 @@
  *     toInk(pad.strokes).svg; // trimmed, themeable, printable
  *
  * The React surface, the Ant Design dialog, and the read-only manifest live in
- * `@oxygenui-design/signature`. This package is what stays the same whichever
+ * `@zoblocks/signature`. This package is what stays the same whichever
  * way that goes.
  */
 

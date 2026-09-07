@@ -234,15 +234,15 @@ export default async function MarketItemPage({ params }: { params: Promise<{ slu
 
           {item.kind === "component" && (
             <pre className="mt-4 overflow-x-auto rounded-lg bg-panel p-3 font-mono text-[0.6875rem] text-panel-fg">
-              {`// oxygen.json
+              {`// zoblocks.json
 "registries": {
-  "@oxygen-pro": {
-    "url": "${"https://app.oxygenui.design/r/pro/{name}.json"}",
-    "headers": { "Authorization": "Bearer \${OXYGEN_TOKEN}" }
+  "@zoblocks-pro": {
+    "url": "${"https://app.zoblocks.design/r/pro/{name}.json"}",
+    "headers": { "Authorization": "Bearer \${ZOBLOCKS_TOKEN}" }
   }
 }
 
-npx @oxygenui-design/cli add @oxygen-pro/${item.slug}`}
+npx @zoblocks/cli add @zoblocks-pro/${item.slug}`}
             </pre>
           )}
         </Panel>

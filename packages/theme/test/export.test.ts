@@ -8,8 +8,8 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { antdBridge } from "@oxygenui-design/bridge-antd";
-import { muiBridge } from "@oxygenui-design/bridge-mui";
+import { antdBridge } from "@zoblocks/bridge-antd";
+import { muiBridge } from "@zoblocks/bridge-mui";
 import { exportTheme, importDtcg, importFrameworkTheme } from "../src/index";
 import { publishedTheme } from "./fixture";
 
@@ -41,7 +41,7 @@ describe("DTCG", () => {
 
 describe("CSS and Tailwind", () => {
   it("emits the same stylesheet the CDN serves", () => {
-    expect(exportTheme(publishedTheme(), "css").body).toContain("--ox-ref-brand-600: #1d63c9;");
+    expect(exportTheme(publishedTheme(), "css").body).toContain("--zb-ref-brand-600: #1d63c9;");
   });
 
   it("emits a Tailwind v4 theme block", () => {
@@ -56,21 +56,21 @@ describe("the framework exports", () => {
    * A resolved theme, the way the app supplies one.
    *
    * These two formats are the bridges' tables read backwards, and a bridge
-   * maps *semantic* tokens — `--ox-accent`, not `ref.brand.600`. Passing a
+   * maps *semantic* tokens — `--zb-accent`, not `ref.brand.600`. Passing a
    * document alone used to produce a four-token file that looked like it had
    * worked; the signature now asks for the thing the mapping actually needs.
    */
   const RESOLVED = {
-    "--ox-accent": "#1d63c9",
-    "--ox-accent-hover": "#1851a5",
-    "--ox-accent-subtle": "#f2f6fd",
-    "--ox-accent-border": "#c1d6f6",
-    "--ox-text": "#16181d",
-    "--ox-bg": "#ffffff",
-    "--ox-surface": "#ffffff",
-    "--ox-border": "#dfe3e8",
-    "--ox-radius": "0.5rem",
-    "--ox-font-sans": "Instrument Sans, system-ui, sans-serif",
+    "--zb-accent": "#1d63c9",
+    "--zb-accent-hover": "#1851a5",
+    "--zb-accent-subtle": "#f2f6fd",
+    "--zb-accent-border": "#c1d6f6",
+    "--zb-text": "#16181d",
+    "--zb-bg": "#ffffff",
+    "--zb-surface": "#ffffff",
+    "--zb-border": "#dfe3e8",
+    "--zb-radius": "0.5rem",
+    "--zb-font-sans": "Instrument Sans, system-ui, sans-serif",
   };
 
   it("writes the customer's brand in antd's vocabulary", () => {
@@ -92,7 +92,7 @@ describe("the framework exports", () => {
   it("writes only tokens the matching bridge treats as counterparts", () => {
     const antd = exportTheme(publishedTheme(), "antd", RESOLVED).body;
     for (const unmapped of antdBridge.unmapped) {
-      // The bridge's unmapped list is in `--ox-*` terms; what matters is that
+      // The bridge's unmapped list is in `--zb-*` terms; what matters is that
       // nothing clinical appears in the export at all.
       if (!unmapped.includes("status") && !unmapped.includes("flag")) continue;
       expect(antd.toLowerCase()).not.toContain("colorerror");
@@ -100,7 +100,7 @@ describe("the framework exports", () => {
     }
     const mui = exportTheme(publishedTheme(), "mui", RESOLVED).body;
     expect(mui).not.toContain("error");
-    expect(muiBridge.unmapped).toContain("--ox-status-critical");
+    expect(muiBridge.unmapped).toContain("--zb-status-critical");
   });
 
   it("says at the point of use that it is chrome only", () => {

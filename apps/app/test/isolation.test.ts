@@ -16,7 +16,7 @@ import { describe, expect, it } from "vitest";
 import { scoped } from "@/db/scope";
 import { createTheme, publishTheme, saveDraft } from "@/lib/themes";
 import { loadTokenSource } from "../../../scripts/gen/tokens/load";
-import type { TokenSource } from "@oxygenui-design/tokens/validate";
+import type { TokenSource } from "@zoblocks/tokens/validate";
 import { twoOrgs, storedTokens } from "./harness";
 
 let base: TokenSource;

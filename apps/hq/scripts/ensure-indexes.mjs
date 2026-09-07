@@ -10,7 +10,7 @@
  *
  * Idempotent: safe to run against a live database, and safe to run twice.
  *
- *   pnpm --filter @oxygenui-design/hq db:indexes
+ *   pnpm --filter @zoblocks/hq db:indexes
  */
 
 import { readFileSync } from "node:fs";

@@ -13,8 +13,8 @@ import { afterEach, describe, expect, it } from "vitest";
 import { readFileSync, existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { Accordion } from "../registry/oxygen/accordion/accordion";
-import type { AccordionItem } from "../registry/oxygen/lib/accordion-core";
+import { Accordion } from "../registry/zoblocks/accordion/accordion";
+import type { AccordionItem } from "../registry/zoblocks/lib/accordion-core";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = (p: string) => readFileSync(path.join(ROOT, p), "utf8");
@@ -33,7 +33,7 @@ describe("printing", () => {
     { key: "w", label: "Psychotherapy notes", access: { kind: "withheld", reason: "Author only" } },
   ];
 
-  const panels = (c: HTMLElement) => [...c.querySelectorAll<HTMLElement>(".ox-accordion__panel")];
+  const panels = (c: HTMLElement) => [...c.querySelectorAll<HTMLElement>(".zb-accordion__panel")];
 
   it("unhides permitted sections before the dialog opens", async () => {
     // content-visibility: hidden cannot be undone from a print stylesheet for a
@@ -111,8 +111,8 @@ describe("the registry item", () => {
     // one means every panel is permanently visible — the CSS is what asserts
     // the hiding that `display: grid` overrode.
     const targets = core.files.map((f: { target: string }) => f.target);
-    expect(targets).toContain("lib/oxygen-accordion.tsx");
-    expect(targets).toContain("styles/oxygen-accordion.css");
+    expect(targets).toContain("lib/zoblocks-accordion.tsx");
+    expect(targets).toContain("styles/zoblocks-accordion.css");
   });
 
   it("carries the real source, not a placeholder", () => {
@@ -130,7 +130,7 @@ describe("the registry item", () => {
     ] as const) {
       /*
        * Bare names, not URLs. ADR 0016 stopped expanding registry dependencies
-       * to absolute oxygenui.design URLs so that a mirror resolves within
+       * to absolute zoblocks.design URLs so that a mirror resolves within
        * itself; a dependency is now a relationship rather than a location.
        */
       expect(
@@ -168,7 +168,7 @@ describe("the npm package", () => {
   it("generates the accordion source from the registry, not by hand", () => {
     const generated = read("packages/react/src/components/accordion/accordion.tsx");
     expect(generated).toContain("GENERATED FILE — DO NOT EDIT");
-    expect(generated).toContain("registry/oxygen/accordion/accordion.tsx");
+    expect(generated).toContain("registry/zoblocks/accordion/accordion.tsx");
   });
 
   it("keeps the client directive first, ahead of the banner", () => {
@@ -180,23 +180,23 @@ describe("the npm package", () => {
 
   it("rewrites consumer specifiers to package-relative ones", () => {
     const generated = read("packages/react/src/components/accordion/accordion.tsx");
-    expect(generated).not.toContain("@/lib/oxygen-accordion");
+    expect(generated).not.toContain("@/lib/zoblocks-accordion");
     expect(generated).toContain('"../../lib/accordion-core"');
   });
 
   it("keeps the registry and the package byte-identical below the header", () => {
     // Two hand-written trees drift. The parity check is what makes "generated"
     // mean something.
-    const source = read("registry/oxygen/accordion/accordion.tsx");
+    const source = read("registry/zoblocks/accordion/accordion.tsx");
     const generated = read("packages/react/src/components/accordion/accordion.tsx");
 
     const normalise = (text: string) =>
       text
         .replace(/^"use client";\s*/, "")
         .replace(/\/\/ GENERATED FILE[\s\S]*?not this one\.\n/, "")
-        .replace(/@\/lib\/oxygen-accordion/g, "../../lib/accordion-core")
+        .replace(/@\/lib\/zoblocks-accordion/g, "../../lib/accordion-core")
         .replace(/@\/lib\/utils/g, "../../lib/utils")
-        .replace(/@\/components\/oxygen\/([a-z0-9-]+)/g, "../../components/$1/$1")
+        .replace(/@\/components\/zoblocks\/([a-z0-9-]+)/g, "../../components/$1/$1")
         .trim();
 
     expect(normalise(generated)).toBe(normalise(source));
@@ -209,8 +209,8 @@ describe("the npm package", () => {
     expect(existsSync(path.join(ROOT, "packages/react/src/styles/loader.css"))).toBe(true);
 
     const bundle = read("packages/react/src/styles.css");
-    expect(bundle).toContain(".ox-accordion__panel");
-    expect(bundle).toContain(".ox-loader");
+    expect(bundle).toContain(".zb-accordion__panel");
+    expect(bundle).toContain(".zb-loader");
   });
 
   it("exports the behaviour layer from the barrel", () => {
@@ -225,7 +225,7 @@ describe("the npm package", () => {
 /* ------------------------------------------------------------------ */
 
 describe("the stylesheet", () => {
-  const css = read("registry/oxygen/lib/accordion.css");
+  const css = read("registry/zoblocks/lib/accordion.css");
   /**
    * Declarations only.
    *
@@ -238,7 +238,7 @@ describe("the stylesheet", () => {
     // Without this the panel is visible in every browser without
     // hidden=until-found support — the single highest-consequence line in the
     // file.
-    expect(css).toMatch(/\.ox-accordion__panel\[hidden\]\s*\{[^}]*content-visibility:\s*hidden/);
+    expect(css).toMatch(/\.zb-accordion__panel\[hidden\]\s*\{[^}]*content-visibility:\s*hidden/);
   });
 
   it("animates without measuring anything", () => {
@@ -252,7 +252,7 @@ describe("the stylesheet", () => {
     // A component that reaches past the semantic tier silently ignores a brand
     // override, and on a severity rail that means rendering someone else's
     // critical colour.
-    expect(declarations).not.toMatch(/--ox-ref-/);
+    expect(declarations).not.toMatch(/--zb-ref-/);
   });
 
   it("uses logical properties throughout", () => {
@@ -272,7 +272,7 @@ describe("the stylesheet", () => {
   });
 
   it("keeps the target above the WCAG 2.2 floor whatever the density", () => {
-    expect(css).toContain("max(var(--ox-accordion-target), var(--ox-density-target-floor))");
+    expect(css).toContain("max(var(--zb-accordion-target), var(--zb-density-target-floor))");
   });
 
   it("designs the reduced-motion and forced-colors states rather than ignoring them", () => {
@@ -287,32 +287,32 @@ describe("the stylesheet", () => {
 /* ------------------------------------------------------------------ */
 
 describe("tokens", () => {
-  const emitted = read("packages/tokens/src/oxygen-tokens.css");
+  const emitted = read("packages/tokens/src/zoblocks-tokens.css");
 
   it("emits a rail for every severity plus restricted", () => {
     for (const key of ["critical", "high", "low", "normal", "unknown", "restricted"]) {
-      expect(emitted, key).toContain(`--ox-accordion-rail-${key}:`);
+      expect(emitted, key).toContain(`--zb-accordion-rail-${key}:`);
     }
   });
 
   it("routes severity rails through the status scale, and restricted through flags", () => {
     // Restricted describes the record's legal standing, not a measurement. The
     // same distinction PatientBanner already makes.
-    expect(emitted).toContain("--ox-accordion-rail-critical: var(--ox-status-critical)");
-    expect(emitted).toContain("--ox-accordion-rail-restricted: var(--ox-flag-restricted)");
+    expect(emitted).toContain("--zb-accordion-rail-critical: var(--zb-status-critical)");
+    expect(emitted).toContain("--zb-accordion-rail-restricted: var(--zb-flag-restricted)");
   });
 
   it("gives every density profile a duration", () => {
     const profiles = ["patient", "standard", "clinical"];
     for (const profile of profiles) {
-      const block = emitted.split(`[data-ox-density="${profile}"]`)[1]?.split("}")[0] ?? "";
-      expect(block, profile).toContain("--ox-density-duration");
+      const block = emitted.split(`[data-zb-density="${profile}"]`)[1]?.split("}")[0] ?? "";
+      expect(block, profile).toContain("--zb-density-duration");
     }
   });
 
   it("makes the accordion read its duration from density", () => {
     // Motion belongs to density for the same reason spacing does: the same
     // component serves a nurse scanning ninety rows and a patient reading one.
-    expect(emitted).toContain("--ox-accordion-duration: var(--ox-density-duration)");
+    expect(emitted).toContain("--zb-accordion-duration: var(--zb-density-duration)");
   });
 });

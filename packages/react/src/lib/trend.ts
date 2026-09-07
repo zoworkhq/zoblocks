@@ -5,7 +5,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/lib/trend.ts. Edit that file, not this one.
+// Generated from registry/zoblocks/lib/trend.ts. Edit that file, not this one.
 /**
  * A sparkline is a claim that the points are comparable.
  *

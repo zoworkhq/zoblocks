@@ -1,6 +1,6 @@
 ---
-"@oxygenui-design/tokens": minor
-"@oxygenui-design/theme": minor
+"@zoblocks/tokens": minor
+"@zoblocks/theme": minor
 ---
 
 DTCG spec compliance at the boundary, and themes in five formats.
@@ -20,7 +20,7 @@ the spec form and back, byte-identical.
 
 **Five exports.** DTCG, CSS, Tailwind `@theme`, an antd `ConfigProvider` token
 object, and an MUI `createTheme` call. The last two are the bridge mapping
-tables run backwards — a bridge reads `colorPrimary` and writes `--ox-accent`;
+tables run backwards — a bridge reads `colorPrimary` and writes `--zb-accent`;
 the export reads the accent and writes `colorPrimary` — so a customer can theme
 their _own_ antd or MUI components from the brand they configured once, and the
 correspondence stays correct automatically when a bridge is corrected.

@@ -57,7 +57,7 @@ describe("the public barrel", () => {
 describe("rendering through the package entry point", () => {
   it.each(LOADERS)("%s renders and announces itself", (_name, Component) => {
     const view = render(<Component label="Loading results" />);
-    const root = view.container.querySelector("[data-ox-loader]");
+    const root = view.container.querySelector("[data-zb-loader]");
 
     expect(root).not.toBeNull();
     expect(root).toHaveAttribute("role", "status");
@@ -67,11 +67,11 @@ describe("rendering through the package entry point", () => {
 
   it("resolves the rewritten sibling import — Pulse delegates to Rhythm when small", () => {
     // This is the specifier the generator rewrites from
-    // "@/components/oxygen/rhythm-loader". If the rewrite were wrong the module
+    // "@/components/zoblocks/rhythm-loader". If the rewrite were wrong the module
     // would not resolve at all, so reaching this assertion is most of the test.
     const view = render(<PulseLoader label="Loading" size={24} />);
-    expect(view.container.querySelector("[data-ox-loader]")).toHaveAttribute(
-      "data-ox-loader",
+    expect(view.container.querySelector("[data-zb-loader]")).toHaveAttribute(
+      "data-zb-loader",
       "rhythm",
     );
   });
@@ -108,7 +108,7 @@ describe("packaging correctness", () => {
   });
 
   it("rewrote every consumer-project specifier", () => {
-    // "@/lib/..." and "@/components/oxygen/..." only resolve inside a project
+    // "@/lib/..." and "@/components/zoblocks/..." only resolve inside a project
     // that has the consumer path aliases. Inside a package they resolve nowhere.
     for (const file of [
       "src/index.ts",
@@ -137,7 +137,7 @@ describe("packaging correctness", () => {
 
   it("ships the stylesheet the components need to animate", () => {
     const css = readFileSync(path.join(PKG, "src/styles.css"), "utf8");
-    expect(css).toContain("@keyframes ox-loader-beat");
+    expect(css).toContain("@keyframes zb-loader-beat");
     expect(css).toContain("prefers-reduced-motion");
     expect(css).toContain("forced-colors");
   });

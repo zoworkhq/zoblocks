@@ -1,7 +1,7 @@
 /**
  * The six numbers that decide whether the meter reads as an instrument.
  *
- * Oxygen's motion layer has four durations and two curves and no springs. A
+ * Zoblocks's motion layer has four durations and two curves and no springs. A
  * level meter needs one thing that layer does not have — an asymmetric
  * envelope — and it needs it to be exact, so these live here rather than in
  * the token set. Every one of them is quoted from §08 of the brief.

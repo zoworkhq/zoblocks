@@ -1,12 +1,12 @@
 {
-  "name": "@oxygenui-design/host-react",
+  "name": "@zoblocks/host-react",
   "version": "0.1.0",
   "description": "The host primitives an application is built from — Button, Input, Switch, Checkbox, Select, Tabs — resolved from whichever UI framework the host runs, so one demo source renders under Ant Design, Material UI, or neither.",
   "license": "MIT",
-  "homepage": "https://oxygenui.design",
+  "homepage": "https://zoblocks.design",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zoworkhq/oxygenui.git",
+    "url": "git+https://github.com/zoworkhq/zoblocks.git",
     "directory": "packages/host-react"
   },
   "keywords": [
@@ -67,9 +67,9 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@oxygenui-design/bridge-antd": "workspace:*",
-    "@oxygenui-design/bridge-core": "workspace:*",
-    "@oxygenui-design/bridge-mui": "workspace:*"
+    "@zoblocks/bridge-antd": "workspace:*",
+    "@zoblocks/bridge-core": "workspace:*",
+    "@zoblocks/bridge-mui": "workspace:*"
   },
   "peerDependencies": {
     "@mui/material": "^9.0.0",
@@ -88,7 +88,7 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/material": "^9.3.1",
-    "@oxygenui-design/tsconfig": "workspace:*",
+    "@zoblocks/tsconfig": "workspace:*",
     "@testing-library/react": "^16",
     "@testing-library/user-event": "^14",
     "@types/react": "^19.0.2",

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Trash2, Upload } from "lucide-react";
-import type { FontFace } from "@oxygenui-design/theme";
+import type { FontFace } from "@zoblocks/theme";
 import { removeFontAction, uploadFontAction } from "@/lib/actions";
 import { ActionForm } from "@/components/action-form";
 import { cn } from "@/lib/utils";
@@ -99,7 +99,7 @@ export function TypographyEditor({
           empty={
             <p className="surface px-5 py-6 text-center text-[0.8125rem] text-graphite">
               No uploaded faces. The theme uses whatever{" "}
-              <code className="font-mono text-[0.75rem]">--ox-font-sans</code> resolves to — set
+              <code className="font-mono text-[0.75rem]">--zb-font-sans</code> resolves to — set
               that on the token editor to point at a face you already host.
             </p>
           }

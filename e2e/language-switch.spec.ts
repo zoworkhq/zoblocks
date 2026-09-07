@@ -28,8 +28,8 @@ import { test, expect, type Page } from "@playwright/test";
  */
 const PAGE = "/components/clinical-status";
 
-/** The chip colour that must survive every switch: `--ox-status-critical`, light. */
-const OXYGEN_CRITICAL = "rgb(185, 28, 28)";
+/** The chip colour that must survive every switch: `--zb-status-critical`, light. */
+const ZOBLOCKS_CRITICAL = "rgb(185, 28, 28)";
 
 function control(page: Page) {
   return page.getByRole("radiogroup", { name: "Design language" });
@@ -38,12 +38,12 @@ function control(page: Page) {
 async function choose(page: Page, label: string) {
   await control(page).getByRole("radio", { name: label }).click();
   // The chunk is fetched on click; the wrapper appears when it has executed.
-  await expect(page.locator(`[data-ox-bridge], [data-ox-host]`).first()).toBeVisible();
+  await expect(page.locator(`[data-zb-bridge], [data-zb-host]`).first()).toBeVisible();
 }
 
 /** The element each host mounts its token patch on. */
 function hosted(page: Page) {
-  return page.locator("[data-ox-bridge], [data-ox-host]").first();
+  return page.locator("[data-zb-bridge], [data-zb-host]").first();
 }
 
 /**
@@ -61,9 +61,9 @@ test.describe("@bridge design language switch", () => {
     await page.goto(PAGE);
     await expect(control(page)).toBeVisible();
 
-    // Oxygen is the default and must cost nothing: neither framework has been
+    // Zoblocks is the default and must cost nothing: neither framework has been
     // fetched yet, so neither framework's classes exist.
-    await expect(hosted(page)).toHaveAttribute("data-ox-host", "oxygen");
+    await expect(hosted(page)).toHaveAttribute("data-zb-host", "zoblocks");
     await expect(page.locator(".ant-btn")).toHaveCount(0);
     await expect(page.locator(".MuiButton-root")).toHaveCount(0);
 
@@ -71,12 +71,12 @@ test.describe("@bridge design language switch", () => {
     // `.ant-btn-primary` is emitted by antd itself. A reproduction cannot
     // produce it, which is what makes this an assertion about the real library.
     await expect(page.locator(".ant-btn-primary").first()).toBeVisible();
-    await expect(hosted(page)).toHaveAttribute("data-ox-bridge", "antd");
+    await expect(hosted(page)).toHaveAttribute("data-zb-bridge", "antd");
 
     await choose(page, "Material UI");
     await expect(page.locator(".MuiButton-contained").first()).toBeVisible();
     await expect(page.locator(".MuiOutlinedInput-notchedOutline").first()).toBeAttached();
-    await expect(hosted(page)).toHaveAttribute("data-ox-bridge", "mui");
+    await expect(hosted(page)).toHaveAttribute("data-zb-bridge", "mui");
     // Switching hosts must unmount the previous one rather than layering it.
     await expect(page.locator(".ant-btn")).toHaveCount(0);
   });
@@ -112,11 +112,11 @@ test.describe("@bridge design language switch", () => {
 
   test("re-themes the component but never its clinical colours", async ({ page }) => {
     await page.goto(PAGE);
-    const chip = page.locator(".ox-cs").first();
+    const chip = page.locator(".zb-cs").first();
     await expect(chip).toBeVisible();
 
     const before = await chip.evaluate((el) => getComputedStyle(el).color);
-    expect(before).toBe(OXYGEN_CRITICAL);
+    expect(before).toBe(ZOBLOCKS_CRITICAL);
 
     for (const [label, accent] of [
       ["Ant Design", "#1677ff"],
@@ -124,20 +124,20 @@ test.describe("@bridge design language switch", () => {
     ] as const) {
       await choose(page, label);
 
-      // The chrome does move: the framework's primary reaches `--ox-accent`.
+      // The chrome does move: the framework's primary reaches `--zb-accent`.
       // Read from the inline style rather than the computed value — the pane
       // can return a mid-transition colour, and this is the value the bridge
       // actually wrote.
       await expect
         .poll(() =>
-          hosted(page).evaluate((el) => (el as HTMLElement).style.getPropertyValue("--ox-accent")),
+          hosted(page).evaluate((el) => (el as HTMLElement).style.getPropertyValue("--zb-accent")),
         )
         .toBe(accent);
 
       // The clinical colour does not. `bridge-core` refuses a status write at
       // runtime and both bridges list all eight in `unmapped`; this is the same
       // rule observed from outside, on a real cascade.
-      await expect(chip).toHaveCSS("color", OXYGEN_CRITICAL);
+      await expect(chip).toHaveCSS("color", ZOBLOCKS_CRITICAL);
     }
   });
 
@@ -157,7 +157,7 @@ test.describe("@bridge design language switch", () => {
   test("is one tab stop, with arrows moving inside it", async ({ page }) => {
     await page.goto(PAGE);
     const group = control(page);
-    const selected = group.getByRole("radio", { name: "Oxygen" });
+    const selected = group.getByRole("radio", { name: "Zoblocks" });
     await selected.focus();
 
     // Roving tabindex, per the APG radiogroup pattern: the two unselected

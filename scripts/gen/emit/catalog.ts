@@ -8,8 +8,8 @@
  * types rather than from a second description of them.
  */
 
-import { installCommandFor } from "@oxygenui-design/component-meta";
-import type { ComponentDoc, PropDoc } from "@oxygenui-design/component-meta";
+import { installCommandFor } from "@zoblocks/component-meta";
+import type { ComponentDoc, PropDoc } from "@zoblocks/component-meta";
 import { banner, paths } from "../config";
 import type { LoadedComponent } from "../load";
 import type { ExtractedExport } from "../props";
@@ -91,7 +91,7 @@ export function buildCatalog(
        * From the component's own distribution channel, not from a template.
        *
        * Three components publish to npm because they wrap antd, and this line
-       * handed all three an `oxygen add` command for a registry item that does
+       * handed all three an `zoblocks add` command for a registry item that does
        * not exist. The card computed the right line locally, so the same
        * component advertised two different commands depending on which surface
        * you read it from.
@@ -136,7 +136,7 @@ export function buildCatalog(
 export async function emitCatalog(catalog: ComponentDoc[], emitter: Emitter): Promise<void> {
   const source = `${banner()}
 
-import type { ComponentDoc } from "@oxygenui-design/component-meta";
+import type { ComponentDoc } from "@zoblocks/component-meta";
 
 export const CATALOG: ComponentDoc[] = ${JSON.stringify(catalog, null, 2)};
 

@@ -1,6 +1,6 @@
 ---
-"@oxygenui-design/react": minor
-"@oxygenui-design/fhir": minor
+"@zoblocks/react": minor
+"@zoblocks/fhir": minor
 ---
 
 Add DataGrid — a clinical worklist that states what it is showing, out of what.
@@ -59,7 +59,7 @@ grid refuses past rather than degrading; and a delimited writer that
 neutralises spreadsheet formula injection, including the full-width forms Excel
 normalises, with no way to switch it off.
 
-`@oxygenui-design/fhir` gains `Bundle.link`, so the paging relations a search
+`@zoblocks/fhir` gains `Bundle.link`, so the paging relations a search
 returns are representable at all. The private fixtures package gains
 `caseloadPhq9` and `unknownTotal` alongside it — the same search against two
 conformant servers, one of which states a total and one of which will not.

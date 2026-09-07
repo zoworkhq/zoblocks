@@ -36,7 +36,7 @@ import { Field, Input, Select, SubmitButton } from "@/components/ui";
 const SCOPE = {
   registry: {
     label: "The component registry",
-    hint: "Installs purchased components with the Oxygen CLI. It cannot read your themes.",
+    hint: "Installs purchased components with the Zoblocks CLI. It cannot read your themes.",
   },
   figma: {
     label: "Themes, for the Figma plugin",

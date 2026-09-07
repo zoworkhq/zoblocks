@@ -6,8 +6,8 @@
  * accidentally required this page would be the one to notice.
  */
 
-import "@oxygenui-design/loaders/pulse";
-import "@oxygenui-design/loaders/rhythm";
+import "@zoblocks/loaders/pulse";
+import "@zoblocks/loaders/rhythm";
 
 const loader = document.querySelector("#loader") as HTMLElement;
 const determinate = document.querySelector("#determinate") as HTMLElement;
@@ -27,7 +27,7 @@ document.querySelector("#step")?.addEventListener("click", () => {
   determinate.setAttribute("progress", String(progress));
 });
 
-for (const type of ["ox-loader-show", "ox-loader-hide"]) {
+for (const type of ["zb-loader-show", "zb-loader-hide"]) {
   document.addEventListener(type, () => {
     events.textContent = String(++seen);
   });

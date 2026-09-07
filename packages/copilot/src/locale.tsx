@@ -4,7 +4,7 @@
  * Two things this file does that a plain object would not.
  *
  * **It separates the clinician register from the patient register** — the same
- * split `@oxygenui-design/intl` already makes. There is no patient surface in
+ * split `@zoblocks/intl` already makes. There is no patient surface in
  * Copilot today, but the disclosure and crisis strings are the ones a host is
  * most likely to want to reword for a lay reader, and having the seam already
  * cut is cheaper than retrofitting it.

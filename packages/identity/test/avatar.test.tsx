@@ -1,4 +1,4 @@
-import { policy, resolveIdentity } from "@oxygenui-design/identity-core";
+import { policy, resolveIdentity } from "@zoblocks/identity-core";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { BannerAvatar, IdentityAvatar } from "../src/IdentityAvatar.js";
@@ -39,7 +39,7 @@ describe("IdentityAvatar", () => {
     // components must work under a strict policy.
     const { container } = render(<IdentityAvatar identity={av()} />);
     const root = container.firstElementChild as HTMLElement;
-    expect(root.className).toMatch(/ox-avatar--sw[1-6]/);
+    expect(root.className).toMatch(/zb-avatar--sw[1-6]/);
     expect(root.getAttribute("style") ?? "").not.toMatch(/color|background-color/);
   });
 
@@ -62,8 +62,8 @@ describe("IdentityAvatar", () => {
               : ({ kind } as const);
         const { container } = render(<IdentityAvatar identity={av()} photo={photo} />);
         const el = container.firstElementChild as HTMLElement;
-        expect(el.dataset.oxPhoto).toBe(kind);
-        seen.add(`${el.dataset.oxPhoto}|${el.className}`);
+        expect(el.dataset.zbPhoto).toBe(kind);
+        seen.add(`${el.dataset.zbPhoto}|${el.className}`);
       }
       // Five states, five distinct renderings. This is the test that fails the
       // day someone "simplifies" the fallback to always show initials.
@@ -80,28 +80,28 @@ describe("IdentityAvatar", () => {
 
     it("reports withheld when the record has a photo and the policy denies it", () => {
       const { container } = render(<IdentityAvatar identity={av(F.withPhoto, P)} />);
-      expect((container.firstElementChild as HTMLElement).dataset.oxPhoto).toBe("withheld");
+      expect((container.firstElementChild as HTMLElement).dataset.zbPhoto).toBe("withheld");
     });
 
     it("reports none-on-file when there is genuinely no photo, even under deny", () => {
       const { container } = render(<IdentityAvatar identity={av(F.amaraA, P)} />);
-      expect((container.firstElementChild as HTMLElement).dataset.oxPhoto).toBe("none-on-file");
+      expect((container.firstElementChild as HTMLElement).dataset.zbPhoto).toBe("none-on-file");
     });
   });
 
   it("marks a deceased record without relying on colour alone", () => {
     const { container } = render(<IdentityAvatar identity={av(F.deceased)} />);
-    expect((container.firstElementChild as HTMLElement).className).toContain("ox-avatar--deceased");
+    expect((container.firstElementChild as HTMLElement).className).toContain("zb-avatar--deceased");
   });
 
   it("marks a test record", () => {
     const { container } = render(<IdentityAvatar identity={av(F.testPatient)} />);
-    expect((container.firstElementChild as HTMLElement).className).toContain("ox-avatar--test");
+    expect((container.firstElementChild as HTMLElement).className).toContain("zb-avatar--test");
   });
 
   it("uses container-query sizing by default", () => {
     const { container } = render(<IdentityAvatar identity={av()} />);
-    expect((container.firstElementChild as HTMLElement).className).toContain("ox-avatar--auto");
+    expect((container.firstElementChild as HTMLElement).className).toContain("zb-avatar--auto");
   });
 
   it("renders script-correct initials", () => {
@@ -146,6 +146,6 @@ describe("BannerAvatar", () => {
   it("falls back to the single-node renderer when there is no photograph", () => {
     const { container } = render(<BannerAvatar identity={av(F.amaraA, ALLOW)} />);
     expect(container.querySelector("img")).toBeNull();
-    expect((container.firstElementChild as HTMLElement).dataset.oxPhoto).toBe("none-on-file");
+    expect((container.firstElementChild as HTMLElement).dataset.zbPhoto).toBe("none-on-file");
   });
 });

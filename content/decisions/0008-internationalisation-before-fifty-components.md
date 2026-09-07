@@ -2,7 +2,7 @@
 
 **Status:** accepted · 6 August 2026
 
-> **Ratified 16 August 2026.** Implemented at five components rather than fifty, as this ADR argued. @oxygenui-design/intl ships with register-aware lookup and a missing-key path that never renders blank.
+> **Ratified 16 August 2026.** Implemented at five components rather than fifty, as this ADR argued. @zoblocks/intl ships with register-aware lookup and a missing-key path that never renders blank.
 
 ## Context
 
@@ -27,7 +27,7 @@ not different tones of the same string.
 
 ## Decision
 
-**`@oxygenui/intl` is built in Phase 1 and the retrofit completes before the
+**`@zoblocks/intl` is built in Phase 1 and the retrofit completes before the
 catalog passes roughly 50 components.**
 
 1. **A provider and a message catalog with English defaults.** Every

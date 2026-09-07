@@ -20,7 +20,7 @@
  */
 
 import * as React from "react";
-import type { Availability, StepState, TabItem, Tone } from "@oxygenui-design/tabs-core";
+import type { Availability, StepState, TabItem, Tone } from "@zoblocks/tabs-core";
 import { TabsContext, ValidatedByParent } from "./context.js";
 import { useValidateProps } from "./internal.js";
 import { TabsRoot, type TabsRootProps } from "./TabsRoot.js";
@@ -153,7 +153,7 @@ export function TabsAddButton({
     <button
       {...rest}
       type="button"
-      className={["ox-tabs__add", className].filter(Boolean).join(" ")}
+      className={["zb-tabs__add", className].filter(Boolean).join(" ")}
       aria-label={context.locale.add}
       onClick={context.onAddTab}
     >

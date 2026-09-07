@@ -8,17 +8,17 @@
  *
  * Three properties it has to get right, and each fails silently:
  *
- *   - **Order.** A semantic variable aliasing `--ox-ref-brand-700` cannot be
+ *   - **Order.** A semantic variable aliasing `--zb-ref-brand-700` cannot be
  *     written before that variable exists, so the brand tier goes first and the
  *     alias resolves a name to an id at the moment of writing.
- *   - **Identity.** Every variable is stamped with its Oxygen token, and an
+ *   - **Identity.** Every variable is stamped with its Zoblocks token, and an
  *     existing one is found by that stamp. Matching on the label would create a
  *     duplicate the first time somebody tidies a collection.
  *   - **Nothing is deleted.** Orphans were listed in the preview and are left
  *     alone. `api.ts` has no `remove` at all, so this is structural.
  */
 
-import type { PlannedValue, PlannedVariable, ThemeName } from "@oxygenui-design/figma-core";
+import type { PlannedValue, PlannedVariable, ThemeName } from "@zoblocks/figma-core";
 
 import { PIN, applyOrder, modesFor } from "../pull";
 import { TIER_KEY, TOKEN_KEY, LOCKED_KEY } from "./read";
@@ -142,7 +142,7 @@ async function collectionIndex(
 }
 
 /**
- * Keyed by the Oxygen token, and only for variables that carry one.
+ * Keyed by the Zoblocks token, and only for variables that carry one.
  *
  * A file with a hand-made variable called `accent` is not a file where somebody
  * already pulled; treating it as one would silently take ownership of a swatch

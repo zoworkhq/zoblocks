@@ -7,7 +7,7 @@
  *
  * The first is that the demo mounts at all. Signature is the only component on
  * the site that carries Ant Design, and it is consumed from a workspace package
- * rather than from `registry/oxygen` like everything else. That import path is
+ * rather than from `registry/zoblocks` like everything else. That import path is
  * the part with no test anywhere: for a while the page compiled, typechecked,
  * and rendered a heading above a 500, because the package's own ESM specifiers
  * were unresolvable by the bundler. A green unit suite said nothing about it.

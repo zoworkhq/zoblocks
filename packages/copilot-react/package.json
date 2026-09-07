@@ -1,12 +1,12 @@
 {
-  "name": "@oxygenui-design/copilot-react",
+  "name": "@zoblocks/copilot-react",
   "version": "0.1.0",
-  "description": "Headless React for Oxygen Copilot. Hooks and unstyled primitives that own state, keyboard, focus and ARIA \u2014 no design system, no styles.",
+  "description": "Headless React for Zoblocks Copilot. Hooks and unstyled primitives that own state, keyboard, focus and ARIA \u2014 no design system, no styles.",
   "license": "MIT",
-  "homepage": "https://oxygenui.design/components/copilot",
+  "homepage": "https://zoblocks.design/components/copilot",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zoworkhq/oxygenui.git",
+    "url": "git+https://github.com/zoworkhq/zoblocks.git",
     "directory": "packages/copilot-react"
   },
   "keywords": [
@@ -55,14 +55,14 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@oxygenui-design/copilot-core": "workspace:*"
+    "@zoblocks/copilot-core": "workspace:*"
   },
   "peerDependencies": {
     "react": "^18.2.0 || ^19.0.0",
     "react-dom": "^18.2.0 || ^19.0.0"
   },
   "devDependencies": {
-    "@oxygenui-design/tsconfig": "workspace:*",
+    "@zoblocks/tsconfig": "workspace:*",
     "@testing-library/dom": "^10",
     "@testing-library/jest-dom": "^7",
     "@testing-library/react": "^16",

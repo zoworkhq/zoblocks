@@ -17,11 +17,11 @@ import { describe, expect, it } from "vitest";
 import axe from "axe-core";
 import type { ReactElement } from "react";
 
-import { PageLoader, PulseLoader } from "../registry/oxygen/pulse-loader/pulse-loader";
-import { RhythmLoader } from "../registry/oxygen/rhythm-loader/rhythm-loader";
-import { BreathLoader } from "../registry/oxygen/breath-loader/breath-loader";
-import { HelixLoader } from "../registry/oxygen/helix-loader/helix-loader";
-import { InfusionLoader } from "../registry/oxygen/infusion-loader/infusion-loader";
+import { PageLoader, PulseLoader } from "../registry/zoblocks/pulse-loader/pulse-loader";
+import { RhythmLoader } from "../registry/zoblocks/rhythm-loader/rhythm-loader";
+import { BreathLoader } from "../registry/zoblocks/breath-loader/breath-loader";
+import { HelixLoader } from "../registry/zoblocks/helix-loader/helix-loader";
+import { InfusionLoader } from "../registry/zoblocks/infusion-loader/infusion-loader";
 
 /**
  * Colour rules need a layout engine jsdom does not have; running them here

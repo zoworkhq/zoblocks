@@ -21,11 +21,11 @@ import { MongoMemoryServer } from "mongodb-memory-server";
 const here = path.dirname(fileURLToPath(import.meta.url));
 const app = path.resolve(here, "..");
 
-const mongo = await MongoMemoryServer.create({ instance: { dbName: "oxygen_console" } });
+const mongo = await MongoMemoryServer.create({ instance: { dbName: "zoblocks_console" } });
 const env = {
   ...process.env,
   DATABASE_URL: mongo.getUri(),
-  APP_DB_NAME: "oxygen_console",
+  APP_DB_NAME: "zoblocks_console",
   // The fixture the specs assert against. Absolute, because `fontFaceSchema`
   // validates `src` as a URL and a relative path is not one.
   CONSOLE_ASSET_ORIGIN: "http://localhost:6003",

@@ -41,10 +41,10 @@ export function indicatorGeometry(trigger: TriggerOffsets): IndicatorGeometry {
 /** The four custom properties the stylesheet consumes. */
 export function indicatorStyle(geometry: IndicatorGeometry): Record<string, string> {
   return {
-    "--ox-tabs-ind-x": `${geometry.x}px`,
-    "--ox-tabs-ind-y": `${geometry.y}px`,
-    "--ox-tabs-ind-w": `${geometry.width}px`,
-    "--ox-tabs-ind-h": `${geometry.height}px`,
+    "--zb-tabs-ind-x": `${geometry.x}px`,
+    "--zb-tabs-ind-y": `${geometry.y}px`,
+    "--zb-tabs-ind-w": `${geometry.width}px`,
+    "--zb-tabs-ind-h": `${geometry.height}px`,
   };
 }
 

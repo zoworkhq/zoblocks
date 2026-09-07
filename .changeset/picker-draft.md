@@ -1,5 +1,5 @@
 ---
-"@oxygenui-design/theme": patch
+"@zoblocks/theme": patch
 ---
 
 Cover the asset store, the manifest and the picker, and fix a field that could not be typed into

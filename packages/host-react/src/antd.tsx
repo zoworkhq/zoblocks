@@ -3,7 +3,7 @@
 /**
  * The Ant Design host.
  *
- *     import { AntdHost } from "@oxygenui-design/host-react/antd";
+ *     import { AntdHost } from "@zoblocks/host-react/antd";
  *
  *     <AntdHost mode="light">
  *       <YourDemo />          // unchanged
@@ -26,7 +26,7 @@
 
 import * as React from "react";
 import { Button, Checkbox, ConfigProvider, Input, Select, Switch, Tabs, theme } from "antd";
-import { AntdBridge } from "@oxygenui-design/bridge-antd";
+import { AntdBridge } from "@zoblocks/bridge-antd";
 import type {
   HostButtonProps,
   HostCheckboxProps,
@@ -61,7 +61,7 @@ function AntdInput({ label, size = "middle", className, ...rest }: HostInputProp
   if (!label) return <span className={className}>{field}</span>;
   return (
     <span className={className} style={{ display: "inline-flex", flexDirection: "column", gap: 4 }}>
-      <label htmlFor={id} style={{ fontSize: 12, color: "var(--ox-text-muted)", lineHeight: 1.2 }}>
+      <label htmlFor={id} style={{ fontSize: 12, color: "var(--zb-text-muted)", lineHeight: 1.2 }}>
         {label}
       </label>
       {field}
@@ -111,7 +111,7 @@ function AntdSelect({
   if (!label) return <span className={className}>{control}</span>;
   return (
     <span className={className} style={{ display: "inline-flex", flexDirection: "column", gap: 4 }}>
-      <span style={{ fontSize: 12, color: "var(--ox-text-muted)", lineHeight: 1.2 }}>{label}</span>
+      <span style={{ fontSize: 12, color: "var(--zb-text-muted)", lineHeight: 1.2 }}>{label}</span>
       {control}
     </span>
   );

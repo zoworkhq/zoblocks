@@ -52,16 +52,16 @@ describe("compact", () => {
    * would still spread onto the element and blank the property.
    */
   it("drops undefined so the CSS fallback wins", () => {
-    expect(compact({ "--ox-accent": "#059478", "--ox-text": undefined })).toEqual({
-      "--ox-accent": "#059478",
+    expect(compact({ "--zb-accent": "#059478", "--zb-text": undefined })).toEqual({
+      "--zb-accent": "#059478",
     });
   });
 
   it("drops empty strings, which a framework can hand back for an unset value", () => {
-    expect(compact({ "--ox-accent": "" })).toEqual({});
+    expect(compact({ "--zb-accent": "" })).toEqual({});
   });
 
   it("keeps a legitimate zero", () => {
-    expect(compact({ "--ox-duration": 0 })).toEqual({ "--ox-duration": 0 });
+    expect(compact({ "--zb-duration": 0 })).toEqual({ "--zb-duration": 0 });
   });
 });

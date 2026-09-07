@@ -39,7 +39,7 @@ export function ThemeScreens({ slug, facts }: { slug: string; facts: ThemeFacts 
                   <Icon
                     aria-hidden="true"
                     strokeWidth={2}
-                    className="size-3.5 shrink-0 text-oxygen-deep"
+                    className="size-3.5 shrink-0 text-brand-deep"
                   />
                   <span className="flex-1 text-[0.8125rem] font-semibold">{label}</span>
                   <ArrowRight

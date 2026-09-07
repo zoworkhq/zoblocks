@@ -1,5 +1,5 @@
 /**
- * @oxygenui-design/intl — messages, and the register they are written in.
+ * @zoblocks/intl — messages, and the register they are written in.
  *
  * ADR 0008 puts a deadline on this: retrofitting internationalisation across
  * 500 components is an enormous project, across 24 it is a week, and across 5

@@ -7,7 +7,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/accordion/accordion.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/accordion/accordion.tsx. Edit that file, not this one.
 /**
  * Accordion — a disclosure widget that can be read while it is closed.
  *
@@ -21,7 +21,7 @@
  *      If collapsing a section could change what the reader does next, the
  *      header carries the fact that would change it.
  *   2. **Expanding is not disclosing.** A gated item opens to an explanation
- *      and keeps its content behind `onDisclose`. See lib/oxygen-accordion.
+ *      and keeps its content behind `onDisclose`. See lib/zoblocks-accordion.
  *   3. **Withheld is a value.** A section this reader cannot obtain still gets a
  *      row that says so, because deleting it claims the record is complete.
  *
@@ -98,7 +98,7 @@ export interface AccordionProps extends Omit<
   /** Per-slot inline styles, matching Ant Design v6's semantic DOM. */
   styles?: Partial<Record<AccordionSlot, React.CSSProperties>>;
 
-  /* -- Oxygen additions ---------------------------------------------- */
+  /* -- Zoblocks additions ---------------------------------------------- */
 
   /**
    * Heading level for every trigger.
@@ -108,7 +108,7 @@ export interface AccordionProps extends Omit<
    * nested accordion that hardcodes its level flattens it silently.
    */
   headingLevel?: AccordionHeadingLevel;
-  /** Overrides any inherited `data-ox-density`. */
+  /** Overrides any inherited `data-zb-density`. */
   density?: AccordionDensity;
   /** Container shape. `separate` gives each section its own card. */
   variant?: AccordionVariant;
@@ -137,15 +137,15 @@ export interface AccordionProps extends Omit<
 }
 
 const SIZE_FONT: Record<AccordionSize, string> = {
-  small: "var(--ox-text-sm)",
-  medium: "var(--ox-accordion-font)",
-  large: "var(--ox-text-md)",
+  small: "var(--zb-text-sm)",
+  medium: "var(--zb-accordion-font)",
+  large: "var(--zb-text-md)",
 };
 
 function Chevron() {
   return (
     <svg
-      className="ox-accordion__icon"
+      className="zb-accordion__icon"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -226,28 +226,28 @@ function Gate({
           : locale.consentRequest;
 
   return (
-    <div className="ox-accordion__gate" data-kind={access.kind}>
-      <p className="ox-accordion__gate-title">{gateTitle(access, locale)}</p>
+    <div className="zb-accordion__gate" data-kind={access.kind}>
+      <p className="zb-accordion__gate-title">{gateTitle(access, locale)}</p>
 
       {access.kind === "consent" ? (
-        <p className="ox-accordion__gate-note">
+        <p className="zb-accordion__gate-note">
           {access.policy}
           {access.expiresAt ? ` · ${locale.consentExpires(access.expiresAt)}` : ""}
         </p>
       ) : null}
 
       {access.kind === "reason" || (access.kind === "consent" && consentGranted) ? (
-        <p className="ox-accordion__gate-note">{locale.recorded}</p>
+        <p className="zb-accordion__gate-note">{locale.recorded}</p>
       ) : null}
 
       {access.kind === "reason" && reasons.length > 0 ? (
         <>
-          <label className="ox-accordion__gate-reasons" htmlFor={selectId}>
+          <label className="zb-accordion__gate-reasons" htmlFor={selectId}>
             {locale.reasonLegend}
           </label>
           <select
             id={selectId}
-            className="ox-accordion__gate-select"
+            className="zb-accordion__gate-select"
             value={reasonCode}
             onChange={(event) => setReasonCode(event.target.value)}
           >
@@ -260,10 +260,10 @@ function Gate({
         </>
       ) : null}
 
-      <div className="ox-accordion__gate-actions">
+      <div className="zb-accordion__gate-actions">
         <button
           type="button"
-          className="ox-accordion__gate-confirm"
+          className="zb-accordion__gate-confirm"
           disabled={pending}
           onClick={() => onConfirm(access.kind === "reason" ? reasonCode : undefined)}
         >
@@ -272,7 +272,7 @@ function Gate({
       </div>
 
       {refused ? (
-        <p className="ox-accordion__gate-refused" role="status">
+        <p className="zb-accordion__gate-refused" role="status">
           {locale.refused}
         </p>
       ) : null}
@@ -392,7 +392,7 @@ export function Accordion({
       // false for withheld items, and a gate is not content worth printing.
       restored = [
         ...root.querySelectorAll(
-          ':scope > [data-print-expanded="true"] > .ox-accordion__panel[hidden]',
+          ':scope > [data-print-expanded="true"] > .zb-accordion__panel[hidden]',
         ),
       ];
       for (const node of restored) node.removeAttribute("hidden");
@@ -414,24 +414,24 @@ export function Accordion({
   const rootStyle: AccordionVars = {
     ...styles?.root,
     ...style,
-    "--ox-accordion-font": SIZE_FONT[size],
+    "--zb-accordion-font": SIZE_FONT[size],
   };
 
   return (
     <div
       {...rest}
       ref={rootRef}
-      className={cn("ox-accordion", classNames?.root, className)}
+      className={cn("zb-accordion", classNames?.root, className)}
       style={rootStyle}
-      // The root marker every Oxygen component carries, matching the loaders'
-      // `data-ox-loader`. It is what a test, a VRT fixture or a host stylesheet
+      // The root marker every Zoblocks component carries, matching the loaders'
+      // `data-zb-loader`. It is what a test, a VRT fixture or a host stylesheet
       // uses to find the component without depending on a class name that
       // customisation is explicitly allowed to replace.
-      data-ox-accordion=""
+      data-zb-accordion=""
       data-variant={resolvedVariant}
       data-bordered={bordered ? "true" : "false"}
       data-icon-placement={expandIconPlacement}
-      {...(density ? { "data-ox-density": density } : {})}
+      {...(density ? { "data-zb-density": density } : {})}
     >
       {resolvedItems.map((item) => {
         const access = accessOf(item);
@@ -467,7 +467,7 @@ export function Accordion({
         return (
           <div
             key={item.key}
-            className={cn("ox-accordion__item", item.classNames?.item, classNames?.item)}
+            className={cn("zb-accordion__item", item.classNames?.item, classNames?.item)}
             style={{ ...styles?.item, ...item.styles?.item }}
             data-open={open ? "true" : "false"}
             data-access={access.kind}
@@ -476,13 +476,13 @@ export function Accordion({
             {...(item.pinned ? { "data-pinned": "true" } : {})}
           >
             <Heading
-              className={cn("ox-accordion__heading", classNames?.header, item.classNames?.header)}
+              className={cn("zb-accordion__heading", classNames?.header, item.classNames?.header)}
               style={{ ...styles?.header, ...item.styles?.header }}
             >
               <button
                 {...triggerProps}
                 className={cn(
-                  "ox-accordion__trigger",
+                  "zb-accordion__trigger",
                   classNames?.trigger,
                   item.classNames?.trigger,
                 )}
@@ -492,18 +492,18 @@ export function Accordion({
                 {showArrow ? expandIcon ? expandIcon({ item, isOpen: open }) : <Chevron /> : null}
 
                 <span
-                  className={cn("ox-accordion__label", classNames?.label, item.classNames?.label)}
+                  className={cn("zb-accordion__label", classNames?.label, item.classNames?.label)}
                   style={{ ...styles?.label, ...item.styles?.label }}
                 >
                   {item.label}
                 </span>
 
-                <span className="ox-accordion__spacer" />
+                <span className="zb-accordion__spacer" />
 
                 {item.summary || withheld || item.pinned ? (
                   <span
                     className={cn(
-                      "ox-accordion__summary",
+                      "zb-accordion__summary",
                       classNames?.summary,
                       item.classNames?.summary,
                     )}
@@ -519,20 +519,20 @@ export function Accordion({
               </button>
             </Heading>
 
-            {item.extra ? <div className="ox-accordion__extra">{item.extra}</div> : null}
+            {item.extra ? <div className="zb-accordion__extra">{item.extra}</div> : null}
 
             <div
               {...panelProps}
-              className={cn("ox-accordion__panel", classNames?.panel, item.classNames?.panel)}
+              className={cn("zb-accordion__panel", classNames?.panel, item.classNames?.panel)}
               style={{ ...styles?.panel, ...item.styles?.panel }}
             >
-              <div className="ox-accordion__body">
+              <div className="zb-accordion__body">
                 <div
-                  className={cn("ox-accordion__inner", classNames?.body, item.classNames?.body)}
+                  className={cn("zb-accordion__inner", classNames?.body, item.classNames?.body)}
                   style={{ ...styles?.body, ...item.styles?.body }}
                 >
                   {withheld ? (
-                    <p className="ox-accordion__withheld-reason">{access.reason}</p>
+                    <p className="zb-accordion__withheld-reason">{access.reason}</p>
                   ) : mount ? (
                     body
                   ) : null}

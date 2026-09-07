@@ -7,9 +7,9 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/lib/switch.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/lib/switch.tsx. Edit that file, not this one.
 /**
- * switch-core — the state model behind Oxygen's Switch.
+ * switch-core — the state model behind Zoblocks's Switch.
  *
  * A switch in a consumer application is one axis: `checked`. In a shared
  * clinical record it is three, and they are genuinely independent — a control
@@ -25,10 +25,10 @@
  *
  * `useCommitPhase` is exported on its own for the same reason `useLoadingGate`
  * is: an application will need this decision for something that is not an
- * Oxygen Switch — a checkbox, a segmented control, an inline dropdown — and a
+ * Zoblocks Switch — a checkbox, a segmented control, an inline dropdown — and a
  * second hand-rolled copy of it is a second set of bugs.
  *
- * Styling lives in `styles/oxygen-switch.css`, installed alongside this file.
+ * Styling lives in `styles/zoblocks-switch.css`, installed alongside this file.
  * No Tailwind utilities: keyframes cannot be expressed as tokens, and a
  * component whose motion depends on the host's Tailwind config renders
  * unstyled in a Vue app.
@@ -79,7 +79,7 @@ export type SwitchValue = boolean | "unknown";
 /**
  * Why a value is absent.
  *
- * Structurally identical to `AbsentReason` in `@oxygenui-design/fhir`, which is
+ * Structurally identical to `AbsentReason` in `@zoblocks/fhir`, which is
  * the normalised form of a FHIR `dataAbsentReason`. It is restated here rather
  * than imported because a primitive takes no dependency it does not need
  * (ADR 0010) — pipe `resolveAbsentReason(obs.dataAbsentReason)` straight in.
@@ -650,7 +650,7 @@ export type SwitchAudience = "clinician" | "patient";
  * Track and thumb geometry per size, in pixels.
  *
  * The hit area is deliberately NOT here — it comes from
- * `--ox-switch-target-min`, which follows the density profile. Shrinking the
+ * `--zb-switch-target-min`, which follows the density profile. Shrinking the
  * pill must never shrink the target: a mis-tap on a clinical flag is not a
  * cosmetic defect, and SC 2.5.8 holds at every density.
  */
@@ -667,9 +667,9 @@ export type SwitchVars = React.CSSProperties & Record<`--${string}`, string | nu
 export function sizeVars(size: SwitchSize): SwitchVars {
   const { track, thumb } = SWITCH_SIZE[size];
   return {
-    "--ox-switch-track-w": `${track[0]}px`,
-    "--ox-switch-track-h": `${track[1]}px`,
-    "--ox-switch-thumb-size": `${thumb}px`,
+    "--zb-switch-track-w": `${track[0]}px`,
+    "--zb-switch-track-h": `${track[1]}px`,
+    "--zb-switch-thumb-size": `${thumb}px`,
   };
 }
 

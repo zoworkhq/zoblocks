@@ -7,7 +7,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/lib/datetime-parts.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/lib/datetime-parts.tsx. Edit that file, not this one.
 /**
  * The parts of the date, time and session system.
  *
@@ -61,12 +61,12 @@ import {
   type DurationBand,
   type DurationPreset,
   type MonthRef,
-  type OxAbsentDate,
-  type OxDate,
-  type OxPartialDate,
-  type OxTemporal,
-  type OxTime,
-  type OxTimeRange,
+  type ZbAbsentDate,
+  type ZbDate,
+  type ZbPartialDate,
+  type ZbTemporal,
+  type ZbTime,
+  type ZbTimeRange,
   type SessionInterval,
   type TemporalAbsence,
 } from "../lib/datetime";
@@ -122,11 +122,11 @@ import {
 /* Reconciliation compares these strings instead — see `useValueSync`. */
 /* ------------------------------------------------------------------ */
 
-function dateKey(value: OxDate | null | undefined): string {
+function dateKey(value: ZbDate | null | undefined): string {
   return value ? `${value.y}-${value.m}-${value.d}` : "";
 }
 
-function timeKey(value: OxTime | null | undefined): string {
+function timeKey(value: ZbTime | null | undefined): string {
   return value ? `${value.h}:${value.mi}:${value.s ?? 0}` : "";
 }
 
@@ -175,7 +175,7 @@ function birthKey(value: BirthDateValue | undefined): string {
 /* Segment plumbing                                                   */
 /* ------------------------------------------------------------------ */
 
-export function dateToSegments(date: OxDate | null): SegmentValues {
+export function dateToSegments(date: ZbDate | null): SegmentValues {
   if (!date) return { m: null, d: null, y: null };
   return { m: date.m, d: date.d, y: date.y };
 }
@@ -187,7 +187,7 @@ export function dateToSegments(date: OxDate | null): SegmentValues {
  * tell them apart on purpose: an incomplete field and an impossible one are
  * both "no value yet", and the field's own message says which.
  */
-export function segmentsToDate(values: SegmentValues): OxDate | null {
+export function segmentsToDate(values: SegmentValues): ZbDate | null {
   const { y, m, d } = values;
   if (y == null || m == null || d == null) return null;
   return isValidDate(y, m, d) ? plainDate(y, m, d) : null;
@@ -213,7 +213,7 @@ export interface DateFieldProps extends Omit<
   "onChange" | "defaultValue" | "children"
 > {
   /** Controlled value. Pass `null` for empty, never `undefined`. */
-  value?: OxDate | null;
+  value?: ZbDate | null;
   /**
    * Uncontrolled initial value.
    *
@@ -223,12 +223,12 @@ export interface DateFieldProps extends Omit<
    * putting a date of birth in a third party's index. When both are passed,
    * `value` wins — the ordinary React contract.
    */
-  defaultValue?: OxDate | null;
+  defaultValue?: ZbDate | null;
   /**
    * Fired on every complete, valid date, and with `null` when the field is cleared. Never
    * fired mid-typing.
    */
-  onChange?: (value: OxDate | null) => void;
+  onChange?: (value: ZbDate | null) => void;
 
   /**
    * Today, supplied by the host.
@@ -239,7 +239,7 @@ export interface DateFieldProps extends Omit<
    * visually regression-tested, and server and client would disagree on the
    * boundary between one day and the next.
    */
-  now?: OxDate;
+  now?: ZbDate;
 
   /** Segment order. From the locale, never guessed. */
   order?: DateOrder;
@@ -257,9 +257,9 @@ export interface DateFieldProps extends Omit<
    * Earliest selectable date, inclusive. Dates before it are refused with a spoken reason
    * rather than silently ignored.
    */
-  min?: OxDate;
+  min?: ZbDate;
   /** Latest selectable date, inclusive. */
-  max?: OxDate;
+  max?: ZbDate;
   /**
    * What a future date means here — allowed, warned about, or refused. A date of birth and an
    * appointment want opposite answers.
@@ -308,9 +308,9 @@ export interface DateFieldProps extends Omit<
    */
   showCalendar?: boolean;
   /** Forwarded to the popover calendar — the reason a day cannot be chosen. */
-  unavailable?: (date: OxDate) => string | null;
+  unavailable?: (date: ZbDate) => string | null;
   /** Forwarded to the popover calendar — open-slot count under the numeral. */
-  load?: (date: OxDate) => number | null;
+  load?: (date: ZbDate) => number | null;
   /** 0 = Sunday. Forwarded to the popover calendar. */
   weekStart?: number;
   /** Rendered under the popover grid — relative-date chips, a clear action. */
@@ -354,11 +354,11 @@ interface FieldNotice {
  * with a rule and never blocks, an advisory is said once and politely.
  */
 export function reviewDate(
-  value: OxDate | null,
+  value: ZbDate | null,
   options: {
-    now?: OxDate;
-    min?: OxDate;
-    max?: OxDate;
+    now?: ZbDate;
+    min?: ZbDate;
+    max?: ZbDate;
     futurePolicy?: TemporalPolicy;
     pastPolicy?: TemporalPolicy;
     showRelative?: boolean;
@@ -512,23 +512,23 @@ export const DateField = React.forwardRef<HTMLDivElement, DateFieldProps>(
     return (
       <div
         ref={ref}
-        data-ox-date-field={value ? "set" : "empty"}
-        className={cn("ox-dt-stack", className)}
+        data-zb-date-field={value ? "set" : "empty"}
+        className={cn("zb-dt-stack", className)}
         {...rest}
       >
         {label ? (
-          <label className="ox-dt-label" htmlFor={fieldId}>
+          <label className="zb-dt-label" htmlFor={fieldId}>
             {label}
             {required ? (
-              <span className="ox-dt-label__required" aria-hidden="true">
+              <span className="zb-dt-label__required" aria-hidden="true">
                 *
               </span>
             ) : null}
-            {optional ? <span className="ox-dt-label__optional">Optional</span> : null}
+            {optional ? <span className="zb-dt-label__optional">Optional</span> : null}
           </label>
         ) : null}
 
-        <div className={withCalendar ? "ox-dt-anchor" : undefined}>
+        <div className={withCalendar ? "zb-dt-anchor" : undefined}>
           <SegmentedField
             ref={fieldHandle}
             id={fieldId}
@@ -640,14 +640,14 @@ export interface CalendarProps extends Omit<
   mode?: CalendarMode;
 
   /** Controlled value. Pass `null` for empty, never `undefined`. */
-  value?: OxDate | null;
+  value?: ZbDate | null;
   /**
    * Uncontrolled initial value. Pass this or `value`, never both; `value` wins if you pass
    * both.
    */
-  defaultValue?: OxDate | null;
+  defaultValue?: ZbDate | null;
   /** Fired when a single date is chosen. Only meaningful in `mode="single"`. */
-  onChange?: (value: OxDate | null) => void;
+  onChange?: (value: ZbDate | null) => void;
 
   /** The selected range, controlled. Only meaningful in `mode="range"`. */
   range?: DateRangeValue | null;
@@ -664,11 +664,11 @@ export interface CalendarProps extends Omit<
   onRangeChange?: (range: DateRangeValue) => void;
 
   /** The selected dates, controlled. Only meaningful in `mode="multiple"`. */
-  dates?: OxDate[];
+  dates?: ZbDate[];
   /** The dates on first render, uncontrolled. Pass this or `dates`, never both. */
-  defaultDates?: OxDate[];
+  defaultDates?: ZbDate[];
   /** Fired whenever the multiple-selection set changes. */
-  onDatesChange?: (dates: OxDate[]) => void;
+  onDatesChange?: (dates: ZbDate[]) => void;
   /** Cap for `mode="multiple"`. Further dates are refused, never dialogued. */
   maxDates?: number;
 
@@ -697,12 +697,12 @@ export interface CalendarProps extends Omit<
    * clock, so a calendar without `now` simply has no today, which is correct
    * for a historical picker and deliberate everywhere else.
    */
-  now?: OxDate | null;
+  now?: ZbDate | null;
 
   /** Earliest selectable date, inclusive. */
-  min?: OxDate;
+  min?: ZbDate;
   /** Latest selectable date, inclusive. */
-  max?: OxDate;
+  max?: ZbDate;
   /**
    * The reason a date cannot be chosen, or null.
    *
@@ -710,9 +710,9 @@ export interface CalendarProps extends Omit<
    * muted treatment covers every reason; five colours would be five things to
    * learn and still illegible to a colour-blind reader.
    */
-  unavailable?: (date: OxDate) => string | null;
+  unavailable?: (date: ZbDate) => string | null;
   /** Open-slot count under the numeral, so density is visible before a click. */
-  load?: (date: OxDate) => number | null;
+  load?: (date: ZbDate) => number | null;
 
   /**
    * Named periods down the side — "This month", "Last week".
@@ -807,15 +807,15 @@ export interface CalendarProps extends Omit<
 /** The arrow-key legend. Decoration for the eye; the grid speaks for itself. */
 function KeyboardHints() {
   return (
-    <div className="ox-dt-cal__hints" aria-hidden="true">
-      <span className="ox-dt-cal__hint">
+    <div className="zb-dt-cal__hints" aria-hidden="true">
+      <span className="zb-dt-cal__hint">
         <kbd>→</kbd>
         <kbd>←</kbd>
         <kbd>↑</kbd>
         <kbd>↓</kbd>
         navigate
       </span>
-      <span className="ox-dt-cal__hint">
+      <span className="zb-dt-cal__hint">
         <kbd>↵</kbd>
         select
       </span>
@@ -873,7 +873,7 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
       controlledRange ?? undefined,
       defaultRange ?? { start: null, end: null },
     );
-    const [dates, setDates] = useTemporalValue<OxDate[]>(controlledDates, defaultDates ?? []);
+    const [dates, setDates] = useTemporalValue<ZbDate[]>(controlledDates, defaultDates ?? []);
 
     /*
      * The draft an `explicit` calendar edits.
@@ -895,7 +895,7 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
       setDraft({ value, range, dates, key: committedKey });
     }
 
-    const writeValue = (next: OxDate | null) => {
+    const writeValue = (next: ZbDate | null) => {
       if (explicit) {
         setDraft((was) => ({ ...was, value: next }));
         return;
@@ -913,7 +913,7 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
       onRangeChange?.(next);
     };
 
-    const writeDates = (next: OxDate[]) => {
+    const writeDates = (next: ZbDate[]) => {
       if (explicit) {
         setDraft((was) => ({ ...was, dates: next }));
         return;
@@ -935,7 +935,7 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
      * treatment for it.
      */
     const isUnavailable = React.useCallback(
-      (date: OxDate): string | null => {
+      (date: ZbDate): string | null => {
         if (min && compareDates(date, min) < 0) return "before the earliest allowed date";
         if (max && compareDates(date, max) > 0) return "after the latest allowed date";
         return unavailable?.(date) ?? null;
@@ -943,7 +943,7 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
       [min, max, unavailable],
     );
 
-    const handleSelect = (date: OxDate) => {
+    const handleSelect = (date: ZbDate) => {
       if (mode === "range") {
         const current = live.range;
         const next: DateRangeValue =
@@ -958,7 +958,7 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
 
       if (mode === "multiple") {
         const at = live.dates.findIndex((existing) => isSameDate(existing, date));
-        let next: OxDate[];
+        let next: ZbDate[];
         if (at > -1) {
           // Clicking a selected date removes it. A remove control inside a 32px
           // cell would be under the target floor, and a second click is what
@@ -976,7 +976,7 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
     };
 
     /** Brings a rail choice into view. A period you cannot see is a period you have to trust. */
-    const revealMonth = (date: OxDate) => {
+    const revealMonth = (date: ZbDate) => {
       const next = { y: date.y, m: date.m };
       setMonth(next);
       onMonthChange?.(next);
@@ -1030,14 +1030,14 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
 
     const rail = railed ? (
       <div
-        className="ox-dt-cal__rail"
+        className="zb-dt-cal__rail"
         role="group"
         aria-label={mode === "range" ? "Named periods" : "Named dates"}
       >
         {showCustomPreset ? (
           <button
             type="button"
-            className={cn("ox-dt-cal__preset", custom && "ox-dt-cal__preset--on")}
+            className={cn("zb-dt-cal__preset", custom && "zb-dt-cal__preset--on")}
             aria-pressed={custom}
             onClick={clearSelection}
           >
@@ -1050,8 +1050,8 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
                 key={preset.id}
                 type="button"
                 className={cn(
-                  "ox-dt-cal__preset",
-                  activePreset?.id === preset.id && "ox-dt-cal__preset--on",
+                  "zb-dt-cal__preset",
+                  activePreset?.id === preset.id && "zb-dt-cal__preset--on",
                 )}
                 aria-pressed={activePreset?.id === preset.id}
                 onClick={() => applyPreset(preset)}
@@ -1068,7 +1068,7 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
                 <button
                   key={shortcut.id}
                   type="button"
-                  className={cn("ox-dt-cal__preset", on && "ox-dt-cal__preset--on")}
+                  className={cn("zb-dt-cal__preset", on && "zb-dt-cal__preset--on")}
                   aria-pressed={on}
                   onClick={() => applyShortcut(shortcut)}
                 >
@@ -1108,13 +1108,13 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
     };
 
     const actions = explicit ? (
-      <div className="ox-dt-cal__actions">
-        <button type="button" className="ox-dt-cal__action" onClick={cancelNow}>
+      <div className="zb-dt-cal__actions">
+        <button type="button" className="zb-dt-cal__action" onClick={cancelNow}>
           {cancelLabel}
         </button>
         <button
           type="button"
-          className="ox-dt-cal__action ox-dt-cal__action--primary"
+          className="zb-dt-cal__action zb-dt-cal__action--primary"
           disabled={!completable}
           onClick={commitNow}
         >
@@ -1133,7 +1133,7 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
       ) : null;
 
     return (
-      <div ref={ref} data-ox-calendar={mode} className={cn(className)} {...rest}>
+      <div ref={ref} data-zb-calendar={mode} className={cn(className)} {...rest}>
         <CalendarGrid
           mode={mode}
           value={live.value}
@@ -1178,7 +1178,7 @@ Calendar.displayName = "Calendar";
  * "next Tuesday" also resolves "nxt tues" to *something*, and a silent wrong
  * answer in a clinical date field is worse than no shortcut at all.
  */
-export function relativeDateOptions(now: OxDate): DateShortcut[] {
+export function relativeDateOptions(now: ZbDate): DateShortcut[] {
   // Sunday is 0, so the distance to the next Monday is (8 - weekday) mod 7 —
   // and 0 means today is Monday, which should offer the Monday after.
   const toNextMonday = (8 - weekdayOf(now)) % 7 || 7;
@@ -1231,17 +1231,17 @@ export interface DateRangeFieldProps extends Omit<
   onChange?: (range: DateRangeValue) => void;
 
   /** Today, supplied by the host. Nothing here reads a clock. */
-  now?: OxDate;
+  now?: ZbDate;
   /** Segment order. Match the locale, not the developer's. */
   order?: DateOrder;
   /** Earliest selectable date, inclusive. */
-  min?: OxDate;
+  min?: ZbDate;
   /** Latest selectable date, inclusive. */
-  max?: OxDate;
+  max?: ZbDate;
   /** The reason a date cannot be chosen, or null. Spoken, not just dimmed. */
-  unavailable?: (date: OxDate) => string | null;
+  unavailable?: (date: ZbDate) => string | null;
   /** Open-slot count under each numeral. */
-  load?: (date: OxDate) => number | null;
+  load?: (date: ZbDate) => number | null;
 
   /** Named periods down the side of the panel. `dateRangePresets(now)` is the general set. */
   presets?: readonly DateRangePreset[];
@@ -1294,7 +1294,7 @@ const EMPTY_RANGE: DateRangeValue = { start: null, end: null };
 /** An arrow between the two halves, not a hyphen. A hyphen inside a date reads as a separator. */
 function RangeArrow() {
   return (
-    <span className="ox-dt-range__arrow" aria-hidden="true">
+    <span className="zb-dt-range__arrow" aria-hidden="true">
       <svg
         viewBox="0 0 24 24"
         width="14"
@@ -1437,23 +1437,23 @@ export const DateRangeField = React.forwardRef<HTMLDivElement, DateRangeFieldPro
     return (
       <div
         ref={ref}
-        data-ox-date-range={range.start && range.end ? "set" : "empty"}
-        className={cn("ox-dt-stack", className)}
+        data-zb-date-range={range.start && range.end ? "set" : "empty"}
+        className={cn("zb-dt-stack", className)}
         {...rest}
       >
         {label ? (
-          <span className="ox-dt-label" id={`${fieldId}-label`}>
+          <span className="zb-dt-label" id={`${fieldId}-label`}>
             {label}
             {required ? (
-              <span className="ox-dt-label__required" aria-hidden="true">
+              <span className="zb-dt-label__required" aria-hidden="true">
                 *
               </span>
             ) : null}
-            {optional ? <span className="ox-dt-label__optional">Optional</span> : null}
+            {optional ? <span className="zb-dt-label__optional">Optional</span> : null}
           </span>
         ) : null}
 
-        <div className={withCalendar ? "ox-dt-anchor" : undefined}>
+        <div className={withCalendar ? "zb-dt-anchor" : undefined}>
           {/*
             One shell, two tab stops.
             The single-tab-stop rule is per field, and a range is two fields:
@@ -1463,10 +1463,10 @@ export const DateRangeField = React.forwardRef<HTMLDivElement, DateRangeFieldPro
           */}
           <div
             className={cn(
-              "ox-dt-range",
-              isInvalid && "ox-dt-range--invalid",
-              disabled && "ox-dt-range--disabled",
-              readOnly && "ox-dt-range--readonly",
+              "zb-dt-range",
+              isInvalid && "zb-dt-range--invalid",
+              disabled && "zb-dt-range--disabled",
+              readOnly && "zb-dt-range--readonly",
             )}
           >
             <SegmentedField
@@ -1506,13 +1506,13 @@ export const DateRangeField = React.forwardRef<HTMLDivElement, DateRangeFieldPro
             />
 
             {showSpan && ordered && days != null && days > 0 ? (
-              <span className="ox-dt-range__span">{`${days} day${days === 1 ? "" : "s"}`}</span>
+              <span className="zb-dt-range__span">{`${days} day${days === 1 ? "" : "s"}`}</span>
             ) : null}
 
             {withCalendar ? (
               <button
                 type="button"
-                className="ox-dt-field__trigger ox-dt-range__trigger"
+                className="zb-dt-field__trigger zb-dt-range__trigger"
                 aria-label="Choose from calendar"
                 aria-haspopup="dialog"
                 aria-expanded={open}
@@ -1617,7 +1617,7 @@ DateRangeField.displayName = "DateRangeField";
  * conflating the two is how a component ends up with two sources of truth for
  * midnight.
  */
-export function timeToSegments(time: OxTime | null, hour24 = false): SegmentValues {
+export function timeToSegments(time: ZbTime | null, hour24 = false): SegmentValues {
   if (!time) return { h: null, mi: null, s: null, ap: null };
   if (hour24) return { h: time.h, mi: time.mi, s: time.s ?? null, ap: null };
   return {
@@ -1631,7 +1631,7 @@ export function timeToSegments(time: OxTime | null, hour24 = false): SegmentValu
 export function segmentsToTime(
   values: SegmentValues,
   options: { hour24?: boolean; showSecond?: boolean } = {},
-): OxTime | null {
+): ZbTime | null {
   const { h, mi, s, ap } = values;
   if (h == null || mi == null) return null;
   if (options.showSecond && s == null) return null;
@@ -1652,14 +1652,14 @@ export interface TimeFieldProps extends Omit<
   "onChange" | "defaultValue" | "children"
 > {
   /** Controlled value. Pass `null` for empty, never `undefined`. */
-  value?: OxTime | null;
+  value?: ZbTime | null;
   /**
    * Uncontrolled initial value. Pass this or `value`, never both; `value` wins if you pass
    * both.
    */
-  defaultValue?: OxTime | null;
+  defaultValue?: ZbTime | null;
   /** Fired on every complete time, and with `null` when cleared. */
-  onChange?: (value: OxTime | null) => void;
+  onChange?: (value: ZbTime | null) => void;
 
   /** 24-hour display. The stored value is 24-hour either way. */
   hour24?: boolean;
@@ -1680,9 +1680,9 @@ export interface TimeFieldProps extends Omit<
   presetLabel?: string;
 
   /** Earliest selectable time, inclusive. */
-  min?: OxTime;
+  min?: ZbTime;
   /** Latest selectable time, inclusive. */
-  max?: OxTime;
+  max?: ZbTime;
 
   /** The field's visible label, and its accessible name. */
   label?: string;
@@ -1762,7 +1762,7 @@ export const TimeField = React.forwardRef<HTMLDivElement, TimeFieldProps>(
     const fieldId = id ?? `${reactId}-field`;
     const messageId = `${reactId}-message`;
 
-    const emit = (next: OxTime | null) => {
+    const emit = (next: ZbTime | null) => {
       markEmitted(`${hour24 ? 24 : 12}|${timeKey(next)}`);
       setValue(next);
       onChange?.(next);
@@ -1808,19 +1808,19 @@ export const TimeField = React.forwardRef<HTMLDivElement, TimeFieldProps>(
     return (
       <div
         ref={ref}
-        data-ox-time-field={hour24 ? "24-hour" : "12-hour"}
-        className={cn("ox-dt-stack", className)}
+        data-zb-time-field={hour24 ? "24-hour" : "12-hour"}
+        className={cn("zb-dt-stack", className)}
         {...rest}
       >
         {label ? (
-          <label className="ox-dt-label" htmlFor={fieldId}>
+          <label className="zb-dt-label" htmlFor={fieldId}>
             {label}
             {required ? (
-              <span className="ox-dt-label__required" aria-hidden="true">
+              <span className="zb-dt-label__required" aria-hidden="true">
                 *
               </span>
             ) : null}
-            {optional ? <span className="ox-dt-label__optional">Optional</span> : null}
+            {optional ? <span className="zb-dt-label__optional">Optional</span> : null}
           </label>
         ) : null}
 
@@ -1847,7 +1847,7 @@ export const TimeField = React.forwardRef<HTMLDivElement, TimeFieldProps>(
         />
 
         {presets?.length ? (
-          <div className="ox-dt-chips" role="group" aria-label={presetLabel}>
+          <div className="zb-dt-chips" role="group" aria-label={presetLabel}>
             {presets.map((minutes) => {
               const time = plainTime(Math.floor(minutes / 60) % 24, minutes % 60);
               const on = value != null && minutesOfTime(value) === minutes % 1440;
@@ -1855,7 +1855,7 @@ export const TimeField = React.forwardRef<HTMLDivElement, TimeFieldProps>(
                 <button
                   key={minutes}
                   type="button"
-                  className="ox-dt-chip"
+                  className="zb-dt-chip"
                   aria-pressed={on}
                   disabled={disabled || readOnly}
                   onClick={() => {
@@ -1939,11 +1939,11 @@ export interface TimeRangeFieldProps extends Omit<
   "onChange" | "defaultValue" | "children"
 > {
   /** Controlled value. Either end may be null. */
-  value?: OxTimeRange | null;
+  value?: ZbTimeRange | null;
   /** Uncontrolled initial value. Pass this or `value`, never both. */
-  defaultValue?: OxTimeRange | null;
+  defaultValue?: ZbTimeRange | null;
   /** Fired when either end changes. */
-  onChange?: (range: OxTimeRange) => void;
+  onChange?: (range: ZbTimeRange) => void;
 
   /** 24-hour display. The stored value is 24-hour either way. */
   hour24?: boolean;
@@ -1997,10 +1997,10 @@ export interface TimeRangeFieldProps extends Omit<
   doneLabel?: string;
 }
 
-const EMPTY_TIME_RANGE: OxTimeRange = { start: null, end: null };
+const EMPTY_TIME_RANGE: ZbTimeRange = { start: null, end: null };
 
 /** `HH:MM`, for a form body. Never the locale rendering. */
-function isoTime(time: OxTime | null): string {
+function isoTime(time: ZbTime | null): string {
   if (!time) return "";
   return `${String(time.h).padStart(2, "0")}:${String(time.mi).padStart(2, "0")}`;
 }
@@ -2040,7 +2040,7 @@ function TimeColumn(props: {
   React.useEffect(() => {
     if (!shouldRefocus.current) return;
     shouldRefocus.current = false;
-    listRef.current?.querySelector<HTMLButtonElement>('[data-ox-dt-active="true"]')?.focus();
+    listRef.current?.querySelector<HTMLButtonElement>('[data-zb-dt-active="true"]')?.focus();
   });
 
   // The selected option is scrolled to on open. A column that opens at
@@ -2090,15 +2090,15 @@ function TimeColumn(props: {
   };
 
   return (
-    <div className="ox-dt-timecol">
-      <div className="ox-dt-timecol__head" id={headingId}>
+    <div className="zb-dt-timecol">
+      <div className="zb-dt-timecol__head" id={headingId}>
         {heading}
       </div>
       <div
         ref={listRef}
         role="listbox"
         aria-labelledby={headingId}
-        className="ox-dt-timecol__list"
+        className="zb-dt-timecol__list"
         onKeyDown={onKeyDown}
       >
         {minutes.map((value) => {
@@ -2116,8 +2116,8 @@ function TimeColumn(props: {
               aria-label={reason ? `${text}, unavailable, ${reason}` : text}
               title={reason ?? undefined}
               tabIndex={value === focusMinutes ? 0 : -1}
-              data-ox-dt-active={value === focusMinutes ? "true" : undefined}
-              className={cn("ox-dt-timeopt", reason && "ox-dt-timeopt--blocked")}
+              data-zb-dt-active={value === focusMinutes ? "true" : undefined}
+              className={cn("zb-dt-timeopt", reason && "zb-dt-timeopt--blocked")}
               onClick={() => {
                 if (reason) return;
                 setActive(value);
@@ -2167,7 +2167,7 @@ export const TimeRangeField = React.forwardRef<HTMLDivElement, TimeRangeFieldPro
       ...rest
     } = props;
 
-    const [range, setRange] = useTemporalValue<OxTimeRange>(
+    const [range, setRange] = useTemporalValue<ZbTimeRange>(
       controlled ?? undefined,
       defaultValue ?? EMPTY_TIME_RANGE,
     );
@@ -2178,7 +2178,7 @@ export const TimeRangeField = React.forwardRef<HTMLDivElement, TimeRangeFieldPro
       timeToSegments(range.end, hour24),
     );
     const [open, setOpen] = React.useState(false);
-    const [draft, setDraft] = React.useState<OxTimeRange>(range);
+    const [draft, setDraft] = React.useState<ZbTimeRange>(range);
     const startHandle = React.useRef<SegmentedFieldHandle>(null);
 
     const markEmitted = useValueSync(`${timeKey(range.start)}|${timeKey(range.end)}`, () => {
@@ -2190,7 +2190,7 @@ export const TimeRangeField = React.forwardRef<HTMLDivElement, TimeRangeFieldPro
     const fieldId = id ?? `${reactId}-time-range`;
     const messageId = `${reactId}-message`;
 
-    const write = (next: OxTimeRange) => {
+    const write = (next: ZbTimeRange) => {
       markEmitted(`${timeKey(next.start)}|${timeKey(next.end)}`);
       setRange(next);
       onChange?.(next);
@@ -2272,7 +2272,7 @@ export const TimeRangeField = React.forwardRef<HTMLDivElement, TimeRangeFieldPro
       [reasonForEnd, startMinutes],
     );
 
-    const setPanelRange = (next: OxTimeRange) => {
+    const setPanelRange = (next: ZbTimeRange) => {
       if (commit === "explicit") setDraft(next);
       else write(next);
     };
@@ -2327,32 +2327,32 @@ export const TimeRangeField = React.forwardRef<HTMLDivElement, TimeRangeFieldPro
     return (
       <div
         ref={ref}
-        data-ox-time-range={range.start && range.end ? "set" : "empty"}
-        className={cn("ox-dt-stack", className)}
+        data-zb-time-range={range.start && range.end ? "set" : "empty"}
+        className={cn("zb-dt-stack", className)}
         {...rest}
       >
         {label ? (
-          <span className="ox-dt-label" id={`${fieldId}-label`}>
+          <span className="zb-dt-label" id={`${fieldId}-label`}>
             {label}
             {required ? (
-              <span className="ox-dt-label__required" aria-hidden="true">
+              <span className="zb-dt-label__required" aria-hidden="true">
                 *
               </span>
             ) : null}
-            {optional ? <span className="ox-dt-label__optional">Optional</span> : null}
+            {optional ? <span className="zb-dt-label__optional">Optional</span> : null}
           </span>
         ) : null}
 
-        <div className={withPanel ? "ox-dt-anchor" : undefined}>
+        <div className={withPanel ? "zb-dt-anchor" : undefined}>
           <div
             className={cn(
-              "ox-dt-range",
-              isInvalid && "ox-dt-range--invalid",
-              disabled && "ox-dt-range--disabled",
-              readOnly && "ox-dt-range--readonly",
+              "zb-dt-range",
+              isInvalid && "zb-dt-range--invalid",
+              disabled && "zb-dt-range--disabled",
+              readOnly && "zb-dt-range--readonly",
             )}
           >
-            <span className="ox-dt-range__glyph" aria-hidden="true">
+            <span className="zb-dt-range__glyph" aria-hidden="true">
               <ClockGlyph />
             </span>
 
@@ -2389,7 +2389,7 @@ export const TimeRangeField = React.forwardRef<HTMLDivElement, TimeRangeFieldPro
             />
 
             {showDuration && duration != null && duration > 0 ? (
-              <span className="ox-dt-range__span">
+              <span className="zb-dt-range__span">
                 {formatDuration(duration, { compact: true })}
               </span>
             ) : null}
@@ -2397,7 +2397,7 @@ export const TimeRangeField = React.forwardRef<HTMLDivElement, TimeRangeFieldPro
             {withPanel ? (
               <button
                 type="button"
-                className="ox-dt-field__trigger ox-dt-range__trigger"
+                className="zb-dt-field__trigger zb-dt-range__trigger"
                 aria-label="Choose from a list of times"
                 aria-haspopup="dialog"
                 aria-expanded={open}
@@ -2413,8 +2413,8 @@ export const TimeRangeField = React.forwardRef<HTMLDivElement, TimeRangeFieldPro
 
           {withPanel ? (
             <TemporalPopover open={open} onDismiss={dismiss} label={label ?? "Choose a time range"}>
-              <div className="ox-dt-timerange">
-                <div className="ox-dt-timerange__cols">
+              <div className="zb-dt-timerange">
+                <div className="zb-dt-timerange__cols">
                   <TimeColumn
                     heading={startLabel}
                     minutes={options}
@@ -2446,11 +2446,11 @@ export const TimeRangeField = React.forwardRef<HTMLDivElement, TimeRangeFieldPro
                 </div>
 
                 {commit === "explicit" ? (
-                  <div className="ox-dt-cal__foot">
-                    <div className="ox-dt-cal__actions">
+                  <div className="zb-dt-cal__foot">
+                    <div className="zb-dt-cal__actions">
                       <button
                         type="button"
-                        className="ox-dt-cal__action"
+                        className="zb-dt-cal__action"
                         onClick={() => {
                           setDraft(range);
                           dismiss();
@@ -2460,7 +2460,7 @@ export const TimeRangeField = React.forwardRef<HTMLDivElement, TimeRangeFieldPro
                       </button>
                       <button
                         type="button"
-                        className="ox-dt-cal__action ox-dt-cal__action--primary"
+                        className="zb-dt-cal__action zb-dt-cal__action--primary"
                         disabled={!draft.start || !draft.end}
                         onClick={() => {
                           write(draft);
@@ -2673,7 +2673,7 @@ export const SessionTimeField = React.forwardRef<HTMLDivElement, SessionTimeFiel
                     {" "}
                     <button
                       type="button"
-                      className="ox-dt-chip"
+                      className="zb-dt-chip"
                       onClick={() => emit(withSessionEnd(session, suggestedEnd, options))}
                     >
                       {`End at ${formatClockTime(suggestedEnd, { hour24 })} instead`}
@@ -2700,11 +2700,11 @@ export const SessionTimeField = React.forwardRef<HTMLDivElement, SessionTimeFiel
         // The driver, queryable. A VRT shot and an interaction test both need
         // to know which member is held, and reading it off a class name is
         // how a test comes to depend on a style.
-        data-ox-session={session.hold}
-        className={cn("ox-dt-stack", className)}
+        data-zb-session={session.hold}
+        className={cn("zb-dt-stack", className)}
         {...rest}
       >
-        <div className="ox-dt-session">
+        <div className="zb-dt-session">
           <TimeField
             label={startLabel}
             hour24={hour24}
@@ -2716,7 +2716,7 @@ export const SessionTimeField = React.forwardRef<HTMLDivElement, SessionTimeFiel
             }}
           />
 
-          <span className="ox-dt-session__arrow" aria-hidden="true">
+          <span className="zb-dt-session__arrow" aria-hidden="true">
             <svg
               viewBox="0 0 24 24"
               width="18"
@@ -2731,7 +2731,7 @@ export const SessionTimeField = React.forwardRef<HTMLDivElement, SessionTimeFiel
             </svg>
           </span>
 
-          <div className="ox-dt-stack">
+          <div className="zb-dt-stack">
             <TimeField
               label={endLabel}
               hour24={hour24}
@@ -2744,21 +2744,21 @@ export const SessionTimeField = React.forwardRef<HTMLDivElement, SessionTimeFiel
             />
             <DriverBadge held={session.hold === "end"} />
             {session.endDayOffset ? (
-              <span className="ox-dt-nextday">
+              <span className="zb-dt-nextday">
                 {nextDateLabel ? `next day · ${nextDateLabel}` : "next day"}
               </span>
             ) : null}
           </div>
 
-          <div className="ox-dt-stack">
-            <span className="ox-dt-label" id={`${reactId}-duration`}>
+          <div className="zb-dt-stack">
+            <span className="zb-dt-label" id={`${reactId}-duration`}>
               {durationLabel}
             </span>
             <output
               className={cn(
-                "ox-dt-session__duration",
-                session.hold === "duration" && "ox-dt-session__duration--held",
-                session.exceedsMax && "ox-dt-session__duration--invalid",
+                "zb-dt-session__duration",
+                session.hold === "duration" && "zb-dt-session__duration--held",
+                session.exceedsMax && "zb-dt-session__duration--invalid",
               )}
               aria-labelledby={`${reactId}-duration`}
             >
@@ -2769,12 +2769,12 @@ export const SessionTimeField = React.forwardRef<HTMLDivElement, SessionTimeFiel
         </div>
 
         {durationPresets?.length ? (
-          <div className="ox-dt-chips" role="group" aria-label="Session length">
+          <div className="zb-dt-chips" role="group" aria-label="Session length">
             {durationPresets.map((preset) => (
               <button
                 key={preset.minutes}
                 type="button"
-                className="ox-dt-chip"
+                className="zb-dt-chip"
                 aria-pressed={session.durationMin === preset.minutes}
                 disabled={disabled || readOnly}
                 title={preset.label}
@@ -2782,7 +2782,7 @@ export const SessionTimeField = React.forwardRef<HTMLDivElement, SessionTimeFiel
               >
                 {`${preset.minutes}m`}
                 {bands?.length ? (
-                  <span className="ox-dt-chip__code">
+                  <span className="zb-dt-chip__code">
                     {bandFor(preset.minutes, bands)?.code ?? ""}
                   </span>
                 ) : null}
@@ -2794,7 +2794,7 @@ export const SessionTimeField = React.forwardRef<HTMLDivElement, SessionTimeFiel
         {/* The whole session as one sentence, for a screen reader that would
             otherwise have to assemble it from three separate controls and a
             badge. Polite: it changes on every keystroke. */}
-        <span className="ox-dt-sr" role="status" aria-live="polite">
+        <span className="zb-dt-sr" role="status" aria-live="polite">
           {`${formatClockTime(session.start, { hour24 })} to ${formatClockTime(session.end, { hour24 })}${
             session.endDayOffset ? " the next day" : ""
           }, ${formatDuration(session.durationMin)}. ${
@@ -2805,7 +2805,7 @@ export const SessionTimeField = React.forwardRef<HTMLDivElement, SessionTimeFiel
         </span>
 
         {startDateLabel ? (
-          <span className="ox-dt-sr">{`Session date ${startDateLabel}`}</span>
+          <span className="zb-dt-sr">{`Session date ${startDateLabel}`}</span>
         ) : null}
 
         {notice ? (
@@ -2829,7 +2829,7 @@ SessionTimeField.displayName = "SessionTimeField";
  */
 function DriverBadge(props: { held: boolean }) {
   return (
-    <span className={cn("ox-dt-driver", props.held && "ox-dt-driver--held")}>
+    <span className={cn("zb-dt-driver", props.held && "zb-dt-driver--held")}>
       {props.held ? <LockGlyph /> : null}
       {props.held ? "Held" : "Derived"}
     </span>
@@ -2890,7 +2890,7 @@ export const BEHAVIORAL_HEALTH_DURATIONS: readonly DurationPreset[] = [
  */
 
 /** Everything a birth date can legitimately be. */
-export type BirthDateValue = OxDate | OxPartialDate | OxAbsentDate | null;
+export type BirthDateValue = ZbDate | ZbPartialDate | ZbAbsentDate | null;
 
 /** How much of the date the workflow is asking for. */
 export type BirthDatePrecision = "day" | "month" | "year";
@@ -2913,7 +2913,7 @@ export interface BirthDateFieldProps extends Omit<
   onChange?: (value: BirthDateValue) => void;
 
   /** Today, supplied by the host. The age and the future check both need it. */
-  now: OxDate;
+  now: ZbDate;
 
   /**
    * How exactly the date is known — full, month, or year. Controlled; pair with
@@ -2948,7 +2948,7 @@ export interface BirthDateFieldProps extends Omit<
    * Offered rather than applied, because silently pre-filling a legal
    * attestation is a different defect from making somebody type it twice.
    */
-  suggested?: OxDate;
+  suggested?: ZbDate;
 
   /** The field's visible label, and its accessible name. */
   label?: string;
@@ -3001,11 +3001,11 @@ const YEAR_SEGMENT: FieldSegment = {
   wide: true,
 };
 
-function isAbsent(value: BirthDateValue): value is OxAbsentDate {
+function isAbsent(value: BirthDateValue): value is ZbAbsentDate {
   return !!value && value.kind === "absent";
 }
 
-function asFullDate(value: BirthDateValue): OxDate | null {
+function asFullDate(value: BirthDateValue): ZbDate | null {
   return value && value.kind === "date" ? value : null;
 }
 
@@ -3129,26 +3129,26 @@ export const BirthDateField = React.forwardRef<HTMLDivElement, BirthDateFieldPro
     return (
       <div
         ref={ref}
-        data-ox-birth-date={isAbsent(value) ? "absent" : precision}
-        className={cn("ox-dt-stack", className)}
+        data-zb-birth-date={isAbsent(value) ? "absent" : precision}
+        className={cn("zb-dt-stack", className)}
         {...rest}
       >
-        <label className="ox-dt-label" htmlFor={fieldId}>
+        <label className="zb-dt-label" htmlFor={fieldId}>
           {label}
           {required ? (
-            <span className="ox-dt-label__required" aria-hidden="true">
+            <span className="zb-dt-label__required" aria-hidden="true">
               *
             </span>
           ) : null}
         </label>
 
         {isAbsent(value) ? (
-          <div className="ox-dt-readout">
-            <span className="ox-dt-readout__absent">Not recorded</span>
+          <div className="zb-dt-readout">
+            <span className="zb-dt-readout__absent">Not recorded</span>
             {!readOnly && !disabled ? (
               <button
                 type="button"
-                className="ox-dt-chip"
+                className="zb-dt-chip"
                 onClick={() => {
                   emit(null);
                   setSegments({ m: null, d: null, y: null });
@@ -3159,7 +3159,7 @@ export const BirthDateField = React.forwardRef<HTMLDivElement, BirthDateFieldPro
             ) : null}
           </div>
         ) : (
-          <div className="ox-dt-anchor">
+          <div className="zb-dt-anchor">
             <SegmentedField
               id={fieldId}
               segments={segmentSet}
@@ -3217,30 +3217,30 @@ export const BirthDateField = React.forwardRef<HTMLDivElement, BirthDateFieldPro
         )}
 
         {!hideAge && (age || value?.kind === "partial-date") ? (
-          <div className="ox-dt-age">
+          <div className="zb-dt-age">
             {age ? (
               <>
-                <span className="ox-dt-age__value">
+                <span className="zb-dt-age__value">
                   {age.days < 28 ? age.days : age.years < 2 ? age.months : age.years}
                 </span>
-                <span className="ox-dt-age__unit">
+                <span className="zb-dt-age__unit">
                   {describeAgeLabel(age).replace(/^\d+\s/, "")}
                 </span>
               </>
             ) : value?.kind === "partial-date" ? (
               <>
-                <span className="ox-dt-age__value">{`about ${now.y - value.y}`}</span>
-                <span className="ox-dt-age__unit">years old</span>
+                <span className="zb-dt-age__value">{`about ${now.y - value.y}`}</span>
+                <span className="zb-dt-age__unit">years old</span>
               </>
             ) : null}
           </div>
         ) : null}
 
-        <div className="ox-dt-chips">
+        <div className="zb-dt-chips">
           {suggested && !full ? (
             <button
               type="button"
-              className="ox-dt-chip"
+              className="zb-dt-chip"
               disabled={disabled || readOnly}
               onClick={() => commitSegments(dateToSegments(suggested))}
             >
@@ -3251,7 +3251,7 @@ export const BirthDateField = React.forwardRef<HTMLDivElement, BirthDateFieldPro
           {allowEstimated ? (
             <button
               type="button"
-              className="ox-dt-chip"
+              className="zb-dt-chip"
               aria-pressed={precision === "year"}
               disabled={disabled || readOnly}
               onClick={() => switchPrecision(precision === "year" ? "day" : "year")}
@@ -3263,7 +3263,7 @@ export const BirthDateField = React.forwardRef<HTMLDivElement, BirthDateFieldPro
           {allowAbsent ? (
             <button
               type="button"
-              className="ox-dt-chip"
+              className="zb-dt-chip"
               aria-pressed={isAbsent(value)}
               disabled={disabled || readOnly}
               onClick={() =>
@@ -3334,9 +3334,9 @@ BirthDateField.displayName = "BirthDateField";
 
 export interface ClinicalDateTimeProps extends Omit<React.HTMLAttributes<HTMLElement>, "children"> {
   /** Any member of the temporal value space, including absence. */
-  value: OxTemporal | null;
+  value: ZbTemporal | null;
   /** Today, for the relative aid. Omit it and no relative label is rendered. */
-  now?: OxDate;
+  now?: ZbDate;
   /** Show "5 days ago" beside the value. */
   showRelative?: boolean;
   /**
@@ -3384,14 +3384,14 @@ export const ClinicalDateTime = React.forwardRef<HTMLElement, ClinicalDateTimePr
       return (
         <Tag
           ref={ref}
-          data-ox-clinical-date-time="restricted"
-          className={cn("ox-dt-readout", "ox-dt-readout--restricted", className)}
+          data-zb-clinical-date-time="restricted"
+          className={cn("zb-dt-readout", "zb-dt-readout--restricted", className)}
           {...rest}
         >
           {/* Masked rather than removed: a missing field reads as a missing
               record, and the difference matters to whoever asks next. */}
           <span aria-hidden="true">•• / •• / ••••</span>
-          <span className="ox-dt-sr">Hidden by your access level</span>
+          <span className="zb-dt-sr">Hidden by your access level</span>
         </Tag>
       );
     }
@@ -3400,11 +3400,11 @@ export const ClinicalDateTime = React.forwardRef<HTMLElement, ClinicalDateTimePr
       return (
         <Tag
           ref={ref}
-          data-ox-clinical-date-time="empty"
-          className={cn("ox-dt-readout", className)}
+          data-zb-clinical-date-time="empty"
+          className={cn("zb-dt-readout", className)}
           {...rest}
         >
-          <span className="ox-dt-readout__absent">Not recorded</span>
+          <span className="zb-dt-readout__absent">Not recorded</span>
         </Tag>
       );
     }
@@ -3413,11 +3413,11 @@ export const ClinicalDateTime = React.forwardRef<HTMLElement, ClinicalDateTimePr
       return (
         <Tag
           ref={ref}
-          data-ox-clinical-date-time="absent"
-          className={cn("ox-dt-readout", className)}
+          data-zb-clinical-date-time="absent"
+          className={cn("zb-dt-readout", className)}
           {...rest}
         >
-          <span className="ox-dt-readout__absent">
+          <span className="zb-dt-readout__absent">
             {ABSENCE_WORDS[value.reason] ?? "Not recorded"}
           </span>
         </Tag>
@@ -3427,7 +3427,7 @@ export const ClinicalDateTime = React.forwardRef<HTMLElement, ClinicalDateTimePr
     /* ---- the parts ---------------------------------------------------- */
 
     let primary: string;
-    let dateForRelative: OxDate | null = null;
+    let dateForRelative: ZbDate | null = null;
     let machine: string | undefined;
 
     switch (value.kind) {
@@ -3460,7 +3460,7 @@ export const ClinicalDateTime = React.forwardRef<HTMLElement, ClinicalDateTimePr
         break;
       case "instant":
       default: {
-        const instant = value as Extract<OxTemporal, { kind: "instant" }>;
+        const instant = value as Extract<ZbTemporal, { kind: "instant" }>;
         primary = `${formatPlainDate(instant.date, "medium")} · ${formatClockTime(instant.time, { hour24 })}`;
         dateForRelative = instant.date;
         machine = `${formatPlainDate(instant.date, "iso")}T${formatClockTime(instant.time, { hour24: true })} ${instant.zone}`;
@@ -3490,16 +3490,16 @@ export const ClinicalDateTime = React.forwardRef<HTMLElement, ClinicalDateTimePr
     return (
       <Tag
         ref={ref}
-        data-ox-clinical-date-time={value.kind}
+        data-zb-clinical-date-time={value.kind}
         dateTime={as === "time" ? machine : undefined}
-        className={cn("ox-dt-readout", className)}
+        className={cn("zb-dt-readout", className)}
         {...rest}
       >
         <span>{primary}</span>
-        {relative ? <span className="ox-dt-readout__relative">{relative}</span> : null}
-        {secondZone ? <span className="ox-dt-readout__relative">{secondZone}</span> : null}
+        {relative ? <span className="zb-dt-readout__relative">{relative}</span> : null}
+        {secondZone ? <span className="zb-dt-readout__relative">{secondZone}</span> : null}
         {showZone && value.kind === "instant" ? (
-          <span className="ox-dt-readout__zone">{machine}</span>
+          <span className="zb-dt-readout__zone">{machine}</span>
         ) : null}
       </Tag>
     );
@@ -3545,7 +3545,7 @@ export interface TimeSlotGridProps extends Omit<
   /** Availability as the host read it. Never fetched here. */
   set: AvailabilitySet;
   /** The clock, injected. Staleness is measured against it. */
-  now?: { date: OxDate; time: OxTime };
+  now?: { date: ZbDate; time: ZbTime };
   /** Selected slot id. Ids are stable across a refresh on purpose. */
   value?: string | null;
   /**
@@ -3593,9 +3593,9 @@ export const TimeSlotGrid = React.forwardRef<HTMLDivElement, TimeSlotGridProps>(
 
     if (set.slots.length === 0 || openTotal === 0) {
       return (
-        <div ref={ref} data-ox-slot-grid="empty" className={cn("ox-dt-stack", className)} {...rest}>
+        <div ref={ref} data-zb-slot-grid="empty" className={cn("zb-dt-stack", className)} {...rest}>
           {emptyState ?? (
-            <p className="ox-dt-msg">
+            <p className="zb-dt-msg">
               {set.exhausted
                 ? "No times on this day."
                 : // "We stopped looking" and "there is nothing" are different
@@ -3612,32 +3612,32 @@ export const TimeSlotGrid = React.forwardRef<HTMLDivElement, TimeSlotGridProps>(
     return (
       <div
         ref={ref}
-        data-ox-slot-grid={stale ? "stale" : "fresh"}
-        className={cn("ox-dt-stack", className)}
+        data-zb-slot-grid={stale ? "stale" : "fresh"}
+        className={cn("zb-dt-stack", className)}
         {...rest}
       >
         {now ? (
-          <p className="ox-dt-asof" role="status" aria-live="polite">
+          <p className="zb-dt-asof" role="status" aria-live="polite">
             {stale
               ? `Availability is ${ageMinutes} minute${ageMinutes === 1 ? "" : "s"} old.`
               : `${openTotal} time${openTotal === 1 ? "" : "s"} · as of ${formatClockTime(set.asOf.time, { hour24 })}`}
             {stale && onRefresh ? (
-              <button type="button" className="ox-dt-chip" onClick={onRefresh}>
+              <button type="button" className="zb-dt-chip" onClick={onRefresh}>
                 Refresh
               </button>
             ) : null}
           </p>
         ) : null}
 
-        <div className={cn(stale && "ox-dt-slots--stale")}>
+        <div className={cn(stale && "zb-dt-slots--stale")}>
           {groups.map((group) => (
-            <section key={group.part} className="ox-dt-slotgroup">
-              <h6 className="ox-dt-slotgroup__head" id={`${group.part}-head`}>
+            <section key={group.part} className="zb-dt-slotgroup">
+              <h6 className="zb-dt-slotgroup__head" id={`${group.part}-head`}>
                 {group.label}
-                <span className="ox-dt-slotgroup__rule" aria-hidden="true" />
+                <span className="zb-dt-slotgroup__rule" aria-hidden="true" />
                 <span>{`${group.openCount} open`}</span>
               </h6>
-              <div className="ox-dt-slots" role="group" aria-labelledby={`${group.part}-head`}>
+              <div className="zb-dt-slots" role="group" aria-labelledby={`${group.part}-head`}>
                 {group.slots.map((slot) => (
                   <SlotButton
                     key={slot.id}
@@ -3654,7 +3654,7 @@ export const TimeSlotGrid = React.forwardRef<HTMLDivElement, TimeSlotGridProps>(
         </div>
 
         {/* The group label, once, for a reader arriving by landmark. */}
-        <span className="ox-dt-sr">{label}</span>
+        <span className="zb-dt-sr">{label}</span>
       </div>
     );
   },
@@ -3692,12 +3692,12 @@ function SlotButton(props: {
   return (
     <button
       type="button"
-      data-ox-slot={state.kind}
+      data-zb-slot={state.kind}
       className={cn(
-        "ox-dt-slot",
-        selected && "ox-dt-slot--selected",
-        blocked && "ox-dt-slot--blocked",
-        held && "ox-dt-slot--held",
+        "zb-dt-slot",
+        selected && "zb-dt-slot--selected",
+        blocked && "zb-dt-slot--blocked",
+        held && "zb-dt-slot--held",
       )}
       aria-label={name}
       aria-pressed={selected}
@@ -3754,7 +3754,7 @@ export interface RecurrenceFieldProps extends Omit<
   onChange?: (rule: RecurrenceRule) => void;
 
   /** The first occurrence. The rule is meaningless without one. */
-  startDate: OxDate;
+  startDate: ZbDate;
   /** Rendered into the sentence — "at 3:00 PM". */
   timeLabel?: string;
   /** How far the preview expands. Bounded twice; this is the softer bound. */
@@ -3764,7 +3764,7 @@ export interface RecurrenceFieldProps extends Omit<
   /** Whether "no end date" may be chosen at all. */
   allowNoEnd?: boolean;
   /** Emitted whenever the expansion changes, so a host can check conflicts. */
-  onExpand?: (dates: OxDate[]) => void;
+  onExpand?: (dates: ZbDate[]) => void;
 
   /**
    * A rule imported from elsewhere that this component cannot express.
@@ -3854,12 +3854,12 @@ export const RecurrenceField = React.forwardRef<HTMLDivElement, RecurrenceFieldP
       return (
         <div
           ref={ref}
-          data-ox-recurrence="unsupported"
-          className={cn("ox-dt-stack", className)}
+          data-zb-recurrence="unsupported"
+          className={cn("zb-dt-stack", className)}
           {...rest}
         >
-          <span className="ox-dt-label">{label}</span>
-          <p className="ox-dt-summary">
+          <span className="zb-dt-label">{label}</span>
+          <p className="zb-dt-summary">
             <b>This series cannot be edited here.</b>{" "}
             {`It uses ${unsupported.parts.join(", ")}, which this builder does not implement.`}
             <code>{unsupported.source}</code>
@@ -3883,20 +3883,20 @@ export const RecurrenceField = React.forwardRef<HTMLDivElement, RecurrenceFieldP
         ref={ref}
         role="group"
         aria-label={label}
-        data-ox-recurrence={rule.freq.toLowerCase()}
-        className={cn("ox-dt-stack", className)}
+        data-zb-recurrence={rule.freq.toLowerCase()}
+        className={cn("zb-dt-stack", className)}
         {...rest}
       >
-        <div className="ox-dt-stack">
-          <span className="ox-dt-label" id={`${reactId}-freq`}>
+        <div className="zb-dt-stack">
+          <span className="zb-dt-label" id={`${reactId}-freq`}>
             Frequency
           </span>
-          <div className="ox-dt-chips" role="group" aria-labelledby={`${reactId}-freq`}>
+          <div className="zb-dt-chips" role="group" aria-labelledby={`${reactId}-freq`}>
             {FREQUENCIES.map((option) => (
               <button
                 key={option.id}
                 type="button"
-                className="ox-dt-chip"
+                className="zb-dt-chip"
                 aria-pressed={option.id === rule.freq}
                 disabled={disabled}
                 onClick={() => emit({ ...rule, freq: option.id })}
@@ -3907,16 +3907,16 @@ export const RecurrenceField = React.forwardRef<HTMLDivElement, RecurrenceFieldP
           </div>
         </div>
 
-        <div className="ox-dt-stack">
-          <span className="ox-dt-label" id={`${reactId}-interval`}>
+        <div className="zb-dt-stack">
+          <span className="zb-dt-label" id={`${reactId}-interval`}>
             Every
           </span>
-          <div className="ox-dt-chips" role="group" aria-labelledby={`${reactId}-interval`}>
+          <div className="zb-dt-chips" role="group" aria-labelledby={`${reactId}-interval`}>
             {[1, 2, 3, 4].map((n) => (
               <button
                 key={n}
                 type="button"
-                className="ox-dt-chip"
+                className="zb-dt-chip"
                 aria-pressed={(rule.interval ?? 1) === n}
                 disabled={disabled}
                 onClick={() => emit({ ...rule, interval: n })}
@@ -3928,11 +3928,11 @@ export const RecurrenceField = React.forwardRef<HTMLDivElement, RecurrenceFieldP
         </div>
 
         {rule.freq === "WEEKLY" ? (
-          <div className="ox-dt-stack">
-            <span className="ox-dt-label" id={`${reactId}-days`}>
+          <div className="zb-dt-stack">
+            <span className="zb-dt-label" id={`${reactId}-days`}>
               On
             </span>
-            <div className="ox-dt-weekdays" role="group" aria-labelledby={`${reactId}-days`}>
+            <div className="zb-dt-weekdays" role="group" aria-labelledby={`${reactId}-days`}>
               {([0, 1, 2, 3, 4, 5, 6] as Weekday[]).map((day) => {
                 const on = (rule.byWeekday ?? []).includes(day);
                 return (
@@ -3963,14 +3963,14 @@ export const RecurrenceField = React.forwardRef<HTMLDivElement, RecurrenceFieldP
           </div>
         ) : null}
 
-        <div className="ox-dt-stack">
-          <span className="ox-dt-label" id={`${reactId}-ends`}>
+        <div className="zb-dt-stack">
+          <span className="zb-dt-label" id={`${reactId}-ends`}>
             Ends
           </span>
-          <div className="ox-dt-chips" role="group" aria-labelledby={`${reactId}-ends`}>
+          <div className="zb-dt-chips" role="group" aria-labelledby={`${reactId}-ends`}>
             <button
               type="button"
-              className="ox-dt-chip"
+              className="zb-dt-chip"
               aria-pressed={endMode === "count"}
               disabled={disabled}
               onClick={() => emit({ ...rule, count: countOptions[2] ?? 12, until: undefined })}
@@ -3979,7 +3979,7 @@ export const RecurrenceField = React.forwardRef<HTMLDivElement, RecurrenceFieldP
             </button>
             <button
               type="button"
-              className="ox-dt-chip"
+              className="zb-dt-chip"
               aria-pressed={endMode === "until"}
               disabled={disabled}
               onClick={() =>
@@ -3991,7 +3991,7 @@ export const RecurrenceField = React.forwardRef<HTMLDivElement, RecurrenceFieldP
             {allowNoEnd ? (
               <button
                 type="button"
-                className="ox-dt-chip"
+                className="zb-dt-chip"
                 aria-pressed={endMode === "never"}
                 disabled={disabled}
                 onClick={() => emit({ ...rule, count: undefined, until: undefined })}
@@ -4002,12 +4002,12 @@ export const RecurrenceField = React.forwardRef<HTMLDivElement, RecurrenceFieldP
           </div>
 
           {endMode === "count" ? (
-            <div className="ox-dt-chips" role="group" aria-label="Number of sessions">
+            <div className="zb-dt-chips" role="group" aria-label="Number of sessions">
               {countOptions.map((n) => (
                 <button
                   key={n}
                   type="button"
-                  className="ox-dt-chip"
+                  className="zb-dt-chip"
                   aria-pressed={rule.count === n}
                   disabled={disabled}
                   onClick={() => emit({ ...rule, count: n, until: undefined })}
@@ -4019,7 +4019,7 @@ export const RecurrenceField = React.forwardRef<HTMLDivElement, RecurrenceFieldP
           ) : null}
         </div>
 
-        <p className="ox-dt-summary" role="status" aria-live="polite">
+        <p className="zb-dt-summary" role="status" aria-live="polite">
           <b>{sentence.charAt(0).toUpperCase() + sentence.slice(1)}</b>
           {/* "Last" only where the rule actually has one. An unbounded rule's
               final previewed date is an artefact of the preview cap, and
@@ -4097,13 +4097,13 @@ export interface SchedulableActor {
 /** What the host is being asked for. */
 export interface AvailabilityQuery {
   actorId: string;
-  date: OxDate;
+  date: ZbDate;
   durationMinutes: number;
 }
 
 /** Open counts per day, so the strip can be drawn without loading each day. */
 export interface DayLoad {
-  date: OxDate;
+  date: ZbDate;
   openCount: number;
 }
 
@@ -4136,9 +4136,9 @@ export interface AppointmentSchedulerProps extends Omit<
   onActorChange?: (actorId: string) => void;
 
   /** The day whose slots are shown. */
-  date?: OxDate;
+  date?: ZbDate;
   /** Fired when the reader moves to another day. */
-  onDateChange?: (date: OxDate) => void;
+  onDateChange?: (date: ZbDate) => void;
   /** Open counts for the strip. The host supplies these; nothing is derived. */
   dayLoads?: readonly DayLoad[];
   /** How many days the strip shows. */
@@ -4153,7 +4153,7 @@ export interface AppointmentSchedulerProps extends Omit<
   onRequestAvailability?: (query: AvailabilityQuery) => void;
 
   /** The clock, injected. Staleness and the strip both need it. */
-  now: { date: OxDate; time: OxTime };
+  now: { date: ZbDate; time: ZbTime };
   /** How long the appointment being booked is. Changes which slots can accommodate it. */
   durationMinutes?: number;
   /**
@@ -4167,7 +4167,7 @@ export interface AppointmentSchedulerProps extends Omit<
    * Fired with the chosen slot. Booking itself is the host's, because it needs a write the
    * component cannot make.
    */
-  onSelect?: (choice: { actor: SchedulableActor; date: OxDate; slot: Slot }) => void;
+  onSelect?: (choice: { actor: SchedulableActor; date: ZbDate; slot: Slot }) => void;
   /** A hold that ran out while the form was open. */
   onHoldExpired?: (slot: Slot) => void;
   /** The server said no. Rendered with its alternatives. */
@@ -4211,7 +4211,7 @@ export const AppointmentScheduler = React.forwardRef<HTMLDivElement, Appointment
     const actorId = controlledActor ?? uncontrolledActor;
     const actor = providers.find((p) => p.id === actorId) ?? providers[0];
 
-    const [uncontrolledDate, setUncontrolledDate] = React.useState<OxDate>(now.date);
+    const [uncontrolledDate, setUncontrolledDate] = React.useState<ZbDate>(now.date);
     const date = controlledDate ?? uncontrolledDate;
 
     const [uncontrolledValue, setUncontrolledValue] = React.useState<string | null>(null);
@@ -4238,7 +4238,7 @@ export const AppointmentScheduler = React.forwardRef<HTMLDivElement, Appointment
       ask({ actorId: nextId });
     };
 
-    const pickDate = (next: OxDate) => {
+    const pickDate = (next: ZbDate) => {
       if (isSameDate(next, date)) return;
       if (controlledDate === undefined) setUncontrolledDate(next);
       if (controlledValue === undefined) setUncontrolledValue(null);
@@ -4251,7 +4251,7 @@ export const AppointmentScheduler = React.forwardRef<HTMLDivElement, Appointment
       [now.date, horizonDays],
     );
 
-    const loadFor = (day: OxDate): number | null => {
+    const loadFor = (day: ZbDate): number | null => {
       const found = dayLoads?.find((entry) => isSameDate(entry.date, day));
       return found ? found.openCount : null;
     };
@@ -4272,18 +4272,18 @@ export const AppointmentScheduler = React.forwardRef<HTMLDivElement, Appointment
         ref={ref}
         role="group"
         aria-label={label}
-        data-ox-appointment-scheduler={selected ? "selected" : "choosing"}
-        className={cn("ox-dt-stack", className)}
+        data-zb-appointment-scheduler={selected ? "selected" : "choosing"}
+        className={cn("zb-dt-stack", className)}
         {...rest}
       >
         {/* ---- who ---------------------------------------------------- */}
         {providers.length > 1 ? (
-          <div className="ox-dt-chips" role="group" aria-label="Clinician">
+          <div className="zb-dt-chips" role="group" aria-label="Clinician">
             {providers.map((provider) => (
               <button
                 key={provider.id}
                 type="button"
-                className="ox-dt-chip"
+                className="zb-dt-chip"
                 aria-pressed={provider.id === actorId}
                 onClick={() => pickActor(provider.id)}
               >
@@ -4294,7 +4294,7 @@ export const AppointmentScheduler = React.forwardRef<HTMLDivElement, Appointment
         ) : null}
 
         {/* ---- when: the week strip ----------------------------------- */}
-        <div className="ox-dt-daystrip" role="group" aria-label="Day">
+        <div className="zb-dt-daystrip" role="group" aria-label="Day">
           {days.map((day) => {
             const open = loadFor(day);
             const empty = open === 0;
@@ -4310,9 +4310,9 @@ export const AppointmentScheduler = React.forwardRef<HTMLDivElement, Appointment
                 key={formatPlainDate(day, "iso")}
                 type="button"
                 className={cn(
-                  "ox-dt-day",
-                  isSameDate(day, date) && "ox-dt-day--selected",
-                  empty && "ox-dt-day--empty",
+                  "zb-dt-day",
+                  isSameDate(day, date) && "zb-dt-day--selected",
+                  empty && "zb-dt-day--empty",
                 )}
                 aria-label={name}
                 aria-pressed={isSameDate(day, date)}
@@ -4322,10 +4322,10 @@ export const AppointmentScheduler = React.forwardRef<HTMLDivElement, Appointment
                   pickDate(day);
                 }}
               >
-                <span className="ox-dt-day__weekday" aria-hidden="true">
+                <span className="zb-dt-day__weekday" aria-hidden="true">
                   {WEEKDAY_ABBREVIATIONS[weekdayOf(day)]}
                 </span>
-                <span className="ox-dt-day__date" aria-hidden="true">
+                <span className="zb-dt-day__date" aria-hidden="true">
                   {day.d}
                 </span>
                 {/* The count, where there is one. An unknown load renders
@@ -4333,7 +4333,7 @@ export const AppointmentScheduler = React.forwardRef<HTMLDivElement, Appointment
                     there is nothing", which is a different fact from "we have
                     not looked", and the accessible name above says which. */}
                 {open == null ? null : (
-                  <span className="ox-dt-day__count" aria-hidden="true">
+                  <span className="zb-dt-day__count" aria-hidden="true">
                     {open === 0 ? "0 open" : `${open} open`}
                   </span>
                 )}
@@ -4358,19 +4358,19 @@ export const AppointmentScheduler = React.forwardRef<HTMLDivElement, Appointment
 
         {/* ---- the server said no ------------------------------------- */}
         {rejection ? (
-          <div className="ox-dt-stack" data-ox-rejection="true">
+          <div className="zb-dt-stack" data-zb-rejection="true">
             <FieldMessage tone="error" id={`${reactId}-rejection`}>
               {rejection.reason}
             </FieldMessage>
             {rejection.alternatives?.length ? (
               <>
-                <p className="ox-dt-msg">Nothing was booked. These are still open:</p>
-                <div className="ox-dt-slots" role="group" aria-label="Alternative times">
+                <p className="zb-dt-msg">Nothing was booked. These are still open:</p>
+                <div className="zb-dt-slots" role="group" aria-label="Alternative times">
                   {rejection.alternatives.map((slot) => (
                     <button
                       key={slot.id}
                       type="button"
-                      className="ox-dt-slot"
+                      className="zb-dt-slot"
                       onClick={() => {
                         if (controlledValue === undefined) setUncontrolledValue(slot.id);
                         if (actor) onSelect?.({ actor, date, slot });
@@ -4387,7 +4387,7 @@ export const AppointmentScheduler = React.forwardRef<HTMLDivElement, Appointment
 
         {/* ---- the sentence ------------------------------------------- */}
         {selected && actor ? (
-          <p className="ox-dt-summary" role="status" aria-live="polite">
+          <p className="zb-dt-summary" role="status" aria-live="polite">
             <b>{actor.name}</b>
             {` · ${formatPlainDate(date, "long")} · ${formatClockTime(selected.start, { hour24 })} – ${formatClockTime(
               timeFromMinutes(minutesOfTime(selected.start) + selected.durationMinutes).time,
@@ -4407,10 +4407,10 @@ export const AppointmentScheduler = React.forwardRef<HTMLDivElement, Appointment
               : ""}
             {/* Said out loud, because a scheduler that looks committed and is
                 not is how double-bookings reach a diary. */}
-            <span className="ox-dt-readout__relative"> Not booked yet.</span>
+            <span className="zb-dt-readout__relative"> Not booked yet.</span>
           </p>
         ) : (
-          <p className="ox-dt-msg">Choose a time to see the appointment summary.</p>
+          <p className="zb-dt-msg">Choose a time to see the appointment summary.</p>
         )}
       </div>
     );
@@ -4455,7 +4455,7 @@ export interface RecurringSeriesSchedulerProps extends Omit<
 > {
   /** The recurrence rule the series expands from. */
   rule: RecurrenceRule;
-  startDate: OxDate;
+  startDate: ZbDate;
   /** Rendered into the sentence and each row — "3:00 PM – 3:53 PM". */
   timeLabel?: string;
   /** The host's answers. Absent means nothing has been checked yet. */
@@ -4466,7 +4466,7 @@ export interface RecurringSeriesSchedulerProps extends Omit<
    * Fired when the reader moves or drops one occurrence that conflicts. The series is edited
    * per occurrence, never regenerated.
    */
-  onResolve?: (isoDate: string, to: OxDate) => void;
+  onResolve?: (isoDate: string, to: ZbDate) => void;
   /** Fired when the reader undoes a resolution and restores the original occurrence. */
   onUnresolve?: (isoDate: string) => void;
   /** Resolve every conflict that carries an alternative, in one press. */
@@ -4475,8 +4475,8 @@ export interface RecurringSeriesSchedulerProps extends Omit<
    * Fired with the whole resolved series. Nothing is booked until every conflict is resolved
    * or explicitly kept.
    */
-  onBook?: (dates: OxDate[]) => void;
-  onExpand?: (dates: OxDate[]) => void;
+  onBook?: (dates: ZbDate[]) => void;
+  onExpand?: (dates: ZbDate[]) => void;
 
   /** The field's visible label, and its accessible name. */
   label?: string;
@@ -4562,11 +4562,11 @@ export const RecurringSeriesScheduler = React.forwardRef<
       ref={ref}
       role="group"
       aria-label={label}
-      data-ox-series={review.conflicts > 0 ? "conflicts" : "clear"}
-      className={cn("ox-dt-stack", className)}
+      data-zb-series={review.conflicts > 0 ? "conflicts" : "clear"}
+      className={cn("zb-dt-stack", className)}
       {...rest}
     >
-      <p className="ox-dt-summary">
+      <p className="zb-dt-summary">
         <b>{describeSeries(rule, { timeLabel }).replace(/^./, (c) => c.toUpperCase())}</b>
         {` · starting ${formatPlainDate(startDate, "medium")}`}
       </p>
@@ -4575,7 +4575,7 @@ export const RecurringSeriesScheduler = React.forwardRef<
           occurrence count has told the billing team a number that will not
           match reality, and told the patient about sessions that will not
           happen. */}
-      <dl className="ox-dt-tally">
+      <dl className="zb-dt-tally">
         <div>
           <dd>{review.total}</dd>
           <dt>dates in range</dt>
@@ -4585,7 +4585,7 @@ export const RecurringSeriesScheduler = React.forwardRef<
           <dt>can be booked</dt>
         </div>
         <div>
-          <dd data-ox-tally="conflicts">{review.conflicts}</dd>
+          <dd data-zb-tally="conflicts">{review.conflicts}</dd>
           <dt>conflicts</dt>
         </div>
         {review.excluded > 0 ? (
@@ -4596,7 +4596,7 @@ export const RecurringSeriesScheduler = React.forwardRef<
         ) : null}
       </dl>
 
-      <ol className="ox-dt-series">
+      <ol className="zb-dt-series">
         {shown.map((occurrence) => {
           const iso = formatPlainDate(occurrence.date, "iso");
           const verdict = verdictFor(iso);
@@ -4611,20 +4611,20 @@ export const RecurringSeriesScheduler = React.forwardRef<
                 : "open";
 
           return (
-            <li key={iso} data-ox-occurrence={state}>
-              <span className="ox-dt-series__n" aria-hidden="true">
+            <li key={iso} data-zb-occurrence={state}>
+              <span className="zb-dt-series__n" aria-hidden="true">
                 {occurrence.skippedReason ? "" : occurrence.index}
               </span>
-              <span className="ox-dt-series__when">
+              <span className="zb-dt-series__when">
                 {isResolved && alternative
                   ? alternative.label
                   : `${formatPlainDate(occurrence.date, "weekday")}${timeLabel ? ` · ${timeLabel}` : ""}`}
                 {occurrence.skippedReason ? (
-                  <span className="ox-dt-series__why">Excluded — facility closed</span>
+                  <span className="zb-dt-series__why">Excluded — facility closed</span>
                 ) : verdict && !isResolved ? (
-                  <span className="ox-dt-series__why">{verdict.reason}</span>
+                  <span className="zb-dt-series__why">{verdict.reason}</span>
                 ) : isResolved ? (
-                  <span className="ox-dt-series__why">
+                  <span className="zb-dt-series__why">
                     {`moved from ${formatPlainDate(occurrence.date, "weekday")}`}
                   </span>
                 ) : null}
@@ -4633,7 +4633,7 @@ export const RecurringSeriesScheduler = React.forwardRef<
               {verdict && !isResolved && alternative ? (
                 <button
                   type="button"
-                  className="ox-dt-chip"
+                  className="zb-dt-chip"
                   disabled={disabled}
                   onClick={() => onResolve?.(iso, alternative.date)}
                 >
@@ -4642,7 +4642,7 @@ export const RecurringSeriesScheduler = React.forwardRef<
               ) : isResolved ? (
                 <button
                   type="button"
-                  className="ox-dt-chip"
+                  className="zb-dt-chip"
                   disabled={disabled}
                   onClick={() => onUnresolve?.(iso)}
                 >
@@ -4653,17 +4653,17 @@ export const RecurringSeriesScheduler = React.forwardRef<
           );
         })}
         {hidden > 0 ? (
-          <li data-ox-occurrence="more">
-            <span className="ox-dt-series__n" aria-hidden="true" />
-            <span className="ox-dt-series__when">{`+ ${hidden} more`}</span>
+          <li data-zb-occurrence="more">
+            <span className="zb-dt-series__n" aria-hidden="true" />
+            <span className="zb-dt-series__when">{`+ ${hidden} more`}</span>
           </li>
         ) : null}
       </ol>
 
-      <div className="ox-dt-chips">
+      <div className="zb-dt-chips">
         <button
           type="button"
-          className="ox-dt-chip"
+          className="zb-dt-chip"
           disabled={disabled || bookable.length === 0}
           onClick={() => onBook?.(bookable)}
         >
@@ -4672,13 +4672,13 @@ export const RecurringSeriesScheduler = React.forwardRef<
             : `Book all ${review.bookable} sessions`}
         </button>
         {resolvableCount > 0 ? (
-          <button type="button" className="ox-dt-chip" disabled={disabled} onClick={onResolveAll}>
+          <button type="button" className="zb-dt-chip" disabled={disabled} onClick={onResolveAll}>
             Resolve all automatically
           </button>
         ) : null}
       </div>
 
-      <p className="ox-dt-msg" role="status" aria-live="polite">
+      <p className="zb-dt-msg" role="status" aria-live="polite">
         {review.conflicts > 0
           ? `${review.conflicts} conflict${review.conflicts === 1 ? "" : "s"} to resolve. Nothing is written until you choose.`
           : `All ${review.bookable} resolve cleanly. Nothing is written until you choose.`}
@@ -4717,7 +4717,7 @@ RecurringSeriesScheduler.displayName = "RecurringSeriesScheduler";
 
 /** A date the group does not meet, and why. */
 export interface SeriesExclusion {
-  date: OxDate;
+  date: ZbDate;
   reason: string;
 }
 
@@ -4727,7 +4727,7 @@ export interface GroupSeriesSchedulerProps extends Omit<
 > {
   name: string;
   rule: RecurrenceRule;
-  startDate: OxDate;
+  startDate: ZbDate;
   /** "4:00 PM – 5:30 PM". Rendered into the sentence and every row. */
   timeLabel?: string;
   /** How long each session runs. */
@@ -4807,11 +4807,11 @@ export const GroupSeriesScheduler = React.forwardRef<HTMLDivElement, GroupSeries
         ref={ref}
         role="group"
         aria-label={`${name} — ${label}`}
-        data-ox-group-series={kept.length > 0 ? "scheduled" : "empty"}
-        className={cn("ox-dt-stack", className)}
+        data-zb-group-series={kept.length > 0 ? "scheduled" : "empty"}
+        className={cn("zb-dt-stack", className)}
         {...rest}
       >
-        <p className="ox-dt-summary">
+        <p className="zb-dt-summary">
           <b>{`${describeRule(rule)}${timeLabel ? `, ${timeLabel}` : ""}`}</b>
           {firstSession && lastSession
             ? ` · ${formatPlainDate(firstSession.date, "medium")} → ${formatPlainDate(lastSession.date, "medium")}`
@@ -4822,13 +4822,13 @@ export const GroupSeriesScheduler = React.forwardRef<HTMLDivElement, GroupSeries
           ) : null}
         </p>
 
-        <dl className="ox-dt-tally">
+        <dl className="zb-dt-tally">
           <div>
             <dd>{occurrences.length}</dd>
             <dt>dates in range</dt>
           </div>
           <div>
-            <dd data-ox-tally={exclusions.length > 0 ? "conflicts" : undefined}>
+            <dd data-zb-tally={exclusions.length > 0 ? "conflicts" : undefined}>
               {exclusions.length}
             </dd>
             <dt>closures</dt>
@@ -4845,22 +4845,22 @@ export const GroupSeriesScheduler = React.forwardRef<HTMLDivElement, GroupSeries
           ) : null}
           {enrolled != null ? (
             <div>
-              <dd data-ox-tally={overCapacity ? "conflicts" : undefined}>{enrolled}</dd>
+              <dd data-zb-tally={overCapacity ? "conflicts" : undefined}>{enrolled}</dd>
               <dt>enrolled</dt>
             </div>
           ) : null}
         </dl>
 
-        <dl className="ox-dt-readout ox-dt-stack">
+        <dl className="zb-dt-readout zb-dt-stack">
           {facilitators.length > 0 ? (
             <div>
-              <dt className="ox-dt-label">Clinicians</dt>
+              <dt className="zb-dt-label">Clinicians</dt>
               <dd>{facilitators.join(" · ")}</dd>
             </div>
           ) : null}
           {room ? (
             <div>
-              <dt className="ox-dt-label">Room</dt>
+              <dt className="zb-dt-label">Room</dt>
               <dd>
                 {room.name}
                 {room.capacity != null ? ` · capacity ${room.capacity}` : ""}
@@ -4869,13 +4869,13 @@ export const GroupSeriesScheduler = React.forwardRef<HTMLDivElement, GroupSeries
           ) : null}
           {modality ? (
             <div>
-              <dt className="ox-dt-label">Modality</dt>
+              <dt className="zb-dt-label">Modality</dt>
               <dd>{modality}</dd>
             </div>
           ) : null}
           {totalMinutes != null ? (
             <div>
-              <dt className="ox-dt-label">Series duration</dt>
+              <dt className="zb-dt-label">Series duration</dt>
               <dd>
                 {`${kept.length} sessions · ${sessionMinutes} min each · ${Math.round(totalMinutes / 60)} hr total`}
               </dd>
@@ -4885,21 +4885,21 @@ export const GroupSeriesScheduler = React.forwardRef<HTMLDivElement, GroupSeries
 
         {exclusions.length > 0 ? (
           <>
-            <p className="ox-dt-msg">
+            <p className="zb-dt-msg">
               Excluded dates, written into the series as EXDATE so the count downstream matches the
               sessions that happen.
             </p>
-            <ol className="ox-dt-series">
+            <ol className="zb-dt-series">
               {exclusions.map((exclusion) => (
-                <li key={formatPlainDate(exclusion.date, "iso")} data-ox-occurrence="excluded">
-                  <span className="ox-dt-series__n" aria-hidden="true" />
-                  <span className="ox-dt-series__when">
+                <li key={formatPlainDate(exclusion.date, "iso")} data-zb-occurrence="excluded">
+                  <span className="zb-dt-series__n" aria-hidden="true" />
+                  <span className="zb-dt-series__when">
                     {`${formatPlainDate(exclusion.date, "weekday")}${timeLabel ? ` · ${timeLabel}` : ""}`}
                   </span>
-                  <span className="ox-dt-chip" aria-hidden="true">
+                  <span className="zb-dt-chip" aria-hidden="true">
                     {exclusion.reason}
                   </span>
-                  <span className="ox-dt-sr">{exclusion.reason}</span>
+                  <span className="zb-dt-sr">{exclusion.reason}</span>
                 </li>
               ))}
             </ol>

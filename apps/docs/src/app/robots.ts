@@ -3,6 +3,6 @@ import type { MetadataRoute } from "next";
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: { userAgent: "*", allow: "/" },
-    sitemap: "https://oxygenui.design/sitemap.xml",
+    sitemap: "https://zoblocks.design/sitemap.xml",
   };
 }

@@ -12,7 +12,7 @@
  * an exception collapses them into one.
  */
 
-import type { ThemeName } from "@oxygenui-design/figma-core";
+import type { ThemeName } from "@zoblocks/figma-core";
 
 export interface ThemeSummary {
   slug: string;
@@ -51,7 +51,7 @@ export type Outcome<T> =
   { ok: true; value: T } | { ok: false; error: string; detail?: string[]; status?: number };
 
 export interface Credential {
-  /** Origin only — `https://app.oxygenui.design`. No path. */
+  /** Origin only — `https://app.zoblocks.design`. No path. */
   origin: string;
   token: string;
 }
@@ -177,5 +177,5 @@ export function readOrigin(raw: string): string | undefined {
 /** Prefixed, so a mistyped paste is caught before a round trip. */
 export function readToken(raw: string): string | undefined {
   const trimmed = raw.trim();
-  return /^oxy_live_[\w-]{20,}$/.test(trimmed) ? trimmed : undefined;
+  return /^zb_live_[\w-]{20,}$/.test(trimmed) ? trimmed : undefined;
 }

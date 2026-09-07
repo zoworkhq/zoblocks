@@ -107,13 +107,13 @@ test.describe("accessibility in a real layout engine", () => {
     await page.goto("/components/pulse-loader");
     await settle(page);
 
-    const loader = page.locator("[data-ox-loader]").first();
+    const loader = page.locator("[data-zb-loader]").first();
     await expect(loader).toBeVisible();
 
     // Forced colours discards every custom colour, which is exactly why the
     // stroke must fall back to a system colour rather than to nothing.
     const stroke = await loader
-      .locator(".ox-loader__stroke")
+      .locator(".zb-loader__stroke")
       .first()
       .evaluate((el) => getComputedStyle(el).stroke);
     expect(stroke).not.toBe("none");
@@ -156,15 +156,15 @@ test.describe("accessibility in a real layout engine", () => {
         const el = document.querySelector(selector);
         return el ? getComputedStyle(el).animationName : null;
       };
-      const art = document.querySelector(".ox-loader__art");
+      const art = document.querySelector(".zb-loader__art");
       return {
-        beat: nameFor(".ox-loader__beat"),
-        head: nameFor(".ox-loader__head"),
-        tail: nameFor(".ox-loader__tail"),
-        draw: nameFor(".ox-loader__draw"),
+        beat: nameFor(".zb-loader__beat"),
+        head: nameFor(".zb-loader__head"),
+        tail: nameFor(".zb-loader__tail"),
+        draw: nameFor(".zb-loader__draw"),
         art: art ? getComputedStyle(art).animationName : null,
         drawOffset: (() => {
-          const el = document.querySelector(".ox-loader__draw");
+          const el = document.querySelector(".zb-loader__draw");
           return el ? getComputedStyle(el).strokeDashoffset : null;
         })(),
       };
@@ -182,6 +182,6 @@ test.describe("accessibility in a real layout engine", () => {
     // The designed part: the shape completes rather than freezing part-drawn,
     // and the mark breathes in opacity so it still reads as working.
     expect(state.drawOffset, "the heart is left part-drawn").toBe("0px");
-    expect(state.art, "the still state should breathe").toBe("ox-loader-still");
+    expect(state.art, "the still state should breathe").toBe("zb-loader-still");
   });
 });

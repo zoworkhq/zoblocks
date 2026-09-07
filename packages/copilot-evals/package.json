@@ -1,12 +1,12 @@
 {
-  "name": "@oxygenui-design/copilot-evals",
+  "name": "@zoblocks/copilot-evals",
   "version": "0.1.0",
-  "description": "The eval harness behind Oxygen Copilot. Five suites and one release gate — because below roughly 70% reliability, automation makes clinicians worse than no automation.",
+  "description": "The eval harness behind Zoblocks Copilot. Five suites and one release gate — because below roughly 70% reliability, automation makes clinicians worse than no automation.",
   "license": "MIT",
-  "homepage": "https://oxygenui.design/components/copilot",
+  "homepage": "https://zoblocks.design/components/copilot",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zoworkhq/oxygenui.git",
+    "url": "git+https://github.com/zoworkhq/zoblocks.git",
     "directory": "packages/copilot-evals"
   },
   "keywords": [
@@ -51,10 +51,10 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@oxygenui-design/copilot-core": "workspace:*"
+    "@zoblocks/copilot-core": "workspace:*"
   },
   "devDependencies": {
-    "@oxygenui-design/tsconfig": "workspace:*",
+    "@zoblocks/tsconfig": "workspace:*",
     "@vitest/coverage-v8": "^4.1.10",
     "typescript": "^5.7.2",
     "vitest": "^4.1.10"

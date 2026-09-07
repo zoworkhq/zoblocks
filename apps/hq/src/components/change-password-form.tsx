@@ -81,7 +81,7 @@ export function ChangePasswordForm() {
       {state.error && (
         <p
           role="alert"
-          className="flex items-start gap-2 rounded-lg border border-[var(--ox-status-critical-border)] bg-[var(--ox-status-critical-bg)] px-3 py-2 text-[0.75rem] text-[var(--ox-status-critical)]"
+          className="flex items-start gap-2 rounded-lg border border-[var(--zb-status-critical-border)] bg-[var(--zb-status-critical-bg)] px-3 py-2 text-[0.75rem] text-[var(--zb-status-critical)]"
         >
           <CircleAlert aria-hidden="true" className="mt-px size-3.5 shrink-0" />
           {state.error}

@@ -24,7 +24,7 @@ import {
   minimalDisclosure,
   type CopilotEvent,
   type Source,
-} from "@oxygenui-design/copilot-core";
+} from "@zoblocks/copilot-core";
 
 const disclosure = minimalDisclosure("test-model@1");
 

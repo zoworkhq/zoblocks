@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { VALIDATOR_VERSION, validateTheme } from "@oxygenui-design/theme";
+import { VALIDATOR_VERSION, validateTheme } from "@zoblocks/theme";
 import { requireMember } from "@/lib/auth";
 import { scoped } from "@/db/scope";
 import { baseTokens } from "@/lib/base-tokens";

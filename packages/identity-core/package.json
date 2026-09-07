@@ -1,12 +1,12 @@
 {
-  "name": "@oxygenui-design/identity-core",
+  "name": "@zoblocks/identity-core",
   "version": "0.1.0",
-  "description": "The identity engine behind Oxygen's patient avatar, chip and banner. Name resolution, deterministic swatches, script-aware initials, and the disambiguation pass that keeps two patients with one name apart — no React, no DOM.",
+  "description": "The identity engine behind Zoblocks's patient avatar, chip and banner. Name resolution, deterministic swatches, script-aware initials, and the disambiguation pass that keeps two patients with one name apart — no React, no DOM.",
   "license": "MIT",
-  "homepage": "https://oxygenui.design/components/patient-banner",
+  "homepage": "https://zoblocks.design/components/patient-banner",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zoworkhq/oxygenui.git",
+    "url": "git+https://github.com/zoworkhq/zoblocks.git",
     "directory": "packages/identity-core"
   },
   "keywords": [
@@ -54,10 +54,10 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@oxygenui-design/fhir": "workspace:*"
+    "@zoblocks/fhir": "workspace:*"
   },
   "devDependencies": {
-    "@oxygenui-design/tsconfig": "workspace:*",
+    "@zoblocks/tsconfig": "workspace:*",
     "@vitest/coverage-v8": "^4.1.10",
     "typescript": "^5.7.2",
     "vitest": "^4.1.10"

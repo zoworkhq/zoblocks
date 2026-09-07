@@ -19,7 +19,7 @@
 import path from "node:path";
 import ts from "typescript";
 import { WORKSPACE_ALIASES } from "./emit/tsconfig-paths";
-import type { PropDoc } from "@oxygenui-design/component-meta";
+import type { PropDoc } from "@zoblocks/component-meta";
 import { ROOT } from "./config";
 import type { LoadedComponent } from "./load";
 

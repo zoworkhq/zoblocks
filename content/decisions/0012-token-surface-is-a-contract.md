@@ -24,33 +24,33 @@ The seam that does work is already in the repository and was never named.
 Component stylesheets resolve every value through an ordered chain:
 
 ```css
---ox-tabs-accent: var(--ox-accent, var(--ant-color-primary, #059478));
+--zb-tabs-accent: var(--zb-accent, var(--ant-color-primary, #059478));
 ```
 
 Read left to right: our token if the host set one, otherwise the host
 framework's, otherwise a literal that passed the contrast gate. There are 145
 such declarations across four shipped stylesheets, plus a working JavaScript
-bridge at `@oxygenui-design/tabs/antd` that reads `theme.useToken()` and writes
+bridge at `@zoblocks/tabs/antd` that reads `theme.useToken()` and writes
 the same properties. Three of the four layers of a pluggable theming
 architecture existed; what was missing was a name and an enforcement mechanism.
 
 Two consequences of leaving it unnamed showed up immediately when the surface
 was first generated:
 
-- **Seven component tokens referenced tokens that do not exist.** `--ox-fg`,
-  `--ox-fg-muted`, `--ox-fg-subtle`, `--ox-rule` and `--ox-status-accent` are
+- **Seven component tokens referenced tokens that do not exist.** `--zb-fg`,
+  `--zb-fg-muted`, `--zb-fg-subtle`, `--zb-rule` and `--zb-status-accent` are
   plausible, consistent with their neighbours, and defined nowhere. The
   affected components render correctly — against antd's colour or the literal —
-  and silently never follow an Oxygen brand. The docs site masked it by
+  and silently never follow a Zoblocks brand. The docs site masked it by
   defining the invented names in `tabs-gallery.css`.
 - **Nothing distinguished a chrome token from a clinical one.** A bridge
-  mapping a host's `colorError` onto `--ox-status-critical` would replace a
+  mapping a host's `colorError` onto `--zb-status-critical` would replace a
   colour holding a validated 4.5:1 floor and a 60° hue separation from
   `status.low` with an arbitrary brand red. Nothing in the build could object.
 
 ## Decision
 
-**The `--ox-<component>-*` token surface is a published, versioned contract.
+**The `--zb-<component>-*` token surface is a published, versioned contract.
 It is generated from the source that defines it, and a theme bridge is the only
 sanctioned way a UI framework reaches a component.**
 
@@ -58,7 +58,7 @@ Concretely:
 
 1. **The surface is generated, never hand-written.** `pnpm gen` reads the DTCG
    component tier and every component stylesheet and emits
-   `@oxygenui-design/tokens/surface`: one entry per token, carrying its
+   `@zoblocks/tokens/surface`: one entry per token, carrying its
    component, its semantic fallback, its kind, the host-framework variables
    already in its chain, whether it terminates in a literal, and whether a
    bridge may write it. The manifest is committed, so a change to the contract
@@ -74,7 +74,7 @@ Concretely:
    and an exemption that becomes unnecessary also fails, so the list cannot
    quietly become permanent.
 
-4. **A `--ox-*` fallback naming a token nothing defines fails the build.** This
+4. **A `--zb-*` fallback naming a token nothing defines fails the build.** This
    is the defect above, and it is invisible to every other check: valid CSS,
    correct pixels, silent non-participation in the theming system.
 
@@ -87,7 +87,7 @@ Concretely:
    a paying customer is.
 
 6. **The gate is a module, not a build script.** The rules moved from
-   `scripts/gen/tokens/validate.ts` to `@oxygenui-design/tokens/validate`:
+   `scripts/gen/tokens/validate.ts` to `@zoblocks/tokens/validate`:
    pure functions, no `node:*`, no DOM. The build, a theme app's live
    preview, and a server-side publish gate run identical code. A customer whose
    palette passed in the browser and failed in CI has been told two different

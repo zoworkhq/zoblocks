@@ -18,7 +18,7 @@
 
 import * as React from "react";
 import { DemoNote } from "@/components/site/demo-note";
-import { Tabs, type TabVariant } from "@oxygenui-design/tabs";
+import { Tabs, type TabVariant } from "@zoblocks/tabs";
 import { cn } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ */
@@ -143,7 +143,7 @@ function Icon({ name }: { name: IconName }) {
 
 function Panel({ title, children }: { title: string; children?: React.ReactNode }) {
   return (
-    <div className="ox-demo-panel">
+    <div className="zb-demo-panel">
       <b>{title}</b>
       {children ? <span> — {children}</span> : null}
     </div>
@@ -174,19 +174,19 @@ interface DemoProps {
  */
 function Demo({ id, name, api, tags, note, children, wide }: DemoProps) {
   return (
-    <figure id={id} className="ox-demo scroll-mt-28">
-      <figcaption className="ox-demo__head">
-        <span className="ox-demo__id">{id.toUpperCase()}</span>
-        <span className="ox-demo__name">{name}</span>
-        <code className="ox-demo__api">{api}</code>
+    <figure id={id} className="zb-demo scroll-mt-28">
+      <figcaption className="zb-demo__head">
+        <span className="zb-demo__id">{id.toUpperCase()}</span>
+        <span className="zb-demo__name">{name}</span>
+        <code className="zb-demo__api">{api}</code>
         <span className="grow" />
         {tags?.map((tag) => (
-          <span key={tag} className="ox-demo__tag">
+          <span key={tag} className="zb-demo__tag">
             {tag}
           </span>
         ))}
       </figcaption>
-      <div className={cn("ox-demo__stage", wide && "ox-demo__stage--wide")}>{children}</div>
+      <div className={cn("zb-demo__stage", wide && "zb-demo__stage--wide")}>{children}</div>
       <DemoNote>{note}</DemoNote>
     </figure>
   );
@@ -307,17 +307,17 @@ function Underline() {
 /** The chart header: the composition tabs are most often part of. */
 function ChartHeader() {
   return (
-    <div className="ox-chart">
-      <div className="ox-chart__head">
+    <div className="zb-chart">
+      <div className="zb-chart__head">
         <div>
-          <div className="ox-chart__name">Ravi Menon</div>
-          <div className="ox-chart__mrn">MRN 88-2049 · 47 y · DOB 1979-02-11</div>
+          <div className="zb-chart__name">Ravi Menon</div>
+          <div className="zb-chart__mrn">MRN 88-2049 · 47 y · DOB 1979-02-11</div>
         </div>
-        <div className="ox-chart__actions">
-          <button type="button" className="ox-demo-btn">
+        <div className="zb-chart__actions">
+          <button type="button" className="zb-demo-btn">
             Share
           </button>
-          <button type="button" className="ox-demo-btn ox-demo-btn--primary">
+          <button type="button" className="zb-demo-btn zb-demo-btn--primary">
             New note
           </button>
         </div>
@@ -348,7 +348,7 @@ function ChartHeader() {
             tone: "critical",
             children: (
               <>
-                <div className="ox-alert ox-alert--critical" role="alert">
+                <div className="zb-alert zb-alert--critical" role="alert">
                   <strong>2 critical results, unacknowledged.</strong> Potassium 6.4 mmol/L (ref
                   3.5–5.1) · Troponin I 0.94 ng/mL (ref &lt;0.04)
                 </div>
@@ -457,7 +457,7 @@ function Editable() {
           },
         }}
       />
-      <ul className="ox-log">
+      <ul className="zb-log">
         {log.map((line, index) => (
           <li key={`${line}-${index}`}>{line}</li>
         ))}
@@ -601,9 +601,9 @@ function CardChoice() {
         {
           value: "immediate",
           label: (
-            <span className="ox-card">
-              <span className="ox-card__title">Immediate</span>
-              <span className="ox-card__body">
+            <span className="zb-card">
+              <span className="zb-card__title">Immediate</span>
+              <span className="zb-card__body">
                 Visible in the patient portal as soon as it is verified.
               </span>
             </span>
@@ -613,9 +613,9 @@ function CardChoice() {
         {
           value: "reviewed",
           label: (
-            <span className="ox-card">
-              <span className="ox-card__title">After review</span>
-              <span className="ox-card__body">
+            <span className="zb-card">
+              <span className="zb-card__title">After review</span>
+              <span className="zb-card__body">
                 Held until a clinician marks it reviewed. Median delay 6 h.
               </span>
             </span>
@@ -625,9 +625,9 @@ function CardChoice() {
         {
           value: "scheduled",
           label: (
-            <span className="ox-card">
-              <span className="ox-card__title">Scheduled</span>
-              <span className="ox-card__body">
+            <span className="zb-card">
+              <span className="zb-card__title">Scheduled</span>
+              <span className="zb-card__body">
                 Released at a fixed time you choose, review or not.
               </span>
             </span>
@@ -646,7 +646,7 @@ function Spark({ seed }: { seed: number }) {
     [seed],
   );
   return (
-    <div className="ox-spark" aria-hidden="true">
+    <div className="zb-spark" aria-hidden="true">
       {bars.map((height, index) => (
         <span key={index} style={{ height: `${height}%`, animationDelay: `${index * 55}ms` }} />
       ))}
@@ -689,10 +689,10 @@ function StatTiles() {
         value: stat.value,
         textLabel: `${stat.key}, ${stat.amount}, ${stat.good ? "better" : "worse"} than last week`,
         label: (
-          <span className="ox-stat">
-            <span className="ox-stat__key">{stat.key}</span>
-            <span className="ox-stat__value">{stat.amount}</span>
-            <span className={cn("ox-stat__delta", stat.good ? "is-good" : "is-bad")}>
+          <span className="zb-stat">
+            <span className="zb-stat__key">{stat.key}</span>
+            <span className="zb-stat__value">{stat.amount}</span>
+            <span className={cn("zb-stat__delta", stat.good ? "is-good" : "is-bad")}>
               {stat.delta}
             </span>
           </span>
@@ -841,16 +841,16 @@ function GuardDemo() {
       />
 
       {asking ? (
-        <div className="ox-sheet" role="alertdialog" aria-label="Unsaved changes">
+        <div className="zb-sheet" role="alertdialog" aria-label="Unsaved changes">
           <h5>This note has unsigned changes</h5>
           <p>
             Switching away keeps the draft but does not sign it. An unsigned note is not part of the
             legal record.
           </p>
-          <div className="ox-sheet__actions">
+          <div className="zb-sheet__actions">
             <button
               type="button"
-              className="ox-demo-btn"
+              className="zb-demo-btn"
               onClick={() => {
                 asking(false);
                 setAsking(null);
@@ -861,7 +861,7 @@ function GuardDemo() {
             </button>
             <button
               type="button"
-              className="ox-demo-btn ox-demo-btn--primary"
+              className="zb-demo-btn zb-demo-btn--primary"
               onClick={() => {
                 asking(true);
                 setAsking(null);
@@ -875,7 +875,7 @@ function GuardDemo() {
         </div>
       ) : null}
 
-      <ul className="ox-log">
+      <ul className="zb-log">
         {log.map((line, index) => (
           <li key={`${line}-${index}`}>{line}</li>
         ))}
@@ -939,14 +939,14 @@ const DENSITIES = ["patient", "standard", "clinical"] as const;
 function MatrixCell({ theme, density }: { theme: string; density: string }) {
   return (
     <div
-      className="ox-matrix__cell"
-      data-ox-theme={theme === "hc" ? "high-contrast" : theme}
-      data-ox-density={density}
+      className="zb-matrix__cell"
+      data-zb-theme={theme === "hc" ? "high-contrast" : theme}
+      data-zb-density={density}
     >
-      <div className="ox-matrix__label">
+      <div className="zb-matrix__label">
         {theme} · {density}
       </div>
-      <div className="ox-matrix__body">
+      <div className="zb-matrix__body">
         <Tabs
           as="radiogroup"
           variant="segmented"
@@ -1029,7 +1029,7 @@ export function TabsGallery() {
    * it until the reader picks one here.
    *
    * It used to be hardcoded to "light". The demo scopes set their own literal
-   * `--ox-*` values — that is the point of them, and why the matrix can show
+   * `--zb-*` values — that is the point of them, and why the matrix can show
    * three themes at once — so on the dark site every stage rendered as a white
    * slab. Nothing was broken, but a page whose argument is "the tokens carry
    * the theme" opening on eleven light-mode panels in a dark page argues the
@@ -1054,10 +1054,10 @@ export function TabsGallery() {
   const active = CHAPTERS.find((item) => item.id === chapter) ?? CHAPTERS[0]!;
 
   return (
-    <div className="ox-gallery">
+    <div className="zb-gallery">
       {/* Control bar — the three axes nobody checks by hand, one click each. */}
       {/* Chapter navigation — itself a tablist, built from the component. */}
-      <div className="ox-gallery__chapters">
+      <div className="zb-gallery__chapters">
         <Tabs
           as="radiogroup"
           variant="segmented"
@@ -1066,12 +1066,12 @@ export function TabsGallery() {
           onChange={(next) => setChapter(next as Chapter)}
           items={CHAPTERS.map((item) => ({ value: item.id, label: item.label }))}
         />
-        <p className="ox-gallery__blurb">{active.blurb}</p>
+        <p className="zb-gallery__blurb">{active.blurb}</p>
       </div>
 
-      <div className="ox-gallery__stage" data-ox-theme={theme === "hc" ? "high-contrast" : theme}>
+      <div className="zb-gallery__stage" data-zb-theme={theme === "hc" ? "high-contrast" : theme}>
         {chapter === "gallery" ? (
-          <div className="ox-gallery__grid">
+          <div className="zb-gallery__grid">
             <Demo
               id="v01"
               name="Segmented"
@@ -1194,7 +1194,7 @@ export function TabsGallery() {
         ) : null}
 
         {chapter === "modes" ? (
-          <div className="ox-gallery__grid">
+          <div className="zb-gallery__grid">
             <Demo
               id="m1"
               name='as="tabs"'
@@ -1240,7 +1240,7 @@ export function TabsGallery() {
         ) : null}
 
         {chapter === "overflow" ? (
-          <div className="ox-gallery__grid">
+          <div className="zb-gallery__grid">
             <Demo
               id="o1"
               name="Scroll"
@@ -1286,7 +1286,7 @@ export function TabsGallery() {
         ) : null}
 
         {chapter === "states" ? (
-          <div className="ox-gallery__grid">
+          <div className="zb-gallery__grid">
             <Demo
               id="s1"
               name="Unsaved-changes guard"
@@ -1327,9 +1327,9 @@ export function TabsGallery() {
               note="The same items in all eleven skins. Tab into any of them and the keyboard model is identical, because the skin is CSS and the mode is the accessibility tree."
               wide
             >
-              <div className="ox-variants">
+              <div className="zb-variants">
                 {VARIANTS.map((variant) => (
-                  <div key={variant} className="ox-variants__row">
+                  <div key={variant} className="zb-variants__row">
                     <code>{variant}</code>
                     <Tabs
                       as="tabs"
@@ -1350,7 +1350,7 @@ export function TabsGallery() {
         ) : null}
 
         {chapter === "matrix" ? (
-          <div className="ox-matrix">
+          <div className="zb-matrix">
             {THEMES.map(([themeKey]) =>
               DENSITIES.map((densityKey) => (
                 <MatrixCell

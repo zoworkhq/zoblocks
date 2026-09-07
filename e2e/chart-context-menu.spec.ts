@@ -53,7 +53,7 @@ async function landingAt(page: Page, index: number, fraction: number) {
        */
       document.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
       await new Promise((resolve) => requestAnimationFrame(resolve));
-      const row = document.querySelectorAll<HTMLElement>("[data-ox-menu]")[index];
+      const row = document.querySelectorAll<HTMLElement>("[data-zb-menu]")[index];
       if (!row) throw new Error(`no trigger at index ${index}`);
 
       const target = window.innerHeight * fraction;
@@ -67,14 +67,14 @@ async function landingAt(page: Page, index: number, fraction: number) {
       await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
       const hit = document.elementFromPoint(x, y);
-      const menu = document.querySelector(".ox-menu");
+      const menu = document.querySelector(".zb-menu");
       const rect = menu?.getBoundingClientRect();
       return {
-        landing: hit?.closest(".ox-menu__subject")
+        landing: hit?.closest(".zb-menu__subject")
           ? "subject"
-          : hit?.closest(".ox-menu__item")
+          : hit?.closest(".zb-menu__item")
             ? "verb"
-            : hit?.closest(".ox-menu")
+            : hit?.closest(".zb-menu")
               ? "chrome"
               : "outside",
         cursorX: x,
@@ -95,7 +95,7 @@ test.describe("@a11y the pointer never lands on a verb", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(PAGE);
     await page.waitForLoadState("networkidle");
-    await expect(page.locator("[data-ox-menu]").first()).toBeVisible();
+    await expect(page.locator("[data-zb-menu]").first()).toBeVisible();
   });
 
   for (const [name, fraction] of [
@@ -141,12 +141,12 @@ test.describe("@a11y the subject survives a real layout engine", () => {
   });
 
   test("names the popup, and a masked row keeps its name back", async ({ page }) => {
-    const rows = page.locator("[data-ox-menu]");
+    const rows = page.locator("[data-zb-menu]");
     await rows.first().click({ button: "right" });
 
-    const menu = page.locator(".ox-menu");
+    const menu = page.locator(".zb-menu");
     await expect(menu).toBeVisible();
-    await expect(menu.locator(".ox-menu__subject")).toContainText("Lisinopril 10 mg");
+    await expect(menu.locator(".zb-menu__subject")).toContainText("Lisinopril 10 mg");
 
     // The header is the popup's accessible name, so both audiences get the
     // wrong-patient check from one element.
@@ -159,18 +159,18 @@ test.describe("@a11y the subject survives a real layout engine", () => {
     // The third row is a 42 CFR Part 2 note rendered masked. The menu may say
     // less than its trigger; it may never say more.
     await rows.nth(2).click({ button: "right" });
-    await expect(menu.locator(".ox-menu__subject")).toContainText("Restricted record");
+    await expect(menu.locator(".zb-menu__subject")).toContainText("Restricted record");
     await expect(menu).not.toContainText("Nwosu");
   });
 
   test("the subject stays visible however long the list is", async ({ page }) => {
-    await page.locator("[data-ox-menu]").first().click({ button: "right" });
-    const subject = page.locator(".ox-menu__subject");
+    await page.locator("[data-zb-menu]").first().click({ button: "right" });
+    const subject = page.locator(".zb-menu__subject");
     await expect(subject).toBeInViewport();
 
     // Only the list scrolls. A menu that can scroll its own subject out of
     // view has thrown away the reason it has one.
-    const list = page.locator(".ox-menu__list");
+    const list = page.locator(".zb-menu__list");
     await list.evaluate((node) => node.scrollTo(0, node.scrollHeight));
     await expect(subject).toBeInViewport();
   });
@@ -180,11 +180,11 @@ test.describe("@a11y consequence is reachable but never adjacent", () => {
   test("a clinical verb takes a second step, in the menu", async ({ page }) => {
     await page.goto(PAGE);
     await page.waitForLoadState("networkidle");
-    await page.locator("[data-ox-menu]").first().click({ button: "right" });
+    await page.locator("[data-zb-menu]").first().click({ button: "right" });
 
-    const menu = page.locator(".ox-menu");
+    const menu = page.locator(".zb-menu");
     // A separator between every band: a discontinue is never one row below a copy.
-    expect(await menu.locator(".ox-menu__separator").count()).toBeGreaterThan(0);
+    expect(await menu.locator(".zb-menu__separator").count()).toBeGreaterThan(0);
 
     await menu.getByRole("menuitem", { name: /Discontinue/ }).click();
     await expect(menu).toContainText("next scheduled dose is 14:00 today");
@@ -196,11 +196,11 @@ test.describe("@a11y consequence is reachable but never adjacent", () => {
     await page.goto(PAGE);
     await page.waitForLoadState("networkidle");
 
-    const row = page.locator("[data-ox-menu]").first();
+    const row = page.locator("[data-zb-menu]").first();
     await row.focus();
     await page.keyboard.press("Shift+F10");
 
-    const menu = page.locator(".ox-menu");
+    const menu = page.locator(".zb-menu");
     await expect(menu).toBeVisible();
     // A keyboard open arms the first verb; a pointer open arms nothing.
     await expect(menu.getByRole("menuitem", { name: /Open order/ })).toBeFocused();
@@ -228,14 +228,14 @@ test.describe("@a11y a submenu is a menu, not a chevron", () => {
 
   test("opens beside its row and runs a child", async ({ page }) => {
     // The result row: "Trend" is the only submenu on the page.
-    await page.locator("[data-ox-menu]").nth(1).click({ button: "right" });
+    await page.locator("[data-zb-menu]").nth(1).click({ button: "right" });
 
-    const parent = page.locator(".ox-menu").first();
+    const parent = page.locator(".zb-menu").first();
     const trigger = parent.getByRole("menuitem", { name: /Trend/ });
     await expect(trigger).toHaveAttribute("aria-expanded", "false");
     await trigger.click();
 
-    const child = page.locator(".ox-menu--sub");
+    const child = page.locator(".zb-menu--sub");
     await expect(child).toBeVisible();
     await expect(trigger).toHaveAttribute("aria-expanded", "true");
 
@@ -256,18 +256,18 @@ test.describe("@a11y a submenu is a menu, not a chevron", () => {
     // The one jsdom nearly missed: the child is a separate portal, so a click
     // inside it must not read as a click away.
     await child.getByRole("menuitem", { name: "Last 30 days" }).click();
-    await expect(page.locator(".ox-menu")).toHaveCount(0);
+    await expect(page.locator(".zb-menu")).toHaveCount(0);
   });
 
   test("opens on hover after an intent delay, and survives the gap between menus", async ({
     page,
   }) => {
-    await page.locator("[data-ox-menu]").nth(1).click({ button: "right" });
-    const parent = page.locator(".ox-menu").first();
+    await page.locator("[data-zb-menu]").nth(1).click({ button: "right" });
+    const parent = page.locator(".zb-menu").first();
     const trigger = parent.getByRole("menuitem", { name: /Trend/ });
 
     await trigger.hover();
-    const child = page.locator(".ox-menu--sub");
+    const child = page.locator(".zb-menu--sub");
     await expect(child).toBeVisible();
 
     // Crossing from the trigger into the child passes over dead space between
@@ -283,25 +283,25 @@ test.describe("@a11y a submenu is a menu, not a chevron", () => {
   });
 
   test("ArrowRight opens it, ArrowLeft gives the row back", async ({ page }) => {
-    const row = page.locator("[data-ox-menu]").nth(1);
+    const row = page.locator("[data-zb-menu]").nth(1);
     await row.focus();
     await page.keyboard.press("Shift+F10");
-    await expect(page.locator(".ox-menu").first()).toBeVisible();
+    await expect(page.locator(".zb-menu").first()).toBeVisible();
 
     await page.keyboard.press("ArrowDown");
     await page.keyboard.press("ArrowDown");
     await expect(
-      page.locator(".ox-menu").first().getByRole("menuitem", { name: /Trend/ }),
+      page.locator(".zb-menu").first().getByRole("menuitem", { name: /Trend/ }),
     ).toBeFocused();
 
     await page.keyboard.press("ArrowRight");
-    await expect(page.locator(".ox-menu--sub")).toBeVisible();
+    await expect(page.locator(".zb-menu--sub")).toBeVisible();
     await expect(page.getByRole("menuitem", { name: "Last 7 days" })).toBeFocused();
 
     await page.keyboard.press("ArrowLeft");
-    await expect(page.locator(".ox-menu--sub")).toHaveCount(0);
+    await expect(page.locator(".zb-menu--sub")).toHaveCount(0);
     await expect(
-      page.locator(".ox-menu").first().getByRole("menuitem", { name: /Trend/ }),
+      page.locator(".zb-menu").first().getByRole("menuitem", { name: /Trend/ }),
     ).toBeFocused();
   });
 });
@@ -333,9 +333,9 @@ test.describe("@a11y clamped to a container, not the viewport", () => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    const stage = page.locator("[data-ox-menu-stage]");
+    const stage = page.locator("[data-zb-menu-stage]");
     await expect(stage).toBeVisible();
-    const rows = stage.locator("[data-ox-menu]");
+    const rows = stage.locator("[data-zb-menu]");
     await expect(rows).toHaveCount(3);
 
     for (let index = 0; index < 3; index += 1) {
@@ -346,13 +346,13 @@ test.describe("@a11y clamped to a container, not the viewport", () => {
         button: "right",
       });
 
-      const menu = page.locator(".ox-menu").first();
+      const menu = page.locator(".zb-menu").first();
       await expect(menu).toBeVisible();
       await expect(menu.getByText(/\d+ hidden/)).toBeVisible();
 
       const fits = await page.evaluate(() => {
-        const m = document.querySelector(".ox-menu")!.getBoundingClientRect();
-        const s = document.querySelector("[data-ox-menu-stage]")!.getBoundingClientRect();
+        const m = document.querySelector(".zb-menu")!.getBoundingClientRect();
+        const s = document.querySelector("[data-zb-menu-stage]")!.getBoundingClientRect();
         return {
           over: [s.top - m.top, m.bottom - s.bottom, s.left - m.left, m.right - s.right].map(
             Math.round,

@@ -9,13 +9,46 @@ import { ThemeToggle } from "@/components/site/theme-toggle";
 import { SIGN_UP_LABEL, signInHref, signUpHref } from "@/lib/app";
 import { cn } from "@/lib/utils";
 
-export function OxygenMark({ className = "h-4 w-7" }: { className?: string }) {
-  // Two bonded circles — O₂. The bond is the brand color; the atoms are not.
+export function ZoblocksMark({ className = "h-4 w-7" }: { className?: string }) {
+  /*
+   * Two blocks and the tenon that joins them.
+   *
+   * It keeps the skeleton of the mark it replaces — two shapes either side of a
+   * brand-coloured joint — because the header sits one click from a customer's
+   * bookmark and a wholly unrelated shape reads as a different product. What
+   * changed is the vocabulary: squares rather than circles, and a tenon rather
+   * than a bond, which is the thing this library actually does. You take a
+   * block and it fits.
+   *
+   * The composition is symmetric about its centre, so the header's 180° hover
+   * rotation lands back on itself rather than on a mirrored shape.
+   *
+   * The tenon is painted before the outlines so the blocks' strokes stay
+   * unbroken over it: a joint that cuts the outline reads as a gap at 16px.
+   */
   return (
     <svg viewBox="0 0 28 16" className={className} aria-hidden="true">
-      <line x1="8" y1="8" x2="20" y2="8" stroke="var(--color-oxygen)" strokeWidth="2.5" />
-      <circle cx="8" cy="8" r="5.5" fill="none" stroke="currentColor" strokeWidth="2" />
-      <circle cx="20" cy="8" r="5.5" fill="none" stroke="currentColor" strokeWidth="2" />
+      <rect x="11.5" y="5.5" width="5" height="5" rx="1.25" fill="var(--color-brand)" />
+      <rect
+        x="2.5"
+        y="3"
+        width="9.5"
+        height="10"
+        rx="2"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
+      <rect
+        x="16"
+        y="3"
+        width="9.5"
+        height="10"
+        rx="2"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
     </svg>
   );
 }
@@ -98,11 +131,11 @@ export function SiteHeader() {
           // target, not a link inside a sentence, so the Inline exception does
           // not cover it. It sits in a taller header row, so nothing moves.
           className="group flex min-h-6 items-center gap-2.5 text-ink"
-          aria-label="Oxygen UI home"
+          aria-label="Zoblocks home"
         >
-          <OxygenMark className="h-4 w-7 transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:rotate-180" />
+          <ZoblocksMark className="h-4 w-7 transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:rotate-180" />
           <span className="font-display text-[0.9375rem] font-semibold tracking-tight">
-            Oxygen UI
+            Zoblocks
           </span>
           <span className="numeric hidden rounded border border-rule px-1.5 py-0.5 text-[0.625rem] text-graphite-soft sm:inline">
             v0.1.0
@@ -130,7 +163,7 @@ export function SiteHeader() {
                     <span
                       aria-hidden="true"
                       className={cn(
-                        "absolute inset-x-3 -bottom-px h-px origin-left bg-oxygen transition-transform duration-400 ease-[var(--ease-out-expo)]",
+                        "absolute inset-x-3 -bottom-px h-px origin-left bg-brand transition-transform duration-400 ease-[var(--ease-out-expo)]",
                         active ? "scale-x-100" : "scale-x-0",
                       )}
                     />
@@ -163,7 +196,7 @@ export function SiteHeader() {
               their audit are untouched, but nothing in the UI turns them on. If
               it ever returns to the picker, this exemption has to go with it. */}
           <a
-            href="https://github.com/zoworkhq/oxygenui"
+            href="https://github.com/zoworkhq/zoblocks"
             className="ml-1 hidden items-center gap-1.5 rounded-lg border border-rule px-2.5 py-1.5 text-sm text-graphite transition-colors duration-200 hover:border-rule-strong hover:text-ink sm:inline-flex"
           >
             <Github aria-hidden="true" className="size-3.5" />
@@ -224,7 +257,7 @@ const FOOTER_LINKS = [
     title: "Resources",
     links: [
       { href: "/r/index.json", label: "Registry JSON", external: true },
-      { href: "https://github.com/zoworkhq/oxygenui", label: "GitHub", external: true },
+      { href: "https://github.com/zoworkhq/zoblocks", label: "GitHub", external: true },
       { href: "https://hl7.org/fhir/R4/", label: "FHIR R4 spec", external: true },
     ],
   },
@@ -255,8 +288,8 @@ export function SiteFooter() {
         <div className="flex flex-col gap-10 md:flex-row md:justify-between">
           <div className="max-w-xs">
             <div className="flex items-center gap-2.5 text-ink">
-              <OxygenMark />
-              <span className="font-display text-sm font-semibold tracking-tight">Oxygen UI</span>
+              <ZoblocksMark />
+              <span className="font-display text-sm font-semibold tracking-tight">Zoblocks</span>
             </div>
             <p className="body-sm mt-3 text-graphite">
               Healthcare components typed to FHIR R4. Source you own, states you can trust.
@@ -314,8 +347,8 @@ export function SiteFooter() {
 
         <div className="mt-10 border-t border-rule pt-6">
           <p className="body-sm max-w-2xl text-graphite-soft">
-            Oxygen UI is not a compliance boundary and is not a medical device. All demo data on
-            this site is synthetic.
+            Zoblocks is not a compliance boundary and is not a medical device. All demo data on this
+            site is synthetic.
           </p>
         </div>
       </div>

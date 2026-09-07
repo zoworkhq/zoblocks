@@ -18,7 +18,7 @@
  */
 
 import * as React from "react";
-import { HOST_IDS, HOST_LABEL } from "@oxygenui-design/host-react";
+import { HOST_IDS, HOST_LABEL } from "@zoblocks/host-react";
 import { cn } from "@/lib/utils";
 import { setDesignLanguage, useDesignLanguage, type DesignLanguage } from "@/lib/design-language";
 import { LANGUAGE_MARK } from "./framework-marks";

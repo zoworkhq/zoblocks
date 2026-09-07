@@ -125,7 +125,7 @@ describe("resolveFlat", () => {
   it("publishes a density reference as a var(), never as a raw DTCG alias", () => {
     const source = validSource();
     const flat = resolveFlat(source, map({ "badge.pad": "{density.gap}" }));
-    expect(flat.get("badge.pad")).toBe("var(--ox-density-gap)");
+    expect(flat.get("badge.pad")).toBe("var(--zb-density-gap)");
     expect(flat.get("badge.pad")).not.toContain("{");
   });
 });

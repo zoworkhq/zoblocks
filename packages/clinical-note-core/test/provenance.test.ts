@@ -73,10 +73,10 @@ describe("the mark spec", () => {
     expect(
       getAttrs(
         el({
-          "data-ox-origin": "pulled",
-          "data-ox-source": "Observation/1",
-          "data-ox-at": "2026-08-16T06:12:00+05:30",
-          "data-ox-confidence": "0.5",
+          "data-zb-origin": "pulled",
+          "data-zb-source": "Observation/1",
+          "data-zb-at": "2026-08-16T06:12:00+05:30",
+          "data-zb-confidence": "0.5",
         }),
       ),
     ).toEqual({
@@ -89,21 +89,21 @@ describe("the mark spec", () => {
   });
 
   it("reads the review flag on AI spans", () => {
-    expect(getAttrs(el({ "data-ox-origin": "ai", "data-ox-reviewed": "true" }))).toMatchObject({
+    expect(getAttrs(el({ "data-zb-origin": "ai", "data-zb-reviewed": "true" }))).toMatchObject({
       origin: "ai",
       reviewed: true,
     });
-    expect(getAttrs(el({ "data-ox-origin": "ai" }))).toMatchObject({ reviewed: false });
+    expect(getAttrs(el({ "data-zb-origin": "ai" }))).toMatchObject({ reviewed: false });
   });
 
   it("rejects a span whose origin is not one of the six", () => {
-    expect(getAttrs(el({ "data-ox-origin": "vibes" }))).toBe(false);
+    expect(getAttrs(el({ "data-zb-origin": "vibes" }))).toBe(false);
     expect(getAttrs(el({}))).toBe(false);
   });
 
   it("discards an unparseable confidence rather than storing NaN", () => {
     expect(
-      getAttrs(el({ "data-ox-origin": "dictated", "data-ox-confidence": "wat" })),
+      getAttrs(el({ "data-zb-origin": "dictated", "data-zb-confidence": "wat" })),
     ).toMatchObject({
       confidence: null,
     });
@@ -114,7 +114,7 @@ describe("the mark spec", () => {
       noteSchema.marks["provenance"]!.create(provenance({ origin: "typed" }) as never),
       false,
     ) as [string, Record<string, string>, number];
-    expect(bare[1]).toEqual({ "data-ox-origin": "typed" });
+    expect(bare[1]).toEqual({ "data-zb-origin": "typed" });
 
     const full = provenanceMarkSpec.toDOM!(
       noteSchema.marks["provenance"]!.create(
@@ -128,10 +128,10 @@ describe("the mark spec", () => {
       false,
     ) as [string, Record<string, string>, number];
     expect(full[1]).toEqual({
-      "data-ox-origin": "dictated",
-      "data-ox-source": "deepgram",
-      "data-ox-at": "2026-08-16T06:12:00+05:30",
-      "data-ox-confidence": "0.62",
+      "data-zb-origin": "dictated",
+      "data-zb-source": "deepgram",
+      "data-zb-at": "2026-08-16T06:12:00+05:30",
+      "data-zb-confidence": "0.62",
     });
   });
 
@@ -140,7 +140,7 @@ describe("the mark spec", () => {
       noteSchema.marks["provenance"]!.create(provenance({ origin: "ai" }) as never),
       false,
     ) as [string, Record<string, string>, number];
-    expect(ai[1]["data-ox-reviewed"]).toBe("false");
+    expect(ai[1]["data-zb-reviewed"]).toBe("false");
   });
 });
 

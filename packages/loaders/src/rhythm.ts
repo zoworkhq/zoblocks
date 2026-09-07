@@ -1,12 +1,12 @@
 /**
- * `<ox-rhythm-loader>` — one rhythm strip, swept like a monitor.
+ * `<zb-rhythm-loader>` — one rhythm strip, swept like a monitor.
  *
- *   import "@oxygenui-design/loaders/rhythm";
- *   <ox-rhythm-loader size="sm" label="Loading results"></ox-rhythm-loader>
+ *   import "@zoblocks/loaders/rhythm";
+ *   <zb-rhythm-loader size="sm" label="Loading results"></zb-rhythm-loader>
  */
 
 import { LOADER_ART, LOADER_VIEWBOX } from "./art.js";
-import { OxLoaderElement, beatMs, cycleMs, define, strokePx } from "./base.js";
+import { ZbLoaderElement, beatMs, cycleMs, define, strokePx } from "./base.js";
 
 /**
  * Exported because Pulse renders it below 40px, where the heart stops being
@@ -20,7 +20,7 @@ export function rhythmArt(): string {
     </svg>`;
 }
 
-export class OxRhythmLoader extends OxLoaderElement {
+export class ZbRhythmLoader extends ZbLoaderElement {
   static override get observedAttributes(): string[] {
     return [...super.observedAttributes, "bpm"];
   }
@@ -37,10 +37,10 @@ export class OxRhythmLoader extends OxLoaderElement {
 
   protected override vars(sizePx: number): Array<[string, string]> {
     return [
-      ["--ox-loader-size", `${sizePx}px`],
-      ["--ox-loader-beat", `${beatMs(this.bpm, this.speed)}ms`],
-      ["--ox-loader-cycle", `${cycleMs(4000, this.speed)}ms`],
-      ["--ox-loader-stroke", `${strokePx(sizePx)}px`],
+      ["--zb-loader-size", `${sizePx}px`],
+      ["--zb-loader-beat", `${beatMs(this.bpm, this.speed)}ms`],
+      ["--zb-loader-cycle", `${cycleMs(4000, this.speed)}ms`],
+      ["--zb-loader-stroke", `${strokePx(sizePx)}px`],
     ];
   }
 
@@ -49,10 +49,10 @@ export class OxRhythmLoader extends OxLoaderElement {
   }
 }
 
-define("ox-rhythm-loader", OxRhythmLoader);
+define("zb-rhythm-loader", ZbRhythmLoader);
 
 declare global {
   interface HTMLElementTagNameMap {
-    "ox-rhythm-loader": OxRhythmLoader;
+    "zb-rhythm-loader": ZbRhythmLoader;
   }
 }

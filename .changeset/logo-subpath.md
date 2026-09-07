@@ -1,23 +1,23 @@
 ---
-"@oxygenui-design/theme": minor
+"@zoblocks/theme": minor
 ---
 
-The logo checker moves to `@oxygenui-design/theme/logo`
+The logo checker moves to `@zoblocks/theme/logo`
 
 `checkLogo`, `checkBrandAsset`, `logoContentType`, `logoHeaders`,
 `MAX_LOGO_BYTES`, `LOGO_VARIANTS` and `imageSize` are no longer exported from
-the package barrel. They are at `@oxygenui-design/theme/logo`.
+the package barrel. They are at `@zoblocks/theme/logo`.
 
 **Breaking for anyone importing them from the barrel**, which is the point.
 `checkLogo` hashes uploaded bytes with `node:crypto`, so any consumer that
-bundled `@oxygenui-design/theme` for a browser was carrying an unresolvable
+bundled `@zoblocks/theme` for a browser was carrying an unresolvable
 import — and `imageSize` is 6 kB of PNG, JPEG, WebP and SVG header parsing that
 only makes sense when you are holding an upload. Both are server work, and the
 subpath says so.
 
 ```diff
--import { checkLogo, MAX_LOGO_BYTES } from "@oxygenui-design/theme";
-+import { checkLogo, MAX_LOGO_BYTES } from "@oxygenui-design/theme/logo";
+-import { checkLogo, MAX_LOGO_BYTES } from "@zoblocks/theme";
++import { checkLogo, MAX_LOGO_BYTES } from "@zoblocks/theme/logo";
 ```
 
 The `LogoFormat` and `Dimensions` _types_ stay on the barrel. They describe an

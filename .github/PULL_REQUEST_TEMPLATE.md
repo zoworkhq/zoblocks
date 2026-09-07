@@ -41,7 +41,7 @@ with a reason — an unticked box with no explanation blocks review.
 
 - [ ] User-visible copy follows [CONTENT.md](../CONTENT.md)
 - [ ] Every colour resolves through a semantic token — no primitives, no literals
-- [ ] No hardcoded user-visible English (goes through `@oxygenui/intl`)
+- [ ] No hardcoded user-visible English (goes through `@zoblocks/intl`)
 
 **Supply chain**
 

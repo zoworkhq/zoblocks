@@ -4,7 +4,7 @@ import { defineConfig } from "vitest/config";
 /**
  * Absolute, because a bare `src/**` glob is not anchored to this package.
  *
- * This package's tests import `@oxygenui-design/signature-core`, whose own
+ * This package's tests import `@zoblocks/signature-core`, whose own
  * sources also live under a `src/` directory. Vitest 3 reported only this
  * package's files; Vitest 4 matched the sibling's `src/` too and folded five
  * of its files into this gate — which dropped the reported branch coverage to

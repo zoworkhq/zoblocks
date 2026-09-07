@@ -29,7 +29,7 @@ import type {
   Practitioner,
   Provenance,
   QuestionnaireResponse,
-} from "@oxygenui-design/fhir";
+} from "@zoblocks/fhir";
 
 export const MRN_SYSTEM = "http://example.org/fhir/sid/mrn";
 

@@ -7,9 +7,9 @@
  * reuses the same binary so `pnpm dev` works on a clean checkout without
  * anyone provisioning a cluster.
  *
- *     pnpm --filter @oxygenui-design/app db:dev     # leave running
- *     pnpm --filter @oxygenui-design/app db:seed
- *     pnpm --filter @oxygenui-design/app dev
+ *     pnpm --filter @zoblocks/app db:dev     # leave running
+ *     pnpm --filter @zoblocks/app db:seed
+ *     pnpm --filter @zoblocks/app dev
  *
  * **The data is gone when this process stops.** That is the point: a
  * development database that survives is a development database people start
@@ -41,7 +41,7 @@ import { MongoMemoryServer } from "mongodb-memory-server";
 const PORT = Number(process.env.APP_DEV_DB_PORT || 59789);
 
 const server = await MongoMemoryServer.create({
-  instance: { port: PORT, dbName: "oxygen_console" },
+  instance: { port: PORT, dbName: "zoblocks_console" },
 });
 const uri = server.getUri();
 
@@ -49,7 +49,7 @@ console.log("");
 console.log("  Ephemeral MongoDB running on a fixed port.");
 console.log("");
 console.log(`    DATABASE_URL=${uri}`);
-console.log("    APP_DB_NAME=oxygen_console");
+console.log("    APP_DB_NAME=zoblocks_console");
 console.log("");
 console.log("  That URL is stable across restarts, so apps/app/.env.local only");
 console.log("  ever needs writing once.");

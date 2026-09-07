@@ -1,11 +1,11 @@
-# @oxygenui-design/identity-core
+# @zoblocks/identity-core
 
-The engine behind Oxygen's patient avatar, chip and banner. No React, no Ant
+The engine behind Zoblocks's patient avatar, chip and banner. No React, no Ant
 Design, no DOM — it takes a FHIR `Patient` and returns a value a renderer can
 walk without knowing any FHIR.
 
 ```ts
-import { resolveIdentity, policy, disambiguate } from "@oxygenui-design/identity-core";
+import { resolveIdentity, policy, disambiguate } from "@zoblocks/identity-core";
 
 const p = policy({ locale: "en-GB", disclosure: "clinical", now: new Date() });
 const me = resolveIdentity(patient, p);
@@ -79,5 +79,5 @@ assertion that fails if per-pair work creeps back into the O(n²) loop.
 
 ---
 
-Oxygen UI is not a compliance boundary and is not a medical device. See the
+Zoblocks is not a compliance boundary and is not a medical device. See the
 repository README.

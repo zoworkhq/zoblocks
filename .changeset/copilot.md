@@ -1,8 +1,8 @@
 ---
-"@oxygenui-design/copilot-core": minor
-"@oxygenui-design/copilot-react": minor
-"@oxygenui-design/copilot": minor
-"@oxygenui-design/copilot-evals": minor
+"@zoblocks/copilot-core": minor
+"@zoblocks/copilot-react": minor
+"@zoblocks/copilot": minor
+"@zoblocks/copilot-evals": minor
 ---
 
 First release: Copilot, a floating clinical assistant.
@@ -58,5 +58,5 @@ and the eval harness. The registry item is a second skin over the same two
 packages — which settles the wrap-versus-registry question Signature left open,
 because almost none of Copilot is actually antd.
 
-Also adds `@oxygenui/no-stigmatising-language` to the ESLint plugin, matching
+Also adds `@zoblocks/no-stigmatising-language` to the ESLint plugin, matching
 the runtime check on model output.

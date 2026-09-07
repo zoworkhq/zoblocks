@@ -2,13 +2,13 @@
 
 **Status:** accepted · 6 August 2026
 
-> **Ratified 16 August 2026.** Both channels ship and are generated from one source (scripts/gen/emit/react-package.ts). The upgrade channel this ADR called for exists as @oxygenui-design/react.
+> **Ratified 16 August 2026.** Both channels ship and are generated from one source (scripts/gen/emit/react-package.ts). The upgrade channel this ADR called for exists as @zoblocks/react.
 > **Supersedes part of:** the distribution assumption implicit in [0001](0001-fhir-typed-props.md)
-> **Superseded in part by [0016](0016-the-installer-is-ours.md):** the decision below stands, but the registry is now installed by `@oxygenui-design/cli` in a format we define, not by a third-party CLI.
+> **Superseded in part by [0016](0016-the-installer-is-ours.md):** the decision below stands, but the registry is now installed by `@zoblocks/cli` in a format we define, not by a third-party CLI.
 
 ## Context
 
-Oxygen ships today through a shadcn registry: the CLI copies component source
+Zoblocks ships today through a shadcn registry: the CLI copies component source
 into the customer's repository. The README sells this deliberately — "yours to
 read, audit, and change" — and for a healthcare buyer who must review what
 renders a potassium result, that auditability is a genuine feature.
@@ -27,7 +27,7 @@ are implementable over copy-source. It also conflicts with the roadmap's premise
 of free and Pro **npm packages**.
 
 A second, quieter cost: because registry source is written with consumer-shaped
-specifiers (`@/lib/utils`, `@/components/oxygen/status-badge`), the root
+specifiers (`@/lib/utils`, `@/components/zoblocks/status-badge`), the root
 `tsconfig.json` must map each one backwards so the repo typechecks. That file
 carries the comment _"Add a mapping for every shared registry component the
 catalog grows."_ It is an O(n) manual step that exists solely because the import
@@ -38,7 +38,7 @@ direction is inverted.
 **npm is the source of truth. The registry is a generated projection of it.**
 
 1. Component source lives in npm packages under `packages/`, written with real
-   package specifiers (`import { cn } from "@oxygenui/utils"`). It typechecks
+   package specifiers (`import { cn } from "@zoblocks/utils"`). It typechecks
    natively; no path mapping.
 
 2. The registry generator emits copy-source output from those same files,

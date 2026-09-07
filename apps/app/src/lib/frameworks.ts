@@ -5,7 +5,7 @@
  * down twice. A bridge that gains a mapping changes this page on the next
  * build; a hand-maintained list would have gone stale the first time one did.
  *
- * The import path is load-bearing. `@oxygenui-design/bridge-antd` — the
+ * The import path is load-bearing. `@zoblocks/bridge-antd` — the
  * barrel — pulls in `AntdBridge.tsx`, which imports `antd`. The app must
  * never resolve a UI framework: that is the whole architectural claim, and an
  * admin app quietly depending on both antd *and* MUI would falsify it in
@@ -15,15 +15,15 @@
  * gate working.
  */
 
-import { resolvePatch, type BridgeDefinition } from "@oxygenui-design/bridge-core";
-import { antdBridge, type AntdTokens } from "@oxygenui-design/bridge-antd/definition";
-import { muiBridge, type MuiTheme } from "@oxygenui-design/bridge-mui/definition";
+import { resolvePatch, type BridgeDefinition } from "@zoblocks/bridge-core";
+import { antdBridge, type AntdTokens } from "@zoblocks/bridge-antd/definition";
+import { muiBridge, type MuiTheme } from "@zoblocks/bridge-mui/definition";
 import {
   CLINICAL_SEMANTIC,
   NOT_BRIDGEABLE,
   TOKEN_SURFACE,
   surfaceEntry,
-} from "@oxygenui-design/tokens/surface";
+} from "@zoblocks/tokens/surface";
 import type { FrameworkId } from "@/db/collections";
 
 /**
@@ -99,7 +99,7 @@ const MUI_PROBE: MuiTheme = {
  * Read from the generated manifest, not re-derived here. The first version of
  * this file collected the `semantic` field of every `bridgeable: false`
  * component token, which is the same rule read from the wrong end: it only
- * finds clinical tokens some component already consumes. `--ox-flag-provisional`
+ * finds clinical tokens some component already consumes. `--zb-flag-provisional`
  * is defined in the semantic tier and referenced by nothing yet, so it fell
  * through and this screen described an identity flag as an ordinary gap in Ant
  * Design's palette. The generator now publishes the rule as data.
@@ -148,7 +148,7 @@ function factsFor<Host>(
   /*
    * Reach, counted through the fallback chain rather than by name.
    *
-   * A bridge writes `--ox-accent` once; forty component tokens fall through to
+   * A bridge writes `--zb-accent` once; forty component tokens fall through to
    * it. Counting only what the bridge writes would report 40-odd tokens for a
    * bridge that in fact restyles most of the library, which understates the
    * architecture by an order of magnitude — and that reach is the entire

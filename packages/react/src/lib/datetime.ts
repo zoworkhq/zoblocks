@@ -5,7 +5,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/lib/datetime.ts. Edit that file, not this one.
+// Generated from registry/zoblocks/lib/datetime.ts. Edit that file, not this one.
 /**
  * The temporal engine: values, calendar arithmetic, parsing, and the session
  * algebra. No React, no DOM, no I/O, and — deliberately — no wall clock.
@@ -13,8 +13,8 @@
  * Four rules shape everything below, and each one is a decision rather than a
  * preference.
  *
- * **1. A value carries its own precision.** `OxDate` has no time member and
- * `OxPartialDate` has no day. That is not tidiness: `new Date("1986-07-18")`
+ * **1. A value carries its own precision.** `ZbDate` has no time member and
+ * `ZbPartialDate` has no day. That is not tidiness: `new Date("1986-07-18")`
  * is midnight UTC, which is the 17th of July in California, and a birth date
  * stored as an instant is the single most common temporal defect in healthcare
  * software. The type makes it unrepresentable rather than discouraged.
@@ -30,7 +30,7 @@
  * needs "now" takes it as an argument. There is no argless `new Date()` in
  * this file and a test asserts there never will be.
  *
- * **4. Absence is a value.** `OxAbsentDate` carries a reason, the same way
+ * **4. Absence is a value.** `ZbAbsentDate` carries a reason, the same way
  * Switch carries `"unknown"`. A registration form that cannot distinguish
  * "no date of birth" from "nobody asked" is lying, and CONTENT.md forbids
  * punctuating the difference away as an em dash.
@@ -41,7 +41,7 @@
 /* ------------------------------------------------------------------ */
 
 /** A civil calendar date. No time, no zone, no instant. */
-export interface OxDate {
+export interface ZbDate {
   kind: "date";
   y: number;
   /** 1–12. */
@@ -58,7 +58,7 @@ export interface OxDate {
  * Coercing "born around 1962" to 1 January 1962 invents a fact that will be
  * read as precise for the rest of the record's life.
  */
-export interface OxPartialDate {
+export interface ZbPartialDate {
   kind: "partial-date";
   y: number;
   m?: number;
@@ -66,7 +66,7 @@ export interface OxPartialDate {
 }
 
 /** A wall-clock time with no date. A shift start is one of these. */
-export interface OxTime {
+export interface ZbTime {
   kind: "time";
   /** 0–23, always. The 12-hour split is presentation. */
   h: number;
@@ -76,10 +76,10 @@ export interface OxTime {
 }
 
 /** A local date and time with no zone. An encounter start in clinic time. */
-export interface OxDateTime {
+export interface ZbDateTime {
   kind: "datetime";
-  date: OxDate;
-  time: OxTime;
+  date: ZbDate;
+  time: ZbTime;
 }
 
 /**
@@ -90,10 +90,10 @@ export interface OxDateTime {
  * twenty-three weeks of every year — surfacing as "everything moved an hour"
  * on a Monday morning in November.
  */
-export interface OxInstant {
+export interface ZbInstant {
   kind: "instant";
-  date: OxDate;
-  time: OxTime;
+  date: ZbDate;
+  time: ZbTime;
   /** An IANA identifier, e.g. `"America/New_York"`. Never an offset. */
   zone: string;
 }
@@ -101,29 +101,29 @@ export interface OxInstant {
 /** Why a temporal value is not present. Mirrors FHIR `data-absent-reason`. */
 export type TemporalAbsence = "unknown" | "asked-declined" | "not-asked" | "temp-unknown";
 
-export interface OxAbsentDate {
+export interface ZbAbsentDate {
   kind: "absent";
   reason: TemporalAbsence;
 }
 
-export type OxTemporal = OxDate | OxPartialDate | OxTime | OxDateTime | OxInstant | OxAbsentDate;
+export type ZbTemporal = ZbDate | ZbPartialDate | ZbTime | ZbDateTime | ZbInstant | ZbAbsentDate;
 
-export type TemporalPrecision = OxTemporal["kind"];
+export type TemporalPrecision = ZbTemporal["kind"];
 
 /** The discriminant, as a function, for hosts narrowing an unknown value. */
-export function temporalPrecision(value: OxTemporal): TemporalPrecision {
+export function temporalPrecision(value: ZbTemporal): TemporalPrecision {
   return value.kind;
 }
 
-export function isTemporalAbsent(value: OxTemporal | null | undefined): value is OxAbsentDate {
+export function isTemporalAbsent(value: ZbTemporal | null | undefined): value is ZbAbsentDate {
   return !!value && value.kind === "absent";
 }
 
-export function plainDate(y: number, m: number, d: number): OxDate {
+export function plainDate(y: number, m: number, d: number): ZbDate {
   return { kind: "date", y, m, d };
 }
 
-export function plainTime(h: number, mi: number, s?: number): OxTime {
+export function plainTime(h: number, mi: number, s?: number): ZbTime {
   return s === undefined ? { kind: "time", h, mi } : { kind: "time", h, mi, s };
 }
 
@@ -156,7 +156,7 @@ export function daysInMonth(y: number, m: number): number {
  * objects and subtracting — is wrong across a DST boundary by an hour, which
  * rounds to a day often enough to matter in a length-of-stay calculation.
  */
-export function toEpochDay(a: OxDate): number {
+export function toEpochDay(a: ZbDate): number {
   let y = a.y;
   const m = a.m;
   if (m <= 2) y -= 1;
@@ -167,7 +167,7 @@ export function toEpochDay(a: OxDate): number {
   return era * 146097 + doe - 719468;
 }
 
-export function fromEpochDay(days: number): OxDate {
+export function fromEpochDay(days: number): ZbDate {
   const z = days + 719468;
   const era = Math.floor(z / 146097);
   const doe = z - era * 146097;
@@ -182,7 +182,7 @@ export function fromEpochDay(days: number): OxDate {
   return plainDate(m <= 2 ? y + 1 : y, m, d);
 }
 
-export function addCalendarDays(a: OxDate, n: number): OxDate {
+export function addCalendarDays(a: ZbDate, n: number): ZbDate {
   return fromEpochDay(toEpochDay(a) + n);
 }
 
@@ -193,7 +193,7 @@ export function addCalendarDays(a: OxDate, n: number): OxDate {
  * monthly depot injection silently moves to the wrong month and stays there
  * for the rest of the series.
  */
-export function addCalendarMonths(a: OxDate, n: number): OxDate {
+export function addCalendarMonths(a: ZbDate, n: number): ZbDate {
   const total = a.y * 12 + (a.m - 1) + n;
   const y = Math.floor(total / 12);
   const m = (((total % 12) + 12) % 12) + 1;
@@ -201,16 +201,16 @@ export function addCalendarMonths(a: OxDate, n: number): OxDate {
 }
 
 /** Negative when `a` is earlier. The value is the difference in days. */
-export function compareDates(a: OxDate, b: OxDate): number {
+export function compareDates(a: ZbDate, b: ZbDate): number {
   return toEpochDay(a) - toEpochDay(b);
 }
 
-export function isSameDate(a: OxDate | null | undefined, b: OxDate | null | undefined): boolean {
+export function isSameDate(a: ZbDate | null | undefined, b: ZbDate | null | undefined): boolean {
   return !!a && !!b && a.y === b.y && a.m === b.m && a.d === b.d;
 }
 
 /** 0 = Sunday. 1970-01-01 was a Thursday, which is where the 4 comes from. */
-export function weekdayOf(a: OxDate): number {
+export function weekdayOf(a: ZbDate): number {
   const z = toEpochDay(a);
   return (((z + 4) % 7) + 7) % 7;
 }
@@ -230,7 +230,7 @@ export interface BusinessDayOptions {
   /** Weekday numbers that count as working, 0 = Sunday. Defaults to Mon–Fri. */
   workdays?: readonly number[];
   /** Organisation closures — holidays, training days, a facility shutdown. */
-  closed?: (date: OxDate) => boolean;
+  closed?: (date: ZbDate) => boolean;
 }
 
 const DEFAULT_WORKDAYS = [1, 2, 3, 4, 5] as const;
@@ -241,13 +241,13 @@ const DEFAULT_WORKDAYS = [1, 2, 3, 4, 5] as const;
  * Saturday clinics has a different working week from an outpatient office, and
  * "three business days" means something different in each.
  */
-export function isBusinessDay(date: OxDate, options: BusinessDayOptions = {}): boolean {
+export function isBusinessDay(date: ZbDate, options: BusinessDayOptions = {}): boolean {
   const workdays = options.workdays ?? DEFAULT_WORKDAYS;
   if (!workdays.includes(weekdayOf(date))) return false;
   return !options.closed?.(date);
 }
 
-export function addBusinessDays(from: OxDate, n: number, options: BusinessDayOptions = {}): OxDate {
+export function addBusinessDays(from: ZbDate, n: number, options: BusinessDayOptions = {}): ZbDate {
   const direction = n < 0 ? -1 : 1;
   const wanted = Math.abs(n);
   let current = from;
@@ -275,33 +275,33 @@ export function addBusinessDays(from: OxDate, n: number, options: BusinessDayOpt
  * is worse than no preset: it is a report that is off by two days and looks
  * right.
  */
-export function startOfWeek(date: OxDate, weekStart = 0): OxDate {
+export function startOfWeek(date: ZbDate, weekStart = 0): ZbDate {
   const into = (((weekdayOf(date) - weekStart) % 7) + 7) % 7;
   return addCalendarDays(date, -into);
 }
 
 /** The last day of the week `date` falls in. */
-export function endOfWeek(date: OxDate, weekStart = 0): OxDate {
+export function endOfWeek(date: ZbDate, weekStart = 0): ZbDate {
   return addCalendarDays(startOfWeek(date, weekStart), 6);
 }
 
 /** The first of the month `date` falls in. */
-export function startOfMonth(date: OxDate): OxDate {
+export function startOfMonth(date: ZbDate): ZbDate {
   return plainDate(date.y, date.m, 1);
 }
 
 /** The last day of the month `date` falls in — February aware, leap aware. */
-export function endOfMonth(date: OxDate): OxDate {
+export function endOfMonth(date: ZbDate): ZbDate {
   return plainDate(date.y, date.m, daysInMonth(date.y, date.m));
 }
 
 /** 1 January of the year `date` falls in. */
-export function startOfYear(date: OxDate): OxDate {
+export function startOfYear(date: ZbDate): ZbDate {
   return plainDate(date.y, 1, 1);
 }
 
 /** 31 December of the year `date` falls in. */
-export function endOfYear(date: OxDate): OxDate {
+export function endOfYear(date: ZbDate): ZbDate {
   return plainDate(date.y, 12, 31);
 }
 
@@ -310,9 +310,9 @@ export function endOfYear(date: OxDate): OxDate {
 /* ------------------------------------------------------------------ */
 
 /** A closed interval of whole days. Both ends are inclusive and selectable. */
-export interface OxDateRange {
-  start: OxDate | null;
-  end: OxDate | null;
+export interface ZbDateRange {
+  start: ZbDate | null;
+  end: ZbDate | null;
 }
 
 /**
@@ -323,14 +323,14 @@ export interface OxDateRange {
  * `rangeContains` and the band painter from each having their own opinion
  * about which end is which.
  */
-export function normalizeDateRange(range: OxDateRange): OxDateRange {
+export function normalizeDateRange(range: ZbDateRange): ZbDateRange {
   const { start, end } = range;
   if (!start || !end) return range;
   return compareDates(start, end) <= 0 ? range : { start: end, end: start };
 }
 
 /** Whether a range has both ends. An incomplete range is a legal state, not an error. */
-export function isCompleteRange(range: OxDateRange | null | undefined): boolean {
+export function isCompleteRange(range: ZbDateRange | null | undefined): boolean {
   return Boolean(range?.start && range?.end);
 }
 
@@ -342,14 +342,14 @@ export function isCompleteRange(range: OxDateRange | null | undefined): boolean 
  * exclusive convention belongs to timestamps, and mixing the two is how a
  * week of treatment gets billed as six days.
  */
-export function rangeDayCount(range: OxDateRange): number | null {
+export function rangeDayCount(range: ZbDateRange): number | null {
   const { start, end } = normalizeDateRange(range);
   if (!start || !end) return null;
   return toEpochDay(end) - toEpochDay(start) + 1;
 }
 
 /** Whether a date falls inside a range, both ends included. */
-export function rangeContains(range: OxDateRange, date: OxDate): boolean {
+export function rangeContains(range: ZbDateRange, date: ZbDate): boolean {
   const { start, end } = normalizeDateRange(range);
   if (!start || !end) return false;
   return compareDates(date, start) >= 0 && compareDates(date, end) <= 0;
@@ -357,8 +357,8 @@ export function rangeContains(range: OxDateRange, date: OxDate): boolean {
 
 /** Whether two ranges describe the same two days. */
 export function isSameRange(
-  a: OxDateRange | null | undefined,
-  b: OxDateRange | null | undefined,
+  a: ZbDateRange | null | undefined,
+  b: ZbDateRange | null | undefined,
 ): boolean {
   const left = a ? normalizeDateRange(a) : null;
   const right = b ? normalizeDateRange(b) : null;
@@ -375,15 +375,15 @@ export function isSameRange(
 export interface DateShortcut {
   id: string;
   label: string;
-  date: OxDate;
+  date: ZbDate;
 }
 
 /** A named range a reader can take in one press. */
 export interface DateRangePreset {
   id: string;
   label: string;
-  start: OxDate;
-  end: OxDate;
+  start: ZbDate;
+  end: ZbDate;
 }
 
 /**
@@ -399,7 +399,7 @@ export interface DateRangePreset {
  * in March and in August, which is what makes the whole surface testable.
  */
 export function dateRangePresets(
-  now: OxDate,
+  now: ZbDate,
   options: { weekStart?: number } = {},
 ): DateRangePreset[] {
   const weekStart = options.weekStart ?? 0;
@@ -434,7 +434,7 @@ export function dateRangePresets(
 
 /** The preset a range currently matches, or null when the reader built their own. */
 export function matchRangePreset(
-  range: OxDateRange | null | undefined,
+  range: ZbDateRange | null | undefined,
   presets: readonly DateRangePreset[],
 ): DateRangePreset | null {
   if (!range?.start || !range.end) return null;
@@ -445,7 +445,7 @@ export function matchRangePreset(
 /* Times and durations                                                */
 /* ------------------------------------------------------------------ */
 
-export function minutesOfTime(t: OxTime): number {
+export function minutesOfTime(t: ZbTime): number {
   return t.h * 60 + t.mi;
 }
 
@@ -456,7 +456,7 @@ export function minutesOfTime(t: OxTime): number {
  * ninety minutes" is a different appointment depending on whether the caller
  * notices it landed on tomorrow.
  */
-export function timeFromMinutes(total: number): { time: OxTime; dayOffset: number } {
+export function timeFromMinutes(total: number): { time: ZbTime; dayOffset: number } {
   const dayOffset = Math.floor(total / 1440);
   const rest = ((total % 1440) + 1440) % 1440;
   return { time: plainTime(Math.floor(rest / 60), rest % 60), dayOffset };
@@ -482,7 +482,7 @@ export interface TemporalAge {
  * weeks the unit that matters is days. `describeAgeLabel` picks the unit; this
  * returns all three so a host can pick differently.
  */
-export function ageOn(dob: OxDate, now: OxDate): TemporalAge {
+export function ageOn(dob: ZbDate, now: ZbDate): TemporalAge {
   const days = compareDates(now, dob);
   if (days < 0) return { years: 0, months: 0, days, future: true };
 
@@ -565,7 +565,7 @@ function pad2(n: number): string {
  * our own month names is how a library ends up with fourteen locales and a
  * backlog.
  */
-export function formatPlainDate(date: OxDate, style: DateStyle = "medium"): string {
+export function formatPlainDate(date: ZbDate, style: DateStyle = "medium"): string {
   const month = MONTH_SHORT[date.m - 1];
   switch (style) {
     case "iso":
@@ -593,7 +593,7 @@ export interface ClockFormatOptions {
   showSecond?: boolean;
 }
 
-export function formatClockTime(t: OxTime, options: ClockFormatOptions = {}): string {
+export function formatClockTime(t: ZbTime, options: ClockFormatOptions = {}): string {
   const seconds = options.showSecond && t.s !== undefined ? `:${pad2(t.s)}` : "";
   if (options.hour24) return `${pad2(t.h)}:${pad2(t.mi)}${seconds}`;
   const hour = t.h % 12 === 0 ? 12 : t.h % 12;
@@ -635,9 +635,9 @@ export function formatDuration(minutes: number, options: DurationFormatOptions =
 /* ------------------------------------------------------------------ */
 
 /** A start and an end time of day. Both ends are the times themselves, not a duration. */
-export interface OxTimeRange {
-  start: OxTime | null;
-  end: OxTime | null;
+export interface ZbTimeRange {
+  start: ZbTime | null;
+  end: ZbTime | null;
 }
 
 /**
@@ -650,7 +650,7 @@ export interface OxTimeRange {
  * correction, which is information a clamp destroys.
  */
 export function timeRangeMinutes(
-  range: OxTimeRange,
+  range: ZbTimeRange,
   options: { allowOvernight?: boolean } = {},
 ): number | null {
   const { start, end } = range;
@@ -668,7 +668,7 @@ export function timeRangeMinutes(
  * record is not a date, and the thresholds below are a clinical judgement
  * rather than a locale one — which is why they live here and not in `Intl`.
  */
-export function describeRelativeDay(date: OxDate, now: OxDate): string {
+export function describeRelativeDay(date: ZbDate, now: ZbDate): string {
   const n = compareDates(date, now);
   if (n === 0) return "Today";
   if (n === 1) return "Tomorrow";
@@ -705,7 +705,7 @@ export interface DateParseOptions {
  * Seven digits is genuinely ambiguous and returns `null` rather than a guess,
  * because a plausible wrong date in a clinical field is worse than an empty one.
  */
-export function parseDateDigits(input: string, options: DateParseOptions = {}): OxDate | null {
+export function parseDateDigits(input: string, options: DateParseOptions = {}): ZbDate | null {
   const digits = (input ?? "").replace(/\D/g, "");
   const order = options.order ?? "MDY";
   const pivot = options.twoDigitYearPivot ?? 30;
@@ -748,7 +748,7 @@ export function parseDateDigits(input: string, options: DateParseOptions = {}): 
 }
 
 export interface ParsedTime {
-  time: OxTime;
+  time: ZbTime;
   /**
    * True when a 1–12 hour was typed in a 12-hour locale with no meridiem.
    *
@@ -820,7 +820,7 @@ export interface MonthRef {
 }
 
 export interface CalendarCell {
-  date: OxDate;
+  date: ZbDate;
   /** False for the leading and trailing days of the adjacent months. */
   inMonth: boolean;
 }
@@ -857,8 +857,8 @@ export function weekdayOrder(weekStart = 0): number[] {
 export type SessionHold = "duration" | "end";
 
 export interface SessionInterval {
-  start: OxTime;
-  end: OxTime;
+  start: ZbTime;
+  end: ZbTime;
   /** 1 when the end falls on the next day. Crossing midnight is a value. */
   endDayOffset: 0 | 1;
   durationMin: number;
@@ -871,7 +871,7 @@ export interface SessionInterval {
    * The likeliest correction when `exceedsMax` — usually the other meridiem.
    * Offered, never applied.
    */
-  suggestedEnd?: OxTime;
+  suggestedEnd?: ZbTime;
 }
 
 export interface SessionOptions {
@@ -901,8 +901,8 @@ const DEFAULT_MAX_MIN = 480;
  * state rather than inference, and the component renders it.
  */
 function deriveSession(input: {
-  start: OxTime;
-  end?: OxTime;
+  start: ZbTime;
+  end?: ZbTime;
   endDayOffset?: number;
   durationMin?: number;
   hold: SessionHold;
@@ -954,7 +954,7 @@ function deriveSession(input: {
 }
 
 export function sessionFrom(
-  start: OxTime,
+  start: ZbTime,
   durationMin: number,
   options: SessionOptions = {},
 ): SessionInterval {
@@ -976,7 +976,7 @@ export function sessionFrom(
  */
 export function withSessionStart(
   session: SessionInterval,
-  start: OxTime,
+  start: ZbTime,
   options: SessionOptions = {},
 ): SessionInterval {
   return deriveSession({
@@ -992,7 +992,7 @@ export function withSessionStart(
 
 export function withSessionEnd(
   session: SessionInterval,
-  end: OxTime,
+  end: ZbTime,
   options: SessionOptions = {},
 ): SessionInterval {
   const allowOvernight = options.allowOvernight ?? true;
@@ -1139,7 +1139,7 @@ function fieldsInZone(zone: string, epochMs: number): ZonedFields | null {
   }
 }
 
-function asUtcMs(date: OxDate, time: OxTime): number {
+function asUtcMs(date: ZbDate, time: ZbTime): number {
   return Date.UTC(date.y, date.m - 1, date.d, time.h, time.mi, time.s ?? 0);
 }
 
@@ -1163,7 +1163,7 @@ function offsetAtInstant(zone: string, epochMs: number): number | null {
  * that never happened. The fix is to round-trip: convert the candidate back to
  * the zone's own fields and require them to match what was asked for.
  */
-function instantsForLocal(zone: string, date: OxDate, time: OxTime): number[] {
+function instantsForLocal(zone: string, date: ZbDate, time: ZbTime): number[] {
   const naive = asUtcMs(date, time);
   const day = 86400000;
 
@@ -1199,7 +1199,7 @@ function instantsForLocal(zone: string, date: OxDate, time: OxTime): number[] {
  * eventually meets one of them. Returns null when the runtime does not know
  * the zone, so a caller renders clinic time alone rather than a converted lie.
  */
-export function zoneOffsetMinutes(zone: string, date: OxDate, time: OxTime): number | null {
+export function zoneOffsetMinutes(zone: string, date: ZbDate, time: ZbTime): number | null {
   const [first] = instantsForLocal(zone, date, time);
   if (first !== undefined) return offsetAtInstant(zone, first);
   // A non-existent local time still has a defensible offset for arithmetic —
@@ -1229,7 +1229,7 @@ export type ZoneVerdict =
  * on a fall-back night is an hour of ambiguity in a controlled-substance record
  * unless somebody is asked which one — so the two offsets are both returned.
  */
-export function classifyLocalTime(zone: string, date: OxDate, time: OxTime): ZoneVerdict {
+export function classifyLocalTime(zone: string, date: ZbDate, time: ZbTime): ZoneVerdict {
   const instants = instantsForLocal(zone, date, time);
   const [earliest] = instants;
   const latest = instants.length > 0 ? instants[instants.length - 1] : undefined;
@@ -1261,9 +1261,9 @@ export function classifyLocalTime(zone: string, date: OxDate, time: OxTime): Zon
  * European Union is three weeks of every March.
  */
 export function describeZoneShift(
-  instant: OxInstant,
+  instant: ZbInstant,
   viewerZone: string,
-): { local: OxTime; date: OxDate; sameZone: boolean } | null {
+): { local: ZbTime; date: ZbDate; sameZone: boolean } | null {
   if (instant.zone === viewerZone) {
     return { local: instant.time, date: instant.date, sameZone: true };
   }
@@ -1286,9 +1286,9 @@ export function describeZoneShift(
  * Parses the FHIR `date` forms — `YYYY`, `YYYY-MM`, `YYYY-MM-DD`.
  *
  * A partial form returns a partial value rather than being padded to the first
- * of the month, which is the whole reason `OxPartialDate` exists.
+ * of the month, which is the whole reason `ZbPartialDate` exists.
  */
-export function fromIsoDate(value: string): OxDate | OxPartialDate | null {
+export function fromIsoDate(value: string): ZbDate | ZbPartialDate | null {
   const full = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
   if (full) {
     const [y, m, d] = [Number(full[1]), Number(full[2]), Number(full[3])];
@@ -1304,7 +1304,7 @@ export function fromIsoDate(value: string): OxDate | OxPartialDate | null {
   return null;
 }
 
-export function toIsoDate(value: OxDate | OxPartialDate): string {
+export function toIsoDate(value: ZbDate | ZbPartialDate): string {
   if (value.kind === "date") return formatPlainDate(value, "iso");
   if (value.m === undefined) return String(value.y);
   if (value.d === undefined) return `${value.y}-${pad2(value.m)}`;

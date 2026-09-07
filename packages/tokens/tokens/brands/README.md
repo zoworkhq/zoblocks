@@ -21,17 +21,17 @@ only — never semantic ones:
 }
 ```
 
-Then `pnpm gen`. The build emits `[data-ox-brand="northwind"]` blocks and the
+Then `pnpm gen`. The build emits `[data-zb-brand="northwind"]` blocks and the
 brand is live:
 
 ```html
-<html data-ox-brand="northwind"></html>
+<html data-zb-brand="northwind"></html>
 ```
 
 ## Why primitives only
 
 The tier discipline is what makes this work. Components reference semantic
-tokens, semantic tokens reference primitives, and `@oxygenui/no-primitive-token`
+tokens, semantic tokens reference primitives, and `@zoblocks/no-primitive-token`
 makes a component reaching past that a lint error. So replacing the palette
 reaches every component without any component knowing a brand exists.
 

@@ -302,7 +302,7 @@ export function CommandMenu() {
                           className={cn(
                             "flex cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm",
                             item.index === active
-                              ? "bg-oxygen/10 text-ink"
+                              ? "bg-brand/10 text-ink"
                               : "text-graphite hover:bg-paper-sunk",
                           )}
                         >
@@ -311,15 +311,13 @@ export function CommandMenu() {
                               aria-hidden="true"
                               className={cn(
                                 "size-3.5 shrink-0 transition-opacity",
-                                item.index === active
-                                  ? "text-oxygen-deep opacity-100"
-                                  : "opacity-0",
+                                item.index === active ? "text-brand-deep opacity-100" : "opacity-0",
                               )}
                             />
                             <span className="truncate font-medium">{item.label}</span>
                           </span>
                           {item.hint && (
-                            <span className="numeric shrink-0 text-xs text-oxygen-deep">
+                            <span className="numeric shrink-0 text-xs text-brand-deep">
                               {item.hint}
                             </span>
                           )}

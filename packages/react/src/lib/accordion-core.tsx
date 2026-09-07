@@ -7,9 +7,9 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/lib/accordion-core.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/lib/accordion-core.tsx. Edit that file, not this one.
 /**
- * accordion-core — the behaviour behind every Oxygen disclosure surface.
+ * accordion-core — the behaviour behind every Zoblocks disclosure surface.
  *
  * Nothing here renders. It is the part a customer must not rewrite when they
  * replace our visual language, because it is where the accessibility contract
@@ -39,7 +39,7 @@
  *      makes it structural: `children` is `never` alongside `kind: "withheld"`,
  *      so the content cannot sit in the bundle waiting for a CSS mistake.
  *
- * Styling lives in `styles/oxygen-accordion.css`, installed alongside this file.
+ * Styling lives in `styles/zoblocks-accordion.css`, installed alongside this file.
  */
 
 import * as React from "react";
@@ -58,7 +58,7 @@ import * as React from "react";
 /**
  * A style object that may also carry CSS custom properties.
  *
- * React's CSSProperties has no room for `--ox-accordion-font`, and the usual
+ * React's CSSProperties has no room for `--zb-accordion-font`, and the usual
  * workaround is an `as React.CSSProperties` cast at the call site — which also
  * silences real typos in the properties beside it. A template-literal key
  * widens the type exactly as far as it needs to go and no further.
@@ -439,7 +439,7 @@ export function useAccordion(options: UseAccordionOptions): AccordionApi {
   } = options;
 
   const reactId = React.useId();
-  const base = idPrefix ?? `ox-acc-${reactId.replace(/:/g, "")}`;
+  const base = idPrefix ?? `zb-acc-${reactId.replace(/:/g, "")}`;
 
   const controlled = activeKey === undefined ? undefined : normalizeKeys(activeKey);
   const [rawOpen, commit] = useControllableSet(controlled, normalizeKeys(defaultActiveKey));
@@ -667,7 +667,7 @@ export function useAccordion(options: UseAccordionOptions): AccordionApi {
     (item: AccordionItem) => ({
       // A real heading element carries role and level implicitly. Stated here
       // as data for the renderer, which picks h1–h6 from `headingLevel`.
-      "data-ox-accordion-heading": String(headingLevel),
+      "data-zb-accordion-heading": String(headingLevel),
       className: item.classNames?.header,
       style: item.styles?.header,
     }),

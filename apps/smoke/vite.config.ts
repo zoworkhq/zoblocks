@@ -26,10 +26,10 @@ export default defineConfig({
     vue({
       template: {
         compilerOptions: {
-          // Without this Vue resolves <ox-pulse-loader> as a component, fails,
+          // Without this Vue resolves <zb-pulse-loader> as a component, fails,
           // and warns at runtime. This one line is the whole Vue integration
           // story, and the reason the page asserts on console warnings.
-          isCustomElement: (tag) => tag.startsWith("ox-"),
+          isCustomElement: (tag) => tag.startsWith("zb-"),
         },
       },
     }),

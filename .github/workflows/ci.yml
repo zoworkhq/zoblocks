@@ -286,7 +286,7 @@ jobs:
       # half the test, since Angular and Vue reject bad markup at compile time.
       # Its first run found the elements broken in React 19, Vue, and Angular.
       #
-      # `OXYGEN_BASE_URL` is deliberately NOT set here.
+      # `ZOBLOCKS_BASE_URL` is deliberately NOT set here.
       #
       # Setting it tells playwright.config.ts to skip starting the docs server,
       # on the assumption that one is already running — which used to be true by
@@ -349,6 +349,29 @@ jobs:
       - name: Scan for non-synthetic identifiers
         run: bash scripts/no-phi.sh
 
+  retired-names:
+    name: Retired name check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # The project was renamed to Zoblocks in September 2026, retiring the
+      # previous name entirely.
+      # A sweep makes that true once; this keeps it true. A repository this size
+      # regrows a name within a week of hand-written commits — a copied import,
+      # a pasted URL, a comment written from memory.
+      #
+      # It also fails on a tracked source file that reads as binary, because a
+      # stray NUL byte makes a file invisible to every text tool. That is not
+      # hypothetical: one file escaped the original sweep exactly that way.
+      #
+      # Exemptions and their reasons are in the script, not here, so this and
+      # `pnpm verify` run identical code.
+      - name: Scan for the retired name
+        run: bash scripts/retired-names.sh
+
   # ---------------------------------------------------------------------------
   # Deployment
   #
@@ -371,7 +394,7 @@ jobs:
     timeout-minutes: 15
     environment:
       name: production
-      url: https://oxygenui.design
+      url: https://zoblocks.design
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -415,7 +438,7 @@ jobs:
           expected=$(node -e 'process.stdout.write(require("./registry.json").items.map(i=>i.name).sort().join(","))')
           echo "Expecting: $expected"
 
-          url="https://oxygenui.design/r/index.json?ci=${GITHUB_SHA}"
+          url="https://zoblocks.design/r/index.json?ci=${GITHUB_SHA}"
           # `_` rather than `i`: the counter bounds the loop and is never
           # read, and shellcheck is right to say so.
           for _ in $(seq 1 10); do
@@ -468,7 +491,7 @@ jobs:
     timeout-minutes: 15
     environment:
       name: production-hq
-      url: https://hq.oxygenui.design
+      url: https://hq.zoblocks.design
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -508,7 +531,7 @@ jobs:
       - name: Verify hq is serving hq
         run: |
           set -uo pipefail
-          host=hq.oxygenui.design
+          host=hq.zoblocks.design
 
           if ! getent hosts "$host" >/dev/null 2>&1 && ! host "$host" >/dev/null 2>&1; then
             echo "$host does not resolve yet — domain not attached to this project. Skipping the check." \
@@ -528,7 +551,7 @@ jobs:
 
   # The console — sign-in, the marketplace catalogue, checkout and delivery.
   #
-  # It has never been deployed. `app.oxygenui.design` has no DNS record, which
+  # It has never been deployed. `app.zoblocks.design` has no DNS record, which
   # is why /login is unreachable and why the public marketplace fetched an
   # empty catalogue from the day it shipped: every one of those symptoms is
   # this missing job.
@@ -540,7 +563,7 @@ jobs:
   #
   #   1. A Vercel project with Root Directory `apps/app`, and its id set as the
   #      repository variable VERCEL_PROJECT_ID_APP.
-  #   2. `app.oxygenui.design` attached to that project.
+  #   2. `app.zoblocks.design` attached to that project.
   #   3. Its runtime environment: DATABASE_URL for a production MongoDB, and
   #      the Stripe keys if checkout is to complete. Without the database the
   #      deploy succeeds and every request 500s.
@@ -554,7 +577,7 @@ jobs:
     timeout-minutes: 15
     environment:
       name: production-app
-      url: https://app.oxygenui.design
+      url: https://app.zoblocks.design
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -590,7 +613,7 @@ jobs:
       - name: Verify the console is serving its catalogue
         run: |
           set -uo pipefail
-          host=app.oxygenui.design
+          host=app.zoblocks.design
 
           if ! getent hosts "$host" >/dev/null 2>&1 && ! host "$host" >/dev/null 2>&1; then
             echo "$host does not resolve yet — domain not attached to this project. Skipping the check." \

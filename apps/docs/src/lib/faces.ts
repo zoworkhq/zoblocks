@@ -19,7 +19,7 @@
  * screen that claims to be clinical software.
  */
 
-import { CASELOAD, CASELOAD_TAIL } from "@/registry/oxygen/data-grid/data-grid.fixtures";
+import { CASELOAD, CASELOAD_TAIL } from "@/registry/zoblocks/data-grid/data-grid.fixtures";
 
 /** Every distinct portrait the caseload fixtures reference, in a stable order. */
 const FACES: readonly string[] = [

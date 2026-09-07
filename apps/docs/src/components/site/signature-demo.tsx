@@ -26,8 +26,8 @@ import {
   toFhirBundle,
   type SignatureValue,
   type SignedValue,
-} from "@oxygenui-design/signature";
-import "@oxygenui-design/signature/styles.css";
+} from "@zoblocks/signature";
+import "@zoblocks/signature/styles.css";
 import { SignatureDrawing, StrokeAnatomy } from "@/components/site/signature-showcase";
 import { cn } from "@/lib/utils";
 
@@ -241,13 +241,13 @@ export function SignatureDemo() {
       >
         {/*
           The accent follows the design language, and used to be pinned to
-          Oxygen's.
+          Zoblocks's.
 
-          Pinning it was right while Oxygen was the only language: with only
+          Pinning it was right while Zoblocks was the only language: with only
           the algorithm set, the primary button was antd's #1677ff with white
           on it — 4.10:1, an AA failure on the one page in the docs that
-          renders antd — and a reader looking at Oxygen's signature control
-          should see Oxygen's accent. It became wrong the moment the switcher
+          renders antd — and a reader looking at Zoblocks's signature control
+          should see Zoblocks's accent. It became wrong the moment the switcher
           shipped, because this was then the one panel on the page that ignored
           it.
 

@@ -1,5 +1,5 @@
 ---
-"@oxygenui-design/bridge-mui": patch
+"@zoblocks/bridge-mui": patch
 ---
 
 Never emit a MUI primary palette without `main`
@@ -7,7 +7,7 @@ Never emit a MUI primary palette without `main`
 `createTheme` runs `augmentColor` over any `palette.primary` it is given and
 throws when `main` is absent — so an object carrying only `dark` was not a
 partial theme, it was one that took the host's application down at import. That
-state is one override away: a theme with `--ox-accent-hover` set and `--ox-accent`
+state is one override away: a theme with `--zb-accent-hover` set and `--zb-accent`
 not.
 
 `toMuiTheme` now omits `primary` entirely rather than emitting shades with

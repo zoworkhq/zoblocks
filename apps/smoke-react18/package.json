@@ -1,5 +1,5 @@
 {
-  "name": "@oxygenui-design/smoke-react18",
+  "name": "@zoblocks/smoke-react18",
   "version": "0.0.0",
   "private": true,
   "description": "The React 18 half of the cross-framework proof. Separate package because two React majors cannot share a node_modules.",
@@ -11,8 +11,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@oxygenui-design/loaders": "workspace:*",
-    "@oxygenui-design/tokens": "workspace:*"
+    "@zoblocks/loaders": "workspace:*",
+    "@zoblocks/tokens": "workspace:*"
   },
   "devDependencies": {
     "@types/react": "^18.3.18",

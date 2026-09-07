@@ -7,7 +7,7 @@
  * first. This is the second.
  */
 
-import { identityInitials, type Identity } from "@oxygenui-design/identity-core";
+import { identityInitials, type Identity } from "@zoblocks/identity-core";
 import { useCallback, useMemo, useState, type ReactNode } from "react";
 import { useIdentityPolicy } from "./IdentityProvider.js";
 
@@ -15,9 +15,9 @@ export type VerifyMode = "initials" | "birth-date";
 
 /** Literal class map. See the note in `states.tsx`. */
 const VERIFY_STATE_CLASS = {
-  idle: "ox-verify--idle",
-  wrong: "ox-verify--wrong",
-  confirmed: "ox-verify--confirmed",
+  idle: "zb-verify--idle",
+  wrong: "zb-verify--wrong",
+  confirmed: "zb-verify--confirmed",
 } as const;
 
 export interface PatientVerifyProps {
@@ -67,21 +67,21 @@ export function PatientVerify(props: PatientVerifyProps): ReactNode {
 
   return (
     <div
-      className={["ox-verify", VERIFY_STATE_CLASS[state]].join(" ")}
+      className={["zb-verify", VERIFY_STATE_CLASS[state]].join(" ")}
       role="alertdialog"
       aria-label={`Confirm the patient before ${action}`}
-      data-ox-patient-id={identity.key}
+      data-zb-patient-id={identity.key}
     >
-      <span className="ox-verify__rail" aria-hidden="true" />
-      <div className="ox-verify__body">
-        <p className="ox-verify__title">Confirm the patient before {action}</p>
-        <p className="ox-verify__prompt">
+      <span className="zb-verify__rail" aria-hidden="true" />
+      <div className="zb-verify__body">
+        <p className="zb-verify__title">Confirm the patient before {action}</p>
+        <p className="zb-verify__prompt">
           You are about to <strong>{action}</strong>. {label}.
         </p>
-        <div className="ox-verify__row">
-          <div className="ox-verify__who">
-            <span className="ox-verify__name">{identity.name.text}</span>
-            <span className="ox-verify__detail">
+        <div className="zb-verify__row">
+          <div className="zb-verify__who">
+            <span className="zb-verify__name">{identity.name.text}</span>
+            <span className="zb-verify__detail">
               {[
                 identity.birthDate?.text,
                 identity.identifiers[0] &&
@@ -91,10 +91,10 @@ export function PatientVerify(props: PatientVerifyProps): ReactNode {
                 .join(" · ")}
             </span>
           </div>
-          <label className="ox-verify__field">
-            <span className="ox-visually-hidden">{label}</span>
+          <label className="zb-verify__field">
+            <span className="zb-visually-hidden">{label}</span>
             <input
-              className="ox-verify__input"
+              className="zb-verify__input"
               value={entry}
               inputMode={mode === "birth-date" ? "numeric" : "text"}
               autoComplete="off"
@@ -109,16 +109,16 @@ export function PatientVerify(props: PatientVerifyProps): ReactNode {
               placeholder={mode === "birth-date" ? "DDMMYYYY" : "Initials"}
             />
           </label>
-          <button type="button" className="ox-btn ox-btn--primary" onClick={submit}>
+          <button type="button" className="zb-btn zb-btn--primary" onClick={submit}>
             Confirm
           </button>
           {onCancel && (
-            <button type="button" className="ox-btn" onClick={onCancel}>
+            <button type="button" className="zb-btn" onClick={onCancel}>
               Cancel
             </button>
           )}
         </div>
-        <p className="ox-verify__result" role="status">
+        <p className="zb-verify__result" role="status">
           {state === "wrong" &&
             `That does not match the patient on screen. Nothing has been ordered. Check the chart before retrying.`}
           {state === "confirmed" && `Confirmed for ${identity.name.text}.`}

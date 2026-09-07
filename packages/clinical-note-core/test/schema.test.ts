@@ -125,9 +125,9 @@ describe("DOM round trip", () => {
     expect(
       spec.getAttrs!(
         el({
-          "data-ox-code": "10164-2",
-          "data-ox-title": "HPI",
-          "data-ox-required": "true",
+          "data-zb-code": "10164-2",
+          "data-zb-title": "HPI",
+          "data-zb-required": "true",
         }),
       ),
     ).toEqual({ code: "10164-2", system: LOINC, title: "HPI", required: true });
@@ -146,22 +146,22 @@ describe("DOM round trip", () => {
       number,
     ];
     expect(out[0]).toBe("section");
-    expect(out[1]["data-ox-code"]).toBe("1");
-    expect(out[1]["data-ox-required"]).toBeUndefined();
+    expect(out[1]["data-zb-code"]).toBe("1");
+    expect(out[1]["data-zb-required"]).toBeUndefined();
   });
 
   it("round-trips a blank, hinted and bare", () => {
     const spec = noteSchema.nodes["wildcard"]!.spec;
-    expect(spec.parseDOM![0]!.getAttrs!(el({ "data-ox-wildcard": "dose" }))).toEqual({
+    expect(spec.parseDOM![0]!.getAttrs!(el({ "data-zb-wildcard": "dose" }))).toEqual({
       hint: "dose",
     });
     expect(spec.parseDOM![0]!.getAttrs!(el({}))).toEqual({ hint: "" });
     expect(spec.toDOM!(blank("dose"))).toEqual([
       "span",
-      { "data-ox-wildcard": "dose" },
+      { "data-zb-wildcard": "dose" },
       "***dose***",
     ]);
-    expect(spec.toDOM!(blank())).toEqual(["span", { "data-ox-wildcard": "" }, "***"]);
+    expect(spec.toDOM!(blank())).toEqual(["span", { "data-zb-wildcard": "" }, "***"]);
   });
 
   it("serialises every block node to the element FHIR narrative permits", () => {

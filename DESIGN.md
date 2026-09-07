@@ -1,6 +1,6 @@
-# Oxygen UI — Product Design Contract
+# Zoblocks — Product Design Contract
 
-Copy this file into any product built with Oxygen and fill it in. It is the
+Copy this file into any product built with Zoblocks and fill it in. It is the
 handoff artifact between design, engineering, clinical review, and any AI
 coding agent working in the repository. Keep it versioned next to the code.
 
@@ -18,9 +18,9 @@ An unfilled section is not a formatting problem — it is an unmade decision.
 
 ## Visual language
 
-- **Theme:** `oxygen-light` · `oxygen-dark` · customer brand
+- **Theme:** `zoblocks-light` · `zoblocks-dark` · customer brand
 - **Density:** `patient` · `standard` · `clinical`
-  (set with `data-ox-density` on the container)
+  (set with `data-zb-density` on the container)
 - **Status semantics:** never color alone — every status pairs a color with an
   icon and a text label
 - **Brand overrides applied:**
@@ -67,6 +67,6 @@ implementing team's responsibility:
 - **Clinical validation and sign-off:**
 - **Regulatory obligations:**
 
-> Oxygen UI is not a compliance boundary. It does not make an application
+> Zoblocks is not a compliance boundary. It does not make an application
 > HIPAA, GDPR, or DPDP compliant, and it is not a medical device or clinical
 > decision support.

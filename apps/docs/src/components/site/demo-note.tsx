@@ -41,7 +41,7 @@ export function splitNote(text: string): { lead: string; rest: string } {
 
 export function DemoNote({
   children,
-  className = "ox-demo__note",
+  className = "zb-demo__note",
 }: {
   children: React.ReactNode;
   className?: string;
@@ -59,7 +59,7 @@ export function DemoNote({
   return (
     <div className={className}>
       <p>{lead}</p>
-      <details className="ox-demo__more">
+      <details className="zb-demo__more">
         <summary>Why it behaves this way</summary>
         <p>{rest}</p>
       </details>

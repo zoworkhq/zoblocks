@@ -19,9 +19,14 @@ apps/hq/drizzle/meta
 
 # Token build outputs. The DTCG source in packages/tokens/tokens/ is
 # hand-written and IS formatted; everything below is emitted from it.
-packages/tokens/src/oxygen-tokens.css
+packages/tokens/src/zoblocks-tokens.css
 packages/tokens/src/tailwind.css
 packages/tokens/src/tokens.ts
 packages/tokens/src/tokens.json
 packages/tokens/src/contrast.json
 packages/tokens/src/surface.ts
+
+# Frozen. Everything under content/archive/ is a dated record of decisions made
+# before the September 2026 rename; reformatting it would rewrite history for
+# no reader's benefit. See content/archive/README.md.
+content/archive

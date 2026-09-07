@@ -7,9 +7,9 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/lib/clinical-note.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/lib/clinical-note.tsx. Edit that file, not this one.
 /**
- * The React binding for `@oxygenui-design/clinical-note-core`.
+ * The React binding for `@zoblocks/clinical-note-core`.
  *
  * The engine has no DOM. This file is the part that does: it mounts a
  * ProseMirror view, keeps React and ProseMirror's own state in sync, and
@@ -49,7 +49,7 @@ import {
   type Origin,
   type Phrase,
   type ProvenanceAttrs,
-} from "@oxygenui-design/clinical-note-core";
+} from "@zoblocks/clinical-note-core";
 
 /* ------------------------------------------------------------------ */
 /* Provenance decorations                                              */
@@ -66,11 +66,11 @@ import {
  */
 export const ORIGIN_CLASS: Record<Origin, string> = {
   typed: "",
-  dictated: "ox-note-pv ox-note-pv-dictated",
-  template: "ox-note-pv ox-note-pv-template",
-  pulled: "ox-note-pv ox-note-pv-pulled",
-  copied: "ox-note-pv ox-note-pv-copied",
-  ai: "ox-note-pv ox-note-pv-ai",
+  dictated: "zb-note-pv zb-note-pv-dictated",
+  template: "zb-note-pv zb-note-pv-template",
+  pulled: "zb-note-pv zb-note-pv-pulled",
+  copied: "zb-note-pv zb-note-pv-copied",
+  ai: "zb-note-pv zb-note-pv-ai",
 };
 
 export const ORIGIN_LABEL: Record<Origin, string> = {
@@ -144,7 +144,7 @@ function decorateOrigins(doc: PMNode, show: boolean): DecorationSet {
       Decoration.inline(range.from, range.to, {
         class: ORIGIN_CLASS[range.origin],
         // Read by assistive technology on caret entry, and by the tooltip.
-        "data-ox-origin": range.origin,
+        "data-zb-origin": range.origin,
         title:
           range.origin === "ai" && !range.attrs.reviewed
             ? `${ORIGIN_LABEL[range.origin]} — not yet reviewed`
@@ -221,7 +221,7 @@ export function useClinicalNote(options: UseClinicalNoteOptions): ClinicalNoteAp
         state,
         editable: () => !readOnly,
         attributes: {
-          class: "ox-note-doc",
+          class: "zb-note-doc",
           role: "textbox",
           "aria-multiline": "true",
           "aria-label": label,
@@ -262,7 +262,7 @@ export function useClinicalNote(options: UseClinicalNoteOptions): ClinicalNoteAp
   const setShowOrigins = React.useCallback((next: boolean) => {
     setShowOriginsState(next);
     showOriginsRef.current = next;
-    viewRef.current?.dispatch(viewRef.current.state.tr.setMeta("ox-origins", next));
+    viewRef.current?.dispatch(viewRef.current.state.tr.setMeta("zb-origins", next));
   }, []);
 
   const run = React.useCallback((fn: (view: EditorView) => void) => {

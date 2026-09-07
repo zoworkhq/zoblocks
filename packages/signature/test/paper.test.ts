@@ -37,13 +37,13 @@ function block(selector: string): string {
 
 describe("the signing surface", () => {
   it("paints its own ground", () => {
-    const surface = block(".ox-signature__surface");
-    expect(surface).toMatch(/background:\s*var\(--ox-signature-paper\)/);
-    expect(surface).toMatch(/--ox-signature-paper:\s*#ffffff/i);
+    const surface = block(".zb-signature__surface");
+    expect(surface).toMatch(/background:\s*var\(--zb-signature-paper\)/);
+    expect(surface).toMatch(/--zb-signature-paper:\s*#ffffff/i);
   });
 
   it("does not take its ground from a theme token", () => {
-    const surface = block(".ox-signature__surface");
+    const surface = block(".zb-signature__surface");
     const background = surface.match(/\n\s*background:\s*([^;]+);/)?.[1] ?? "";
     // An `--ant-*` here is the original bug: it resolves dark under a dark
     // theme and the ink disappears.
@@ -54,18 +54,18 @@ describe("the signing surface", () => {
     // They used to be theme tokens, which meant near-white marks on white
     // paper the moment the surface stopped following the theme with them.
     for (const selector of [
-      ".ox-signature__baseline",
-      ".ox-signature__cue",
-      ".ox-signature__placeholder",
+      ".zb-signature__baseline",
+      ".zb-signature__cue",
+      ".zb-signature__placeholder",
     ]) {
       const rule = block(selector);
       const paint = rule.match(/(?:color|border-bottom):\s*([^;]+);/)?.[1] ?? "";
-      expect(paint, `${selector} paints from a theme token`).toMatch(/--ox-signature-/);
+      expect(paint, `${selector} paints from a theme token`).toMatch(/--zb-signature-/);
     }
   });
 
   it("greys a disabled pad rather than theming it", () => {
-    const disabled = block(".ox-signature--disabled .ox-signature__surface");
+    const disabled = block(".zb-signature--disabled .zb-signature__surface");
     expect(disabled).toMatch(/background:\s*#f5f5f5/i);
   });
 });

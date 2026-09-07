@@ -3,7 +3,7 @@
  *
  * The picker in the Figma plugin. Names, slugs, and which version is live.
  *
- *     Authorization: Bearer oxy_live_…
+ *     Authorization: Bearer zb_live_…
  *
  * Archived themes are absent: they are out of circulation and their stylesheets
  * still serve, so offering one in a picker would invite a designer to build a

@@ -5,14 +5,14 @@ body:
   - type: markdown
     attributes:
       value: |
-        **Never paste real patient data.** Use `@oxygenui-design/fixtures`, or
+        **Never paste real patient data.** Use `@zoblocks/fixtures`, or
         invent values on `example.org`. We delete and re-request anything
         containing real data.
   - type: input
     id: package
     attributes:
       label: Package or component
-      placeholder: "@oxygenui-design/loaders · pulse-loader"
+      placeholder: "@zoblocks/loaders · pulse-loader"
     validations: { required: true }
   - type: input
     id: version

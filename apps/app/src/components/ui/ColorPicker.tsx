@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Check, Pipette } from "lucide-react";
-import { contrastBetween } from "@oxygenui-design/tokens/validate";
+import { contrastBetween } from "@zoblocks/tokens/validate";
 import { cn } from "@/lib/utils";
 
 /**
@@ -221,7 +221,7 @@ export function ColorPicker({ value, onChange, ramp, against, onClose }: ColorPi
             set(next);
           }
         }}
-        className="relative h-32 w-full cursor-crosshair rounded-lg border border-rule focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-oxygen/30"
+        className="relative h-32 w-full cursor-crosshair rounded-lg border border-rule focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand/30"
         style={{
           backgroundImage:
             "linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, transparent)",
@@ -244,7 +244,7 @@ export function ColorPicker({ value, onChange, ramp, against, onClose }: ColorPi
           max={359}
           value={Math.round(hsv.h)}
           onChange={(event) => set({ h: Number(event.target.value) })}
-          className="ox-hue h-3 w-full cursor-pointer appearance-none rounded-full"
+          className="zb-hue h-3 w-full cursor-pointer appearance-none rounded-full"
         />
       </label>
 
@@ -269,7 +269,7 @@ export function ColorPicker({ value, onChange, ramp, against, onClose }: ColorPi
               if (/^#[0-9a-f]{6}$/i.test(normalised)) onChange(normalised.toLowerCase());
             }}
             spellCheck={false}
-            className="w-full rounded-lg border border-rule-strong bg-paper px-2.5 py-1.5 font-mono text-[0.8125rem] uppercase focus:border-oxygen-deep focus:outline-none focus:ring-[3px] focus:ring-oxygen/20"
+            className="w-full rounded-lg border border-rule-strong bg-paper px-2.5 py-1.5 font-mono text-[0.8125rem] uppercase focus:border-brand-deep focus:outline-none focus:ring-[3px] focus:ring-brand/20"
           />
         </label>
         {/*

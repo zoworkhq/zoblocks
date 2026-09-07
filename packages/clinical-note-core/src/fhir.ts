@@ -18,7 +18,7 @@
  * Written to the R4 shape throughout. R4's cardinality is a strict subset of
  * what R5 accepts, so populating it produces a payload valid under both.
  *
- * No dependency on `@oxygenui-design/fhir`: this emits plain JSON, so the
+ * No dependency on `@zoblocks/fhir`: this emits plain JSON, so the
  * engine stays light and a consumer validates with whatever they already run.
  */
 
@@ -150,7 +150,7 @@ export const COAUTHORS_SIGNATURE: FhirCoding = {
 };
 
 /**
- * The Oxygen extension carrying composition ratios.
+ * The Zoblocks extension carrying composition ratios.
  *
  * **Not standard, and this file says so in the URL rather than hoping nobody
  * notices.** There is no FHIR element for per-range authorship or for "what
@@ -161,7 +161,7 @@ export const COAUTHORS_SIGNATURE: FhirCoding = {
  * should learn from our documentation, not from their own debugging.
  */
 export const COMPOSITION_EXTENSION =
-  "https://oxygenui.design/fhir/StructureDefinition/note-composition";
+  "https://zoblocks.design/fhir/StructureDefinition/note-composition";
 
 /* ------------------------------------------------------------------ */
 /* Options                                                             */
@@ -404,7 +404,7 @@ export function withDigest(
           extension: [
             ...(provenance.extension ?? []),
             {
-              url: "https://oxygenui.design/fhir/StructureDefinition/note-digest",
+              url: "https://zoblocks.design/fhir/StructureDefinition/note-digest",
               valueString: value,
             },
           ],

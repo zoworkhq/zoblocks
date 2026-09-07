@@ -26,7 +26,7 @@ const PAGE = "/components/tabs";
 /**
  * Wait for every visible strip to have measured itself.
  *
- * A tab list sets `data-ox-measured` once its indicator geometry is known.
+ * A tab list sets `data-zb-measured` once its indicator geometry is known.
  * Before that the fit is still being decided, the strip is moving, and both
  * clicking and measuring it give answers about a transient state — which on a
  * contended runner is most of the reason a geometry test fails.
@@ -36,27 +36,27 @@ const PAGE = "/components/tabs";
  * had not appeared yet. Each looked like a different bug.
  */
 async function awaitMeasured(page: Page) {
-  const strips = page.locator(".ox-gallery [data-ox-list]");
+  const strips = page.locator(".zb-gallery [data-zb-list]");
   const count = await strips.count();
   for (let i = 0; i < count; i++) {
     await strips.nth(i).evaluate((element) => {
       if (element.hasAttribute("hidden")) return;
-      if (element.hasAttribute("data-ox-measured")) return;
+      if (element.hasAttribute("data-zb-measured")) return;
 
       // Only a strip that draws an indicator ever sets the attribute. Waiting
       // on one that does not is a guaranteed two-second stall per strip, per
       // call — which turned a 1.2-minute suite into three minutes before this
       // check was added.
-      if (!element.querySelector(".ox-tabs__thumb, .ox-tabs__line")) return;
+      if (!element.querySelector(".zb-tabs__thumb, .zb-tabs__line")) return;
 
       return new Promise<void>((resolve) => {
         const observer = new MutationObserver(() => {
-          if (element.hasAttribute("data-ox-measured")) {
+          if (element.hasAttribute("data-zb-measured")) {
             observer.disconnect();
             resolve();
           }
         });
-        observer.observe(element, { attributes: true, attributeFilter: ["data-ox-measured"] });
+        observer.observe(element, { attributes: true, attributeFilter: ["data-zb-measured"] });
         // Bounded, so a strip that never measures fails on its own assertion
         // rather than by timing out here with nothing to say.
         setTimeout(() => {
@@ -70,7 +70,7 @@ async function awaitMeasured(page: Page) {
 
 async function openGallery(page: Page) {
   await page.goto(PAGE);
-  const gallery = page.locator(".ox-gallery");
+  const gallery = page.locator(".zb-gallery");
   await gallery.scrollIntoViewIfNeeded();
   await expect(gallery).toBeVisible();
 
@@ -113,7 +113,7 @@ async function clickClear(target: Locator) {
 }
 
 async function chooseChapter(page: Page, label: string) {
-  await clickClear(page.locator(".ox-gallery__chapters").getByRole("radio", { name: label }));
+  await clickClear(page.locator(".zb-gallery__chapters").getByRole("radio", { name: label }));
   await page.waitForTimeout(250);
   await awaitMeasured(page);
 }
@@ -151,7 +151,7 @@ test.describe("indicator geometry @a11y", () => {
   test("the thumb lands on the selected tab", async ({ page }) => {
     await openGallery(page);
     const demo = page.locator("#v01");
-    const thumb = demo.locator(".ox-tabs__thumb");
+    const thumb = demo.locator(".zb-tabs__thumb");
     const selected = demo.locator('[role="tab"][aria-selected="true"]');
 
     const before = await thumb.boundingBox();
@@ -172,7 +172,7 @@ test.describe("indicator geometry @a11y", () => {
     // slept on: the assertion is where it *settles*, and how long settling
     // takes belongs to the machine.
     await expect(async () => {
-      const thumb = await demo.locator(".ox-tabs__thumb").boundingBox();
+      const thumb = await demo.locator(".zb-tabs__thumb").boundingBox();
       const selected = await demo.locator('[role="tab"][aria-selected="true"]').boundingBox();
       expect(Math.abs(thumb!.x - selected!.x)).toBeLessThan(1.5);
       expect(Math.abs(thumb!.width - selected!.width)).toBeLessThan(1.5);
@@ -182,7 +182,7 @@ test.describe("indicator geometry @a11y", () => {
   test("the underline sits on the rail, not floating above it", async ({ page }) => {
     await openGallery(page);
     const demo = page.locator("#v03");
-    const line = await demo.locator(".ox-tabs__line").boundingBox();
+    const line = await demo.locator(".zb-tabs__line").boundingBox();
     const list = await demo.locator('[role="tablist"]').boundingBox();
     // The indicator's bottom edge should coincide with the list's.
     expect(Math.abs(line!.y + line!.height - (list!.y + list!.height))).toBeLessThan(1.5);
@@ -191,7 +191,7 @@ test.describe("indicator geometry @a11y", () => {
   test("the thumb re-measures when density changes", async ({ page }) => {
     await openGallery(page);
     const demo = page.locator("#v01");
-    const before = await demo.locator(".ox-tabs__thumb").boundingBox();
+    const before = await demo.locator(".zb-tabs__thumb").boundingBox();
 
     await setControl(page, "Density", "patient");
 
@@ -205,7 +205,7 @@ test.describe("indicator geometry @a11y", () => {
      * looks exactly like the bug this test exists to catch, and was not.
      */
     await expect(async () => {
-      const after = await demo.locator(".ox-tabs__thumb").boundingBox();
+      const after = await demo.locator(".zb-tabs__thumb").boundingBox();
       const selected = await demo.locator('[role="tab"][aria-selected="true"]').boundingBox();
       // If the indicator had not re-measured it would still be sized for the
       // trigger it was measured against.
@@ -221,7 +221,7 @@ test.describe("indicator geometry @a11y", () => {
 
     const demo = page.locator("#v01");
     await expect(async () => {
-      const thumb = await demo.locator(".ox-tabs__thumb").boundingBox();
+      const thumb = await demo.locator(".zb-tabs__thumb").boundingBox();
       const selected = await demo.locator('[role="tab"][aria-selected="true"]').boundingBox();
       // Physical offsets in a mirrored layout: the case a logical-property
       // implementation gets exactly backwards.
@@ -247,13 +247,13 @@ test.describe("overflow @a11y", () => {
   test("the scroll strip reports its edges and moves", async ({ page }) => {
     await openGallery(page);
     await chooseChapter(page, "Overflow");
-    const bar = page.locator("#o1 .ox-tabs__bar");
-    await expect(bar).toHaveAttribute("data-ox-start", "true");
+    const bar = page.locator("#o1 .zb-tabs__bar");
+    await expect(bar).toHaveAttribute("data-zb-start", "true");
 
-    const list = page.locator("#o1 .ox-tabs__list");
+    const list = page.locator("#o1 .zb-tabs__list");
     await list.evaluate((element) => element.scrollBy({ left: 240 }));
     await page.waitForTimeout(300);
-    await expect(bar).toHaveAttribute("data-ox-start", "false");
+    await expect(bar).toHaveAttribute("data-zb-start", "false");
   });
 
   test("the priority-plus menu keeps the selected tab visible", async ({ page }) => {
@@ -340,7 +340,7 @@ test.describe("visual @vrt", () => {
   test("the nine-cell theme x density matrix", async ({ page }) => {
     await openGallery(page);
     await chooseChapter(page, "Theme × density");
-    const matrix = page.locator(".ox-matrix");
+    const matrix = page.locator(".zb-matrix");
     await expect(matrix).toBeVisible();
     await page.waitForTimeout(400);
     /*
@@ -355,7 +355,7 @@ test.describe("visual @vrt", () => {
   test("every variant, one strip each", async ({ page }) => {
     await openGallery(page);
     await chooseChapter(page, "States");
-    const variants = page.locator("#s4 .ox-variants");
+    const variants = page.locator("#s4 .zb-variants");
     await expect(variants).toBeVisible();
     await page.waitForTimeout(400);
     await expect(variants).toHaveScreenshot("tabs-variants.png");

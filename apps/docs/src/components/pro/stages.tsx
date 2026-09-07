@@ -40,7 +40,7 @@ export function StageRamp() {
                 height: seed ? 52 : 34,
                 borderRadius: 3,
                 transformOrigin: "bottom",
-                background: `color-mix(in srgb, var(--site-oxygen) ${Math.round((RAMP_L[i] ?? 0.5) * 100)}%, var(--site-paper))`,
+                background: `color-mix(in srgb, var(--site-brand) ${Math.round((RAMP_L[i] ?? 0.5) * 100)}%, var(--site-paper))`,
                 ...(seed ? { outline: "1.5px solid var(--site-ink)", outlineOffset: 1 } : {}),
               }}
             />
@@ -171,13 +171,7 @@ export function StagePin() {
 
 /** A palette cycled through three colour-vision simulations. */
 export function StageVision() {
-  const swatches = [
-    "var(--crit)",
-    "var(--high)",
-    "var(--low)",
-    "var(--norm)",
-    "var(--site-oxygen)",
-  ];
+  const swatches = ["var(--crit)", "var(--high)", "var(--low)", "var(--norm)", "var(--site-brand)"];
   return (
     <div style={{ width: "100%" }}>
       <p className="sLabel" style={{ marginBottom: 9 }}>
@@ -309,7 +303,7 @@ export function StageFigma() {
               width: 12,
               height: 12,
               borderRadius: 3,
-              background: "var(--site-oxygen)",
+              background: "var(--site-brand)",
             }}
           />
         </span>
@@ -350,7 +344,7 @@ export function StageRoles() {
               borderRadius: 4,
               background:
                 i < 8
-                  ? "color-mix(in srgb, var(--site-oxygen) 55%, transparent)"
+                  ? "color-mix(in srgb, var(--site-brand) 55%, transparent)"
                   : "var(--site-rule)",
             }}
           />
@@ -422,7 +416,7 @@ export function StageMarket() {
         <path
           className="mkTick"
           d="M7.5 12.4l3 3 6-6.4"
-          stroke="var(--site-oxygen)"
+          stroke="var(--site-brand)"
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"

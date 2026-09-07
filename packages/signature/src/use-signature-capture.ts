@@ -28,7 +28,7 @@ import {
   type CaptureOptions,
   type Sample,
   type Stroke,
-} from "@oxygenui-design/signature-core";
+} from "@zoblocks/signature-core";
 
 export interface UseSignatureCaptureOptions extends Partial<CaptureOptions> {
   /** Restore an existing signature for editing. */

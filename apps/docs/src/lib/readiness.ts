@@ -1,7 +1,7 @@
 /**
  * What is finished, and in what order it leads the catalogue.
  *
- * The list itself now lives in `@oxygenui-design/component-meta`, beside the
+ * The list itself now lives in `@zoblocks/component-meta`, beside the
  * metadata it qualifies. It moved because two readers could not reach it here:
  * the generator that writes `llms.txt` runs outside this app, and both it and
  * the command palette were building component lists from the whole catalogue —
@@ -28,9 +28,9 @@ export {
   DISTRIBUTION_CONTRACT,
   installCommandFor,
   type DistributionState,
-} from "@oxygenui-design/component-meta";
+} from "@zoblocks/component-meta";
 
-import { isDocumented, documentedRank } from "@oxygenui-design/component-meta";
+import { isDocumented, documentedRank } from "@zoblocks/component-meta";
 
 /** Whether a component has a page worth opening. */
 export function isReady(name: string): boolean {

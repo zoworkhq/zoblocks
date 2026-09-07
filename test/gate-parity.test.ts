@@ -47,7 +47,7 @@ const NOT_A_GATE = new Set([
   "Verify hq is serving hq",
   // Same shape as hq's: it asserts a deployment, which is the one thing a
   // local run has no equivalent of. It also self-skips until the domain is
-  // attached — `app.oxygenui.design` has no DNS record yet.
+  // attached — `app.zoblocks.design` has no DNS record yet.
   "Verify the console is serving its catalogue",
   "Deploy preview",
 ]);
@@ -72,6 +72,7 @@ const GATE_COMMANDS: Record<string, string> = {
   "Bundle budgets": "pnpm size",
   "Architecture rules": "pnpm deps",
   "Scan for non-synthetic identifiers": "scripts/no-phi.sh",
+  "Scan for the retired name": "scripts/retired-names.sh",
 };
 
 /** Every `- name:` in the workflow, which is every step that has one. */

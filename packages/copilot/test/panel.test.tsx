@@ -160,7 +160,7 @@ describe("reasoning is disclosed, not displayed", () => {
     const { user } = setup();
     await ask(user, "AF first line?");
     expect(screen.getByRole("article")).toHaveTextContent("Rate control is a reasonable");
-    expect(screen.getByRole("article").querySelector(".ox-copilot-answer")).not.toHaveTextContent(
+    expect(screen.getByRole("article").querySelector(".zb-copilot-answer")).not.toHaveTextContent(
       "Checking the guideline",
     );
   });
@@ -304,10 +304,10 @@ describe("expanding the panel", () => {
     await ask(user, "AF first line?");
 
     await user.click(screen.getByRole("button", { name: DEFAULT_LOCALE.expand }));
-    expect(container.querySelector(".ox-copilot-panel--expanded")).toBeInTheDocument();
+    expect(container.querySelector(".zb-copilot-panel--expanded")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: DEFAULT_LOCALE.collapse }));
-    expect(container.querySelector(".ox-copilot-panel--expanded")).toBeNull();
+    expect(container.querySelector(".zb-copilot-panel--expanded")).toBeNull();
   });
 });
 

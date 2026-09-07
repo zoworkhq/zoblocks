@@ -19,7 +19,7 @@
  * validation into every consumer. Here, "unable without a witness" is a
  * compile error.
  *
- * See §03 of oxygen-signature-brief.html for the clinical reasoning, and
+ * See §03 of zoblocks-signature-brief.html for the clinical reasoning, and
  * `fhir.ts` for how each member maps onto FHIR.
  */
 

@@ -1,5 +1,5 @@
 /**
- * `<ox-switch>` — the clinical switch, for a page that is not React.
+ * `<zb-switch>` — the clinical switch, for a page that is not React.
  *
  * Same three axes as the React component: what the record says, what the
  * system is doing about it, and whether you may change it. What differs is who
@@ -8,10 +8,10 @@
  * host drives, the element renders and announces — which is also how the
  * loaders package works, and how a Vue or Angular consumer expects to bind.
  *
- *     <ox-switch label="Contact precautions" value="on" tone="caution"
- *                state-labels="in-effect"></ox-switch>
+ *     <zb-switch label="Contact precautions" value="on" tone="caution"
+ *                state-labels="in-effect"></zb-switch>
  *
- *     el.addEventListener("ox-switch-request", (event) => {
+ *     el.addEventListener("zb-switch-request", (event) => {
  *       el.phase = "pending";
  *       api.set(event.detail.value).then(
  *         () => { el.value = event.detail.value; el.phase = "committed"; },
@@ -47,13 +47,13 @@ import {
  * Events the element dispatches. All bubble and cross the shadow boundary.
  *
  * Hyphens, not colons — Angular reserves the colon in `(event)` bindings for
- * its global-target syntax, so `(ox-switch:request)` fails to compile in a
+ * its global-target syntax, so `(zb-switch:request)` fails to compile in a
  * template. The loaders package learned this the same way.
  */
 export const SWITCH_EVENTS = [
-  "ox-switch-request",
-  "ox-switch-resolve-conflict",
-  "ox-switch-cancel-queued",
+  "zb-switch-request",
+  "zb-switch-resolve-conflict",
+  "zb-switch-cancel-queued",
 ] as const;
 export type SwitchEvent = (typeof SWITCH_EVENTS)[number];
 
@@ -78,11 +78,11 @@ function isValue(input: string | null): input is SwitchValue {
 }
 
 const CHECK =
-  '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false" part="glyph" class="ox-switch__glyph"><path d="M3 8.5l3.2 3.2L13 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false" part="glyph" class="zb-switch__glyph"><path d="M3 8.5l3.2 3.2L13 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const QUERY =
-  '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false" part="glyph" class="ox-switch__glyph"><path d="M8 4.2v5.2M8 12.4v.2" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
+  '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false" part="glyph" class="zb-switch__glyph"><path d="M8 4.2v5.2M8 12.4v.2" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
 
-export class OxSwitchElement extends HTMLElement {
+export class ZbSwitchElement extends HTMLElement {
   static get observedAttributes(): readonly string[] {
     return OBSERVED;
   }
@@ -161,36 +161,36 @@ export class OxSwitchElement extends HTMLElement {
     style.textContent = SWITCH_CSS;
 
     const wrapper = document.createElement("span");
-    wrapper.className = "ox-switch";
+    wrapper.className = "zb-switch";
     wrapper.setAttribute("part", "root");
 
     this.#control = document.createElement("button");
     this.#control.type = "button";
-    this.#control.className = "ox-switch__control";
+    this.#control.className = "zb-switch__control";
     this.#control.setAttribute("part", "control");
     // The role goes on the host too, so a host application's own queries and
     // its axe run both find it without piercing the shadow boundary.
     this.#control.setAttribute("role", "switch");
 
     const track = document.createElement("span");
-    track.className = "ox-switch__track";
+    track.className = "zb-switch__track";
     track.setAttribute("part", "track");
 
     this.#thumb = document.createElement("span");
-    this.#thumb.className = "ox-switch__thumb";
+    this.#thumb.className = "zb-switch__thumb";
     this.#thumb.setAttribute("part", "thumb");
     track.append(this.#thumb);
     this.#control.append(track);
 
     const text = document.createElement("span");
-    text.className = "ox-switch__text";
+    text.className = "zb-switch__text";
     this.#labelText = document.createElement("span");
-    this.#labelText.className = "ox-switch__label";
+    this.#labelText.className = "zb-switch__label";
     this.#stateWord = document.createElement("span");
-    this.#stateWord.className = "ox-switch__state";
+    this.#stateWord.className = "zb-switch__state";
     this.#stateWord.setAttribute("part", "state");
     this.#note = document.createElement("span");
-    this.#note.className = "ox-switch__note";
+    this.#note.className = "zb-switch__note";
     text.append(this.#labelText, this.#stateWord, this.#note);
 
     // The path out of "unknown" that records the negative. Visually hidden,
@@ -198,15 +198,15 @@ export class OxSwitchElement extends HTMLElement {
     // un-ask a question, which is the one thing this control must not allow.
     this.#negative = document.createElement("button");
     this.#negative.type = "button";
-    this.#negative.className = "ox-switch__sr";
+    this.#negative.className = "zb-switch__sr";
 
     this.#polite = document.createElement("span");
-    this.#polite.className = "ox-switch__sr";
+    this.#polite.className = "zb-switch__sr";
     this.#polite.setAttribute("role", "status");
     this.#polite.setAttribute("aria-live", "polite");
 
     this.#assertive = document.createElement("span");
-    this.#assertive.className = "ox-switch__sr";
+    this.#assertive.className = "zb-switch__sr";
     this.#assertive.setAttribute("role", "alert");
     this.#assertive.setAttribute("aria-live", "assertive");
 
@@ -227,7 +227,7 @@ export class OxSwitchElement extends HTMLElement {
 
   #request(next: "on" | "off"): void {
     this.dispatchEvent(
-      new CustomEvent("ox-switch-request", {
+      new CustomEvent("zb-switch-request", {
         detail: { value: next, from: this.value },
         bubbles: true,
         composed: true,
@@ -250,17 +250,17 @@ export class OxSwitchElement extends HTMLElement {
     const geometry = SWITCH_SIZE[size] ?? SWITCH_SIZE.default;
 
     // Host attributes: state is readable from outside the shadow boundary.
-    this.setAttribute("data-ox-switch", "");
-    this.setAttribute("data-ox-state", value);
-    this.setAttribute("data-ox-phase", phase);
+    this.setAttribute("data-zb-switch", "");
+    this.setAttribute("data-zb-state", value);
+    this.setAttribute("data-zb-phase", phase);
     this.setAttribute(
-      "data-ox-tone",
+      "data-zb-tone",
       (this.getAttribute("tone") as SwitchTone | null) ?? "affirmative",
     );
-    this.setAttribute("data-ox-size", size);
-    this.style.setProperty("--ox-switch-track-w", `${geometry.track[0]}px`);
-    this.style.setProperty("--ox-switch-track-h", `${geometry.track[1]}px`);
-    this.style.setProperty("--ox-switch-thumb-size", `${geometry.thumb}px`);
+    this.setAttribute("data-zb-size", size);
+    this.style.setProperty("--zb-switch-track-w", `${geometry.track[0]}px`);
+    this.style.setProperty("--zb-switch-track-h", `${geometry.track[1]}px`);
+    this.style.setProperty("--zb-switch-thumb-size", `${geometry.thumb}px`);
 
     this.#control.setAttribute(
       "aria-checked",
@@ -284,8 +284,8 @@ export class OxSwitchElement extends HTMLElement {
     const error = this.getAttribute("error");
     this.#note.textContent = error ?? (this.readOnly ? (lockedReason ?? "") : "");
     this.#note.className = error
-      ? "ox-switch__note ox-switch__note--error"
-      : "ox-switch__note ox-switch__note--locked";
+      ? "zb-switch__note zb-switch__note--error"
+      : "zb-switch__note zb-switch__note--locked";
 
     this.#negative.textContent =
       value === "unknown" && !this.readOnly && !this.disabled
@@ -340,12 +340,12 @@ export class OxSwitchElement extends HTMLElement {
   }
 }
 
-if (typeof customElements !== "undefined" && !customElements.get("ox-switch")) {
-  customElements.define("ox-switch", OxSwitchElement);
+if (typeof customElements !== "undefined" && !customElements.get("zb-switch")) {
+  customElements.define("zb-switch", ZbSwitchElement);
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    "ox-switch": OxSwitchElement;
+    "zb-switch": ZbSwitchElement;
   }
 }

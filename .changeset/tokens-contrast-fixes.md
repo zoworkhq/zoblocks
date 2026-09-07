@@ -1,5 +1,5 @@
 ---
-"@oxygenui-design/tokens": minor
+"@zoblocks/tokens": minor
 ---
 
 Fix three WCAG 2.2 AA contrast failures, and widen the gate that missed them.
@@ -7,7 +7,7 @@ Fix three WCAG 2.2 AA contrast failures, and widen the gate that missed them.
 The focus indicator measured **2.50:1** against the 3:1 floor in SC 1.4.11 and
 2.4.11 — it governs every focusable element in every component. `text-on-accent`
 measured **3.81:1** against 4.5:1, which is every primary button label.
-`border-strong`, which backs `--ox-field-border` and `--ox-chart-axis`, measured
+`border-strong`, which backs `--zb-field-border` and `--zb-chart-axis`, measured
 **1.48:1** on light and **2.02:1** on dark against a 3:1 floor.
 
 Values changed: `accent` → `brand.700`, `accent-hover` → `brand.800`,

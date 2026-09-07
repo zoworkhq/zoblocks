@@ -1,12 +1,12 @@
 {
-  "name": "@oxygenui-design/tabs-core",
+  "name": "@zoblocks/tabs-core",
   "version": "0.1.0",
-  "description": "The selection engine behind Oxygen's tab system. Semantic modes, the WAI-ARIA keyboard model, priority-plus overflow and indicator geometry — no React, no DOM, no dependencies.",
+  "description": "The selection engine behind Zoblocks's tab system. Semantic modes, the WAI-ARIA keyboard model, priority-plus overflow and indicator geometry — no React, no DOM, no dependencies.",
   "license": "MIT",
-  "homepage": "https://oxygenui.design/components/tabs",
+  "homepage": "https://zoblocks.design/components/tabs",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zoworkhq/oxygenui.git",
+    "url": "git+https://github.com/zoworkhq/zoblocks.git",
     "directory": "packages/tabs-core"
   },
   "keywords": [
@@ -56,7 +56,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
-    "@oxygenui-design/tsconfig": "workspace:*",
+    "@zoblocks/tsconfig": "workspace:*",
     "@vitest/coverage-v8": "^4.1.10",
     "typescript": "^5.7.2",
     "vitest": "^4.1.10"

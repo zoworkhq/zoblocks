@@ -3,7 +3,7 @@
 /**
  * A theme applied inline, without a stylesheet.
  *
- *     <OxygenTheme tokens={{ "--ox-accent": "#1d63c9" }}>{app}</OxygenTheme>
+ *     <ZoblocksTheme tokens={{ "--zb-accent": "#1d63c9" }}>{app}</ZoblocksTheme>
  *
  * The third delivery mode. Most applications should link the published
  * stylesheet — version-pinned, CDN-cacheable, no JavaScript, and it survives
@@ -19,11 +19,11 @@
 
 import * as React from "react";
 
-export interface OxygenThemeProps {
+export interface ZoblocksThemeProps {
   children: React.ReactNode;
   /** Custom properties to apply. Keys must be `--` prefixed. */
   tokens: Record<string, string | number | undefined>;
-  /** Sets `data-ox-brand`, so brand-scoped CSS applies to this subtree too. */
+  /** Sets `data-zb-brand`, so brand-scoped CSS applies to this subtree too. */
   brand?: string;
   theme?: "light" | "dark" | "high-contrast";
   density?: "patient" | "standard" | "clinical";
@@ -31,7 +31,7 @@ export interface OxygenThemeProps {
   as?: "div" | "span";
 }
 
-export function OxygenTheme({
+export function ZoblocksTheme({
   children,
   tokens,
   brand,
@@ -39,7 +39,7 @@ export function OxygenTheme({
   density,
   className,
   as = "div",
-}: OxygenThemeProps) {
+}: ZoblocksThemeProps) {
   const style = React.useMemo(() => {
     const out: Record<string, string | number> = {};
     for (const [key, value] of Object.entries(tokens)) {
@@ -57,9 +57,9 @@ export function OxygenTheme({
     {
       className,
       style,
-      ...(brand ? { "data-ox-brand": brand } : {}),
-      ...(theme ? { "data-ox-theme": theme } : {}),
-      ...(density ? { "data-ox-density": density } : {}),
+      ...(brand ? { "data-zb-brand": brand } : {}),
+      ...(theme ? { "data-zb-theme": theme } : {}),
+      ...(density ? { "data-zb-density": density } : {}),
     },
     children,
   );

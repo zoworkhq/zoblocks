@@ -1,8 +1,8 @@
 {
-  "name": "@oxygenui-design/hq",
+  "name": "@zoblocks/hq",
   "version": "0.1.0",
   "private": true,
-  "description": "hq.oxygenui.design — internal task management for the Zowork team. Not part of the public registry.",
+  "description": "hq.zoblocks.design — internal task management for the Zowork team. Not part of the public registry.",
   "scripts": {
     "dev": "next dev --turbopack --port 6002",
     "build": "next build",
@@ -14,7 +14,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@oxygenui-design/tokens": "workspace:*",
+    "@zoblocks/tokens": "workspace:*",
     "bcryptjs": "^3.0.2",
     "clsx": "^2.1.1",
     "lucide-react": "^0.468.0",
@@ -26,7 +26,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@oxygenui-design/tsconfig": "workspace:*",
+    "@zoblocks/tsconfig": "workspace:*",
     "@tailwindcss/postcss": "^4.0.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^22.10.2",

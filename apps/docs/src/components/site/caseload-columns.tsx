@@ -20,13 +20,13 @@
 
 import * as React from "react";
 import { PatientPortrait } from "@/components/site/patient-portrait";
-import type { DataGridColumn } from "@/registry/oxygen/data-grid/data-grid";
+import type { DataGridColumn } from "@/registry/zoblocks/data-grid/data-grid";
 import {
   CSSRS_ORDER,
   DISENGAGEMENT,
   phq9Band,
   type CaseloadRow,
-} from "@/registry/oxygen/data-grid/data-grid.fixtures";
+} from "@/registry/zoblocks/data-grid/data-grid.fixtures";
 
 /** Portrait, name, identifier. A name is not an identifier; the row carries both. */
 function Client({ row }: { row: CaseloadRow }) {

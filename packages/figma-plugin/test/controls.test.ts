@@ -14,9 +14,9 @@ import { renderControls } from "../src/ui/controls";
 import type { Choice } from "../src/ui/controls";
 import type { CollectionSummary } from "../src/protocol";
 
-const OXYGEN: CollectionSummary = {
+const ZOBLOCKS: CollectionSummary = {
   id: "c1",
-  name: "Oxygen / Semantic",
+  name: "Zoblocks / Semantic",
   modes: ["light", "dark", "high-contrast"],
   stamped: 26,
   colours: 26,
@@ -49,12 +49,12 @@ function draw(collections: CollectionSummary[], value: Choice, grounds: string[]
   });
 }
 
-const oxygenChoice: Choice = { collection: OXYGEN.name, mode: "light", kind: "text" };
+const zoblocksChoice: Choice = { collection: ZOBLOCKS.name, mode: "light", kind: "text" };
 const paletteChoice: Choice = { collection: SWATCHES.name, mode: "Mode 1", kind: "text" };
 
 describe("the collection picker", () => {
   it("labels every control", () => {
-    draw([OXYGEN], oxygenChoice);
+    draw([ZOBLOCKS], zoblocksChoice);
     for (const select of root.querySelectorAll("select")) {
       const label = root.querySelector(`label[for="${select.id}"]`);
       expect(label, select.id).not.toBeNull();
@@ -63,20 +63,20 @@ describe("the collection picker", () => {
   });
 
   it("states the counts that decide which reading a collection can get", () => {
-    draw([OXYGEN, SWATCHES], oxygenChoice);
+    draw([ZOBLOCKS, SWATCHES], zoblocksChoice);
     const options = [...root.querySelectorAll("#collection option")].map((o) => o.textContent);
-    expect(options[0]).toContain("26 colours, 26 Oxygen");
-    expect(options[1]).toContain("3 colours, 0 Oxygen");
+    expect(options[0]).toContain("26 colours, 26 Zoblocks");
+    expect(options[1]).toContain("3 colours, 0 Zoblocks");
   });
 
   it("offers the modes the chosen collection actually has", () => {
-    draw([OXYGEN, SWATCHES], oxygenChoice);
+    draw([ZOBLOCKS, SWATCHES], zoblocksChoice);
     const modes = [...root.querySelectorAll("#mode option")].map((o) => o.textContent);
     expect(modes).toEqual(["light", "dark", "high-contrast"]);
   });
 
   it("reports a change as a whole choice, not a field", () => {
-    draw([OXYGEN, SWATCHES], oxygenChoice);
+    draw([ZOBLOCKS, SWATCHES], zoblocksChoice);
     const select = root.querySelector<HTMLSelectElement>("#collection")!;
     select.value = SWATCHES.name;
     select.dispatchEvent(new Event("change"));
@@ -84,9 +84,9 @@ describe("the collection picker", () => {
   });
 });
 
-describe("what a palette reading needs and an Oxygen reading does not", () => {
+describe("what a palette reading needs and a Zoblocks reading does not", () => {
   it("asks for a ground only when the pairs are unknown", () => {
-    draw([OXYGEN], oxygenChoice);
+    draw([ZOBLOCKS], zoblocksChoice);
     expect(root.querySelector("#ground")).toBeNull();
     expect(root.querySelector("fieldset.kinds")).toBeNull();
 
@@ -133,7 +133,7 @@ describe("nothing to measure", () => {
   });
 
   it("falls back to the first collection when the chosen one is gone", () => {
-    draw([SWATCHES], oxygenChoice, ["Paper"]);
+    draw([SWATCHES], zoblocksChoice, ["Paper"]);
     const select = root.querySelector<HTMLSelectElement>("#collection")!;
     expect(select.value).toBe(SWATCHES.name);
   });
@@ -142,7 +142,7 @@ describe("nothing to measure", () => {
 describe("the ground picker with nothing to pick from", () => {
   it("renders empty rather than throwing when the report has not arrived", () => {
     // The first paint after choosing a palette collection: the panel knows the
-    // collection has no Oxygen stamps but has not been told its colour names
+    // collection has no Zoblocks stamps but has not been told its colour names
     // yet, so the list is briefly empty.
     draw([SWATCHES], paletteChoice, []);
     const ground = root.querySelector<HTMLSelectElement>("#ground")!;
@@ -164,10 +164,10 @@ describe("the ground picker with nothing to pick from", () => {
   });
 
   it("reports a mode change", () => {
-    draw([OXYGEN], oxygenChoice);
+    draw([ZOBLOCKS], zoblocksChoice);
     const mode = root.querySelector<HTMLSelectElement>("#mode")!;
     mode.value = "dark";
     mode.dispatchEvent(new Event("change"));
-    expect(changes).toEqual([{ ...oxygenChoice, mode: "dark" }]);
+    expect(changes).toEqual([{ ...zoblocksChoice, mode: "dark" }]);
   });
 });

@@ -17,46 +17,46 @@ import * as React from "react";
 import { facesFor } from "@/lib/faces";
 import { HostStage } from "./host-stage";
 import { HostChrome } from "./host-chrome";
-import { PageLoader, PulseLoader } from "@/registry/oxygen/pulse-loader/pulse-loader";
-import { Recorder, RecorderDispositionStrip } from "@/registry/oxygen/recorder/recorder";
-import { RhythmLoader } from "@/registry/oxygen/rhythm-loader/rhythm-loader";
-import { BreathLoader } from "@/registry/oxygen/breath-loader/breath-loader";
-import { HelixLoader } from "@/registry/oxygen/helix-loader/helix-loader";
-import { InfusionLoader } from "@/registry/oxygen/infusion-loader/infusion-loader";
-import { Accordion } from "@/registry/oxygen/accordion/accordion";
+import { PageLoader, PulseLoader } from "@/registry/zoblocks/pulse-loader/pulse-loader";
+import { Recorder, RecorderDispositionStrip } from "@/registry/zoblocks/recorder/recorder";
+import { RhythmLoader } from "@/registry/zoblocks/rhythm-loader/rhythm-loader";
+import { BreathLoader } from "@/registry/zoblocks/breath-loader/breath-loader";
+import { HelixLoader } from "@/registry/zoblocks/helix-loader/helix-loader";
+import { InfusionLoader } from "@/registry/zoblocks/infusion-loader/infusion-loader";
+import { Accordion } from "@/registry/zoblocks/accordion/accordion";
 import {
   ChartAccordion,
   type ChartSection,
-} from "@/registry/oxygen/chart-accordion/chart-accordion";
-import { SafetyPlan } from "@/registry/oxygen/safety-plan/safety-plan";
-import { Timeline } from "@/registry/oxygen/timeline/timeline";
-import { CareTimeline } from "@/registry/oxygen/care-timeline/care-timeline";
+} from "@/registry/zoblocks/chart-accordion/chart-accordion";
+import { SafetyPlan } from "@/registry/zoblocks/safety-plan/safety-plan";
+import { Timeline } from "@/registry/zoblocks/timeline/timeline";
+import { CareTimeline } from "@/registry/zoblocks/care-timeline/care-timeline";
 import {
   COVERAGE as TIMELINE_COVERAGE,
   EVENTS as TIMELINE_EVENTS,
   HEALTHY_COVERAGE as TIMELINE_HEALTHY_COVERAGE,
   NOW as TIMELINE_NOW,
   SEEN_THROUGH as TIMELINE_SEEN_THROUGH,
-} from "@/registry/oxygen/care-timeline/care-timeline.fixtures";
-import type { AccordionItem } from "@/registry/oxygen/lib/accordion-core";
-import { Tabs } from "@oxygenui-design/tabs";
-import { Copilot } from "@/registry/oxygen/copilot/copilot";
-import { ClinicalNote, ClinicalNoteReader } from "@/registry/oxygen/clinical-note/clinical-note";
-import { ResultValue, type ResultValueData } from "@/registry/oxygen/result-value/result-value";
+} from "@/registry/zoblocks/care-timeline/care-timeline.fixtures";
+import type { AccordionItem } from "@/registry/zoblocks/lib/accordion-core";
+import { Tabs } from "@zoblocks/tabs";
+import { Copilot } from "@/registry/zoblocks/copilot/copilot";
+import { ClinicalNote, ClinicalNoteReader } from "@/registry/zoblocks/clinical-note/clinical-note";
+import { ResultValue, type ResultValueData } from "@/registry/zoblocks/result-value/result-value";
 import {
   RiskIndicator,
   type RiskAssessment,
-} from "@/registry/oxygen/risk-indicator/risk-indicator";
+} from "@/registry/zoblocks/risk-indicator/risk-indicator";
 import {
   ProvenanceChip,
   type ProvenanceRecord,
   type StalenessPolicy,
-} from "@/registry/oxygen/provenance-chip/provenance-chip";
+} from "@/registry/zoblocks/provenance-chip/provenance-chip";
 import {
   TrendIndicator,
   type TrendPoint,
   type TrendSeries,
-} from "@/registry/oxygen/trend-indicator/trend-indicator";
+} from "@/registry/zoblocks/trend-indicator/trend-indicator";
 import {
   ChartCoPresence,
   CoverageCard,
@@ -65,22 +65,22 @@ import {
   type Clinician,
   type CoverageWindow,
   type Presence,
-} from "@/registry/oxygen/care-team-presence/care-team-presence";
-import type { Patient } from "@oxygenui-design/fhir";
+} from "@/registry/zoblocks/care-team-presence/care-team-presence";
+import type { Patient } from "@zoblocks/fhir";
 import {
   ChartHeader,
   type EncounterOption,
   type SafetyInput,
-} from "@/registry/oxygen/chart-header/chart-header";
+} from "@/registry/zoblocks/chart-header/chart-header";
 import {
   RecentPatientStack,
   type OpenChart,
-} from "@/registry/oxygen/recent-patient-stack/recent-patient-stack";
+} from "@/registry/zoblocks/recent-patient-stack/recent-patient-stack";
 import {
   ChartCommandPalette,
   type PaletteItem,
-} from "@/registry/oxygen/chart-command-palette/chart-command-palette";
-import { DataGrid } from "@/registry/oxygen/data-grid/data-grid";
+} from "@/registry/zoblocks/chart-command-palette/chart-command-palette";
+import { DataGrid } from "@/registry/zoblocks/data-grid/data-grid";
 import { CASELOAD_COLUMNS_DOC } from "@/components/site/caseload-columns";
 import {
   ARRIVALS as GRID_ARRIVALS,
@@ -89,12 +89,12 @@ import {
   CASELOAD_COVERAGE,
   CASELOAD_WITH_EVERY_ABSENCE,
   type CaseloadRow,
-} from "@/registry/oxygen/data-grid/data-grid.fixtures";
+} from "@/registry/zoblocks/data-grid/data-grid.fixtures";
 import {
   AllergyChip,
   AllergyList,
   type AllergyRecord,
-} from "@/registry/oxygen/allergy-chip/allergy-chip";
+} from "@/registry/zoblocks/allergy-chip/allergy-chip";
 import {
   ClinicalStatus,
   SCALES,
@@ -102,8 +102,8 @@ import {
   StatusLegend,
   type ScaleName,
   type StatusStep,
-} from "@/registry/oxygen/clinical-status/clinical-status";
-import { mixed, noteDoc, noteSection, para } from "@/registry/oxygen/lib/clinical-note";
+} from "@/registry/zoblocks/clinical-status/clinical-status";
+import { mixed, noteDoc, noteSection, para } from "@/registry/zoblocks/lib/clinical-note";
 import {
   betweenVisits,
   createStaticProvider,
@@ -113,7 +113,7 @@ import {
   type CopilotEvent,
   type ResolvedContext,
   type Source,
-} from "@oxygenui-design/copilot-core";
+} from "@zoblocks/copilot-core";
 import { ContextMenuStage } from "@/components/site/context-menu-demo";
 import { SignatureDemo } from "@/components/site/signature-demo";
 import {
@@ -138,14 +138,14 @@ import {
   TimeField,
   TimeRangeField,
   timeGrid,
-} from "@/registry/oxygen/date-picker/date-picker";
+} from "@/registry/zoblocks/date-picker/date-picker";
 import {
   dateRangePresets,
   plainDate,
   plainTime,
   sessionFrom,
   withSessionEnd,
-} from "@/lib/oxygen-datetime";
+} from "@/lib/zoblocks-datetime";
 type Density = "patient" | "standard" | "clinical";
 
 /**
@@ -176,7 +176,7 @@ interface Scenario {
    * What goes on the stage, at the density the reader has chosen.
    *
    * Almost every scenario ignores the argument: the density control writes
-   * `data-ox-density` onto the stage wrapper and the tokens under it do the
+   * `data-zb-density` onto the stage wrapper and the tokens under it do the
    * rest. A component that reads the attribute on its *own* element — the data
    * grid sets its own row height that way — shadows the wrapper's, so it has to
    * be told instead, and this is how it is told.
@@ -238,7 +238,7 @@ function AdvancingInfusion() {
  * outright: "live component previews should never look dark on a light page."
  * The component tokens follow the same `.dark` class on the document, so the
  * two already agree and anything declared here could only disagree with both.
- * An earlier version of this pinned `[data-ox-theme="dark"]`, on the mistaken
+ * An earlier version of this pinned `[data-zb-theme="dark"]`, on the mistaken
  * reading that the panel was dark under both themes; on a light page that put
  * dark-theme tab colours — pale cyan on near-white — inside a white panel.
  */
@@ -258,17 +258,17 @@ function InstrumentStage({ children }: { children: React.ReactNode }) {
  * that applies: non-disabled dimmed text takes the muted ink, never a tone that
  * happens to land above the floor in the theme it was eyeballed in.
  *
- * `--ox-text-muted` is gated against `bg`, `surface` and `bg-subtle` in all
+ * `--zb-text-muted` is gated against `bg`, `surface` and `bg-subtle` in all
  * three themes (7.24:1 at worst, in light) — a caption on any of them is
  * covered by a measurement that already exists.
  */
 const PREVIEW_CAPTION: React.CSSProperties = {
   margin: 0,
-  fontFamily: "var(--ox-font-mono, monospace)",
+  fontFamily: "var(--zb-font-mono, monospace)",
   fontSize: 10,
   letterSpacing: "0.08em",
   textTransform: "uppercase",
-  color: "var(--ox-text-muted)",
+  color: "var(--zb-text-muted)",
 };
 
 const CHART_ITEMS: AccordionItem[] = [
@@ -476,16 +476,16 @@ function RecordBehind({ children }: { children: React.ReactNode }) {
     ["Platelets", "212 ×10⁹/L"],
   ];
   return (
-    <div className="overflow-hidden rounded-xl border border-[var(--ox-border)] bg-[var(--ox-bg)]">
+    <div className="overflow-hidden rounded-xl border border-[var(--zb-border)] bg-[var(--zb-bg)]">
       {children}
       <div aria-hidden="true" className="pointer-events-none select-none px-4 py-3 opacity-40">
-        <div className="flex gap-4 border-b border-[var(--ox-border)] pb-2">
+        <div className="flex gap-4 border-b border-[var(--zb-border)] pb-2">
           {["Summary", "Results", "Medications", "Notes"].map((tab, i) => (
             <span
               key={tab}
               className={cn(
                 "text-xs",
-                i === 1 ? "text-[var(--ox-text)]" : "text-[var(--ox-text-muted)]",
+                i === 1 ? "text-[var(--zb-text)]" : "text-[var(--zb-text-muted)]",
               )}
             >
               {tab}
@@ -495,7 +495,7 @@ function RecordBehind({ children }: { children: React.ReactNode }) {
         {rows.map(([label, value]) => (
           <p
             key={label}
-            className="m-0 flex justify-between gap-6 border-b border-[var(--ox-border)] py-1.5 text-xs text-[var(--ox-text-muted)] last:border-b-0"
+            className="m-0 flex justify-between gap-6 border-b border-[var(--zb-border)] py-1.5 text-xs text-[var(--zb-text-muted)] last:border-b-0"
           >
             <span>{label}</span>
             <span>{value}</span>
@@ -514,43 +514,43 @@ function HostChart({ children, tall }: { children: React.ReactNode; tall?: boole
   ];
 
   return (
-    <div className="overflow-hidden rounded-xl border border-[var(--ox-border)] bg-[var(--ox-bg)] shadow-[0_1px_2px_rgb(0_0_0/0.05),0_18px_44px_-20px_rgb(0_0_0/0.25)]">
+    <div className="overflow-hidden rounded-xl border border-[var(--zb-border)] bg-[var(--zb-bg)] shadow-[0_1px_2px_rgb(0_0_0/0.05),0_18px_44px_-20px_rgb(0_0_0/0.25)]">
       {/* Host chrome. Decorative: the accessible content is the component. */}
       <div
         aria-hidden="true"
-        className="flex items-center gap-2 border-b border-[var(--ox-border)] bg-[var(--ox-bg-subtle)] px-3 py-2"
+        className="flex items-center gap-2 border-b border-[var(--zb-border)] bg-[var(--zb-bg-subtle)] px-3 py-2"
       >
         <span className="flex gap-1.5">
           {[0, 1, 2].map((i) => (
-            <i key={i} className="block size-2.5 rounded-full bg-[var(--ox-border-strong)]" />
+            <i key={i} className="block size-2.5 rounded-full bg-[var(--zb-border-strong)]" />
           ))}
         </span>
-        <span className="font-mono text-[0.65rem] tracking-[0.14em] text-[var(--ox-text-muted)]">
+        <span className="font-mono text-[0.65rem] tracking-[0.14em] text-[var(--zb-text-muted)]">
           HOST APPLICATION · ENCOUNTER VIEW
         </span>
       </div>
 
       <div className={cn("relative px-4 pb-4 pt-3", tall ? "min-h-[34rem]" : "min-h-[26rem]")}>
         <div aria-hidden="true" className="pointer-events-none select-none opacity-45">
-          <p className="m-0 mb-3 text-sm font-semibold text-[var(--ox-text)]">
+          <p className="m-0 mb-3 text-sm font-semibold text-[var(--zb-text)]">
             Amara Okonkwo{" "}
-            <span className="font-mono text-xs font-normal text-[var(--ox-text-muted)]">
+            <span className="font-mono text-xs font-normal text-[var(--zb-text-muted)]">
               F · 68y · MRN 0042-1187
             </span>
           </p>
           {["PROBLEM LIST", "MEDICATIONS", "RECENT RESULTS"].map((label, section) => (
             <section
               key={label}
-              className="mb-2.5 rounded-lg border border-[var(--ox-border)] px-3 py-2.5"
+              className="mb-2.5 rounded-lg border border-[var(--zb-border)] px-3 py-2.5"
             >
-              <p className="m-0 mb-2 font-mono text-[0.6rem] tracking-[0.14em] text-[var(--ox-text-muted)]">
+              <p className="m-0 mb-2 font-mono text-[0.6rem] tracking-[0.14em] text-[var(--zb-text-muted)]">
                 {label}
               </p>
               {(bars[section] ?? []).map((width, row) => (
                 <i
                   key={row}
                   style={{ width }}
-                  className="mb-1.5 block h-2 rounded-full bg-[var(--ox-bg-muted)] last:mb-0"
+                  className="mb-1.5 block h-2 rounded-full bg-[var(--zb-bg-muted)] last:mb-0"
                 />
               ))}
             </section>
@@ -738,23 +738,23 @@ function NaiveTimeline() {
   ];
 
   return (
-    <div className="rounded-lg border border-[var(--ox-border)] bg-[var(--ox-surface)] p-5">
+    <div className="rounded-lg border border-[var(--zb-border)] bg-[var(--zb-surface)] p-5">
       <div className="mb-4 flex items-baseline justify-between">
-        <span className="text-base font-semibold text-[var(--ox-text)]">Patient Timeline</span>
-        <span className="text-sm text-[var(--ox-text-muted)]">See All</span>
+        <span className="text-base font-semibold text-[var(--zb-text)]">Patient Timeline</span>
+        <span className="text-sm text-[var(--zb-text-muted)]">See All</span>
       </div>
       <ol className="m-0 list-none p-0">
         {rows.map(([title, date], index) => (
           <li key={title} className="grid grid-cols-[2rem_1fr] gap-3">
             <span className="grid justify-items-center">
-              <span className="size-8 rounded-full border border-[var(--ox-border)]" />
+              <span className="size-8 rounded-full border border-[var(--zb-border)]" />
               {index < rows.length - 1 ? (
-                <span className="mt-1.5 w-px flex-1 self-stretch bg-[var(--ox-border)]" />
+                <span className="mt-1.5 w-px flex-1 self-stretch bg-[var(--zb-border)]" />
               ) : null}
             </span>
             <span className="pb-4">
-              <span className="block text-sm font-semibold text-[var(--ox-text)]">{title}</span>
-              <span className="block text-xs text-[var(--ox-text-subtle)]">{date}</span>
+              <span className="block text-sm font-semibold text-[var(--zb-text)]">{title}</span>
+              <span className="block text-xs text-[var(--zb-text-subtle)]">{date}</span>
             </span>
           </li>
         ))}
@@ -1630,7 +1630,7 @@ function RecConsole() {
   return (
     <div className="w-full overflow-hidden rounded-xl border border-rule bg-panel">
       <div className="flex flex-wrap items-center gap-2 border-b border-rule bg-paper-sunk px-3 py-2">
-        <span className="ox-rec-tell">Recording</span>
+        <span className="zb-rec-tell">Recording</span>
         <span className="rounded border border-rule px-1.5 py-0.5 font-mono text-[0.6rem] uppercase tracking-wider text-panel-muted">
           Consent 09:11
         </span>
@@ -1811,7 +1811,7 @@ function GridStage({ children }: { children: React.ReactNode }) {
  * The page's density vocabulary, in the grid's own.
  *
  * They are two different words for the same control and they collide on one
- * attribute: the preview writes `data-ox-density="patient|standard|clinical"`
+ * attribute: the preview writes `data-zb-density="patient|standard|clinical"`
  * on the stage, and the grid writes `comfortable|regular|compact` on itself,
  * which shadows it. So the grid is passed the value rather than left to inherit
  * one it will overwrite — and the mapping is the one grid.css already argues
@@ -3452,7 +3452,7 @@ gridCapacityRefusal(120_000);
       note: "The most valuable thing this component does is disappear. Passed `suppressed`, it renders nothing at all \u2014 no dock, no dictation indicator, no keyboard listener. Each interruption during medication administration is associated with a measurable rise in clinical errors, and the FDA moved time-critical use under the criterion about independent review for the same reason.",
       render: () => (
         <HostChart>
-          <div className="grid place-items-center py-10 text-sm text-[--ox-text-muted]">
+          <div className="grid place-items-center py-10 text-sm text-[--zb-text-muted]">
             Nothing renders while the clinician is mid-procedure. That is the state.
           </div>
         </HostChart>
@@ -3689,13 +3689,13 @@ gridCapacityRefusal(120_000);
         <InstrumentStage>
           <div className="grid w-full gap-6 lg:grid-cols-2">
             <figure className="m-0">
-              <figcaption className="mb-2 text-xs uppercase tracking-wider text-[var(--ox-text-subtle)]">
+              <figcaption className="mb-2 text-xs uppercase tracking-wider text-[var(--zb-text-subtle)]">
                 As usually shipped
               </figcaption>
               <NaiveTimeline />
             </figure>
             <figure className="m-0">
-              <figcaption className="mb-2 text-xs uppercase tracking-wider text-[var(--ox-text-subtle)]">
+              <figcaption className="mb-2 text-xs uppercase tracking-wider text-[var(--zb-text-subtle)]">
                 CareTimeline, layout=&quot;card&quot;
               </figcaption>
               <CareTimeline
@@ -4282,7 +4282,7 @@ const NO_CHROME = new Set([
    * above a worklist that came to 583px of content in a 384px stage, centred,
    * which clipped the top of the chrome out of reach and the last table row off
    * the bottom. The grid re-themes on its own under the language switch (its
-   * type, accent and radius all come off the bridged `--ox-*` values), so
+   * type, accent and radius all come off the bridged `--zb-*` values), so
    * dropping the band costs the reader nothing that switch was showing them.
    */
   "data-grid",
@@ -4543,10 +4543,10 @@ export function ComponentPreview({
                     key={item.id}
                     type="button"
                     role="tab"
-                    id={`ox-state-${name}-${item.id}`}
+                    id={`zb-state-${name}-${item.id}`}
                     data-state-id={item.id}
                     aria-selected={active}
-                    aria-controls={`ox-stage-${name}`}
+                    aria-controls={`zb-stage-${name}`}
                     // Roving tabindex: the rail is one tab stop and the arrows
                     // move within it, per the APG tab pattern.
                     tabIndex={active ? 0 : -1}
@@ -4584,13 +4584,13 @@ export function ComponentPreview({
           */}
           <div
             key={scenario.id}
-            id={`ox-stage-${name}`}
+            id={`zb-stage-${name}`}
             role="tabpanel"
-            aria-labelledby={`ox-state-${name}-${scenario.id}`}
+            aria-labelledby={`zb-state-${name}-${scenario.id}`}
             // Focusable because the panel can scroll and can contain nothing
             // focusable of its own — WCAG 2.1.1.
             tabIndex={0}
-            data-ox-density={density}
+            data-zb-density={density}
             /*
               Centred vertically, stretched horizontally.
               
@@ -4622,9 +4622,9 @@ export function ComponentPreview({
               `HostStage` mounts the selected framework's provider and its
               token bridge on one wrapper, so the component below is drawn from
               that framework's tokens while the panel around it — rail, chrome,
-              code, notes — stays Oxygen's. A docs site that rebranded itself
+              code, notes — stays Zoblocks's. A docs site that rebranded itself
               into Ant Design when a reader clicked "Ant Design" would have
-              stopped being able to show what Oxygen looks like, which is the
+              stopped being able to show what Zoblocks looks like, which is the
               thing it exists to do.
             */}
             <HostStage className="my-auto flex w-full min-w-0 flex-col gap-6">

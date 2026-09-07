@@ -21,7 +21,7 @@ import { createElement, type ReactElement } from "react";
 import { readdirSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import type { Meta, StoryObj } from "@oxygenui-design/component-meta";
+import type { Meta, StoryObj } from "@zoblocks/component-meta";
 
 /**
  * The one Vite API this file uses, declared locally.
@@ -38,7 +38,7 @@ declare global {
 }
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const COMPONENTS_DIR = path.join(ROOT, "registry", "oxygen");
+const COMPONENTS_DIR = path.join(ROOT, "registry", "zoblocks");
 
 /** Colour rules need a layout engine jsdom lacks; `pnpm a11y` covers them in a browser. */
 const AXE_OPTIONS: axe.RunOptions = {
@@ -60,11 +60,11 @@ const componentNames = readdirSync(COMPONENTS_DIR, { withFileTypes: true })
  * resolve differently depending on whether Vite's client types are in scope,
  * and this file is typechecked by the root tsconfig as well as by Vitest.
  */
-const storyModules = import.meta.glob("../registry/oxygen/*/*.stories.tsx", {
+const storyModules = import.meta.glob("../registry/zoblocks/*/*.stories.tsx", {
   eager: true,
 }) as Record<string, StoryModule>;
 
-const metaModules = import.meta.glob("../registry/oxygen/*/*.meta.ts", {
+const metaModules = import.meta.glob("../registry/zoblocks/*/*.meta.ts", {
   eager: true,
 }) as Record<string, { default: { name: string; states: string[]; categories: string[] } }>;
 
@@ -182,11 +182,11 @@ describe("every story renders", () => {
       // deliberately shows nothing — and the second must say so.
       if (entry.story.parameters?.skipVrt) return;
       const rooted = Array.from(view.container.querySelectorAll<HTMLElement>("*")).some((el) =>
-        Array.from(el.attributes).some((attr) => attr.name.startsWith("data-ox-")),
+        Array.from(el.attributes).some((attr) => attr.name.startsWith("data-zb-")),
       );
       expect(
         rooted,
-        `${entry.component} › ${entry.exportName} rendered no element carrying a data-ox-* root marker`,
+        `${entry.component} › ${entry.exportName} rendered no element carrying a data-zb-* root marker`,
       ).toBe(true);
     },
   );

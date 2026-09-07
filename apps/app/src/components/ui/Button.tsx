@@ -61,7 +61,7 @@ export function buttonClasses({
     "transition-[background-color,border-color,color] duration-200",
     !blocked && variant === "primary" && "bg-cta text-paper hover:bg-cta-hover",
     !blocked && variant === "secondary" && "border-rule-strong bg-paper hover:bg-paper-sunk",
-    !blocked && variant === "ghost" && "text-oxygen-deep hover:bg-accent-wash",
+    !blocked && variant === "ghost" && "text-brand-deep hover:bg-accent-wash",
     !blocked &&
       variant === "danger" &&
       "border-fail/30 bg-fail-wash text-fail hover:bg-fail-wash/70",

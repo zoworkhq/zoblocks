@@ -25,12 +25,12 @@ import {
   type TokenMap,
   type TokenProblem,
   type TokenSource,
-} from "@oxygenui-design/tokens/validate";
+} from "@zoblocks/tokens/validate";
 
 import { runGate } from "../src/gate";
-import { oxygenFile, PASSING } from "./fixture";
+import { zoblocksFile, PASSING } from "./fixture";
 
-const OXYGEN = "Oxygen / Semantic";
+const ZOBLOCKS = "Zoblocks / Semantic";
 
 function map(entries: Record<string, string>): TokenMap {
   const out: TokenMap = new Map();
@@ -53,7 +53,7 @@ function sourceFor(values: Record<string, string>): TokenSource {
       map(
         Object.fromEntries(
           Object.entries(values).map(([k, v]) => [
-            k.replace("--ox-", "").replace(/^(status|flag)-/, "$1."),
+            k.replace("--zb-", "").replace(/^(status|flag)-/, "$1."),
             v,
           ]),
         ),
@@ -85,15 +85,15 @@ function gateProblems(values: Record<string, string>): TokenProblem[] {
 
 describe("the plugin and the publish gate", () => {
   it("agree that the shipped palette passes", () => {
-    const report = runGate(oxygenFile(), { collection: OXYGEN, figmaMode: "light" });
+    const report = runGate(zoblocksFile(), { collection: ZOBLOCKS, figmaMode: "light" });
     expect(report.readings.filter((r) => !r.passes)).toEqual([]);
     expect(gateProblems(PASSING)).toEqual([]);
   });
 
   it("print the same ratio for the same failing pair", () => {
-    const broken = { ...PASSING, "--ox-text-muted": "#a8b0bb" };
-    const report = runGate(oxygenFile({ "--ox-text-muted": "#a8b0bb" }), {
-      collection: OXYGEN,
+    const broken = { ...PASSING, "--zb-text-muted": "#a8b0bb" };
+    const report = runGate(zoblocksFile({ "--zb-text-muted": "#a8b0bb" }), {
+      collection: ZOBLOCKS,
       figmaMode: "light",
     });
 
@@ -112,12 +112,12 @@ describe("the plugin and the publish gate", () => {
   it("agree on which pairs fail, not merely on how many", () => {
     const broken = {
       ...PASSING,
-      "--ox-text-muted": "#a8b0bb",
-      "--ox-focus-ring": "#cfd8e3",
-      "--ox-status-critical": "#e88c90",
+      "--zb-text-muted": "#a8b0bb",
+      "--zb-focus-ring": "#cfd8e3",
+      "--zb-status-critical": "#e88c90",
     };
 
-    const failing = runGate(oxygenFile(broken), { collection: OXYGEN, figmaMode: "light" })
+    const failing = runGate(zoblocksFile(broken), { collection: ZOBLOCKS, figmaMode: "light" })
       .readings.filter((r) => !r.passes)
       .map((r) => `${r.fg} on ${r.bg}`)
       .sort();
@@ -137,8 +137,8 @@ describe("the plugin and the publish gate", () => {
   });
 
   it("holds a status colour to the floor `checkStatusContrast` holds it to", () => {
-    const broken = { ...PASSING, "--ox-status-critical": "#e88c90" };
-    const report = runGate(oxygenFile(broken), { collection: OXYGEN, figmaMode: "light" });
+    const broken = { ...PASSING, "--zb-status-critical": "#e88c90" };
+    const report = runGate(zoblocksFile(broken), { collection: ZOBLOCKS, figmaMode: "light" });
     const reading = report.readings.find((r) => r.fg === "status.critical")!;
 
     const message = gateProblems(broken).find((p) => p.message.startsWith("status.critical"))!;
@@ -147,8 +147,8 @@ describe("the plugin and the publish gate", () => {
   });
 
   it("uses the same hue-separation wording the gate uses", () => {
-    const broken = { ...PASSING, "--ox-status-high": "#8a1c22", "--ox-status-low": "#a02216" };
-    const report = runGate(oxygenFile(broken), { collection: OXYGEN, figmaMode: "light" });
+    const broken = { ...PASSING, "--zb-status-high": "#8a1c22", "--zb-status-low": "#a02216" };
+    const report = runGate(zoblocksFile(broken), { collection: ZOBLOCKS, figmaMode: "light" });
     const gate = gateProblems(broken).find((p) => p.message.includes("apart in hue"))!;
 
     expect(gate).toBeDefined();
@@ -158,7 +158,7 @@ describe("the plugin and the publish gate", () => {
 
 describe("the plugin and the published conformance table", () => {
   it("report the same ratio and the same floor for every pair both cover", () => {
-    const report = runGate(oxygenFile(), { collection: OXYGEN, figmaMode: "light" });
+    const report = runGate(zoblocksFile(), { collection: ZOBLOCKS, figmaMode: "light" });
     const published = measureContrast(sourceFor(PASSING)).filter((r) => r.theme === "light");
 
     let compared = 0;

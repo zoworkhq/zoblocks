@@ -203,7 +203,7 @@ describe("counts, tones and dots reach the accessible name", () => {
         items={[{ value: "all", label: "All", count: 12 }]}
       />,
     );
-    const badge = screen.getByRole("tab").querySelector(".ox-tabs__count");
+    const badge = screen.getByRole("tab").querySelector(".zb-tabs__count");
     expect(badge).toHaveAttribute("aria-hidden", "true");
   });
 });

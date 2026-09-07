@@ -72,7 +72,7 @@ export default defineConfig({
     : [["list"]],
 
   use: {
-    baseURL: process.env.OXYGEN_BASE_URL ?? "http://localhost:6001",
+    baseURL: process.env.ZOBLOCKS_BASE_URL ?? "http://localhost:6001",
     trace: "on-first-retry",
     screenshot: "only-on-failure",
   },
@@ -235,18 +235,17 @@ export default defineConfig({
      * flaky login. `scripts/e2e-server.mjs` does all three and tears the
      * database down with the process.
      */
-    ...(process.env.OXYGEN_APP_URL
+    ...(process.env.ZOBLOCKS_APP_URL
       ? []
       : [
           {
-            command:
-              "pnpm --filter @oxygenui-design/app build && pnpm --filter @oxygenui-design/app e2e:server",
+            command: "pnpm --filter @zoblocks/app build && pnpm --filter @zoblocks/app e2e:server",
             url: "http://localhost:6003/login",
             reuseExistingServer: !process.env.CI,
             timeout: 180_000,
           },
         ]),
-    ...(process.env.OXYGEN_BASE_URL
+    ...(process.env.ZOBLOCKS_BASE_URL
       ? []
       : [
           {
@@ -261,31 +260,29 @@ export default defineConfig({
              * The app entry above already builds for the same reason; turbo
              * makes the no-op case cheap.
              */
-            command:
-              "pnpm --filter @oxygenui-design/docs build && pnpm --filter @oxygenui-design/docs start",
+            command: "pnpm --filter @zoblocks/docs build && pnpm --filter @zoblocks/docs start",
             url: "http://localhost:6001",
             reuseExistingServer: !process.env.CI,
             // Matches the app's, now that this one builds before it serves.
             timeout: 180_000,
           },
         ]),
-    ...(process.env.OXYGEN_SMOKE_URL
+    ...(process.env.ZOBLOCKS_SMOKE_URL
       ? []
       : [
           {
-            command:
-              "pnpm --filter @oxygenui-design/smoke build && pnpm --filter @oxygenui-design/smoke preview",
+            command: "pnpm --filter @zoblocks/smoke build && pnpm --filter @zoblocks/smoke preview",
             url: "http://localhost:6010",
             reuseExistingServer: !process.env.CI,
             timeout: 120_000,
           },
         ]),
-    ...(process.env.OXYGEN_SMOKE_18_URL
+    ...(process.env.ZOBLOCKS_SMOKE_18_URL
       ? []
       : [
           {
             command:
-              "pnpm --filter @oxygenui-design/smoke-react18 build && pnpm --filter @oxygenui-design/smoke-react18 preview",
+              "pnpm --filter @zoblocks/smoke-react18 build && pnpm --filter @zoblocks/smoke-react18 preview",
             url: "http://localhost:6011",
             reuseExistingServer: !process.env.CI,
             timeout: 120_000,
@@ -295,12 +292,12 @@ export default defineConfig({
     // application source under antd, MUI and neither, and asserts the
     // accessibility trees match — the check that fails if framework coupling
     // ever leaks into a component.
-    ...(process.env.OXYGEN_HOSTS_URL
+    ...(process.env.ZOBLOCKS_HOSTS_URL
       ? []
       : [
           {
             command:
-              "pnpm --filter @oxygenui-design/smoke-hosts build && pnpm --filter @oxygenui-design/smoke-hosts preview",
+              "pnpm --filter @zoblocks/smoke-hosts build && pnpm --filter @zoblocks/smoke-hosts preview",
             /*
              * `/none/`, not `/`.
              *

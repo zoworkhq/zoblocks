@@ -8,10 +8,10 @@
 
 import { createRoot } from "react-dom/client";
 import { ConfigProvider } from "antd";
-import { AntdBridge } from "@oxygenui-design/bridge-antd";
+import { AntdBridge } from "@zoblocks/bridge-antd";
 import { Application } from "../shared/Application";
-import "@oxygenui-design/tokens/oxygen-tokens.css";
-import "@oxygenui-design/react/styles.css";
+import "@zoblocks/tokens/zoblocks-tokens.css";
+import "@zoblocks/react/styles.css";
 import "../shared/page.css";
 
 createRoot(document.getElementById("root")!).render(
@@ -22,7 +22,7 @@ createRoot(document.getElementById("root")!).render(
         borderRadius: 10,
         fontFamily: "Georgia, serif",
         // Deliberately present. The bridge must not carry it onto a clinical
-        // token, and the test asserts the badge keeps Oxygen's validated red.
+        // token, and the test asserts the badge keeps Zoblocks's validated red.
         colorError: "#ff00ff",
       },
     }}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Switch, Timeline } from "@oxygenui-design/react";
+import { Switch, Timeline } from "@zoblocks/react";
 import { Preview } from "@/components/ui";
 import type { EditorModel, ThemeName } from "@/lib/token-editor";
 
@@ -37,22 +37,22 @@ export function TokenPreview({
   /*
    * Every semantic token, not only the edited ones.
    *
-   * The app's own page resolves `--ox-accent` from Oxygen's palette, not
+   * The app's own page resolves `--zb-accent` from Zoblocks's palette, not
    * from this customer's brand — so a preview applying only the overrides would
    * show a customer their edits sitting on our colours.
    */
   for (const [name, value] of Object.entries(model.resolved)) tokens[name] = value;
   for (const [path, value] of Object.entries(overrides)) {
-    tokens[`--ox-${path.replace(/\./g, "-")}`] = value;
+    tokens[`--zb-${path.replace(/\./g, "-")}`] = value;
   }
 
   /*
    * And every component token that falls through to one of them.
    *
    * Required, not belt-and-braces. The component tier is declared at `:root` —
-   * `--ox-switch-track-on-bg: var(--ox-accent)` — and a `var()` resolves at the
-   * element that declares it, so setting `--ox-accent` on this subtree changes
-   * nothing a component actually reads. Without this the switch stayed Oxygen's
+   * `--zb-switch-track-on-bg: var(--zb-accent)` — and a `var()` resolves at the
+   * element that declares it, so setting `--zb-accent` on this subtree changes
+   * nothing a component actually reads. Without this the switch stayed Zoblocks's
    * teal while the swatch beside it went red, which is a preview that lies.
    */
   for (const [semantic, names] of Object.entries(model.dependents)) {

@@ -7,7 +7,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/pulse-loader/pulse-loader.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/pulse-loader/pulse-loader.tsx. Edit that file, not this one.
 /**
  * PulseLoader — an open heart with a rhythm line running through it.
  *
@@ -73,33 +73,33 @@ export function PulseLoader({ bpm, speed = 1, size, ...props }: PulseLoaderProps
       {...props}
       variant="pulse"
       vars={{
-        "--ox-loader-size": `${px}px`,
-        "--ox-loader-beat": `${beat}ms`,
-        "--ox-loader-cycle": `${cycleMs(4000, clamp(speed, 0.5, 2))}ms`,
-        "--ox-loader-stroke": `${strokePx(px)}px`,
+        "--zb-loader-size": `${px}px`,
+        "--zb-loader-beat": `${beat}ms`,
+        "--zb-loader-cycle": `${cycleMs(4000, clamp(speed, 0.5, 2))}ms`,
+        "--zb-loader-stroke": `${strokePx(px)}px`,
       }}
       art={
         <svg viewBox={LOADER_VIEWBOX.pulse} focusable="false">
-          <g className="ox-loader__beat">
+          <g className="zb-loader__beat">
             <path
-              className="ox-loader__stroke ox-loader__draw"
+              className="zb-loader__stroke zb-loader__draw"
               pathLength={100}
               d={LOADER_ART.heartTop}
             />
             <path
-              className="ox-loader__stroke ox-loader__draw"
+              className="zb-loader__stroke zb-loader__draw"
               pathLength={100}
               d={LOADER_ART.heartBottom}
             />
           </g>
-          <path className="ox-loader__stroke ox-loader__track" d={LOADER_ART.heartLine} />
+          <path className="zb-loader__stroke zb-loader__track" d={LOADER_ART.heartLine} />
           <path
-            className="ox-loader__stroke ox-loader__tail"
+            className="zb-loader__stroke zb-loader__tail"
             pathLength={100}
             d={LOADER_ART.heartLine}
           />
           <path
-            className="ox-loader__stroke ox-loader__head"
+            className="zb-loader__stroke zb-loader__head"
             pathLength={100}
             d={LOADER_ART.heartLine}
           />

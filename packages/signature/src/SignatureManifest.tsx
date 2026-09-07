@@ -28,7 +28,7 @@
  */
 
 import * as React from "react";
-import type { SignatureValue, SignedValue } from "@oxygenui-design/signature-core";
+import type { SignatureValue, SignedValue } from "@zoblocks/signature-core";
 import { SignatureInk } from "./SignatureInk";
 import { useLocale, type SignatureLocale } from "./locale";
 
@@ -66,8 +66,8 @@ export function SignatureManifest({
   return (
     <section
       className={[
-        "ox-signature-manifest",
-        value.outcome === "revoked" ? "ox-signature-manifest--revoked" : "",
+        "zb-signature-manifest",
+        value.outcome === "revoked" ? "zb-signature-manifest--revoked" : "",
         className ?? "",
       ]
         .filter(Boolean)
@@ -75,7 +75,7 @@ export function SignatureManifest({
       aria-label={typeof title === "string" ? title : undefined}
     >
       {title ? (
-        <header className="ox-signature-manifest__ink" style={{ paddingBlock: 12 }}>
+        <header className="zb-signature-manifest__ink" style={{ paddingBlock: 12 }}>
           <strong style={{ flex: 1 }}>{title}</strong>
           {verified !== undefined ? (
             <StatusText tone={verified ? "ok" : "bad"}>
@@ -87,7 +87,7 @@ export function SignatureManifest({
 
       {signed ? <Ink value={signed} t={t} revoked={value.outcome === "revoked"} /> : null}
 
-      <dl className="ox-signature-manifest__rows">
+      <dl className="zb-signature-manifest__rows">
         {signed ? (
           <>
             <Row label="Meaning">{t.meaning[signed.meaning] ?? signed.meaning}</Row>
@@ -152,7 +152,7 @@ function Ink({ value, t, revoked }: { value: SignedValue; t: SignatureLocale; re
   const alt = `${revoked ? "Withdrawn signature" : "Signature"} of ${value.signer.name}, ${t.signedOn.toLowerCase()} ${formatInstant(value.recordedAt)}`;
 
   return (
-    <div className="ox-signature-manifest__ink">
+    <div className="zb-signature-manifest__ink">
       <SignatureInk ink={value.ink} label={alt} style={{ maxWidth: 260, height: "auto" }} />
       <div>
         <div style={{ fontWeight: 600, fontSize: "1.05em" }}>{value.signer.name}</div>
@@ -241,7 +241,7 @@ function OutcomeRows({ value, t }: { value: SignatureValue; t: SignatureLocale }
 
 function Row({ label, children }: { label: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div className="ox-signature-manifest__row">
+    <div className="zb-signature-manifest__row">
       <dt>{label}</dt>
       <dd>{children}</dd>
     </div>

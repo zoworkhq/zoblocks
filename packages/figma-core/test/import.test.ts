@@ -1,5 +1,5 @@
 /**
- * Figma variables read back as Oxygen overrides.
+ * Figma variables read back as Zoblocks overrides.
  *
  * The failure this guards is quiet and total: a theme that has lost a clinical
  * signal renders correctly, passes every other check, and ships. Severity in
@@ -26,15 +26,15 @@ const colour = (hex: string) => ({
 const snapshot: VariableSnapshot = {
   variables: [
     {
-      token: "--ox-accent",
+      token: "--zb-accent",
       name: "accent",
-      collection: "Oxygen / Semantic",
+      collection: "Zoblocks / Semantic",
       values: { light: colour("#1851a5") },
     },
     ...CLINICAL.map((token) => ({
       token,
-      name: token.replace("--ox-", ""),
-      collection: "Oxygen / Semantic",
+      name: token.replace("--zb-", ""),
+      collection: "Zoblocks / Semantic",
       values: { light: colour("#b4232b") },
     })),
     {
@@ -56,11 +56,11 @@ describe("the report a designer gets back", () => {
   it("accepts what a customer may set", () => {
     const report = fromVariables(snapshot, { locked: CLINICAL });
     // The rgb wins over the stored hex — it is what the file actually holds.
-    expect(report.matched["--ox-accent"]).toBe("#808080");
+    expect(report.matched["--zb-accent"]).toBe("#808080");
   });
 
   /**
-   * A variable with no plugin data is not an Oxygen token.
+   * A variable with no plugin data is not a Zoblocks token.
    *
    * Reported by the label a designer sees rather than dropped, because "we
    * ignored four of your variables" is a thing they need to be able to check
@@ -89,10 +89,10 @@ describe("what it will not turn into a value", () => {
       {
         variables: [
           {
-            token: "--ox-accent",
+            token: "--zb-accent",
             name: "accent",
-            collection: "Oxygen / Semantic",
-            values: { light: { kind: "alias", token: "--ox-ref-brand-700" } },
+            collection: "Zoblocks / Semantic",
+            values: { light: { kind: "alias", token: "--zb-ref-brand-700" } },
           },
         ],
       },
@@ -110,9 +110,9 @@ describe("what it will not turn into a value", () => {
       {
         variables: [
           {
-            token: "--ox-accent",
+            token: "--zb-accent",
             name: "accent",
-            collection: "Oxygen / Semantic",
+            collection: "Zoblocks / Semantic",
             values: { dark: colour("#5a94e7") },
           },
         ],
@@ -127,16 +127,16 @@ describe("what it will not turn into a value", () => {
       {
         variables: [
           {
-            token: "--ox-accent",
+            token: "--zb-accent",
             name: "accent",
-            collection: "Oxygen / Semantic",
+            collection: "Zoblocks / Semantic",
             values: { dark: colour("#5a94e7") },
           },
         ],
       },
       { locked: CLINICAL, mode: "dark" },
     );
-    expect(report.matched["--ox-accent"]).toBe("#808080");
+    expect(report.matched["--zb-accent"]).toBe("#808080");
   });
 
   /**
@@ -148,6 +148,6 @@ describe("what it will not turn into a value", () => {
   it("refuses nothing when given no lock list, and that is the caller's problem", () => {
     const report = fromVariables(snapshot);
     expect(report.discardedClinical).toEqual([]);
-    expect(Object.keys(report.matched)).toContain("--ox-status-critical");
+    expect(Object.keys(report.matched)).toContain("--zb-status-critical");
   });
 });

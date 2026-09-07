@@ -8,7 +8,7 @@
  * costs one emitter.
  */
 
-import { distributionState, installCommandFor } from "@oxygenui-design/component-meta";
+import { distributionState, installCommandFor } from "@zoblocks/component-meta";
 import { HOMEPAGE, paths } from "../config";
 import type { LoadedComponent } from "../load";
 import type { Emitter } from "../write";
@@ -72,14 +72,14 @@ export async function emitAgentManifest(
       return `## ${layer[0]!.toUpperCase()}${layer.slice(1)}\n\n${items}`;
     });
 
-  const content = `# Oxygen UI
+  const content = `# Zoblocks
 
 > React components for healthcare interfaces, typed to FHIR R4 and delivered as
-> source through the Oxygen registry. Components take FHIR resources as props
+> source through the Zoblocks registry. Components take FHIR resources as props
 > directly and render absence, preliminary status, restricted records, and
 > critical results as explicit states rather than as blanks.
 
-Oxygen UI is not a compliance boundary, not a medical device, and not clinical
+Zoblocks is not a compliance boundary, not a medical device, and not clinical
 decision support. Access control, audit, data residency, and clinical validation
 remain the implementing team's responsibility.
 

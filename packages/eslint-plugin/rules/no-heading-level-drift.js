@@ -23,7 +23,7 @@ function elementName(node) {
   const name = node.openingElement?.name;
   if (!name) return undefined;
   if (name.type === "JSXIdentifier") return name.name;
-  // <Oxygen.Accordion /> — take the property, which is what carries the meaning.
+  // <Zoblocks.Accordion /> — take the property, which is what carries the meaning.
   if (name.type === "JSXMemberExpression" && name.property.type === "JSXIdentifier") {
     return name.property.name;
   }

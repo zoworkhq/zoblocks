@@ -57,9 +57,9 @@ export function TrajectoryPanel() {
 
       <path
         d="M40,72 L120,80 L200,90 L280,100 L360,110 L440,118 L520,124 L600,130 L680,134 L680,168 L600,162 L520,155 L440,147 L360,138 L280,127 L200,114 L120,98 L40,72 Z"
-        fill="color-mix(in srgb, var(--site-oxygen) 12%, transparent)"
+        fill="color-mix(in srgb, var(--site-brand) 12%, transparent)"
       />
-      <text className="axis" x="452" y="146" fill="var(--site-oxygen)">
+      <text className="axis" x="452" y="146" fill="var(--site-brand)">
         expected response band
       </text>
 
@@ -184,9 +184,9 @@ export function TrajectoryOne() {
       </text>
       <path
         d="M40,66 L150,76 L260,88 L370,100 L480,110 L590,118 L680,122 L680,154 L590,148 L480,140 L370,130 L260,116 L150,96 L40,66 Z"
-        fill="color-mix(in srgb, var(--site-oxygen) 13%, transparent)"
+        fill="color-mix(in srgb, var(--site-brand) 13%, transparent)"
       />
-      <text className="axis" x="450" y="136" fill="var(--site-oxygen)">
+      <text className="axis" x="450" y="136" fill="var(--site-brand)">
         expected for an intake of 18
       </text>
       <polyline

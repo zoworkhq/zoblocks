@@ -21,7 +21,7 @@ import Image from "next/image";
  * What this deliberately does not do is model the absence of a photograph.
  * "No photo on file", "the photo failed to load" and "withheld by policy" are
  * three different facts and rendering them identically is a silently degraded
- * safety control; `PatientChip` in `@oxygenui-design/identity` distinguishes
+ * safety control; `PatientChip` in `@zoblocks/identity` distinguishes
  * five of them. This is a demo cell, and it says so here rather than pretending
  * to be the answer.
  */

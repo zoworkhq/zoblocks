@@ -1,7 +1,7 @@
 /**
  * The narrow slice of FHIR R4 this engine touches.
  *
- * Declared here rather than imported from `@oxygenui-design/fhir` for the same
+ * Declared here rather than imported from `@zoblocks/fhir` for the same
  * reason `signature-core` declares its own: this package promises zero
  * dependencies, and that promise is what lets a host import the safety pipeline
  * into a Node handler, an edge worker, or a React Native app without dragging a

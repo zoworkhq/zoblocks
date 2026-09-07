@@ -211,7 +211,7 @@ export function CatalogExplorer({ catalog }: { catalog: readonly ComponentDoc[] 
               "w-full rounded-lg border border-transparent bg-transparent py-1.5 pl-8 pr-2 text-sm",
               "placeholder:text-graphite-soft",
               "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1",
-              "focus-visible:outline-oxygen",
+              "focus-visible:outline-brand",
             )}
           />
         </label>
@@ -248,7 +248,7 @@ export function CatalogExplorer({ catalog }: { catalog: readonly ComponentDoc[] 
               "inline-flex shrink-0 items-center gap-1 rounded-lg px-2 py-1.5",
               "text-xs text-graphite transition-colors hover:text-ink",
               "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
-              "focus-visible:outline-oxygen",
+              "focus-visible:outline-brand",
             )}
           >
             <X aria-hidden="true" className="size-3" />
@@ -380,9 +380,9 @@ function Picker({
           "hover:border-rule-strong hover:text-ink",
           // The trigger reads as set rather than as empty once a filter is on,
           // because the row is small enough that a changed word is easy to miss.
-          value && "border-oxygen/45 text-ink",
+          value && "border-brand/45 text-ink",
           "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1",
-          "focus-visible:outline-oxygen",
+          "focus-visible:outline-brand",
         )}
       >
         <option value="">{all}</option>

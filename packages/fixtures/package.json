@@ -1,8 +1,8 @@
 {
-  "name": "@oxygenui-design/fixtures",
+  "name": "@zoblocks/fixtures",
   "version": "0.1.0",
   "private": true,
-  "description": "Synthetic, non-PHI FHIR fixtures for Oxygen docs, demos, and tests.",
+  "description": "Synthetic, non-PHI FHIR fixtures for Zoblocks docs, demos, and tests.",
   "license": "MIT",
   "type": "module",
   "sideEffects": false,
@@ -16,10 +16,10 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@oxygenui-design/fhir": "workspace:*"
+    "@zoblocks/fhir": "workspace:*"
   },
   "devDependencies": {
-    "@oxygenui-design/tsconfig": "workspace:*",
+    "@zoblocks/tsconfig": "workspace:*",
     "typescript": "^5.7.2"
   }
 }

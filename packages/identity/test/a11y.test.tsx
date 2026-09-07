@@ -68,7 +68,7 @@ describe("the accessible contract", () => {
     const { container } = F.renderWithPolicy(
       <PatientBanner patient={F.amaraA} context="navigation" />,
     );
-    const avatar = container.querySelector(".ox-avatar");
+    const avatar = container.querySelector(".zb-avatar");
     expect(avatar).toHaveAttribute("aria-hidden", "true");
   });
 
@@ -136,9 +136,9 @@ describe("server rendering", () => {
         <PatientChip patient={F.amaraA} />
       </IdentityProvider>,
     );
-    const server = /ox-avatar--sw(\d)/.exec(html)?.[1];
+    const server = /zb-avatar--sw(\d)/.exec(html)?.[1];
     const { container } = F.renderWithPolicy(<PatientChip patient={F.amaraA} />);
-    const client = /ox-avatar--sw(\d)/.exec(container.innerHTML)?.[1];
+    const client = /zb-avatar--sw(\d)/.exec(container.innerHTML)?.[1];
     expect(server).toBe(client);
   });
 });
@@ -178,6 +178,6 @@ describe("disclosure leakage", () => {
     expect(html).not.toContain("123 456 789");
     // The shape survives: still a banner, still an identifier of the same
     // length, still the same swatch.
-    expect(html).toContain("ox-banner");
+    expect(html).toContain("zb-banner");
   });
 });

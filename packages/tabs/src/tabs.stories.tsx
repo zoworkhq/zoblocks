@@ -12,14 +12,14 @@
  * do real work: the overflow menu, the collapsed picker and the async guard
  * are exactly the states a demo would otherwise skip.
  *
- * The chart these stories render is assembled from `@oxygenui-design/fixtures`
+ * The chart these stories render is assembled from `@zoblocks/fixtures`
  * rather than typed out, so a count on a tab cannot drift from the data behind
  * it.
  */
 
 import * as React from "react";
-import type { Meta, StoryObj } from "@oxygenui-design/component-meta";
-import { allergyList, medicationList, observationPanel } from "@oxygenui-design/fixtures";
+import type { Meta, StoryObj } from "@zoblocks/component-meta";
+import { allergyList, medicationList, observationPanel } from "@zoblocks/fixtures";
 import { expect, userEvent, waitFor, within } from "../../../test/story-kit";
 import { stubGeometry, triggerResize } from "../test/geometry.js";
 import { Tabs, type TabsItemProps } from "./index.js";
@@ -200,7 +200,7 @@ export const Stale: Story = {
   },
   play: async ({ canvasElement }) => {
     const labs = within(canvasElement).getByRole("tab", { name: /^Labs/ });
-    expect(labs.getAttribute("data-ox-availability")).toBe("stale");
+    expect(labs.getAttribute("data-zb-availability")).toBe("stale");
     // Not disabled. A clinician looking at cached potassium needs to know it
     // is cached, not that the section has gone away.
     expect(labs.getAttribute("aria-disabled")).toBeNull();
@@ -218,7 +218,7 @@ export const UnavailableOffline: Story = {
   },
   play: async ({ canvasElement }) => {
     const meds = within(canvasElement).getByRole("tab", { name: /Medications/ });
-    expect(meds.getAttribute("data-ox-availability")).toBe("unavailable");
+    expect(meds.getAttribute("data-zb-availability")).toBe("unavailable");
     expect(meds.getAttribute("aria-label")).toContain("unavailable");
   },
 };
@@ -242,7 +242,7 @@ export const UnsavedChanges: Story = {
     const note = within(canvasElement).getByRole("tab", { name: /Progress note/ });
     // The dot itself is aria-hidden; the fact it carries travels in the name.
     expect(note.getAttribute("aria-label")).toBe("Progress note, unsaved changes");
-    expect(note.querySelector("[data-ox-dot='dirty']")?.getAttribute("aria-hidden")).toBe("true");
+    expect(note.querySelector("[data-zb-dot='dirty']")?.getAttribute("aria-hidden")).toBe("true");
   },
 };
 
@@ -283,7 +283,7 @@ export const CompletedStep: Story = {
   },
   play: async ({ canvasElement }) => {
     const identity = within(canvasElement).getByRole("tab", { name: "Identity" });
-    expect(identity.getAttribute("data-ox-state")).toBe("done");
+    expect(identity.getAttribute("data-zb-state")).toBe("done");
     // Done is not disabled: going back to a finished step is how somebody
     // fixes the name they mistyped two screens ago.
     expect(identity.getAttribute("aria-disabled")).toBeNull();
@@ -302,7 +302,7 @@ export const LockedStep: Story = {
   },
   play: async ({ canvasElement }) => {
     const history = within(canvasElement).getByRole("tab", { name: "History" });
-    expect(history.getAttribute("data-ox-state")).toBe("locked");
+    expect(history.getAttribute("data-zb-state")).toBe("locked");
     await userEvent.click(history);
     // A locked step cannot be jumped to, and says so rather than doing nothing.
     expect(history.getAttribute("aria-selected")).toBe("false");
@@ -335,7 +335,7 @@ const manySections: TabsItemProps[] = [
 }));
 
 async function narrow(canvasElement: HTMLElement, clientWidth: number) {
-  const list = canvasElement.querySelector<HTMLElement>("[data-ox-list]");
+  const list = canvasElement.querySelector<HTMLElement>("[data-zb-list]");
   if (!list) throw new Error("no tab list rendered");
   stubGeometry(list, { clientWidth, scrollWidth: 8 * 140, tabWidth: 140 });
   triggerResize();
@@ -355,12 +355,12 @@ export const OverflowMenu: Story = {
     await narrow(canvasElement, 420);
     await waitFor(() => {
       expect(
-        canvasElement.querySelector(".ox-tabs__more-button"),
+        canvasElement.querySelector(".zb-tabs__more-button"),
         "no overflow trigger appeared",
       ).toBeTruthy();
     });
 
-    const more = canvasElement.querySelector<HTMLButtonElement>(".ox-tabs__more-button");
+    const more = canvasElement.querySelector<HTMLButtonElement>(".zb-tabs__more-button");
     // How many are hidden is in the name, not only in the badge — the badge is
     // aria-hidden precisely so the number is not announced twice.
     expect(more?.textContent).toMatch(/\d+ hidden/);
@@ -369,7 +369,7 @@ export const OverflowMenu: Story = {
     expect(more?.getAttribute("aria-haspopup")).toBe("menu");
 
     await userEvent.click(more as HTMLButtonElement);
-    const menu = canvasElement.querySelector<HTMLElement>(".ox-tabs__menu");
+    const menu = canvasElement.querySelector<HTMLElement>(".zb-tabs__menu");
     expect(menu?.hidden).toBe(false);
     expect(within(menu as HTMLElement).getAllByRole("menuitem").length).toBeGreaterThan(0);
   },
@@ -388,11 +388,11 @@ export const CollapsedToPicker: Story = {
     await narrow(canvasElement, 200);
     await waitFor(() => {
       expect(
-        canvasElement.querySelector("select.ox-tabs__select"),
+        canvasElement.querySelector("select.zb-tabs__select"),
         "the strip did not collapse to a picker",
       ).toBeTruthy();
     });
-    const select = canvasElement.querySelector<HTMLSelectElement>("select.ox-tabs__select");
+    const select = canvasElement.querySelector<HTMLSelectElement>("select.zb-tabs__select");
     // A native select, deliberately: it is the only control that already
     // behaves correctly on every mobile platform.
     expect(select?.options.length).toBe(manySections.length);
@@ -441,7 +441,7 @@ export const AwaitingGuard: Story = {
     // Selection has not moved: the guard has not answered yet, and moving
     // first would show the clinician a panel the save might still reject.
     await waitFor(() => {
-      expect(canvasElement.querySelector("[data-ox-pending]")).toBeTruthy();
+      expect(canvasElement.querySelector("[data-zb-pending]")).toBeTruthy();
     });
     expect(canvas.getByRole("tab", { name: "Summary" }).getAttribute("aria-selected")).toBe("true");
 

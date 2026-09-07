@@ -48,7 +48,7 @@ function gapsFor(component: LoadedComponent, propCount: number): string[] {
    * documentation, as the visual-regression fixture, as the accessibility
    * fixture, and — through play functions — as the interaction test. The root
    * harness in `test/stories.test.tsx` is what provides all four, and it globs
-   * `registry/oxygen`, renders in jsdom, and carries no framework beyond React.
+   * `registry/zoblocks`, renders in jsdom, and carries no framework beyond React.
    *
    * A package component cannot be rendered there. Signature wraps Ant Design;
    * pulling antd into the registry harness to satisfy a file check would make

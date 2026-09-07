@@ -25,15 +25,15 @@
 
 import { cache } from "react";
 import { tokenSourceFrom } from "../../../../scripts/gen/tokens/load";
-import type { TokenSource } from "@oxygenui-design/tokens/validate";
+import type { TokenSource } from "@zoblocks/tokens/validate";
 
-import primitive from "@oxygenui-design/tokens/tokens/primitive.json";
-import shared from "@oxygenui-design/tokens/tokens/semantic/shared.json";
-import light from "@oxygenui-design/tokens/tokens/semantic/light.json";
-import dark from "@oxygenui-design/tokens/tokens/semantic/dark.json";
-import highContrast from "@oxygenui-design/tokens/tokens/semantic/high-contrast.json";
-import density from "@oxygenui-design/tokens/tokens/density.json";
-import component from "@oxygenui-design/tokens/tokens/component.json";
+import primitive from "@zoblocks/tokens/tokens/primitive.json";
+import shared from "@zoblocks/tokens/tokens/semantic/shared.json";
+import light from "@zoblocks/tokens/tokens/semantic/light.json";
+import dark from "@zoblocks/tokens/tokens/semantic/dark.json";
+import highContrast from "@zoblocks/tokens/tokens/semantic/high-contrast.json";
+import density from "@zoblocks/tokens/tokens/density.json";
+import component from "@zoblocks/tokens/tokens/component.json";
 
 export const baseTokens = cache(async (): Promise<TokenSource> =>
   tokenSourceFrom({ primitive, shared, light, dark, highContrast, density, component }),

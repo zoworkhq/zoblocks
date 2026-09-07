@@ -1,5 +1,5 @@
 /**
- * @oxygenui-design/tabs-testing — assertions that read the accessibility tree.
+ * @zoblocks/tabs-testing — assertions that read the accessibility tree.
  *
  * These exist because the defects that matter in a tab strip are not visual.
  * A snapshot test passes happily on a `role="tablist"` full of anchors, on a
@@ -7,14 +7,14 @@
  * points at nothing. Each of those is a control that looks finished and is
  * unusable, and each has a one-line assertion here.
  *
- *     import { expectTabsContract } from "@oxygenui-design/tabs-testing";
+ *     import { expectTabsContract } from "@zoblocks/tabs-testing";
  *
  *     render(<Tabs as="tabs" … />);
  *     expectTabsContract(screen.getByRole("tablist"));
  *
  * Framework-agnostic: it takes DOM elements and throws `Error` on failure, so
  * it works under Vitest, Jest, Playwright or a bare script. It deliberately
- * does not depend on `@oxygenui-design/tabs` — the point is to be able to hold
+ * does not depend on `@zoblocks/tabs` — the point is to be able to hold
  * *any* implementation to the contract, including one a customer wrote.
  */
 

@@ -22,7 +22,7 @@ import {
   classifyScope,
   type CopilotMode,
   type CopilotProvider,
-} from "@oxygenui-design/copilot-core";
+} from "@zoblocks/copilot-core";
 import {
   defaultGrade,
   runProvider,

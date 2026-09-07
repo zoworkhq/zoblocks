@@ -58,10 +58,10 @@ ruleTester.run("tabs-semantic-mode", tabsSemanticMode, {
     { code: 'import Tabs from "rc-tabs";\nconst a = <Tabs items={items} />;' },
     { code: 'import { Tabs as Foo } from "antd";\nconst a = <Tabs items={items} as="tabs" />;' },
 
-    // Oxygen's own Tabs is still required to declare itself, however it is
+    // Zoblocks's own Tabs is still required to declare itself, however it is
     // imported — otherwise the fix above would disable the rule everywhere.
     {
-      code: 'import { Tabs } from "@oxygenui-design/react";\nconst a = <Tabs as="tabs" items={items} />;',
+      code: 'import { Tabs } from "@zoblocks/react";\nconst a = <Tabs as="tabs" items={items} />;',
     },
     {
       code: 'import { Tabs } from "./tabs.js";\nconst a = <Tabs as="nav" items={[{ href: "/a" }]} />;',
@@ -100,7 +100,7 @@ ruleTester.run("tabs-semantic-mode", tabsSemanticMode, {
   invalid: [
     // Imported from a workspace package: still ours, still required.
     {
-      code: 'import { Tabs } from "@oxygenui-design/react";\nconst a = <Tabs items={items} />;',
+      code: 'import { Tabs } from "@zoblocks/react";\nconst a = <Tabs items={items} />;',
       errors: [{ messageId: "missingMode" }],
     },
     // Relative import: ours.
@@ -121,7 +121,7 @@ ruleTester.run("tabs-semantic-mode", tabsSemanticMode, {
     },
     {
       // Ours, by package specifier — the rule still applies.
-      code: 'import { Tabs } from "@oxygenui-design/tabs";\nconst a = <Tabs items={items} />;',
+      code: 'import { Tabs } from "@zoblocks/tabs";\nconst a = <Tabs items={items} />;',
       errors: [{ messageId: "missingMode" }],
     },
     {
@@ -130,8 +130,8 @@ ruleTester.run("tabs-semantic-mode", tabsSemanticMode, {
       errors: [{ messageId: "missingMode" }],
     },
     {
-      // Ours, by the specifier the Oxygen CLI writes into a consumer project.
-      code: 'import { Tabs } from "@/components/oxygen/tabs";\nconst a = <Tabs items={items} />;',
+      // Ours, by the specifier the Zoblocks CLI writes into a consumer project.
+      code: 'import { Tabs } from "@/components/zoblocks/tabs";\nconst a = <Tabs items={items} />;',
       errors: [{ messageId: "missingMode" }],
     },
     {

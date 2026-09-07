@@ -5,7 +5,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/lib/timeline-fhir.ts. Edit that file, not this one.
+// Generated from registry/zoblocks/lib/timeline-fhir.ts. Edit that file, not this one.
 /**
  * FHIR resources, read into timeline events.
  *
@@ -54,14 +54,14 @@ import type {
   Reference,
   Resource,
   Task,
-} from "@oxygenui-design/fhir";
+} from "@zoblocks/fhir";
 import {
   codeableText,
   formatObservationValue,
   isCritical,
   getInterpretation,
   medicationName,
-} from "@oxygenui-design/fhir";
+} from "@zoblocks/fhir";
 import type { Party, TimelineEvent, TimelineStatus } from "../lib/timeline-core";
 
 /* ------------------------------------------------------------------ */

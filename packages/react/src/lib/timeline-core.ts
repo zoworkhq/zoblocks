@@ -5,7 +5,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/lib/timeline-core.ts. Edit that file, not this one.
+// Generated from registry/zoblocks/lib/timeline-core.ts. Edit that file, not this one.
 /**
  * timeline-core — everything a chronology has to get right before it renders.
  *
@@ -38,7 +38,7 @@
  *      go into that row is the defect clustering invents, so anything a reader
  *      would act on is promoted out before a cluster forms.
  *
- * Styling lives in `styles/oxygen-timeline.css`, installed alongside this file.
+ * Styling lives in `styles/zoblocks-timeline.css`, installed alongside this file.
  */
 
 import type { AccessDescriptor } from "../lib/accordion-core";
@@ -1088,7 +1088,7 @@ const STATUS_WORDS_CLINICIAN: TimelineLocale["status"] = {
 /**
  * The clinician catalog.
  *
- * Not yet in an `@oxygenui-design/intl` catalog, deliberately: that is the
+ * Not yet in an `@zoblocks/intl` catalog, deliberately: that is the
  * point at which changing a word becomes a breaking change, and these should
  * be checked against a real product's screen first.
  */

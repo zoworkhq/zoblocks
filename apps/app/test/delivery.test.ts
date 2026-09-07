@@ -7,12 +7,12 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { emptyAssets, isServable, emitThemeCss } from "@oxygenui-design/theme";
+import { emptyAssets, isServable, emitThemeCss } from "@zoblocks/theme";
 import { db } from "@/db/client";
 import { unscopedPublishedVersion } from "@/db/scope";
 import { createTheme, publishTheme, saveDraft } from "@/lib/themes";
 import { loadTokenSource } from "../../../scripts/gen/tokens/load";
-import type { TokenSource } from "@oxygenui-design/tokens/validate";
+import type { TokenSource } from "@zoblocks/tokens/validate";
 import { actingAs, seedOrg, twoOrgs } from "./harness";
 
 let base: TokenSource;
@@ -84,7 +84,7 @@ describe("what is served", () => {
     await publishTheme(auth, await tokens(), id);
 
     const css = await resolve("northwind", "clinical@1.css");
-    expect(css).toContain("--ox-ref-brand-600: #1d63c9;");
+    expect(css).toContain("--zb-ref-brand-600: #1d63c9;");
   });
 
   it("keeps every published version reachable, so a pin stays valid", async () => {

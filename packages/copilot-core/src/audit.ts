@@ -3,7 +3,7 @@
  *
  * Mapped onto FHIR rather than an invented format, following the precedent
  * `signature-core` set: a customer already has somewhere to put an `AuditEvent`,
- * and does not have somewhere to put an `OxygenCopilotLogEntry`.
+ * and does not have somewhere to put an `ZoblocksCopilotLogEntry`.
  *
  * Two things in here are worth arguing about, so both are stated plainly.
  *
@@ -21,7 +21,7 @@
  *
  * This package emits objects. It writes nothing, stores nothing, and holds no
  * network configuration; the host's sink decides where they go. That is a
- * liability position as much as an architectural one — Oxygen should not become
+ * liability position as much as an architectural one — Zoblocks should not become
  * a processor of clinical interaction data.
  */
 
@@ -55,7 +55,7 @@ export interface AuditExchangeInput {
 
 /** DICOM audit message codes, which FHIR reuses for AuditEvent.type. */
 const DCM = "http://dicom.nema.org/resources/ontology/DCM";
-const COPILOT_SYSTEM = "https://oxygenui.design/fhir/CodeSystem/copilot-audit";
+const COPILOT_SYSTEM = "https://zoblocks.design/fhir/CodeSystem/copilot-audit";
 
 /**
  * `outcome` uses FHIR's own coarse scale: 0 success, 4 minor failure, 8 serious,
@@ -165,7 +165,7 @@ export function auditExchange(input: AuditExchangeInput): AuditEvent {
       },
     ],
     source: {
-      observer: { display: "Oxygen Copilot" },
+      observer: { display: "Zoblocks Copilot" },
       type: [{ system: DCM, code: "110153", display: "Source Role ID" }],
     },
     entity: [
@@ -226,7 +226,7 @@ export function provenanceForInsertion(input: {
           ...(actor.reference ? { reference: actor.reference } : {}),
         },
         // The model assisted. It did not author, and it is not accountable.
-        onBehalfOf: { display: `Oxygen Copilot (${modelId})` },
+        onBehalfOf: { display: `Zoblocks Copilot (${modelId})` },
       },
     ],
     entity: sourceIds.map((id) => ({

@@ -2,7 +2,7 @@
  * The homepage instrument: all five loaders, running.
  *
  * Not a screenshot and not a video — the real registry components, the same
- * files `oxygen add` copies into a customer's project. A loader is one of the
+ * files `zoblocks add` copies into a customer's project. A loader is one of the
  * few components whose entire value is visible in three seconds, so the
  * honest thing to put on a homepage is the component itself.
  *
@@ -10,11 +10,11 @@
  */
 
 import Link from "next/link";
-import { PulseLoader } from "@/registry/oxygen/pulse-loader/pulse-loader";
-import { RhythmLoader } from "@/registry/oxygen/rhythm-loader/rhythm-loader";
-import { BreathLoader } from "@/registry/oxygen/breath-loader/breath-loader";
-import { HelixLoader } from "@/registry/oxygen/helix-loader/helix-loader";
-import { InfusionLoader } from "@/registry/oxygen/infusion-loader/infusion-loader";
+import { PulseLoader } from "@/registry/zoblocks/pulse-loader/pulse-loader";
+import { RhythmLoader } from "@/registry/zoblocks/rhythm-loader/rhythm-loader";
+import { BreathLoader } from "@/registry/zoblocks/breath-loader/breath-loader";
+import { HelixLoader } from "@/registry/zoblocks/helix-loader/helix-loader";
+import { InfusionLoader } from "@/registry/zoblocks/infusion-loader/infusion-loader";
 
 const LOADERS = [
   {

@@ -19,7 +19,7 @@
  */
 
 import * as React from "react";
-import { describeTrigger, interpolate, type TabItem } from "@oxygenui-design/tabs-core";
+import { describeTrigger, interpolate, type TabItem } from "@zoblocks/tabs-core";
 import { idFor, useTabsContext, type TriggerVisuals } from "./context.js";
 import { useIsoLayoutEffect } from "./internal.js";
 
@@ -205,12 +205,12 @@ export const TabsTrigger = React.forwardRef<HTMLElement, TabsTriggerProps>(funct
 
   const shared = {
     ref: setRef,
-    className: ["ox-tabs__tab", className].filter(Boolean).join(" "),
-    "data-ox-tab": "",
-    "data-ox-value": value,
-    "data-ox-state": state,
-    "data-ox-availability": availability,
-    "data-ox-selected": selected || undefined,
+    className: ["zb-tabs__tab", className].filter(Boolean).join(" "),
+    "data-zb-tab": "",
+    "data-zb-value": value,
+    "data-zb-state": state,
+    "data-zb-availability": availability,
+    "data-zb-selected": selected || undefined,
     onClick: handleClick,
     ...(composedLabel ? { "aria-label": composedLabel } : {}),
     ...(disabled ? { "aria-disabled": true as const } : {}),
@@ -221,22 +221,22 @@ export const TabsTrigger = React.forwardRef<HTMLElement, TabsTriggerProps>(funct
   const inner = (
     <>
       {icon ? (
-        <span className="ox-tabs__icon" aria-hidden="true">
+        <span className="zb-tabs__icon" aria-hidden="true">
           {icon}
         </span>
       ) : null}
-      {/* `data-ox-text` feeds the stylesheet's width reservation: the selected
+      {/* `data-zb-text` feeds the stylesheet's width reservation: the selected
           state is bolder, and without holding the bold width the trigger grows
           as the indicator animates towards where it used to be. */}
-      <span className="ox-tabs__label" data-ox-text={resolvedText}>
+      <span className="zb-tabs__label" data-zb-text={resolvedText}>
         {children}
       </span>
       {typeof count === "number" ? (
-        <span className="ox-tabs__count" data-ox-tone={tone} aria-hidden="true">
+        <span className="zb-tabs__count" data-zb-tone={tone} aria-hidden="true">
           {count}
         </span>
       ) : null}
-      {dot ? <span className="ox-tabs__dot" data-ox-dot={String(dot)} aria-hidden="true" /> : null}
+      {dot ? <span className="zb-tabs__dot" data-zb-dot={String(dot)} aria-hidden="true" /> : null}
       {/*
         A pointer affordance, and only that.
 
@@ -251,9 +251,9 @@ export const TabsTrigger = React.forwardRef<HTMLElement, TabsTriggerProps>(funct
       */}
       {closable && ctx.onCloseTab ? (
         <span
-          className="ox-tabs__close"
+          className="zb-tabs__close"
           aria-hidden="true"
-          data-ox-close=""
+          data-zb-close=""
           title={interpolate(ctx.locale.close, { label: resolvedText })}
           onClick={(event) => {
             event.stopPropagation();
@@ -265,7 +265,7 @@ export const TabsTrigger = React.forwardRef<HTMLElement, TabsTriggerProps>(funct
         </span>
       ) : null}
       {reasonId ? (
-        <span id={reasonId} className="ox-tabs__sr">
+        <span id={reasonId} className="zb-tabs__sr">
           {disabledReason}
         </span>
       ) : null}

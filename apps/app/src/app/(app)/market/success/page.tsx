@@ -102,7 +102,7 @@ export default async function SuccessPage({
           <ul className="space-y-1">
             {items.map((item) => (
               <li key={item.slug}>
-                <Link href={`/market/${item.slug}`} className="font-medium hover:text-oxygen-deep">
+                <Link href={`/market/${item.slug}`} className="font-medium hover:text-brand-deep">
                   {item.title}
                 </Link>
               </li>

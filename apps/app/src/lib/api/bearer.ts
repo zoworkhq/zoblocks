@@ -59,7 +59,7 @@ export async function bearer(request: Request, capability: Capability): Promise<
         { error: "Missing bearer token." },
         {
           status: 401,
-          headers: { ...NO_STORE, "WWW-Authenticate": 'Bearer realm="oxygen-figma"' },
+          headers: { ...NO_STORE, "WWW-Authenticate": 'Bearer realm="zoblocks-figma"' },
         },
       ),
     };

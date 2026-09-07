@@ -1,16 +1,16 @@
 /**
- * `oxygen.json` — the consumer's install configuration.
+ * `zoblocks.json` — the consumer's install configuration.
  *
  * It answers two questions the CLI cannot guess: where this project's `@/`
  * import alias points, and which registries it may reach.
  *
  *     {
- *       "$schema": "https://oxygenui.design/schema/oxygen.json",
+ *       "$schema": "https://zoblocks.design/schema/zoblocks.json",
  *       "root": "src",
  *       "registries": {
- *         "@oxygen-pro": {
- *           "url": "https://app.oxygenui.design/r/pro/{name}.json",
- *           "headers": { "Authorization": "Bearer ${OXYGEN_TOKEN}" }
+ *         "@zoblocks-pro": {
+ *           "url": "https://app.zoblocks.design/r/pro/{name}.json",
+ *           "headers": { "Authorization": "Bearer ${ZOBLOCKS_TOKEN}" }
  *         }
  *       }
  *     }
@@ -23,9 +23,9 @@
  * ## Why there is one path setting and not four
  *
  * An earlier version of this file let you place components, lib, hooks, and
- * styles independently. That is a promise this CLI cannot keep. Oxygen source
+ * styles independently. That is a promise this CLI cannot keep. Zoblocks source
  * is copied verbatim, and it imports itself through the `@/` alias —
- * `@/lib/utils`, `@/components/oxygen/timeline`. Those specifiers are inside
+ * `@/lib/utils`, `@/components/zoblocks/timeline`. Those specifiers are inside
  * the files, so a component's location is fixed by the source, not by
  * configuration: moving `utils.ts` to `src/shared/` while `care-timeline.tsx`
  * still imports `@/lib/utils` produces an install that writes nine files and
@@ -43,11 +43,11 @@ import { readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 
-export const CONFIG_FILE = "oxygen.json";
-export const CONFIG_SCHEMA_URL = "https://oxygenui.design/schema/oxygen.json";
+export const CONFIG_FILE = "zoblocks.json";
+export const CONFIG_SCHEMA_URL = "https://zoblocks.design/schema/zoblocks.json";
 
 /** The public registry. Always available, needs no credential, cannot be shadowed. */
-export const PUBLIC_REGISTRY_URL = "https://oxygenui.design/r/{name}.json";
+export const PUBLIC_REGISTRY_URL = "https://zoblocks.design/r/{name}.json";
 
 export interface RegistryConfig {
   /** A URL template containing `{name}`. */
@@ -55,7 +55,7 @@ export interface RegistryConfig {
   headers?: Record<string, string>;
 }
 
-export interface OxygenConfig {
+export interface ZoblocksConfig {
   $schema?: string;
   /**
    * Directory the project's `@/` alias resolves to, relative to the project
@@ -68,7 +68,7 @@ export interface OxygenConfig {
 /**
  * Where `@/` points when nothing says otherwise.
  *
- * A `src` directory is the near-universal convention in the frameworks Oxygen
+ * A `src` directory is the near-universal convention in the frameworks Zoblocks
  * targets, and getting this wrong costs one edit to a file the CLI just told
  * you it wrote. Guessing is cheaper than prompting every developer for an
  * answer that is right by default.
@@ -82,16 +82,43 @@ export class ConfigError extends Error {
   }
 }
 
+/**
+ * The name this file carried before the project was renamed from Zoblocks to
+ * Zoblocks. A consumer who installed anything under the old name has one of
+ * these committed, and it parses identically — only the filename moved.
+ *
+ * It is read, never written. `resolveConfigPath` prefers the current name, so
+ * a project holding both files is unambiguous, and `readConfig` warns once so
+ * the reader knows why the CLI is looking at a file the docs no longer mention.
+ */
+export const LEGACY_CONFIG_FILE = "oxygen.json"; // rename-sweep-exempt: must name the retired file
+
 export function configPath(cwd: string): string {
   return path.join(cwd, CONFIG_FILE);
 }
 
-export function configExists(cwd: string): boolean {
-  return existsSync(configPath(cwd));
+export function legacyConfigPath(cwd: string): string {
+  return path.join(cwd, LEGACY_CONFIG_FILE);
 }
 
 /**
- * Guess where `@/` points, for `oxygen init`.
+ * The config this project actually has, current name first.
+ *
+ * Returns the current path when neither exists, so the caller's "no config
+ * here" error names the file it should create rather than the retired one.
+ */
+export function resolveConfigPath(cwd: string): { file: string; legacy: boolean } {
+  if (existsSync(configPath(cwd))) return { file: configPath(cwd), legacy: false };
+  if (existsSync(legacyConfigPath(cwd))) return { file: legacyConfigPath(cwd), legacy: true };
+  return { file: configPath(cwd), legacy: false };
+}
+
+export function configExists(cwd: string): boolean {
+  return existsSync(configPath(cwd)) || existsSync(legacyConfigPath(cwd));
+}
+
+/**
+ * Guess where `@/` points, for `zoblocks init`.
  *
  * Reported in init's output rather than applied silently, so a wrong guess is
  * visible at the moment it is made instead of at the first failed build.
@@ -100,7 +127,7 @@ export function guessRoot(cwd: string): string {
   return existsSync(path.join(cwd, "src")) ? "src" : ".";
 }
 
-export function defaultConfig(cwd: string): OxygenConfig {
+export function defaultConfig(cwd: string): ZoblocksConfig {
   return {
     $schema: CONFIG_SCHEMA_URL,
     root: guessRoot(cwd),
@@ -108,22 +135,35 @@ export function defaultConfig(cwd: string): OxygenConfig {
   };
 }
 
-export async function readConfig(cwd: string): Promise<OxygenConfig> {
-  const file = configPath(cwd);
+export async function readConfig(cwd: string): Promise<ZoblocksConfig> {
+  const { file, legacy } = resolveConfigPath(cwd);
   if (!existsSync(file)) {
-    throw new ConfigError(`No ${CONFIG_FILE} in ${cwd}.\n\nRun "oxygen init" to create one.`);
+    throw new ConfigError(`No ${CONFIG_FILE} in ${cwd}.\n\nRun "zoblocks init" to create one.`);
   }
+
+  if (legacy) {
+    // One line, not a nag. The file still works; the reader only needs to know
+    // the CLI found it under the old name and what to rename it to.
+    console.warn(
+      `${LEGACY_CONFIG_FILE} is the pre-rename name for ${CONFIG_FILE}. ` +
+        `Rename it to ${CONFIG_FILE} — the contents are unchanged.`,
+    );
+  }
+
+  // Error text names the file actually on disk, so a legacy project is not
+  // told to fix a file it does not have.
+  const named = legacy ? LEGACY_CONFIG_FILE : CONFIG_FILE;
 
   let parsed: unknown;
   const text = await readFile(file, "utf8");
   try {
     parsed = JSON.parse(text);
   } catch (error) {
-    throw new ConfigError(`${CONFIG_FILE} is not valid JSON — ${(error as Error).message}`);
+    throw new ConfigError(`${named} is not valid JSON — ${(error as Error).message}`);
   }
 
   if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-    throw new ConfigError(`${CONFIG_FILE} must contain a JSON object.`);
+    throw new ConfigError(`${named} must contain a JSON object.`);
   }
 
   const raw = parsed as Record<string, unknown>;
@@ -135,12 +175,12 @@ export async function readConfig(cwd: string): Promise<OxygenConfig> {
   for (const [name, registry] of Object.entries(registries)) {
     if (!name.startsWith("@")) {
       throw new ConfigError(
-        `${CONFIG_FILE}: registry "${name}" must start with "@" — namespaces are written as "@oxygen-pro".`,
+        `${named}: registry "${name}" must start with "@" — namespaces are written as "@zoblocks-pro".`,
       );
     }
     if (typeof registry?.url !== "string" || !registry.url.includes("{name}")) {
       throw new ConfigError(
-        `${CONFIG_FILE}: registry "${name}" needs a "url" containing "{name}", e.g. "https://app.oxygenui.design/r/pro/{name}.json".`,
+        `${named}: registry "${name}" needs a "url" containing "{name}", e.g. "https://app.zoblocks.design/r/pro/{name}.json".`,
       );
     }
   }
@@ -152,7 +192,7 @@ export async function readConfig(cwd: string): Promise<OxygenConfig> {
   };
 }
 
-export async function writeConfig(cwd: string, config: OxygenConfig): Promise<void> {
+export async function writeConfig(cwd: string, config: ZoblocksConfig): Promise<void> {
   await writeFile(configPath(cwd), `${JSON.stringify(config, null, 2)}\n`, "utf8");
 }
 
@@ -170,7 +210,7 @@ export async function writeConfig(cwd: string, config: OxygenConfig): Promise<vo
  * not, and it puts the file somewhere obvious rather than failing.
  */
 export function resolveTarget(
-  config: OxygenConfig,
+  config: ZoblocksConfig,
   file: { path: string; target?: string },
 ): string {
   return path.join(config.root, file.target ?? path.basename(file.path));
@@ -184,7 +224,7 @@ export function resolveTarget(
  * the developer then goes looking for the wrong problem.
  *
  * A header that looks like a live credential written literally is also
- * refused. `oxygen.json` is a committed file, and the failure it prevents —
+ * refused. `zoblocks.json` is a committed file, and the failure it prevents —
  * a token in git history — is not one the developer can undo later.
  */
 export function expandHeaders(
@@ -195,11 +235,16 @@ export function expandHeaders(
   const expanded: Record<string, string> = {};
 
   for (const [key, value] of Object.entries(headers ?? {})) {
-    if (/oxy_(live|test)_[A-Za-z0-9]/.test(value)) {
+    // Both prefixes. `zb_` is what the console mints now; `oxy_` is what it
+    // minted before the rename, and a token from then is still a live
+    // credential that must not be committed. Dropping the old prefix here
+    // would turn this guard off for exactly the tokens most likely to be
+    // sitting in an old config.
+    if (/\b(zb|oxy)_(live|test)_[A-Za-z0-9]/.test(value)) {
       throw new ConfigError(
         `${CONFIG_FILE}: registry "${registryName}" has a token written literally into "${key}".\n\n` +
           `Move it to your environment and reference it instead:\n` +
-          `  "${key}": "Bearer \${OXYGEN_TOKEN}"\n\n` +
+          `  "${key}": "Bearer \${ZOBLOCKS_TOKEN}"\n\n` +
           `This file is meant to be committed; the token is not.`,
       );
     }
@@ -210,7 +255,7 @@ export function expandHeaders(
         throw new ConfigError(
           `${CONFIG_FILE}: registry "${registryName}" needs the environment variable ${variable}, which is not set.\n\n` +
             `Mint a token in the console under Marketplace → Access tokens, then:\n` +
-            `  export ${variable}=oxy_live_…`,
+            `  export ${variable}=zb_live_…`,
         );
       }
       return found;

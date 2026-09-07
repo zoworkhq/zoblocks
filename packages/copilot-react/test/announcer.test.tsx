@@ -15,7 +15,7 @@ import {
   useAnnouncer,
   DEFAULT_ANNOUNCER_MESSAGES,
 } from "../src/use-announcer.js";
-import { EMPTY_ANSWER, type Answer, type Source } from "@oxygenui-design/copilot-core";
+import { EMPTY_ANSWER, type Answer, type Source } from "@zoblocks/copilot-core";
 
 const source: Source = {
   id: "s1",

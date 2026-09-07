@@ -2,7 +2,7 @@
  * The catalogue the public site can show on its own.
  *
  * `catalogue()` reads the console, which owns what is for sale — and the
- * console is not deployed: `app.oxygenui.design` has no DNS record, so the
+ * console is not deployed: `app.zoblocks.design` has no DNS record, so the
  * fetch has always failed and the marketplace page has always rendered its
  * empty state. A storefront that cannot list anything until a separate service
  * exists is a storefront that does not work, and "The catalogue is loading" is
@@ -86,7 +86,7 @@ export const DOES_NOT_CLAIM = [
 
 /** The licence every pack is sold under. One grant, stated once. */
 export const PACK_LICENCE = {
-  id: "oxygen-pack-1.0",
+  id: "zoblocks-pack-1.0",
   grant: "Perpetual, for every member of this organisation and every product it ships",
   derivatives: "permitted for the licensee's own products",
   resale: "prohibited, including inside a template or theme",
@@ -239,7 +239,7 @@ export const PREVIEW_CATALOGUE: PreviewItem[] = [
     version: 1,
     comingSoon: false,
     frameworks: ["antd"],
-    files: ["components/oxygen/vitals-flowsheet.tsx"],
+    files: ["components/zoblocks/vitals-flowsheet.tsx"],
     checked: {
       contrastPairs: 12,
       floor: "4.5:1",

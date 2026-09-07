@@ -1,12 +1,12 @@
 {
-  "name": "@oxygenui-design/fhir",
+  "name": "@zoblocks/fhir",
   "version": "0.1.1",
   "description": "Narrow FHIR R4 type contracts and pure read helpers for healthcare UI. Zero runtime dependencies.",
   "license": "MIT",
-  "homepage": "https://oxygenui.design",
+  "homepage": "https://zoblocks.design",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zoworkhq/oxygenui.git",
+    "url": "git+https://github.com/zoworkhq/zoblocks.git",
     "directory": "packages/fhir"
   },
   "keywords": [
@@ -51,7 +51,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
-    "@oxygenui-design/tsconfig": "workspace:*",
+    "@zoblocks/tsconfig": "workspace:*",
     "typescript": "^5.7.2",
     "vitest": "^4.1.10"
   }

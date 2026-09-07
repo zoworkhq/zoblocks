@@ -17,7 +17,7 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { TOKEN_SURFACE } from "@oxygenui-design/tokens/surface";
+import { TOKEN_SURFACE } from "@zoblocks/tokens/surface";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = (p: string) => JSON.parse(readFileSync(path.join(ROOT, p), "utf8"));
@@ -137,21 +137,21 @@ describe("emitted token values", () => {
       expect(t, `theme ${theme}`).toBeDefined();
       if (!t) continue;
 
-      const bg = t["--ox-bg"] ?? "";
-      const surface = t["--ox-surface"] ?? "";
-      expect(ratio(t["--ox-focus-ring"] ?? "", bg), `${theme} focus-ring`).toBeGreaterThanOrEqual(
+      const bg = t["--zb-bg"] ?? "";
+      const surface = t["--zb-surface"] ?? "";
+      expect(ratio(t["--zb-focus-ring"] ?? "", bg), `${theme} focus-ring`).toBeGreaterThanOrEqual(
         3,
       );
       expect(
-        ratio(t["--ox-text-on-accent"] ?? "", t["--ox-accent"] ?? ""),
+        ratio(t["--zb-text-on-accent"] ?? "", t["--zb-accent"] ?? ""),
         `${theme} text-on-accent`,
       ).toBeGreaterThanOrEqual(4.5);
       expect(
-        ratio(t["--ox-border-strong"] ?? "", bg),
+        ratio(t["--zb-border-strong"] ?? "", bg),
         `${theme} border-strong on bg`,
       ).toBeGreaterThanOrEqual(3);
       expect(
-        ratio(t["--ox-border-strong"] ?? "", surface),
+        ratio(t["--zb-border-strong"] ?? "", surface),
         `${theme} border-strong on surface`,
       ).toBeGreaterThanOrEqual(3);
     }
@@ -161,7 +161,7 @@ describe("emitted token values", () => {
     // `tokens.json` is documented as a flat map for external tooling. An
     // unresolved "{ref.size.md}" reaching a consumer is a silent corruption.
     //
-    // `var(--ox-density-*)` is deliberately allowed: density varies per
+    // `var(--zb-density-*)` is deliberately allowed: density varies per
     // container and genuinely cannot be reduced at build time, so a runtime
     // reference is the honest value. A raw DTCG alias never is.
     const leaked: string[] = [];
@@ -193,7 +193,7 @@ describe("emitted token values", () => {
 
   it("never lets a component token reach a primitive", () => {
     const violations = Object.entries(tokens.component)
-      .filter(([, v]) => typeof v === "string" && v.includes("--ox-ref-"))
+      .filter(([, v]) => typeof v === "string" && v.includes("--zb-ref-"))
       .map(([k]) => k);
     expect(violations).toEqual([]);
   });
@@ -261,7 +261,7 @@ describe("generated prop documentation", () => {
 /* ------------------------------------------------------------------ */
 
 describe("brand axis", () => {
-  const css = readFileSync(path.join(ROOT, "packages/tokens/src/oxygen-tokens.css"), "utf8");
+  const css = readFileSync(path.join(ROOT, "packages/tokens/src/zoblocks-tokens.css"), "utf8");
   const branded = tokens as typeof tokens & {
     brands?: Record<string, Record<string, Record<string, string>>>;
   };
@@ -269,19 +269,19 @@ describe("brand axis", () => {
   it("emits a scoped block per brand", () => {
     // "A new customer brand is a JSON file and a build" — the claim is only
     // true if the build actually produces something a page can switch on.
-    expect(css).toContain('[data-ox-brand="northwind"]');
+    expect(css).toContain('[data-zb-brand="northwind"]');
   });
 
   it("replaces primitives, so every semantic token downstream follows", () => {
-    const base = tokens.themes.light?.["--ox-accent"];
-    const brand = branded.brands?.northwind?.light?.["--ox-accent"];
+    const base = tokens.themes.light?.["--zb-accent"];
+    const brand = branded.brands?.northwind?.light?.["--zb-accent"];
     expect(brand).toBeDefined();
     expect(brand).not.toBe(base);
   });
 
   it("re-themes in dark as well as light, without a second brand file", () => {
-    const light = branded.brands?.northwind?.light?.["--ox-accent"];
-    const dark = branded.brands?.northwind?.dark?.["--ox-accent"];
+    const light = branded.brands?.northwind?.light?.["--zb-accent"];
+    const dark = branded.brands?.northwind?.dark?.["--zb-accent"];
     expect(light).toBeDefined();
     expect(dark).toBeDefined();
     expect(dark).not.toBe(light);
@@ -293,9 +293,9 @@ describe("brand axis", () => {
     for (const theme of ["light", "dark", "high-contrast"]) {
       for (const status of ["critical", "high", "low", "normal", "unknown"]) {
         expect(
-          branded.brands?.northwind?.[theme]?.[`--ox-status-${status}`],
+          branded.brands?.northwind?.[theme]?.[`--zb-status-${status}`],
           `${theme} status.${status} must be inherited`,
-        ).toBe(tokens.themes[theme]?.[`--ox-status-${status}`]);
+        ).toBe(tokens.themes[theme]?.[`--zb-status-${status}`]);
       }
     }
   });
@@ -307,11 +307,11 @@ describe("brand axis", () => {
       for (const [theme, map] of Object.entries(themes)) {
         const floor = theme === "high-contrast" ? 7 : 4.5;
         expect(
-          ratio(map["--ox-text-on-accent"] ?? "", map["--ox-accent"] ?? ""),
+          ratio(map["--zb-text-on-accent"] ?? "", map["--zb-accent"] ?? ""),
           `${name}/${theme}: label on a primary action`,
         ).toBeGreaterThanOrEqual(floor);
         expect(
-          ratio(map["--ox-focus-ring"] ?? "", map["--ox-bg"] ?? ""),
+          ratio(map["--zb-focus-ring"] ?? "", map["--zb-bg"] ?? ""),
           `${name}/${theme}: focus indicator`,
         ).toBeGreaterThanOrEqual(theme === "high-contrast" ? 4.5 : 3);
       }
@@ -329,16 +329,16 @@ describe("brand axis", () => {
   });
 
   it("places brand blocks after the base palette, so they win on source order", () => {
-    expect(css.indexOf('[data-ox-brand="northwind"]')).toBeGreaterThan(css.indexOf(":root {"));
+    expect(css.indexOf('[data-zb-brand="northwind"]')).toBeGreaterThan(css.indexOf(":root {"));
   });
 });
 
 describe("density-linked component tokens", () => {
-  const css = readFileSync(path.join(ROOT, "packages/tokens/src/oxygen-tokens.css"), "utf8");
+  const css = readFileSync(path.join(ROOT, "packages/tokens/src/zoblocks-tokens.css"), "utf8");
 
-  /** The declarations inside one `[data-ox-density="…"]` block. */
+  /** The declarations inside one `[data-zb-density="…"]` block. */
   function densityBlock(profile: string): string {
-    const start = css.indexOf(`[data-ox-density="${profile}"] {`);
+    const start = css.indexOf(`[data-zb-density="${profile}"] {`);
     expect(start, `no block for density "${profile}"`).toBeGreaterThan(-1);
     return css.slice(start, css.indexOf("\n}", start));
   }
@@ -347,21 +347,21 @@ describe("density-linked component tokens", () => {
    * The bug this guards is silent and was shipped.
    *
    * `var()` inside a custom-property declaration is substituted against the
-   * element the declaration applies to. `--ox-switch-target-min:
-   * var(--ox-density-target)` written once on `:root` therefore captures the
+   * element the declaration applies to. `--zb-switch-target-min:
+   * var(--zb-density-target)` written once on `:root` therefore captures the
    * root profile's value and inherits that literal — so a container marked
-   * `data-ox-density="clinical"` moved `--ox-density-target` beneath it while
+   * `data-zb-density="clinical"` moved `--zb-density-target` beneath it while
    * every switch inside kept the root profile's hit area.
    *
    * Nothing looked wrong. The component's own accessibility note claimed the
    * target followed density, and it did not.
    */
   const DENSITY_LINKED = [
-    "--ox-switch-target-min",
-    "--ox-switch-gap",
-    "--ox-accordion-target",
-    "--ox-accordion-pad-x",
-    "--ox-accordion-pad-y",
+    "--zb-switch-target-min",
+    "--zb-switch-gap",
+    "--zb-accordion-target",
+    "--zb-accordion-pad-x",
+    "--zb-accordion-pad-y",
   ];
 
   for (const profile of ["patient", "standard", "clinical"]) {
@@ -383,8 +383,8 @@ describe("density-linked component tokens", () => {
     for (const token of DENSITY_LINKED) {
       const line = block.split("\n").find((l) => l.trim().startsWith(`${token}:`));
       expect(line, `${token} missing`).toBeDefined();
-      expect(line, `${token} should reference a --ox-density-* var`).toMatch(
-        /var\(--ox-density-[a-z-]+\)/,
+      expect(line, `${token} should reference a --zb-density-* var`).toMatch(
+        /var\(--zb-density-[a-z-]+\)/,
       );
     }
   });
@@ -392,7 +392,7 @@ describe("density-linked component tokens", () => {
   it("finds no density-linked component token left only on :root", () => {
     const root = css.slice(css.indexOf(":root {"), css.indexOf("\n}", css.indexOf(":root {")));
     const linked = [
-      ...root.matchAll(/(--ox-(?!density)[a-z0-9-]+):\s*var\(--ox-density-[a-z-]+\)/g),
+      ...root.matchAll(/(--zb-(?!density)[a-z0-9-]+):\s*var\(--zb-density-[a-z-]+\)/g),
     ]
       .map((m) => m[1] as string)
       .filter((name) => !densityBlock("clinical").includes(`${name}:`));
@@ -410,7 +410,7 @@ describe("density-linked component tokens", () => {
 
 /**
  * The gate moved out of `scripts/gen/tokens/validate.ts` and into
- * `@oxygenui-design/tokens/validate` so the theme app can run the same
+ * `@zoblocks/tokens/validate` so the theme app can run the same
  * rules the build runs. A refactor of the one module that decides whether a
  * clinical colour is readable deserves more than "the build still passed".
  *
@@ -421,7 +421,7 @@ describe("density-linked component tokens", () => {
 describe("the extracted validator agrees with the shipped evidence", () => {
   it("reports no problem on the source that ships", async () => {
     const { loadTokenSource } = await import("../scripts/gen/tokens/load");
-    const { validateTokens } = await import("@oxygenui-design/tokens/validate");
+    const { validateTokens } = await import("@zoblocks/tokens/validate");
 
     const problems = validateTokens(await loadTokenSource());
     expect(problems.map((p) => p.message)).toEqual([]);
@@ -429,7 +429,7 @@ describe("the extracted validator agrees with the shipped evidence", () => {
 
   it("reproduces contrast.json exactly, reading and measuring independently", async () => {
     const { loadTokenSource } = await import("../scripts/gen/tokens/load");
-    const { measureContrast } = await import("@oxygenui-design/tokens/validate");
+    const { measureContrast } = await import("@zoblocks/tokens/validate");
 
     const measured = measureContrast(await loadTokenSource());
     const committed = read("packages/tokens/src/contrast.json");
@@ -441,7 +441,7 @@ describe("the extracted validator agrees with the shipped evidence", () => {
 
   it("still holds every brand to the base palette's bar", async () => {
     const { loadTokenSource } = await import("../scripts/gen/tokens/load");
-    const { validateTokens } = await import("@oxygenui-design/tokens/validate");
+    const { validateTokens } = await import("@zoblocks/tokens/validate");
 
     const source = await loadTokenSource();
     expect(

@@ -124,7 +124,7 @@
   top: 50%;
   width: 2px;
   height: 17px;
-  background: var(--site-oxygen);
+  background: var(--site-brand);
   transform: translateY(-50%) scaleY(0);
   transform-origin: center;
   transition: transform 0.32s var(--b-ease);
@@ -147,7 +147,7 @@
 }
 .oxb .railItem[aria-current] svg {
   opacity: 1;
-  color: var(--site-oxygen);
+  color: var(--site-brand);
 }
 .oxb .railGroup {
   margin-top: 16px;
@@ -554,7 +554,7 @@
   font-size: 18px;
   background: linear-gradient(
     140deg,
-    color-mix(in srgb, var(--site-oxygen) 26%, transparent),
+    color-mix(in srgb, var(--site-brand) 26%, transparent),
     color-mix(in srgb, var(--low) 22%, transparent)
   );
   border: 1px solid var(--site-rule-strong);
@@ -738,7 +738,7 @@
   right: 12px;
   bottom: -1px;
   height: 2px;
-  background: var(--site-oxygen);
+  background: var(--site-brand);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.35s var(--b-ease);
@@ -1135,8 +1135,8 @@
   box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--high) 50%, transparent);
 }
 .oxb .pv-ai {
-  background: color-mix(in srgb, var(--site-oxygen) 15%, transparent);
-  box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--site-oxygen) 50%, transparent);
+  background: color-mix(in srgb, var(--site-brand) 15%, transparent);
+  box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--site-brand) 50%, transparent);
 }
 .oxb .legend {
   display: flex;
@@ -1183,7 +1183,7 @@
   display: block;
   height: 100%;
   width: 0;
-  background: var(--site-oxygen);
+  background: var(--site-brand);
   transition: width 0.3s var(--b-ease);
 }
 .oxb .btn {
@@ -1269,14 +1269,14 @@
   font-size: 10px;
   padding: 1px 5px;
   border-radius: 5px;
-  background: color-mix(in srgb, var(--site-oxygen) 16%, transparent);
-  border: 1px solid color-mix(in srgb, var(--site-oxygen) 40%, transparent);
+  background: color-mix(in srgb, var(--site-brand) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--site-brand) 40%, transparent);
   color: var(--site-accent-text);
   cursor: pointer;
   transition: 0.18s var(--b-ease);
 }
 .oxb .cite:hover {
-  background: color-mix(in srgb, var(--site-oxygen) 30%, transparent);
+  background: color-mix(in srgb, var(--site-brand) 30%, transparent);
 }
 .oxb .copDock {
   border-top: 1px solid var(--site-rule);
@@ -1321,7 +1321,7 @@
 }
 @keyframes oxb-flash {
   0% {
-    background: color-mix(in srgb, var(--site-oxygen) 34%, transparent);
+    background: color-mix(in srgb, var(--site-brand) 34%, transparent);
   }
   100% {
     background: transparent;

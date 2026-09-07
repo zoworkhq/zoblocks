@@ -3,7 +3,7 @@
  *
  * Deliberately the same shape a built-in brand already has. A brand today is
  * `packages/tokens/tokens/brands/<name>.json`: primitive overrides, validated
- * by the token gate, compiled into `[data-ox-brand="…"]` blocks at build time.
+ * by the token gate, compiled into `[data-zb-brand="…"]` blocks at build time.
  * A customer theme is that file plus an envelope — who owns it, which version
  * it is, and what the validator said when it was published.
  *
@@ -19,7 +19,7 @@
 import { z } from "zod";
 import { BRAND_ASSET_ROLES, type BrandAssetRole } from "./assets";
 import { REPLACEABLE_SLOTS } from "./icons";
-import { CLINICAL_SEMANTIC, NOT_BRIDGEABLE } from "@oxygenui-design/tokens/surface";
+import { CLINICAL_SEMANTIC, NOT_BRIDGEABLE } from "@zoblocks/tokens/surface";
 
 /**
  * A hex colour, six digits or three.
@@ -36,7 +36,7 @@ export const hexSchema = z
   );
 
 /**
- * The `[data-ox-brand]` value, and part of the stylesheet URL.
+ * The `[data-zb-brand]` value, and part of the stylesheet URL.
  *
  * Kebab-case because it becomes a CSS attribute selector — the same constraint
  * `loadBrands()` already enforces on built-in brands, for the same reason.
@@ -47,7 +47,7 @@ export const slugSchema = z
   .max(48)
   .regex(
     /^[a-z0-9]+(-[a-z0-9]+)*$/,
-    "must be kebab-case — it becomes a [data-ox-brand] value, a CSS attribute selector, and part of the stylesheet URL",
+    "must be kebab-case — it becomes a [data-zb-brand] value, a CSS attribute selector, and part of the stylesheet URL",
   );
 
 /**
@@ -59,7 +59,7 @@ export const slugSchema = z
  * by, so a customer and a host framework are held to one rule rather than two
  * that can drift apart.
  */
-const CLINICAL_PATHS = new Set(CLINICAL_SEMANTIC.map((name) => name.replace(/^--ox-/, "")));
+const CLINICAL_PATHS = new Set(CLINICAL_SEMANTIC.map((name) => name.replace(/^--zb-/, "")));
 const CLINICAL_COMPONENT = new Set<string>(NOT_BRIDGEABLE);
 
 /** `status.critical`, `flag.deceased` — the paths, as the source spells them. */
@@ -89,7 +89,7 @@ const EMPTY_LAYER = { light: {}, dark: {}, "high-contrast": {} };
  * A component-tier value.
  *
  * Not `hexSchema`: the surface carries dimensions, durations and shadows as
- * well as colours, and refusing `--ox-switch-focus-width: 3px` because it is
+ * well as colours, and refusing `--zb-switch-focus-width: 3px` because it is
  * not a colour would be the wrong rule. Colour-ness is checked per token
  * against the manifest's `kind` in `validateTheme`, where the manifest is in
  * hand; the length cap and the escape check in `emit.ts` are what keep any
@@ -136,11 +136,11 @@ export const themeTokensSchema = z
 
     for (const [theme, entries] of Object.entries(tokens.component)) {
       for (const name of Object.keys(entries)) {
-        if (!name.startsWith("--ox-")) {
+        if (!name.startsWith("--zb-")) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["component", theme, name],
-            message: `${name} is not an Oxygen custom property. Component overrides are keyed by the property exactly as the surface manifest declares it.`,
+            message: `${name} is not a Zoblocks custom property. Component overrides are keyed by the property exactly as the surface manifest declares it.`,
           });
           continue;
         }

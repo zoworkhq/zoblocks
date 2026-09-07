@@ -22,7 +22,7 @@
  */
 
 export interface IconSlot {
-  /** Stable id. Becomes `--ox-icon-{slot}` and the upload's filename match. */
+  /** Stable id. Becomes `--zb-icon-{slot}` and the upload's filename match. */
   slot: string;
   /** What it is, for somebody choosing which file to drop on it. */
   label: string;
@@ -132,7 +132,7 @@ export function iconSlot(slot: string): IconSlot {
   return found;
 }
 
-/** `--ox-icon-send`. The property a stylesheet reads and a bridge may not. */
+/** `--zb-icon-send`. The property a stylesheet reads and a bridge may not. */
 export function iconVar(slot: string): string {
-  return `--ox-icon-${slot}`;
+  return `--zb-icon-${slot}`;
 }

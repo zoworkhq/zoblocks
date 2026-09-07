@@ -5,7 +5,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/trend-indicator/trend-indicator.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/trend-indicator/trend-indicator.tsx. Edit that file, not this one.
 /**
  * TrendIndicator — a sparkline that refuses to draw a trend it cannot justify.
  *
@@ -23,7 +23,7 @@
  * One SVG path per segment, memoised on series identity. No chart library,
  * no per-point DOM, and it renders the same on a server.
  *
- * Styling lives in `styles/oxygen-trend.css`, installed alongside.
+ * Styling lives in `styles/zoblocks-trend.css`, installed alongside.
  */
 
 import * as React from "react";
@@ -109,18 +109,18 @@ function TrendIndicatorImpl({
   return (
     <div
       {...rest}
-      className={cn("ox-trend", className)}
-      data-ox-trend=""
-      data-ox-direction={reading?.direction ?? "none"}
-      data-ox-judgement={reading?.judgement ?? "unknown"}
-      data-ox-noise={reading?.withinNoise ? "" : undefined}
+      className={cn("zb-trend", className)}
+      data-zb-trend=""
+      data-zb-direction={reading?.direction ?? "none"}
+      data-zb-judgement={reading?.judgement ?? "unknown"}
+      data-zb-noise={reading?.withinNoise ? "" : undefined}
       role="figure"
       aria-label={label}
       aria-describedby={describedBy ?? tableId}
     >
       {drawLine ? (
         <svg
-          className="ox-trend__chart"
+          className="zb-trend__chart"
           viewBox={`0 0 ${width} ${height}`}
           width={width}
           height={height}
@@ -132,7 +132,7 @@ function TrendIndicatorImpl({
         >
           {path.band ? (
             <rect
-              className="ox-trend__band"
+              className="zb-trend__band"
               x={0}
               y={path.band.y}
               width={width}
@@ -145,10 +145,10 @@ function TrendIndicatorImpl({
             says it only to someone who already knows the convention.
           */}
           {path.paths.map((d, index) => (
-            <path key={index} className="ox-trend__line" d={d} fill="none" />
+            <path key={index} className="zb-trend__line" d={d} fill="none" />
           ))}
           {path.last ? (
-            <circle className="ox-trend__terminus" cx={path.last.x} cy={path.last.y} r={1.75} />
+            <circle className="zb-trend__terminus" cx={path.last.x} cy={path.last.y} r={1.75} />
           ) : null}
         </svg>
       ) : null}
@@ -158,25 +158,25 @@ function TrendIndicatorImpl({
         only thing left below 40px — never an unreadable line.
       */}
       {reading ? (
-        <span className="ox-trend__readout" aria-hidden="true">
-          <span className="ox-trend__glyph" data-ox-direction={reading.direction} />
-          <span className="ox-trend__delta">
+        <span className="zb-trend__readout" aria-hidden="true">
+          <span className="zb-trend__glyph" data-zb-direction={reading.direction} />
+          <span className="zb-trend__delta">
             {reading.change > 0 ? "+" : ""}
             {reading.change}
-            {series.unit ? <span className="ox-trend__unit">{series.unit}</span> : null}
+            {series.unit ? <span className="zb-trend__unit">{series.unit}</span> : null}
           </span>
         </span>
       ) : (
         // Not a flat line. An absent trend and a trend that did not move are
         // different facts, and drawing the second for the first is the lie
         // this component exists to refuse.
-        <span className="ox-trend__none" aria-hidden="true">
+        <span className="zb-trend__none" aria-hidden="true">
           {whyNoTrend(series)}
         </span>
       )}
 
       {breaks.length ? (
-        <span className="ox-trend__break" aria-hidden="true">
+        <span className="zb-trend__break" aria-hidden="true">
           {breaks[0]?.breakReason}
         </span>
       ) : null}
@@ -188,7 +188,7 @@ function TrendIndicatorImpl({
         somebody is about to act on.
       */}
       {describedBy ? null : (
-        <table id={tableId} className="ox-trend__table">
+        <table id={tableId} className="zb-trend__table">
           <caption>{series.label}</caption>
           <thead>
             <tr>

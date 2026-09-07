@@ -57,7 +57,7 @@ describe("locale", () => {
     );
     // A title rather than a name: the affordance is aria-hidden, because an
     // interactive control inside role="tab" is invalid ARIA.
-    expect(document.querySelector(".ox-tabs__close")).toHaveAttribute("title", "Fermer Alpha");
+    expect(document.querySelector(".zb-tabs__close")).toHaveAttribute("title", "Fermer Alpha");
   });
 
   it("nests providers, with the inner one winning", () => {
@@ -161,7 +161,7 @@ describe("variants and layout attributes", () => {
     );
     expect(screen.getByRole("tablist")).toBeInTheDocument();
     expect(screen.getAllByRole("tab")).toHaveLength(2);
-    expect(document.querySelector(`[data-ox-variant="${variant}"]`)).toBeInTheDocument();
+    expect(document.querySelector(`[data-zb-variant="${variant}"]`)).toBeInTheDocument();
     unmount();
   });
 
@@ -169,29 +169,29 @@ describe("variants and layout attributes", () => {
     const { unmount } = render(
       <Tabs as="tabs" aria-label="Docs" variant="segmented" defaultValue="a" items={items} />,
     );
-    expect(document.querySelector('[data-ox-indicator="thumb"]')).toBeInTheDocument();
+    expect(document.querySelector('[data-zb-indicator="thumb"]')).toBeInTheDocument();
     unmount();
 
     render(<Tabs as="tabs" aria-label="Docs" variant="pill" defaultValue="a" items={items} />);
     // Wrapping variants get no indicator: there is no continuous path across
     // a line break for one to travel along.
-    expect(document.querySelector('[data-ox-indicator="none"]')).toBeInTheDocument();
+    expect(document.querySelector('[data-zb-indicator="none"]')).toBeInTheDocument();
   });
 
   it("exposes size and fill as attributes for the stylesheet", () => {
     render(
       <Tabs as="tabs" aria-label="Docs" size="lg" fill="equal" defaultValue="a" items={items} />,
     );
-    const root = document.querySelector(".ox-tabs");
-    expect(root).toHaveAttribute("data-ox-size", "lg");
-    expect(root).toHaveAttribute("data-ox-fill", "equal");
+    const root = document.querySelector(".zb-tabs");
+    expect(root).toHaveAttribute("data-zb-size", "lg");
+    expect(root).toHaveAttribute("data-zb-fill", "equal");
   });
 
   it("reserves the selected label width so the indicator does not chase a moving target", () => {
     render(<Tabs as="tabs" aria-label="Docs" defaultValue="a" items={items} />);
     expect(
-      screen.getByRole("tab", { name: "Alpha" }).querySelector(".ox-tabs__label"),
-    ).toHaveAttribute("data-ox-text", "Alpha");
+      screen.getByRole("tab", { name: "Alpha" }).querySelector(".zb-tabs__label"),
+    ).toHaveAttribute("data-zb-text", "Alpha");
   });
 });
 

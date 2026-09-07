@@ -13,17 +13,12 @@
  * way back.
  */
 
-import { CLINICAL_SEMANTIC } from "@oxygenui-design/tokens/surface";
-import {
-  ANCHOR_STEP,
-  RAMP_STEPS,
-  generateRamp,
-  type ValidationRecord,
-} from "@oxygenui-design/theme";
+import { CLINICAL_SEMANTIC } from "@zoblocks/tokens/surface";
+import { ANCHOR_STEP, RAMP_STEPS, generateRamp, type ValidationRecord } from "@zoblocks/theme";
 import type { Authorized } from "@/lib/authorize";
 import { THEME_NAMES, buildEditorModel, type ThemeName } from "@/lib/token-editor";
 import { ThemeError, saveBrand, type BaseTokens } from "@/lib/themes";
-import { withTierDefaults } from "@oxygenui-design/theme";
+import { withTierDefaults } from "@zoblocks/theme";
 
 export interface ThemeSummary {
   slug: string;

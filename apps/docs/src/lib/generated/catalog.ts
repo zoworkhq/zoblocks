@@ -5,7 +5,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 
-import type { ComponentDoc } from "@oxygenui-design/component-meta";
+import type { ComponentDoc } from "@zoblocks/component-meta";
 
 export const CATALOG: ComponentDoc[] = [
   {
@@ -87,7 +87,7 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "density",
         "type": "AccordionDensity",
-        "description": "Overrides any inherited `data-ox-density`.",
+        "description": "Overrides any inherited `data-zb-density`.",
         "required": false
       },
       {
@@ -241,7 +241,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "density",
             "type": "AccordionDensity",
-            "description": "Overrides any inherited `data-ox-density`.",
+            "description": "Overrides any inherited `data-zb-density`.",
             "required": false
           },
           {
@@ -393,7 +393,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "density",
             "type": "AccordionDensity",
-            "description": "Overrides any inherited `data-ox-density`.",
+            "description": "Overrides any inherited `data-zb-density`.",
             "required": false
           },
           {
@@ -496,7 +496,7 @@ export const CATALOG: ComponentDoc[] = [
         "extendsType": "Omit<AccordionProps, \"items\" | \"accordion\" | \"onChange\">"
       }
     ],
-    "usage": "import { Accordion } from \"@/components/oxygen/accordion\";\n\n<Accordion\n  headingLevel={2}\n  density=\"clinical\"\n  onDisclose={async (event) => {\n    await audit.record({ section: event.key, reason: event.reasonCode, at: event.at });\n    return true;\n  }}\n  items={[\n    {\n      key: \"risk\",\n      label: \"Risk & suicidality\",\n      severity: \"critical\",\n      summary: \"C-SSRS positive · 13 Aug\",\n      children: <RiskPanel {...risk} />,\n    },\n    {\n      key: \"sud\",\n      label: \"Substance use treatment\",\n      access: { kind: \"consent\", policy: \"42 CFR Part 2\", state: \"granted\" },\n      children: <SudPanel {...sud} />,\n    },\n    {\n      key: \"psychotherapy\",\n      label: \"Psychotherapy notes\",\n      access: { kind: \"withheld\", reason: \"Kept separately by the author\" },\n    },\n  ]}\n/>",
+    "usage": "import { Accordion } from \"@/components/zoblocks/accordion\";\n\n<Accordion\n  headingLevel={2}\n  density=\"clinical\"\n  onDisclose={async (event) => {\n    await audit.record({ section: event.key, reason: event.reasonCode, at: event.at });\n    return true;\n  }}\n  items={[\n    {\n      key: \"risk\",\n      label: \"Risk & suicidality\",\n      severity: \"critical\",\n      summary: \"C-SSRS positive · 13 Aug\",\n      children: <RiskPanel {...risk} />,\n    },\n    {\n      key: \"sud\",\n      label: \"Substance use treatment\",\n      access: { kind: \"consent\", policy: \"42 CFR Part 2\", state: \"granted\" },\n      children: <SudPanel {...sud} />,\n    },\n    {\n      key: \"psychotherapy\",\n      label: \"Psychotherapy notes\",\n      access: { kind: \"withheld\", reason: \"Kept separately by the author\" },\n    },\n  ]}\n/>",
     "guidance": {
       "use": [
         "Long records where most sections are not needed on most visits — charts, treatment plans, note histories.",
@@ -541,7 +541,7 @@ export const CATALOG: ComponentDoc[] = [
       "Not an access control. onDisclose reports that a reader asked; refusing to render is not the same as refusing to serve, and the application still owns authorisation and audit.",
       "Severity is supplied, never derived. The component will not score an instrument or decide what is urgent — that would make it clinical decision support.",
       "React cannot express hidden=\"until-found\": React 19 serialises it as hidden=\"\", so the attribute is upgraded after commit. Between commit and effect a closed panel is hidden but not yet findable.",
-      "Requires styles/oxygen-accordion.css, installed with accordion-core.",
+      "Requires styles/zoblocks-accordion.css, installed with accordion-core.",
       "Above roughly 200 sections, render your own windowed list over useAccordion. Virtualising breaks find-in-page, so the component does not do it silently.",
       "persistKey is not implemented. Remembering which sections a reader opened is per-product storage, and storing it for a gated section would defeat the gate."
     ],
@@ -556,7 +556,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @oxygenui-design/cli add accordion",
+    "install": "npx @zoblocks/cli add accordion",
     "relationships": {
       "builtWith": [],
       "usedIn": [
@@ -720,7 +720,7 @@ export const CATALOG: ComponentDoc[] = [
         "extendsType": "Omit<React.HTMLAttributes<HTMLDivElement>, \"children\">"
       }
     ],
-    "usage": "import { AllergyChip, AllergyList, fromAllergyIntolerance } from \"@/components/oxygen/allergy-chip\";\nimport \"@/styles/oxygen-allergy.css\";\n\n<AllergyList\n  records={records}\n  noneKnown={{ asserter: \"R. Okafor, RN\", assertedAt: \"14 Aug 2026\" }}\n  onAsk={openIntake}\n/>",
+    "usage": "import { AllergyChip, AllergyList, fromAllergyIntolerance } from \"@/components/zoblocks/allergy-chip\";\nimport \"@/styles/zoblocks-allergy.css\";\n\n<AllergyList\n  records={records}\n  noneKnown={{ asserter: \"R. Okafor, RN\", assertedAt: \"14 Aug 2026\" }}\n  onAsk={openIntake}\n/>",
     "guidance": {
       "use": [
         "In an allergy banner, a pre-prescribe check, a medication administration screen and intake reconciliation — the four places the criticality field decides what happens next.",
@@ -770,7 +770,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @oxygenui-design/cli add allergy-chip",
+    "install": "npx @zoblocks/cli add allergy-chip",
     "technicalName": "AllergyChip",
     "aliases": [
       "allergy badge",
@@ -1247,7 +1247,7 @@ export const CATALOG: ComponentDoc[] = [
         "extendsType": "LoaderCommonProps"
       }
     ],
-    "usage": "import { BreathLoader } from \"@/components/oxygen/breath-loader\";\n\n// Patient-facing page wait\n<BreathLoader mode=\"page\" label=\"Loading your information\" />\n\n// Slower still, for a long wait\n<BreathLoader speed={0.7} label=\"Preparing your summary\" hint=\"This can take a few seconds.\" />",
+    "usage": "import { BreathLoader } from \"@/components/zoblocks/breath-loader\";\n\n// Patient-facing page wait\n<BreathLoader mode=\"page\" label=\"Loading your information\" />\n\n// Slower still, for a long wait\n<BreathLoader speed={0.7} label=\"Preparing your summary\" hint=\"This can take a few seconds.\" />",
     "guidance": {
       "use": [
         "Patient-facing surfaces: portals, results pages, check-in, onboarding.",
@@ -1276,7 +1276,7 @@ export const CATALOG: ComponentDoc[] = [
     ],
     "limitations": [
       "Not a progress source. The application supplies progress; this loader cannot show it.",
-      "Requires styles/oxygen-loader.css, installed with loader-core.",
+      "Requires styles/zoblocks-loader.css, installed with loader-core.",
       "Needs about 40px to read as three distinct rings rather than one soft pulse."
     ],
     "related": [
@@ -1289,7 +1289,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @oxygenui-design/cli add breath-loader"
+    "install": "npx @zoblocks/cli add breath-loader"
   },
   {
     "name": "care-team-presence",
@@ -1461,7 +1461,7 @@ export const CATALOG: ComponentDoc[] = [
         "extendsType": "Omit< React.HTMLAttributes<HTMLDivElement>, \"children\" >"
       }
     ],
-    "usage": "import {\n  CoverageCard,\n  PresenceChip,\n} from \"@/components/oxygen/care-team-presence\";\nimport \"@/styles/oxygen-presence.css\";\n\n<PresenceChip\n  presence={{\n    clinician: { id: \"pr-4\", display: \"A. Vance, MD\", role: \"Attending\" },\n    state: \"signed-out\",\n    coveredBy: { id: \"pr-1\", display: \"T. Boateng, MD\", role: \"Night attending\" },\n    until: \"07:00\",\n  }}\n  onContact={(target) => page(target)}\n/>\n\n<CoverageCard windows={rota} now={serverTime} onPage={page} />",
+    "usage": "import {\n  CoverageCard,\n  PresenceChip,\n} from \"@/components/zoblocks/care-team-presence\";\nimport \"@/styles/zoblocks-presence.css\";\n\n<PresenceChip\n  presence={{\n    clinician: { id: \"pr-4\", display: \"A. Vance, MD\", role: \"Attending\" },\n    state: \"signed-out\",\n    coveredBy: { id: \"pr-1\", display: \"T. Boateng, MD\", role: \"Night attending\" },\n    until: \"07:00\",\n  }}\n  onContact={(target) => page(target)}\n/>\n\n<CoverageCard windows={rota} now={serverTime} onPage={page} />",
     "guidance": {
       "use": [
         "Beside a clinician's name anywhere the reader might be about to contact them — a care team panel, a message composer, a chart header.",
@@ -1517,7 +1517,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @oxygenui-design/cli add care-team-presence",
+    "install": "npx @zoblocks/cli add care-team-presence",
     "technicalName": "CareTeamPresence",
     "aliases": [
       "presence indicator",
@@ -2121,7 +2121,7 @@ export const CATALOG: ComponentDoc[] = [
         ]
       }
     ],
-    "usage": "import { CareTimeline } from \"@/components/oxygen/care-timeline\";\n\n<CareTimeline\n  aria-label=\"Care timeline for Ada Lovelace\"\n  events={events}\n  now={serverTime}\n  coverage={{\n    window: { from: \"2025-07-01\" },\n    order: \"newest-first\",\n    total: 43,\n    hidden: [{ reason: \"access\", count: 2 }],\n    sources: [\n      { id: \"ehr\", label: \"Northside EHR\", status: \"ok\" },\n      {\n        id: \"hie\",\n        label: \"Northside Regional Exchange\",\n        status: \"unavailable\",\n        detail: \"Timed out after 8s.\",\n      },\n    ],\n  }}\n  group=\"auto\"\n  cluster={{ kinds: [\"observation\"], within: \"P3D\", min: 3 }}\n  seenThrough=\"2026-08-12T14:02:00+05:30\"\n  lateEntryAfter=\"P2D\"\n  onLoadOlder={() => fetchOlder()}\n/>",
+    "usage": "import { CareTimeline } from \"@/components/zoblocks/care-timeline\";\n\n<CareTimeline\n  aria-label=\"Care timeline for Ada Lovelace\"\n  events={events}\n  now={serverTime}\n  coverage={{\n    window: { from: \"2025-07-01\" },\n    order: \"newest-first\",\n    total: 43,\n    hidden: [{ reason: \"access\", count: 2 }],\n    sources: [\n      { id: \"ehr\", label: \"Northside EHR\", status: \"ok\" },\n      {\n        id: \"hie\",\n        label: \"Northside Regional Exchange\",\n        status: \"unavailable\",\n        detail: \"Timed out after 8s.\",\n      },\n    ],\n  }}\n  group=\"auto\"\n  cluster={{ kinds: [\"observation\"], within: \"P3D\", min: 3 }}\n  seenThrough=\"2026-08-12T14:02:00+05:30\"\n  lateEntryAfter=\"P2D\"\n  onLoadOlder={() => fetchOlder()}\n/>",
     "guidance": {
       "use": [
         "The chart's own timeline view, where a clinician is asking what has been happening to this person.",
@@ -2175,7 +2175,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @oxygenui-design/cli add care-timeline",
+    "install": "npx @zoblocks/cli add care-timeline",
     "relationships": {
       "builtWith": [
         "timeline"
@@ -2245,7 +2245,7 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "density",
         "type": "AccordionDensity",
-        "description": "Overrides any inherited `data-ox-density`.",
+        "description": "Overrides any inherited `data-zb-density`.",
         "required": false,
         "default": "\"clinical\""
       },
@@ -2392,7 +2392,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "density",
             "type": "AccordionDensity",
-            "description": "Overrides any inherited `data-ox-density`.",
+            "description": "Overrides any inherited `data-zb-density`.",
             "required": false,
             "default": "\"clinical\""
           },
@@ -2504,7 +2504,7 @@ export const CATALOG: ComponentDoc[] = [
         "extendsType": "Omit< AccordionProps, \"items\" | \"activeKey\" | \"defaultActiveKey\" | \"accordion\" | \"onChange\" >"
       }
     ],
-    "usage": "import { ChartAccordion } from \"@/components/oxygen/chart-accordion\";\n\n<ChartAccordion\n  toolbarLabel=\"Ada Lovelace · 38 · MRN 4471902\"\n  headingLevel={2}\n  onDisclose={async (event) => audit.record(event)}\n  sections={[\n    {\n      key: \"risk\",\n      label: \"Risk & suicidality\",\n      severity: \"critical\",\n      status: \"C-SSRS positive\",\n      updatedAt: \"2026-08-13T09:12:00+05:30\",\n      children: <RiskPanel {...risk} />,\n    },\n    {\n      key: \"meds\",\n      label: \"Medications\",\n      severity: \"high\",\n      status: \"Clozapine ANC due 18 Aug\",\n      count: \"4 active\",\n      children: <MedicationList {...meds} />,\n    },\n    {\n      key: \"psychotherapy\",\n      label: \"Psychotherapy notes\",\n      access: { kind: \"withheld\", reason: \"Kept separately by the author\" },\n    },\n  ]}\n/>",
+    "usage": "import { ChartAccordion } from \"@/components/zoblocks/chart-accordion\";\n\n<ChartAccordion\n  toolbarLabel=\"Ada Lovelace · 38 · MRN 4471902\"\n  headingLevel={2}\n  onDisclose={async (event) => audit.record(event)}\n  sections={[\n    {\n      key: \"risk\",\n      label: \"Risk & suicidality\",\n      severity: \"critical\",\n      status: \"C-SSRS positive\",\n      updatedAt: \"2026-08-13T09:12:00+05:30\",\n      children: <RiskPanel {...risk} />,\n    },\n    {\n      key: \"meds\",\n      label: \"Medications\",\n      severity: \"high\",\n      status: \"Clozapine ANC due 18 Aug\",\n      count: \"4 active\",\n      children: <MedicationList {...meds} />,\n    },\n    {\n      key: \"psychotherapy\",\n      label: \"Psychotherapy notes\",\n      access: { kind: \"withheld\", reason: \"Kept separately by the author\" },\n    },\n  ]}\n/>",
     "guidance": {
       "use": [
         "The main record view, where sections are read closed more often than open.",
@@ -2532,8 +2532,8 @@ export const CATALOG: ComponentDoc[] = [
       }
     ],
     "limitations": [
-      "The chip is local to this component until StatusBadge ships. It already uses the --ox-badge-* tokens, so adopting StatusBadge is a refactor rather than a re-design.",
-      "The timestamp is rendered verbatim, not localised. Formatting and time-zone rendering belong to @oxygenui-design/intl, and inventing a second formatter here would guarantee they disagree.",
+      "The chip is local to this component until StatusBadge ships. It already uses the --zb-badge-* tokens, so adopting StatusBadge is a refactor rather than a re-design.",
+      "The timestamp is rendered verbatim, not localised. Formatting and time-zone rendering belong to @zoblocks/intl, and inventing a second formatter here would guarantee they disagree.",
       "Expand all opens gated sections to their gate, not to their content — one press cannot consent on the reader's behalf.",
       "Sections are rendered in the order given. It does not sort by severity, because a record's order is usually clinical rather than alphabetical."
     ],
@@ -2549,7 +2549,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @oxygenui-design/cli add chart-accordion",
+    "install": "npx @zoblocks/cli add chart-accordion",
     "relationships": {
       "builtWith": [
         "accordion"
@@ -2710,7 +2710,7 @@ export const CATALOG: ComponentDoc[] = [
         ]
       }
     ],
-    "usage": "import { ChartCommandPalette } from \"@/components/oxygen/chart-command-palette\";\nimport \"@/styles/oxygen-palette.css\";\n\n<ChartCommandPalette\n  open={open}\n  items={items}\n  scope={{ inScope: myPatients, breakGlass: true }}\n  onRun={run}\n  onSearchAudit={(audit) => log(\"patient-search\", audit)}\n  onClose={() => setOpen(false)}\n/>",
+    "usage": "import { ChartCommandPalette } from \"@/components/zoblocks/chart-command-palette\";\nimport \"@/styles/zoblocks-palette.css\";\n\n<ChartCommandPalette\n  open={open}\n  items={items}\n  scope={{ inScope: myPatients, breakGlass: true }}\n  onRun={run}\n  onSearchAudit={(audit) => log(\"patient-search\", audit)}\n  onClose={() => setOpen(false)}\n/>",
     "guidance": {
       "use": [
         "Behind ⌘K, everywhere. The palette is the shortcut the fastest clinicians already invented for themselves.",
@@ -2767,7 +2767,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @oxygenui-design/cli add chart-command-palette",
+    "install": "npx @zoblocks/cli add chart-command-palette",
     "technicalName": "ChartCommandPalette",
     "aliases": [
       "command palette",
@@ -3243,7 +3243,7 @@ export const CATALOG: ComponentDoc[] = [
         ]
       }
     ],
-    "usage": "import { ChartContextMenu } from \"@/components/oxygen/chart-context-menu\";\nimport \"@/styles/oxygen-menu.css\";\n\n<ChartContextMenu\n  subject={{\n    resource: \"MedicationRequest\",\n    id: order.id,\n    label: \"Lisinopril 10 mg\",\n    detail: \"Oral · daily · started 4 Mar 2026\",\n    masked: row.restricted,\n  }}\n  actions={medicationActions}\n  policy={{ role: \"a registered nurse\", permitted, breakGlass: true }}\n  now={serverTime}\n  onRun={(action, subject) => dispatch(action.id, subject)}\n  onDisclose={(record) => audit.write(\"disclosure\", record)}\n>\n  {(trigger) => <tr {...trigger}>{cells}</tr>}\n</ChartContextMenu>",
+    "usage": "import { ChartContextMenu } from \"@/components/zoblocks/chart-context-menu\";\nimport \"@/styles/zoblocks-menu.css\";\n\n<ChartContextMenu\n  subject={{\n    resource: \"MedicationRequest\",\n    id: order.id,\n    label: \"Lisinopril 10 mg\",\n    detail: \"Oral · daily · started 4 Mar 2026\",\n    masked: row.restricted,\n  }}\n  actions={medicationActions}\n  policy={{ role: \"a registered nurse\", permitted, breakGlass: true }}\n  now={serverTime}\n  onRun={(action, subject) => dispatch(action.id, subject)}\n  onDisclose={(record) => audit.write(\"disclosure\", record)}\n>\n  {(trigger) => <tr {...trigger}>{cells}</tr>}\n</ChartContextMenu>",
     "guidance": {
       "use": [
         "On any row that already identifies a record — a medication, a result, a note, a patient in a worklist. The subject header is only honest if the row it came from was.",
@@ -3301,7 +3301,7 @@ export const CATALOG: ComponentDoc[] = [
       "The menu follows its trigger on scroll and closes on a viewport resize. It is anchored to a place inside the row, not to a viewport coordinate.",
       "Break-glass is signalled, never performed. The step-up authentication behind it is a separate surface.",
       "The disclosure record is produced, not written. The component knows the action and the subject, never the actor or the session.",
-      "Strings are English and not routed through @oxygenui/intl — true of every registry component today."
+      "Strings are English and not routed through @zoblocks/intl — true of every registry component today."
     ],
     "related": [
       "chart-command-palette",
@@ -3312,7 +3312,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @oxygenui-design/cli add chart-context-menu",
+    "install": "npx @zoblocks/cli add chart-context-menu",
     "technicalName": "ChartContextMenu",
     "aliases": [
       "context menu",
@@ -3831,7 +3831,7 @@ export const CATALOG: ComponentDoc[] = [
         ]
       }
     ],
-    "usage": "import { ChartHeader } from \"@/components/oxygen/chart-header\";\nimport \"@/styles/oxygen-chart-header.css\";\n\n<ChartHeader\n  patient={patient}\n  identifiers={[{ kind: \"mrn\" }, { kind: \"nhs\" }]}\n  surface=\"orders\"\n  now={serverTime}\n  encounters={open}\n  selectedEncounterId={encounterId}\n  onSelectEncounter={setEncounterId}\n  safety={{\n    allergies: { label: \"Penicillin — anaphylaxis\", tone: \"critical\" },\n    codeStatus: { label: \"DNR\" },\n  }}\n>\n  <OrderForm />\n</ChartHeader>",
+    "usage": "import { ChartHeader } from \"@/components/zoblocks/chart-header\";\nimport \"@/styles/zoblocks-chart-header.css\";\n\n<ChartHeader\n  patient={patient}\n  identifiers={[{ kind: \"mrn\" }, { kind: \"nhs\" }]}\n  surface=\"orders\"\n  now={serverTime}\n  encounters={open}\n  selectedEncounterId={encounterId}\n  onSelectEncounter={setEncounterId}\n  safety={{\n    allergies: { label: \"Penicillin — anaphylaxis\", tone: \"critical\" },\n    codeStatus: { label: \"DNR\" },\n  }}\n>\n  <OrderForm />\n</ChartHeader>",
     "guidance": {
       "use": [
         "On every chart screen, for the whole session. It is chrome, not a section.",
@@ -3889,9 +3889,9 @@ export const CATALOG: ComponentDoc[] = [
     "dependencies": [
       "clsx",
       "tailwind-merge",
-      "@oxygenui-design/identity"
+      "@zoblocks/identity"
     ],
-    "install": "npx @oxygenui-design/cli add chart-header",
+    "install": "npx @zoblocks/cli add chart-header",
     "technicalName": "ChartHeader",
     "aliases": [
       "patient header",
@@ -4393,7 +4393,7 @@ export const CATALOG: ComponentDoc[] = [
         "extendsType": "Omit<React.HTMLAttributes<HTMLDivElement>, \"onChange\">"
       }
     ],
-    "usage": "import { ClinicalNote } from \"@/components/oxygen/clinical-note\";\n\n// The minimum. `now` has no default on purpose — the host owns the clock.\n<ClinicalNote\n  noteType=\"progress\"\n  subject={{\n    reference: \"Patient/4471902\",\n    display: \"RANDOL, Joshua\",\n    identifier: \"4471902\",\n    birthDate: \"12 Mar 1996\",\n    detail: \"30y M · Bed 4E-12\",\n  }}\n  author={{ display: \"R. Menon, MD\", role: \"Resident\", requiresCosign: true }}\n  now={await serverTime()}\n  onCommit={(kind, doc, acknowledgedWarnings) => save(kind, doc, acknowledgedWarnings)}\n/>\n\n// Reading a signed note loads no editor at all.\n<ClinicalNote.Reader\n  subject={subject}\n  title=\"Progress note\"\n  doc={signedDoc}\n  attestations={[{ who: \"R. Menon, MD\", when: \"16 Aug 2026, 14:41 IST (UTC+05:30)\" }]}\n  addenda={[{ author: \"A. Iyer, MD\", when: \"19 Aug 2026, 09:14 IST\", text: \"…\" }]}\n/>",
+    "usage": "import { ClinicalNote } from \"@/components/zoblocks/clinical-note\";\n\n// The minimum. `now` has no default on purpose — the host owns the clock.\n<ClinicalNote\n  noteType=\"progress\"\n  subject={{\n    reference: \"Patient/4471902\",\n    display: \"RANDOL, Joshua\",\n    identifier: \"4471902\",\n    birthDate: \"12 Mar 1996\",\n    detail: \"30y M · Bed 4E-12\",\n  }}\n  author={{ display: \"R. Menon, MD\", role: \"Resident\", requiresCosign: true }}\n  now={await serverTime()}\n  onCommit={(kind, doc, acknowledgedWarnings) => save(kind, doc, acknowledgedWarnings)}\n/>\n\n// Reading a signed note loads no editor at all.\n<ClinicalNote.Reader\n  subject={subject}\n  title=\"Progress note\"\n  doc={signedDoc}\n  attestations={[{ who: \"R. Menon, MD\", when: \"16 Aug 2026, 14:41 IST (UTC+05:30)\" }]}\n  addenda={[{ author: \"A. Iyer, MD\", when: \"19 Aug 2026, 09:14 IST\", text: \"…\" }]}\n/>",
     "guidance": {
       "use": [
         "Clinician-facing documentation where the note is the legal record — progress notes, H&Ps, consultations, discharge summaries. The gate and the addendum model are what make it a record rather than a document.",
@@ -4436,7 +4436,7 @@ export const CATALOG: ComponentDoc[] = [
     ],
     "limitations": [
       "No phrase library, terminology or attestation wording ships here. Those are jurisdictional, organisational and licensing decisions; the component provides the seams.",
-      "Per-range provenance is not standardised anywhere in FHIR. It travels as a custom Oxygen extension that a conforming server may legitimately ignore or strip.",
+      "Per-range provenance is not standardised anywhere in FHIR. It travels as a custom Zoblocks extension that a conforming server may legitimately ignore or strip.",
       "There is no clock. `now` is a required prop, because a browser clock on a ward workstation is not evidence.",
       "No speech recognizer, no collaboration server, no crypto. The component defines the channel, the integration and the seam; the implementations are the deployment's.",
       "The LOINC section codes match published display names but must be confirmed — with their C-CDA cardinality — against the implementation guide a deployment conforms to.",
@@ -4453,7 +4453,7 @@ export const CATALOG: ComponentDoc[] = [
     "dependencies": [
       "clsx",
       "tailwind-merge",
-      "@oxygenui-design/clinical-note-core",
+      "@zoblocks/clinical-note-core",
       "prosemirror-view",
       "prosemirror-state",
       "prosemirror-model",
@@ -4461,7 +4461,7 @@ export const CATALOG: ComponentDoc[] = [
       "prosemirror-history",
       "prosemirror-commands"
     ],
-    "install": "npx @oxygenui-design/cli add clinical-note"
+    "install": "npx @zoblocks/cli add clinical-note"
   },
   {
     "name": "clinical-status",
@@ -4645,7 +4645,7 @@ export const CATALOG: ComponentDoc[] = [
         "extendsType": "React.HTMLAttributes<HTMLDListElement>"
       }
     ],
-    "usage": "import { ClinicalStatus } from \"@/components/oxygen/clinical-status\";\nimport \"@/styles/oxygen-clinical-status.css\";\n\n<ClinicalStatus scale=\"criticality\" step=\"critical\" />\n<ClinicalStatus scale=\"access\" step=\"part-2\" />\n<ClinicalStatus scale=\"result-status\" step=\"preliminary\" shape=\"affix\" />",
+    "usage": "import { ClinicalStatus } from \"@/components/zoblocks/clinical-status\";\nimport \"@/styles/zoblocks-clinical-status.css\";\n\n<ClinicalStatus scale=\"criticality\" step=\"critical\" />\n<ClinicalStatus scale=\"access\" step=\"part-2\" />\n<ClinicalStatus scale=\"result-status\" step=\"preliminary\" shape=\"affix\" />",
     "guidance": {
       "use": [
         "Anywhere a record carries a state a clinician acts on — result criticality, order lifecycle, access class, engagement, AI verification.",
@@ -4684,7 +4684,7 @@ export const CATALOG: ComponentDoc[] = [
     "limitations": [
       "The vocabulary is closed by design. A host that needs a step outside the nine scales must extend the vocabulary rather than pass free text, and that is a pull request rather than a prop.",
       "The dot presentation carries one visible channel and is only safe in a column that is entirely status, beside a legend. Nothing in the component can enforce that.",
-      "No terminology service. The words here are English clinician and patient phrasings; a deployment needing another language supplies them through @oxygenui-design/intl."
+      "No terminology service. The words here are English clinician and patient phrasings; a deployment needing another language supplies them through @zoblocks/intl."
     ],
     "related": [
       "chart-accordion",
@@ -4701,7 +4701,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @oxygenui-design/cli add clinical-status",
+    "install": "npx @zoblocks/cli add clinical-status",
     "technicalName": "ClinicalStatus",
     "aliases": [
       "status badge",
@@ -4923,7 +4923,7 @@ export const CATALOG: ComponentDoc[] = [
         "title": "Criticality, mapped rather than guessed",
         "description": "The interpretation code decides the step. HH and LL are the panic values and the only ones that reach critical; H and L are simply outside the range, and conflating the two is how an alert list becomes noise nobody reads.",
         "fixture": "observationPotassiumCritical",
-        "code": "import { ClinicalStatus, fromInterpretation } from \"@/components/oxygen/clinical-status\";\nimport { observationPotassiumCritical } from \"@oxygenui-design/fixtures\";\n\nconst code = observationPotassiumCritical.interpretation?.[0]?.coding?.[0]?.code;\nconst step = fromInterpretation(code);\n\n// null rather than a guess when the code is unrecognised: a visible gap beats\n// a plausible lie.\n{step && <ClinicalStatus scale=\"criticality\" step={step} qualifier=\"resulted 41 minutes ago\" />}"
+        "code": "import { ClinicalStatus, fromInterpretation } from \"@/components/zoblocks/clinical-status\";\nimport { observationPotassiumCritical } from \"@zoblocks/fixtures\";\n\nconst code = observationPotassiumCritical.interpretation?.[0]?.coding?.[0]?.code;\nconst step = fromInterpretation(code);\n\n// null rather than a guess when the code is unrecognised: a visible gap beats\n// a plausible lie.\n{step && <ClinicalStatus scale=\"criticality\" step={step} qualifier=\"resulted 41 minutes ago\" />}"
       },
       {
         "id": "restricted-is-not-absent",
@@ -5336,7 +5336,7 @@ export const CATALOG: ComponentDoc[] = [
         ]
       }
     ],
-    "usage": "import { Copilot } from \"@/components/oxygen/copilot\";\nimport { lookUp, prepare } from \"@oxygenui-design/copilot-core\";\n\n// Safest first deployment: reference lookup, no patient data anywhere.\n<Copilot provider={ourEndpoint} modes={[lookUp]} />\n\n// With the chart, once a resolver is wired.\n<Copilot\n  provider={ourEndpoint}\n  modes={[lookUp, prepare]}\n  subject={{ reference: \"Patient/123\", display: \"Amara Okonkwo\" }}\n  context={resolver}\n  actor={{ display: \"Dr Okafor\", reference: \"Practitioner/7\" }}\n  onAudit={(event) => auditSink.write(event)}\n  // The most valuable prop in the API.\n  suppressed={isAdministeringMedication || isSigningOrders}\n/>",
+    "usage": "import { Copilot } from \"@/components/zoblocks/copilot\";\nimport { lookUp, prepare } from \"@zoblocks/copilot-core\";\n\n// Safest first deployment: reference lookup, no patient data anywhere.\n<Copilot provider={ourEndpoint} modes={[lookUp]} />\n\n// With the chart, once a resolver is wired.\n<Copilot\n  provider={ourEndpoint}\n  modes={[lookUp, prepare]}\n  subject={{ reference: \"Patient/123\", display: \"Amara Okonkwo\" }}\n  context={resolver}\n  actor={{ display: \"Dr Okafor\", reference: \"Practitioner/7\" }}\n  onAudit={(event) => auditSink.write(event)}\n  // The most valuable prop in the API.\n  suppressed={isAdministeringMedication || isSigningOrders}\n/>",
     "guidance": {
       "use": [
         "Clinician-facing reference lookup, where no patient data reaches the model at all. This is the safest first deployment and needs no BAA covering PHI in the model call.",
@@ -5381,7 +5381,7 @@ export const CATALOG: ComponentDoc[] = [
       "The crisis classifier is deterministic and rule-based. It is tuned so that clinical documentation ('denies SI', 'C-SSRS negative') does not escalate, which is what makes it usable in psychiatry — but it is a floor, not a substitute for a risk protocol.",
       "Built-in crisis lines are a development default. 988 is US-only; a host must supply its own for production.",
       "Copilot cannot secure a backend. It guarantees the shape of what it sends and the provenance of what it renders; it cannot stop a host wiring an agent with standing EHR write access behind it.",
-      "Requires @oxygenui-design/copilot-react and @oxygenui-design/copilot-core from npm. The engine is deliberately not inlined — a safety control nobody reads before pasting is not a safety control."
+      "Requires @zoblocks/copilot-react and @zoblocks/copilot-core from npm. The engine is deliberately not inlined — a safety control nobody reads before pasting is not a safety control."
     ],
     "related": [
       "clinical-note"
@@ -5389,10 +5389,10 @@ export const CATALOG: ComponentDoc[] = [
     "dependencies": [
       "clsx",
       "tailwind-merge",
-      "@oxygenui-design/copilot-core",
-      "@oxygenui-design/copilot-react"
+      "@zoblocks/copilot-core",
+      "@zoblocks/copilot-react"
     ],
-    "install": "npx @oxygenui-design/cli add copilot"
+    "install": "npx @zoblocks/cli add copilot"
   },
   {
     "name": "data-grid",
@@ -5833,7 +5833,7 @@ export const CATALOG: ComponentDoc[] = [
         ]
       }
     ],
-    "usage": "import { DataGrid, type DataGridColumn } from \"@/components/oxygen/data-grid\";\nimport \"@/styles/oxygen-grid.css\";\n\nconst columns: DataGridColumn<Row>[] = [\n  { key: \"name\", header: \"Patient\", kind: \"text\", value: (r) => r.name },\n  { key: \"mrn\", header: \"MRN\", kind: \"identifier\", value: (r) => r.mrn },\n  {\n    key: \"phq9\",\n    header: \"PHQ-9\",\n    kind: \"measure\",\n    // An absence is a value, not a hole. There is no null to pass here.\n    value: (r) => r.phq9 ?? { absent: \"awaiting\" },\n  },\n  {\n    key: \"risk\",\n    header: \"Disengagement risk\",\n    kind: \"number\",\n    value: (r) => r.risk,\n    derived: {\n      model: \"disengagement\",\n      version: \"v1.8\",\n      validatedOn: \"9,140 outpatient episodes\",\n      population: \"adults, English-language intake only\",\n    },\n  },\n];\n\n<DataGrid\n  caption=\"Clients on this team's caseload with a raised PHQ-9 or a recent risk screen\"\n  title=\"Caseload · PHQ-9 raised or risk screened\"\n  columns={columns}\n  rows={rows}\n  rowKey={(row) => row.mrn}\n  coverage={{\n    shown: rows.length,\n    total: cohortTotal,\n    noun: \"clients on this team's caseload\",\n    predicate: \"PHQ-9 of 10 or more, or a risk screen in the last 14 days.\",\n  }}\n  identify={(row) => ({ primary: row.name, secondary: `MRN ${row.mrn}` })}\n  arrivals={held}\n  onAdmitArrivals={admit}\n/>",
+    "usage": "import { DataGrid, type DataGridColumn } from \"@/components/zoblocks/data-grid\";\nimport \"@/styles/zoblocks-grid.css\";\n\nconst columns: DataGridColumn<Row>[] = [\n  { key: \"name\", header: \"Patient\", kind: \"text\", value: (r) => r.name },\n  { key: \"mrn\", header: \"MRN\", kind: \"identifier\", value: (r) => r.mrn },\n  {\n    key: \"phq9\",\n    header: \"PHQ-9\",\n    kind: \"measure\",\n    // An absence is a value, not a hole. There is no null to pass here.\n    value: (r) => r.phq9 ?? { absent: \"awaiting\" },\n  },\n  {\n    key: \"risk\",\n    header: \"Disengagement risk\",\n    kind: \"number\",\n    value: (r) => r.risk,\n    derived: {\n      model: \"disengagement\",\n      version: \"v1.8\",\n      validatedOn: \"9,140 outpatient episodes\",\n      population: \"adults, English-language intake only\",\n    },\n  },\n];\n\n<DataGrid\n  caption=\"Clients on this team's caseload with a raised PHQ-9 or a recent risk screen\"\n  title=\"Caseload · PHQ-9 raised or risk screened\"\n  columns={columns}\n  rows={rows}\n  rowKey={(row) => row.mrn}\n  coverage={{\n    shown: rows.length,\n    total: cohortTotal,\n    noun: \"clients on this team's caseload\",\n    predicate: \"PHQ-9 of 10 or more, or a risk screen in the last 14 days.\",\n  }}\n  identify={(row) => ({ primary: row.name, secondary: `MRN ${row.mrn}` })}\n  arrivals={held}\n  onAdmitArrivals={admit}\n/>",
     "guidance": {
       "use": [
         "For any list somebody will act from — a worklist, a queue, a cohort, a results review. The coverage line is what makes it safe to act from, and it is the reason to reach for this rather than a table.",
@@ -5889,10 +5889,10 @@ export const CATALOG: ComponentDoc[] = [
       "One sort column. Multi-column sort is a real requirement in a worklist and is not here yet.",
       "No column resize, reorder, pinning or grouping. Columns are typed objects precisely so a saved view can carry those later; today the caller sets width and order.",
       "No selection model and no row expansion. A grid that owns selection also owns the bulk-action confirmation, which is ChartContextMenu's job.",
-      "Filtering is the caller's. The grid renders the predicate as a sentence and never composes one — a component that owned the filter would also own the query, and no Oxygen package makes a network call.",
+      "Filtering is the caller's. The grid renders the predicate as a sentence and never composes one — a component that owned the filter would also own the query, and no Zoblocks package makes a network call.",
       "The export helper produces delimited text, not XLSX. Typed cells are the stronger answer to formula injection; the quote prefix is what is available without a writer dependency.",
       "`status` columns sort by a declared order that the caller supplies. There is no terminology binding, so a mis-declared order sorts wrongly and nothing catches it.",
-      "Strings are English and not routed through @oxygenui/intl — true of every registry component today."
+      "Strings are English and not routed through @zoblocks/intl — true of every registry component today."
     ],
     "related": [
       "chart-context-menu",
@@ -5904,7 +5904,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @oxygenui-design/cli add data-grid",
+    "install": "npx @zoblocks/cli add data-grid",
     "technicalName": "DataGrid",
     "aliases": [
       "data grid",
@@ -6216,13 +6216,13 @@ export const CATALOG: ComponentDoc[] = [
     "props": [
       {
         "name": "defaultValue",
-        "type": "string | number | readonly string[] | DateRangeValue | BirthDateValue | OxTime | SessionInterval | OxTimeRange | RecurrenceRule",
+        "type": "string | number | readonly string[] | DateRangeValue | BirthDateValue | ZbTime | SessionInterval | ZbTimeRange | RecurrenceRule",
         "description": "Uncontrolled initial value. Pass this **or** `value`, never both. There is deliberately no runtime warning: ADR 0009 forbids component source writing to the console at all, because a component that logs is one error-reporting integration away from putting a date of birth in a third party's index. When both are passed, `value` wins — the ordinary React contract. Uncontrolled initial value. Pass this or `value`, never both; `value` wins if you pass both. Uncontrolled initial value. Pass this or `value`, never both.",
         "required": false
       },
       {
         "name": "onChange",
-        "type": "((value: OxDate | null) => void) | ((value: OxDate | null) => void) | ((range: DateRangeValue) => void) | ((value: BirthDateValue) => void) | ((value: OxTime | null) => void) | ((value: SessionInterval) => void) | ((range: OxTimeRange) => void) | React.ChangeEventHandler<HTMLDivElement, Element> | ((rule: RecurrenceRule) => void) | React.ChangeEventHandler<HTMLElement, Element>",
+        "type": "((value: ZbDate | null) => void) | ((value: ZbDate | null) => void) | ((range: DateRangeValue) => void) | ((value: BirthDateValue) => void) | ((value: ZbTime | null) => void) | ((value: SessionInterval) => void) | ((range: ZbTimeRange) => void) | React.ChangeEventHandler<HTMLDivElement, Element> | ((rule: RecurrenceRule) => void) | React.ChangeEventHandler<HTMLElement, Element>",
         "description": "Fired on every complete, valid date, and with `null` when the field is cleared. Never fired mid-typing. Fired when a single date is chosen. Only meaningful in `mode=\"single\"`. Fired when either end changes — by typing, by the calendar, or by a preset. Fired with the whole birth-date value, which carries its precision and any absence reason alongside the date. Fired on every complete time, and with `null` when cleared. Fired whenever start, end or duration changes. The interval is always internally consistent when it fires. Fired when either end changes. Fired with the recurrence rule whenever any part of it changes.",
         "required": false
       },
@@ -6239,13 +6239,13 @@ export const CATALOG: ComponentDoc[] = [
         "props": [
           {
             "name": "defaultValue",
-            "type": "string | number | readonly string[] | DateRangeValue | BirthDateValue | OxTime | SessionInterval | OxTimeRange | RecurrenceRule",
+            "type": "string | number | readonly string[] | DateRangeValue | BirthDateValue | ZbTime | SessionInterval | ZbTimeRange | RecurrenceRule",
             "description": "Uncontrolled initial value. Pass this **or** `value`, never both. There is deliberately no runtime warning: ADR 0009 forbids component source writing to the console at all, because a component that logs is one error-reporting integration away from putting a date of birth in a third party's index. When both are passed, `value` wins — the ordinary React contract. Uncontrolled initial value. Pass this or `value`, never both; `value` wins if you pass both. Uncontrolled initial value. Pass this or `value`, never both.",
             "required": false
           },
           {
             "name": "onChange",
-            "type": "((value: OxDate | null) => void) | ((value: OxDate | null) => void) | ((range: DateRangeValue) => void) | ((value: BirthDateValue) => void) | ((value: OxTime | null) => void) | ((value: SessionInterval) => void) | ((range: OxTimeRange) => void) | React.ChangeEventHandler<HTMLDivElement, Element> | ((rule: RecurrenceRule) => void) | React.ChangeEventHandler<HTMLElement, Element>",
+            "type": "((value: ZbDate | null) => void) | ((value: ZbDate | null) => void) | ((range: DateRangeValue) => void) | ((value: BirthDateValue) => void) | ((value: ZbTime | null) => void) | ((value: SessionInterval) => void) | ((range: ZbTimeRange) => void) | React.ChangeEventHandler<HTMLDivElement, Element> | ((rule: RecurrenceRule) => void) | React.ChangeEventHandler<HTMLElement, Element>",
             "description": "Fired on every complete, valid date, and with `null` when the field is cleared. Never fired mid-typing. Fired when a single date is chosen. Only meaningful in `mode=\"single\"`. Fired when either end changes — by typing, by the calendar, or by a preset. Fired with the whole birth-date value, which carries its precision and any absence reason alongside the date. Fired on every complete time, and with `null` when cleared. Fired whenever start, end or duration changes. The interval is always internally consistent when it fires. Fired when either end changes. Fired with the recurrence rule whenever any part of it changes.",
             "required": false
           },
@@ -6298,7 +6298,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "defaultValue",
-            "type": "OxDate | null",
+            "type": "ZbDate | null",
             "description": "Uncontrolled initial value. Pass this **or** `value`, never both. There is deliberately no runtime warning: ADR 0009 forbids component source writing to the console at all, because a component that logs is one error-reporting integration away from putting a date of birth in a third party's index. When both are passed, `value` wins — the ordinary React contract.",
             "required": false
           },
@@ -6340,19 +6340,19 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "load",
-            "type": "((date: OxDate) => number | null)",
+            "type": "((date: ZbDate) => number | null)",
             "description": "Forwarded to the popover calendar — open-slot count under the numeral.",
             "required": false
           },
           {
             "name": "max",
-            "type": "OxDate",
+            "type": "ZbDate",
             "description": "Latest selectable date, inclusive.",
             "required": false
           },
           {
             "name": "min",
-            "type": "OxDate",
+            "type": "ZbDate",
             "description": "Earliest selectable date, inclusive. Dates before it are refused with a spoken reason rather than silently ignored.",
             "required": false
           },
@@ -6364,13 +6364,13 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "now",
-            "type": "OxDate",
+            "type": "ZbDate",
             "description": "Today, supplied by the host. Required wherever a policy or a relative label is in play, because ENGINEERING.md §9 forbids a component reading the wall clock to decide what to render — output that depends on when it rendered cannot be visually regression-tested, and server and client would disagree on the boundary between one day and the next.",
             "required": false
           },
           {
             "name": "onChange",
-            "type": "((value: OxDate | null) => void)",
+            "type": "((value: ZbDate | null) => void)",
             "description": "Fired on every complete, valid date, and with `null` when the field is cleared. Never fired mid-typing.",
             "required": false
           },
@@ -6424,13 +6424,13 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "unavailable",
-            "type": "((date: OxDate) => string | null)",
+            "type": "((date: ZbDate) => string | null)",
             "description": "Forwarded to the popover calendar — the reason a day cannot be chosen.",
             "required": false
           },
           {
             "name": "value",
-            "type": "OxDate | null",
+            "type": "ZbDate | null",
             "description": "Controlled value. Pass `null` for empty, never `undefined`.",
             "required": false
           },
@@ -6459,13 +6459,13 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "dates",
-            "type": "OxDate[]",
+            "type": "ZbDate[]",
             "description": "The selected dates, controlled. Only meaningful in `mode=\"multiple\"`.",
             "required": false
           },
           {
             "name": "defaultDates",
-            "type": "OxDate[]",
+            "type": "ZbDate[]",
             "description": "The dates on first render, uncontrolled. Pass this or `dates`, never both.",
             "required": false
           },
@@ -6483,7 +6483,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "defaultValue",
-            "type": "OxDate | null",
+            "type": "ZbDate | null",
             "description": "Uncontrolled initial value. Pass this or `value`, never both; `value` wins if you pass both.",
             "required": false
           },
@@ -6513,13 +6513,13 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "load",
-            "type": "((date: OxDate) => number | null)",
+            "type": "((date: ZbDate) => number | null)",
             "description": "Open-slot count under the numeral, so density is visible before a click.",
             "required": false
           },
           {
             "name": "max",
-            "type": "OxDate",
+            "type": "ZbDate",
             "description": "Latest selectable date, inclusive.",
             "required": false
           },
@@ -6531,7 +6531,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "min",
-            "type": "OxDate",
+            "type": "ZbDate",
             "description": "Earliest selectable date, inclusive.",
             "required": false
           },
@@ -6567,7 +6567,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "now",
-            "type": "OxDate | null",
+            "type": "ZbDate | null",
             "description": "The day marked \"today\". Required to mark one — the component reads no clock, so a calendar without `now` simply has no today, which is correct for a historical picker and deliberate everywhere else.",
             "required": false
           },
@@ -6579,7 +6579,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "onChange",
-            "type": "((value: OxDate | null) => void)",
+            "type": "((value: ZbDate | null) => void)",
             "description": "Fired when a single date is chosen. Only meaningful in `mode=\"single\"`.",
             "required": false
           },
@@ -6591,7 +6591,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "onDatesChange",
-            "type": "((dates: OxDate[]) => void)",
+            "type": "((dates: ZbDate[]) => void)",
             "description": "Fired whenever the multiple-selection set changes.",
             "required": false
           },
@@ -6633,13 +6633,13 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "unavailable",
-            "type": "((date: OxDate) => string | null)",
+            "type": "((date: ZbDate) => string | null)",
             "description": "The reason a date cannot be chosen, or null. A string rather than a boolean because the reason is spoken and shown. One muted treatment covers every reason; five colours would be five things to learn and still illegible to a colour-blind reader.",
             "required": false
           },
           {
             "name": "value",
-            "type": "OxDate | null",
+            "type": "ZbDate | null",
             "description": "Controlled value. Pass `null` for empty, never `undefined`.",
             "required": false
           },
@@ -6722,13 +6722,13 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "load",
-            "type": "((date: OxDate) => number | null)",
+            "type": "((date: ZbDate) => number | null)",
             "description": "Open-slot count under each numeral.",
             "required": false
           },
           {
             "name": "max",
-            "type": "OxDate",
+            "type": "ZbDate",
             "description": "Latest selectable date, inclusive.",
             "required": false
           },
@@ -6740,7 +6740,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "min",
-            "type": "OxDate",
+            "type": "ZbDate",
             "description": "Earliest selectable date, inclusive.",
             "required": false
           },
@@ -6764,7 +6764,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "now",
-            "type": "OxDate",
+            "type": "ZbDate",
             "description": "Today, supplied by the host. Nothing here reads a clock.",
             "required": false
           },
@@ -6830,7 +6830,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "unavailable",
-            "type": "((date: OxDate) => string | null)",
+            "type": "((date: ZbDate) => string | null)",
             "description": "The reason a date cannot be chosen, or null. Spoken, not just dimmed.",
             "required": false
           },
@@ -6853,7 +6853,7 @@ export const CATALOG: ComponentDoc[] = [
         "props": [
           {
             "name": "defaultValue",
-            "type": "OxTime | null",
+            "type": "ZbTime | null",
             "description": "Uncontrolled initial value. Pass this or `value`, never both; `value` wins if you pass both.",
             "required": false
           },
@@ -6895,13 +6895,13 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "max",
-            "type": "OxTime",
+            "type": "ZbTime",
             "description": "Latest selectable time, inclusive.",
             "required": false
           },
           {
             "name": "min",
-            "type": "OxTime",
+            "type": "ZbTime",
             "description": "Earliest selectable time, inclusive.",
             "required": false
           },
@@ -6913,7 +6913,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "onChange",
-            "type": "((value: OxTime | null) => void)",
+            "type": "((value: ZbTime | null) => void)",
             "description": "Fired on every complete time, and with `null` when cleared.",
             "required": false
           },
@@ -6955,7 +6955,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "value",
-            "type": "OxTime | null",
+            "type": "ZbTime | null",
             "description": "Controlled value. Pass `null` for empty, never `undefined`.",
             "required": false
           }
@@ -6984,7 +6984,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "defaultValue",
-            "type": "OxTimeRange | null",
+            "type": "ZbTimeRange | null",
             "description": "Uncontrolled initial value. Pass this or `value`, never both.",
             "required": false
           },
@@ -7062,7 +7062,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "onChange",
-            "type": "((range: OxTimeRange) => void)",
+            "type": "((range: ZbTimeRange) => void)",
             "description": "Fired when either end changes.",
             "required": false
           },
@@ -7116,7 +7116,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "value",
-            "type": "OxTimeRange | null",
+            "type": "ZbTimeRange | null",
             "description": "Controlled value. Either end may be null.",
             "required": false
           }
@@ -7234,7 +7234,7 @@ export const CATALOG: ComponentDoc[] = [
         "props": [
           {
             "name": "now",
-            "type": "OxDate",
+            "type": "ZbDate",
             "description": "Today, supplied by the host. The age and the future check both need it.",
             "required": true
           },
@@ -7348,7 +7348,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "suggested",
-            "type": "OxDate",
+            "type": "ZbDate",
             "description": "A value already on file, offered as a one-press fill. WCAG 2.2 SC 3.3.7 asks that previously entered information be available rather than re-typed — intake asks for a date of birth two and three times. Offered rather than applied, because silently pre-filling a legal attestation is a different defect from making somebody type it twice.",
             "required": false
           },
@@ -7371,7 +7371,7 @@ export const CATALOG: ComponentDoc[] = [
         "props": [
           {
             "name": "value",
-            "type": "OxTemporal | null",
+            "type": "ZbTemporal | null",
             "description": "Any member of the temporal value space, including absence.",
             "required": true
           },
@@ -7389,7 +7389,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "now",
-            "type": "OxDate",
+            "type": "ZbDate",
             "description": "Today, for the relative aid. Omit it and no relative label is rendered.",
             "required": false
           },
@@ -7454,7 +7454,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "now",
-            "type": "{ date: OxDate; time: OxTime; }",
+            "type": "{ date: ZbDate; time: ZbTime; }",
             "description": "The clock, injected. Staleness is measured against it.",
             "required": false
           },
@@ -7483,7 +7483,7 @@ export const CATALOG: ComponentDoc[] = [
         "props": [
           {
             "name": "startDate",
-            "type": "OxDate",
+            "type": "ZbDate",
             "description": "The first occurrence. The rule is meaningless without one.",
             "required": true
           },
@@ -7525,7 +7525,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "onExpand",
-            "type": "((dates: OxDate[]) => void)",
+            "type": "((dates: ZbDate[]) => void)",
             "description": "Emitted whenever the expansion changes, so a host can check conflicts.",
             "required": false
           },
@@ -7572,7 +7572,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "now",
-            "type": "{ date: OxDate; time: OxTime; }",
+            "type": "{ date: ZbDate; time: ZbTime; }",
             "description": "The clock, injected. Staleness and the strip both need it.",
             "required": true
           },
@@ -7596,7 +7596,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "date",
-            "type": "OxDate",
+            "type": "ZbDate",
             "description": "The day whose slots are shown.",
             "required": false
           },
@@ -7638,7 +7638,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "onDateChange",
-            "type": "((date: OxDate) => void)",
+            "type": "((date: ZbDate) => void)",
             "description": "Fired when the reader moves to another day.",
             "required": false
           },
@@ -7662,7 +7662,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "onSelect",
-            "type": "((choice: { actor: SchedulableActor; date: OxDate; slot: Slot; }) => void)",
+            "type": "((choice: { actor: SchedulableActor; date: ZbDate; slot: Slot; }) => void)",
             "description": "Fired with the chosen slot. Booking itself is the host's, because it needs a write the component cannot make.",
             "required": false
           },
@@ -7697,7 +7697,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "startDate",
-            "type": "OxDate",
+            "type": "ZbDate",
             "description": "",
             "required": true
           },
@@ -7715,19 +7715,19 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "onBook",
-            "type": "((dates: OxDate[]) => void)",
+            "type": "((dates: ZbDate[]) => void)",
             "description": "Fired with the whole resolved series. Nothing is booked until every conflict is resolved or explicitly kept.",
             "required": false
           },
           {
             "name": "onExpand",
-            "type": "((dates: OxDate[]) => void)",
+            "type": "((dates: ZbDate[]) => void)",
             "description": "",
             "required": false
           },
           {
             "name": "onResolve",
-            "type": "((isoDate: string, to: OxDate) => void)",
+            "type": "((isoDate: string, to: ZbDate) => void)",
             "description": "Fired when the reader moves or drops one occurrence that conflicts. The series is edited per occurrence, never regenerated.",
             "required": false
           },
@@ -7786,7 +7786,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "startDate",
-            "type": "OxDate",
+            "type": "ZbDate",
             "description": "",
             "required": true
           },
@@ -7853,7 +7853,7 @@ export const CATALOG: ComponentDoc[] = [
         ]
       }
     ],
-    "usage": "import { DatePicker } from \"@/components/oxygen/date-picker\";\nimport { plainDate } from \"@/lib/oxygen-datetime\";\nimport \"@/styles/oxygen-datetime.css\";\n\n// The clock is injected. Nothing in this family reads it.\nconst today = plainDate(2026, 8, 26);\n\n<DatePicker variant=\"picker\" label=\"Appointment date\" now={today} value={date} onChange={setDate} />\n<DatePicker variant=\"birth-date\" now={today} allowEstimated allowAbsent />\n<DatePicker variant=\"session\" durationPresets={org.presets} bands={org.bands} />\n<DatePicker variant=\"slots\" set={availability} now={now} onSelect={hold} />\n\n// Or reach for a part directly when the surface chose at design time.\nimport { SessionTimeField } from \"@/components/oxygen/date-picker\";",
+    "usage": "import { DatePicker } from \"@/components/zoblocks/date-picker\";\nimport { plainDate } from \"@/lib/zoblocks-datetime\";\nimport \"@/styles/zoblocks-datetime.css\";\n\n// The clock is injected. Nothing in this family reads it.\nconst today = plainDate(2026, 8, 26);\n\n<DatePicker variant=\"picker\" label=\"Appointment date\" now={today} value={date} onChange={setDate} />\n<DatePicker variant=\"birth-date\" now={today} allowEstimated allowAbsent />\n<DatePicker variant=\"session\" durationPresets={org.presets} bands={org.bands} />\n<DatePicker variant=\"slots\" set={availability} now={now} onSelect={hold} />\n\n// Or reach for a part directly when the surface chose at design time.\nimport { SessionTimeField } from \"@/components/zoblocks/date-picker\";",
     "guidance": {
       "use": [
         "variant=\"field\" for a date the user already knows — service date, admission, assessment. Four-fifths of healthcare date fields are this, and a popover there is four clicks where eight keystrokes would do.",
@@ -7913,7 +7913,7 @@ export const CATALOG: ComponentDoc[] = [
       }
     ],
     "limitations": [
-      "The value is an OxDate, not a Dayjs. This is the deliberate divergence from Ant Design: matching the value type would put a date library in the graph of every form component — exactly what ADR 0010 exists to prevent — and would make a birth date representable as midnight UTC. A Dayjs codebase converts at the boundary.",
+      "The value is an ZbDate, not a Dayjs. This is the deliberate divergence from Ant Design: matching the value type would put a date library in the graph of every form component — exactly what ADR 0010 exists to prevent — and would make a birth date representable as midnight UTC. A Dayjs codebase converts at the boundary.",
       "Ant Design's prop names are not implemented, and ADR 0010 requires the divergences be named: there is no picker, showTime, allowClear, status or DatePicker.RangePicker, and antd's disabledDate and format are spelled unavailable and order. The reasons differ. unavailable returns the reason a day cannot be chosen rather than a boolean, because that reason is spoken and shown, and a boolean cannot carry it. picker=\"week\" and picker=\"quarter\" have no healthcare workflow we have found, and a stub rendering a day grid would be worse than an honest absence. The rest is unbuilt rather than rejected. A migration from antd is not yet one changed import line.",
       "Recurrence implements a named RFC 5545 subset — DAILY, WEEKLY, MONTHLY with INTERVAL, BYDAY, BYSETPOS, BYMONTHDAY, COUNT, UNTIL and EXDATE. Anything else is refused and rendered read-only with its original string, rather than silently mis-expanded.",
       "Nothing here fetches, holds, or books. Availability arrives as data with an age and every transition is reported through a callback — ADR 0009 forbids the network in component source, and the host is the only party that can reconcile a rejection anyway.",
@@ -7930,7 +7930,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @oxygenui-design/cli add date-picker",
+    "install": "npx @zoblocks/cli add date-picker",
     "technicalName": "DatePicker",
     "aliases": [
       "react date picker",
@@ -8227,7 +8227,7 @@ export const CATALOG: ComponentDoc[] = [
         "title": "One changed import",
         "description": "The props match antd's, so the migration is the import line and a conversion at the value boundary. That is ADR 0010's promise, and this is the component that tests it hardest — because antd actually has this one.",
         "fixture": "appointmentBooked",
-        "code": "- import { DatePicker } from \"antd\";\n+ import { DatePicker } from \"@oxygenui-design/react\";\n\n  <DatePicker\n    disabledDate={closed}\n    allowClear\n    status={hasError ? \"error\" : undefined}\n-   value={dayjsValue}\n+   value={oxDate}          // { kind: \"date\", y, m, d }\n  />"
+        "code": "- import { DatePicker } from \"antd\";\n+ import { DatePicker } from \"@zoblocks/react\";\n\n  <DatePicker\n    disabledDate={closed}\n    allowClear\n    status={hasError ? \"error\" : undefined}\n-   value={dayjsValue}\n+   value={zbDate}          // { kind: \"date\", y, m, d }\n  />"
       },
       {
         "id": "series-arithmetic",
@@ -8505,7 +8505,7 @@ export const CATALOG: ComponentDoc[] = [
         ]
       }
     ],
-    "usage": "import { HelixLoader } from \"@/components/oxygen/helix-loader\";\n\n<HelixLoader mode=\"overlay\" label=\"Running the panel\" delay={200} />",
+    "usage": "import { HelixLoader } from \"@/components/zoblocks/helix-loader\";\n\n<HelixLoader mode=\"overlay\" label=\"Running the panel\" delay={200} />",
     "guidance": {
       "use": [
         "Laboratory, genomics, pathology, and research surfaces where analysis is the thing being waited on.",
@@ -8534,7 +8534,7 @@ export const CATALOG: ComponentDoc[] = [
     ],
     "limitations": [
       "Not a progress source. Use Infusion Loader when the remaining time is known.",
-      "Requires styles/oxygen-loader.css, installed with loader-core.",
+      "Requires styles/zoblocks-loader.css, installed with loader-core.",
       "Eighteen animated nodes — the heaviest of the five, though still compositor-only.",
       "Depicts no real sequence data. It is a mark, not a visualisation."
     ],
@@ -8548,7 +8548,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @oxygenui-design/cli add helix-loader"
+    "install": "npx @zoblocks/cli add helix-loader"
   },
   {
     "name": "infusion-loader",
@@ -8789,7 +8789,7 @@ export const CATALOG: ComponentDoc[] = [
         ]
       }
     ],
-    "usage": "import { InfusionLoader } from \"@/components/oxygen/infusion-loader\";\n\n// Determinate: the application knows how much is left\n<InfusionLoader progress={42} label=\"Importing records\" showLabel />\n\n// Indeterminate: it does not, and says so by drifting\n<InfusionLoader label=\"Preparing the export\" />",
+    "usage": "import { InfusionLoader } from \"@/components/zoblocks/infusion-loader\";\n\n// Determinate: the application knows how much is left\n<InfusionLoader progress={42} label=\"Importing records\" showLabel />\n\n// Indeterminate: it does not, and says so by drifting\n<InfusionLoader label=\"Preparing the export\" />",
     "guidance": {
       "use": [
         "Multi-step work whose progress is genuinely known: imports, uploads, record transfers, batch exports.",
@@ -8818,7 +8818,7 @@ export const CATALOG: ComponentDoc[] = [
     ],
     "limitations": [
       "Does not compute progress. The application supplies the number and owns its truthfulness.",
-      "Requires styles/oxygen-loader.css, installed with loader-core.",
+      "Requires styles/zoblocks-loader.css, installed with loader-core.",
       "Percentage only. It shows no time estimate and no per-step breakdown."
     ],
     "related": [
@@ -8831,7 +8831,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @oxygenui-design/cli add infusion-loader"
+    "install": "npx @zoblocks/cli add infusion-loader"
   },
   {
     "name": "provenance-chip",
@@ -8994,7 +8994,7 @@ export const CATALOG: ComponentDoc[] = [
         "extendsType": "Base"
       }
     ],
-    "usage": "import { ProvenanceChip, ledgerFrom } from \"@/components/oxygen/provenance-chip\";\nimport \"@/styles/oxygen-provenance.css\";\n\nconst ledger = ledgerFrom(records);\n\n<ProvenanceChip\n  resourceId=\"obs-bp-1\"\n  ledger={ledger}\n  now={serverTime}\n  stalenessPolicy={(r) => (r.source === \"device\" ? 48 * 3600_000 : null)}\n/>",
+    "usage": "import { ProvenanceChip, ledgerFrom } from \"@/components/zoblocks/provenance-chip\";\nimport \"@/styles/zoblocks-provenance.css\";\n\nconst ledger = ledgerFrom(records);\n\n<ProvenanceChip\n  resourceId=\"obs-bp-1\"\n  ledger={ledger}\n  now={serverTime}\n  stalenessPolicy={(r) => (r.source === \"device\" ? 48 * 3600_000 : null)}\n/>",
     "guidance": {
       "use": [
         "Beside any value whose origin changes what a reader should do with it — vitals, medication lists, problem lists, external documents, anything a model produced.",
@@ -9044,7 +9044,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @oxygenui-design/cli add provenance-chip",
+    "install": "npx @zoblocks/cli add provenance-chip",
     "technicalName": "ProvenanceChip",
     "aliases": [
       "data source badge",
@@ -9632,7 +9632,7 @@ export const CATALOG: ComponentDoc[] = [
         "extendsType": "LoaderCommonProps"
       }
     ],
-    "usage": "import { PageLoader, PulseLoader } from \"@/components/oxygen/pulse-loader\";\n\n// Full-page wait, e.g. Next.js app/loading.tsx\n<PageLoader label=\"Loading your records\" />\n\n// Region overlay that never flashes and admits a stall\n<PulseLoader\n  mode=\"overlay\"\n  label=\"Loading results\"\n  delay={200}\n  slowAfter={8000}\n  onSlow={reportSlowWait}\n/>",
+    "usage": "import { PageLoader, PulseLoader } from \"@/components/zoblocks/pulse-loader\";\n\n// Full-page wait, e.g. Next.js app/loading.tsx\n<PageLoader label=\"Loading your records\" />\n\n// Region overlay that never flashes and admits a stall\n<PulseLoader\n  mode=\"overlay\"\n  label=\"Loading results\"\n  delay={200}\n  slowAfter={8000}\n  onSlow={reportSlowWait}\n/>",
     "guidance": {
       "use": [
         "Application boot and full-page route changes, where the brand moment is worth the space.",
@@ -9665,7 +9665,7 @@ export const CATALOG: ComponentDoc[] = [
     ],
     "limitations": [
       "Not a progress source. The application supplies progress; the loader only renders it.",
-      "Requires styles/oxygen-loader.css, installed with loader-core. Without it the loader renders as a static mark rather than an animated one.",
+      "Requires styles/zoblocks-loader.css, installed with loader-core. Without it the loader renders as a static mark rather than an animated one.",
       "One cardiac rhythm. It does not depict arrhythmia, and it must never be read as a patient's actual rate."
     ],
     "related": [
@@ -9679,7 +9679,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @oxygenui-design/cli add pulse-loader",
+    "install": "npx @zoblocks/cli add pulse-loader",
     "relationships": {
       "builtWith": [
         "rhythm-loader"
@@ -9856,7 +9856,7 @@ export const CATALOG: ComponentDoc[] = [
         "extendsType": "Omit< React.HTMLAttributes<HTMLDivElement>, \"children\" | \"onSelect\" >"
       }
     ],
-    "usage": "import { RecentPatientStack } from \"@/components/oxygen/recent-patient-stack\";\nimport \"@/styles/oxygen-workspace.css\";\n\n<RecentPatientStack\n  charts={open}\n  activeId={activeId}\n  now={serverTime}\n  onActivate={(chart, { reassert }) =>\n    reassert ? confirmIdentity(chart) : switchTo(chart)\n  }\n  onClose={closeChart}\n  onReorder={setOrder}\n/>",
+    "usage": "import { RecentPatientStack } from \"@/components/zoblocks/recent-patient-stack\";\nimport \"@/styles/zoblocks-workspace.css\";\n\n<RecentPatientStack\n  charts={open}\n  activeId={activeId}\n  now={serverTime}\n  onActivate={(chart, { reassert }) =>\n    reassert ? confirmIdentity(chart) : switchTo(chart)\n  }\n  onClose={closeChart}\n  onReorder={setOrder}\n/>",
     "guidance": {
       "use": [
         "In the top bar of a clinical workspace, above the chart header rather than inside it.",
@@ -9913,7 +9913,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @oxygenui-design/cli add recent-patient-stack",
+    "install": "npx @zoblocks/cli add recent-patient-stack",
     "technicalName": "RecentPatientStack",
     "aliases": [
       "chart switcher",
@@ -10601,7 +10601,7 @@ export const CATALOG: ComponentDoc[] = [
         "extendsType": "React.HTMLAttributes<HTMLDivElement>"
       }
     ],
-    "usage": "import { Recorder } from \"@/components/oxygen/recorder\";\n\n// Ambient capture. The host owns getUserMedia; the component owns the truth\n// about what is arriving.\n<Recorder\n  variant=\"bars\"\n  phase=\"recording\"\n  source={analyser}\n  device={{ deviceId: \"jabra\", label: \"Jabra Link 380\" }}\n  expectedDevice={{ deviceId: \"jabra\", label: \"Jabra Link 380\" }}\n  onFault={(fault) => fault && report(fault.code)}\n/>\n\n// Reviewing the take. Peaks and speakers come from the ingest sidecar.\n<Recorder\n  variant=\"duet\"\n  phase=\"ready\"\n  peaks={peaks}\n  speakers={speakers}\n  position={0.44}\n  durationMs={754_000}\n  speakerLabels={[\"Dr Okafor\", \"Patient\"]}\n/>",
+    "usage": "import { Recorder } from \"@/components/zoblocks/recorder\";\n\n// Ambient capture. The host owns getUserMedia; the component owns the truth\n// about what is arriving.\n<Recorder\n  variant=\"bars\"\n  phase=\"recording\"\n  source={analyser}\n  device={{ deviceId: \"jabra\", label: \"Jabra Link 380\" }}\n  expectedDevice={{ deviceId: \"jabra\", label: \"Jabra Link 380\" }}\n  onFault={(fault) => fault && report(fault.code)}\n/>\n\n// Reviewing the take. Peaks and speakers come from the ingest sidecar.\n<Recorder\n  variant=\"duet\"\n  phase=\"ready\"\n  peaks={peaks}\n  speakers={speakers}\n  position={0.44}\n  durationMs={754_000}\n  speakerLabels={[\"Dr Okafor\", \"Patient\"]}\n/>",
     "guidance": {
       "use": [
         "Ambient documentation and dictation, where the clinician is looking at the patient rather than the screen and needs to see at a glance that capture is working.",
@@ -10640,7 +10640,7 @@ export const CATALOG: ComponentDoc[] = [
       "It does not move bytes. No upload, no retry, no queue, no recogniser — it renders where a recording is and the host is responsible for getting it there.",
       "Duet needs a peaks sidecar and one speaker byte per bucket, emitted at ingest. Without diarisation it renders a single rail rather than guessing.",
       "Consent copy, disclosure wording and mid-session redaction are deliberately unbuilt, pending clinical and legal review. consent is a typed opaque object the component renders and never authors.",
-      "Requires styles/oxygen-recorder.css, installed with recorder-core. Without it the arts render as unstyled markup."
+      "Requires styles/zoblocks-recorder.css, installed with recorder-core. Without it the arts render as unstyled markup."
     ],
     "related": [
       "pulse-loader",
@@ -10650,9 +10650,9 @@ export const CATALOG: ComponentDoc[] = [
     "dependencies": [
       "clsx",
       "tailwind-merge",
-      "@oxygenui-design/recorder-core"
+      "@zoblocks/recorder-core"
     ],
-    "install": "npx @oxygenui-design/cli add recorder"
+    "install": "npx @zoblocks/cli add recorder"
   },
   {
     "name": "result-value",
@@ -10774,7 +10774,7 @@ export const CATALOG: ComponentDoc[] = [
         "extendsType": "Omit<React.HTMLAttributes<HTMLDivElement>, \"children\">"
       }
     ],
-    "usage": "import { ResultValue, fromObservation } from \"@/components/oxygen/result-value\";\nimport \"@/styles/oxygen-result-value.css\";\n\n<ResultValue value={fromObservation(observation)} now={serverTime} />",
+    "usage": "import { ResultValue, fromObservation } from \"@/components/zoblocks/result-value\";\nimport \"@/styles/zoblocks-result-value.css\";\n\n<ResultValue value={fromObservation(observation)} now={serverTime} />",
     "guidance": {
       "use": [
         "Anywhere a single observation is rendered — lab results, vitals, screening scores, device readings, point-of-care tests, patient-reported measures.",
@@ -10829,7 +10829,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @oxygenui-design/cli add result-value",
+    "install": "npx @zoblocks/cli add result-value",
     "technicalName": "ResultValue",
     "aliases": [
       "lab result",
@@ -11012,7 +11012,7 @@ export const CATALOG: ComponentDoc[] = [
         "title": "A FHIR Observation, unedited",
         "description": "The adapter leaves undefined everything it cannot determine. A missing referenceRange becomes no range — not an empty one, and not a silent assumption of normality.",
         "fixture": "observationPotassiumCritical",
-        "code": "import { ResultValue, fromObservation } from \"@/components/oxygen/result-value\";\nimport { observationPotassiumCritical } from \"@oxygenui-design/fixtures\";\n\n// `now` is the host's, never a clock this component reads: a relative time\n// computed at render silently ages on a ward workstation left open all shift.\n<ResultValue value={fromObservation(observationPotassiumCritical)} now={serverTime} />;"
+        "code": "import { ResultValue, fromObservation } from \"@/components/zoblocks/result-value\";\nimport { observationPotassiumCritical } from \"@zoblocks/fixtures\";\n\n// `now` is the host's, never a clock this component reads: a relative time\n// computed at render silently ages on a ward workstation left open all shift.\n<ResultValue value={fromObservation(observationPotassiumCritical)} now={serverTime} />;"
       },
       {
         "id": "absence",
@@ -11333,7 +11333,7 @@ export const CATALOG: ComponentDoc[] = [
         "extendsType": "LoaderCommonProps"
       }
     ],
-    "usage": "import { RhythmLoader } from \"@/components/oxygen/rhythm-loader\";\n\n// Inline, beside a control\n<RhythmLoader size=\"sm\" label=\"Loading results\" />\n\n// Clinical dashboard panel, slower cadence\n<RhythmLoader mode=\"overlay\" bpm={52} label=\"Loading the worklist\" delay={200} />",
+    "usage": "import { RhythmLoader } from \"@/components/zoblocks/rhythm-loader\";\n\n// Inline, beside a control\n<RhythmLoader size=\"sm\" label=\"Loading results\" />\n\n// Clinical dashboard panel, slower cadence\n<RhythmLoader mode=\"overlay\" bpm={52} label=\"Loading the worklist\" delay={200} />",
     "guidance": {
       "use": [
         "Clinical density: worklists, results tables, monitoring dashboards.",
@@ -11362,7 +11362,7 @@ export const CATALOG: ComponentDoc[] = [
     ],
     "limitations": [
       "Not a progress source. Use Infusion Loader when the remaining time is genuinely known.",
-      "Requires styles/oxygen-loader.css, installed with loader-core.",
+      "Requires styles/zoblocks-loader.css, installed with loader-core.",
       "A single fixed complex. It does not vary, and it is not clinical data."
     ],
     "related": [
@@ -11376,7 +11376,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @oxygenui-design/cli add rhythm-loader",
+    "install": "npx @zoblocks/cli add rhythm-loader",
     "relationships": {
       "builtWith": [],
       "usedIn": [
@@ -11536,7 +11536,7 @@ export const CATALOG: ComponentDoc[] = [
         "extendsType": "Omit<React.HTMLAttributes<HTMLDivElement>, \"children\">"
       }
     ],
-    "usage": "import { RiskIndicator } from \"@/components/oxygen/risk-indicator\";\nimport \"@/styles/oxygen-risk.css\";\n\n<RiskIndicator\n  assessment={readmission}\n  now={serverTime}\n  notADiagnosis=\"A statistical estimate from historical patterns. Not a diagnosis, and not a substitute for assessment.\"\n/>",
+    "usage": "import { RiskIndicator } from \"@/components/zoblocks/risk-indicator\";\nimport \"@/styles/zoblocks-risk.css\";\n\n<RiskIndicator\n  assessment={readmission}\n  now={serverTime}\n  notADiagnosis=\"A statistical estimate from historical patterns. Not a diagnosis, and not a substitute for assessment.\"\n/>",
     "guidance": {
       "use": [
         "Readmission, deterioration, no-show and care-gap models — anywhere a score drives who gets called first.",
@@ -11587,7 +11587,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @oxygenui-design/cli add risk-indicator",
+    "install": "npx @zoblocks/cli add risk-indicator",
     "technicalName": "RiskIndicator",
     "aliases": [
       "risk score",
@@ -11938,7 +11938,7 @@ export const CATALOG: ComponentDoc[] = [
         "extendsType": "Omit< React.HTMLAttributes<HTMLDivElement>, \"children\" | \"onChange\" >"
       }
     ],
-    "usage": "import { SafetyPlan } from \"@/components/oxygen/safety-plan\";\n\n<SafetyPlan\n  revisedAt=\"2026-08-11\"\n  headingLevel={2}\n  steps={{\n    warningSigns: { entries: [\"Sleeping less than four hours\", \"Not answering messages for two days\"] },\n    internalCoping: { entries: [\"Walk to the end of the road and back\", \"Four in, six out, ten times\"] },\n    distractions: { entries: [\"The cafe on Bell Street before 11am\"] },\n    supportContacts: { contacts: [{ name: \"Priya\", detail: \"Sister\", availability: \"Any time\" }] },\n    professionals: {\n      contacts: [\n        { name: \"988\", detail: \"Suicide & Crisis Lifeline\", availability: \"24 hours\" },\n        { name: \"County crisis team\", detail: \"555 0148\", availability: \"24 hours\" },\n      ],\n    },\n    environment: { entries: [\"Priya is holding the spare keys to the garage\"] },\n  }}\n/>",
+    "usage": "import { SafetyPlan } from \"@/components/zoblocks/safety-plan\";\n\n<SafetyPlan\n  revisedAt=\"2026-08-11\"\n  headingLevel={2}\n  steps={{\n    warningSigns: { entries: [\"Sleeping less than four hours\", \"Not answering messages for two days\"] },\n    internalCoping: { entries: [\"Walk to the end of the road and back\", \"Four in, six out, ten times\"] },\n    distractions: { entries: [\"The cafe on Bell Street before 11am\"] },\n    supportContacts: { contacts: [{ name: \"Priya\", detail: \"Sister\", availability: \"Any time\" }] },\n    professionals: {\n      contacts: [\n        { name: \"988\", detail: \"Suicide & Crisis Lifeline\", availability: \"24 hours\" },\n        { name: \"County crisis team\", detail: \"555 0148\", availability: \"24 hours\" },\n      ],\n    },\n    environment: { entries: [\"Priya is holding the spare keys to the garage\"] },\n  }}\n/>",
     "guidance": {
       "use": [
         "Patient-facing portals and apps, which is what the default patient density and second-person wording are for.",
@@ -11985,7 +11985,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @oxygenui-design/cli add safety-plan",
+    "install": "npx @zoblocks/cli add safety-plan",
     "relationships": {
       "builtWith": [
         "accordion"
@@ -12034,7 +12034,7 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "absentReason",
         "type": "AbsentReason",
-        "description": "Why the value is `\"unknown\"`. Structurally the output of `resolveAbsentReason()` in `@oxygenui-design/fhir`.",
+        "description": "Why the value is `\"unknown\"`. Structurally the output of `resolveAbsentReason()` in `@zoblocks/fhir`.",
         "required": false
       },
       {
@@ -12059,7 +12059,7 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "checked",
         "type": "SwitchValue",
-        "description": "`\"unknown\"` is Oxygen's widening. antd's `boolean` shape is unchanged.",
+        "description": "`\"unknown\"` is Zoblocks's widening. antd's `boolean` shape is unchanged.",
         "required": false
       },
       {
@@ -12316,7 +12316,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "absentReason",
             "type": "AbsentReason",
-            "description": "Why the value is `\"unknown\"`. Structurally the output of `resolveAbsentReason()` in `@oxygenui-design/fhir`.",
+            "description": "Why the value is `\"unknown\"`. Structurally the output of `resolveAbsentReason()` in `@zoblocks/fhir`.",
             "required": false
           },
           {
@@ -12341,7 +12341,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "checked",
             "type": "SwitchValue",
-            "description": "`\"unknown\"` is Oxygen's widening. antd's `boolean` shape is unchanged.",
+            "description": "`\"unknown\"` is Zoblocks's widening. antd's `boolean` shape is unchanged.",
             "required": false
           },
           {
@@ -12598,7 +12598,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "absentReason",
             "type": "AbsentReason",
-            "description": "Why the value is `\"unknown\"`. Structurally the output of `resolveAbsentReason()` in `@oxygenui-design/fhir`.",
+            "description": "Why the value is `\"unknown\"`. Structurally the output of `resolveAbsentReason()` in `@zoblocks/fhir`.",
             "required": false
           },
           {
@@ -12622,7 +12622,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "checked",
             "type": "SwitchValue",
-            "description": "`\"unknown\"` is Oxygen's widening. antd's `boolean` shape is unchanged.",
+            "description": "`\"unknown\"` is Zoblocks's widening. antd's `boolean` shape is unchanged.",
             "required": false
           },
           {
@@ -12893,7 +12893,7 @@ export const CATALOG: ComponentDoc[] = [
         "extendsType": "Omit<React.HTMLAttributes<HTMLDivElement>, \"title\">"
       }
     ],
-    "usage": "import { Switch, SwitchField, SwitchList } from \"@/components/oxygen/switch\";\n\n// The whole three-phase UX, including rollback and announcement.\n<Switch\n  label=\"Contact precautions\"\n  stateLabels=\"in-effect\"\n  tone=\"caution\"\n  checked={precautions}\n  onCommit={async (next) => {\n    await api.setPrecautions({ encounter, contact: next });\n    setPrecautions(next);\n  }}\n  now={serverTime}\n/>\n\n// An absence that says which kind it is.\n<Switch\n  label=\"Advance directive on file\"\n  checked=\"unknown\"\n  absentReason=\"not-collected\"\n  stateLabels=\"yes-no\"\n/>\n\n// A group, counting unknown separately from off.\n<SwitchList title=\"Isolation precautions\" counts={{ on: 2, total: 5, unknown: 1 }}>\n  <SwitchField label=\"Contact\" description=\"Gown and gloves on entry.\" checked />\n  <SwitchField label=\"Airborne\" readOnly lockedReason=\"No negative-pressure room on this unit.\" />\n</SwitchList>",
+    "usage": "import { Switch, SwitchField, SwitchList } from \"@/components/zoblocks/switch\";\n\n// The whole three-phase UX, including rollback and announcement.\n<Switch\n  label=\"Contact precautions\"\n  stateLabels=\"in-effect\"\n  tone=\"caution\"\n  checked={precautions}\n  onCommit={async (next) => {\n    await api.setPrecautions({ encounter, contact: next });\n    setPrecautions(next);\n  }}\n  now={serverTime}\n/>\n\n// An absence that says which kind it is.\n<Switch\n  label=\"Advance directive on file\"\n  checked=\"unknown\"\n  absentReason=\"not-collected\"\n  stateLabels=\"yes-no\"\n/>\n\n// A group, counting unknown separately from off.\n<SwitchList title=\"Isolation precautions\" counts={{ on: 2, total: 5, unknown: 1 }}>\n  <SwitchField label=\"Contact\" description=\"Gown and gloves on entry.\" checked />\n  <SwitchField label=\"Airborne\" readOnly lockedReason=\"No negative-pressure room on this unit.\" />\n</SwitchList>",
     "guidance": {
       "use": [
         "A single independent setting that takes effect immediately, has two states, and is worth seeing at a glance in a list of similar settings.",
@@ -12917,7 +12917,7 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "label": "The hit area never shrinks with the pill",
-        "detail": "The target is a pseudo-element sized max(track, --ox-switch-target-min), which follows the density profile. A 26x14px micro switch in a clinical table still presents a 24px-or-larger target."
+        "detail": "The target is a pseudo-element sized max(track, --zb-switch-target-min), which follows the density profile. A 26x14px micro switch in a clinical table still presents a 24px-or-larger target."
       },
       {
         "label": "State survives without colour",
@@ -12952,9 +12952,9 @@ export const CATALOG: ComponentDoc[] = [
       "aria-checked=\"mixed\" on role=switch is spec-valid but unevenly supported. The state word is always in the accessible description so the announcement is correct either way, but the NVDA, JAWS and VoiceOver matrix must be recorded before this reaches stable.",
       "Diverges from antd in one place, deliberately: loading maps to phase=\"pending\" and does not disable the control.",
       "Does not write on expiry. until renders the window and fires onExpire; the application owns the write, because a client clock deciding to lift a clinical flag is a defect.",
-      "confirm=\"countersign\" collects a second identity through the caller's verify callback. It does not authenticate anyone, and it is not a signature capture — compose it with @oxygenui-design/signature when evidence is required.",
+      "confirm=\"countersign\" collects a second identity through the caller's verify callback. It does not authenticate anyone, and it is not a signature capture — compose it with @zoblocks/signature when evidence is required.",
       "audience selects the default label preset and size. Wiring it to separate clinician and patient intl catalogs is not done yet.",
-      "Requires styles/oxygen-switch.css, installed with switch-core."
+      "Requires styles/zoblocks-switch.css, installed with switch-core."
     ],
     "related": [
       "clinical-note",
@@ -12966,7 +12966,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @oxygenui-design/cli add switch"
+    "install": "npx @zoblocks/cli add switch"
   },
   {
     "name": "timeline",
@@ -13197,7 +13197,7 @@ export const CATALOG: ComponentDoc[] = [
         ]
       }
     ],
-    "usage": "import { Timeline } from \"@/components/oxygen/timeline\";\n\n<Timeline\n  aria-label=\"Release history\"\n  mode=\"start\"\n  items={[\n    { key: \"1\", title: \"0.3.0\", content: \"Switch, Tabs, ChartAccordion.\" },\n    { key: \"2\", title: \"0.2.0\", content: \"Signature and Identity.\" },\n    { key: \"3\", title: \"0.1.0\", content: \"Five loaders.\" },\n  ]}\n/>",
+    "usage": "import { Timeline } from \"@/components/zoblocks/timeline\";\n\n<Timeline\n  aria-label=\"Release history\"\n  mode=\"start\"\n  items={[\n    { key: \"1\", title: \"0.3.0\", content: \"Switch, Tabs, ChartAccordion.\" },\n    { key: \"2\", title: \"0.2.0\", content: \"Signature and Identity.\" },\n    { key: \"3\", title: \"0.1.0\", content: \"Five loaders.\" },\n  ]}\n/>",
     "guidance": {
       "use": [
         "Any ordered sequence of moments: a release history, an order's progress, an audit trail.",
@@ -13227,7 +13227,7 @@ export const CATALOG: ComponentDoc[] = [
     "limitations": [
       "No current or activeIndex. antd hardcodes current to the last item and its stylesheet dots that item's rail; a history has no current step, so the prop does not exist here and the dotted rail is free to mean something.",
       "color accepts antd's four presets and any CSS colour, and nothing enforces a text equivalent beside it. That enforcement belongs on the clinical layer, where the vocabulary is closed.",
-      "titleSpan sets --ox-timeline-title-span rather than reproducing antd's internal head-span calculation. The rendered geometry is close, not identical.",
+      "titleSpan sets --zb-timeline-title-span rather than reproducing antd's internal head-span calculation. The rendered geometry is close, not identical.",
       "The Ant Design documentation site and the 6.6.0 source disagree on mode's default — the table says end, the source falls back to start. This follows the source, and the parity test asserts against the installed version.",
       "Migrating an existing antd call site is one import plus an accessible name. The three deliberate divergences, and the dotted rail antd draws that this one does not, are written up in content/guides/migrating-from-antd-timeline.md."
     ],
@@ -13240,7 +13240,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @oxygenui-design/cli add timeline",
+    "install": "npx @zoblocks/cli add timeline",
     "relationships": {
       "builtWith": [],
       "usedIn": [
@@ -13365,7 +13365,7 @@ export const CATALOG: ComponentDoc[] = [
         "extendsType": "Omit< React.HTMLAttributes<HTMLDivElement>, \"children\" >"
       }
     ],
-    "usage": "import { TrendIndicator } from \"@/components/oxygen/trend-indicator\";\nimport \"@/styles/oxygen-trend.css\";\n\n<TrendIndicator\n  series={{\n    id: \"phq9\",\n    label: \"PHQ-9\",\n    valence: \"higher-is-worse\",\n    significantChange: 5,\n    points: [{ at: \"2026-05-02\", value: 18 }, { at: \"2026-06-06\", value: 14 }],\n  }}\n/>",
+    "usage": "import { TrendIndicator } from \"@/components/zoblocks/trend-indicator\";\nimport \"@/styles/zoblocks-trend.css\";\n\n<TrendIndicator\n  series={{\n    id: \"phq9\",\n    label: \"PHQ-9\",\n    valence: \"higher-is-worse\",\n    significantChange: 5,\n    points: [{ at: \"2026-05-02\", value: 18 }, { at: \"2026-06-06\", value: 14 }],\n  }}\n/>",
     "guidance": {
       "use": [
         "In a flowsheet or a results list, beside the latest value rather than instead of it.",
@@ -13415,7 +13415,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @oxygenui-design/cli add trend-indicator",
+    "install": "npx @zoblocks/cli add trend-indicator",
     "technicalName": "TrendIndicator",
     "aliases": [
       "sparkline",
@@ -13650,7 +13650,7 @@ export const CATALOG: ComponentDoc[] = [
     "since": "0.1.0",
     "layer": "clinical",
     "distribution": "package",
-    "packageName": "@oxygenui-design/identity",
+    "packageName": "@zoblocks/identity",
     "frameworks": {
       "antd": {
         "policy": "neutral",
@@ -13844,7 +13844,7 @@ export const CATALOG: ComponentDoc[] = [
         ]
       }
     ],
-    "usage": "import {\n  IdentityProvider,\n  PatientBanner,\n  PatientGuard,\n} from \"@oxygenui-design/identity\";\nimport \"@oxygenui-design/identity/styles.css\";\n\n<IdentityProvider disclosure=\"clinical\" photos=\"allow\" onSensitiveReveal={audit.write}>\n  {/* context=\"action\" takes a two-or-more tuple: NPSG.01.01.01 as a compile error. */}\n  <PatientBanner\n    patient={patient}\n    context=\"action\"\n    identifiers={[{ kind: \"mrn\" }, { kind: \"nhs\" }]}\n  >\n    {/* Refuses to render if the chart on screen is not the one this was opened for. */}\n    <PatientGuard expect={openedFor.id} expectName={openedFor.name}>\n      <OrderForm />\n    </PatientGuard>\n  </PatientBanner>\n</IdentityProvider>;",
+    "usage": "import {\n  IdentityProvider,\n  PatientBanner,\n  PatientGuard,\n} from \"@zoblocks/identity\";\nimport \"@zoblocks/identity/styles.css\";\n\n<IdentityProvider disclosure=\"clinical\" photos=\"allow\" onSensitiveReveal={audit.write}>\n  {/* context=\"action\" takes a two-or-more tuple: NPSG.01.01.01 as a compile error. */}\n  <PatientBanner\n    patient={patient}\n    context=\"action\"\n    identifiers={[{ kind: \"mrn\" }, { kind: \"nhs\" }]}\n  >\n    {/* Refuses to render if the chart on screen is not the one this was opened for. */}\n    <PatientGuard expect={openedFor.id} expectName={openedFor.name}>\n      <OrderForm />\n    </PatientGuard>\n  </PatientBanner>\n</IdentityProvider>;",
     "guidance": {
       "use": [
         "The pinned header of any chart, order screen or note editor — `context=\"action\"` wherever a care action follows, which requires two person-specific identifiers at the type level.",
@@ -13911,9 +13911,9 @@ export const CATALOG: ComponentDoc[] = [
       "recent-patient-stack"
     ],
     "dependencies": [
-      "@oxygenui-design/identity-core"
+      "@zoblocks/identity-core"
     ],
-    "install": "pnpm add @oxygenui-design/identity"
+    "install": "pnpm add @zoblocks/identity"
   },
   {
     "name": "signature",
@@ -13923,7 +13923,7 @@ export const CATALOG: ComponentDoc[] = [
     "since": "0.1.0",
     "layer": "clinical",
     "distribution": "package",
-    "packageName": "@oxygenui-design/signature",
+    "packageName": "@zoblocks/signature",
     "frameworks": {
       "antd": {
         "policy": "wrapping",
@@ -14037,7 +14037,7 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "methods",
         "type": "CaptureMethod[]",
-        "description": "Which capture methods to offer. Omitting `\"type\"` produces a component that fails WCAG 2.1.1 at Level A: drawing is a path-dependent input technique, and without the typed path this control is not operable without a pointer. It is permitted because a host may have a genuinely equivalent alternative elsewhere on the page, but it is never the default — and `@oxygenui/signature-requires-typed-path` makes it a lint error rather than a runtime app message, because a component has no business writing to a customer's app.",
+        "description": "Which capture methods to offer. Omitting `\"type\"` produces a component that fails WCAG 2.1.1 at Level A: drawing is a path-dependent input technique, and without the typed path this control is not operable without a pointer. It is permitted because a host may have a genuinely equivalent alternative elsewhere on the page, but it is never the default — and `@zoblocks/signature-requires-typed-path` makes it a lint error rather than a runtime app message, because a component has no business writing to a customer's app.",
         "required": false,
         "default": "[\"draw\", \"type\", \"upload\"]"
       },
@@ -14175,7 +14175,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "methods",
             "type": "CaptureMethod[]",
-            "description": "Which capture methods to offer. Omitting `\"type\"` produces a component that fails WCAG 2.1.1 at Level A: drawing is a path-dependent input technique, and without the typed path this control is not operable without a pointer. It is permitted because a host may have a genuinely equivalent alternative elsewhere on the page, but it is never the default — and `@oxygenui/signature-requires-typed-path` makes it a lint error rather than a runtime app message, because a component has no business writing to a customer's app.",
+            "description": "Which capture methods to offer. Omitting `\"type\"` produces a component that fails WCAG 2.1.1 at Level A: drawing is a path-dependent input technique, and without the typed path this control is not operable without a pointer. It is permitted because a host may have a genuinely equivalent alternative elsewhere on the page, but it is never the default — and `@zoblocks/signature-requires-typed-path` makes it a lint error rather than a runtime app message, because a component has no business writing to a customer's app.",
             "required": false,
             "default": "[\"draw\", \"type\", \"upload\"]"
           },
@@ -14242,7 +14242,7 @@ export const CATALOG: ComponentDoc[] = [
         ]
       }
     ],
-    "usage": "import { Form } from \"antd\";\nimport { Signature, signatureRequired } from \"@oxygenui-design/signature\";\nimport \"@oxygenui-design/signature/styles.css\";\n\n// signatureRequired() accepts a decline as an answer. A rule demanding\n// outcome === \"signed\" would make refusal impossible to submit.\n<Form.Item name=\"consent\" label=\"Patient signature\" rules={[signatureRequired()]}>\n  <Signature\n    now={serverTime}\n    meaning=\"consent\"\n    attestation=\"I have read the information about this procedure, I have had the chance to ask questions, and I agree to go ahead.\"\n    subject={{ display: \"Randall, Josh\", reference: \"Patient/4471902\" }}\n    recordedBy={{ name: \"A. Okafor\", credential: \"RN\" }}\n    outcomes={[\"declined\", \"unable\", \"verbal\", \"on-paper\"]}\n  />\n</Form.Item>;",
+    "usage": "import { Form } from \"antd\";\nimport { Signature, signatureRequired } from \"@zoblocks/signature\";\nimport \"@zoblocks/signature/styles.css\";\n\n// signatureRequired() accepts a decline as an answer. A rule demanding\n// outcome === \"signed\" would make refusal impossible to submit.\n<Form.Item name=\"consent\" label=\"Patient signature\" rules={[signatureRequired()]}>\n  <Signature\n    now={serverTime}\n    meaning=\"consent\"\n    attestation=\"I have read the information about this procedure, I have had the chance to ask questions, and I agree to go ahead.\"\n    subject={{ display: \"Randall, Josh\", reference: \"Patient/4471902\" }}\n    recordedBy={{ name: \"A. Okafor\", credential: \"RN\" }}\n    outcomes={[\"declined\", \"unable\", \"verbal\", \"on-paper\"]}\n  />\n</Form.Item>;",
     "guidance": {
       "use": [
         "Consent forms, treatment authorisations, and anywhere a refusal must be recordable rather than left blank.",
@@ -14290,7 +14290,7 @@ export const CATALOG: ComponentDoc[] = [
       }
     ],
     "limitations": [
-      "Ant Design is a peer dependency. This is the only Oxygen component that is not distributed as copy-as-source, because copying antd's Modal and Form into a consumer's repository would be a fork rather than a component.",
+      "Ant Design is a peer dependency. This is the only Zoblocks component that is not distributed as copy-as-source, because copying antd's Modal and Form into a consumer's repository would be a fork rather than a component.",
       "Signature.data is a graphical signature only — an image of a mark. Deployments needing non-repudiation add a second Signature entry carrying a JWS.",
       "The timestamp is a required prop, not read from the clock. A browser clock is not evidence, and 42 CFR 482.24(c)(1) wants entries dated by whoever is accountable.",
       "Stroke biometrics are captured into the model but never emitted unless explicitly opted in, because whether stroke dynamics are a 'writing sample' is unsettled under BIPA and CUBI.",
@@ -14303,9 +14303,9 @@ export const CATALOG: ComponentDoc[] = [
     ],
     "dependencies": [
       "antd",
-      "@oxygenui-design/signature-core"
+      "@zoblocks/signature-core"
     ],
-    "install": "pnpm add @oxygenui-design/signature",
+    "install": "pnpm add @zoblocks/signature",
     "technicalName": "Signature",
     "aliases": [
       "signature pad",
@@ -14537,7 +14537,7 @@ export const CATALOG: ComponentDoc[] = [
         "title": "Consent inside an antd Form",
         "description": "The common case. `signatureRequired()` treats a decline as a valid answer — a rule demanding outcome === \"signed\" would make refusal impossible to submit.",
         "fixture": "patientRoutine",
-        "code": "import { Form } from \"antd\";\nimport { Signature, signatureRequired } from \"@oxygenui-design/signature\";\nimport \"@oxygenui-design/signature/styles.css\";\n\n<Form.Item name=\"consent\" rules={[signatureRequired()]}>\n  <Signature\n    now={serverTime}\n    meaning=\"consent\"\n    attestation=\"I agree to the treatment described above.\"\n  />\n</Form.Item>;"
+        "code": "import { Form } from \"antd\";\nimport { Signature, signatureRequired } from \"@zoblocks/signature\";\nimport \"@zoblocks/signature/styles.css\";\n\n<Form.Item name=\"consent\" rules={[signatureRequired()]}>\n  <Signature\n    now={serverTime}\n    meaning=\"consent\"\n    attestation=\"I agree to the treatment described above.\"\n  />\n</Form.Item>;"
       },
       {
         "id": "refusal",
@@ -14551,7 +14551,7 @@ export const CATALOG: ComponentDoc[] = [
         "title": "What it emits, and why it is not a Consent",
         "description": "Consent carries no signature element in R4 or R5 — only Provenance.signature does. The component emits a transaction Bundle so the two land together or not at all.",
         "fixture": "provenanceConsent",
-        "code": "import { toFhirBundle } from \"@oxygenui-design/signature\";\nimport { patientRoutine } from \"@oxygenui-design/fixtures\";\n\n// A transaction Bundle: the Consent and the Provenance that signs it, posted\n// together or not at all. Emitting the Consent alone would store an agreement\n// with nothing proving anyone made it.\nconst bundle = toFhirBundle(value, {\n  release: \"R4\",\n  subject: {\n    display: \"Amara Okonkwo\",\n    reference: `Patient/${patientRoutine.id}`,\n  },\n});\n\n// bundle.entry[0] → POST Consent\n// bundle.entry[1] → POST Provenance, carrying Provenance.signature\n\n// The signer travels on the value, not in these options: who signed is part of\n// what was captured, and re-supplying it here would let the two disagree."
+        "code": "import { toFhirBundle } from \"@zoblocks/signature\";\nimport { patientRoutine } from \"@zoblocks/fixtures\";\n\n// A transaction Bundle: the Consent and the Provenance that signs it, posted\n// together or not at all. Emitting the Consent alone would store an agreement\n// with nothing proving anyone made it.\nconst bundle = toFhirBundle(value, {\n  release: \"R4\",\n  subject: {\n    display: \"Amara Okonkwo\",\n    reference: `Patient/${patientRoutine.id}`,\n  },\n});\n\n// bundle.entry[0] → POST Consent\n// bundle.entry[1] → POST Provenance, carrying Provenance.signature\n\n// The signer travels on the value, not in these options: who signed is part of\n// what was captured, and re-supplying it here would let the two disagree."
       }
     ],
     "fixtures": [
@@ -14603,7 +14603,7 @@ export const CATALOG: ComponentDoc[] = [
     "since": "0.1.0",
     "layer": "primitive",
     "distribution": "package",
-    "packageName": "@oxygenui-design/tabs",
+    "packageName": "@zoblocks/tabs",
     "frameworks": {
       "antd": {
         "policy": "compatible",
@@ -15009,7 +15009,7 @@ export const CATALOG: ComponentDoc[] = [
         "props": []
       }
     ],
-    "usage": "import { Tabs } from \"@oxygenui-design/tabs\";\nimport \"@oxygenui-design/tabs/styles.css\";\n\n// `as` is required and has no default: it selects the accessibility tree.\n// `variant` is orthogonal and changes no ARIA at all.\n<Tabs\n  as=\"tabs\"\n  variant=\"segmented\"\n  aria-label=\"Chart sections\"\n  defaultValue=\"summary\"\n  items={[\n    { value: \"summary\", label: \"Summary\", children: <Summary /> },\n    // The tone reaches the accessible name as a word: \"Labs, 2 critical\".\n    { value: \"labs\", label: \"Labs\", count: 2, tone: \"critical\", children: <Labs /> },\n    {\n      value: \"bh\",\n      label: \"Behavioural health\",\n      disabled: true,\n      disabledReason: \"Restricted — opening records an access event\",\n    },\n  ]}\n/>;",
+    "usage": "import { Tabs } from \"@zoblocks/tabs\";\nimport \"@zoblocks/tabs/styles.css\";\n\n// `as` is required and has no default: it selects the accessibility tree.\n// `variant` is orthogonal and changes no ARIA at all.\n<Tabs\n  as=\"tabs\"\n  variant=\"segmented\"\n  aria-label=\"Chart sections\"\n  defaultValue=\"summary\"\n  items={[\n    { value: \"summary\", label: \"Summary\", children: <Summary /> },\n    // The tone reaches the accessible name as a word: \"Labs, 2 critical\".\n    { value: \"labs\", label: \"Labs\", count: 2, tone: \"critical\", children: <Labs /> },\n    {\n      value: \"bh\",\n      label: \"Behavioural health\",\n      disabled: true,\n      disabledReason: \"Restricted — opening records an access event\",\n    },\n  ]}\n/>;",
     "guidance": {
       "use": [
         "Panels of one object — a chart with Summary, Vitals, Labs, Notes. That is as=\"tabs\".",
@@ -15029,7 +15029,7 @@ export const CATALOG: ComponentDoc[] = [
     "accessibility": [
       {
         "label": "The mode is declared, not guessed",
-        "detail": "`as` selects the accessibility tree: tablist of buttons, a real nav of anchors, a radiogroup, or a gated tablist. It has no default, `@oxygenui/tabs-semantic-mode` makes omitting it a lint error, and passing an href under as=\"tabs\" throws. A tablist of links passes every automated checker and then destroys focus on the first arrow key."
+        "detail": "`as` selects the accessibility tree: tablist of buttons, a real nav of anchors, a radiogroup, or a gated tablist. It has no default, `@zoblocks/tabs-semantic-mode` makes omitting it a lint error, and passing an href under as=\"tabs\" throws. A tablist of links passes every automated checker and then destroys focus on the first arrow key."
       },
       {
         "label": "One tab stop, and it follows selection",
@@ -15074,9 +15074,9 @@ export const CATALOG: ComponentDoc[] = [
       "switch"
     ],
     "dependencies": [
-      "@oxygenui-design/tabs-core"
+      "@zoblocks/tabs-core"
     ],
-    "install": "pnpm add @oxygenui-design/tabs",
+    "install": "pnpm add @zoblocks/tabs",
     "technicalName": "Tabs",
     "aliases": [
       "tab strip",
@@ -15306,14 +15306,14 @@ export const CATALOG: ComponentDoc[] = [
         "title": "Chart sections",
         "description": "The common case: a view switch over a patient chart, with a critical count on Labs that reaches the accessible name as a word.",
         "fixture": "patientRoutine",
-        "code": "import { Tabs } from \"@oxygenui-design/tabs\";\nimport { allergyList, medicationList, observationPanel } from \"@oxygenui-design/fixtures\";\nimport \"@oxygenui-design/tabs/styles.css\";\n\nconst critical = observationPanel.filter(isCritical);\n\n<Tabs\n  as=\"tabs\"\n  aria-label=\"Chart sections\"\n  defaultValue=\"summary\"\n  items={[\n    { value: \"summary\", label: \"Summary\", children: <Summary /> },\n    {\n      value: \"labs\",\n      label: \"Labs\",\n      // Counted from the data, never typed in. A tone is a claim about the\n      // patient, so it has to come from the same place the panel does.\n      count: critical.length,\n      tone: critical.length ? \"critical\" : \"neutral\",\n      children: <Labs observations={observationPanel} />,\n    },\n    { value: \"meds\", label: \"Medications\", count: medicationList.length, children: <Meds /> },\n    { value: \"allergies\", label: \"Allergies\", count: allergyList.length, children: <Allergies /> },\n  ]}\n/>;"
+        "code": "import { Tabs } from \"@zoblocks/tabs\";\nimport { allergyList, medicationList, observationPanel } from \"@zoblocks/fixtures\";\nimport \"@zoblocks/tabs/styles.css\";\n\nconst critical = observationPanel.filter(isCritical);\n\n<Tabs\n  as=\"tabs\"\n  aria-label=\"Chart sections\"\n  defaultValue=\"summary\"\n  items={[\n    { value: \"summary\", label: \"Summary\", children: <Summary /> },\n    {\n      value: \"labs\",\n      label: \"Labs\",\n      // Counted from the data, never typed in. A tone is a claim about the\n      // patient, so it has to come from the same place the panel does.\n      count: critical.length,\n      tone: critical.length ? \"critical\" : \"neutral\",\n      children: <Labs observations={observationPanel} />,\n    },\n    { value: \"meds\", label: \"Medications\", count: medicationList.length, children: <Meds /> },\n    { value: \"allergies\", label: \"Allergies\", count: allergyList.length, children: <Allergies /> },\n  ]}\n/>;"
       },
       {
         "id": "restricted-section",
         "title": "A section that is restricted, not absent",
         "description": "A disabled tab requires a reason. Omitting the section entirely would tell the clinician it does not exist; greying it silently tells them nothing.",
         "fixture": "patientRestricted",
-        "code": "import { patientRestricted } from \"@oxygenui-design/fixtures\";\n\n<Tabs\n  as=\"tabs\"\n  aria-label=\"Chart sections\"\n  defaultValue=\"summary\"\n  items={[\n    { value: \"summary\", label: \"Summary\", children: <Summary /> },\n    {\n      value: \"bh\",\n      label: \"Behavioural health\",\n      disabled: true,\n      // Mandatory. aria-disabled, never the disabled attribute — a keyboard\n      // user has to be able to reach it to find out why they cannot open it.\n      disabledReason:\n        \"Restricted. Opening it records an access event and notifies the record owner.\",\n    },\n  ]}\n/>;"
+        "code": "import { patientRestricted } from \"@zoblocks/fixtures\";\n\n<Tabs\n  as=\"tabs\"\n  aria-label=\"Chart sections\"\n  defaultValue=\"summary\"\n  items={[\n    { value: \"summary\", label: \"Summary\", children: <Summary /> },\n    {\n      value: \"bh\",\n      label: \"Behavioural health\",\n      disabled: true,\n      // Mandatory. aria-disabled, never the disabled attribute — a keyboard\n      // user has to be able to reach it to find out why they cannot open it.\n      disabledReason:\n        \"Restricted. Opening it records an access event and notifies the record owner.\",\n    },\n  ]}\n/>;"
       },
       {
         "id": "segmented-filter",

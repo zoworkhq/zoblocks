@@ -10,7 +10,7 @@
 
 import { describe, expect, it } from "vitest";
 import { loadTokenSource } from "../../../scripts/gen/tokens/load";
-import type { TokenSource } from "@oxygenui-design/tokens/validate";
+import type { TokenSource } from "@zoblocks/tokens/validate";
 import {
   ThemeError,
   checkTheme,
@@ -207,7 +207,7 @@ describe("the served stylesheet", () => {
     await publishTheme(auth, await tokens(), id);
 
     const css = await versionCss(auth, id, 1);
-    expect(css).toContain("--ox-ref-brand-600: #1d63c9;");
+    expect(css).toContain("--zb-ref-brand-600: #1d63c9;");
     expect(css).toContain("clinical@1");
   });
 
@@ -218,8 +218,8 @@ describe("the served stylesheet", () => {
     await publishTheme(auth, await tokens(), id);
 
     const css = (await versionCss(auth, id, 1))!;
-    expect(css).not.toContain("--ox-status-");
-    expect(css).not.toContain("--ox-flag-");
+    expect(css).not.toContain("--zb-status-");
+    expect(css).not.toContain("--zb-flag-");
   });
 
   it("returns nothing for a version that was never published", async () => {

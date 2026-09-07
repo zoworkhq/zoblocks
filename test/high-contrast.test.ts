@@ -3,7 +3,7 @@
  *
  * It was neither reachable nor audited when this file was written. `packages/tokens` has emitted 59 high-contrast values held to
  * a 7:1 floor since the pipeline landed, selected by
- * `[data-ox-theme="high-contrast"]` — an attribute nothing in the repository
+ * `[data-zb-theme="high-contrast"]` — an attribute nothing in the repository
  * ever set. A mode we advertise, hold to AAA, and had no evidence for is worse
  * than one we do not ship: the token gate reported it green while no page could
  * turn it on and `scripts/a11y.ts` iterated two themes.
@@ -26,11 +26,11 @@ import { fileURLToPath } from "node:url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = (p: string) => readFileSync(path.join(ROOT, p), "utf8");
 
-const SELECTOR = '[data-ox-theme="high-contrast"]';
+const SELECTOR = '[data-zb-theme="high-contrast"]';
 
 describe("the token build emits it", () => {
   it("declares a high-contrast block", () => {
-    expect(read("packages/tokens/src/oxygen-tokens.css")).toContain(`${SELECTOR} {`);
+    expect(read("packages/tokens/src/zoblocks-tokens.css")).toContain(`${SELECTOR} {`);
   });
 
   it("gives it the same key space as light, per the parity gate", () => {
@@ -60,7 +60,7 @@ describe("it survives without being an option", () => {
   /*
    * The picker offers Light and Dark only, by product decision. That removed
    * the *way in*, not the theme: 59 tokens at a 7:1 floor still sit behind
-   * `[data-ox-theme="high-contrast"]`, the site palette still matches them,
+   * `[data-zb-theme="high-contrast"]`, the site palette still matches them,
    * and the axe run still covers all three.
    *
    * These assertions exist because a theme with no way in is exactly the state
@@ -76,7 +76,7 @@ describe("it survives without being an option", () => {
 
   it("is still a value the theme layer accepts and applies", () => {
     const theme = read("apps/docs/src/lib/theme.ts");
-    expect(theme).toContain('setAttribute("data-ox-theme", "high-contrast")');
+    expect(theme).toContain('setAttribute("data-zb-theme", "high-contrast")');
     // Read back, so a preference stored before the picker changed is honoured
     // rather than silently downgraded to light.
     expect(theme).toContain('raw === "high-contrast"');
@@ -96,12 +96,12 @@ describe("it survives without being an option", () => {
     // A deferred application paints light and snaps, which for a reader who
     // needs high contrast is the flash that matters most.
     expect(read("apps/docs/src/lib/theme.ts")).toContain(
-      'if(t==="high-contrast"){e.setAttribute("data-ox-theme","high-contrast")',
+      'if(t==="high-contrast"){e.setAttribute("data-zb-theme","high-contrast")',
     );
   });
 
   it("removes the attribute when another theme is chosen", () => {
-    expect(read("apps/docs/src/lib/theme.ts")).toContain('removeAttribute("data-ox-theme")');
+    expect(read("apps/docs/src/lib/theme.ts")).toContain('removeAttribute("data-zb-theme")');
   });
 });
 

@@ -13,7 +13,7 @@ import { unscopedFontAsset } from "@/db/scope";
 import { ThemeError, createTheme, publishTheme, versionCss } from "@/lib/themes";
 import { fontHref, removeFont, uploadFont } from "@/lib/fonts";
 import { loadTokenSource } from "../../../scripts/gen/tokens/load";
-import type { TokenSource } from "@oxygenui-design/tokens/validate";
+import type { TokenSource } from "@zoblocks/tokens/validate";
 import { twoOrgs } from "./harness";
 
 let base: TokenSource;
@@ -211,7 +211,7 @@ describe("a published version keeps the face it was published with", () => {
     const css = await versionCss(nw, id, version);
     expect(css).toContain("@font-face");
     expect(css).toContain("font-display: swap");
-    expect(css).toContain("--ox-font-sans:");
+    expect(css).toContain("--zb-font-sans:");
   });
 
   it("serves nothing extra for a theme with no fonts", async () => {

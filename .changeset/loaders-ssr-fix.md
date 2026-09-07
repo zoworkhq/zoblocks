@@ -1,10 +1,10 @@
 ---
-"@oxygenui-design/loaders": patch
+"@zoblocks/loaders": patch
 ---
 
 Fix a crash when the package is imported in any Node context.
 
-`class OxLoaderElement extends HTMLElement` was evaluated at module scope, so
+`class ZbLoaderElement extends HTMLElement` was evaluated at module scope, so
 importing the package on a server threw `ReferenceError: HTMLElement is not
 defined` before anything rendered — breaking Nuxt, Angular Universal, Astro,
 SvelteKit, and Next.js server components, every one of which this package's

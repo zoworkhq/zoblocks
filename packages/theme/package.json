@@ -1,12 +1,12 @@
 {
-  "name": "@oxygenui-design/theme",
+  "name": "@zoblocks/theme",
   "version": "0.1.0",
   "description": "Customer themes at runtime: the document model, the ramp generator, the three-point validation, and the CSS payload a published theme is served as.",
   "license": "MIT",
-  "homepage": "https://oxygenui.design",
+  "homepage": "https://zoblocks.design",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zoworkhq/oxygenui.git",
+    "url": "git+https://github.com/zoworkhq/zoblocks.git",
     "directory": "packages/theme"
   },
   "keywords": [
@@ -63,10 +63,10 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@oxygenui-design/bridge-antd": "workspace:*",
-    "@oxygenui-design/bridge-core": "workspace:*",
-    "@oxygenui-design/bridge-mui": "workspace:*",
-    "@oxygenui-design/tokens": "workspace:*",
+    "@zoblocks/bridge-antd": "workspace:*",
+    "@zoblocks/bridge-core": "workspace:*",
+    "@zoblocks/bridge-mui": "workspace:*",
+    "@zoblocks/tokens": "workspace:*",
     "zod": "^3.24.1"
   },
   "peerDependencies": {
@@ -78,9 +78,9 @@
     }
   },
   "devDependencies": {
-    "@oxygenui-design/bridge-antd": "workspace:*",
-    "@oxygenui-design/bridge-mui": "workspace:*",
-    "@oxygenui-design/tsconfig": "workspace:*",
+    "@zoblocks/bridge-antd": "workspace:*",
+    "@zoblocks/bridge-mui": "workspace:*",
+    "@zoblocks/tsconfig": "workspace:*",
     "@testing-library/react": "^16",
     "@types/react": "^19.0.2",
     "@vitest/coverage-v8": "^4.1.10",

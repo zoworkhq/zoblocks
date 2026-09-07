@@ -69,7 +69,7 @@ describe("the icon set", () => {
   it.each(ICONS)("%s carries the slot its mask is keyed to", (_name, Glyph) => {
     const { container } = render(<Glyph />);
     const el = glyphOf(container);
-    expect(el).toHaveClass("ox-icon");
+    expect(el).toHaveClass("zb-icon");
     expect(el?.getAttribute("data-icon")).toMatch(/^[a-z0-9-]+$/);
   });
 
@@ -78,7 +78,7 @@ describe("the icon set", () => {
     const el = glyphOf(container);
     expect(el).toHaveClass("my-class");
     // And keeps its own, because dropping either would drop the glyph.
-    expect(el).toHaveClass("ox-icon");
+    expect(el).toHaveClass("zb-icon");
     expect(el).toHaveAttribute("data-icon", "send");
     expect(el).toHaveAttribute("data-testid", "send");
   });

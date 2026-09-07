@@ -10,8 +10,8 @@
 
 import { StrictMode, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import "@oxygenui-design/loaders/pulse";
-import "@oxygenui-design/loaders/rhythm";
+import "@zoblocks/loaders/pulse";
+import "@zoblocks/loaders/rhythm";
 
 declare module "react" {
   // The only way to teach React 19's JSX about a custom element. React 19
@@ -21,9 +21,9 @@ declare module "react" {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace JSX {
     interface IntrinsicElements {
-      "ox-pulse-loader": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> &
+      "zb-pulse-loader": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> &
         Record<string, unknown>;
-      "ox-rhythm-loader": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> &
+      "zb-rhythm-loader": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> &
         Record<string, unknown>;
     }
   }
@@ -42,11 +42,11 @@ function App() {
     const node = host.current;
     if (!node) return;
     const bump = () => setEvents((n) => n + 1);
-    node.addEventListener("ox-loader-show", bump);
-    node.addEventListener("ox-loader-hide", bump);
+    node.addEventListener("zb-loader-show", bump);
+    node.addEventListener("zb-loader-hide", bump);
     return () => {
-      node.removeEventListener("ox-loader-show", bump);
-      node.removeEventListener("ox-loader-hide", bump);
+      node.removeEventListener("zb-loader-show", bump);
+      node.removeEventListener("zb-loader-hide", bump);
     };
   }, []);
 
@@ -57,7 +57,7 @@ function App() {
       </h1>
 
       <div className="row">
-        <ox-pulse-loader
+        <zb-pulse-loader
           id="loader"
           label="Loading patient record"
           mode="inline"
@@ -70,7 +70,7 @@ function App() {
       </div>
 
       <div className="row">
-        <ox-rhythm-loader
+        <zb-rhythm-loader
           id="determinate"
           label="Uploading study"
           mode="inline"

@@ -1,6 +1,6 @@
-# @oxygenui-design/clinical-note-core
+# @zoblocks/clinical-note-core
 
-The engine behind Oxygen's `ClinicalNote`. Coded sections, per-range
+The engine behind Zoblocks's `ClinicalNote`. Coded sections, per-range
 provenance, a composable sign gate, and deterministic serialization to FHIR,
 XHTML and plain text.
 
@@ -9,7 +9,7 @@ what lets a server validate, render or re-hash a note without a browser
 anywhere in the picture.
 
 ```bash
-npm install @oxygenui-design/clinical-note-core
+npm install @zoblocks/clinical-note-core
 ```
 
 ---
@@ -39,7 +39,7 @@ import {
   composition,
   toFhirBundle,
   toText,
-} from "@oxygenui-design/clinical-note-core";
+} from "@zoblocks/clinical-note-core";
 
 const doc = emptyNote("progress");
 
@@ -100,7 +100,7 @@ trailing-zero carve-out guarantees false positives.
 ## Provenance
 
 ```ts
-import { provenance, provenanceRanges, unreviewedAi } from "@oxygenui-design/clinical-note-core";
+import { provenance, provenanceRanges, unreviewedAi } from "@zoblocks/clinical-note-core";
 
 // Six origins: typed · dictated · template · pulled · copied · ai
 provenance({ origin: "pulled", source: "Observation/cbc-1", at: "2026-08-16T06:12:00+05:30" });
@@ -147,7 +147,7 @@ be within reach of a UI package.
 
 ```ts
 import { createHash } from "node:crypto";
-import { toCanonical, toFhirBundle, withDigest } from "@oxygenui-design/clinical-note-core";
+import { toCanonical, toFhirBundle, withDigest } from "@zoblocks/clinical-note-core";
 
 const bundle = toFhirBundle(doc, options, toText(doc));
 withDigest(bundle, doc, (bytes) => createHash("sha256").update(bytes).digest("base64"));
@@ -161,13 +161,13 @@ R5.
 
 ## Boundaries
 
-Oxygen UI provides user-interface components. This package does not make an
+Zoblocks provides user-interface components. This package does not make an
 application HIPAA, GDPR or DPDP compliant, is not a medical device, is not
 clinical decision support, and does not by itself establish the legal validity
 or admissibility of any record.
 
 Per-range provenance is **not standardised anywhere in FHIR**. It travels as a
-custom Oxygen extension that a conforming server may legitimately ignore or
+custom Zoblocks extension that a conforming server may legitimately ignore or
 strip. It is the most valuable thing this package produces and it is
 non-standard; that trade is acceptable only because it is stated here.
 
@@ -179,7 +179,7 @@ implementation guide it conforms to.
 
 ## Design reasoning
 
-`oxygen-clinical-note-brief.html` at the repository root: the library survey
+`zoblocks-clinical-note-brief.html` at the repository root: the library survey
 (§04), the sixty-three features and the v1 cut (§05), the accessibility
 requirements (§07), the data contract (§09) and what the law actually requires
 (§10).

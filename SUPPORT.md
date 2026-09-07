@@ -2,7 +2,7 @@
 
 ## Documentation first
 
-- **[oxygenui.design](https://oxygenui.design)** — component pages with live
+- **[zoblocks.design](https://zoblocks.design)** — component pages with live
   previews of every state, props tables, accessibility notes, and install
   commands
 - **[ENGINEERING.md](ENGINEERING.md)** — the standard every component is built
@@ -16,14 +16,14 @@
 
 | What                           | Where                                                                                                                               |
 | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
-| A bug                          | [Open a bug report](https://github.com/zoworkhq/oxygenui/issues/new?template=bug_report.yml)                                        |
-| A missing component or feature | [Open a request](https://github.com/zoworkhq/oxygenui/issues/new?template=component_request.yml)                                    |
-| An accessibility problem       | [Open an accessibility issue](https://github.com/zoworkhq/oxygenui/issues/new?template=accessibility.yml) — these are triaged first |
+| A bug                          | [Open a bug report](https://github.com/zoworkhq/zoblocks/issues/new?template=bug_report.yml)                                        |
+| A missing component or feature | [Open a request](https://github.com/zoworkhq/zoblocks/issues/new?template=component_request.yml)                                    |
+| An accessibility problem       | [Open an accessibility issue](https://github.com/zoworkhq/zoblocks/issues/new?template=accessibility.yml) — these are triaged first |
 | A security vulnerability       | **Never an issue.** Follow [SECURITY.md](SECURITY.md)                                                                               |
-| A question                     | [Discussions](https://github.com/zoworkhq/oxygenui/discussions)                                                                     |
+| A question                     | [Discussions](https://github.com/zoworkhq/zoblocks/discussions)                                                                     |
 
 **Never paste real patient data into an issue, a discussion, or a pull request.**
-Use the synthetic fixtures in `@oxygenui-design/fixtures`, or invent values on
+Use the synthetic fixtures in `@zoblocks/fixtures`, or invent values on
 `example.org`. We will delete anything containing real data and ask you to file
 again.
 

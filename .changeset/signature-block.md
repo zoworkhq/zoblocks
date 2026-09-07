@@ -1,6 +1,6 @@
 ---
-"@oxygenui-design/signature": minor
-"@oxygenui-design/signature-core": minor
+"@zoblocks/signature": minor
+"@zoblocks/signature-core": minor
 ---
 
 SignatureBlock — the attestation at the foot of a document

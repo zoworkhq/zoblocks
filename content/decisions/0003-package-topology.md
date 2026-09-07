@@ -19,12 +19,12 @@ Three shapes were considered.
 exports.**
 
 ```
-L0  @oxygenui-design/tokens  @oxygenui-design/fhir  @oxygenui/intl  @oxygenui/utils
-L1  @oxygenui/primitives  @oxygenui/system
-L2  @oxygenui/react  @oxygenui/icons  @oxygenui/pro-charts
-    @oxygenui/pro-forms  @oxygenui/pro-scheduling
-L3  @oxygenui/blocks  @oxygenui/pro-blocks
-—   @oxygenui/codemod  @oxygenui/cli
+L0  @zoblocks/tokens  @zoblocks/fhir  @zoblocks/intl  @zoblocks/utils
+L1  @zoblocks/primitives  @zoblocks/system
+L2  @zoblocks/react  @zoblocks/icons  @zoblocks/pro-charts
+    @zoblocks/pro-forms  @zoblocks/pro-scheduling
+L3  @zoblocks/blocks  @zoblocks/pro-blocks
+—   @zoblocks/codemod  @zoblocks/cli
 ```
 
 Supporting decisions:
@@ -57,12 +57,12 @@ few.
 **Rejected: one package per component (500 packages).** Precise versioning, but
 the shared-internals graph is disqualifying. `StatusBadge` is imported across
 most of the catalog; per-component packaging means either every package inlines
-a copy of it, or several hundred packages depend on `@oxygenui/status-badge` and
+a copy of it, or several hundred packages depend on `@zoblocks/status-badge` and
 every consumer resolves version skew across them. Radix consolidated away from
 this shape for the same reason. The operational cost — 500 manifests, 500
 changelogs, a publish step that takes an hour — compounds it.
 
-**Rejected: a single `@oxygenui/react`.** One version for everything means a
+**Rejected: a single `@zoblocks/react`.** One version for everything means a
 scheduling fix bumps the patient banner, every release note is mostly noise, and
 there is no seam to place the commercial boundary on. It also removes any
 ability to let a Pro pack move at a different cadence from the free core.

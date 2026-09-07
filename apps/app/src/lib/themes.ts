@@ -42,8 +42,8 @@ import {
   type ThemeTokens,
   type ThemeTokensInput,
   type ValidationRecord,
-} from "@oxygenui-design/theme";
-import type { TokenSource } from "@oxygenui-design/tokens/validate";
+} from "@zoblocks/theme";
+import type { TokenSource } from "@zoblocks/tokens/validate";
 import type { ThemeDoc, ThemeVersionDoc } from "@/db/collections";
 import type { Authorized } from "./authorize";
 import { baseTokens } from "./base-tokens";

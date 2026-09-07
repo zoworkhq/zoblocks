@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { SURFACE_COMPONENTS, surfaceFor } from "@oxygenui-design/tokens/surface";
-import { THEME_NAMES, withTierDefaults, type ThemeName } from "@oxygenui-design/theme";
+import { SURFACE_COMPONENTS, surfaceFor } from "@zoblocks/tokens/surface";
+import { THEME_NAMES, withTierDefaults, type ThemeName } from "@zoblocks/theme";
 import { requireMember } from "@/lib/auth";
 import { scoped } from "@/db/scope";
 import { baseTokens } from "@/lib/base-tokens";
@@ -51,7 +51,7 @@ export default async function ComponentsPage({
    * Resolved through the same model the token editor uses, so the placeholder a
    * customer sees is the value their application will draw — including any
    * semantic override they made on the other screen. Showing the raw
-   * `var(--ox-…)` chain instead would be accurate and useless.
+   * `var(--zb-…)` chain instead would be accurate and useless.
    */
   // Built once per theme and used twice: for the rows, and for the preview's
   // semantic ground. Rebuilding it below would be the same work with a chance
@@ -108,7 +108,7 @@ export default async function ComponentsPage({
                       "flex items-center justify-between gap-2 rounded-lg px-2.5 py-1.5",
                       "text-[0.8125rem] transition-colors duration-200",
                       active
-                        ? "bg-accent-wash font-medium text-oxygen-deep"
+                        ? "bg-accent-wash font-medium text-brand-deep"
                         : "text-graphite hover:bg-paper-sunk hover:text-ink",
                     )}
                   >

@@ -5,7 +5,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/lib/allergy.ts. Edit that file, not this one.
+// Generated from registry/zoblocks/lib/allergy.ts. Edit that file, not this one.
 /**
  * Two severity-shaped fields that mean opposite things, and the empty state
  * that is not empty.

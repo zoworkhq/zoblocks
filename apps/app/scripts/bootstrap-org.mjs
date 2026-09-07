@@ -58,7 +58,7 @@ if (!uri) {
 
 const client = new MongoClient(uri);
 await client.connect();
-const db = client.db(process.env.APP_DB_NAME || "oxygen_console");
+const db = client.db(process.env.APP_DB_NAME || "zoblocks_console");
 
 // The same indexes the app relies on. Creating a member before the unique index
 // on `emailLower` exists would let a duplicate through and the constraint would

@@ -1,12 +1,12 @@
 {
-  "name": "@oxygenui-design/elements",
+  "name": "@zoblocks/elements",
   "version": "0.1.0",
-  "description": "Oxygen UI controls as dependency-free custom elements. A clinical switch that distinguishes off from never-asked, renders a write in flight without removing the control, and says which value the record holds when one fails. Works in React, Vue, Angular, Svelte, or plain HTML.",
+  "description": "Zoblocks controls as dependency-free custom elements. A clinical switch that distinguishes off from never-asked, renders a write in flight without removing the control, and says which value the record holds when one fails. Works in React, Vue, Angular, Svelte, or plain HTML.",
   "license": "MIT",
-  "homepage": "https://oxygenui.design/components",
+  "homepage": "https://zoblocks.design/components",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zoworkhq/oxygenui.git",
+    "url": "git+https://github.com/zoworkhq/zoblocks.git",
     "directory": "packages/elements"
   },
   "keywords": [
@@ -66,7 +66,7 @@
     "check-tarball": "node scripts/check-tarball.mjs"
   },
   "devDependencies": {
-    "@oxygenui-design/tsconfig": "workspace:*",
+    "@zoblocks/tsconfig": "workspace:*",
     "jsdom": "^30",
     "typescript": "^5.7.2",
     "vitest": "^4.1.10"

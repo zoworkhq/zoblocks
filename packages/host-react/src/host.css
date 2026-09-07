@@ -1,14 +1,14 @@
 /**
- * Oxygen's reference host chrome.
+ * Zoblocks's reference host chrome.
  *
  * Structure and geometry only — every colour, radius, duration and easing is
- * read from `--ox-*`, so these controls restyle under a bridge exactly as a
- * clinical component does. That is what makes the Oxygen state in the
+ * read from `--zb-*`, so these controls restyle under a bridge exactly as a
+ * clinical component does. That is what makes the Zoblocks state in the
  * framework switcher worth having: it is not "antd with our palette", it is
  * our own geometry wearing whatever tokens are in scope.
  *
  * Fallbacks are given on every `var()` because these may be mounted in a page
- * that has not loaded `oxygen-tokens.css` — an unstyled button is a worse
+ * that has not loaded `zoblocks-tokens.css` — an unstyled button is a worse
  * failure than a slightly wrong one.
  */
 
@@ -16,83 +16,83 @@
 /* Button                                                            */
 /* ---------------------------------------------------------------- */
 
-.ox-host-btn {
-  --ox-host-btn-h: 2.25rem;
+.zb-host-btn {
+  --zb-host-btn-h: 2.25rem;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  min-block-size: var(--ox-host-btn-h);
+  min-block-size: var(--zb-host-btn-h);
   padding-inline: 0.95rem;
   border: 1px solid transparent;
-  border-radius: var(--ox-radius, 0.5rem);
-  font-family: var(--ox-font-sans, inherit);
-  font-size: var(--ox-text-base, 0.875rem);
+  border-radius: var(--zb-radius, 0.5rem);
+  font-family: var(--zb-font-sans, inherit);
+  font-size: var(--zb-text-base, 0.875rem);
   font-weight: 500;
   line-height: 1.2;
   cursor: pointer;
   white-space: nowrap;
-  background: var(--ox-accent, #067662);
-  color: var(--ox-text-on-accent, #ffffff);
+  background: var(--zb-accent, #067662);
+  color: var(--zb-text-on-accent, #ffffff);
   transition:
-    background-color var(--ox-duration, 180ms) var(--ox-ease, ease),
-    border-color var(--ox-duration, 180ms) var(--ox-ease, ease),
-    color var(--ox-duration, 180ms) var(--ox-ease, ease);
+    background-color var(--zb-duration, 180ms) var(--zb-ease, ease),
+    border-color var(--zb-duration, 180ms) var(--zb-ease, ease),
+    color var(--zb-duration, 180ms) var(--zb-ease, ease);
 }
 
-.ox-host-btn[data-ox-host-size="small"] {
-  --ox-host-btn-h: 1.75rem;
+.zb-host-btn[data-zb-host-size="small"] {
+  --zb-host-btn-h: 1.75rem;
   padding-inline: 0.65rem;
-  font-size: var(--ox-text-sm, 0.8125rem);
+  font-size: var(--zb-text-sm, 0.8125rem);
 }
 
-.ox-host-btn[data-ox-host-size="large"] {
-  --ox-host-btn-h: 2.75rem;
+.zb-host-btn[data-zb-host-size="large"] {
+  --zb-host-btn-h: 2.75rem;
   padding-inline: 1.25rem;
 }
 
-.ox-host-btn:hover:not(:disabled) {
-  background: var(--ox-accent-hover, #0a5d4f);
+.zb-host-btn:hover:not(:disabled) {
+  background: var(--zb-accent-hover, #0a5d4f);
 }
 
 /* `default` is the outlined one, matching antd's vocabulary. */
-.ox-host-btn[data-ox-host-variant="default"] {
-  background: var(--ox-surface, #ffffff);
-  color: var(--ox-text, #0f172a);
-  border-color: var(--ox-border-strong, #64748b);
+.zb-host-btn[data-zb-host-variant="default"] {
+  background: var(--zb-surface, #ffffff);
+  color: var(--zb-text, #0f172a);
+  border-color: var(--zb-border-strong, #64748b);
 }
 
-.ox-host-btn[data-ox-host-variant="default"]:hover:not(:disabled) {
-  background: var(--ox-surface, #ffffff);
-  color: var(--ox-accent, #067662);
-  border-color: var(--ox-accent, #067662);
+.zb-host-btn[data-zb-host-variant="default"]:hover:not(:disabled) {
+  background: var(--zb-surface, #ffffff);
+  color: var(--zb-accent, #067662);
+  border-color: var(--zb-accent, #067662);
 }
 
-.ox-host-btn[data-ox-host-variant="text"] {
+.zb-host-btn[data-zb-host-variant="text"] {
   background: transparent;
-  color: var(--ox-text, #0f172a);
+  color: var(--zb-text, #0f172a);
   border-color: transparent;
 }
 
-.ox-host-btn[data-ox-host-variant="text"]:hover:not(:disabled) {
-  background: var(--ox-bg-muted, #f1f5f9);
+.zb-host-btn[data-zb-host-variant="text"]:hover:not(:disabled) {
+  background: var(--zb-bg-muted, #f1f5f9);
 }
 
-.ox-host-btn[data-ox-host-danger] {
-  background: var(--ox-status-critical, #b91c1c);
+.zb-host-btn[data-zb-host-danger] {
+  background: var(--zb-status-critical, #b91c1c);
   color: #ffffff;
   border-color: transparent;
 }
 
-.ox-host-btn[data-ox-host-danger][data-ox-host-variant="default"],
-.ox-host-btn[data-ox-host-danger][data-ox-host-variant="text"] {
+.zb-host-btn[data-zb-host-danger][data-zb-host-variant="default"],
+.zb-host-btn[data-zb-host-danger][data-zb-host-variant="text"] {
   background: transparent;
-  color: var(--ox-status-critical, #b91c1c);
+  color: var(--zb-status-critical, #b91c1c);
   border-color: currentColor;
 }
 
-.ox-host-btn:disabled {
+.zb-host-btn:disabled {
   cursor: not-allowed;
   opacity: 0.45;
 }
@@ -101,8 +101,8 @@
 /* Field — input and select share the shell                          */
 /* ---------------------------------------------------------------- */
 
-.ox-host-field {
-  --ox-host-field-h: 2.25rem;
+.zb-host-field {
+  --zb-host-field-h: 2.25rem;
 
   display: inline-flex;
   flex-direction: column;
@@ -110,54 +110,54 @@
   min-inline-size: 0;
 }
 
-.ox-host-field[data-ox-host-size="small"] {
-  --ox-host-field-h: 1.75rem;
+.zb-host-field[data-zb-host-size="small"] {
+  --zb-host-field-h: 1.75rem;
 }
-.ox-host-field[data-ox-host-size="large"] {
-  --ox-host-field-h: 2.75rem;
+.zb-host-field[data-zb-host-size="large"] {
+  --zb-host-field-h: 2.75rem;
 }
 
-.ox-host-field__label {
-  font-family: var(--ox-font-sans, inherit);
-  font-size: var(--ox-text-xs, 0.75rem);
+.zb-host-field__label {
+  font-family: var(--zb-font-sans, inherit);
+  font-size: var(--zb-text-xs, 0.75rem);
   line-height: 1.2;
-  color: var(--ox-text-muted, #475569);
+  color: var(--zb-text-muted, #475569);
 }
 
-.ox-host-field__input {
+.zb-host-field__input {
   inline-size: 100%;
-  min-block-size: var(--ox-host-field-h);
+  min-block-size: var(--zb-host-field-h);
   padding-inline: 0.7rem;
-  border: 1px solid var(--ox-border-strong, #64748b);
-  border-radius: var(--ox-radius, 0.5rem);
-  background: var(--ox-surface, #ffffff);
-  color: var(--ox-text, #0f172a);
-  font-family: var(--ox-font-sans, inherit);
-  font-size: var(--ox-text-base, 0.875rem);
-  transition: border-color var(--ox-duration, 180ms) var(--ox-ease, ease);
+  border: 1px solid var(--zb-border-strong, #64748b);
+  border-radius: var(--zb-radius, 0.5rem);
+  background: var(--zb-surface, #ffffff);
+  color: var(--zb-text, #0f172a);
+  font-family: var(--zb-font-sans, inherit);
+  font-size: var(--zb-text-base, 0.875rem);
+  transition: border-color var(--zb-duration, 180ms) var(--zb-ease, ease);
 }
 
-.ox-host-field__input::placeholder {
-  color: var(--ox-text-subtle, #64748b);
+.zb-host-field__input::placeholder {
+  color: var(--zb-text-subtle, #64748b);
 }
 
-.ox-host-field__input:hover:not(:disabled) {
-  border-color: var(--ox-accent, #067662);
+.zb-host-field__input:hover:not(:disabled) {
+  border-color: var(--zb-accent, #067662);
 }
 
-.ox-host-field__input[data-ox-host-status="error"] {
-  border-color: var(--ox-status-critical, #b91c1c);
+.zb-host-field__input[data-zb-host-status="error"] {
+  border-color: var(--zb-status-critical, #b91c1c);
 }
-.ox-host-field__input[data-ox-host-status="warning"] {
-  border-color: var(--ox-status-high, #b45309);
+.zb-host-field__input[data-zb-host-status="warning"] {
+  border-color: var(--zb-status-high, #b45309);
 }
 
-.ox-host-field__input:disabled {
+.zb-host-field__input:disabled {
   cursor: not-allowed;
   opacity: 0.55;
 }
 
-.ox-host-select {
+.zb-host-select {
   appearance: none;
   padding-inline-end: 1.9rem;
   cursor: pointer;
@@ -179,46 +179,46 @@
 /* Switch                                                            */
 /* ---------------------------------------------------------------- */
 
-.ox-host-switch {
-  --ox-host-switch-w: 2.5rem;
-  --ox-host-switch-h: 1.4rem;
+.zb-host-switch {
+  --zb-host-switch-w: 2.5rem;
+  --zb-host-switch-h: 1.4rem;
 
   display: inline-flex;
   align-items: center;
   flex: none;
-  inline-size: var(--ox-host-switch-w);
-  block-size: var(--ox-host-switch-h);
+  inline-size: var(--zb-host-switch-w);
+  block-size: var(--zb-host-switch-h);
   padding: 2px;
   border: 0;
   border-radius: 999px;
   cursor: pointer;
-  background: var(--ox-border-strong, #64748b);
-  transition: background-color var(--ox-duration, 180ms) var(--ox-ease, ease);
+  background: var(--zb-border-strong, #64748b);
+  transition: background-color var(--zb-duration, 180ms) var(--zb-ease, ease);
 }
 
-.ox-host-switch[data-ox-host-size="small"] {
-  --ox-host-switch-w: 1.9rem;
-  --ox-host-switch-h: 1.1rem;
+.zb-host-switch[data-zb-host-size="small"] {
+  --zb-host-switch-w: 1.9rem;
+  --zb-host-switch-h: 1.1rem;
 }
 
-.ox-host-switch[aria-checked="true"] {
-  background: var(--ox-accent, #067662);
+.zb-host-switch[aria-checked="true"] {
+  background: var(--zb-accent, #067662);
 }
 
-.ox-host-switch__thumb {
+.zb-host-switch__thumb {
   display: block;
-  inline-size: calc(var(--ox-host-switch-h) - 6px);
-  block-size: calc(var(--ox-host-switch-h) - 6px);
+  inline-size: calc(var(--zb-host-switch-h) - 6px);
+  block-size: calc(var(--zb-host-switch-h) - 6px);
   border-radius: 50%;
   background: #ffffff;
-  transition: transform var(--ox-duration, 180ms) var(--ox-ease, ease);
+  transition: transform var(--zb-duration, 180ms) var(--zb-ease, ease);
 }
 
-.ox-host-switch[aria-checked="true"] .ox-host-switch__thumb {
-  transform: translateX(calc(var(--ox-host-switch-w) - var(--ox-host-switch-h)));
+.zb-host-switch[aria-checked="true"] .zb-host-switch__thumb {
+  transform: translateX(calc(var(--zb-host-switch-w) - var(--zb-host-switch-h)));
 }
 
-.ox-host-switch:disabled {
+.zb-host-switch:disabled {
   cursor: not-allowed;
   opacity: 0.45;
 }
@@ -227,21 +227,21 @@
 /* Checkbox                                                          */
 /* ---------------------------------------------------------------- */
 
-.ox-host-check {
+.zb-host-check {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  font-family: var(--ox-font-sans, inherit);
-  font-size: var(--ox-text-base, 0.875rem);
-  color: var(--ox-text, #0f172a);
+  font-family: var(--zb-font-sans, inherit);
+  font-size: var(--zb-text-base, 0.875rem);
+  color: var(--zb-text, #0f172a);
   cursor: pointer;
 }
 
-.ox-host-check input {
+.zb-host-check input {
   inline-size: 1rem;
   block-size: 1rem;
   margin: 0;
-  accent-color: var(--ox-accent, #067662);
+  accent-color: var(--zb-accent, #067662);
   cursor: pointer;
 }
 
@@ -249,41 +249,41 @@
 /* Tabs                                                              */
 /* ---------------------------------------------------------------- */
 
-.ox-host-tabs__strip {
+.zb-host-tabs__strip {
   display: flex;
   gap: 0.25rem;
-  border-block-end: 1px solid var(--ox-border, #e2e8f0);
+  border-block-end: 1px solid var(--zb-border, #e2e8f0);
 }
 
-.ox-host-tabs__tab {
+.zb-host-tabs__tab {
   padding: 0.5rem 0.85rem;
   border: 0;
   border-block-end: 2px solid transparent;
   margin-block-end: -1px;
   background: none;
-  font-family: var(--ox-font-sans, inherit);
-  font-size: var(--ox-text-base, 0.875rem);
+  font-family: var(--zb-font-sans, inherit);
+  font-size: var(--zb-text-base, 0.875rem);
   font-weight: 500;
-  color: var(--ox-text-muted, #475569);
+  color: var(--zb-text-muted, #475569);
   cursor: pointer;
-  transition: color var(--ox-duration, 180ms) var(--ox-ease, ease);
+  transition: color var(--zb-duration, 180ms) var(--zb-ease, ease);
 }
 
-.ox-host-tabs__tab:hover:not(:disabled) {
-  color: var(--ox-text, #0f172a);
+.zb-host-tabs__tab:hover:not(:disabled) {
+  color: var(--zb-text, #0f172a);
 }
 
-.ox-host-tabs__tab[aria-selected="true"] {
-  color: var(--ox-accent, #067662);
-  border-block-end-color: var(--ox-accent, #067662);
+.zb-host-tabs__tab[aria-selected="true"] {
+  color: var(--zb-accent, #067662);
+  border-block-end-color: var(--zb-accent, #067662);
 }
 
-.ox-host-tabs__tab:disabled {
+.zb-host-tabs__tab:disabled {
   cursor: not-allowed;
   opacity: 0.45;
 }
 
-.ox-host-tabs__panel {
+.zb-host-tabs__panel {
   padding-block-start: 1rem;
 }
 
@@ -299,21 +299,21 @@
  * we want: the focus indicator for these controls is decided here, once, and
  * cannot be half-overridden into invisibility.
  */
-.ox-host-btn:focus-visible,
-.ox-host-field__input:focus-visible,
-.ox-host-switch:focus-visible,
-.ox-host-check input:focus-visible,
-.ox-host-tabs__tab:focus-visible {
-  outline: 2px solid var(--ox-focus-ring, #059478);
+.zb-host-btn:focus-visible,
+.zb-host-field__input:focus-visible,
+.zb-host-switch:focus-visible,
+.zb-host-check input:focus-visible,
+.zb-host-tabs__tab:focus-visible {
+  outline: 2px solid var(--zb-focus-ring, #059478);
   outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ox-host-btn,
-  .ox-host-field__input,
-  .ox-host-switch,
-  .ox-host-switch__thumb,
-  .ox-host-tabs__tab {
+  .zb-host-btn,
+  .zb-host-field__input,
+  .zb-host-switch,
+  .zb-host-switch__thumb,
+  .zb-host-tabs__tab {
     transition-duration: 1ms;
   }
 }

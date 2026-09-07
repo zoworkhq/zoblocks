@@ -5,12 +5,12 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/lib/recorder.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/lib/recorder.tsx. Edit that file, not this one.
 /**
  * recorder-core's React binding: the loop, the frame, and the shared chrome.
  *
  * Everything with an opinion about audio lives in
- * `@oxygenui-design/recorder-core`, which has no React and no DOM and can be
+ * `@zoblocks/recorder-core`, which has no React and no DOM and can be
  * asserted numerically in Node. This file supplies the two things that
  * genuinely need a browser — a requestAnimationFrame delta and an
  * `AnalyserNode` — and then gets out of the way.
@@ -36,7 +36,7 @@ import {
   type Signal,
   type SignalFrame,
   type TimeDomainSource,
-} from "@oxygenui-design/recorder-core";
+} from "@zoblocks/recorder-core";
 
 import { cn } from "../lib/utils";
 
@@ -48,15 +48,15 @@ export type RecorderMotion = "auto" | "reduced" | "full";
  *
  * A template literal would be shorter and would produce no CSS: Tailwind
  * resolves classes by scanning source text, so an interpolated name is invisible
- * to it and the element renders unstyled. `@oxygenui/no-dynamic-class-name`
+ * to it and the element renders unstyled. `@zoblocks/no-dynamic-class-name`
  * fails the build on it, which is how this stayed a five-line map.
  */
 const ART_CLASS: Readonly<Record<RecorderArt, string>> = {
-  pulse: "ox-rec-pulse",
-  bars: "ox-rec-bars",
-  strip: "ox-rec-strip",
-  duet: "ox-rec-duet",
-  stream: "ox-rec-stream",
+  pulse: "zb-rec-pulse",
+  bars: "zb-rec-bars",
+  strip: "zb-rec-strip",
+  duet: "zb-rec-duet",
+  stream: "zb-rec-stream",
 };
 
 /** Below this the `bars` art reports itself as `strip`. §14 of the brief. */
@@ -154,7 +154,7 @@ export function paintLane(lane: HTMLElement | null, read: (index: number) => num
  * How many bars fit, measured rather than assumed.
  *
  * A fixed count is wrong at every width but one. The lane is `flex-end`, and a
- * bar is capped at `--ox-recorder-bar-w` so it stays a bar rather than becoming
+ * bar is capped at `--zb-recorder-bar-w` so it stays a bar rather than becoming
  * a block — so 72 bars span about 360px however wide the pane is, and on a
  * 550px pane that leaves 190px of empty lane on the left. It does not read as
  * "no data yet". It reads as broken.
@@ -224,8 +224,8 @@ export const RecorderFrame = React.forwardRef<HTMLDivElement, RecorderFrameProps
     return (
       <div
         ref={mergeRefs(ref, innerRef)}
-        className={cn("ox-rec", ART_CLASS[art], className)}
-        data-ox-recorder={art}
+        className={cn("zb-rec", ART_CLASS[art], className)}
+        data-zb-recorder={art}
         data-motion={motion}
         data-signal={hasSignal ? "live" : "none"}
         data-fault={fault?.severity ?? "none"}
@@ -243,7 +243,7 @@ export function RecorderTell({
 }: {
   readonly label?: string;
 }): React.JSX.Element {
-  return <span className="ox-rec-tell">{label}</span>;
+  return <span className="zb-rec-tell">{label}</span>;
 }
 
 /**
@@ -259,7 +259,7 @@ export function RecorderFaultBanner({
 }): React.JSX.Element | null {
   if (fault === null) return null;
   return (
-    <div className="ox-rec-fault" data-severity={fault.severity} role="alert">
+    <div className="zb-rec-fault" data-severity={fault.severity} role="alert">
       <span>
         <b>{fault.message}</b>
         {fault.fix !== undefined ? ` ${fault.fix}` : null}
@@ -312,7 +312,7 @@ export function RecorderIcon({
 }): React.JSX.Element {
   return (
     <svg
-      className="ox-rec-icon"
+      className="zb-rec-icon"
       viewBox="0 0 24 24"
       width={size}
       height={size}
@@ -341,7 +341,7 @@ export function RecorderButton({
   readonly primary?: boolean;
 }): React.JSX.Element {
   return (
-    <button type="button" className="ox-rec-btn-sm" data-primary={primary} {...rest}>
+    <button type="button" className="zb-rec-btn-sm" data-primary={primary} {...rest}>
       {icon !== undefined ? <RecorderIcon name={icon} /> : null}
       {children}
     </button>

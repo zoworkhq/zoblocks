@@ -3,7 +3,7 @@
 /**
  * The Material UI host.
  *
- *     import { MuiHost } from "@oxygenui-design/host-react/mui";
+ *     import { MuiHost } from "@zoblocks/host-react/mui";
  *
  *     <MuiHost mode="light">
  *       <YourDemo />          // byte-identical to the antd page
@@ -49,7 +49,7 @@ import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import TextField from "@mui/material/TextField";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { MuiBridge } from "@oxygenui-design/bridge-mui";
+import { MuiBridge } from "@zoblocks/bridge-mui";
 import type {
   HostButtonProps,
   HostCheckboxProps,

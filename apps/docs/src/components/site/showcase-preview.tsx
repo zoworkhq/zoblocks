@@ -36,7 +36,7 @@ export function ShowcasePreview({
         <span className="eyebrow hidden text-panel-muted sm:block">{density} density</span>
       </div>
 
-      <div data-ox-density={density} className="relative p-4 sm:p-5">
+      <div data-zb-density={density} className="relative p-4 sm:p-5">
         {render ? (
           render()
         ) : (

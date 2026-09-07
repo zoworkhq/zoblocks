@@ -1,8 +1,8 @@
 /**
  * The theme choice, and why it lives in a cookie.
  *
- * The docs site and the app are separate origins — `oxygenui.design` and
- * `app.oxygenui.design` in production, `:6001` and `:6003` locally. A reader
+ * The docs site and the app are separate origins — `zoblocks.design` and
+ * `app.zoblocks.design` in production, `:6001` and `:6003` locally. A reader
  * who sets dark here and clicks "Sign in" should not be thrown into a white
  * login screen, so the choice has to survive the origin hop.
  *
@@ -12,11 +12,11 @@
  *
  *   - **Locally**, cookies ignore the port entirely. One set on `localhost`
  *     is sent to `localhost:6001` and `localhost:6003` alike.
- *   - **In production**, a cookie scoped to `.oxygenui.design` is sent to the
+ *   - **In production**, a cookie scoped to `.zoblocks.design` is sent to the
  *     apex and to every subdomain.
  *
  * `localStorage` is still written alongside it. That is not belt-and-braces:
- * `scripts/a11y.ts` drives the audit by setting `oxygen-theme` in storage
+ * `scripts/a11y.ts` drives the audit by setting `zoblocks-theme` in storage
  * before each pass, and the pre-paint script still reads it as a fallback, so
  * the high-contrast theme stays auditable even though the picker no longer
  * offers it.
@@ -31,7 +31,7 @@
  * "follow the OS" as an explicit third state after choosing otherwise.
  *
  * `high-contrast` is gone from the picker but survives as a value. The token
- * build emits 59 tokens at a 7:1 floor behind `[data-ox-theme="high-contrast"]`
+ * build emits 59 tokens at a 7:1 floor behind `[data-zb-theme="high-contrast"]`
  * and the a11y script audits them; deleting the value would make that theme
  * unreachable again, which is the exact regression the comment in `globals.css`
  * was written about.
@@ -41,8 +41,8 @@ export type Theme = "light" | "dark";
 /** Values the pre-paint script and the audit may legitimately encounter. */
 export type StoredTheme = Theme | "high-contrast";
 
-export const THEME_COOKIE = "oxygen-theme";
-export const THEME_STORAGE_KEY = "oxygen-theme";
+export const THEME_COOKIE = "zoblocks-theme";
+export const THEME_STORAGE_KEY = "zoblocks-theme";
 
 /** A year. Long enough that the choice feels permanent, short enough to expire. */
 const MAX_AGE = 60 * 60 * 24 * 365;
@@ -56,14 +56,14 @@ const MAX_AGE = 60 * 60 * 24 * 365;
  */
 function cookieDomain(): string {
   const host = location.hostname;
-  return host === "oxygenui.design" || host.endsWith(".oxygenui.design")
-    ? "; domain=.oxygenui.design"
+  return host === "zoblocks.design" || host.endsWith(".zoblocks.design")
+    ? "; domain=.zoblocks.design"
     : "";
 }
 
 export function readStoredTheme(): StoredTheme | null {
   try {
-    const match = document.cookie.match(/(?:^|;\s*)oxygen-theme=([^;]*)/);
+    const match = document.cookie.match(/(?:^|;\s*)zoblocks-theme=([^;]*)/);
     const encoded = match?.[1];
     const fromCookie = encoded === undefined ? null : decodeURIComponent(encoded);
     const raw = fromCookie ?? localStorage.getItem(THEME_STORAGE_KEY);
@@ -86,11 +86,11 @@ export function applyTheme(theme: StoredTheme): void {
   // two. Layering it over dark would give a reader two half-applied palettes.
   if (theme === "high-contrast") {
     root.classList.remove("dark");
-    root.setAttribute("data-ox-theme", "high-contrast");
+    root.setAttribute("data-zb-theme", "high-contrast");
     return;
   }
 
-  root.removeAttribute("data-ox-theme");
+  root.removeAttribute("data-zb-theme");
   root.classList.toggle("dark", theme === "dark");
 }
 
@@ -111,4 +111,4 @@ export function writeTheme(theme: Theme): void {
  * a string rather than an import for the same reason — it has to execute before
  * any bundle is fetched.
  */
-export const THEME_BOOT_SCRIPT = `(function(){try{var e=document.documentElement,m=document.cookie.match(/(?:^|;\\s*)oxygen-theme=([^;]*)/),t=m?decodeURIComponent(m[1]):null;if(!t){t=localStorage.getItem("oxygen-theme")||localStorage.getItem("oxygen-app-theme")||localStorage.getItem("oxygen-console-theme")}if(t==="high-contrast"){e.setAttribute("data-ox-theme","high-contrast");return}var d=t?t==="dark":matchMedia("(prefers-color-scheme: dark)").matches;e.classList.toggle("dark",d)}catch(e){}})()`;
+export const THEME_BOOT_SCRIPT = `(function(){try{var e=document.documentElement,m=document.cookie.match(/(?:^|;\\s*)zoblocks-theme=([^;]*)/),t=m?decodeURIComponent(m[1]):null;if(!t){t=localStorage.getItem("zoblocks-theme")||localStorage.getItem("zoblocks-app-theme")||localStorage.getItem("zoblocks-console-theme")}if(t==="high-contrast"){e.setAttribute("data-zb-theme","high-contrast");return}var d=t?t==="dark":matchMedia("(prefers-color-scheme: dark)").matches;e.classList.toggle("dark",d)}catch(e){}})()`;

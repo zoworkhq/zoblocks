@@ -1,7 +1,7 @@
 /**
  * Argument parsing and dispatch.
  *
- * Kept separate from `bin/oxygen.mjs` so the whole surface — including exit
+ * Kept separate from `bin/zoblocks.mjs` so the whole surface — including exit
  * codes and the help text — is reachable from a test without spawning a
  * process.
  */
@@ -12,16 +12,16 @@ import { ConfigError } from "./config.js";
 import { RegistryError } from "./registry.js";
 import { RegistryFormatError } from "./schema.js";
 
-const HELP = `oxygen — install Oxygen UI components into your project
+const HELP = `zoblocks — install Zoblocks components into your project
 
 Usage
-  oxygen init                      Create oxygen.json
-  oxygen add <component...>        Add components and their dependencies
-  oxygen list                      List the public catalog
+  zoblocks init                      Create zoblocks.json
+  zoblocks add <component...>        Add components and their dependencies
+  zoblocks list                      List the public catalog
 
 Specifiers
   vitals-panel                     A component from the public catalog
-  @oxygen-pro/vitals-flowsheet     A component from a registry in oxygen.json
+  @zoblocks-pro/vitals-flowsheet     A component from a registry in zoblocks.json
   https://…/item.json              A registry item by URL
 
 Options
@@ -30,12 +30,12 @@ Options
   --dry-run        Show what would be written, write nothing
   --no-deps        Do not touch package.json or the lockfile
   --yes            Let this run your package manager for npm dependencies
-  --force          init only: overwrite an existing oxygen.json
+  --force          init only: overwrite an existing zoblocks.json
   --version        Print the version
   --help           Print this
 
 Paid components need a token with the "registry" scope, minted in the console
-under Marketplace → Access tokens and read from OXYGEN_TOKEN.
+under Marketplace → Access tokens and read from ZOBLOCKS_TOKEN.
 `;
 
 export interface RunOptions {

@@ -1,5 +1,5 @@
 ---
-"@oxygenui-design/theme": minor
+"@zoblocks/theme": minor
 ---
 
 Brand artwork: seven roles, one table, and a manifest to deliver them
@@ -28,9 +28,9 @@ Three things this changes that are worth knowing about:
   assets CSS never draws, absolute URLs, and the measured size so a host can
   reserve the space.
 
-The three marks also reach CSS as `--ox-logo-light`, `--ox-logo-dark`,
-`--ox-logo-mono`, plus `--ox-logo`, which switches with the theme so a host
-writes `background-image: var(--ox-logo)` and nothing else.
+The three marks also reach CSS as `--zb-logo-light`, `--zb-logo-dark`,
+`--zb-logo-mono`, plus `--zb-logo`, which switches with the theme so a host
+writes `background-image: var(--zb-logo)` and nothing else.
 
 `themeAssetsSchema.logos` is now `.brand`, and entries carry `role` instead of
 `variant`. `emptyAssets()` is exported, because the empty literal it replaces

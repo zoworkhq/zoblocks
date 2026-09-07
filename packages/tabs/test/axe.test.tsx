@@ -5,7 +5,7 @@
  * defect this component exists to prevent. A `role="tablist"` wrapped around
  * anchors passes every rule here, because every individual attribute is
  * spelled correctly — it is the *claim* that is wrong. That failure is caught
- * by `validateTabsConfig` and by `@oxygenui/tabs-semantic-mode`, and the tests
+ * by `validateTabsConfig` and by `@zoblocks/tabs-semantic-mode`, and the tests
  * for it live elsewhere.
  *
  * What axe does catch is the ordinary regression: a name that went missing, a

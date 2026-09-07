@@ -5,7 +5,7 @@
  * stay loadable from a `<script type="module">` with no bundler, no React and
  * no build step. That makes drift the obvious risk, so
  * `test/switch-parity.test.ts` in the repository root asserts that these values
- * are identical to `registry/oxygen/lib/switch.tsx`'s — the same discipline the
+ * are identical to `registry/zoblocks/lib/switch.tsx`'s — the same discipline the
  * loaders package uses for its art constants, which has already caught two
  * divergences.
  */

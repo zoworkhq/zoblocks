@@ -89,7 +89,7 @@ function Motif({ slug, kind }: { slug: string; kind: ShelfItem["kind"] }) {
   const at = (i: number, span: number) => ((seed >>> (i * 3)) % span) + 1;
 
   const ink = "fill-current opacity-[0.14]";
-  const lit = "fill-oxygen/35";
+  const lit = "fill-brand/35";
 
   if (kind === "theme") {
     // A ramp. Five steps, because a severity scale is the thing a theme pack
@@ -104,7 +104,7 @@ function Motif({ slug, kind }: { slug: string; kind: ShelfItem["kind"] }) {
             width={15}
             height={20}
             rx={3}
-            className="fill-oxygen"
+            className="fill-brand"
             opacity={0.12 + i * 0.13}
           />
         ))}
@@ -203,7 +203,7 @@ function Manifest({ paths }: { paths: string[] }) {
     <ul className="flex w-full flex-col justify-center gap-1 font-mono text-[0.6875rem] leading-relaxed">
       {paths.slice(0, 5).map((path) => (
         <li key={path} className="flex items-baseline gap-1.5 text-graphite">
-          <span aria-hidden="true" className="text-oxygen-deep">
+          <span aria-hidden="true" className="text-brand-deep">
             ·
           </span>
           <span className="truncate">{path}</span>
@@ -230,7 +230,7 @@ export function PackPreview({ item, className }: { item: ShelfItem; className?: 
   if (item.art.length > 0) {
     const gallery = item.art.length > 3;
     return (
-      <div className={cn(band, "text-ink")} style={{ height: 132 }} data-ox-pack-preview="art">
+      <div className={cn(band, "text-ink")} style={{ height: 132 }} data-zb-pack-preview="art">
         <div
           className={cn(
             "grid h-full w-full place-items-center gap-3",
@@ -254,7 +254,7 @@ export function PackPreview({ item, className }: { item: ShelfItem; className?: 
    */
   if (item.swatches.length > 0) {
     return (
-      <div className={cn(band, "gap-0")} style={{ height: 132 }} data-ox-pack-preview="swatches">
+      <div className={cn(band, "gap-0")} style={{ height: 132 }} data-zb-pack-preview="swatches">
         <ul className="flex h-full w-full items-stretch gap-1">
           {item.swatches.map((swatch) => (
             <li key={swatch.step} className="flex min-w-0 flex-1 flex-col gap-1">
@@ -283,7 +283,7 @@ export function PackPreview({ item, className }: { item: ShelfItem; className?: 
       <div
         className={cn(band, "text-graphite")}
         style={{ height: 132 }}
-        data-ox-pack-preview="motif"
+        data-zb-pack-preview="motif"
       >
         <Motif slug={item.slug} kind={item.kind} />
       </div>
@@ -296,7 +296,7 @@ export function PackPreview({ item, className }: { item: ShelfItem; className?: 
       <div
         className={cn(band, item.filePaths.length > 2 ? "items-start" : "items-center")}
         style={{ height: 132 }}
-        data-ox-pack-preview="manifest"
+        data-zb-pack-preview="manifest"
       >
         <Manifest paths={item.filePaths} />
       </div>
@@ -310,7 +310,7 @@ export function PackPreview({ item, className }: { item: ShelfItem; className?: 
    * a number would be inventing filenames.
    */
   return (
-    <div className={cn(band, "text-graphite")} style={{ height: 132 }} data-ox-pack-preview="count">
+    <div className={cn(band, "text-graphite")} style={{ height: 132 }} data-zb-pack-preview="count">
       <p className="text-center font-mono text-[0.6875rem]">
         {item.files} file{item.files === 1 ? "" : "s"} · v{item.version}
       </p>

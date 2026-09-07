@@ -56,7 +56,7 @@ export function escapeXml(text: string): string {
 
 export interface NarrativeOptions {
   /**
-   * Emit provenance as `data-ox-*` attributes on wrapping spans.
+   * Emit provenance as `data-zb-*` attributes on wrapping spans.
    *
    * Off by default, and the default is the important half. Per-range
    * provenance is not standardised anywhere in FHIR; it travels as custom
@@ -96,12 +96,12 @@ function openTag(mark: Mark, options: NarrativeOptions): string {
   const a = mark.attrs as Record<string, unknown>;
   // Attributes emitted in a fixed order for the same reason as MARK_ORDER:
   // `canonical.ts` hashes this output, so ordering is correctness.
-  const parts: string[] = [`data-ox-origin="${escapeXml(String(a["origin"] ?? "typed"))}"`];
-  if (a["source"] != null) parts.push(`data-ox-source="${escapeXml(String(a["source"]))}"`);
-  if (a["at"] != null) parts.push(`data-ox-at="${escapeXml(String(a["at"]))}"`);
+  const parts: string[] = [`data-zb-origin="${escapeXml(String(a["origin"] ?? "typed"))}"`];
+  if (a["source"] != null) parts.push(`data-zb-source="${escapeXml(String(a["source"]))}"`);
+  if (a["at"] != null) parts.push(`data-zb-at="${escapeXml(String(a["at"]))}"`);
   if (a["confidence"] != null)
-    parts.push(`data-ox-confidence="${escapeXml(String(a["confidence"]))}"`);
-  if (a["origin"] === "ai") parts.push(`data-ox-reviewed="${a["reviewed"] === true}"`);
+    parts.push(`data-zb-confidence="${escapeXml(String(a["confidence"]))}"`);
+  if (a["origin"] === "ai") parts.push(`data-zb-reviewed="${a["reviewed"] === true}"`);
   return `<span ${parts.join(" ")}>`;
 }
 

@@ -14,9 +14,9 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { antdBridge } from "@oxygenui-design/bridge-antd/definition";
-import { muiBridge } from "@oxygenui-design/bridge-mui/definition";
-import { NOT_BRIDGEABLE, TOKEN_SURFACE } from "@oxygenui-design/tokens/surface";
+import { antdBridge } from "@zoblocks/bridge-antd/definition";
+import { muiBridge } from "@zoblocks/bridge-mui/definition";
+import { NOT_BRIDGEABLE, TOKEN_SURFACE } from "@zoblocks/tokens/surface";
 import { CLINICAL_TOTAL, FRAMEWORKS, SURFACE_TOTAL, frameworkFacts } from "@/lib/frameworks";
 import { OrganisationError, setFrameworks } from "@/lib/organisation";
 import { twoOrgs } from "./harness";
@@ -52,7 +52,7 @@ describe("the facts each card shows", () => {
       expect(new Set(framework.writes).size, "no duplicates").toBe(framework.writes.length);
 
       for (const token of framework.writes) {
-        expect(token, `${framework.name} wrote a non-token`).toMatch(/^--ox-/);
+        expect(token, `${framework.name} wrote a non-token`).toMatch(/^--zb-/);
       }
     }
   });
@@ -68,7 +68,7 @@ describe("the facts each card shows", () => {
   /**
    * Reach is counted through the fallback chain, and that is the whole point.
    *
-   * A bridge writes `--ox-accent` once and dozens of component tokens fall
+   * A bridge writes `--zb-accent` once and dozens of component tokens fall
    * through to it. Counting only what the bridge writes would report a couple
    * of dozen tokens for a bridge that in fact restyles most of the library —
    * understating the architecture by an order of magnitude.
@@ -86,17 +86,17 @@ describe("the facts each card shows", () => {
       const clinical = framework.unmapped.filter((t) => t.kind === "clinical");
       const gaps = framework.unmapped.filter((t) => t.kind === "no-counterpart");
 
-      // Both bridges decline the same eight, because the refusal is Oxygen's
+      // Both bridges decline the same eight, because the refusal is Zoblocks's
       // rule rather than a limitation of either framework.
       expect(clinical.map((t) => t.token).sort()).toEqual([
-        "--ox-flag-deceased",
-        "--ox-flag-provisional",
-        "--ox-flag-restricted",
-        "--ox-status-critical",
-        "--ox-status-high",
-        "--ox-status-low",
-        "--ox-status-normal",
-        "--ox-status-unknown",
+        "--zb-flag-deceased",
+        "--zb-flag-provisional",
+        "--zb-flag-restricted",
+        "--zb-status-critical",
+        "--zb-status-high",
+        "--zb-status-low",
+        "--zb-status-normal",
+        "--zb-status-unknown",
       ]);
       expect(gaps.length, `${framework.name} declares no gaps at all`).toBeGreaterThan(0);
       expect(clinical.length + gaps.length).toBe(framework.unmapped.length);
@@ -114,7 +114,7 @@ describe("the app never resolves a UI framework", () => {
   /**
    * The structural guarantee behind the whole architecture.
    *
-   * `@oxygenui-design/bridge-antd` — the barrel — re-exports `AntdBridge.tsx`,
+   * `@zoblocks/bridge-antd` — the barrel — re-exports `AntdBridge.tsx`,
    * which imports `antd`. `/definition` is the mapping alone. If someone
    * "tidies" the import to the barrel, the app starts pulling a UI
    * framework into its graph, which is exactly what the bridge design exists to
@@ -128,7 +128,7 @@ describe("the app never resolves a UI framework", () => {
     const root = path.resolve(__dirname, "..", "src");
 
     const barrelImports = execSync(
-      `grep -rnE 'from "@oxygenui-design/bridge-(antd|mui)"' ${JSON.stringify(root)} || true`,
+      `grep -rnE 'from "@zoblocks/bridge-(antd|mui)"' ${JSON.stringify(root)} || true`,
       { encoding: "utf8" },
     ).trim();
 
@@ -139,7 +139,7 @@ describe("the app never resolves a UI framework", () => {
    * The rule this replaces, and why it changed.
    *
    * It used to be "the app declares neither antd nor MUI anywhere in its
-   * manifest". That was a proxy for the claim that matters — Oxygen's
+   * manifest". That was a proxy for the claim that matters — Zoblocks's
    * components do not need a UI framework — and it held until the app had a
    * legitimate reason to render one: showing a customer the antd theme they are
    * about to download, in antd's own components, because a theme file is a

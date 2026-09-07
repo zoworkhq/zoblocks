@@ -3,7 +3,7 @@
  *
  * This package had no such check, and the release workflow gated on the script's
  * existence — so tokens was the one publishable package inspected by nothing.
- * The consequence shipped: `@oxygenui-design/tokens@0.1.0` on npm predates the
+ * The consequence shipped: `@zoblocks/tokens@0.1.0` on npm predates the
  * token pipeline entirely, exports two paths where the source declares six, and
  * still contains the zero-alpha `surface-overlay` that renders every dialog and
  * popover fully transparent — a bug fixed in source and never republished.
@@ -30,7 +30,7 @@ const files = packed.files.map((f) => f.path);
 const REQUIRED = [
   "dist/tokens.js",
   "dist/tokens.d.ts",
-  "src/oxygen-tokens.css",
+  "src/zoblocks-tokens.css",
   "src/tailwind.css",
   "src/tokens.json",
   "src/contrast.json",
@@ -73,16 +73,16 @@ for (const [subpath, target] of Object.entries(published.exports ?? {})) {
  * indistinguishable from publishing nothing, and it is what makes every
  * component render unstyled.
  */
-const css = readFileSync(path.join(pkgDir, "src/oxygen-tokens.css"), "utf8");
+const css = readFileSync(path.join(pkgDir, "src/zoblocks-tokens.css"), "utf8");
 for (const [marker, why] of [
   [":root", "no :root block — the light theme is the baseline every consumer gets"],
   ['[data-theme="dark"]', "no dark theme"],
-  ['[data-ox-theme="high-contrast"]', "no high-contrast theme"],
-  ['[data-ox-density="clinical"]', "no density profiles"],
+  ['[data-zb-theme="high-contrast"]', "no high-contrast theme"],
+  ['[data-zb-density="clinical"]', "no density profiles"],
   ["prefers-reduced-motion", "no reduced-motion handling"],
   ["forced-colors", "no forced-colors handling"],
 ]) {
-  if (!css.includes(marker)) problems.push(`oxygen-tokens.css: ${why} (missing "${marker}").`);
+  if (!css.includes(marker)) problems.push(`zoblocks-tokens.css: ${why} (missing "${marker}").`);
 }
 
 /**
@@ -93,7 +93,7 @@ for (const [marker, why] of [
 const zeroAlpha = [...css.matchAll(/#[0-9a-fA-F]{6}00\b/g)].map((m) => m[0]);
 if (zeroAlpha.length > 0) {
   problems.push(
-    `oxygen-tokens.css contains a fully transparent colour: ${zeroAlpha.join(", ")}. ` +
+    `zoblocks-tokens.css contains a fully transparent colour: ${zeroAlpha.join(", ")}. ` +
       "This shipped once as surface-overlay and made every dialog see-through.",
   );
 }

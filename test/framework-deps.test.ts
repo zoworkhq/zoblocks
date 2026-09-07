@@ -115,7 +115,7 @@ describe("declared framework dependencies match imports", () => {
 describe("the bridge rule", () => {
   /**
    * A package whose only antd import is a bridge subpath must mark the peer
-   * optional. Otherwise `pnpm add @oxygenui-design/tabs` warns about a missing
+   * optional. Otherwise `pnpm add @zoblocks/tabs` warns about a missing
    * framework the consumer has no intention of using, and the "you never pay
    * for a bridge you did not ask for" claim is false at install time.
    */
@@ -152,10 +152,10 @@ describe("the README package table agrees with the packages", () => {
     const readme = readFileSync(path.join(ROOT, "README.md"), "utf8");
     const rows = readme
       .split("\n")
-      .filter((l) => l.startsWith("| `@oxygenui-design/") && /antd|Ant Design/.test(l));
+      .filter((l) => l.startsWith("| `@zoblocks/") && /antd|Ant Design/.test(l));
 
     for (const row of rows) {
-      const name = /`@oxygenui-design\/([a-z-]+)`/.exec(row)?.[1];
+      const name = /`@zoblocks\/([a-z-]+)`/.exec(row)?.[1];
       if (!name) continue;
       let json: Manifest;
       try {

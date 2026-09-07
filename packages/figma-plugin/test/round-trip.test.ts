@@ -3,7 +3,7 @@
  *
  * The plan names round-trip identity as its first correctness property, and
  * `figma-core` tests the two conversion functions in isolation. This tests the
- * *journey*: an Oxygen hex becomes a plan, becomes floats written into a file,
+ * *journey*: a Zoblocks hex becomes a plan, becomes floats written into a file,
  * is read back out by the adapter, and has to be the same byte.
  *
  * Colour conversion drifts at the edges — 0 and 255, the values that round
@@ -13,7 +13,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { generateRamp } from "@oxygenui-design/tokens/validate";
+import { generateRamp } from "@zoblocks/tokens/validate";
 
 import { applyPull } from "../src/sandbox/apply";
 import { readFile } from "../src/sandbox/read";
@@ -56,7 +56,7 @@ describe("a colour that has been through a file", () => {
     const { snapshot } = await pullInto(figma, payloadFor({}));
 
     for (const [step, hex] of Object.entries(RAMP)) {
-      const variable = snapshot.variables.find((v) => v.token === `--ox-ref-brand-${step}`);
+      const variable = snapshot.variables.find((v) => v.token === `--zb-ref-brand-${step}`);
       expect(variable, `step ${step}`).toBeDefined();
       expect(colourAt(variable!, "default"), `step ${step}`).toBe(hex);
     }
@@ -64,11 +64,11 @@ describe("a colour that has been through a file", () => {
 
   it("survives the values that round across a boundary", async () => {
     const figma = new FakeFigma();
-    const semantic = Object.fromEntries(EDGES.map((hex, i) => [`--ox-edge-${i}`, hex]));
+    const semantic = Object.fromEntries(EDGES.map((hex, i) => [`--zb-edge-${i}`, hex]));
     const { snapshot } = await pullInto(figma, payloadFor(semantic));
 
     for (const [i, hex] of EDGES.entries()) {
-      const variable = snapshot.variables.find((v) => v.token === `--ox-edge-${i}`)!;
+      const variable = snapshot.variables.find((v) => v.token === `--zb-edge-${i}`)!;
       expect(colourAt(variable, "light"), hex).toBe(hex);
     }
   });
@@ -78,14 +78,14 @@ describe("a colour that has been through a file", () => {
     const payload: ResolvedPayload = {
       ...payloadFor({}),
       semantic: {
-        light: { "--ox-text": "#16181d" },
-        dark: { "--ox-text": "#e8ecf1" },
-        "high-contrast": { "--ox-text": "#000000" },
+        light: { "--zb-text": "#16181d" },
+        dark: { "--zb-text": "#e8ecf1" },
+        "high-contrast": { "--zb-text": "#000000" },
       },
     };
 
     const { snapshot } = await pullInto(figma, payload);
-    const text = snapshot.variables.find((v) => v.token === "--ox-text")!;
+    const text = snapshot.variables.find((v) => v.token === "--zb-text")!;
 
     // A transposed mode id would leave all three the same colour, or two of
     // them swapped — and both render plausibly.
@@ -96,9 +96,9 @@ describe("a colour that has been through a file", () => {
 
   it("is stable across repeated pulls, not merely correct once", async () => {
     const figma = new FakeFigma();
-    await pullInto(figma, payloadFor({ "--ox-accent": RAMP[700] }));
-    const first = await pullInto(figma, payloadFor({ "--ox-accent": RAMP[700] }));
-    const second = await pullInto(figma, payloadFor({ "--ox-accent": RAMP[700] }));
+    await pullInto(figma, payloadFor({ "--zb-accent": RAMP[700] }));
+    const first = await pullInto(figma, payloadFor({ "--zb-accent": RAMP[700] }));
+    const second = await pullInto(figma, payloadFor({ "--zb-accent": RAMP[700] }));
 
     // Drift that is one value per pull is invisible in a single round trip and
     // obvious after a fortnight of them.
@@ -107,11 +107,11 @@ describe("a colour that has been through a file", () => {
 
   it("comes back as an alias, not as the colour the alias points at", async () => {
     const figma = new FakeFigma();
-    const { snapshot } = await pullInto(figma, payloadFor({ "--ox-accent": RAMP[700] }));
-    const accent = snapshot.variables.find((v) => v.token === "--ox-accent")!;
+    const { snapshot } = await pullInto(figma, payloadFor({ "--zb-accent": RAMP[700] }));
+    const accent = snapshot.variables.find((v) => v.token === "--zb-accent")!;
 
     // Resolving it on the way out would make the next diff compare a literal
     // against an alias and report a change on every pull.
-    expect(accent.values.light).toEqual({ kind: "alias", token: "--ox-ref-brand-700" });
+    expect(accent.values.light).toEqual({ kind: "alias", token: "--zb-ref-brand-700" });
   });
 });

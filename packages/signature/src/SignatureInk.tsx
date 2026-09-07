@@ -20,7 +20,7 @@
  */
 
 import * as React from "react";
-import type { Ink } from "@oxygenui-design/signature-core";
+import type { Ink } from "@zoblocks/signature-core";
 
 export interface SignatureInkProps {
   ink: Ink;

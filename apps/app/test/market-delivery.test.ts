@@ -116,7 +116,7 @@ describe("registry tokens", () => {
 
     const { token } = await mintToken(auth, "Ada's laptop");
 
-    expect(token.startsWith("oxy_live_")).toBe(true);
+    expect(token.startsWith("zb_live_")).toBe(true);
     const [stored] = await scoped(northwind).registryTokens.find().toArray();
     // The row must contain nothing that could be used to install.
     expect(stored?._id).toBe(hashToken(token));
@@ -130,7 +130,7 @@ describe("registry tokens", () => {
 
     const resolved = await unscopedRegistryToken(hashToken(token));
     expect(resolved?.orgId.toHexString()).toBe(northwind.toHexString());
-    expect(await unscopedRegistryToken(hashToken("oxy_live_wrong"))).toBeUndefined();
+    expect(await unscopedRegistryToken(hashToken("zb_live_wrong"))).toBeUndefined();
   });
 
   it("stops resolving the moment it is revoked", async () => {

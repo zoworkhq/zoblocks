@@ -2,7 +2,7 @@
  * Hex in, Figma's floats out, and back again without drift.
  *
  * Figma stores a colour as `{ r, g, b }` with each channel a float from 0 to 1.
- * Oxygen stores hex. The conversion is four lines and is exactly the kind of
+ * Zoblocks stores hex. The conversion is four lines and is exactly the kind of
  * thing that is quietly wrong at the edges: a naive `Math.round(c * 255)` on the
  * way back is correct, and `Math.floor` — which looks equivalent — loses the
  * top of the range and turns `#ffffff` into `#fefefe`.

@@ -3,7 +3,7 @@
  *
  * These two lists live in different packages on purpose. `ICON_SLOTS` in the
  * theme package is what a customer is offered and what the schema will accept;
- * the `ox-icon--*` classes in `copilot-react` are what the browser actually
+ * the `zb-icon--*` classes in `copilot-react` are what the browser actually
  * draws. Neither package depends on the other — a component asking the theme
  * package what it may render would be the dependency pointing the wrong way —
  * so nothing but this file would notice them drifting apart.
@@ -17,7 +17,7 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { ICON_SLOTS, REPLACEABLE_SLOTS } from "@oxygenui-design/theme";
+import { ICON_SLOTS, REPLACEABLE_SLOTS } from "@zoblocks/theme";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(here, "..");
@@ -34,14 +34,14 @@ describe("every offered slot is a glyph somebody can actually replace", () => {
   });
 
   it("has a mask rule for every slot it draws", () => {
-    const missing = drawn.filter((slot) => !css.includes(`.ox-icon[data-icon="${slot}"] {`));
+    const missing = drawn.filter((slot) => !css.includes(`.zb-icon[data-icon="${slot}"] {`));
     expect(missing).toEqual([]);
   });
 
   /**
    * The override must be the *first* value in the chain, not the fallback.
    *
-   * `var(--ox-icon-send, <built-in>)` takes the customer's glyph when set and
+   * `var(--zb-icon-send, <built-in>)` takes the customer's glyph when set and
    * the shipped one otherwise. Written the other way round it would compile,
    * render correctly in every screenshot, and silently ignore every upload.
    */
@@ -50,14 +50,14 @@ describe("every offered slot is a glyph somebody can actually replace", () => {
       // A literal rather than a regex: the thing being protected is the exact
       // order of two values, and a pattern loose enough to be readable here is
       // loose enough to match the broken form too.
-      const expected = `mask-image: var(--ox-icon-${slot}, var(--ox-icon-${slot}--builtin));`;
+      const expected = `mask-image: var(--zb-icon-${slot}, var(--zb-icon-${slot}--builtin));`;
       expect(css.includes(expected), slot).toBe(true);
     }
   });
 
   it("ships a built-in for every slot, so an un-themed host still has icons", () => {
     for (const slot of drawn) {
-      expect(css.includes(`--ox-icon-${slot}--builtin: url("data:image/svg+xml,`), slot).toBe(true);
+      expect(css.includes(`--zb-icon-${slot}--builtin: url("data:image/svg+xml,`), slot).toBe(true);
     }
   });
 
@@ -68,7 +68,7 @@ describe("every offered slot is a glyph somebody can actually replace", () => {
    */
   it("declares the SVG namespace in every built-in", () => {
     const uris = [
-      ...css.matchAll(/--ox-icon-[a-z0-9-]+--builtin: url\("data:image\/svg\+xml,([^"]+)"\)/g),
+      ...css.matchAll(/--zb-icon-[a-z0-9-]+--builtin: url\("data:image\/svg\+xml,([^"]+)"\)/g),
     ];
     expect(uris.length).toBe(drawn.length);
     for (const [, uri] of uris) {

@@ -11,7 +11,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
-import { resolveTarget, type OxygenConfig } from "./config.js";
+import { resolveTarget, type ZoblocksConfig } from "./config.js";
 import { assertSafeTarget, type RegistryItem } from "./schema.js";
 
 export interface PlannedFile {
@@ -33,7 +33,7 @@ export interface Plan {
 
 export async function planInstall(
   items: RegistryItem[],
-  config: OxygenConfig,
+  config: ZoblocksConfig,
   cwd: string,
 ): Promise<Plan> {
   const files: PlannedFile[] = [];

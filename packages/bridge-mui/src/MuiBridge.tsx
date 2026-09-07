@@ -3,7 +3,7 @@
 /**
  * The React half of the Material UI bridge.
  *
- *     import { MuiBridge } from "@oxygenui-design/bridge-mui";
+ *     import { MuiBridge } from "@zoblocks/bridge-mui";
  *
  *     <ThemeProvider theme={muiTheme}>
  *       <MuiBridge>
@@ -18,7 +18,7 @@
 
 import * as React from "react";
 import { useTheme } from "@mui/material/styles";
-import { assertBridgeOutput, resolvePatch, type TokenPatch } from "@oxygenui-design/bridge-core";
+import { assertBridgeOutput, resolvePatch, type TokenPatch } from "@zoblocks/bridge-core";
 import { muiBridge, type MuiTheme } from "./map";
 
 /** The custom properties this host's MUI theme resolves to. */
@@ -40,5 +40,5 @@ export interface MuiBridgeProps {
 
 export function MuiBridge({ children, className, as = "div" }: MuiBridgeProps) {
   const style = useMuiTokens();
-  return React.createElement(as, { className, style, "data-ox-bridge": muiBridge.id }, children);
+  return React.createElement(as, { className, style, "data-zb-bridge": muiBridge.id }, children);
 }

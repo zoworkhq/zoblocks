@@ -51,7 +51,7 @@ describe("the manifest", () => {
   it("reaches one origin in production, and it is the app", () => {
     // A wildcard would be the easy thing to write and the thing a reviewer
     // cannot check. One exact origin is a claim they can hold us to.
-    expect(manifest.networkAccess.allowedDomains).toEqual(["https://app.oxygenui.design"]);
+    expect(manifest.networkAccess.allowedDomains).toEqual(["https://app.zoblocks.design"]);
     expect(manifest.networkAccess.allowedDomains.every((d) => !d.includes("*"))).toBe(true);
   });
 

@@ -50,7 +50,7 @@ import {
   useSummonShortcut,
   type CopilotShortcut,
   type UseCopilotOptions,
-} from "@oxygenui-design/copilot-react";
+} from "@zoblocks/copilot-react";
 import {
   AnswerBody,
   CheckNotices,
@@ -200,16 +200,16 @@ function CopilotSurface(props: SurfaceProps): React.ReactNode {
   if (api.collapsed) {
     return (
       <div
-        className={["ox-copilot", `ox-copilot--${anchor}`, "ox-copilot--collapsed", className]
+        className={["zb-copilot", `zb-copilot--${anchor}`, "zb-copilot--collapsed", className]
           .filter(Boolean)
           .join(" ")}
-        data-ox-status={api.state.status}
+        data-zb-status={api.state.status}
       >
         <CopilotLiveRegion message={api.announcer.message} />
         <Button
           type="primary"
           shape="circle"
-          className="ox-copilot-bubble"
+          className="zb-copilot-bubble"
           aria-label={locale.reopen}
           onClick={() => api.setCollapsed(false)}
           icon={<SparkIcon />}
@@ -220,7 +220,7 @@ function CopilotSurface(props: SurfaceProps): React.ReactNode {
 
   return (
     <div
-      className={["ox-copilot", `ox-copilot--${anchor}`, className].filter(Boolean).join(" ")}
+      className={["zb-copilot", `zb-copilot--${anchor}`, className].filter(Boolean).join(" ")}
       data-status={api.state.status}
     >
       <CopilotLiveRegion message={api.announcer.message} />
@@ -246,10 +246,10 @@ function CopilotSurface(props: SurfaceProps): React.ReactNode {
       ) : null}
 
       {threadOpen ? null : (
-        <CopilotDockRegion label={locale.dockLabel} className="ox-copilot-dock-region">
+        <CopilotDockRegion label={locale.dockLabel} className="zb-copilot-dock-region">
           {trayOpen ? (
-            <div className="ox-copilot-tray">
-              <div className="ox-copilot-tray-modes" role="group" aria-label={locale.modes}>
+            <div className="zb-copilot-tray">
+              <div className="zb-copilot-tray-modes" role="group" aria-label={locale.modes}>
                 {api.modes.map((mode) => (
                   <Button
                     key={mode.id}
@@ -271,7 +271,7 @@ function CopilotSurface(props: SurfaceProps): React.ReactNode {
                   <CloseIcon />
                 </Button>
               </div>
-              <ul className="ox-copilot-suggestions">
+              <ul className="zb-copilot-suggestions">
                 {api.mode.suggestions.map((suggestion) => (
                   <li key={suggestion.id}>
                     <button
@@ -281,9 +281,9 @@ function CopilotSurface(props: SurfaceProps): React.ReactNode {
                         setTrayOpen(false);
                       }}
                     >
-                      <span className="ox-copilot-suggestion-label">{suggestion.label}</span>
+                      <span className="zb-copilot-suggestion-label">{suggestion.label}</span>
                       {suggestion.reads ? (
-                        <span className="ox-copilot-suggestion-reads">{suggestion.reads}</span>
+                        <span className="zb-copilot-suggestion-reads">{suggestion.reads}</span>
                       ) : null}
                     </button>
                   </li>
@@ -293,12 +293,12 @@ function CopilotSurface(props: SurfaceProps): React.ReactNode {
           ) : null}
 
           {menu.open ? (
-            <ul className="ox-copilot-shortcuts" {...menu.listProps} aria-label={locale.shortcuts}>
+            <ul className="zb-copilot-shortcuts" {...menu.listProps} aria-label={locale.shortcuts}>
               {menu.items.map((item, index) => (
-                <li key={item.id} {...menu.optionProps(index)} className="ox-copilot-shortcut">
+                <li key={item.id} {...menu.optionProps(index)} className="zb-copilot-shortcut">
                   {item.label}
                   {item.description ? (
-                    <span className="ox-copilot-shortcut-desc">{item.description}</span>
+                    <span className="zb-copilot-shortcut-desc">{item.description}</span>
                   ) : null}
                 </li>
               ))}
@@ -310,7 +310,7 @@ function CopilotSurface(props: SurfaceProps): React.ReactNode {
             {...(props.onChangeScope ? { onChange: props.onChangeScope } : {})}
           />
 
-          <div className="ox-copilot-dock">
+          <div className="zb-copilot-dock">
             <Tooltip title={locale.shortcuts}>
               <Button
                 type="text"
@@ -323,7 +323,7 @@ function CopilotSurface(props: SurfaceProps): React.ReactNode {
 
             <Input
               ref={(node) => setInputEl(node?.input ?? null)}
-              className="ox-copilot-field"
+              className="zb-copilot-field"
               variant="borderless"
               value={api.draft}
               placeholder={
@@ -362,7 +362,7 @@ function CopilotSurface(props: SurfaceProps): React.ReactNode {
             )}
           </div>
 
-          <div className="ox-copilot-footer">
+          <div className="zb-copilot-footer">
             <Tooltip title={locale.collapseDock}>
               <Button
                 type="text"
@@ -373,7 +373,7 @@ function CopilotSurface(props: SurfaceProps): React.ReactNode {
                 <CloseIcon />
               </Button>
             </Tooltip>
-            <Text type="secondary" className="ox-copilot-disclaimer">
+            <Text type="secondary" className="zb-copilot-disclaimer">
               {locale.disclaimer}
             </Text>
             <Button type="link" size="small" onClick={() => setDisclosureOpen((open) => !open)}>
@@ -404,16 +404,16 @@ function DictationButton(props: { api: ReturnType<typeof useCopilot> }): React.R
         danger
         aria-label={locale.stopDictation}
         onClick={() => dictation.stop()}
-        className="ox-copilot-dictating"
+        className="zb-copilot-dictating"
       >
-        <span className="ox-copilot-wave" aria-hidden="true">
+        <span className="zb-copilot-wave" aria-hidden="true">
           <i />
           <i />
           <i />
           <i />
           <i />
         </span>
-        <span className="ox-copilot-visually-hidden">{locale.dictationLive}</span>
+        <span className="zb-copilot-visually-hidden">{locale.dictationLive}</span>
       </Button>
     );
   }
@@ -444,12 +444,12 @@ function CopilotPanel(props: {
 
   return (
     <section
-      className={["ox-copilot-panel", props.expanded ? "ox-copilot-panel--expanded" : ""]
+      className={["zb-copilot-panel", props.expanded ? "zb-copilot-panel--expanded" : ""]
         .filter(Boolean)
         .join(" ")}
       aria-label={locale.panelLabel}
     >
-      <header className="ox-copilot-panel-head">
+      <header className="zb-copilot-panel-head">
         {/* The thread switcher. A thread titles itself from its first question,
             so this reads as the conversation rather than as an id. */}
         <Dropdown
@@ -460,13 +460,13 @@ function CopilotPanel(props: {
             onClick: ({ key }) => api.switchThread(key),
           }}
         >
-          <button type="button" className="ox-copilot-thread-switch" aria-label={locale.threads}>
-            <span className="ox-copilot-panel-title">{activeThread?.title ?? api.mode.label}</span>
+          <button type="button" className="zb-copilot-thread-switch" aria-label={locale.threads}>
+            <span className="zb-copilot-panel-title">{activeThread?.title ?? api.mode.label}</span>
             {api.threads.length > 1 ? <ChevronDownIcon /> : null}
           </button>
         </Dropdown>
 
-        <span className="ox-copilot-panel-spacer" />
+        <span className="zb-copilot-panel-spacer" />
 
         <Tooltip title={locale.newChat}>
           <Button type="text" size="small" aria-label={locale.newChat} onClick={api.newThread}>
@@ -497,19 +497,19 @@ function CopilotPanel(props: {
         </Tooltip>
       </header>
 
-      <div className="ox-copilot-thread">
+      <div className="zb-copilot-thread">
         {api.state.messages.map((message) =>
           message.role === "clinician" ? (
-            <p key={message.id} className="ox-copilot-msg-user">
+            <p key={message.id} className="zb-copilot-msg-user">
               {message.text}
             </p>
           ) : (
-            <article key={message.id} className="ox-copilot-msg-assistant">
+            <article key={message.id} className="zb-copilot-msg-assistant">
               {/* Collapsed by design. A visible chain of thought reads as
                   evidence to a clinician, and it is not evidence — it is a
                   narrative the model produced alongside the answer. */}
               {message.answer?.reasoning ? (
-                <details className="ox-copilot-reasoning">
+                <details className="zb-copilot-reasoning">
                   <summary>
                     <ThoughtIcon /> {locale.reasoning}
                   </summary>
@@ -523,7 +523,7 @@ function CopilotPanel(props: {
               ) : null}
               {message.checks ? <CheckNotices findings={message.checks.findings} /> : null}
 
-              <div className="ox-copilot-msg-actions">
+              <div className="zb-copilot-msg-actions">
                 <Tooltip title={locale.helpful}>
                   <Button
                     type="text"
@@ -547,14 +547,14 @@ function CopilotPanel(props: {
 
                 <Button
                   size="small"
-                  className="ox-copilot-verify"
+                  className="zb-copilot-verify"
                   icon={<VerifyIcon />}
                   onClick={api.openSources}
                 >
                   {locale.showSources}
                 </Button>
 
-                <span className="ox-copilot-msg-spacer" />
+                <span className="zb-copilot-msg-spacer" />
 
                 <Tooltip title={locale.copy}>
                   <Button
@@ -600,8 +600,8 @@ function CopilotPanel(props: {
                   analysable, so it asks — from a closed list, because free text
                   produces "bad" and nothing else. */}
               {api.awaitingFeedbackReason ? (
-                <div className="ox-copilot-feedback" role="group" aria-label={locale.whyNotHelpful}>
-                  <span className="ox-copilot-feedback-q">{locale.whyNotHelpful}</span>
+                <div className="zb-copilot-feedback" role="group" aria-label={locale.whyNotHelpful}>
+                  <span className="zb-copilot-feedback-q">{locale.whyNotHelpful}</span>
                   {FEEDBACK_REASONS.map((reason) => (
                     <Button
                       key={reason}
@@ -621,7 +621,7 @@ function CopilotPanel(props: {
         )}
 
         {api.state.status === "streaming" && api.state.current ? (
-          <CopilotAnswerRegion busy className="ox-copilot-streaming">
+          <CopilotAnswerRegion busy className="zb-copilot-streaming">
             {api.state.current.text}
           </CopilotAnswerRegion>
         ) : null}
@@ -636,7 +636,7 @@ function CopilotPanel(props: {
         ) : null}
 
         {api.state.status === "refused" && api.state.error ? (
-          <div className="ox-copilot-refused" role="status">
+          <div className="zb-copilot-refused" role="status">
             <strong>{locale.refusedTitle}</strong>
             <p>{api.state.error.message}</p>
             {api.state.error.suggestedModeId ? (
@@ -653,7 +653,7 @@ function CopilotPanel(props: {
         ) : null}
 
         {api.state.status === "error" && api.state.error ? (
-          <div className="ox-copilot-error" role="alert">
+          <div className="zb-copilot-error" role="alert">
             <strong>{locale.errorTitle}</strong>
             <p>{api.state.error.message}</p>
             {api.state.error.retryable && api.canRetry ? (
@@ -665,7 +665,7 @@ function CopilotPanel(props: {
         ) : null}
 
         {api.state.status === "stopped" ? (
-          <p className="ox-copilot-notice" role="status">
+          <p className="zb-copilot-notice" role="status">
             {locale.stoppedNotice}
           </p>
         ) : null}
@@ -682,9 +682,9 @@ function CopilotPanel(props: {
           and making someone travel back down to the dock to ask about it is
           the kind of small friction that ends in a copy-paste into a chat
           window with none of this component's guarantees. */}
-      <div className="ox-copilot-composer">
+      <div className="zb-copilot-composer">
         <Input
-          className="ox-copilot-composer-field"
+          className="zb-copilot-composer-field"
           variant="borderless"
           value={api.draft}
           placeholder={locale.followUp}
@@ -696,7 +696,7 @@ function CopilotPanel(props: {
             void api.submit();
           }}
         />
-        <div className="ox-copilot-composer-row">
+        <div className="zb-copilot-composer-row">
           {props.onAttach ? (
             <Tooltip title={locale.attach}>
               <Button type="text" size="small" aria-label={locale.attach} onClick={props.onAttach}>
@@ -730,7 +730,7 @@ function CopilotPanel(props: {
               onClick: ({ key }) => api.setMode(key),
             }}
           >
-            <Button size="small" className="ox-copilot-mode-chip" aria-label={locale.modes}>
+            <Button size="small" className="zb-copilot-mode-chip" aria-label={locale.modes}>
               <ModeGlyph modeId={api.mode.id} />
               {api.mode.label}
               <ChevronDownIcon />
@@ -739,13 +739,13 @@ function CopilotPanel(props: {
 
           {/* The sources chip from the mockup: what this answer will be built
               from, stated before the question rather than after the answer. */}
-          <span className="ox-copilot-sources-chip">
+          <span className="zb-copilot-sources-chip">
             <SparkIcon />
             <WorkUpIcon />
             {locale.sourcesChip}
           </span>
 
-          <span className="ox-copilot-composer-spacer" />
+          <span className="zb-copilot-composer-spacer" />
 
           <DictationButton api={api} />
           {api.state.status === "streaming" || api.state.status === "submitting" ? (
@@ -763,7 +763,7 @@ function CopilotPanel(props: {
         </div>
       </div>
 
-      <p className="ox-copilot-disclaimer">{locale.disclaimer}</p>
+      <p className="zb-copilot-disclaimer">{locale.disclaimer}</p>
     </section>
   );
 }

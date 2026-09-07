@@ -1,5 +1,5 @@
 /**
- * The inverse bridge: an Oxygen brand, pushed into Material UI.
+ * The inverse bridge: a Zoblocks brand, pushed into Material UI.
  *
  * The mirror of `map.ts`, and deliberately the same shape as the antd inverse
  * so a customer moving between the two frameworks changes a provider and
@@ -11,7 +11,7 @@
  * is wrong*. The hex would survive; the meaning would not.
  */
 
-import { toPx, type OxygenTokens } from "@oxygenui-design/bridge-core";
+import { toPx, type ZoblocksTokens } from "@zoblocks/bridge-core";
 
 /** The shape `createTheme` takes. Structural, so MUI stays a peer. */
 export interface MuiThemeOptions {
@@ -21,8 +21,8 @@ export interface MuiThemeOptions {
      *
      * `createTheme` runs `augmentColor` over any `primary` it is given and
      * throws — "the color provided to augmentColor is invalid" — if `main` is
-     * missing. So a theme that had defined `--ox-accent-hover` but not
-     * `--ox-accent` used to produce an object that looked fine, typechecked
+     * missing. So a theme that had defined `--zb-accent-hover` but not
+     * `--zb-accent` used to produce an object that looked fine, typechecked
      * against this interface, and took the host's application down at import.
      */
     primary?: { main: string; dark?: string; light?: string; contrastText?: string };
@@ -34,50 +34,50 @@ export interface MuiThemeOptions {
   typography?: { fontFamily?: string; fontSize?: number };
 }
 
-export function toMuiTheme(tokens: OxygenTokens): MuiThemeOptions {
+export function toMuiTheme(tokens: ZoblocksTokens): MuiThemeOptions {
   const options: MuiThemeOptions = {};
 
   /*
    * No accent, no palette entry. The shades are meaningless without the colour
    * they are shades *of*, and MUI refuses the object rather than ignoring it.
    */
-  const main = tokens["--ox-accent"];
+  const main = tokens["--zb-accent"];
   const primary = main
     ? (clean({
         main,
-        dark: tokens["--ox-accent-hover"],
-        light: tokens["--ox-accent-subtle"],
-        contrastText: tokens["--ox-text-on-accent"],
+        dark: tokens["--zb-accent-hover"],
+        light: tokens["--zb-accent-subtle"],
+        contrastText: tokens["--zb-text-on-accent"],
       }) as { main: string; dark?: string; light?: string; contrastText?: string })
     : undefined;
 
   const text = clean({
-    primary: tokens["--ox-text"],
-    secondary: tokens["--ox-text-muted"],
-    disabled: tokens["--ox-text-subtle"],
+    primary: tokens["--zb-text"],
+    secondary: tokens["--zb-text-muted"],
+    disabled: tokens["--zb-text-subtle"],
   });
 
   const background = clean({
-    default: tokens["--ox-bg"],
-    paper: tokens["--ox-surface"],
+    default: tokens["--zb-bg"],
+    paper: tokens["--zb-surface"],
   });
 
   const palette = clean({
     ...(primary ? { primary } : {}),
     ...(text ? { text } : {}),
     ...(background ? { background } : {}),
-    divider: tokens["--ox-border"],
+    divider: tokens["--zb-border"],
   });
   if (palette) options.palette = palette as MuiThemeOptions["palette"];
 
-  // MUI has one radius, a number of pixels. Handing it Oxygen's base is the
+  // MUI has one radius, a number of pixels. Handing it Zoblocks's base is the
   // honest choice — there is nowhere to put the other two steps.
-  const radius = toPx(tokens["--ox-radius"]);
+  const radius = toPx(tokens["--zb-radius"]);
   if (radius !== undefined) options.shape = { borderRadius: radius };
 
   const typography = clean({
-    fontFamily: tokens["--ox-font-sans"],
-    fontSize: toPx(tokens["--ox-text-base"]),
+    fontFamily: tokens["--zb-font-sans"],
+    fontSize: toPx(tokens["--zb-text-base"]),
   });
   if (typography) options.typography = typography as MuiThemeOptions["typography"];
 

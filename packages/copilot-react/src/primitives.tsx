@@ -12,7 +12,7 @@
  */
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import type { Answer, Source } from "@oxygenui-design/copilot-core";
+import type { Answer, Source } from "@zoblocks/copilot-core";
 import type { CopilotApi } from "./use-copilot.js";
 
 /* ------------------------------------------------------------------ */
@@ -279,7 +279,7 @@ export function useFocusReturn(open: boolean): void {
  * The words each register uses.
  *
  * Centralised so the two skins cannot drift. A clinician who learns what
- * "Grounded" means in one Oxygen product should not have to relearn it in
+ * "Grounded" means in one Zoblocks product should not have to relearn it in
  * another.
  */
 export function useRegisterLabel(answer: Answer | null): {

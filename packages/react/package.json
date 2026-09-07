@@ -1,12 +1,12 @@
 {
-  "name": "@oxygenui-design/react",
+  "name": "@zoblocks/react",
   "version": "0.1.0",
   "description": "Healthcare React components typed for the states a demo would skip. Accessible, themeable, reduced-motion aware, with zero runtime dependencies.",
   "license": "MIT",
-  "homepage": "https://oxygenui.design",
+  "homepage": "https://zoblocks.design",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zoworkhq/oxygenui.git",
+    "url": "git+https://github.com/zoworkhq/zoblocks.git",
     "directory": "packages/react"
   },
   "keywords": [
@@ -83,7 +83,7 @@
     "check-tarball": "node scripts/check-tarball.mjs"
   },
   "devDependencies": {
-    "@oxygenui-design/tsconfig": "workspace:*",
+    "@zoblocks/tsconfig": "workspace:*",
     "@testing-library/jest-dom": "^7",
     "@testing-library/react": "^16",
     "@types/react": "^19.0.2",

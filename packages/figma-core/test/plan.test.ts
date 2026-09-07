@@ -41,7 +41,7 @@ describe("the shape of the file it would build", () => {
    */
   it("leaves the component tier out by default", () => {
     const withComponent = theme({
-      component: { light: { "--ox-switch-track-on-bg": "#1851a5" }, dark: {}, "high-contrast": {} },
+      component: { light: { "--zb-switch-track-on-bg": "#1851a5" }, dark: {}, "high-contrast": {} },
     });
 
     expect(toVariablePlan(withComponent).collections.map((c) => c.name)).not.toContain(
@@ -53,8 +53,8 @@ describe("the shape of the file it would build", () => {
   });
 
   it("groups labels on the slash so a panel of sixty is navigable", () => {
-    expect(labelFor("--ox-accent-hover")).toBe("accent/hover");
-    expect(labelFor("--ox-text")).toBe("text");
+    expect(labelFor("--zb-accent-hover")).toBe("accent/hover");
+    expect(labelFor("--zb-text")).toBe("text");
   });
 });
 
@@ -62,37 +62,37 @@ describe("aliases, not flattened hex", () => {
   /**
    * The acceptance criterion the plan singles out, and the reason it does.
    *
-   * `--ox-accent` resolves to exactly the ramp's 700 step. Written as a literal
+   * `--zb-accent` resolves to exactly the ramp's 700 step. Written as a literal
    * it renders identically and severs the link, so moving the brand stops
    * moving the accent — and nothing about the file says so.
    */
   it("aliases a semantic token that resolves to a ramp step", () => {
     const plan = toVariablePlan(theme());
-    const accent = find(plan, "--ox-accent")!;
+    const accent = find(plan, "--zb-accent")!;
 
-    expect(accent.values.light).toEqual({ kind: "alias", token: "--ox-ref-brand-700" });
+    expect(accent.values.light).toEqual({ kind: "alias", token: "--zb-ref-brand-700" });
   });
 
   it("keeps a literal where the value is not a ramp step", () => {
     const plan = toVariablePlan(theme());
-    expect(find(plan, "--ox-text")!.values.light).toMatchObject({ kind: "color", hex: "#16181d" });
+    expect(find(plan, "--zb-text")!.values.light).toMatchObject({ kind: "color", hex: "#16181d" });
   });
 
   it("follows a declared reference ahead of guessing from the value", () => {
-    const plan = toVariablePlan(theme({ references: { "--ox-text": "--ox-ref-brand-950" } }));
+    const plan = toVariablePlan(theme({ references: { "--zb-text": "--zb-ref-brand-950" } }));
     // The declaration wins: the chain is known, not inferred.
-    expect(find(plan, "--ox-text")!.values.light).toEqual({
+    expect(find(plan, "--zb-text")!.values.light).toEqual({
       kind: "alias",
-      token: "--ox-ref-brand-950",
+      token: "--zb-ref-brand-950",
     });
   });
 
   it("aliases per mode, since a token can be a step in one theme and not another", () => {
     const plan = toVariablePlan(theme());
-    const accent = find(plan, "--ox-accent")!;
+    const accent = find(plan, "--zb-accent")!;
 
     expect(accent.values.light).toMatchObject({ kind: "alias" });
-    expect(accent.values.dark).toMatchObject({ kind: "alias", token: "--ox-ref-brand-400" });
+    expect(accent.values.dark).toMatchObject({ kind: "alias", token: "--zb-ref-brand-400" });
   });
 });
 
@@ -104,7 +104,7 @@ describe("clinical tokens arrive locked", () => {
    */
   it("carries the reason, in the words the app uses", () => {
     const plan = toVariablePlan(theme());
-    const critical = find(plan, "--ox-status-critical")!;
+    const critical = find(plan, "--zb-status-critical")!;
 
     expect(critical.locked).toMatch(/hue separation/);
     // Figma shows a variable's description in its own panel, so the reason
@@ -114,7 +114,7 @@ describe("clinical tokens arrive locked", () => {
 
   it("still pushes them, in every theme", () => {
     const plan = toVariablePlan(theme());
-    const critical = find(plan, "--ox-status-critical")!;
+    const critical = find(plan, "--zb-status-critical")!;
     for (const mode of THEMES) expect(critical.values[mode], mode).toBeDefined();
   });
 
@@ -122,27 +122,27 @@ describe("clinical tokens arrive locked", () => {
     const plan = toVariablePlan(theme());
     const unlocked = plan.variables.filter((v) => !v.locked).map((v) => v.token);
     for (const token of CLINICAL.slice(0, 1)) expect(unlocked).not.toContain(token);
-    expect(unlocked).toContain("--ox-accent");
+    expect(unlocked).toContain("--zb-accent");
   });
 });
 
 describe("what it refuses to invent", () => {
   it("skips a ramp entry that is not a colour rather than emitting nonsense", () => {
     const plan = toVariablePlan(theme({ ramp: { ...RAMP, "600": "not-a-colour" } }));
-    expect(find(plan, "--ox-ref-brand-600")).toBeUndefined();
+    expect(find(plan, "--zb-ref-brand-600")).toBeUndefined();
   });
 
   it("keeps a non-colour semantic value as a string, not a broken colour", () => {
     const plan = toVariablePlan(
       theme({
         semantic: {
-          light: { "--ox-font-sans": "Instrument Sans, sans-serif" },
+          light: { "--zb-font-sans": "Instrument Sans, sans-serif" },
           dark: {},
           "high-contrast": {},
         },
       }),
     );
-    expect(find(plan, "--ox-font-sans")!.values.light).toEqual({
+    expect(find(plan, "--zb-font-sans")!.values.light).toEqual({
       kind: "string",
       value: "Instrument Sans, sans-serif",
     });

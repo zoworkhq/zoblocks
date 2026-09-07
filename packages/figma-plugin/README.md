@@ -1,6 +1,6 @@
-# Oxygen
+# Zoblocks
 
-Oxygen's design system, inside Figma. Three things:
+Zoblocks's design system, inside Figma. Three things:
 
 - **Check** — reads the variables already in the open file and measures them
   with the same code the build and the publish gate run. Needs no account.
@@ -23,7 +23,7 @@ version.
 ## Running it
 
 ```bash
-pnpm --filter @oxygenui-design/figma-plugin build
+pnpm --filter @zoblocks/figma-plugin build
 ```
 
 Then in Figma: **Plugins → Development → Import plugin from manifest**, and
@@ -45,14 +45,14 @@ never exceeds the role of the person who minted it.
 
 ## The two readings, and why there are two
 
-**Oxygen** — the collection carries variables stamped with Oxygen token names,
+**Zoblocks** — the collection carries variables stamped with Zoblocks token names,
 so the plugin knows which colour is text and which is the ground beneath it. It
 measures `CONTRAST_PAIRS` and `STATUS_PAIRS` from the validator, at the floors
 `floorForPair` and `floorFor` impose, and reports hue separation between
 `status.high` and `status.low` as a separate finding — two colours can both
 clear 4.5:1 and still be indistinguishable to a reader with deuteranopia.
 
-**Palette** — nothing in the collection carries an Oxygen stamp. The pairs are
+**Palette** — nothing in the collection carries a Zoblocks stamp. The pairs are
 therefore unknown, and pairing swatches by guesswork would produce a confident
 number about a combination nobody will render. So the designer names a ground
 and says whether the colours are text (SC 1.4.3, 4.5:1) or interface components

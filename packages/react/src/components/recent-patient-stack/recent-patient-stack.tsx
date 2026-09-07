@@ -7,7 +7,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/recent-patient-stack/recent-patient-stack.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/recent-patient-stack/recent-patient-stack.tsx. Edit that file, not this one.
 /**
  * RecentPatientStack — a multi-chart workspace that makes the active patient
  * unmistakable, because the alternative is eleven identical browser tabs.
@@ -34,7 +34,7 @@
  * wrong-patient generator, so below the breakpoint the stack renders as a
  * single active chart and a switcher — see the stylesheet.
  *
- * Styling lives in `styles/oxygen-workspace.css`, installed alongside.
+ * Styling lives in `styles/zoblocks-workspace.css`, installed alongside.
  */
 
 import * as React from "react";
@@ -225,13 +225,13 @@ export function RecentPatientStack({
   return (
     <div
       {...rest}
-      className={cn("ox-stack", className)}
-      data-ox-stack=""
-      data-ox-expanded={expanded ? "" : undefined}
+      className={cn("zb-stack", className)}
+      data-zb-stack=""
+      data-zb-expanded={expanded ? "" : undefined}
     >
-      <div className="ox-stack__bar">
+      <div className="zb-stack__bar">
         <div
-          className="ox-stack__tabs"
+          className="zb-stack__tabs"
           role="tablist"
           aria-label="Open charts"
           aria-orientation={expanded ? "vertical" : "horizontal"}
@@ -252,11 +252,11 @@ export function RecentPatientStack({
                 aria-selected={active}
                 // Roving: one stop for the whole stack, arrows within it.
                 tabIndex={active || (!activeId && index === 0) ? 0 : -1}
-                className="ox-stack__tab"
-                data-ox-accent={chartAccent(chart.id)}
-                data-ox-active={active ? "" : undefined}
-                data-ox-pinned={chart.pinned ? "" : undefined}
-                data-ox-work={worst?.kind}
+                className="zb-stack__tab"
+                data-zb-accent={chartAccent(chart.id)}
+                data-zb-active={active ? "" : undefined}
+                data-zb-pinned={chart.pinned ? "" : undefined}
+                data-zb-work={worst?.kind}
                 aria-label={describeChart(chart, { showIdentifier })}
                 onClick={() => activate(chart)}
                 onKeyDown={(event) => onKeyDown(event, chart, index)}
@@ -266,10 +266,10 @@ export function RecentPatientStack({
                   The accent ring is drawn either way, so the hue identity
                   survives a chart that has no photograph on file.
                 */}
-                <span className="ox-stack__avatar" aria-hidden="true">
+                <span className="zb-stack__avatar" aria-hidden="true">
                   {chart.photo ? (
                     // eslint-disable-next-line @next/next/no-img-element -- ships to consumers; no framework image component.
-                    <img className="ox-stack__face" src={chart.photo} alt="" />
+                    <img className="zb-stack__face" src={chart.photo} alt="" />
                   ) : (
                     initials(chart.display)
                   )}
@@ -280,23 +280,23 @@ export function RecentPatientStack({
                   for a reader who already knows the chart, never the thing
                   that identifies it.
                 */}
-                <span className="ox-stack__who" aria-hidden="true">
-                  <span className="ox-stack__name">{chart.display}</span>
+                <span className="zb-stack__who" aria-hidden="true">
+                  <span className="zb-stack__name">{chart.display}</span>
                   {/*
                     Two charts whose names look alike both grow an identifier.
                     Marking only the newcomer would leave the reader comparing
                     a row that has one against a row that does not.
                   */}
                   {showIdentifier && chart.identifier ? (
-                    <span className="ox-stack__identifier">{chart.identifier}</span>
+                    <span className="zb-stack__identifier">{chart.identifier}</span>
                   ) : null}
-                  {chart.reason ? <span className="ox-stack__reason">{chart.reason}</span> : null}
+                  {chart.reason ? <span className="zb-stack__reason">{chart.reason}</span> : null}
                 </span>
 
                 {worst ? (
                   // One word on the tab; the long form is in the accessible
                   // name and in the panel, where there is room for it.
-                  <span className="ox-stack__work" aria-hidden="true">
+                  <span className="zb-stack__work" aria-hidden="true">
                     {WORK_SHORT[worst.kind]}
                   </span>
                 ) : null}
@@ -305,16 +305,16 @@ export function RecentPatientStack({
           })}
         </div>
 
-        <div className="ox-stack__controls">
+        <div className="zb-stack__controls">
           {owed ? (
-            <span className="ox-stack__owed" aria-hidden="true">
+            <span className="zb-stack__owed" aria-hidden="true">
               {owed}
             </span>
           ) : null}
           {onExpandedChange ? (
             <button
               type="button"
-              className="ox-stack__expand"
+              className="zb-stack__expand"
               aria-expanded={expanded}
               onClick={() => onExpandedChange(!expanded)}
             >
@@ -330,17 +330,17 @@ export function RecentPatientStack({
         the tab is already the target for the thing people mean to do.
       */}
       {expanded ? (
-        <ul className="ox-stack__panel">
+        <ul className="zb-stack__panel">
           {ordered.map((chart) => (
-            <li key={chart.id} className="ox-stack__row" data-ox-accent={chartAccent(chart.id)}>
-              <span className="ox-stack__row-name">{chart.display}</span>
+            <li key={chart.id} className="zb-stack__row" data-zb-accent={chartAccent(chart.id)}>
+              <span className="zb-stack__row-name">{chart.display}</span>
               {ambiguous.has(chart.id) && chart.identifier ? (
-                <span className="ox-stack__identifier">{chart.identifier}</span>
+                <span className="zb-stack__identifier">{chart.identifier}</span>
               ) : null}
               {onPin ? (
                 <button
                   type="button"
-                  className="ox-stack__action"
+                  className="zb-stack__action"
                   aria-pressed={Boolean(chart.pinned)}
                   onClick={() => onPin(chart, !chart.pinned)}
                 >
@@ -350,8 +350,8 @@ export function RecentPatientStack({
               {onClose ? (
                 <button
                   type="button"
-                  className="ox-stack__action"
-                  data-ox-close=""
+                  className="zb-stack__action"
+                  data-zb-close=""
                   onClick={() => attemptClose(chart)}
                 >
                   Close {chart.display}
@@ -370,13 +370,13 @@ export function RecentPatientStack({
       */}
       {pending ? (
         <div
-          className="ox-stack__verdict"
-          data-ox-verdict={pending.verdict.kind}
+          className="zb-stack__verdict"
+          data-zb-verdict={pending.verdict.kind}
           role="alertdialog"
           aria-label={pending.verdict.kind === "refuse" ? "Cannot close" : "Close this chart?"}
         >
-          <p className="ox-stack__verdict-reason">{pending.verdict.reason}</p>
-          <div className="ox-stack__verdict-actions">
+          <p className="zb-stack__verdict-reason">{pending.verdict.reason}</p>
+          <div className="zb-stack__verdict-actions">
             {pending.verdict.kind === "confirm" ? (
               <button
                 type="button"

@@ -1,8 +1,8 @@
 /**
  * Create the Stripe Products and Prices the catalogue refers to.
  *
- *     pnpm --filter @oxygenui-design/app stripe:sync            # dry run
- *     pnpm --filter @oxygenui-design/app stripe:sync -- --apply
+ *     pnpm --filter @zoblocks/app stripe:sync            # dry run
+ *     pnpm --filter @zoblocks/app stripe:sync -- --apply
  *
  * The catalogue is the source of truth for what is sold and at what price;
  * Stripe is the source of truth for how it is charged. Something has to keep
@@ -71,12 +71,12 @@ async function stripe(method, path, body) {
   return payload;
 }
 
-/** `empty-state-system` → `oxygen_empty_state_system`. Stable, and readable in the dashboard. */
-const productId = (slug) => `oxygen_${slug.replace(/-/g, "_")}`;
+/** `empty-state-system` → `zoblocks_empty_state_system`. Stable, and readable in the dashboard. */
+const productId = (slug) => `zoblocks_${slug.replace(/-/g, "_")}`;
 
 const client = new MongoClient(uri);
 await client.connect();
-const db = client.db(process.env.APP_DB_NAME || "oxygen_console");
+const db = client.db(process.env.APP_DB_NAME || "zoblocks_console");
 
 const items = await db
   .collection("catalog_items")
@@ -121,7 +121,7 @@ for (const item of items) {
       encodeForm({
         name: item.title,
         description: item.blurb.slice(0, 350),
-        metadata: { oxygenSlug: item.slug, oxygenKind: item.kind },
+        metadata: { zoblocksSlug: item.slug, zoblocksKind: item.kind },
       }),
     );
   } catch {
@@ -132,7 +132,7 @@ for (const item of items) {
         id,
         name: item.title,
         description: item.blurb.slice(0, 350),
-        metadata: { oxygenSlug: item.slug, oxygenKind: item.kind },
+        metadata: { zoblocksSlug: item.slug, zoblocksKind: item.kind },
       }),
     );
   }
@@ -155,7 +155,7 @@ for (const item of items) {
         product: product.id,
         unit_amount: amount,
         currency,
-        metadata: { oxygenSlug: item.slug },
+        metadata: { zoblocksSlug: item.slug },
       }),
     );
 

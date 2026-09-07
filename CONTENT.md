@@ -1,4 +1,4 @@
-# Oxygen UI — Clinical Content Style Guide
+# Zoblocks — Clinical Content Style Guide
 
 Every rule here came from a decision already made inside a component. The
 components enforce them for the surfaces they own; this document exists because
@@ -8,7 +8,7 @@ library reaches those.
 Two of these rules are enforced by lint. The rest are review material.
 
 > **Scope.** Sections 1–9 govern user-visible text in clinical interfaces.
-> Section 10 governs our own product surfaces — `oxygenui.design` and the
+> Section 10 governs our own product surfaces — `zoblocks.design` and the
 > console — which were outside this document until a content audit found that
 > both places it was being broken were places it did not claim to reach.
 >
@@ -71,7 +71,7 @@ is a statement about the system, not about the patient.
 - Render an unavailable section as an empty one. An allergies panel that failed
   to load must not look like a patient with no allergies.
 
-> **Linted.** `@oxygenui/no-absence-placeholder` (error) catches a placeholder
+> **Linted.** `@zoblocks/no-absence-placeholder` (error) catches a placeholder
 > string in the substitution position — the branch taken when a value is
 > missing. A dash used as a separator between two rendered things is
 > typography and is not flagged.
@@ -98,7 +98,7 @@ an assessment that nobody made.
 - Compute an interpretation from a threshold the component invented.
 - Present a provisional diagnosis as settled.
 
-> **Linted.** `@oxygenui/no-ambiguous-clinical-copy` (warning) flags a bare
+> **Linted.** `@zoblocks/no-ambiguous-clinical-copy` (warning) flags a bare
 > "Normal" or "Abnormal" in prose position.
 
 ---
@@ -144,7 +144,7 @@ discards the hue, and roughly one in twelve men cannot separate red from green.
   were already unsure about.
 - Put the consequence in a tooltip and the question in the button.
 
-> **Linted.** `@oxygenui/no-ambiguous-clinical-copy` (warning).
+> **Linted.** `@zoblocks/no-ambiguous-clinical-copy` (warning).
 
 ---
 
@@ -429,10 +429,10 @@ third clause.
 
 | Rule                                   | Severity | Applies to    | Catches                                                            |
 | -------------------------------------- | -------- | ------------- | ------------------------------------------------------------------ |
-| `@oxygenui/no-absence-placeholder`     | error    | components    | A placeholder string substituted for a missing value               |
-| `@oxygenui/no-ambiguous-clinical-copy` | warning  | components    | Bare "Normal", "Are you sure?", generic error copy, bare "Unknown" |
-| `@oxygenui/no-hardcoded-count`         | error    | site, console | A countable figure typed into copy instead of derived (§10.1)      |
-| `@oxygenui/no-vague-failure`           | error    | site, console | A failure message that names nothing (§10.7, §5)                   |
+| `@zoblocks/no-absence-placeholder`     | error    | components    | A placeholder string substituted for a missing value               |
+| `@zoblocks/no-ambiguous-clinical-copy` | warning  | components    | Bare "Normal", "Are you sure?", generic error copy, bare "Unknown" |
+| `@zoblocks/no-hardcoded-count`         | error    | site, console | A countable figure typed into copy instead of derived (§10.1)      |
+| `@zoblocks/no-vague-failure`           | error    | site, console | A failure message that names nothing (§10.7, §5)                   |
 
 The two clinical rules are scoped to prose positions in JSX. A comparison
 operand, a React key, a `className` and an enum-ish prop value are not copy,

@@ -11,7 +11,7 @@
  * being one.
  */
 
-import type { Ink } from "@oxygenui-design/signature-core";
+import type { Ink } from "@zoblocks/signature-core";
 
 const FACES: Record<string, string> = {
   formal: "Georgia, 'Times New Roman', serif",

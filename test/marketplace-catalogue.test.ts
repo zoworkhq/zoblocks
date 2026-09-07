@@ -81,14 +81,14 @@ describe("the public catalogue mirrors the seed", () => {
  *
  * The artwork in that script is the real product. The clinical reviewer and the
  * `price_seed_*` ids are not, and those are the only reasons a localhost guard
- * ever made sense. `OXYGEN_PUBLISH=1` lifts the guard *and* removes both — so
+ * ever made sense. `ZOBLOCKS_PUBLISH=1` lifts the guard *and* removes both — so
  * the invariant worth protecting is that lifting it stays coupled to removing
  * them. A future edit that separates the two would put "SEED DATA — nobody has
  * reviewed this" into a customer-facing database.
  */
 describe("publishing the catalogue for real", () => {
   it("only leaves localhost when explicitly asked", () => {
-    expect(SEED).toMatch(/OXYGEN_PUBLISH/);
+    expect(SEED).toMatch(/ZOBLOCKS_PUBLISH/);
     // The guard still exists, and still mentions localhost.
     expect(SEED).toMatch(/Refusing to seed anything that is not localhost/);
   });

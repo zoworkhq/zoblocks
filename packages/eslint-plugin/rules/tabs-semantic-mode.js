@@ -89,7 +89,7 @@ export default {
     type: "problem",
     docs: {
       description:
-        "Require an explicit semantic mode on Oxygen Tabs, and keep the mode consistent with links and overflow.",
+        "Require an explicit semantic mode on Zoblocks Tabs, and keep the mode consistent with links and overflow.",
     },
     schema: [],
     messages: {
@@ -108,7 +108,7 @@ export default {
 
   create(context) {
     /**
-     * Names bound by an import from somewhere that is not Oxygen.
+     * Names bound by an import from somewhere that is not Zoblocks.
      *
      * The rule matches on the element name, which is the only thing available
      * at a JSX site — and `Tabs` is what antd calls its own tab strip too.
@@ -123,7 +123,7 @@ export default {
       ImportDeclaration(node) {
         const source = node.source.value;
         if (typeof source !== "string") return;
-        if (source.startsWith("@oxygenui") || source.startsWith(".") || source.startsWith("@/")) {
+        if (source.startsWith("@zoblocks") || source.startsWith(".") || source.startsWith("@/")) {
           return;
         }
         for (const specifier of node.specifiers) {

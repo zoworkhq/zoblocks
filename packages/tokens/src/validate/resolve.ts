@@ -112,7 +112,7 @@ export function resolveTheme(
  * `resolveTheme` covers the theme tiers; this covers the two that are
  * theme-invariant, so that every block of `tokens.json` is literal. The file is
  * documented as a flat map for Figma and other tooling, and neither an alias
- * (`{ref.size.md}`) nor a CSS variable (`var(--ox-ref-size-md)`) is a value an
+ * (`{ref.size.md}`) nor a CSS variable (`var(--zb-ref-size-md)`) is a value an
  * external tool can read.
  */
 export function resolveFlat(source: TokenSource, map: TokenMap): Map<string, string> {

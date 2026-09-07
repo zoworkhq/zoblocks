@@ -24,7 +24,7 @@ declare global {
  * into the CMS. Naming the database explicitly makes that impossible, whatever
  * URL is supplied.
  */
-const DB_NAME = process.env.APP_DB_NAME || "oxygen_console";
+const DB_NAME = process.env.APP_DB_NAME || "zoblocks_console";
 
 function connect() {
   const uri = process.env.DATABASE_URL;

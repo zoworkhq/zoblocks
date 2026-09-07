@@ -4,7 +4,7 @@ import { useState } from "react";
 import { createThemeAction } from "@/lib/actions";
 import { ActionForm } from "@/components/action-form";
 import { ColorField, Field, Input, Panel, Ramp, SubmitButton } from "@/components/ui";
-import { RAMP_STEPS, generateRamp } from "@oxygenui-design/theme";
+import { RAMP_STEPS, generateRamp } from "@zoblocks/theme";
 
 /**
  * One colour, not eleven.

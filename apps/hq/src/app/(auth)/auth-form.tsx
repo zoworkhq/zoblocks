@@ -34,7 +34,7 @@ export function AuthForm({
       {state.error && (
         <p
           role="alert"
-          className="flex items-start gap-2 rounded-lg border border-[var(--ox-status-critical-border)] bg-[var(--ox-status-critical-bg)] px-3 py-2.5 text-[0.8125rem] leading-snug text-[var(--ox-status-critical)]"
+          className="flex items-start gap-2 rounded-lg border border-[var(--zb-status-critical-border)] bg-[var(--zb-status-critical-bg)] px-3 py-2.5 text-[0.8125rem] leading-snug text-[var(--zb-status-critical)]"
         >
           <CircleAlert aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
           {state.error}

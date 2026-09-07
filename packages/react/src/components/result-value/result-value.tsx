@@ -5,7 +5,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/result-value/result-value.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/result-value/result-value.tsx. Edit that file, not this one.
 /**
  * ResultValue — a single observation, rendered so the four ways it can lie are
  * all impossible.
@@ -28,7 +28,7 @@
  * them when a filter changes, and re-renders exactly the one that was
  * corrected.
  *
- * Styling lives in `styles/oxygen-result-value.css`, installed alongside.
+ * Styling lives in `styles/zoblocks-result-value.css`, installed alongside.
  */
 
 import * as React from "react";
@@ -111,12 +111,12 @@ function ResultValueImpl({
    * range and the word "critical" in the same breath.
    */
   const shell = {
-    className: cn("ox-rv", className),
-    "data-ox-result": "",
-    "data-ox-density": density,
-    "data-ox-absent": data.absent ?? undefined,
-    "data-ox-interpretation": interpretation?.step ?? undefined,
-    "data-ox-status": data.status ?? undefined,
+    className: cn("zb-rv", className),
+    "data-zb-result": "",
+    "data-zb-density": density,
+    "data-zb-absent": data.absent ?? undefined,
+    "data-zb-interpretation": interpretation?.step ?? undefined,
+    "data-zb-status": data.status ?? undefined,
     "aria-label": sentence,
     ...rest,
   };
@@ -129,14 +129,14 @@ function ResultValueImpl({
           with nothing beside it reads as in range, and that is the second of
           the four failures. */}
       {range ? (
-        <span className="ox-rv__range">
+        <span className="zb-rv__range">
           {range}
           {data.range?.appliesTo ? (
-            <span className="ox-rv__applies"> {data.range.appliesTo}</span>
+            <span className="zb-rv__applies"> {data.range.appliesTo}</span>
           ) : null}
         </span>
       ) : data.noRangeReason ? (
-        <span className="ox-rv__range" data-ox-norange="">
+        <span className="zb-rv__range" data-zb-norange="">
           {data.noRangeReason}
         </span>
       ) : null}
@@ -152,7 +152,7 @@ function ResultValueImpl({
       ) : null}
 
       {data.provenance && data.provenance !== "lab" ? (
-        <span className="ox-rv__provenance" data-ox-provenance={data.provenance}>
+        <span className="zb-rv__provenance" data-zb-provenance={data.provenance}>
           {PROVENANCE_LABEL[data.provenance]}
         </span>
       ) : null}
@@ -160,7 +160,7 @@ function ResultValueImpl({
       {now && data.resultedAt ? <Age at={data.resultedAt} now={now} /> : null}
 
       {(data.notes ?? []).map((note) => (
-        <span key={note} className="ox-rv__note">
+        <span key={note} className="zb-rv__note">
           {note}
         </span>
       ))}
@@ -169,8 +169,8 @@ function ResultValueImpl({
 
   const content = (
     <>
-      <span className="ox-rv__line" aria-hidden="true">
-        {hideAnalyte ? null : <span className="ox-rv__analyte">{data.analyte}</span>}
+      <span className="zb-rv__line" aria-hidden="true">
+        {hideAnalyte ? null : <span className="zb-rv__analyte">{data.analyte}</span>}
         {body}
         {interpretation && !data.absent ? (
           <ClinicalStatus
@@ -182,9 +182,9 @@ function ResultValueImpl({
           />
         ) : null}
         {delta && delta.direction !== "flat" ? (
-          <span className="ox-rv__delta" data-ox-direction={delta.direction}>
+          <span className="zb-rv__delta" data-zb-direction={delta.direction}>
             {delta.direction === "up" ? "▲" : "▼"} {Math.abs(delta.change)}
-            <span className="ox-rv__delta-since"> / {describeElapsed(delta.sinceMs)}</span>
+            <span className="zb-rv__delta-since"> / {describeElapsed(delta.sinceMs)}</span>
           </span>
         ) : null}
       </span>
@@ -196,12 +196,12 @@ function ResultValueImpl({
         with a line through it does.
       */}
       {data.superseded ? (
-        <span className="ox-rv__superseded" aria-hidden="true">
+        <span className="zb-rv__superseded" aria-hidden="true">
           <s>{data.superseded.value}</s> superseded {data.superseded.at}
         </span>
       ) : null}
 
-      <span className="ox-rv__qualifiers" aria-hidden="true">
+      <span className="zb-rv__qualifiers" aria-hidden="true">
         {qualifiers}
       </span>
     </>
@@ -230,10 +230,10 @@ function ResultValueImpl({
 
 function Present({ data }: { data: ResultValueData }) {
   return (
-    <span className="ox-rv__value">
-      {data.comparator ? <span className="ox-rv__comparator">{data.comparator}</span> : null}
-      <span className="ox-rv__number">{data.value}</span>
-      {data.unit ? <span className="ox-rv__unit">{data.unit}</span> : null}
+    <span className="zb-rv__value">
+      {data.comparator ? <span className="zb-rv__comparator">{data.comparator}</span> : null}
+      <span className="zb-rv__number">{data.value}</span>
+      {data.unit ? <span className="zb-rv__unit">{data.unit}</span> : null}
     </span>
   );
 }
@@ -251,9 +251,9 @@ function Absent({ data }: { data: ResultValueData }) {
   if (!data.absent) return null;
   const copy = ABSENCE[data.absent];
   return (
-    <span className="ox-rv__value" data-ox-absent-value="">
-      <span className="ox-rv__absent-word">{copy.short}</span>
-      <span className="ox-rv__absent-detail">{data.absentDetail ?? copy.detail}</span>
+    <span className="zb-rv__value" data-zb-absent-value="">
+      <span className="zb-rv__absent-word">{copy.short}</span>
+      <span className="zb-rv__absent-detail">{data.absentDetail ?? copy.detail}</span>
     </span>
   );
 }
@@ -261,7 +261,7 @@ function Absent({ data }: { data: ResultValueData }) {
 function Age({ at, now }: { at: string; now: string }) {
   const elapsed = Date.parse(now) - Date.parse(at);
   if (!Number.isFinite(elapsed) || elapsed < 0) return null;
-  return <span className="ox-rv__age">{describeElapsed(elapsed)} ago</span>;
+  return <span className="zb-rv__age">{describeElapsed(elapsed)} ago</span>;
 }
 
 /**

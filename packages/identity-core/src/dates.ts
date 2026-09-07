@@ -10,7 +10,7 @@
  *     1st of March. Rendering the day invents a fact.
  */
 
-import { datePrecision } from "@oxygenui-design/fhir";
+import { datePrecision } from "@zoblocks/fhir";
 import type { Age, PreciseDate } from "./types.js";
 
 const MONTHS_SHORT = [

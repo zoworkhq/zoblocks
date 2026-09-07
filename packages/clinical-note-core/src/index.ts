@@ -1,12 +1,12 @@
 /**
- * @oxygenui-design/clinical-note-core — the engine behind Oxygen's ClinicalNote.
+ * @zoblocks/clinical-note-core — the engine behind Zoblocks's ClinicalNote.
  *
  * No React, no Ant Design, no DOM. Coded sections, per-range provenance, a
  * composable sign gate, and deterministic serialization to FHIR, XHTML and
  * plain text.
  *
  *     import { emptyNote, runGate, DEFAULT_RULES, toFhirBundle } from
- *       "@oxygenui-design/clinical-note-core";
+ *       "@zoblocks/clinical-note-core";
  *
  *     const doc = emptyNote("progress");
  *     const gate = runGate(doc, DEFAULT_RULES, {
@@ -21,11 +21,11 @@
  * makes all three visible.
  *
  * The React surface, the Ant Design shell and the sign-gate dialog live in
- * `@oxygenui-design/clinical-note`. This package is what stays the same
+ * `@zoblocks/clinical-note`. This package is what stays the same
  * whichever way that goes — and what a server can import to validate, render or
  * re-hash a note without a browser anywhere in the picture.
  *
- * Design reasoning: `oxygen-clinical-note-brief.html` at the repository root.
+ * Design reasoning: `zoblocks-clinical-note-brief.html` at the repository root.
  */
 
 export {

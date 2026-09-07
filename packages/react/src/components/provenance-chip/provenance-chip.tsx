@@ -5,7 +5,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/provenance-chip/provenance-chip.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/provenance-chip/provenance-chip.tsx. Edit that file, not this one.
 /**
  * ProvenanceChip — where a value came from, and how much of it a human has
  * actually looked at.
@@ -23,7 +23,7 @@
  * standing in for a blood-pressure measurement is not, and that judgement
  * belongs to the caller.
  *
- * Styling lives in `styles/oxygen-provenance.css`, installed alongside.
+ * Styling lives in `styles/zoblocks-provenance.css`, installed alongside.
  */
 
 import * as React from "react";
@@ -135,11 +135,11 @@ export const ProvenanceChip = React.forwardRef<HTMLElement, ProvenanceChipProps>
     const unconfirmed = extracted && !record.confirmed;
 
     const shared = {
-      className: cn("ox-prov", className),
-      "data-ox-provenance": "",
-      "data-ox-source": record.source,
-      "data-ox-staleness": age.state,
-      "data-ox-unconfirmed": unconfirmed ? "" : undefined,
+      className: cn("zb-prov", className),
+      "data-zb-provenance": "",
+      "data-zb-source": record.source,
+      "data-zb-staleness": age.state,
+      "data-zb-unconfirmed": unconfirmed ? "" : undefined,
       "aria-label": label,
       ...rest,
     };
@@ -147,12 +147,12 @@ export const ProvenanceChip = React.forwardRef<HTMLElement, ProvenanceChipProps>
     const body = (
       <>
         <span
-          className="ox-prov__glyph"
-          data-ox-glyph={SOURCE_GLYPH[record.source]}
+          className="zb-prov__glyph"
+          data-zb-glyph={SOURCE_GLYPH[record.source]}
           aria-hidden="true"
         />
         {glyphOnly ? null : (
-          <span className="ox-prov__word" aria-hidden="true">
+          <span className="zb-prov__word" aria-hidden="true">
             {SOURCE_LABEL[record.source]}
           </span>
         )}
@@ -162,7 +162,7 @@ export const ProvenanceChip = React.forwardRef<HTMLElement, ProvenanceChipProps>
           different weight, and the reader has to see that without hovering.
         */}
         {showAge ? (
-          <span className="ox-prov__age" data-ox-staleness={age.state} aria-hidden="true">
+          <span className="zb-prov__age" data-zb-staleness={age.state} aria-hidden="true">
             {describeAgeShort(elapsedMs)}
           </span>
         ) : null}
@@ -172,7 +172,7 @@ export const ProvenanceChip = React.forwardRef<HTMLElement, ProvenanceChipProps>
           looked, which is a different thing from a low-confidence score.
         */}
         {unconfirmed ? (
-          <span className="ox-prov__unconfirmed" aria-hidden="true">
+          <span className="zb-prov__unconfirmed" aria-hidden="true">
             unreviewed
           </span>
         ) : null}
@@ -203,11 +203,11 @@ export const ProvenanceChip = React.forwardRef<HTMLElement, ProvenanceChipProps>
     if (extracted && record.span && onOpenSpan) {
       const span = record.span;
       return (
-        <span className="ox-prov__pair">
+        <span className="zb-prov__pair">
           {chip}
           <button
             type="button"
-            className="ox-prov__span"
+            className="zb-prov__span"
             onClick={() => onOpenSpan(span, record)}
             aria-label={`View the source span: ${span.document}${
               typeof span.page === "number" ? `, page ${span.page}` : ""

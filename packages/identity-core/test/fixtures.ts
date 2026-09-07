@@ -7,7 +7,7 @@
  * broken.
  */
 
-import type { Patient } from "@oxygenui-design/fhir";
+import type { Patient } from "@zoblocks/fhir";
 import {
   EXT_GENDER_IDENTITY,
   EXT_PRONOUNS,

@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { ClipboardList, Rows3, LogOut, Users } from "lucide-react";
-import { AppShell, type NavItem } from "@/components/oxygen/app-shell";
+import { AppShell, type NavItem } from "@/components/zoblocks/app-shell";
 import { signOut } from "@/lib/actions";
 
 /**
@@ -40,10 +40,10 @@ export function Shell({
       currentId={current}
       brand={
         <span className="flex items-baseline gap-2">
-          <span className="text-[0.9375rem] font-semibold tracking-tight text-[var(--ox-text)]">
+          <span className="text-[0.9375rem] font-semibold tracking-tight text-[var(--zb-text)]">
             hq
           </span>
-          <span className="text-[0.6875rem] font-semibold uppercase tracking-wide text-[var(--ox-text-muted)]">
+          <span className="text-[0.6875rem] font-semibold uppercase tracking-wide text-[var(--zb-text-muted)]">
             Zowork
           </span>
         </span>
@@ -52,13 +52,13 @@ export function Shell({
         <form action={signOut} className="flex items-center gap-4">
           <a
             href="/account"
-            className="hidden rounded-md px-2 py-1.5 text-[0.75rem] text-[var(--ox-text-muted)] no-underline transition-colors hover:text-[var(--ox-text)] sm:inline"
+            className="hidden rounded-md px-2 py-1.5 text-[0.75rem] text-[var(--zb-text-muted)] no-underline transition-colors hover:text-[var(--zb-text)] sm:inline"
           >
             {userName}
           </a>
           <button
             type="submit"
-            className="inline-flex items-center gap-1.5 rounded-md px-2 py-1.5 text-[0.75rem] text-[var(--ox-text-muted)] transition-colors hover:text-[var(--ox-text)]"
+            className="inline-flex items-center gap-1.5 rounded-md px-2 py-1.5 text-[0.75rem] text-[var(--zb-text-muted)] transition-colors hover:text-[var(--zb-text)]"
           >
             <LogOut aria-hidden="true" className="size-3.5" />
             Sign out

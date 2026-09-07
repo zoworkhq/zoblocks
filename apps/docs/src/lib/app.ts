@@ -16,7 +16,7 @@
  * These are not — they are the way in, whatever the reader came for.
  */
 
-export const APP = process.env.NEXT_PUBLIC_APP_URL ?? "https://app.oxygenui.design";
+export const APP = process.env.NEXT_PUBLIC_APP_URL ?? "https://app.zoblocks.design";
 
 /** For someone who already has an account. */
 export const signInHref = `${APP}/login`;

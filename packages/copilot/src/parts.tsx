@@ -18,14 +18,14 @@ import {
   type CrisisLine,
   type ScopeSummary,
   type Source,
-} from "@oxygenui-design/copilot-react";
+} from "@zoblocks/copilot-react";
 import {
   disclosureCompleteness,
   disclosureFields,
   DISCLOSURE_LABELS,
   DISCLOSURE_SECTIONS,
   type ModelDisclosure,
-} from "@oxygenui-design/copilot-core";
+} from "@zoblocks/copilot-core";
 import { useLocale } from "./locale.js";
 
 const { Text, Paragraph } = Typography;
@@ -47,20 +47,20 @@ export function RegisterBadge(props: { answer: Answer }): React.ReactNode {
 
   if (register === "grounded") {
     return (
-      <Tag color="green" className="ox-copilot-register" data-register="grounded">
+      <Tag color="green" className="zb-copilot-register" data-register="grounded">
         {locale.grounded} · {sources.size}
       </Tag>
     );
   }
   if (register === "general") {
     return (
-      <Tag color="gold" className="ox-copilot-register" data-register="general">
+      <Tag color="gold" className="zb-copilot-register" data-register="general">
         {locale.general}
       </Tag>
     );
   }
   return (
-    <Tag className="ox-copilot-register" data-register="declined">
+    <Tag className="zb-copilot-register" data-register="declined">
       {locale.declined}
     </Tag>
   );
@@ -86,11 +86,11 @@ export function AnswerBody(props: {
   const segments = segmentAnswer(props.answer);
 
   return (
-    <div className="ox-copilot-answer" data-register={props.answer.register}>
+    <div className="zb-copilot-answer" data-register={props.answer.register}>
       {segments.map((segment, index) => (
         <span
           key={index}
-          className={segment.uncited ? "ox-copilot-uncited" : undefined}
+          className={segment.uncited ? "zb-copilot-uncited" : undefined}
           {...(segment.uncited ? { title: locale.unsupportedHint } : {})}
         >
           {segment.text}
@@ -98,7 +98,7 @@ export function AnswerBody(props: {
             <button
               key={marker}
               type="button"
-              className="ox-copilot-marker"
+              className="zb-copilot-marker"
               aria-label={citationLabel(marker, props.answer.sources.get(marker))}
               onClick={() => props.onCite(marker)}
             >
@@ -123,7 +123,7 @@ export function CheckNotices(props: { findings: readonly CheckFinding[] }): Reac
   );
 
   return (
-    <div className="ox-copilot-findings">
+    <div className="zb-copilot-findings">
       {sorted.map((finding, index) => (
         <Alert
           key={`${finding.code}-${index}`}
@@ -163,18 +163,18 @@ export function SourcesPanel(props: {
   const locale = useLocale();
 
   return (
-    <section className="ox-copilot-sources" aria-label={locale.basisOfAnswer}>
-      <header className="ox-copilot-sources-head">
+    <section className="zb-copilot-sources" aria-label={locale.basisOfAnswer}>
+      <header className="zb-copilot-sources-head">
         <Text strong>{locale.basisOfAnswer}</Text>
         <Button type="text" size="small" aria-label={locale.close} onClick={props.onClose}>
           ✕
         </Button>
       </header>
-      <ol className="ox-copilot-source-list">
+      <ol className="zb-copilot-source-list">
         {props.sources.map((source, index) => (
-          <li key={source.id} className="ox-copilot-source">
-            <div className="ox-copilot-source-title">
-              <span className="ox-copilot-source-marker" aria-hidden="true">
+          <li key={source.id} className="zb-copilot-source">
+            <div className="zb-copilot-source-title">
+              <span className="zb-copilot-source-marker" aria-hidden="true">
                 {index + 1}
               </span>
               {source.url ? (
@@ -185,10 +185,10 @@ export function SourcesPanel(props: {
                 <Text strong>{source.title}</Text>
               )}
             </div>
-            <blockquote className="ox-copilot-passage">
+            <blockquote className="zb-copilot-passage">
               <Highlighted passage={source.passage} highlight={source.highlight} />
             </blockquote>
-            <div className="ox-copilot-source-meta">
+            <div className="zb-copilot-source-meta">
               <span>
                 {locale.retrieved} {source.retrievedAt.slice(0, 10)}
               </span>
@@ -251,22 +251,22 @@ export function ScopeStrip(props: { scope: ScopeSummary; onChange?: () => void }
 
   if (scope.categories.length === 0) {
     return (
-      <p className="ox-copilot-scope" data-empty="true">
-        <span className="ox-copilot-scope-text">{locale.readingNothing}</span>
+      <p className="zb-copilot-scope" data-empty="true">
+        <span className="zb-copilot-scope-text">{locale.readingNothing}</span>
       </p>
     );
   }
 
   return (
-    <p className="ox-copilot-scope">
-      <span className="ox-copilot-scope-text">
+    <p className="zb-copilot-scope">
+      <span className="zb-copilot-scope-text">
         {locale.reading} <strong>{scope.subject?.display ?? scope.subject?.reference ?? ""}</strong>
         {" · "}
         {scope.categories.join(", ")}
       </span>
       {scope.showWithheld ? (
         <Tooltip title={locale.unsupportedHint}>
-          <span className="ox-copilot-withheld">{locale.withheld(scope.withheldCount)}</span>
+          <span className="zb-copilot-withheld">{locale.withheld(scope.withheldCount)}</span>
         </Tooltip>
       ) : null}
       {props.onChange ? (
@@ -297,9 +297,9 @@ export function CrisisNotice(props: {
   const locale = useLocale();
 
   return (
-    <section className="ox-copilot-crisis" role="alert" aria-label={locale.crisisTitle}>
-      <h3 className="ox-copilot-crisis-title">{locale.crisisTitle}</h3>
-      <p className="ox-copilot-crisis-body">
+    <section className="zb-copilot-crisis" role="alert" aria-label={locale.crisisTitle}>
+      <h3 className="zb-copilot-crisis-title">{locale.crisisTitle}</h3>
+      <p className="zb-copilot-crisis-body">
         {props.audience === "user" ? locale.crisisBodyUser : locale.crisisBodyThirdParty}
       </p>
       <Space wrap>
@@ -341,13 +341,13 @@ export function DisclosureSheet(props: { disclosure: ModelDisclosure }): React.R
   const { answered, total } = disclosureCompleteness(props.disclosure);
 
   return (
-    <section className="ox-copilot-disclosure" aria-label={locale.disclosureTitle}>
+    <section className="zb-copilot-disclosure" aria-label={locale.disclosureTitle}>
       <header>
         <Text strong>{locale.disclosureTitle}</Text>
         <Text type="secondary"> · {locale.disclosureCompleteness(answered, total)}</Text>
       </header>
       {DISCLOSURE_SECTIONS.map((section) => (
-        <div key={section} className="ox-copilot-disclosure-section">
+        <div key={section} className="zb-copilot-disclosure-section">
           <h4>{DISCLOSURE_LABELS[section]}</h4>
           <dl>
             {disclosureFields(section).map((field) => {
@@ -369,7 +369,7 @@ export function DisclosureSheet(props: { disclosure: ModelDisclosure }): React.R
           </dl>
         </div>
       ))}
-      <Paragraph type="secondary" className="ox-copilot-disclaimer">
+      <Paragraph type="secondary" className="zb-copilot-disclaimer">
         {locale.disclaimer}
       </Paragraph>
     </section>
@@ -402,13 +402,13 @@ export function ProposalCard(props: { api: CopilotApi }): React.ReactNode {
   if (!proposal) return null;
 
   return (
-    <section className="ox-copilot-proposal" aria-label={locale.proposalTitle}>
+    <section className="zb-copilot-proposal" aria-label={locale.proposalTitle}>
       <h4>{proposal.summary}</h4>
-      <div className="ox-copilot-diff" aria-label={locale.proposalDiff}>
+      <div className="zb-copilot-diff" aria-label={locale.proposalDiff}>
         {proposal.replaces ? (
-          <del className="ox-copilot-diff-removed">{proposal.replaces}</del>
+          <del className="zb-copilot-diff-removed">{proposal.replaces}</del>
         ) : null}
-        <ins className="ox-copilot-diff-added">{proposal.content}</ins>
+        <ins className="zb-copilot-diff-added">{proposal.content}</ins>
       </div>
       <Space>
         {/* Discard first, and autofocused. Confirm is never the default. */}

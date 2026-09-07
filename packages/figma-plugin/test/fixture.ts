@@ -12,7 +12,7 @@ import {
   type FigmaRgb,
   type SnapshotVariable,
   type VariableSnapshot,
-} from "@oxygenui-design/figma-core";
+} from "@zoblocks/figma-core";
 
 /**
  * A hex the fixture insists is a colour.
@@ -36,7 +36,7 @@ export function colour(
   return {
     ...(options.token ? { token: options.token } : {}),
     name,
-    collection: options.collection ?? "Oxygen / Semantic",
+    collection: options.collection ?? "Zoblocks / Semantic",
     values: { [mode]: { kind: "color", hex, rgb: rgb(hex) } },
   };
 }
@@ -48,33 +48,33 @@ export function snapshot(variables: SnapshotVariable[]): VariableSnapshot {
 /**
  * A palette that passes everything the gate checks, in light.
  *
- * Values are the ones Oxygen ships, so a test that asserts a ratio here is
+ * Values are the ones Zoblocks ships, so a test that asserts a ratio here is
  * asserting something about the real design system rather than about a number
  * invented to make a test pass.
  */
 export const PASSING: Record<string, string> = {
-  "--ox-text": "#16181d",
-  "--ox-text-muted": "#4b5563",
-  "--ox-text-subtle": "#5b6474",
-  "--ox-text-on-accent": "#ffffff",
-  "--ox-bg": "#ffffff",
-  "--ox-bg-subtle": "#f6f8fa",
-  "--ox-bg-muted": "#eef1f5",
-  "--ox-surface": "#ffffff",
-  "--ox-accent": "#1851a5",
-  "--ox-accent-hover": "#134286",
-  "--ox-focus-ring": "#1851a5",
-  "--ox-border-strong": "#6b7684",
-  "--ox-status-critical": "#b4232b",
-  "--ox-status-critical-bg": "#fdeced",
-  "--ox-status-high": "#8a4b06",
-  "--ox-status-high-bg": "#fdf1e2",
-  "--ox-status-low": "#1a4fa0",
-  "--ox-status-low-bg": "#e9f0fc",
-  "--ox-status-normal": "#14683f",
-  "--ox-status-normal-bg": "#e6f4ec",
-  "--ox-status-unknown": "#4b5563",
-  "--ox-status-unknown-bg": "#f0f2f5",
+  "--zb-text": "#16181d",
+  "--zb-text-muted": "#4b5563",
+  "--zb-text-subtle": "#5b6474",
+  "--zb-text-on-accent": "#ffffff",
+  "--zb-bg": "#ffffff",
+  "--zb-bg-subtle": "#f6f8fa",
+  "--zb-bg-muted": "#eef1f5",
+  "--zb-surface": "#ffffff",
+  "--zb-accent": "#1851a5",
+  "--zb-accent-hover": "#134286",
+  "--zb-focus-ring": "#1851a5",
+  "--zb-border-strong": "#6b7684",
+  "--zb-status-critical": "#b4232b",
+  "--zb-status-critical-bg": "#fdeced",
+  "--zb-status-high": "#8a4b06",
+  "--zb-status-high-bg": "#fdf1e2",
+  "--zb-status-low": "#1a4fa0",
+  "--zb-status-low-bg": "#e9f0fc",
+  "--zb-status-normal": "#14683f",
+  "--zb-status-normal-bg": "#e6f4ec",
+  "--zb-status-unknown": "#4b5563",
+  "--zb-status-unknown-bg": "#f0f2f5",
   /*
    * Restricted and provisional are part of the status family and were missing
    * here, so `report.missing` carried two entries and the two tests asserting
@@ -88,27 +88,27 @@ export const PASSING: Record<string, string> = {
    * White, because `border-strong` is a mid-grey in every theme and the pair
    * is held to 4.5:1 (7:1 in high contrast).
    */
-  "--ox-text-on-fill": "#ffffff",
-  "--ox-status-restricted": "#5b21b6",
-  "--ox-status-restricted-bg": "#f5f3ff",
-  "--ox-status-provisional": "#0b5c70",
-  "--ox-status-provisional-bg": "#ecfeff",
-  "--ox-flag-restricted": "#8a1c22",
-  "--ox-flag-restricted-bg": "#fdeced",
-  "--ox-flag-provisional": "#7a4a05",
-  "--ox-flag-deceased": "#4b5563",
+  "--zb-text-on-fill": "#ffffff",
+  "--zb-status-restricted": "#5b21b6",
+  "--zb-status-restricted-bg": "#f5f3ff",
+  "--zb-status-provisional": "#0b5c70",
+  "--zb-status-provisional-bg": "#ecfeff",
+  "--zb-flag-restricted": "#8a1c22",
+  "--zb-flag-restricted-bg": "#fdeced",
+  "--zb-flag-provisional": "#7a4a05",
+  "--zb-flag-deceased": "#4b5563",
 };
 
 /** Every token above as a stamped variable in one collection, in one mode. */
-export function oxygenFile(
+export function zoblocksFile(
   over: Record<string, string> = {},
   mode = "light",
-  collection = "Oxygen / Semantic",
+  collection = "Zoblocks / Semantic",
 ): VariableSnapshot {
   const values = { ...PASSING, ...over };
   return snapshot(
     Object.entries(values).map(([token, hex]) =>
-      colour(token.replace("--ox-", ""), hex, { token, collection, mode }),
+      colour(token.replace("--zb-", ""), hex, { token, collection, mode }),
     ),
   );
 }

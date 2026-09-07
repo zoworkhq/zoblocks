@@ -11,7 +11,7 @@
  * twelve men cannot separate red from green.
  */
 
-import { type Identity, type IdentityState } from "@oxygenui-design/identity-core";
+import { type Identity, type IdentityState } from "@zoblocks/identity-core";
 import type { ReactNode } from "react";
 
 export interface StateTagsProps {
@@ -81,23 +81,23 @@ export function describeState(state: IdentityState): Rendered {
  * greppable, which is what a reviewer actually needs.
  */
 const TONE_CLASS: Record<Rendered["tone"], string> = {
-  neutral: "ox-tag--neutral",
-  warn: "ox-tag--warn",
-  error: "ox-tag--error",
-  restricted: "ox-tag--restricted",
-  ok: "ox-tag--ok",
+  neutral: "zb-tag--neutral",
+  warn: "zb-tag--warn",
+  error: "zb-tag--error",
+  restricted: "zb-tag--restricted",
+  ok: "zb-tag--ok",
 };
 
 const SIZE_CLASS: Record<NonNullable<StateTagsProps["size"]>, string> = {
-  xs: "ox-tag--xs",
-  sm: "ox-tag--sm",
+  xs: "zb-tag--xs",
+  sm: "zb-tag--sm",
 };
 
 export function StateTags({ identity, size = "sm", showActive }: StateTagsProps): ReactNode {
   if (identity.states.length === 0) {
     if (!showActive) return null;
     return (
-      <span className={["ox-tag", TONE_CLASS.ok, SIZE_CLASS[size]].join(" ")}>
+      <span className={["zb-tag", TONE_CLASS.ok, SIZE_CLASS[size]].join(" ")}>
         <span aria-hidden="true">●</span> Active
       </span>
     );
@@ -110,8 +110,8 @@ export function StateTags({ identity, size = "sm", showActive }: StateTagsProps)
         return (
           <span
             key={state.kind}
-            className={["ox-tag", TONE_CLASS[r.tone], SIZE_CLASS[size]].join(" ")}
-            data-ox-state={state.kind}
+            className={["zb-tag", TONE_CLASS[r.tone], SIZE_CLASS[size]].join(" ")}
+            data-zb-state={state.kind}
           >
             <span aria-hidden="true">{r.icon}</span> {r.text}
           </span>

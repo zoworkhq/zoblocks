@@ -27,48 +27,48 @@
 import * as React from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { PulseLoader } from "@/registry/oxygen/pulse-loader/pulse-loader";
-import { InfusionLoader } from "@/registry/oxygen/infusion-loader/infusion-loader";
-import { RhythmLoader } from "@/registry/oxygen/rhythm-loader/rhythm-loader";
-import { BreathLoader } from "@/registry/oxygen/breath-loader/breath-loader";
-import { HelixLoader } from "@/registry/oxygen/helix-loader/helix-loader";
-import { Switch } from "@/registry/oxygen/switch/switch";
-import { Accordion } from "@/registry/oxygen/accordion/accordion";
+import { PulseLoader } from "@/registry/zoblocks/pulse-loader/pulse-loader";
+import { InfusionLoader } from "@/registry/zoblocks/infusion-loader/infusion-loader";
+import { RhythmLoader } from "@/registry/zoblocks/rhythm-loader/rhythm-loader";
+import { BreathLoader } from "@/registry/zoblocks/breath-loader/breath-loader";
+import { HelixLoader } from "@/registry/zoblocks/helix-loader/helix-loader";
+import { Switch } from "@/registry/zoblocks/switch/switch";
+import { Accordion } from "@/registry/zoblocks/accordion/accordion";
 import {
   ChartAccordion,
   type ChartSection,
-} from "@/registry/oxygen/chart-accordion/chart-accordion";
-import type { AccordionItem } from "@/registry/oxygen/lib/accordion-core";
-import { SafetyPlan } from "@/registry/oxygen/safety-plan/safety-plan";
-import { Timeline } from "@/registry/oxygen/timeline/timeline";
-import { CareTimeline } from "@/registry/oxygen/care-timeline/care-timeline";
+} from "@/registry/zoblocks/chart-accordion/chart-accordion";
+import type { AccordionItem } from "@/registry/zoblocks/lib/accordion-core";
+import { SafetyPlan } from "@/registry/zoblocks/safety-plan/safety-plan";
+import { Timeline } from "@/registry/zoblocks/timeline/timeline";
+import { CareTimeline } from "@/registry/zoblocks/care-timeline/care-timeline";
 import {
   EVENTS as TIMELINE_EVENTS,
   NOW as TIMELINE_NOW,
-} from "@/registry/oxygen/care-timeline/care-timeline.fixtures";
-import { Tabs } from "@oxygenui-design/tabs";
-import { Copilot } from "@/registry/oxygen/copilot/copilot";
-import { createStaticProvider, lookUp, minimalDisclosure } from "@oxygenui-design/copilot-core";
+} from "@/registry/zoblocks/care-timeline/care-timeline.fixtures";
+import { Tabs } from "@zoblocks/tabs";
+import { Copilot } from "@/registry/zoblocks/copilot/copilot";
+import { createStaticProvider, lookUp, minimalDisclosure } from "@zoblocks/copilot-core";
 import { SignatureMark } from "@/components/site/signature-mark";
-import { ClinicalStatus } from "@/registry/oxygen/clinical-status/clinical-status";
-import { ResultValue } from "@/registry/oxygen/result-value/result-value";
-import { AllergyChip } from "@/registry/oxygen/allergy-chip/allergy-chip";
-import { RiskIndicator } from "@/registry/oxygen/risk-indicator/risk-indicator";
-import { ProvenanceChip } from "@/registry/oxygen/provenance-chip/provenance-chip";
-import { TrendIndicator } from "@/registry/oxygen/trend-indicator/trend-indicator";
-import { PresenceChip } from "@/registry/oxygen/care-team-presence/care-team-presence";
-import { ChartHeader } from "@/registry/oxygen/chart-header/chart-header";
-import { DataGrid, type DataGridColumn } from "@/registry/oxygen/data-grid/data-grid";
+import { ClinicalStatus } from "@/registry/zoblocks/clinical-status/clinical-status";
+import { ResultValue } from "@/registry/zoblocks/result-value/result-value";
+import { AllergyChip } from "@/registry/zoblocks/allergy-chip/allergy-chip";
+import { RiskIndicator } from "@/registry/zoblocks/risk-indicator/risk-indicator";
+import { ProvenanceChip } from "@/registry/zoblocks/provenance-chip/provenance-chip";
+import { TrendIndicator } from "@/registry/zoblocks/trend-indicator/trend-indicator";
+import { PresenceChip } from "@/registry/zoblocks/care-team-presence/care-team-presence";
+import { ChartHeader } from "@/registry/zoblocks/chart-header/chart-header";
+import { DataGrid, type DataGridColumn } from "@/registry/zoblocks/data-grid/data-grid";
 import { PatientPortrait } from "@/components/site/patient-portrait";
 import { facesFor } from "@/lib/faces";
 
 /* One face each on the catalogue card — see `facesFor`. */
 const CARD_FACE = facesFor(["A. Okonkwo", "T. Boateng", "L. Marsh"]);
-import { CASELOAD, type CaseloadRow } from "@/registry/oxygen/data-grid/data-grid.fixtures";
-import { RecentPatientStack } from "@/registry/oxygen/recent-patient-stack/recent-patient-stack";
-import { ChartCommandPalette } from "@/registry/oxygen/chart-command-palette/chart-command-palette";
+import { CASELOAD, type CaseloadRow } from "@/registry/zoblocks/data-grid/data-grid.fixtures";
+import { RecentPatientStack } from "@/registry/zoblocks/recent-patient-stack/recent-patient-stack";
+import { ChartCommandPalette } from "@/registry/zoblocks/chart-command-palette/chart-command-palette";
 import { ContextMenuArt } from "@/components/site/context-menu-demo";
-import { IdentityProvider, PatientChip, IdentitySet } from "@oxygenui-design/identity";
+import { IdentityProvider, PatientChip, IdentitySet } from "@zoblocks/identity";
 import { STATUS_CONTRACT, STATUS_LABEL, type ComponentDoc } from "@/lib/catalog";
 import { AcquireAction, PriceTag } from "@/components/site/acquire";
 import { cn } from "@/lib/utils";
@@ -79,9 +79,9 @@ import {
   isReady,
 } from "@/lib/readiness";
 
-import { Recorder } from "@/registry/oxygen/recorder/recorder";
-import { DateField } from "@/registry/oxygen/date-picker/date-picker";
-import { plainDate } from "@/lib/oxygen-datetime";
+import { Recorder } from "@/registry/zoblocks/recorder/recorder";
+import { DateField } from "@/registry/zoblocks/date-picker/date-picker";
+import { plainDate } from "@/lib/zoblocks-datetime";
 /**
  * Keyed by the stability tiers in ADR 0006. These used to be "shipping",
  * "review", and "design" — labels from an earlier vocabulary that no longer
@@ -89,7 +89,7 @@ import { plainDate } from "@/lib/oxygen-datetime";
  * unstyled.
  */
 const STATUS_STYLE: Record<string, string> = {
-  stable: "border-oxygen/30 bg-oxygen/8 text-oxygen-deep",
+  stable: "border-brand/30 bg-brand/8 text-brand-deep",
   beta: "border-rule-strong bg-paper-sunk text-graphite",
   experimental: "border-rule bg-transparent text-graphite-soft",
   deprecated: "border-rule bg-transparent text-graphite-soft line-through",
@@ -938,20 +938,20 @@ const SWITCH_VALUES = [true, "unknown", false] as const;
  */
 function ClinicalNoteArt() {
   return (
-    <div className="ox-note-doc w-full max-w-[248px] text-[13px] leading-relaxed">
+    <div className="zb-note-doc w-full max-w-[248px] text-[13px] leading-relaxed">
       <p className="mb-2">
-        <span className="ox-note-pv ox-note-pv-copied">Six weeks of progressive fatigue</span>{" "}
+        <span className="zb-note-pv zb-note-pv-copied">Six weeks of progressive fatigue</span>{" "}
         <span>and dyspnea.</span>
       </p>
       <p className="mb-2">
-        <span className="ox-note-pv ox-note-pv-ai">He denies overt bleeding.</span>{" "}
-        <span className="ox-note-pv ox-note-pv-pulled">Hgb 7.1 g/dL</span>
+        <span className="zb-note-pv zb-note-pv-ai">He denies overt bleeding.</span>{" "}
+        <span className="zb-note-pv zb-note-pv-pulled">Hgb 7.1 g/dL</span>
       </p>
-      <div className="mt-3 flex h-2 overflow-hidden rounded-full ring-1 ring-inset ring-[var(--ox-border)]">
-        <span data-origin="typed" className="ox-note-bar block h-full" style={{ width: "24%" }} />
-        <span data-origin="copied" className="ox-note-bar block h-full" style={{ width: "44%" }} />
-        <span data-origin="ai" className="ox-note-bar block h-full" style={{ width: "20%" }} />
-        <span data-origin="pulled" className="ox-note-bar block h-full" style={{ width: "12%" }} />
+      <div className="mt-3 flex h-2 overflow-hidden rounded-full ring-1 ring-inset ring-[var(--zb-border)]">
+        <span data-origin="typed" className="zb-note-bar block h-full" style={{ width: "24%" }} />
+        <span data-origin="copied" className="zb-note-bar block h-full" style={{ width: "44%" }} />
+        <span data-origin="ai" className="zb-note-bar block h-full" style={{ width: "20%" }} />
+        <span data-origin="pulled" className="zb-note-bar block h-full" style={{ width: "12%" }} />
       </div>
     </div>
   );
@@ -1152,21 +1152,21 @@ export function ComponentCard({
        * an overlay link, and five browser tests broke on a selector that was
        * describing the implementation rather than the thing.
        */
-      data-ox-component-card={component.name}
+      data-zb-component-card={component.name}
       style={{ "--reveal-delay": `${(index % 3) * 70}ms` } as React.CSSProperties}
       className={cn(
         "surface-2 group relative flex flex-col overflow-hidden rounded-2xl",
         ready
-          ? "lift focus-within:border-oxygen/45 hover:border-oxygen/45"
-          : "focus-within:border-oxygen/45",
+          ? "lift focus-within:border-brand/45 hover:border-brand/45"
+          : "focus-within:border-brand/45",
         // Span only at 3 columns. At 2 columns a span-2 cell after an odd number
         // of standard cards leaves an empty grid slot.
         featured ? "p-6 lg:col-span-2" : "p-5",
       )}
     >
       {featured && (
-        <span className="axis-label mb-3 inline-flex items-center gap-2 text-oxygen-deep">
-          <span className="size-1.5 rounded-full bg-oxygen" aria-hidden="true" />
+        <span className="axis-label mb-3 inline-flex items-center gap-2 text-brand-deep">
+          <span className="size-1.5 rounded-full bg-brand" aria-hidden="true" />
           Start here
         </span>
       )}
@@ -1209,7 +1209,7 @@ export function ComponentCard({
       {/* Primitives take no FHIR resource; an empty line here would just be a
           gap the reader has to account for. */}
       {component.resource ? (
-        <p className="numeric mt-2 text-xs text-oxygen-deep">{component.resource}</p>
+        <p className="numeric mt-2 text-xs text-brand-deep">{component.resource}</p>
       ) : null}
 
       {/* Not `flex-1`. The summary used to absorb a stretched row's slack and
@@ -1233,7 +1233,7 @@ export function ComponentCard({
 
       {preview ? (
         <div
-          data-ox-density="standard"
+          data-zb-density="standard"
           // `flex-[1_0_auto]`, not `flex-1`. `flex-1` is `1 1 0%`: the frame
           // contributes nothing to the card's intrinsic height and shrinks
           // freely — and `overflow-hidden` zeroes the automatic minimum size
@@ -1316,7 +1316,7 @@ export function ComponentCard({
           {ready ? (
             <span
               aria-hidden="true"
-              className="inline-flex items-center gap-1 text-xs font-medium text-oxygen-deep"
+              className="inline-flex items-center gap-1 text-xs font-medium text-brand-deep"
             >
               View
               <ArrowRight className="size-3.5 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1" />

@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { ActionGate } from "@/components/oxygen/action-gate";
+import { ActionGate } from "@/components/zoblocks/action-gate";
 import { setUserStatus } from "@/lib/actions";
 
 /**

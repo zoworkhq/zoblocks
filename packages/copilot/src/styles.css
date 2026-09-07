@@ -4,12 +4,12 @@
  * the middle of this file would bury everything around it, and a change to one
  * glyph should be a diff somebody can read.
  */
-@import "@oxygenui-design/copilot-react/icons.css";
+@import "@zoblocks/copilot-react/icons.css";
 
 /**
- * Oxygen Copilot — antd skin.
+ * Zoblocks Copilot — antd skin.
  *
- * Reads Oxygen's semantic tokens where they exist and falls back to antd's own
+ * Reads Zoblocks's semantic tokens where they exist and falls back to antd's own
  * CSS variables where they do not, so the component looks native inside a
  * customer's existing antd theme rather than importing a second design
  * language. Every fallback is a real antd v6 token, not a guess.
@@ -21,17 +21,17 @@
  * live even if they cannot see the difference between amber and green.
  */
 
-.ox-copilot {
-  --ox-copilot-radius: var(--ox-radius-lg, 16px);
-  --ox-copilot-surface: var(--ox-surface, var(--ant-color-bg-container, #fff));
-  --ox-copilot-rule: var(--ox-border, var(--ant-color-border-secondary, #f0f0f0));
-  --ox-copilot-ink: var(--ox-text, var(--ant-color-text, rgb(0 0 0 / 0.88)));
-  --ox-copilot-muted: var(--ox-text-muted, var(--ant-color-text-secondary, rgb(0 0 0 / 0.65)));
-  --ox-copilot-accent: var(--ox-accent, var(--ant-color-primary, #1677ff));
-  --ox-copilot-warn: var(--ox-status-high, var(--ant-color-warning, #faad14));
-  --ox-copilot-bad: var(--ox-status-critical, var(--ant-color-error, #ff4d4f));
-  --ox-copilot-ok: var(--ox-status-normal, var(--ant-color-success, #52c41a));
-  --ox-copilot-shadow: var(--ant-box-shadow-secondary, 0 6px 16px 0 rgb(0 0 0 / 0.08));
+.zb-copilot {
+  --zb-copilot-radius: var(--zb-radius-lg, 16px);
+  --zb-copilot-surface: var(--zb-surface, var(--ant-color-bg-container, #fff));
+  --zb-copilot-rule: var(--zb-border, var(--ant-color-border-secondary, #f0f0f0));
+  --zb-copilot-ink: var(--zb-text, var(--ant-color-text, rgb(0 0 0 / 0.88)));
+  --zb-copilot-muted: var(--zb-text-muted, var(--ant-color-text-secondary, rgb(0 0 0 / 0.65)));
+  --zb-copilot-accent: var(--zb-accent, var(--ant-color-primary, #1677ff));
+  --zb-copilot-warn: var(--zb-status-high, var(--ant-color-warning, #faad14));
+  --zb-copilot-bad: var(--zb-status-critical, var(--ant-color-error, #ff4d4f));
+  --zb-copilot-ok: var(--zb-status-normal, var(--ant-color-success, #52c41a));
+  --zb-copilot-shadow: var(--ant-box-shadow-secondary, 0 6px 16px 0 rgb(0 0 0 / 0.08));
 
   position: fixed;
   inset-inline: 0;
@@ -44,23 +44,23 @@
   padding-block-end: max(1rem, env(safe-area-inset-bottom));
   padding-inline: 1rem;
   pointer-events: none;
-  color: var(--ox-copilot-ink);
+  color: var(--zb-copilot-ink);
 }
 
-.ox-copilot > * {
+.zb-copilot > * {
   pointer-events: auto;
 }
 
-.ox-copilot--inline {
+.zb-copilot--inline {
   position: static;
   padding: 0;
 }
 
-.ox-copilot--bottom-right {
+.zb-copilot--bottom-right {
   align-items: flex-end;
 }
 
-.ox-copilot-dock-region {
+.zb-copilot-dock-region {
   width: 100%;
   max-width: 42rem;
   display: flex;
@@ -72,25 +72,25 @@
 /* The dock                                                            */
 /* ------------------------------------------------------------------ */
 
-.ox-copilot-dock {
+.zb-copilot-dock {
   display: flex;
   align-items: center;
   gap: 0.4rem;
   padding: 0.5rem 0.6rem;
-  background: var(--ox-copilot-surface);
-  border: 1px solid var(--ox-copilot-rule);
-  border-radius: var(--ox-copilot-radius);
-  box-shadow: var(--ox-copilot-shadow);
+  background: var(--zb-copilot-surface);
+  border: 1px solid var(--zb-copilot-rule);
+  border-radius: var(--zb-copilot-radius);
+  box-shadow: var(--zb-copilot-shadow);
 }
 
-.ox-copilot-field {
+.zb-copilot-field {
   flex: 1;
   min-width: 0;
 }
 
 /* Every interactive target clears WCAG 2.2 2.5.8's 24px minimum. The icon row
    in a floating dock is exactly where this is normally missed. */
-.ox-copilot-dock button {
+.zb-copilot-dock button {
   min-width: 24px;
   min-height: 24px;
 }
@@ -99,7 +99,7 @@
 /* Scope strip                                                         */
 /* ------------------------------------------------------------------ */
 
-.ox-copilot-scope {
+.zb-copilot-scope {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -107,21 +107,21 @@
   margin: 0;
   padding: 0.3rem 0.75rem;
   font-size: 0.78rem;
-  color: var(--ox-copilot-muted);
-  background: var(--ox-copilot-surface);
-  border: 1px solid var(--ox-copilot-rule);
-  border-radius: calc(var(--ox-copilot-radius) / 2);
+  color: var(--zb-copilot-muted);
+  background: var(--zb-copilot-surface);
+  border: 1px solid var(--zb-copilot-rule);
+  border-radius: calc(var(--zb-copilot-radius) / 2);
 }
 
-.ox-copilot-scope-text strong {
-  color: var(--ox-copilot-ink);
+.zb-copilot-scope-text strong {
+  color: var(--zb-copilot-ink);
 }
 
-.ox-copilot-withheld {
+.zb-copilot-withheld {
   padding: 0.05rem 0.4rem;
   border-radius: 4px;
-  background: color-mix(in oklab, var(--ox-copilot-warn) 18%, transparent);
-  color: var(--ox-copilot-ink);
+  background: color-mix(in oklab, var(--zb-copilot-warn) 18%, transparent);
+  color: var(--zb-copilot-ink);
   font-weight: 500;
 }
 
@@ -129,16 +129,16 @@
 /* Mode tray and shortcuts                                             */
 /* ------------------------------------------------------------------ */
 
-.ox-copilot-tray,
-.ox-copilot-shortcuts {
-  background: var(--ox-copilot-surface);
-  border: 1px solid var(--ox-copilot-rule);
-  border-radius: var(--ox-copilot-radius);
-  box-shadow: var(--ox-copilot-shadow);
+.zb-copilot-tray,
+.zb-copilot-shortcuts {
+  background: var(--zb-copilot-surface);
+  border: 1px solid var(--zb-copilot-rule);
+  border-radius: var(--zb-copilot-radius);
+  box-shadow: var(--zb-copilot-shadow);
   padding: 0.6rem;
 }
 
-.ox-copilot-tray-modes {
+.zb-copilot-tray-modes {
   display: flex;
   align-items: center;
   gap: 0.35rem;
@@ -146,17 +146,17 @@
   margin-block-end: 0.5rem;
 }
 
-.ox-copilot-suggestions {
+.zb-copilot-suggestions {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.ox-copilot-suggestions li + li {
-  border-block-start: 1px solid var(--ox-copilot-rule);
+.zb-copilot-suggestions li + li {
+  border-block-start: 1px solid var(--zb-copilot-rule);
 }
 
-.ox-copilot-suggestions button {
+.zb-copilot-suggestions button {
   display: block;
   width: 100%;
   text-align: start;
@@ -168,72 +168,72 @@
   font: inherit;
 }
 
-.ox-copilot-suggestions button:hover,
-.ox-copilot-suggestions button:focus-visible {
-  background: color-mix(in oklab, var(--ox-copilot-accent) 8%, transparent);
+.zb-copilot-suggestions button:hover,
+.zb-copilot-suggestions button:focus-visible {
+  background: color-mix(in oklab, var(--zb-copilot-accent) 8%, transparent);
 }
 
 /* The scope shown at the point of choice — honest, and nearly free. */
-.ox-copilot-suggestion-reads {
+.zb-copilot-suggestion-reads {
   display: block;
   font-size: 0.75rem;
-  color: var(--ox-copilot-muted);
+  color: var(--zb-copilot-muted);
 }
 
-.ox-copilot-shortcuts {
+.zb-copilot-shortcuts {
   list-style: none;
   margin: 0;
 }
 
-.ox-copilot-shortcut {
+.zb-copilot-shortcut {
   padding: 0.4rem 0.5rem;
   border-radius: 6px;
   cursor: pointer;
 }
 
-.ox-copilot-shortcut[aria-selected="true"] {
-  background: color-mix(in oklab, var(--ox-copilot-accent) 12%, transparent);
+.zb-copilot-shortcut[aria-selected="true"] {
+  background: color-mix(in oklab, var(--zb-copilot-accent) 12%, transparent);
 }
 
-.ox-copilot-shortcut-desc {
+.zb-copilot-shortcut-desc {
   display: block;
   font-size: 0.75rem;
-  color: var(--ox-copilot-muted);
+  color: var(--zb-copilot-muted);
 }
 
 /* ------------------------------------------------------------------ */
 /* Panel                                                               */
 /* ------------------------------------------------------------------ */
 
-.ox-copilot-panel {
+.zb-copilot-panel {
   width: 100%;
   max-width: 42rem;
   max-height: min(70vh, 40rem);
   display: flex;
   flex-direction: column;
-  background: var(--ox-copilot-surface);
-  border: 1px solid var(--ox-copilot-rule);
-  border-radius: var(--ox-copilot-radius);
-  box-shadow: var(--ox-copilot-shadow);
+  background: var(--zb-copilot-surface);
+  border: 1px solid var(--zb-copilot-rule);
+  border-radius: var(--zb-copilot-radius);
+  box-shadow: var(--zb-copilot-shadow);
   overflow: hidden;
 }
 
-.ox-copilot-panel-head {
+.zb-copilot-panel-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
   padding: 0.6rem 0.8rem;
-  border-block-end: 1px solid var(--ox-copilot-rule);
+  border-block-end: 1px solid var(--zb-copilot-rule);
 }
 
-.ox-copilot-panel-title {
+.zb-copilot-panel-title {
   margin: 0;
   font-size: 0.95rem;
   font-weight: 600;
 }
 
-.ox-copilot-thread {
+.zb-copilot-thread {
   flex: 1;
   overflow-y: auto;
   padding: 0.8rem;
@@ -242,22 +242,22 @@
   gap: 0.75rem;
 }
 
-.ox-copilot-msg-user {
+.zb-copilot-msg-user {
   align-self: flex-end;
   max-width: 80%;
   margin: 0;
   padding: 0.35rem 0.7rem;
   border-radius: 12px;
-  background: color-mix(in oklab, var(--ox-copilot-accent) 12%, transparent);
+  background: color-mix(in oklab, var(--zb-copilot-accent) 12%, transparent);
 }
 
-.ox-copilot-msg-assistant {
+.zb-copilot-msg-assistant {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
 }
 
-.ox-copilot-msg-actions {
+.zb-copilot-msg-actions {
   flex-wrap: wrap;
 }
 
@@ -265,38 +265,38 @@
 /* Answer registers — Law 3                                            */
 /* ------------------------------------------------------------------ */
 
-.ox-copilot-answer {
+.zb-copilot-answer {
   line-height: 1.6;
 }
 
 /* The "general knowledge" register is visually distinct from grounded, not
    just labelled differently. A clinician should be able to tell which of the
    three they are looking at from across the room. */
-.ox-copilot-answer[data-register="general"] {
-  border-inline-start: 3px solid var(--ox-copilot-warn);
+.zb-copilot-answer[data-register="general"] {
+  border-inline-start: 3px solid var(--zb-copilot-warn);
   padding-inline-start: 0.6rem;
 }
 
-.ox-copilot-answer[data-register="declined"] {
-  color: var(--ox-copilot-muted);
+.zb-copilot-answer[data-register="declined"] {
+  color: var(--zb-copilot-muted);
   font-style: italic;
 }
 
-.ox-copilot-marker {
+.zb-copilot-marker {
   font-size: 0.68em;
   vertical-align: super;
   margin-inline-start: 1px;
   padding: 0 0.2em;
   border: 0;
   border-radius: 3px;
-  background: color-mix(in oklab, var(--ox-copilot-accent) 15%, transparent);
-  color: var(--ox-copilot-ink);
+  background: color-mix(in oklab, var(--zb-copilot-accent) 15%, transparent);
+  color: var(--zb-copilot-ink);
   cursor: pointer;
   font-family: inherit;
 }
 
-.ox-copilot-uncited {
-  text-decoration: underline wavy var(--ox-copilot-warn);
+.zb-copilot-uncited {
+  text-decoration: underline wavy var(--zb-copilot-warn);
   text-underline-offset: 3px;
 }
 
@@ -304,66 +304,66 @@
 /* Sources                                                             */
 /* ------------------------------------------------------------------ */
 
-.ox-copilot-sources {
-  border-block-start: 1px solid var(--ox-copilot-rule);
+.zb-copilot-sources {
+  border-block-start: 1px solid var(--zb-copilot-rule);
   padding: 0.6rem 0.8rem;
   max-height: 18rem;
   overflow-y: auto;
 }
 
-.ox-copilot-sources-head {
+.zb-copilot-sources-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.ox-copilot-source-list {
+.zb-copilot-source-list {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.ox-copilot-source + .ox-copilot-source {
-  border-block-start: 1px solid var(--ox-copilot-rule);
+.zb-copilot-source + .zb-copilot-source {
+  border-block-start: 1px solid var(--zb-copilot-rule);
   margin-block-start: 0.5rem;
   padding-block-start: 0.5rem;
 }
 
-.ox-copilot-source-title {
+.zb-copilot-source-title {
   display: flex;
   align-items: baseline;
   gap: 0.4rem;
   font-size: 0.85rem;
 }
 
-.ox-copilot-source-marker {
+.zb-copilot-source-marker {
   font-size: 0.7rem;
   padding: 0 0.3em;
   border-radius: 3px;
-  background: color-mix(in oklab, var(--ox-copilot-accent) 15%, transparent);
+  background: color-mix(in oklab, var(--zb-copilot-accent) 15%, transparent);
 }
 
 /* The passage itself, which is what makes verification a glance. */
-.ox-copilot-passage {
+.zb-copilot-passage {
   margin: 0.3rem 0 0;
   padding-inline-start: 0.6rem;
-  border-inline-start: 2px solid var(--ox-copilot-rule);
+  border-inline-start: 2px solid var(--zb-copilot-rule);
   font-size: 0.82rem;
-  color: var(--ox-copilot-muted);
+  color: var(--zb-copilot-muted);
 }
 
-.ox-copilot-passage mark {
-  background: color-mix(in oklab, var(--ox-copilot-warn) 30%, transparent);
-  color: var(--ox-copilot-ink);
+.zb-copilot-passage mark {
+  background: color-mix(in oklab, var(--zb-copilot-warn) 30%, transparent);
+  color: var(--zb-copilot-ink);
 }
 
-.ox-copilot-source-meta {
+.zb-copilot-source-meta {
   display: flex;
   flex-wrap: wrap;
   gap: 0.6rem;
   margin-block-start: 0.3rem;
   font-size: 0.72rem;
-  color: var(--ox-copilot-muted);
+  color: var(--zb-copilot-muted);
   font-variant-numeric: tabular-nums;
 }
 
@@ -371,21 +371,21 @@
 /* Crisis                                                              */
 /* ------------------------------------------------------------------ */
 
-.ox-copilot-crisis {
-  border: 1px solid color-mix(in oklab, var(--ox-copilot-bad) 45%, transparent);
+.zb-copilot-crisis {
+  border: 1px solid color-mix(in oklab, var(--zb-copilot-bad) 45%, transparent);
   border-inline-start-width: 3px;
   border-radius: 10px;
   padding: 0.8rem 1rem;
-  background: color-mix(in oklab, var(--ox-copilot-bad) 6%, transparent);
+  background: color-mix(in oklab, var(--zb-copilot-bad) 6%, transparent);
 }
 
-.ox-copilot-crisis-title {
+.zb-copilot-crisis-title {
   margin: 0 0 0.3rem;
   font-size: 0.95rem;
-  color: var(--ox-copilot-bad);
+  color: var(--zb-copilot-bad);
 }
 
-.ox-copilot-crisis-body {
+.zb-copilot-crisis-body {
   margin: 0 0 0.6rem;
   font-size: 0.88rem;
 }
@@ -394,25 +394,25 @@
 /* Proposal                                                            */
 /* ------------------------------------------------------------------ */
 
-.ox-copilot-proposal {
-  border: 1px solid var(--ox-copilot-rule);
+.zb-copilot-proposal {
+  border: 1px solid var(--zb-copilot-rule);
   border-radius: 10px;
   padding: 0.7rem 0.85rem;
 }
 
-.ox-copilot-diff {
+.zb-copilot-diff {
   margin-block: 0.4rem 0.6rem;
   font-size: 0.85rem;
 }
 
-.ox-copilot-diff-removed {
+.zb-copilot-diff-removed {
   display: block;
-  background: color-mix(in oklab, var(--ox-copilot-bad) 12%, transparent);
+  background: color-mix(in oklab, var(--zb-copilot-bad) 12%, transparent);
 }
 
-.ox-copilot-diff-added {
+.zb-copilot-diff-added {
   display: block;
-  background: color-mix(in oklab, var(--ox-copilot-ok) 12%, transparent);
+  background: color-mix(in oklab, var(--zb-copilot-ok) 12%, transparent);
   text-decoration: none;
 }
 
@@ -420,34 +420,34 @@
 /* Disclosure                                                          */
 /* ------------------------------------------------------------------ */
 
-.ox-copilot-disclosure {
-  background: var(--ox-copilot-surface);
-  border: 1px solid var(--ox-copilot-rule);
-  border-radius: var(--ox-copilot-radius);
+.zb-copilot-disclosure {
+  background: var(--zb-copilot-surface);
+  border: 1px solid var(--zb-copilot-rule);
+  border-radius: var(--zb-copilot-radius);
   padding: 0.8rem 1rem;
   max-height: 24rem;
   overflow-y: auto;
   font-size: 0.85rem;
 }
 
-.ox-copilot-disclosure dl {
+.zb-copilot-disclosure dl {
   margin: 0;
 }
 
-.ox-copilot-disclosure dt {
+.zb-copilot-disclosure dt {
   font-weight: 600;
   font-size: 0.78rem;
-  color: var(--ox-copilot-muted);
+  color: var(--zb-copilot-muted);
 }
 
-.ox-copilot-disclosure dd {
+.zb-copilot-disclosure dd {
   margin: 0 0 0.5rem;
 }
 
 /* Unanswered attributes are shown, not hidden. A customer who sees how many
    their vendor would not answer has learned something. */
-.ox-copilot-disclosure [data-answered="false"] dd {
-  color: var(--ox-copilot-muted);
+.zb-copilot-disclosure [data-answered="false"] dd {
+  color: var(--zb-copilot-muted);
   font-style: italic;
 }
 
@@ -455,7 +455,7 @@
 /* Footer                                                              */
 /* ------------------------------------------------------------------ */
 
-.ox-copilot-footer {
+.zb-copilot-footer {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -463,61 +463,61 @@
   flex-wrap: wrap;
 }
 
-.ox-copilot-disclaimer {
+.zb-copilot-disclaimer {
   font-size: 0.72rem;
   text-align: center;
-  color: var(--ox-copilot-muted);
+  color: var(--zb-copilot-muted);
   margin: 0;
   padding: 0.4rem 0.8rem;
 }
 
-.ox-copilot-notice,
-.ox-copilot-refused,
-.ox-copilot-error {
+.zb-copilot-notice,
+.zb-copilot-refused,
+.zb-copilot-error {
   font-size: 0.85rem;
   padding: 0.5rem 0.7rem;
   border-radius: 8px;
-  background: color-mix(in oklab, var(--ox-copilot-muted) 8%, transparent);
+  background: color-mix(in oklab, var(--zb-copilot-muted) 8%, transparent);
 }
 
-.ox-copilot-error {
-  background: color-mix(in oklab, var(--ox-copilot-bad) 8%, transparent);
+.zb-copilot-error {
+  background: color-mix(in oklab, var(--zb-copilot-bad) 8%, transparent);
 }
 
 /* ------------------------------------------------------------------ */
 /* Dictation                                                           */
 /* ------------------------------------------------------------------ */
 
-.ox-copilot-wave {
+.zb-copilot-wave {
   display: inline-flex;
   align-items: center;
   gap: 2px;
   height: 14px;
 }
 
-.ox-copilot-wave i {
+.zb-copilot-wave i {
   display: block;
   width: 2px;
   height: 4px;
   border-radius: 2px;
   background: currentColor;
-  animation: ox-copilot-wave 1.05s ease-in-out infinite;
+  animation: zb-copilot-wave 1.05s ease-in-out infinite;
 }
 
-.ox-copilot-wave i:nth-child(2) {
+.zb-copilot-wave i:nth-child(2) {
   animation-delay: 0.12s;
 }
-.ox-copilot-wave i:nth-child(3) {
+.zb-copilot-wave i:nth-child(3) {
   animation-delay: 0.24s;
 }
-.ox-copilot-wave i:nth-child(4) {
+.zb-copilot-wave i:nth-child(4) {
   animation-delay: 0.36s;
 }
-.ox-copilot-wave i:nth-child(5) {
+.zb-copilot-wave i:nth-child(5) {
   animation-delay: 0.48s;
 }
 
-@keyframes ox-copilot-wave {
+@keyframes zb-copilot-wave {
   0%,
   100% {
     height: 4px;
@@ -533,19 +533,19 @@
  * announcement is unaffected either way.
  */
 @media (prefers-reduced-motion: reduce) {
-  .ox-copilot-wave i {
+  .zb-copilot-wave i {
     animation: none;
     height: 10px;
   }
-  .ox-copilot-wave i:nth-child(2) {
+  .zb-copilot-wave i:nth-child(2) {
     height: 6px;
   }
-  .ox-copilot-wave i:nth-child(4) {
+  .zb-copilot-wave i:nth-child(4) {
     height: 6px;
   }
 }
 
-.ox-copilot-visually-hidden {
+.zb-copilot-visually-hidden {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -568,35 +568,35 @@
  * consequence.
  */
 @media (max-width: 30rem) {
-  .ox-copilot {
+  .zb-copilot {
     padding-inline: 0;
     gap: 0;
   }
 
-  .ox-copilot-dock-region,
-  .ox-copilot-panel {
+  .zb-copilot-dock-region,
+  .zb-copilot-panel {
     max-width: none;
     border-radius: 0;
   }
 
-  .ox-copilot-dock {
+  .zb-copilot-dock {
     border-radius: 0;
     border-inline: 0;
     flex-wrap: wrap;
   }
 
-  .ox-copilot-panel {
+  .zb-copilot-panel {
     max-height: 60vh;
   }
 }
 
 @media (forced-colors: active) {
-  .ox-copilot-dock,
-  .ox-copilot-panel,
-  .ox-copilot-tray {
+  .zb-copilot-dock,
+  .zb-copilot-panel,
+  .zb-copilot-tray {
     border: 1px solid CanvasText;
   }
-  .ox-copilot-marker {
+  .zb-copilot-marker {
     border: 1px solid CanvasText;
   }
 }
@@ -605,13 +605,13 @@
 /* Panel header, thread switcher                                       */
 /* ------------------------------------------------------------------ */
 
-.ox-copilot-panel-spacer,
-.ox-copilot-msg-spacer,
-.ox-copilot-composer-spacer {
+.zb-copilot-panel-spacer,
+.zb-copilot-msg-spacer,
+.zb-copilot-composer-spacer {
   flex: 1;
 }
 
-.ox-copilot-thread-switch {
+.zb-copilot-thread-switch {
   display: flex;
   align-items: center;
   gap: 0.3rem;
@@ -625,11 +625,11 @@
   cursor: pointer;
 }
 
-.ox-copilot-thread-switch:disabled {
+.zb-copilot-thread-switch:disabled {
   cursor: default;
 }
 
-.ox-copilot-panel-title {
+.zb-copilot-panel-title {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -642,7 +642,7 @@
  * Expanded is a different shape, not a bigger one: the thread gets the height
  * it needs to be read rather than scrolled through eight lines at a time.
  */
-.ox-copilot-panel--expanded {
+.zb-copilot-panel--expanded {
   max-width: min(64rem, 100%);
   max-height: min(88vh, 60rem);
 }
@@ -658,12 +658,12 @@
  * evidence — it is a narrative the model produced alongside the answer. So it
  * is smaller, quieter, and behind a disclosure that has to be opened on purpose.
  */
-.ox-copilot-reasoning {
+.zb-copilot-reasoning {
   font-size: 0.78rem;
-  color: var(--ox-copilot-muted);
+  color: var(--zb-copilot-muted);
 }
 
-.ox-copilot-reasoning summary {
+.zb-copilot-reasoning summary {
   display: flex;
   align-items: center;
   gap: 0.3rem;
@@ -674,14 +674,14 @@
   font-size: 0.68rem;
 }
 
-.ox-copilot-reasoning summary::-webkit-details-marker {
+.zb-copilot-reasoning summary::-webkit-details-marker {
   display: none;
 }
 
-.ox-copilot-reasoning p {
+.zb-copilot-reasoning p {
   margin: 0.35rem 0 0;
   padding-inline-start: 0.6rem;
-  border-inline-start: 2px solid var(--ox-copilot-rule);
+  border-inline-start: 2px solid var(--zb-copilot-rule);
   line-height: 1.5;
 }
 
@@ -689,7 +689,7 @@
 /* Message actions                                                     */
 /* ------------------------------------------------------------------ */
 
-.ox-copilot-msg-actions {
+.zb-copilot-msg-actions {
   display: flex;
   align-items: center;
   gap: 0.1rem;
@@ -697,7 +697,7 @@
 }
 
 /* The verification control earns a border; the rest are quiet icons. */
-.ox-copilot-verify {
+.zb-copilot-verify {
   margin-inline: 0.35rem;
 }
 
@@ -705,21 +705,21 @@
 /* Feedback reasons                                                    */
 /* ------------------------------------------------------------------ */
 
-.ox-copilot-feedback {
+.zb-copilot-feedback {
   display: flex;
   align-items: center;
   gap: 0.3rem;
   flex-wrap: wrap;
   margin-block-start: 0.4rem;
   padding: 0.5rem 0.6rem;
-  border: 1px solid var(--ox-copilot-rule);
+  border: 1px solid var(--zb-copilot-rule);
   border-radius: 8px;
-  background: var(--ox-copilot-surface);
+  background: var(--zb-copilot-surface);
 }
 
-.ox-copilot-feedback-q {
+.zb-copilot-feedback-q {
   font-size: 0.8rem;
-  color: var(--ox-copilot-muted);
+  color: var(--zb-copilot-muted);
   margin-inline-end: 0.2rem;
 }
 
@@ -727,28 +727,28 @@
 /* Panel composer                                                      */
 /* ------------------------------------------------------------------ */
 
-.ox-copilot-composer {
-  border-block-start: 1px solid var(--ox-copilot-rule);
+.zb-copilot-composer {
+  border-block-start: 1px solid var(--zb-copilot-rule);
   padding: 0.5rem 0.6rem;
 }
 
-.ox-copilot-composer-field {
+.zb-copilot-composer-field {
   width: 100%;
 }
 
-.ox-copilot-composer-row {
+.zb-copilot-composer-row {
   display: flex;
   align-items: center;
   gap: 0.25rem;
   margin-block-start: 0.25rem;
 }
 
-.ox-copilot-composer-row button {
+.zb-copilot-composer-row button {
   min-width: 24px;
   min-height: 24px;
 }
 
-.ox-copilot-mode-chip {
+.zb-copilot-mode-chip {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
@@ -759,15 +759,15 @@
  * question, which is the same argument as the scope strip one line up: a
  * clinician should know what they are asking of before they ask it.
  */
-.ox-copilot-sources-chip {
+.zb-copilot-sources-chip {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
   padding: 0.15rem 0.5rem;
-  border: 1px solid var(--ox-copilot-rule);
+  border: 1px solid var(--zb-copilot-rule);
   border-radius: 8px;
   font-size: 0.78rem;
-  color: var(--ox-copilot-muted);
+  color: var(--zb-copilot-muted);
   white-space: nowrap;
 }
 
@@ -775,23 +775,23 @@
 /* Collapsed bubble                                                    */
 /* ------------------------------------------------------------------ */
 
-.ox-copilot--collapsed {
+.zb-copilot--collapsed {
   align-items: flex-end;
 }
 
-.ox-copilot-bubble {
+.zb-copilot-bubble {
   width: 48px;
   height: 48px;
-  box-shadow: var(--ox-copilot-shadow);
+  box-shadow: var(--zb-copilot-shadow);
 }
 
-.ox-copilot-bubble svg {
+.zb-copilot-bubble svg {
   font-size: 1.15rem;
 }
 
 @media (max-width: 30rem) {
   /* The bubble keeps its own inset when the dock has given up its padding. */
-  .ox-copilot--collapsed {
+  .zb-copilot--collapsed {
     padding-inline: 1rem;
     padding-block-end: max(1rem, env(safe-area-inset-bottom));
   }

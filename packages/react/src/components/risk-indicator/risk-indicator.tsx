@@ -5,7 +5,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/risk-indicator/risk-indicator.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/risk-indicator/risk-indicator.tsx. Edit that file, not this one.
 /**
  * RiskIndicator — a risk score that cannot be displayed without its date, its
  * drivers, and the fact that it is not a diagnosis.
@@ -24,7 +24,7 @@
  * `notADiagnosis` is a required prop rather than a convention. Every product
  * that made it optional shipped without it.
  *
- * Styling lives in `styles/oxygen-risk.css`, installed alongside.
+ * Styling lives in `styles/zoblocks-risk.css`, installed alongside.
  */
 
 import * as React from "react";
@@ -124,16 +124,16 @@ export const RiskIndicator = React.forwardRef<HTMLDivElement, RiskIndicatorProps
       <div
         {...rest}
         ref={ref}
-        className={cn("ox-risk", className)}
-        data-ox-risk=""
-        data-ox-band={assessment.band}
-        data-ox-freshness={fresh.state}
-        data-ox-density={density}
+        className={cn("zb-risk", className)}
+        data-zb-risk=""
+        data-zb-band={assessment.band}
+        data-zb-freshness={fresh.state}
+        data-zb-density={density}
         role="group"
         aria-label={describeRisk(assessment, now, notADiagnosis, driverCount)}
       >
-        <div className="ox-risk__head" aria-hidden="true">
-          <span className="ox-risk__outcome">{assessment.outcome}</span>
+        <div className="zb-risk__head" aria-hidden="true">
+          <span className="zb-risk__outcome">{assessment.outcome}</span>
           <ClinicalStatus
             scale="risk"
             step={BAND_STEP[assessment.band]}
@@ -143,16 +143,16 @@ export const RiskIndicator = React.forwardRef<HTMLDivElement, RiskIndicatorProps
         </div>
 
         {scored ? (
-          <div className="ox-risk__figures" aria-hidden="true">
+          <div className="zb-risk__figures" aria-hidden="true">
             {/*
               The numeral is demoted, not hidden. Two decimal places imply a
               precision the model does not have, so it is rounded to a whole
               per cent and set below the band rather than beside it.
             */}
             {typeof assessment.probability === "number" ? (
-              <span className="ox-risk__probability">
+              <span className="zb-risk__probability">
                 {Math.round(assessment.probability * 100)}
-                <span className="ox-risk__unit">%</span>
+                <span className="zb-risk__unit">%</span>
               </span>
             ) : null}
 
@@ -163,13 +163,13 @@ export const RiskIndicator = React.forwardRef<HTMLDivElement, RiskIndicatorProps
               claim nobody made.
             */}
             {typeof assessment.percentile === "number" && assessment.cohort ? (
-              <span className="ox-risk__percentile">
+              <span className="zb-risk__percentile">
                 {ordinal(assessment.percentile)} pct · {assessment.cohort}
               </span>
             ) : null}
           </div>
         ) : (
-          <p className="ox-risk__unscored" aria-hidden="true">
+          <p className="zb-risk__unscored" aria-hidden="true">
             The model could not score this patient. This is not a low score.
           </p>
         )}
@@ -186,8 +186,8 @@ export const RiskIndicator = React.forwardRef<HTMLDivElement, RiskIndicatorProps
           Hiding a container hides everything focusable inside it, which is
           both an axe violation and a button nobody can reach.
         */}
-        <div className="ox-risk__foot">
-          <span className="ox-risk__age" data-ox-freshness={fresh.state} aria-hidden="true">
+        <div className="zb-risk__foot">
+          <span className="zb-risk__age" data-zb-freshness={fresh.state} aria-hidden="true">
             {fresh.state === "expired"
               ? `Expired ${describeAge(fresh.expiredForMs)} ago`
               : `Computed ${describeAge(fresh.ageMs)} ago`}
@@ -197,14 +197,14 @@ export const RiskIndicator = React.forwardRef<HTMLDivElement, RiskIndicatorProps
             onOpenModel ? (
               <button
                 type="button"
-                className="ox-risk__model"
+                className="zb-risk__model"
                 onClick={() => onOpenModel(assessment)}
               >
                 {assessment.model.name}
                 {typeof assessment.model.auc === "number" ? ` · AUC ${assessment.model.auc}` : ""}
               </button>
             ) : (
-              <span className="ox-risk__model" data-ox-static="">
+              <span className="zb-risk__model" data-zb-static="">
                 {assessment.model.name}
                 {typeof assessment.model.auc === "number" ? ` · AUC ${assessment.model.auc}` : ""}
               </span>
@@ -218,11 +218,11 @@ export const RiskIndicator = React.forwardRef<HTMLDivElement, RiskIndicatorProps
           that stays on the panel looking current.
         */}
         {fresh.state === "expired" && (onRecompute || onAcknowledge) ? (
-          <div className="ox-risk__expired">
+          <div className="zb-risk__expired">
             {onRecompute ? (
               <button
                 type="button"
-                className="ox-risk__action"
+                className="zb-risk__action"
                 onClick={() => onRecompute(assessment)}
               >
                 Recompute
@@ -231,8 +231,8 @@ export const RiskIndicator = React.forwardRef<HTMLDivElement, RiskIndicatorProps
             {onAcknowledge ? (
               <button
                 type="button"
-                className="ox-risk__action"
-                data-ox-secondary=""
+                className="zb-risk__action"
+                data-zb-secondary=""
                 onClick={() => onAcknowledge(assessment)}
               >
                 Acknowledge as expired
@@ -243,7 +243,7 @@ export const RiskIndicator = React.forwardRef<HTMLDivElement, RiskIndicatorProps
 
         {/* Last on the face and last in the spoken sentence: put first it is
             boilerplate a reader skips. */}
-        <p className="ox-risk__framing" aria-hidden="true">
+        <p className="zb-risk__framing" aria-hidden="true">
           {notADiagnosis}
         </p>
       </div>
@@ -265,25 +265,25 @@ function Drivers({ drivers, dominant }: { drivers: RiskDriver[]; dominant: numbe
   const weighted = drivers.some((d) => d.weight !== 0);
 
   return (
-    <div className="ox-risk__drivers" aria-hidden="true">
-      <p className="ox-risk__drivers-title">Top drivers</p>
-      <ul className="ox-risk__driver-list">
+    <div className="zb-risk__drivers" aria-hidden="true">
+      <p className="zb-risk__drivers-title">Top drivers</p>
+      <ul className="zb-risk__driver-list">
         {drivers.map((driver) => (
           <li
             key={driver.label}
-            className="ox-risk__driver"
-            data-ox-direction={driverDirection(driver)}
+            className="zb-risk__driver"
+            data-zb-direction={driverDirection(driver)}
           >
-            <span className="ox-risk__driver-label">{driver.label}</span>
+            <span className="zb-risk__driver-label">{driver.label}</span>
             {weighted ? (
               <>
-                <span className="ox-risk__driver-bar">
+                <span className="zb-risk__driver-bar">
                   <span
-                    className="ox-risk__driver-fill"
+                    className="zb-risk__driver-fill"
                     style={{ inlineSize: `${(Math.abs(driver.weight) / widest) * 100}%` }}
                   />
                 </span>
-                <span className="ox-risk__driver-weight">
+                <span className="zb-risk__driver-weight">
                   {driver.weight > 0 ? "+" : ""}
                   {driver.weight}
                 </span>
@@ -291,7 +291,7 @@ function Drivers({ drivers, dominant }: { drivers: RiskDriver[]; dominant: numbe
             ) : (
               // `basis` from a FHIR RiskAssessment names references with no
               // weights. Drawing a bar for them would be inventing one.
-              <span className="ox-risk__driver-weight" data-ox-unweighted="">
+              <span className="zb-risk__driver-weight" data-zb-unweighted="">
                 contributing
               </span>
             )}
@@ -305,7 +305,7 @@ function Drivers({ drivers, dominant }: { drivers: RiskDriver[]; dominant: numbe
         patient; it is reporting one event, and the clinician should know which.
       */}
       {dominant !== null && dominant >= 0.5 ? (
-        <p className="ox-risk__concentration">
+        <p className="zb-risk__concentration">
           {Math.round(dominant * 100)}% of this score comes from one factor.
         </p>
       ) : null}

@@ -9,16 +9,16 @@ once real money has moved through it. It is also what the enterprise motion
 already needed — a pack included in a $25k engagement is delivered by the same
 machinery as a $180 card purchase, rather than by emailing a zip.
 
-The design argument is `oxygen-marketplace-brief.html` at the repository root.
+The design argument is `zoblocks-marketplace-brief.html` at the repository root.
 This file is how to run it.
 
 ## Running it locally
 
 ```bash
-pnpm --filter @oxygenui-design/app db:dev          # leave running
-pnpm --filter @oxygenui-design/app db:seed         # two organisations
-pnpm --filter @oxygenui-design/app db:seed:market  # five catalogue items
-pnpm --filter @oxygenui-design/app dev             # http://localhost:6003
+pnpm --filter @zoblocks/app db:dev          # leave running
+pnpm --filter @zoblocks/app db:seed         # two organisations
+pnpm --filter @zoblocks/app db:seed:market  # five catalogue items
+pnpm --filter @zoblocks/app dev             # http://localhost:6003
 ```
 
 Sign in as `admin@northwind.example`, open **Catalogue**.
@@ -43,8 +43,8 @@ matching the catalogue. That is one command rather than dashboard typing, where
 a transposed digit sells a $450 component for $45:
 
 ```bash
-pnpm --filter @oxygenui-design/app stripe:sync            # prints the plan
-pnpm --filter @oxygenui-design/app stripe:sync -- --apply # creates them
+pnpm --filter @zoblocks/app stripe:sync            # prints the plan
+pnpm --filter @zoblocks/app stripe:sync -- --apply # creates them
 ```
 
 Dry run by default; a live key additionally needs `--live`. It is idempotent —
@@ -108,20 +108,20 @@ items  = <comma-separated catalogue slugs>
 | Icons                   | Written into a theme's **draft** icon slots. Publishing stays separate. |
 | Illustrations, fixtures | `GET /m/{item}/pack.zip` — a deterministic store-only archive.          |
 | Themes                  | A **draft** theme. Nothing is live until an admin publishes it.         |
-| Components              | The Oxygen CLI, through a private namespace.                            |
+| Components              | The Zoblocks CLI, through a private namespace.                          |
 
 ```jsonc
-// the customer's oxygen.json
+// the customer's zoblocks.json
 "registries": {
-  "@oxygen-pro": {
-    "url": "https://app.oxygenui.design/r/pro/{name}.json",
-    "headers": { "Authorization": "Bearer ${OXYGEN_TOKEN}" }
+  "@zoblocks-pro": {
+    "url": "https://app.zoblocks.design/r/pro/{name}.json",
+    "headers": { "Authorization": "Bearer ${ZOBLOCKS_TOKEN}" }
   }
 }
 ```
 
 ```bash
-OXYGEN_TOKEN=oxy_live_… npx @oxygenui-design/cli add @oxygen-pro/vitals-flowsheet
+ZOBLOCKS_TOKEN=zb_live_… npx @zoblocks/cli add @zoblocks-pro/vitals-flowsheet
 ```
 
 Tokens are minted under **Access tokens**, shown once, and stored only as a
@@ -130,7 +130,7 @@ after 90 days, are revocable, and are capped at ten live per organisation.
 
 ## The public shelf
 
-The catalogue is also rendered on `oxygenui.design/marketplace`, because a
+The catalogue is also rendered on `zoblocks.design/marketplace`, because a
 storefront reachable only after sign-up has no top of funnel — the app has
 no anonymous traffic and the docs site does. The app keeps checkout,
 entitlement and delivery; the docs site keeps discovery.
@@ -140,7 +140,7 @@ No entitlement, no order, no organisation, and not the Stripe price id.
 
 ```
 # apps/docs
-NEXT_PUBLIC_APP_URL="https://app.oxygenui.design"
+NEXT_PUBLIC_APP_URL="https://app.zoblocks.design"
 ```
 
 **The docs site must never read this database.** A public marketing page that
@@ -190,5 +190,5 @@ public-stylesheet exceptions. Everything expressing _who paid_ carries `orgId`.
 - **Multi-item purchase.** Fulfilment handles several slugs; checkout creates
   one item at a time and there is no cart.
 - **Public catalogue pages.** A storefront only reachable after sign-in has no
-  top of funnel. Whether the catalogue is mirrored onto `oxygenui.design` is an
+  top of funnel. Whether the catalogue is mirrored onto `zoblocks.design` is an
   open question — it doubles the surface.

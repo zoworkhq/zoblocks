@@ -1,5 +1,5 @@
 /**
- * Oxygen Identity — styles.
+ * Zoblocks Identity — styles.
  *
  * Two rules govern this file:
  *
@@ -13,76 +13,76 @@
  *      window in which two states are simultaneously legible.
  */
 
-:where(.ox-banner, .ox-patient-chip, .ox-avatar, .ox-verify, .ox-guard) {
+:where(.zb-banner, .zb-patient-chip, .zb-avatar, .zb-verify, .zb-guard) {
   /*
    * Three tiers, one reference rule.
    *
-   * Every value below is an `--ox-identity-*` token; each resolves to a
-   * semantic `--ox-*` token, then to an Ant Design `--ant-*` variable, then to
+   * Every value below is an `--zb-identity-*` token; each resolves to a
+   * semantic `--zb-*` token, then to an Ant Design `--ant-*` variable, then to
    * a literal. That chain is what makes one stylesheet correct in three places:
-   * an Oxygen app where the brand and theme flow through, a plain antd app
+   * a Zoblocks app where the brand and theme flow through, a plain antd app
    * where ConfigProvider drives it with no JavaScript, and a bare page where
    * the literals keep it legible.
    *
-   * An earlier version of this file declared `--ox-fg`, `--ox-bg` and
-   * `--ox-radius` here — shadowing the semantic tier for everything nested
+   * An earlier version of this file declared `--zb-fg`, `--zb-bg` and
+   * `--zb-radius` here — shadowing the semantic tier for everything nested
    * inside a banner — and read three names that do not exist
-   * (`--ox-bg-container`, `--ox-text-secondary`, `--ox-fill-tertiary`). The
+   * (`--zb-bg-container`, `--zb-text-secondary`, `--zb-fill-tertiary`). The
    * result looked fine on a white page and ignored the theme entirely: light
    * chrome on a dark app, and no response to a brand at all.
    *
-   * `--ox-identity-*` is the documented override surface. A brand sets those
+   * `--zb-identity-*` is the documented override surface. A brand sets those
    * and nothing else.
    */
 
   /* ---- motion: see §7 of the identity brief -------------------------- */
-  --ox-identity-dur-swap: var(--ox-duration-identity-swap, 180ms);
-  --ox-identity-dur-reveal: var(--ox-duration-identity-reveal, 220ms);
-  --ox-identity-dur-escalate: var(--ox-duration-identity-escalate, 260ms);
+  --zb-identity-dur-swap: var(--zb-duration-identity-swap, 180ms);
+  --zb-identity-dur-reveal: var(--zb-duration-identity-reveal, 220ms);
+  --zb-identity-dur-escalate: var(--zb-duration-identity-escalate, 260ms);
   /* Deliberately zero: an error must be present the instant it is true. */
-  --ox-identity-dur-alert: var(--ox-duration-alert, 0ms);
-  --ox-identity-loop-skeleton: var(--ox-duration-skeleton-loop, 1400ms);
-  --ox-identity-ease: var(--ox-ease, cubic-bezier(0.2, 0, 0, 1));
+  --zb-identity-dur-alert: var(--zb-duration-alert, 0ms);
+  --zb-identity-loop-skeleton: var(--zb-duration-skeleton-loop, 1400ms);
+  --zb-identity-ease: var(--zb-ease, cubic-bezier(0.2, 0, 0, 1));
 
   /* ---- text ---------------------------------------------------------- */
-  --ox-identity-fg: var(--ox-text, var(--ant-color-text, #0f172a));
-  --ox-identity-fg-muted: var(--ox-text-muted, var(--ant-color-text-secondary, #475569));
-  --ox-identity-fg-subtle: var(--ox-text-subtle, var(--ant-color-text-tertiary, #64748b));
-  --ox-identity-fg-faint: var(--ox-text-subtle, var(--ant-color-text-quaternary, #94a3b8));
+  --zb-identity-fg: var(--zb-text, var(--ant-color-text, #0f172a));
+  --zb-identity-fg-muted: var(--zb-text-muted, var(--ant-color-text-secondary, #475569));
+  --zb-identity-fg-subtle: var(--zb-text-subtle, var(--ant-color-text-tertiary, #64748b));
+  --zb-identity-fg-faint: var(--zb-text-subtle, var(--ant-color-text-quaternary, #94a3b8));
 
   /* ---- surfaces ------------------------------------------------------ */
-  --ox-identity-surface: var(--ox-surface, var(--ant-color-bg-container, #ffffff));
-  --ox-identity-border: var(--ox-border, var(--ant-color-border, #d9d9d9));
-  --ox-identity-border-subtle: var(--ox-border, var(--ant-color-border-secondary, #f0f0f0));
-  --ox-identity-fill: var(--ox-bg-muted, var(--ant-color-fill-tertiary, #f1f5f9));
-  --ox-identity-fill-subtle: var(--ox-bg-subtle, var(--ant-color-fill-quaternary, #f8fafc));
+  --zb-identity-surface: var(--zb-surface, var(--ant-color-bg-container, #ffffff));
+  --zb-identity-border: var(--zb-border, var(--ant-color-border, #d9d9d9));
+  --zb-identity-border-subtle: var(--zb-border, var(--ant-color-border-secondary, #f0f0f0));
+  --zb-identity-fill: var(--zb-bg-muted, var(--ant-color-fill-tertiary, #f1f5f9));
+  --zb-identity-fill-subtle: var(--zb-bg-subtle, var(--ant-color-fill-quaternary, #f8fafc));
 
   /* ---- status -------------------------------------------------------- */
-  --ox-identity-critical: var(--ox-status-critical, var(--ant-color-error, #b4423a));
-  --ox-identity-critical-bg: var(--ox-status-critical-bg, var(--ant-color-error-bg, #fbeceb));
-  --ox-identity-critical-border: var(
-    --ox-status-critical-border,
+  --zb-identity-critical: var(--zb-status-critical, var(--ant-color-error, #b4423a));
+  --zb-identity-critical-bg: var(--zb-status-critical-bg, var(--ant-color-error-bg, #fbeceb));
+  --zb-identity-critical-border: var(
+    --zb-status-critical-border,
     var(--ant-color-error-border, #e8b5b0)
   );
-  --ox-identity-warn: var(--ox-status-high, var(--ant-color-warning, #b7791f));
-  --ox-identity-warn-bg: var(--ox-status-high-bg, var(--ant-color-warning-bg, #fbf3e0));
-  --ox-identity-warn-border: var(--ox-status-high-border, var(--ant-color-warning-border, #e4c98a));
-  --ox-identity-ok: var(--ox-status-normal, var(--ant-color-success, #1f8f5f));
-  --ox-identity-ok-bg: var(--ox-status-normal-bg, var(--ant-color-success-bg, #e6f6ee));
-  --ox-identity-ok-border: var(--ox-status-normal-border, var(--ant-color-success-border, #a9dcc3));
-  --ox-identity-accent: var(--ox-accent, var(--ant-color-primary, #059478));
+  --zb-identity-warn: var(--zb-status-high, var(--ant-color-warning, #b7791f));
+  --zb-identity-warn-bg: var(--zb-status-high-bg, var(--ant-color-warning-bg, #fbf3e0));
+  --zb-identity-warn-border: var(--zb-status-high-border, var(--ant-color-warning-border, #e4c98a));
+  --zb-identity-ok: var(--zb-status-normal, var(--ant-color-success, #1f8f5f));
+  --zb-identity-ok-bg: var(--zb-status-normal-bg, var(--ant-color-success-bg, #e6f6ee));
+  --zb-identity-ok-border: var(--zb-status-normal-border, var(--ant-color-success-border, #a9dcc3));
+  --zb-identity-accent: var(--zb-accent, var(--ant-color-primary, #059478));
 
   /* ---- record flags: already semantic, read straight through ---------- */
-  --ox-identity-restricted: var(--ox-flag-restricted, #7c3aed);
-  --ox-identity-restricted-bg: var(--ox-flag-restricted-bg, #f5f3ff);
-  --ox-identity-deceased: var(--ox-flag-deceased, #334155);
+  --zb-identity-restricted: var(--zb-flag-restricted, #7c3aed);
+  --zb-identity-restricted-bg: var(--zb-flag-restricted-bg, #f5f3ff);
+  --zb-identity-deceased: var(--zb-flag-deceased, #334155);
 
   /* ---- shape --------------------------------------------------------- */
-  --ox-identity-radius: var(--ox-radius, 6px);
-  --ox-identity-radius-lg: var(--ox-radius-lg, 8px);
+  --zb-identity-radius: var(--zb-radius, 6px);
+  --zb-identity-radius-lg: var(--zb-radius-lg, 8px);
 }
 
-.ox-visually-hidden {
+.zb-visually-hidden {
   position: absolute;
   inline-size: 1px;
   block-size: 1px;
@@ -98,10 +98,10 @@
 /* IdentityAvatar                                                         */
 /* --------------------------------------------------------------------- */
 
-.ox-avatar {
-  --ox-av-size: 32px;
-  inline-size: var(--ox-av-size);
-  block-size: var(--ox-av-size);
+.zb-avatar {
+  --zb-av-size: 32px;
+  inline-size: var(--zb-av-size);
+  block-size: var(--zb-av-size);
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
@@ -111,44 +111,44 @@
   position: relative;
   user-select: none;
   font-weight: 600;
-  font-size: calc(var(--ox-av-size) * 0.4);
+  font-size: calc(var(--zb-av-size) * 0.4);
   line-height: 1;
-  background-color: var(--ox-sw-bg, var(--ox-identity-fill));
-  color: var(--ox-sw-fg, var(--ox-identity-fg-muted));
-  border: 1px solid var(--ox-sw-border, var(--ox-identity-border));
+  background-color: var(--zb-sw-bg, var(--zb-identity-fill));
+  color: var(--zb-sw-fg, var(--zb-identity-fg-muted));
+  border: 1px solid var(--zb-sw-border, var(--zb-identity-border));
   background-size: cover;
   background-position: center;
   /* The tint is decoration; in forced-colors it goes and the border carries it. */
   forced-color-adjust: none;
 }
 
-.ox-avatar--20 {
-  --ox-av-size: 20px;
+.zb-avatar--20 {
+  --zb-av-size: 20px;
   font-size: 8px;
 }
-.ox-avatar--24 {
-  --ox-av-size: 24px;
+.zb-avatar--24 {
+  --zb-av-size: 24px;
   font-size: 10px;
 }
-.ox-avatar--32 {
-  --ox-av-size: 32px;
+.zb-avatar--32 {
+  --zb-av-size: 32px;
   font-size: 13px;
 }
-.ox-avatar--40 {
-  --ox-av-size: 40px;
+.zb-avatar--40 {
+  --zb-av-size: 40px;
   font-size: 16px;
 }
-.ox-avatar--56 {
-  --ox-av-size: 56px;
+.zb-avatar--56 {
+  --zb-av-size: 56px;
   font-size: 21px;
 }
 
-.ox-avatar > svg {
+.zb-avatar > svg {
   inline-size: 58%;
   block-size: 58%;
   display: block;
 }
-.ox-avatar--img > img {
+.zb-avatar--img > img {
   inline-size: 100%;
   block-size: 100%;
   object-fit: cover;
@@ -157,67 +157,67 @@
 
 /* Six decorative swatches. Values come from packages/tokens; the fallbacks
    below keep the component legible when the token sheet is not installed. */
-.ox-avatar--sw1 {
-  --ox-sw-fg: var(--ox-swatch-1, #115e59);
-  --ox-sw-bg: var(--ox-swatch-1-bg, #f0fdfa);
-  --ox-sw-border: var(--ox-swatch-1-border, #99f6e4);
+.zb-avatar--sw1 {
+  --zb-sw-fg: var(--zb-swatch-1, #115e59);
+  --zb-sw-bg: var(--zb-swatch-1-bg, #f0fdfa);
+  --zb-sw-border: var(--zb-swatch-1-border, #99f6e4);
 }
-.ox-avatar--sw2 {
-  --ox-sw-fg: var(--ox-swatch-2, #155e75);
-  --ox-sw-bg: var(--ox-swatch-2-bg, #ecfeff);
-  --ox-sw-border: var(--ox-swatch-2-border, #a5f3fc);
+.zb-avatar--sw2 {
+  --zb-sw-fg: var(--zb-swatch-2, #155e75);
+  --zb-sw-bg: var(--zb-swatch-2-bg, #ecfeff);
+  --zb-sw-border: var(--zb-swatch-2-border, #a5f3fc);
 }
-.ox-avatar--sw3 {
-  --ox-sw-fg: var(--ox-swatch-3, #3730a3);
-  --ox-sw-bg: var(--ox-swatch-3-bg, #eef2ff);
-  --ox-sw-border: var(--ox-swatch-3-border, #c7d2fe);
+.zb-avatar--sw3 {
+  --zb-sw-fg: var(--zb-swatch-3, #3730a3);
+  --zb-sw-bg: var(--zb-swatch-3-bg, #eef2ff);
+  --zb-sw-border: var(--zb-swatch-3-border, #c7d2fe);
 }
-.ox-avatar--sw4 {
-  --ox-sw-fg: var(--ox-swatch-4, #86198f);
-  --ox-sw-bg: var(--ox-swatch-4-bg, #fdf4ff);
-  --ox-sw-border: var(--ox-swatch-4-border, #f5d0fe);
+.zb-avatar--sw4 {
+  --zb-sw-fg: var(--zb-swatch-4, #86198f);
+  --zb-sw-bg: var(--zb-swatch-4-bg, #fdf4ff);
+  --zb-sw-border: var(--zb-swatch-4-border, #f5d0fe);
 }
-.ox-avatar--sw5 {
-  --ox-sw-fg: var(--ox-swatch-5, #3f6212);
-  --ox-sw-bg: var(--ox-swatch-5-bg, #f7fee7);
-  --ox-sw-border: var(--ox-swatch-5-border, #d9f99d);
+.zb-avatar--sw5 {
+  --zb-sw-fg: var(--zb-swatch-5, #3f6212);
+  --zb-sw-bg: var(--zb-swatch-5-bg, #f7fee7);
+  --zb-sw-border: var(--zb-swatch-5-border, #d9f99d);
 }
-.ox-avatar--sw6 {
-  --ox-sw-fg: var(--ox-swatch-6, #44403c);
-  --ox-sw-bg: var(--ox-swatch-6-bg, #fafaf9);
-  --ox-sw-border: var(--ox-swatch-6-border, #e7e5e4);
+.zb-avatar--sw6 {
+  --zb-sw-fg: var(--zb-swatch-6, #44403c);
+  --zb-sw-bg: var(--zb-swatch-6-bg, #fafaf9);
+  --zb-sw-border: var(--zb-swatch-6-border, #e7e5e4);
 }
 
 /* The five absences, each visually distinct. */
-.ox-avatar--none-on-file {
-  background-color: var(--ox-identity-fill-subtle);
+.zb-avatar--none-on-file {
+  background-color: var(--zb-identity-fill-subtle);
   border-style: dashed;
-  border-color: var(--ox-identity-border);
-  color: var(--ox-identity-fg-faint);
+  border-color: var(--zb-identity-border);
+  color: var(--zb-identity-fg-faint);
 }
-.ox-avatar--unavailable {
-  background-color: var(--ox-identity-critical-bg, #fff2f0);
-  border-color: var(--ox-identity-critical-border, #ffccc7);
-  color: var(--ox-identity-critical, #ff4d4f);
+.zb-avatar--unavailable {
+  background-color: var(--zb-identity-critical-bg, #fff2f0);
+  border-color: var(--zb-identity-critical-border, #ffccc7);
+  color: var(--zb-identity-critical, #ff4d4f);
 }
-.ox-avatar--withheld {
-  background-color: var(--ox-identity-restricted-bg, #f5f3ff);
-  border-color: var(--ox-identity-restricted, #7c3aed);
-  color: var(--ox-identity-restricted, #7c3aed);
+.zb-avatar--withheld {
+  background-color: var(--zb-identity-restricted-bg, #f5f3ff);
+  border-color: var(--zb-identity-restricted, #7c3aed);
+  color: var(--zb-identity-restricted, #7c3aed);
 }
-.ox-avatar--loading {
-  background-color: var(--ox-identity-fill);
-  border-color: var(--ox-identity-border-subtle);
+.zb-avatar--loading {
+  background-color: var(--zb-identity-fill);
+  border-color: var(--zb-identity-border-subtle);
   color: transparent;
 }
-.ox-avatar--loading::after {
+.zb-avatar--loading::after {
   content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(100deg, transparent 22%, rgb(255 255 255 / 0.6) 50%, transparent 78%);
-  animation: ox-shimmer var(--ox-identity-loop-skeleton) linear infinite;
+  animation: zb-shimmer var(--zb-identity-loop-skeleton) linear infinite;
 }
-@keyframes ox-shimmer {
+@keyframes zb-shimmer {
   from {
     transform: translateX(-100%);
   }
@@ -226,30 +226,30 @@
   }
 }
 
-.ox-avatar--deceased {
+.zb-avatar--deceased {
   filter: grayscale(1);
   border-style: double;
   border-width: 3px;
 }
-.ox-avatar--test {
+.zb-avatar--test {
   border-style: dashed;
-  border-color: var(--ox-identity-warn, #faad14);
+  border-color: var(--zb-identity-warn, #faad14);
   background-image: repeating-linear-gradient(
     45deg,
     transparent,
     transparent 3px,
-    var(--ox-identity-warn-bg, #fffbe6) 3px,
-    var(--ox-identity-warn-bg, #fffbe6) 6px
+    var(--zb-identity-warn-bg, #fffbe6) 3px,
+    var(--zb-identity-warn-bg, #fffbe6) 6px
   );
 }
 
 /* Hover darkens the border. Nothing scales — at 5,000 rows a transform is
    5,000 composited layers waiting to happen. */
-.ox-avatar {
-  transition: border-color 140ms var(--ox-identity-ease);
+.zb-avatar {
+  transition: border-color 140ms var(--zb-identity-ease);
 }
-.ox-avatar:hover {
-  border-color: var(--ox-sw-fg, var(--ox-identity-fg-subtle));
+.zb-avatar:hover {
+  border-color: var(--zb-sw-fg, var(--zb-identity-fg-subtle));
 }
 
 /* --------------------------------------------------------------------- */
@@ -267,8 +267,8 @@
  * tallest thing in a box that only fits the text, and it hangs visibly outside
  * the tint on exactly the rows the tint is trying to draw attention to.
  */
-.ox-patient-chip {
-  --ox-patient-chip-rail: transparent;
+.zb-patient-chip {
+  --zb-patient-chip-rail: transparent;
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -276,12 +276,12 @@
   max-inline-size: 100%;
   padding-block: 4px;
   padding-inline: 6px;
-  border-radius: var(--ox-identity-radius);
+  border-radius: var(--zb-identity-radius);
   background: transparent;
   font-variant-numeric: tabular-nums;
   transition:
-    background-color var(--ox-identity-dur-escalate) var(--ox-identity-ease),
-    box-shadow var(--ox-identity-dur-escalate) var(--ox-identity-ease);
+    background-color var(--zb-identity-dur-escalate) var(--zb-identity-ease),
+    box-shadow var(--zb-identity-dur-escalate) var(--zb-identity-ease);
 }
 
 /*
@@ -289,40 +289,40 @@
  * pseudo-element, so it costs no layout: an escalated row and a calm row
  * occupy the same rectangle to the pixel.
  */
-.ox-patient-chip {
-  box-shadow: inset 2px 0 0 0 var(--ox-patient-chip-rail);
+.zb-patient-chip {
+  box-shadow: inset 2px 0 0 0 var(--zb-patient-chip-rail);
 }
 
 /* Full-width rows, for worklists. Inline chips hug their content, which is
    right in a sentence and wrong in a column — a stack of content-width pills
    is a staircase, and a reader scanning for a name has no left edge to follow. */
-.ox-patient-chip--block {
+.zb-patient-chip--block {
   display: flex;
   inline-size: 100%;
 }
 
-.ox-patient-chip__text {
+.zb-patient-chip__text {
   min-inline-size: 0;
 }
-.ox-patient-chip__name {
+.zb-patient-chip__name {
   font-weight: 600;
-  color: var(--ox-identity-fg);
+  color: var(--zb-identity-fg);
 }
-.ox-patient-chip__detail {
+.zb-patient-chip__detail {
   display: block;
   font-size: 12px;
   line-height: 1.35;
-  color: var(--ox-identity-fg-subtle);
+  color: var(--zb-identity-fg-subtle);
   /* Entering information animates; leaving does not. A graceful exit means the
      value is still readable while it leaves, and readable-but-stale is the
      problem this component exists to prevent.
-     `--ox-row` is the row's index when a caller sets it, which staggers a
+     `--zb-row` is the row's index when a caller sets it, which staggers a
      worklist so the eye follows the pass down the list instead of being
      handed the whole result at once. Unset, it is 0 and nothing staggers. */
-  animation: ox-enter var(--ox-identity-dur-escalate) var(--ox-identity-ease) backwards;
-  animation-delay: calc(var(--ox-row, 0) * 40ms);
+  animation: zb-enter var(--zb-identity-dur-escalate) var(--zb-identity-ease) backwards;
+  animation-delay: calc(var(--zb-row, 0) * 40ms);
 }
-@keyframes ox-enter {
+@keyframes zb-enter {
   from {
     opacity: 0;
     transform: translateY(-2px);
@@ -332,168 +332,168 @@
     transform: none;
   }
 }
-.ox-patient-chip--escalated {
-  --ox-patient-chip-rail: var(--ox-identity-warn, #faad14);
-  background: var(--ox-identity-warn-bg, #fffbe6);
-  transition-delay: calc(var(--ox-row, 0) * 40ms);
+.zb-patient-chip--escalated {
+  --zb-patient-chip-rail: var(--zb-identity-warn, #faad14);
+  background: var(--zb-identity-warn-bg, #fffbe6);
+  transition-delay: calc(var(--zb-row, 0) * 40ms);
 }
-.ox-patient-chip__skeleton {
+.zb-patient-chip__skeleton {
   display: inline-block;
   inline-size: 110px;
   block-size: 14px;
   border-radius: 4px;
-  background: var(--ox-identity-fill);
+  background: var(--zb-identity-fill);
 }
 
-.ox-identity-notice {
+.zb-identity-notice {
   padding: 8px 12px;
-  border-block-start: 1px solid var(--ox-identity-border-subtle);
-  background: var(--ox-identity-warn-bg, #fffbe6);
+  border-block-start: 1px solid var(--zb-identity-border-subtle);
+  background: var(--zb-identity-warn-bg, #fffbe6);
   font-size: 12px;
-  color: var(--ox-identity-warn, #ad6800);
+  color: var(--zb-identity-warn, #ad6800);
 }
 
 /* --------------------------------------------------------------------- */
 /* Tags                                                                   */
 /* --------------------------------------------------------------------- */
 
-.ox-tag {
+.zb-tag {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   padding: 0 7px;
   border-radius: 4px;
-  border: 1px solid var(--ox-identity-border);
-  background: var(--ox-identity-fill-subtle);
-  color: var(--ox-identity-fg-muted);
+  border: 1px solid var(--zb-identity-border);
+  background: var(--zb-identity-fill-subtle);
+  color: var(--zb-identity-fg-muted);
   font-size: 12px;
   line-height: 18px;
   font-weight: 500;
   white-space: nowrap;
 }
-.ox-tag--xs {
+.zb-tag--xs {
   font-size: 11px;
   line-height: 16px;
   padding: 0 5px;
 }
-.ox-tag--ok {
-  background: var(--ox-identity-ok-bg, #f6ffed);
-  border-color: var(--ox-identity-ok-border, #b7eb8f);
-  color: var(--ox-identity-ok, #237804);
+.zb-tag--ok {
+  background: var(--zb-identity-ok-bg, #f6ffed);
+  border-color: var(--zb-identity-ok-border, #b7eb8f);
+  color: var(--zb-identity-ok, #237804);
 }
-.ox-tag--warn {
-  background: var(--ox-identity-warn-bg, #fffbe6);
-  border-color: var(--ox-identity-warn-border, #ffe58f);
-  color: var(--ox-identity-warn, #ad6800);
+.zb-tag--warn {
+  background: var(--zb-identity-warn-bg, #fffbe6);
+  border-color: var(--zb-identity-warn-border, #ffe58f);
+  color: var(--zb-identity-warn, #ad6800);
 }
-.ox-tag--error {
-  background: var(--ox-identity-critical-bg, #fff2f0);
-  border-color: var(--ox-identity-critical-border, #ffccc7);
-  color: var(--ox-identity-critical, #a8071a);
+.zb-tag--error {
+  background: var(--zb-identity-critical-bg, #fff2f0);
+  border-color: var(--zb-identity-critical-border, #ffccc7);
+  color: var(--zb-identity-critical, #a8071a);
 }
-.ox-tag--restricted {
-  background: var(--ox-identity-restricted-bg, #f5f3ff);
-  border-color: var(--ox-identity-restricted, #7c3aed);
-  color: var(--ox-identity-restricted, #7c3aed);
+.zb-tag--restricted {
+  background: var(--zb-identity-restricted-bg, #f5f3ff);
+  border-color: var(--zb-identity-restricted, #7c3aed);
+  color: var(--zb-identity-restricted, #7c3aed);
 }
-.ox-tag--neutral {
-  color: var(--ox-identity-deceased, #334155);
+.zb-tag--neutral {
+  color: var(--zb-identity-deceased, #334155);
 }
 
 /* --------------------------------------------------------------------- */
 /* PatientBanner                                                          */
 /* --------------------------------------------------------------------- */
 
-.ox-banner {
+.zb-banner {
   container-type: inline-size;
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
-  background: var(--ox-identity-surface);
-  border: 1px solid var(--ox-identity-border-subtle);
-  border-radius: var(--ox-identity-radius-lg);
+  background: var(--zb-identity-surface);
+  border: 1px solid var(--zb-identity-border-subtle);
+  border-radius: var(--zb-identity-radius-lg);
   font-variant-numeric: tabular-nums;
   /* The whole block transitions as one unit. Never field by field: staggering
      lets a reader catch the old MRN beside the new name, which is a
      wrong-patient hazard created by the animation. */
-  transition: opacity var(--ox-identity-dur-swap) var(--ox-identity-ease);
+  transition: opacity var(--zb-identity-dur-swap) var(--zb-identity-ease);
 }
-.ox-banner__rail {
+.zb-banner__rail {
   inline-size: 3px;
   align-self: stretch;
   border-radius: 3px;
   flex: 0 0 auto;
   background: transparent;
 }
-.ox-banner__rail--neutral {
-  background: var(--ox-identity-fg-faint);
+.zb-banner__rail--neutral {
+  background: var(--zb-identity-fg-faint);
 }
-.ox-banner__rail--warn {
-  background: var(--ox-identity-warn, #faad14);
+.zb-banner__rail--warn {
+  background: var(--zb-identity-warn, #faad14);
 }
-.ox-banner__rail--restricted {
-  background: var(--ox-identity-restricted, #7c3aed);
+.zb-banner__rail--restricted {
+  background: var(--zb-identity-restricted, #7c3aed);
 }
-.ox-banner__rail--error {
-  background: var(--ox-identity-critical, #ff4d4f);
+.zb-banner__rail--error {
+  background: var(--zb-identity-critical, #ff4d4f);
 }
-.ox-banner__rail--none {
+.zb-banner__rail--none {
   display: none;
 }
 
-.ox-banner__block {
+.zb-banner__block {
   flex: 1 1 auto;
   min-inline-size: 0;
 }
-.ox-banner__line1 {
+.zb-banner__line1 {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
 }
-.ox-banner__line2 {
+.zb-banner__line2 {
   display: flex;
   align-items: center;
   gap: 6px 10px;
   flex-wrap: wrap;
   margin-block-start: 3px;
   font-size: 12px;
-  color: var(--ox-identity-fg-muted);
+  color: var(--zb-identity-fg-muted);
 }
-.ox-banner__name {
+.zb-banner__name {
   font-size: 16px;
   font-weight: 600;
   letter-spacing: -0.005em;
-  color: var(--ox-identity-fg);
+  color: var(--zb-identity-fg);
 }
-.ox-banner__pronouns {
+.zb-banner__pronouns {
   font-size: 12px;
-  color: var(--ox-identity-fg-subtle);
+  color: var(--zb-identity-fg-subtle);
 }
-.ox-banner__fld {
+.zb-banner__fld {
   display: inline-flex;
   align-items: baseline;
   gap: 5px;
   white-space: nowrap;
 }
-.ox-banner__lbl {
+.zb-banner__lbl {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--ox-identity-fg-subtle);
+  color: var(--zb-identity-fg-subtle);
 }
-.ox-banner__val {
-  color: var(--ox-identity-fg-muted);
+.zb-banner__val {
+  color: var(--zb-identity-fg-muted);
 }
-.ox-banner__assigner {
+.zb-banner__assigner {
   font-size: 11px;
-  color: var(--ox-identity-fg-faint);
+  color: var(--zb-identity-fg-faint);
 }
-.ox-banner__invalid {
-  color: var(--ox-identity-critical, #ff4d4f);
+.zb-banner__invalid {
+  color: var(--zb-identity-critical, #ff4d4f);
 }
-.ox-banner__actions {
+.zb-banner__actions {
   margin-inline-start: auto;
   display: flex;
   gap: 8px;
@@ -501,161 +501,161 @@
   flex: 0 0 auto;
 }
 
-.ox-banner--restricted {
-  border-color: var(--ox-identity-restricted, #7c3aed);
+.zb-banner--restricted {
+  border-color: var(--zb-identity-restricted, #7c3aed);
 }
-.ox-banner--test {
-  border-color: var(--ox-identity-warn, #faad14);
+.zb-banner--test {
+  border-color: var(--zb-identity-warn, #faad14);
   background-image: repeating-linear-gradient(
     45deg,
     transparent,
     transparent 8px,
-    var(--ox-identity-warn-bg, #fffbe6) 8px,
-    var(--ox-identity-warn-bg, #fffbe6) 16px
+    var(--zb-identity-warn-bg, #fffbe6) 8px,
+    var(--zb-identity-warn-bg, #fffbe6) 16px
   );
 }
-.ox-banner--error {
-  border-color: var(--ox-identity-critical-border, #ffccc7);
-  background: var(--ox-identity-critical-bg, #fff2f0);
-  transition-duration: var(--ox-identity-dur-alert);
+.zb-banner--error {
+  border-color: var(--zb-identity-critical-border, #ffccc7);
+  background: var(--zb-identity-critical-bg, #fff2f0);
+  transition-duration: var(--zb-identity-dur-alert);
 }
 
-.ox-banner__withheld {
+.zb-banner__withheld {
   margin-block-start: 6px;
   font-size: 12px;
-  color: var(--ox-identity-restricted, #7c3aed);
+  color: var(--zb-identity-restricted, #7c3aed);
   display: flex;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
 }
-.ox-banner__reveal {
+.zb-banner__reveal {
   font: inherit;
   font-size: 12px;
   padding: 2px 8px;
-  border: 1px solid var(--ox-identity-border);
-  border-radius: var(--ox-identity-radius);
-  background: var(--ox-identity-surface);
-  color: var(--ox-identity-fg);
+  border: 1px solid var(--zb-identity-border);
+  border-radius: var(--zb-identity-radius);
+  background: var(--zb-identity-surface);
+  color: var(--zb-identity-fg);
   cursor: pointer;
 }
-.ox-banner__skeleton {
+.zb-banner__skeleton {
   display: block;
   border-radius: 4px;
-  background: var(--ox-identity-fill);
+  background: var(--zb-identity-fill);
 }
-.ox-banner__skeleton--name {
+.zb-banner__skeleton--name {
   inline-size: 190px;
   block-size: 20px;
   margin-block-end: 6px;
 }
-.ox-banner__skeleton--line {
+.zb-banner__skeleton--line {
   inline-size: 250px;
   block-size: 14px;
-  background: var(--ox-identity-fill-subtle);
+  background: var(--zb-identity-fill-subtle);
 }
 
 /* --------------------------------------------------------------------- */
 /* Verify and Guard                                                       */
 /* --------------------------------------------------------------------- */
 
-.ox-verify,
-.ox-guard {
+.zb-verify,
+.zb-guard {
   display: flex;
   gap: 12px;
   padding: 12px 16px;
-  border-radius: var(--ox-identity-radius-lg);
-  border: 1px solid var(--ox-identity-critical-border, #ffccc7);
-  background: var(--ox-identity-critical-bg, #fff2f0);
+  border-radius: var(--zb-identity-radius-lg);
+  border: 1px solid var(--zb-identity-critical-border, #ffccc7);
+  background: var(--zb-identity-critical-bg, #fff2f0);
   /* Zero. An error must be present the instant it is true; animating it in
      leaves a window in which a keystroke can still land on the form beneath. */
-  animation-duration: var(--ox-identity-dur-alert);
+  animation-duration: var(--zb-identity-dur-alert);
 }
-.ox-verify--confirmed {
-  border-color: var(--ox-identity-ok-border, #b7eb8f);
-  background: var(--ox-identity-ok-bg, #f6ffed);
+.zb-verify--confirmed {
+  border-color: var(--zb-identity-ok-border, #b7eb8f);
+  background: var(--zb-identity-ok-bg, #f6ffed);
 }
-.ox-verify__rail,
-.ox-guard__rail {
+.zb-verify__rail,
+.zb-guard__rail {
   inline-size: 3px;
   align-self: stretch;
   border-radius: 3px;
-  background: var(--ox-identity-critical, #ff4d4f);
+  background: var(--zb-identity-critical, #ff4d4f);
   flex: 0 0 auto;
 }
-.ox-verify__body,
-.ox-guard > div {
+.zb-verify__body,
+.zb-guard > div {
   flex: 1 1 auto;
   min-inline-size: 0;
 }
-.ox-verify__title,
-.ox-guard__title {
+.zb-verify__title,
+.zb-guard__title {
   margin: 0 0 4px;
   font-size: 15px;
   font-weight: 600;
 }
-.ox-verify__prompt,
-.ox-guard__body {
+.zb-verify__prompt,
+.zb-guard__body {
   margin: 0;
   font-size: 13px;
-  color: var(--ox-identity-fg-muted);
+  color: var(--zb-identity-fg-muted);
 }
-.ox-verify__row {
+.zb-verify__row {
   display: flex;
   gap: 10px;
   align-items: center;
   margin-block-start: 12px;
   flex-wrap: wrap;
 }
-.ox-verify__who {
+.zb-verify__who {
   display: flex;
   flex-direction: column;
 }
-.ox-verify__name {
+.zb-verify__name {
   font-weight: 600;
 }
-.ox-verify__detail {
+.zb-verify__detail {
   font-size: 12px;
-  color: var(--ox-identity-fg-muted);
+  color: var(--zb-identity-fg-muted);
 }
-.ox-verify__field {
+.zb-verify__field {
   margin-inline-start: auto;
 }
-.ox-verify__input {
+.zb-verify__input {
   inline-size: 110px;
   padding: 5px 10px;
-  border: 1px solid var(--ox-identity-border);
-  border-radius: var(--ox-identity-radius);
-  background: var(--ox-identity-surface);
-  color: var(--ox-identity-fg);
+  border: 1px solid var(--zb-identity-border);
+  border-radius: var(--zb-identity-radius);
+  background: var(--zb-identity-surface);
+  color: var(--zb-identity-fg);
   font: inherit;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
-.ox-verify__result {
+.zb-verify__result {
   margin: 10px 0 0;
   font-size: 12px;
   min-block-size: 18px;
 }
-.ox-verify--wrong .ox-verify__result {
-  color: var(--ox-identity-critical, #a8071a);
+.zb-verify--wrong .zb-verify__result {
+  color: var(--zb-identity-critical, #a8071a);
 }
-.ox-verify--confirmed .ox-verify__result {
-  color: var(--ox-identity-ok, #237804);
+.zb-verify--confirmed .zb-verify__result {
+  color: var(--zb-identity-ok, #237804);
 }
 
-.ox-btn {
+.zb-btn {
   font: inherit;
   padding: 4px 12px;
-  border: 1px solid var(--ox-identity-border);
-  border-radius: var(--ox-identity-radius);
-  background: var(--ox-identity-surface);
-  color: var(--ox-identity-fg);
+  border: 1px solid var(--zb-identity-border);
+  border-radius: var(--zb-identity-radius);
+  background: var(--zb-identity-surface);
+  color: var(--zb-identity-fg);
   cursor: pointer;
 }
-.ox-btn--primary {
-  background: var(--ox-identity-accent, #1677ff);
-  border-color: var(--ox-identity-accent, #1677ff);
+.zb-btn--primary {
+  background: var(--zb-identity-accent, #1677ff);
+  border-color: var(--zb-identity-accent, #1677ff);
   color: #fff;
 }
 
@@ -667,41 +667,41 @@
    file: a truncated MRN is a different number, and a truncated name is two
    people on the same ward. */
 @container (max-width: 700px) {
-  .ox-banner .ox-drop-4 {
+  .zb-banner .zb-drop-4 {
     display: none;
   }
 }
 @container (max-width: 560px) {
-  .ox-banner .ox-drop-3 {
+  .zb-banner .zb-drop-3 {
     display: none;
   }
 }
 @container (max-width: 430px) {
-  .ox-banner .ox-drop-2 {
+  .zb-banner .zb-drop-2 {
     display: none;
   }
 }
 @container (max-width: 340px) {
-  .ox-banner .ox-drop-1 {
+  .zb-banner .zb-drop-1 {
     display: none;
   }
-  .ox-banner__name {
+  .zb-banner__name {
     font-size: 14px;
     white-space: normal;
   }
 }
 
-.ox-avatar--auto {
-  --ox-av-size: 40px;
+.zb-avatar--auto {
+  --zb-av-size: 40px;
 }
 @container (max-width: 560px) {
-  .ox-avatar--auto {
-    --ox-av-size: 32px;
+  .zb-avatar--auto {
+    --zb-av-size: 32px;
   }
 }
 @container (max-width: 340px) {
-  .ox-avatar--auto {
-    --ox-av-size: 24px;
+  .zb-avatar--auto {
+    --zb-av-size: 24px;
   }
 }
 
@@ -712,26 +712,26 @@
 @media print {
   /* Everything that was dropped comes back: paper has no container query, and
      a printed banner is read away from the system that could fill the gaps. */
-  .ox-banner .ox-drop-1,
-  .ox-banner .ox-drop-2,
-  .ox-banner .ox-drop-3,
-  .ox-banner .ox-drop-4 {
+  .zb-banner .zb-drop-1,
+  .zb-banner .zb-drop-2,
+  .zb-banner .zb-drop-3,
+  .zb-banner .zb-drop-4 {
     display: inline-flex !important;
   }
   /* Ink, and privacy: a photograph on a printout leaves the building. */
-  .ox-avatar--img > img,
-  .ox-avatar[data-ox-photo="present"] {
+  .zb-avatar--img > img,
+  .zb-avatar[data-zb-photo="present"] {
     background-image: none !important;
   }
-  .ox-avatar--img > img {
+  .zb-avatar--img > img {
     display: none;
   }
-  .ox-banner {
+  .zb-banner {
     border-color: #000;
     box-shadow: none;
   }
-  .ox-banner__reveal,
-  .ox-banner__actions {
+  .zb-banner__reveal,
+  .zb-banner__actions {
     display: none;
   }
 }
@@ -743,15 +743,15 @@
 @media (prefers-reduced-motion: reduce) {
   /* Removed, not shortened. A fade at any duration is a window in which two
      states are simultaneously legible. */
-  :where(.ox-banner, .ox-patient-chip, .ox-avatar, .ox-verify, .ox-guard) {
-    --ox-dur-swap: 0ms;
-    --ox-dur-reveal: 0ms;
-    --ox-dur-escalate: 0ms;
+  :where(.zb-banner, .zb-patient-chip, .zb-avatar, .zb-verify, .zb-guard) {
+    --zb-dur-swap: 0ms;
+    --zb-dur-reveal: 0ms;
+    --zb-dur-escalate: 0ms;
   }
-  .ox-avatar--loading::after {
+  .zb-avatar--loading::after {
     animation: none;
   }
-  .ox-patient-chip__detail {
+  .zb-patient-chip__detail {
     animation: none;
   }
 }
@@ -760,17 +760,17 @@
   /* The tint is the first thing to give up its contrast budget — the token
      layer already collapses all six swatches in high contrast. Border and
      initials carry identity from here. */
-  .ox-avatar {
+  .zb-avatar {
     forced-color-adjust: auto;
     border-width: 2px;
   }
-  .ox-banner,
-  .ox-tag,
-  .ox-verify,
-  .ox-guard {
+  .zb-banner,
+  .zb-tag,
+  .zb-verify,
+  .zb-guard {
     border-width: 2px;
   }
-  .ox-avatar--loading::after {
+  .zb-avatar--loading::after {
     display: none;
   }
 }

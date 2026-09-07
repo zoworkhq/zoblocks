@@ -11,7 +11,7 @@
 import { describe, expect, it } from "vitest";
 import { appApi, readOrigin, readToken, type Fetcher } from "../src/app";
 
-const credential = { origin: "https://app.example.test", token: "oxy_live_" + "x".repeat(30) };
+const credential = { origin: "https://app.example.test", token: "zb_live_" + "x".repeat(30) };
 
 function stub(
   responses: { status: number; body?: unknown; text?: string }[],
@@ -39,7 +39,7 @@ describe("what it sends", () => {
     await appApi(fetcher, credential).themes();
 
     expect(seen[0]!.url).toBe("https://app.example.test/api/v1/themes");
-    expect(seen[0]!.url).not.toContain("oxy_live_");
+    expect(seen[0]!.url).not.toContain("zb_live_");
     expect((seen[0]!.init?.headers as Record<string, string>).authorization).toBe(
       `Bearer ${credential.token}`,
     );
@@ -124,34 +124,29 @@ describe("what it makes of a refusal", () => {
 
 describe("what a designer may type", () => {
   it("accepts an origin and drops what is not one", () => {
-    expect(readOrigin("https://app.oxygenui.design")).toBe("https://app.oxygenui.design");
-    expect(readOrigin("  https://app.oxygenui.design/  ")).toBe("https://app.oxygenui.design");
+    expect(readOrigin("https://app.zoblocks.design")).toBe("https://app.zoblocks.design");
+    expect(readOrigin("  https://app.zoblocks.design/  ")).toBe("https://app.zoblocks.design");
     expect(readOrigin("http://localhost:6003")).toBe("http://localhost:6003");
   });
 
   it("refuses a path, so a pasted deep link is a correction not a 404", () => {
-    expect(readOrigin("https://app.oxygenui.design/themes/clinical")).toBeUndefined();
+    expect(readOrigin("https://app.zoblocks.design/themes/clinical")).toBeUndefined();
   });
 
   it("refuses plaintext http anywhere but localhost", () => {
     // A bearer token over http is the token given away.
-    expect(readOrigin("http://app.oxygenui.design")).toBeUndefined();
+    expect(readOrigin("http://app.zoblocks.design")).toBeUndefined();
   });
 
   it("refuses nonsense", () => {
-    for (const bad of ["", "   ", "app.oxygenui.design", "javascript:alert(1)"]) {
+    for (const bad of ["", "   ", "app.zoblocks.design", "javascript:alert(1)"]) {
       expect(readOrigin(bad), bad).toBeUndefined();
     }
   });
 
   it("checks the token's prefix before spending a round trip on it", () => {
     expect(readToken(` ${credential.token} `)).toBe(credential.token);
-    for (const bad of [
-      "",
-      "oxy_live_short",
-      "sk_live_" + "x".repeat(30),
-      credential.token + " x",
-    ]) {
+    for (const bad of ["", "zb_live_short", "sk_live_" + "x".repeat(30), credential.token + " x"]) {
       expect(readToken(bad), bad).toBeUndefined();
     }
   });

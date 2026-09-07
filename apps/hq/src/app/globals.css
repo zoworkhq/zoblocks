@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
-/* Oxygen components live at the repo root, outside this app's tree, so
+/* Zoblocks components live at the repo root, outside this app's tree, so
    Tailwind's automatic content detection never sees them. */
 @source "../../../../registry";
 
 /* ===========================================================================
- * hq.oxygenui.design
+ * hq.zoblocks.design
  *
  * Reference: ClickUp's List view. Compact rows, Inter, inline controls that
  * appear on hover, colour-coded status dots, avatar chips, flag priorities.
@@ -43,27 +43,27 @@
 }
 
 .hq-shell {
-  --ox-bg: var(--color-vellum);
-  --ox-surface: var(--color-shell);
-  --ox-bg-subtle: var(--color-shell);
-  --ox-bg-muted: var(--color-shell-soft);
-  --ox-border: oklch(33% 0.028 275);
-  --ox-text: var(--color-shell-fg);
-  --ox-text-muted: var(--color-shell-muted);
-  --ox-accent: oklch(82% 0.11 285);
-  --ox-accent-subtle: oklch(33% 0.06 285);
+  --zb-bg: var(--color-vellum);
+  --zb-surface: var(--color-shell);
+  --zb-bg-subtle: var(--color-shell);
+  --zb-bg-muted: var(--color-shell-soft);
+  --zb-border: oklch(33% 0.028 275);
+  --zb-text: var(--color-shell-fg);
+  --zb-text-muted: var(--color-shell-muted);
+  --zb-accent: oklch(82% 0.11 285);
+  --zb-accent-subtle: oklch(33% 0.06 285);
 }
 
 .hq-page {
-  --ox-bg: var(--color-paper);
-  --ox-surface: var(--color-paper);
-  --ox-bg-subtle: var(--color-vellum);
-  --ox-bg-muted: var(--color-vellum);
-  --ox-border: var(--color-rule);
-  --ox-text: var(--color-ink);
-  --ox-text-muted: var(--color-muted);
-  --ox-accent: var(--color-brand);
-  --ox-accent-subtle: var(--color-brand-soft);
+  --zb-bg: var(--color-paper);
+  --zb-surface: var(--color-paper);
+  --zb-bg-subtle: var(--color-vellum);
+  --zb-bg-muted: var(--color-vellum);
+  --zb-border: var(--color-rule);
+  --zb-text: var(--color-ink);
+  --zb-text-muted: var(--color-muted);
+  --zb-accent: var(--color-brand);
+  --zb-accent-subtle: var(--color-brand-soft);
 }
 
 @layer base {

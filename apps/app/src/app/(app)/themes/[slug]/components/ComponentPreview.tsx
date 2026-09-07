@@ -1,6 +1,6 @@
 "use client";
 
-import { Accordion, PulseLoader, Switch, Timeline } from "@oxygenui-design/react";
+import { Accordion, PulseLoader, Switch, Timeline } from "@zoblocks/react";
 import { Preview } from "@/components/ui";
 import type { ThemeName } from "@/lib/token-editor";
 import type { ComponentToken } from "./ComponentEditor";
@@ -17,14 +17,14 @@ import type { ComponentToken } from "./ComponentEditor";
  * Unlike the token editor's preview, this one does not need to fan an override
  * out to its dependents: the customer is setting the component tokens directly,
  * so what they typed is what the component reads. The semantic layer is still
- * applied underneath, because a preview that resolved `--ox-accent` from
- * Oxygen's palette would show a customer their edits sitting on our colours.
+ * applied underneath, because a preview that resolved `--zb-accent` from
+ * Zoblocks's palette would show a customer their edits sitting on our colours.
  */
 
 /**
  * A specimen per component, and an honest gap where there is not one.
  *
- * Only components `@oxygenui-design/react` exports can be drawn here. Tabs,
+ * Only components `@zoblocks/react` exports can be drawn here. Tabs,
  * badge, banner, avatar and patient-chip live in packages the app does not
  * depend on, and adding five dependencies to render five thumbnails is a worse
  * trade than saying so. What is not acceptable is an empty box that reads as a

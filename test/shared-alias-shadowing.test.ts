@@ -1,7 +1,7 @@
 /**
  * `@/lib/utils` means two different files, and both must satisfy the registry.
  *
- * Registry components import `@/lib/utils` because that is where the Oxygen
+ * Registry components import `@/lib/utils` because that is where the Zoblocks
  * CLI writes it in a consumer's project. Inside the docs app the same specifier
  * resolves to `apps/docs/src/lib/utils.ts` — the app's own utils, mapped ahead
  * of `@/*` in its tsconfig — and the two files happen to agree on `cn`, so
@@ -16,7 +16,7 @@
  *
  * The real invariant is that the app's utils must be a superset of the
  * registry's. Two ways to satisfy it: add the export to both, or (better) put
- * the shared thing in its own `@/lib/oxygen-*` module, which no application
+ * the shared thing in its own `@/lib/zoblocks-*` module, which no application
  * shadows. `lib/clock.ts` is what came of this one.
  */
 
@@ -31,7 +31,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
  * Specifiers a registry component may use that an application is likely to
  * own already, mapped to the file each side resolves to.
  *
- * `@/lib/utils` is the only one today. `@/lib/oxygen-*` is deliberately not
+ * `@/lib/utils` is the only one today. `@/lib/zoblocks-*` is deliberately not
  * here: the prefix exists precisely so those cannot collide with an app's own
  * modules.
  */
@@ -42,7 +42,7 @@ const SHADOWED: ReadonlyArray<{
 }> = [
   {
     specifier: "@/lib/utils",
-    registry: "registry/oxygen/lib/utils.ts",
+    registry: "registry/zoblocks/lib/utils.ts",
     app: "apps/docs/src/lib/utils.ts",
   },
 ];
@@ -73,7 +73,7 @@ describe("a shadowed shared module keeps both copies compatible", () => {
       const missing = [...required].filter((name) => !provided.has(name));
       expect(
         missing,
-        "add these to the app's utils, or move them into a `@/lib/oxygen-*` module " +
+        "add these to the app's utils, or move them into a `@/lib/zoblocks-*` module " +
           "that no application shadows — see lib/clock.ts",
       ).toEqual([]);
     },

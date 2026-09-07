@@ -1,8 +1,8 @@
 /**
  * The two delivery channels must draw the same loader.
  *
- * Oxygen ships each loader twice: as React source copied into a customer's repo
- * by the Oxygen CLI, and as a custom element on npm for every other framework.
+ * Zoblocks ships each loader twice: as React source copied into a customer's repo
+ * by the Zoblocks CLI, and as a custom element on npm for every other framework.
  * The React file has to be self-contained — it is copied verbatim, so it cannot
  * import from a workspace package — which means the geometry genuinely exists
  * in two places.
@@ -27,7 +27,7 @@ import {
   cycleMs as registryCycleMs,
   strokePx as registryStrokePx,
   clamp as registryClamp,
-} from "../registry/oxygen/lib/loader";
+} from "../registry/zoblocks/lib/loader";
 
 import {
   LOADER_ART as PACKAGE_ART,
@@ -46,8 +46,8 @@ import {
   clamp as packageClamp,
 } from "../packages/loaders/src/base";
 
-import { PULSE_MIN_SIZE_PX as REGISTRY_PULSE_MIN } from "../registry/oxygen/pulse-loader/pulse-loader";
-import { slugWidth as registrySlugWidth } from "../registry/oxygen/infusion-loader/infusion-loader";
+import { PULSE_MIN_SIZE_PX as REGISTRY_PULSE_MIN } from "../registry/zoblocks/pulse-loader/pulse-loader";
+import { slugWidth as registrySlugWidth } from "../registry/zoblocks/infusion-loader/infusion-loader";
 import { slugWidth as packageSlugWidth } from "../packages/loaders/src/infusion";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -125,7 +125,7 @@ describe("infusion geometry parity", () => {
 });
 
 describe("stylesheet parity", () => {
-  const registryCss = read("registry/oxygen/lib/loader.css");
+  const registryCss = read("registry/zoblocks/lib/loader.css");
   const packageCss = read("packages/loaders/src/css.ts");
 
   /** Every `@keyframes name` declared in a stylesheet. */
@@ -155,14 +155,14 @@ describe("stylesheet parity", () => {
     for (const css of [registryCss, packageCss]) {
       expect(css).toContain("prefers-reduced-motion: reduce");
       expect(css).toContain("forced-colors: active");
-      expect(css).toContain("ox-loader-still");
+      expect(css).toContain("zb-loader-still");
     }
   });
 
   it("references no primitive palette token in either channel", () => {
     // Semantic tokens only, so a brand override actually reaches the loaders.
     for (const css of [registryCss, packageCss]) {
-      expect(css).not.toMatch(/--ox-ref-/);
+      expect(css).not.toMatch(/--zb-ref-/);
       expect(css).not.toMatch(/#[0-9a-f]{3,8}\b/i);
     }
   });
@@ -170,12 +170,12 @@ describe("stylesheet parity", () => {
 
 describe("the registry component stays self-contained", () => {
   const files = [
-    "registry/oxygen/lib/loader.tsx",
-    "registry/oxygen/pulse-loader/pulse-loader.tsx",
-    "registry/oxygen/rhythm-loader/rhythm-loader.tsx",
-    "registry/oxygen/breath-loader/breath-loader.tsx",
-    "registry/oxygen/helix-loader/helix-loader.tsx",
-    "registry/oxygen/infusion-loader/infusion-loader.tsx",
+    "registry/zoblocks/lib/loader.tsx",
+    "registry/zoblocks/pulse-loader/pulse-loader.tsx",
+    "registry/zoblocks/rhythm-loader/rhythm-loader.tsx",
+    "registry/zoblocks/breath-loader/breath-loader.tsx",
+    "registry/zoblocks/helix-loader/helix-loader.tsx",
+    "registry/zoblocks/infusion-loader/infusion-loader.tsx",
   ];
 
   it.each(files)("%s imports nothing from the workspace", (file) => {
@@ -183,7 +183,7 @@ describe("the registry component stays self-contained", () => {
     // import compiles here and fails there, which is the worst possible place
     // for it to fail.
     const source = read(file);
-    expect(source).not.toMatch(/from\s+["']@oxygenui-design\//);
+    expect(source).not.toMatch(/from\s+["']@zoblocks\//);
     expect(source).not.toMatch(/from\s+["']\.\.\/\.\.\//);
   });
 
@@ -199,7 +199,7 @@ describe("the registry component stays self-contained", () => {
 
 describe("helix geometry", () => {
   it("uses the same column count in both channels", () => {
-    const source = read("registry/oxygen/helix-loader/helix-loader.tsx");
+    const source = read("registry/zoblocks/helix-loader/helix-loader.tsx");
     expect(source).toContain(`const COLUMNS = ${HELIX_COLUMNS}`);
   });
 });

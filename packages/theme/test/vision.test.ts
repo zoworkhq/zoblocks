@@ -9,7 +9,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { contrastBetween, hue, hueDistance, parseHex } from "@oxygenui-design/tokens/validate";
+import { contrastBetween, hue, hueDistance, parseHex } from "@zoblocks/tokens/validate";
 import { VISION_KINDS, simulateAll, simulateVision } from "../src/vision";
 
 /** `hueDistance` takes angles, not colours — this is the missing hop. */

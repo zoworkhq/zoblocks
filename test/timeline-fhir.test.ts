@@ -10,8 +10,8 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { TIMELINE_RESOURCE_TYPES, toTimelineEvents } from "../registry/oxygen/lib/timeline-fhir";
-import type { Encounter } from "@oxygenui-design/fhir";
+import { TIMELINE_RESOURCE_TYPES, toTimelineEvents } from "../registry/zoblocks/lib/timeline-fhir";
+import type { Encounter } from "@zoblocks/fhir";
 import {
   appointmentLapsed,
   communicationNotDone,
@@ -23,7 +23,7 @@ import {
   provenanceLateEntry,
   questionnaireUnreturned,
   timelineBundle,
-} from "@oxygenui-design/fixtures";
+} from "@zoblocks/fixtures";
 
 const NOW = "2026-08-18T10:40:00+05:30";
 

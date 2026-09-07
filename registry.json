@@ -1,56 +1,56 @@
 {
-  "$schema": "https://oxygenui.design/schema/registry.json",
-  "name": "oxygenui",
-  "homepage": "https://oxygenui.design",
+  "$schema": "https://zoblocks.design/schema/registry.json",
+  "name": "zoblocks",
+  "homepage": "https://zoblocks.design",
   "items": [
     {
       "name": "utils",
-      "type": "oxygen:lib",
+      "type": "zoblocks:lib",
       "title": "Utils",
-      "description": "Class-name merge helper shared by every Oxygen component.",
+      "description": "Class-name merge helper shared by every Zoblocks component.",
       "dependencies": [
         "clsx",
         "tailwind-merge"
       ],
       "files": [
         {
-          "path": "registry/oxygen/lib/utils.ts",
-          "type": "oxygen:lib",
+          "path": "registry/zoblocks/lib/utils.ts",
+          "type": "zoblocks:lib",
           "target": "lib/utils.ts"
         }
       ]
     },
     {
       "name": "recorder-core",
-      "type": "oxygen:lib",
+      "type": "zoblocks:lib",
       "title": "Recorder core",
       "description": "Signal path, peak buffer, capture machine and the thirteen fault detectors behind Recorder. Installed automatically with the recorder.",
       "dependencies": [
         "clsx",
         "tailwind-merge",
-        "@oxygenui-design/recorder-core"
+        "@zoblocks/recorder-core"
       ],
       "registryDependencies": [
         "utils"
       ],
       "files": [
         {
-          "path": "registry/oxygen/lib/recorder.tsx",
-          "type": "oxygen:lib",
-          "target": "lib/oxygen-recorder.tsx"
+          "path": "registry/zoblocks/lib/recorder.tsx",
+          "type": "zoblocks:lib",
+          "target": "lib/zoblocks-recorder.tsx"
         },
         {
-          "path": "registry/oxygen/lib/recorder.css",
-          "type": "oxygen:file",
-          "target": "styles/oxygen-recorder.css"
+          "path": "registry/zoblocks/lib/recorder.css",
+          "type": "zoblocks:file",
+          "target": "styles/zoblocks-recorder.css"
         }
       ]
     },
     {
       "name": "loader-core",
-      "type": "oxygen:lib",
+      "type": "zoblocks:lib",
       "title": "Loader core",
-      "description": "Shared frame, timing gate, and stylesheet behind every Oxygen loader. Installed automatically with any loader.",
+      "description": "Shared frame, timing gate, and stylesheet behind every Zoblocks loader. Installed automatically with any loader.",
       "dependencies": [
         "clsx",
         "tailwind-merge"
@@ -60,20 +60,20 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/lib/loader.tsx",
-          "type": "oxygen:lib",
-          "target": "lib/oxygen-loader.tsx"
+          "path": "registry/zoblocks/lib/loader.tsx",
+          "type": "zoblocks:lib",
+          "target": "lib/zoblocks-loader.tsx"
         },
         {
-          "path": "registry/oxygen/lib/loader.css",
-          "type": "oxygen:file",
-          "target": "styles/oxygen-loader.css"
+          "path": "registry/zoblocks/lib/loader.css",
+          "type": "zoblocks:file",
+          "target": "styles/zoblocks-loader.css"
         }
       ]
     },
     {
       "name": "accordion-core",
-      "type": "oxygen:lib",
+      "type": "zoblocks:lib",
       "title": "Accordion core",
       "description": "Headless disclosure behaviour and stylesheet behind Accordion and Disclosure: the open-set policies, the ARIA wiring, the access model, and find-in-page support. Installed automatically with either.",
       "registryDependencies": [
@@ -81,38 +81,38 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/lib/accordion-core.tsx",
-          "type": "oxygen:hook",
-          "target": "lib/oxygen-accordion.tsx"
+          "path": "registry/zoblocks/lib/accordion-core.tsx",
+          "type": "zoblocks:hook",
+          "target": "lib/zoblocks-accordion.tsx"
         },
         {
-          "path": "registry/oxygen/lib/accordion.css",
-          "type": "oxygen:file",
-          "target": "styles/oxygen-accordion.css"
+          "path": "registry/zoblocks/lib/accordion.css",
+          "type": "zoblocks:file",
+          "target": "styles/zoblocks-accordion.css"
         }
       ]
     },
     {
       "name": "clinical-status-core",
-      "type": "oxygen:lib",
+      "type": "zoblocks:lib",
       "title": "Clinical status core",
       "description": "The closed status vocabulary: nine scales, forty steps, each carrying a tone, a CSS glyph and a word in both a clinician and a patient register — plus the FHIR adapters that map Observation, AllergyIntolerance, Encounter, Task, Consent and DetectedIssue onto them. Installed automatically with ClinicalStatus.",
       "files": [
         {
-          "path": "registry/oxygen/lib/clinical-status.ts",
-          "type": "oxygen:lib",
-          "target": "lib/oxygen-clinical-status.ts"
+          "path": "registry/zoblocks/lib/clinical-status.ts",
+          "type": "zoblocks:lib",
+          "target": "lib/zoblocks-clinical-status.ts"
         },
         {
-          "path": "registry/oxygen/lib/clinical-status.css",
-          "type": "oxygen:style",
-          "target": "styles/oxygen-clinical-status.css"
+          "path": "registry/zoblocks/lib/clinical-status.css",
+          "type": "zoblocks:style",
+          "target": "styles/zoblocks-clinical-status.css"
         }
       ]
     },
     {
       "name": "result-value-core",
-      "type": "oxygen:lib",
+      "type": "zoblocks:lib",
       "title": "Result value core",
       "description": "The seven absence reasons, the interpretation precedence rule, the delta suppression rule, and the sentence composer that turns an observation into one spoken clinical statement. Includes the FHIR Observation adapter. Installed automatically with ResultValue.",
       "registryDependencies": [
@@ -120,92 +120,92 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/lib/result-value.ts",
-          "type": "oxygen:lib",
-          "target": "lib/oxygen-result-value.ts"
+          "path": "registry/zoblocks/lib/result-value.ts",
+          "type": "zoblocks:lib",
+          "target": "lib/zoblocks-result-value.ts"
         },
         {
-          "path": "registry/oxygen/lib/result-value.css",
-          "type": "oxygen:style",
-          "target": "styles/oxygen-result-value.css"
+          "path": "registry/zoblocks/lib/result-value.css",
+          "type": "zoblocks:style",
+          "target": "styles/zoblocks-result-value.css"
         }
       ]
     },
     {
       "name": "allergy-core",
-      "type": "oxygen:lib",
+      "type": "zoblocks:lib",
       "title": "Allergy core",
       "description": "The distinction between criticality (risk of a future reaction) and reaction severity (how bad a past one was), six verification states, four kinds, and the rule that a no-known-allergies assertion without an asserter and a date is not an assertion. Includes the FHIR AllergyIntolerance adapter. Installed automatically with AllergyChip.",
       "files": [
         {
-          "path": "registry/oxygen/lib/allergy.ts",
-          "type": "oxygen:lib",
-          "target": "lib/oxygen-allergy.ts"
+          "path": "registry/zoblocks/lib/allergy.ts",
+          "type": "zoblocks:lib",
+          "target": "lib/zoblocks-allergy.ts"
         },
         {
-          "path": "registry/oxygen/lib/allergy.css",
-          "type": "oxygen:style",
-          "target": "styles/oxygen-allergy.css"
+          "path": "registry/zoblocks/lib/allergy.css",
+          "type": "zoblocks:style",
+          "target": "styles/zoblocks-allergy.css"
         }
       ]
     },
     {
       "name": "risk-core",
-      "type": "oxygen:lib",
+      "type": "zoblocks:lib",
       "title": "Risk core",
       "description": "Five bands including one for a patient the model could not score, driver attribution with its concentration, and a validity window that turns an old score into an expired one. Includes the FHIR RiskAssessment adapter. Installed automatically with RiskIndicator.",
       "files": [
         {
-          "path": "registry/oxygen/lib/risk.ts",
-          "type": "oxygen:lib",
-          "target": "lib/oxygen-risk.ts"
+          "path": "registry/zoblocks/lib/risk.ts",
+          "type": "zoblocks:lib",
+          "target": "lib/zoblocks-risk.ts"
         },
         {
-          "path": "registry/oxygen/lib/risk.css",
-          "type": "oxygen:style",
-          "target": "styles/oxygen-risk.css"
+          "path": "registry/zoblocks/lib/risk.css",
+          "type": "zoblocks:style",
+          "target": "styles/zoblocks-risk.css"
         }
       ]
     },
     {
       "name": "provenance-core",
-      "type": "oxygen:lib",
+      "type": "zoblocks:lib",
       "title": "Provenance core",
       "description": "Six source classes with CSS glyphs rather than colours, observed-at kept separate from recorded-at, per-datum staleness policies, and the confirmation state of an AI-extracted value. Includes a ledger keyed by resource and version, and the FHIR Provenance adapter. Installed automatically with ProvenanceChip.",
       "files": [
         {
-          "path": "registry/oxygen/lib/provenance.ts",
-          "type": "oxygen:lib",
-          "target": "lib/oxygen-provenance.ts"
+          "path": "registry/zoblocks/lib/provenance.ts",
+          "type": "zoblocks:lib",
+          "target": "lib/zoblocks-provenance.ts"
         },
         {
-          "path": "registry/oxygen/lib/provenance.css",
-          "type": "oxygen:style",
-          "target": "styles/oxygen-provenance.css"
+          "path": "registry/zoblocks/lib/provenance.css",
+          "type": "zoblocks:style",
+          "target": "styles/zoblocks-provenance.css"
         }
       ]
     },
     {
       "name": "trend-core",
-      "type": "oxygen:lib",
+      "type": "zoblocks:lib",
       "title": "Trend core",
       "description": "Comparability segmentation across assay, method and unit changes, a minimum-points floor, the reliable-change threshold that renders noise as flat, and a required valence because half of clinical measures improve by falling. One SVG path per segment, no chart library. Installed automatically with TrendIndicator.",
       "files": [
         {
-          "path": "registry/oxygen/lib/trend.ts",
-          "type": "oxygen:lib",
-          "target": "lib/oxygen-trend.ts"
+          "path": "registry/zoblocks/lib/trend.ts",
+          "type": "zoblocks:lib",
+          "target": "lib/zoblocks-trend.ts"
         },
         {
-          "path": "registry/oxygen/lib/trend.css",
-          "type": "oxygen:style",
-          "target": "styles/oxygen-trend.css"
+          "path": "registry/zoblocks/lib/trend.css",
+          "type": "zoblocks:style",
+          "target": "styles/zoblocks-trend.css"
         }
       ]
     },
     {
       "name": "datetime-core",
-      "type": "oxygen:lib",
+      "type": "zoblocks:lib",
       "title": "Date & time core",
       "description": "The temporal engine and the behaviour every date, time and session control shares. Plain serialisable value types that carry their own precision — a birth date has no time member and cannot become midnight UTC — integer calendar arithmetic, a keyboard-first segmented field, an accessible month grid, and the session algebra whose driver is explicit state rather than an inference. Reads IANA zone data through Intl rather than shipping an offset table, and never reads the wall clock. Installed automatically with DateField, Calendar, DatePicker, BirthDateField, TimeField, SessionTimeField and ClinicalDateTime.",
       "dependencies": [
@@ -217,53 +217,53 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/lib/datetime.ts",
-          "type": "oxygen:lib",
-          "target": "lib/oxygen-datetime.ts"
+          "path": "registry/zoblocks/lib/datetime.ts",
+          "type": "zoblocks:lib",
+          "target": "lib/zoblocks-datetime.ts"
         },
         {
-          "path": "registry/oxygen/lib/datetime-field.tsx",
-          "type": "oxygen:lib",
-          "target": "lib/oxygen-datetime-field.tsx"
+          "path": "registry/zoblocks/lib/datetime-field.tsx",
+          "type": "zoblocks:lib",
+          "target": "lib/zoblocks-datetime-field.tsx"
         },
         {
-          "path": "registry/oxygen/lib/availability.ts",
-          "type": "oxygen:lib",
-          "target": "lib/oxygen-availability.ts"
+          "path": "registry/zoblocks/lib/availability.ts",
+          "type": "zoblocks:lib",
+          "target": "lib/zoblocks-availability.ts"
         },
         {
-          "path": "registry/oxygen/lib/recurrence.ts",
-          "type": "oxygen:lib",
-          "target": "lib/oxygen-recurrence.ts"
+          "path": "registry/zoblocks/lib/recurrence.ts",
+          "type": "zoblocks:lib",
+          "target": "lib/zoblocks-recurrence.ts"
         },
         {
-          "path": "registry/oxygen/lib/datetime-parts.tsx",
-          "type": "oxygen:lib",
-          "target": "lib/oxygen-datetime-parts.tsx"
+          "path": "registry/zoblocks/lib/datetime-parts.tsx",
+          "type": "zoblocks:lib",
+          "target": "lib/zoblocks-datetime-parts.tsx"
         },
         {
-          "path": "registry/oxygen/lib/datetime.css",
-          "type": "oxygen:style",
-          "target": "styles/oxygen-datetime.css"
+          "path": "registry/zoblocks/lib/datetime.css",
+          "type": "zoblocks:style",
+          "target": "styles/zoblocks-datetime.css"
         }
       ]
     },
     {
       "name": "clock-core",
-      "type": "oxygen:lib",
+      "type": "zoblocks:lib",
       "title": "Clock",
       "description": "One date format shared by the components that have to say \"until when\": an ISO timestamp read as the wall-clock time it was written in, rather than re-zoned through the reader's browser. Its own item rather than part of `utils`, because inside an application `@/lib/utils` is a name the application usually already owns.",
       "files": [
         {
-          "path": "registry/oxygen/lib/clock.ts",
-          "type": "oxygen:lib",
-          "target": "lib/oxygen-clock.ts"
+          "path": "registry/zoblocks/lib/clock.ts",
+          "type": "zoblocks:lib",
+          "target": "lib/zoblocks-clock.ts"
         }
       ]
     },
     {
       "name": "presence-core",
-      "type": "oxygen:lib",
+      "type": "zoblocks:lib",
       "title": "Presence core",
       "description": "Nine clinical presence states rather than a green dot, ring geometry that survives a colour deficiency, rota resolution that returns a gap instead of the nearest plausible name, chart co-presence conflict detection, and escalation routing that offers the covering clinician before it offers an override. Installed automatically with CareTeamPresence.",
       "registryDependencies": [
@@ -271,20 +271,20 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/lib/presence.ts",
-          "type": "oxygen:lib",
-          "target": "lib/oxygen-presence.ts"
+          "path": "registry/zoblocks/lib/presence.ts",
+          "type": "zoblocks:lib",
+          "target": "lib/zoblocks-presence.ts"
         },
         {
-          "path": "registry/oxygen/lib/presence.css",
-          "type": "oxygen:style",
-          "target": "styles/oxygen-presence.css"
+          "path": "registry/zoblocks/lib/presence.css",
+          "type": "zoblocks:style",
+          "target": "styles/zoblocks-presence.css"
         }
       ]
     },
     {
       "name": "chart-header-core",
-      "type": "oxygen:lib",
+      "type": "zoblocks:lib",
       "title": "Chart header core",
       "description": "The Sex Parameter for Clinical Use resolved against what is on screen rather than read as a demographic, a safety strip whose absences are named rather than omitted, encounter context that will sit in \"none selected\" rather than pick one for you, and EpisodeOfCare into a program and a week. Installed automatically with ChartHeader.",
       "registryDependencies": [
@@ -292,94 +292,94 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/lib/chart-header.ts",
-          "type": "oxygen:lib",
-          "target": "lib/oxygen-chart-header.ts"
+          "path": "registry/zoblocks/lib/chart-header.ts",
+          "type": "zoblocks:lib",
+          "target": "lib/zoblocks-chart-header.ts"
         },
         {
-          "path": "registry/oxygen/lib/chart-header.css",
-          "type": "oxygen:style",
-          "target": "styles/oxygen-chart-header.css"
+          "path": "registry/zoblocks/lib/chart-header.css",
+          "type": "zoblocks:style",
+          "target": "styles/zoblocks-chart-header.css"
         }
       ]
     },
     {
       "name": "workspace-core",
-      "type": "oxygen:lib",
+      "type": "zoblocks:lib",
       "title": "Workspace core",
       "description": "The multi-chart workspace rules: a per-chart accent derived from the chart id so it is the same hue in every session, automatic disambiguation when two open charts look alike, a graded close verdict that asks about an unsigned note and refuses a draft order, and the fifteen-minute rule for re-asserting identity on return. Installed automatically with RecentPatientStack.",
       "files": [
         {
-          "path": "registry/oxygen/lib/workspace.ts",
-          "type": "oxygen:lib",
-          "target": "lib/oxygen-workspace.ts"
+          "path": "registry/zoblocks/lib/workspace.ts",
+          "type": "zoblocks:lib",
+          "target": "lib/zoblocks-workspace.ts"
         },
         {
-          "path": "registry/oxygen/lib/workspace.css",
-          "type": "oxygen:style",
-          "target": "styles/oxygen-workspace.css"
+          "path": "registry/zoblocks/lib/workspace.css",
+          "type": "zoblocks:style",
+          "target": "styles/zoblocks-workspace.css"
         }
       ]
     },
     {
       "name": "palette-core",
-      "type": "oxygen:lib",
+      "type": "zoblocks:lib",
       "title": "Command palette core",
       "description": "Verb-first ranking with a sixty-line fuzzy matcher, treatment-relationship scoping that counts out-of-scope patients rather than naming them, an audit record for every patient search including the empty ones, and the second-Enter rule for a clinically significant action. Installed automatically with ChartCommandPalette.",
       "files": [
         {
-          "path": "registry/oxygen/lib/palette.ts",
-          "type": "oxygen:lib",
-          "target": "lib/oxygen-palette.ts"
+          "path": "registry/zoblocks/lib/palette.ts",
+          "type": "zoblocks:lib",
+          "target": "lib/zoblocks-palette.ts"
         },
         {
-          "path": "registry/oxygen/lib/palette.css",
-          "type": "oxygen:style",
-          "target": "styles/oxygen-palette.css"
+          "path": "registry/zoblocks/lib/palette.css",
+          "type": "zoblocks:style",
+          "target": "styles/zoblocks-palette.css"
         }
       ]
     },
     {
       "name": "menu-core",
-      "type": "oxygen:lib",
+      "type": "zoblocks:lib",
       "title": "Context menu core",
       "description": "The resolver behind ChartContextMenu: the subject line a masked row may not exceed, four consequence tiers with the field each one makes mandatory, availability that distinguishes pending from refused from withheld, the withheld count, the bulk demotion, and the disclosure record produced on every path including the abandoned one. Installed automatically with ChartContextMenu.",
       "files": [
         {
-          "path": "registry/oxygen/lib/menu.ts",
-          "type": "oxygen:lib",
-          "target": "lib/oxygen-menu.ts"
+          "path": "registry/zoblocks/lib/menu.ts",
+          "type": "zoblocks:lib",
+          "target": "lib/zoblocks-menu.ts"
         },
         {
-          "path": "registry/oxygen/lib/menu.css",
-          "type": "oxygen:style",
-          "target": "styles/oxygen-menu.css"
+          "path": "registry/zoblocks/lib/menu.css",
+          "type": "zoblocks:style",
+          "target": "styles/zoblocks-menu.css"
         }
       ]
     },
     {
       "name": "grid-core",
-      "type": "oxygen:lib",
+      "type": "zoblocks:lib",
       "title": "Data grid core",
       "description": "The engine behind DataGrid: a cell value type with no null member so an absence has to say which kind it is, coverage that admits a total of \"unknown\" because a FHIR server often will not say, comparison that keeps absent values at the bottom in both directions, two-dimensional cursor arithmetic for role=\"grid\", a measured row ceiling the grid refuses past rather than degrading, and a CSV writer that neutralises formula injection with no way to switch it off. Installed automatically with DataGrid.",
       "files": [
         {
-          "path": "registry/oxygen/lib/grid.ts",
-          "type": "oxygen:lib",
-          "target": "lib/oxygen-grid.ts"
+          "path": "registry/zoblocks/lib/grid.ts",
+          "type": "zoblocks:lib",
+          "target": "lib/zoblocks-grid.ts"
         },
         {
-          "path": "registry/oxygen/lib/grid.css",
-          "type": "oxygen:style",
-          "target": "styles/oxygen-grid.css"
+          "path": "registry/zoblocks/lib/grid.css",
+          "type": "zoblocks:style",
+          "target": "styles/zoblocks-grid.css"
         }
       ]
     },
     {
       "name": "switch-core",
-      "type": "oxygen:lib",
+      "type": "zoblocks:lib",
       "title": "Switch core",
-      "description": "The three-axis state model behind Oxygen's Switch: the commit phase machine, the state-label presets, and the absence vocabulary. Installed automatically with Switch.",
+      "description": "The three-axis state model behind Zoblocks's Switch: the commit phase machine, the state-label presets, and the absence vocabulary. Installed automatically with Switch.",
       "dependencies": [
         "clsx",
         "tailwind-merge"
@@ -389,20 +389,20 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/lib/switch.tsx",
-          "type": "oxygen:lib",
-          "target": "lib/oxygen-switch.tsx"
+          "path": "registry/zoblocks/lib/switch.tsx",
+          "type": "zoblocks:lib",
+          "target": "lib/zoblocks-switch.tsx"
         },
         {
-          "path": "registry/oxygen/lib/switch.css",
-          "type": "oxygen:file",
-          "target": "styles/oxygen-switch.css"
+          "path": "registry/zoblocks/lib/switch.css",
+          "type": "zoblocks:file",
+          "target": "styles/zoblocks-switch.css"
         }
       ]
     },
     {
       "name": "timeline-core",
-      "type": "oxygen:lib",
+      "type": "zoblocks:lib",
       "title": "Timeline core",
       "description": "The chronology engine behind Timeline and CareTimeline: precision-preserving time, the stable comparator, grouping, clustering with critical promotion, the coverage claim and its sentence. Installed automatically with either.",
       "registryDependencies": [
@@ -411,24 +411,24 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/lib/timeline-core.ts",
-          "type": "oxygen:lib",
+          "path": "registry/zoblocks/lib/timeline-core.ts",
+          "type": "zoblocks:lib",
           "target": "lib/timeline-core.ts"
         },
         {
-          "path": "registry/oxygen/lib/timeline.css",
-          "type": "oxygen:file",
-          "target": "styles/oxygen-timeline.css"
+          "path": "registry/zoblocks/lib/timeline.css",
+          "type": "zoblocks:file",
+          "target": "styles/zoblocks-timeline.css"
         }
       ]
     },
     {
       "name": "timeline-fhir",
-      "type": "oxygen:lib",
+      "type": "zoblocks:lib",
       "title": "Timeline FHIR adapters",
       "description": "Thirteen FHIR R4 resource types read into timeline events, plus an honest report of everything that could not be mapped. Pure functions — no fetching. Installed automatically with CareTimeline.",
       "dependencies": [
-        "@oxygenui-design/fhir"
+        "@zoblocks/fhir"
       ],
       "registryDependencies": [
         "utils",
@@ -436,19 +436,19 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/lib/timeline-fhir.ts",
-          "type": "oxygen:lib",
+          "path": "registry/zoblocks/lib/timeline-fhir.ts",
+          "type": "zoblocks:lib",
           "target": "lib/timeline-fhir.ts"
         }
       ]
     },
     {
       "name": "clinical-note-core",
-      "type": "oxygen:lib",
+      "type": "zoblocks:lib",
       "title": "Clinical note core",
       "description": "The ProseMirror binding behind Clinical Note: the editor view, the provenance decorations, the toolbar commands, and the document builders. The clinical engine itself is the npm package; this is the part that needs a DOM. Installed automatically with Clinical Note.",
       "dependencies": [
-        "@oxygenui-design/clinical-note-core",
+        "@zoblocks/clinical-note-core",
         "prosemirror-view",
         "prosemirror-state",
         "prosemirror-model",
@@ -461,33 +461,33 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/lib/clinical-note.tsx",
-          "type": "oxygen:hook",
-          "target": "lib/oxygen-clinical-note.tsx"
+          "path": "registry/zoblocks/lib/clinical-note.tsx",
+          "type": "zoblocks:hook",
+          "target": "lib/zoblocks-clinical-note.tsx"
         },
         {
-          "path": "registry/oxygen/lib/clinical-note.css",
-          "type": "oxygen:file",
-          "target": "styles/oxygen-clinical-note.css"
+          "path": "registry/zoblocks/lib/clinical-note.css",
+          "type": "zoblocks:file",
+          "target": "styles/zoblocks-clinical-note.css"
         }
       ]
     },
     {
       "name": "tokens",
-      "type": "oxygen:style",
-      "title": "Oxygen tokens",
-      "description": "Semantic clinical status tokens, three density modes, and light/dark themes. Required by every Oxygen component.",
+      "type": "zoblocks:style",
+      "title": "Zoblocks tokens",
+      "description": "Semantic clinical status tokens, three density modes, and light/dark themes. Required by every Zoblocks component.",
       "files": [
         {
-          "path": "packages/tokens/src/oxygen-tokens.css",
-          "type": "oxygen:file",
-          "target": "styles/oxygen-tokens.css"
+          "path": "packages/tokens/src/zoblocks-tokens.css",
+          "type": "zoblocks:file",
+          "target": "styles/zoblocks-tokens.css"
         }
       ]
     },
     {
       "name": "accordion",
-      "type": "oxygen:component",
+      "type": "zoblocks:component",
       "title": "Accordion",
       "description": "Collapsible sections with a summary slot in the header, clinical severity on the leading edge, sections that cannot be closed, and four kinds of gate between a reader and content that is governed rather than merely hidden. Ant Design's Collapse API, with the accordion mode's accessibility defects fixed.",
       "categories": [
@@ -505,15 +505,15 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/accordion/accordion.tsx",
-          "type": "oxygen:component",
-          "target": "components/oxygen/accordion.tsx"
+          "path": "registry/zoblocks/accordion/accordion.tsx",
+          "type": "zoblocks:component",
+          "target": "components/zoblocks/accordion.tsx"
         }
       ]
     },
     {
       "name": "allergy-chip",
-      "type": "oxygen:component",
+      "type": "zoblocks:component",
       "title": "Allergy Chip",
       "description": "Substance first at full weight, criticality as the primary signal, the worst past reaction as secondary text, and verification as a hairline affix. AllergyList carries the other half: a no-known-allergies assertion and an unasked question look nothing alike, and an assertion missing its author degrades to the second.",
       "categories": [
@@ -532,15 +532,15 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/allergy-chip/allergy-chip.tsx",
-          "type": "oxygen:component",
-          "target": "components/oxygen/allergy-chip.tsx"
+          "path": "registry/zoblocks/allergy-chip/allergy-chip.tsx",
+          "type": "zoblocks:component",
+          "target": "components/zoblocks/allergy-chip.tsx"
         }
       ]
     },
     {
       "name": "breath-loader",
-      "type": "oxygen:component",
+      "type": "zoblocks:component",
       "title": "Breath Loader",
       "description": "Symbol-free loader cycling at roughly fifteen a minute, the rate of calm breathing. Carries no clinical imagery, so it suits any specialty, and its core accepts a customer's logo mark.",
       "categories": [
@@ -558,15 +558,15 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/breath-loader/breath-loader.tsx",
-          "type": "oxygen:component",
-          "target": "components/oxygen/breath-loader.tsx"
+          "path": "registry/zoblocks/breath-loader/breath-loader.tsx",
+          "type": "zoblocks:component",
+          "target": "components/zoblocks/breath-loader.tsx"
         }
       ]
     },
     {
       "name": "care-team-presence",
-      "type": "oxygen:component",
+      "type": "zoblocks:component",
       "title": "Care Team Presence",
       "description": "Nine states rather than a green dot, each drawn as a ring shape before it is a colour. Resolves a rota to the person responsible at this moment and returns a gap when nobody is. Routes an escalation to the covering clinician before it offers an override, and warns about a documentation conflict before you type rather than at save.",
       "categories": [
@@ -584,15 +584,15 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/care-team-presence/care-team-presence.tsx",
-          "type": "oxygen:component",
-          "target": "components/oxygen/care-team-presence.tsx"
+          "path": "registry/zoblocks/care-team-presence/care-team-presence.tsx",
+          "type": "zoblocks:component",
+          "target": "components/zoblocks/care-team-presence.tsx"
         }
       ]
     },
     {
       "name": "care-timeline",
-      "type": "oxygen:component",
+      "type": "zoblocks:component",
       "title": "Care Timeline",
       "description": "A timeline over clinical, administrative, communication and patient-reported events, with coverage as a required prop. Separates planned from happened, keeps an entry recorded in error visible and marked, and refuses to collapse anything a reader would act on.",
       "categories": [
@@ -612,15 +612,15 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/care-timeline/care-timeline.tsx",
-          "type": "oxygen:component",
-          "target": "components/oxygen/care-timeline.tsx"
+          "path": "registry/zoblocks/care-timeline/care-timeline.tsx",
+          "type": "zoblocks:component",
+          "target": "components/zoblocks/care-timeline.tsx"
         }
       ]
     },
     {
       "name": "chart-accordion",
-      "type": "oxygen:component",
+      "type": "zoblocks:component",
       "title": "Chart Accordion",
       "description": "Accordion with a clinical summary vocabulary: a status paired with its severity, a count, and a timestamp at the precision the record holds. Adds an expand-all control that never opens a section the reader may not have.",
       "categories": [
@@ -639,15 +639,15 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/chart-accordion/chart-accordion.tsx",
-          "type": "oxygen:component",
-          "target": "components/oxygen/chart-accordion.tsx"
+          "path": "registry/zoblocks/chart-accordion/chart-accordion.tsx",
+          "type": "zoblocks:component",
+          "target": "components/zoblocks/chart-accordion.tsx"
         }
       ]
     },
     {
       "name": "chart-command-palette",
-      "type": "oxygen:component",
+      "type": "zoblocks:component",
       "title": "Chart Command Palette",
       "description": "Actions rank above records, because a verb is usually what was meant. Patients outside your relationships are counted rather than named. Every patient search emits an audit event, including the ones that matched nobody, and a clinically significant action never runs on the first Enter.",
       "categories": [
@@ -665,15 +665,15 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/chart-command-palette/chart-command-palette.tsx",
-          "type": "oxygen:component",
-          "target": "components/oxygen/chart-command-palette.tsx"
+          "path": "registry/zoblocks/chart-command-palette/chart-command-palette.tsx",
+          "type": "zoblocks:component",
+          "target": "components/zoblocks/chart-command-palette.tsx"
         }
       ]
     },
     {
       "name": "chart-context-menu",
-      "type": "oxygen:component",
+      "type": "zoblocks:component",
       "title": "Chart Context Menu",
       "description": "Every menu opens with a header naming the record, so the first thing under the pointer is never a verb. Four consequence tiers decide the interaction, not the colour. A masked row makes a masked header, and a disclosure is audited on every path.",
       "categories": [
@@ -691,15 +691,15 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/chart-context-menu/chart-context-menu.tsx",
-          "type": "oxygen:component",
-          "target": "components/oxygen/chart-context-menu.tsx"
+          "path": "registry/zoblocks/chart-context-menu/chart-context-menu.tsx",
+          "type": "zoblocks:component",
+          "target": "components/zoblocks/chart-context-menu.tsx"
         }
       ]
     },
     {
       "name": "chart-header",
-      "type": "oxygen:component",
+      "type": "zoblocks:component",
       "title": "Chart Header",
       "description": "Sticky chrome over PatientBanner. Collapse moves content behind a disclosure rather than out of the accessibility tree. The encounter is an explicit control that will sit in “none selected” rather than pick one for you. The Sex Parameter for Clinical Use appears only where an order or a result is in view, with the context it applies to.",
       "categories": [
@@ -709,7 +709,7 @@
       "dependencies": [
         "clsx",
         "tailwind-merge",
-        "@oxygenui-design/identity"
+        "@zoblocks/identity"
       ],
       "registryDependencies": [
         "utils",
@@ -718,15 +718,15 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/chart-header/chart-header.tsx",
-          "type": "oxygen:component",
-          "target": "components/oxygen/chart-header.tsx"
+          "path": "registry/zoblocks/chart-header/chart-header.tsx",
+          "type": "zoblocks:component",
+          "target": "components/zoblocks/chart-header.tsx"
         }
       ]
     },
     {
       "name": "clinical-note",
-      "type": "oxygen:component",
+      "type": "zoblocks:component",
       "title": "Clinical Note",
       "description": "LOINC-coded sections, per-range provenance across six origins, a composable sign gate with three severities, and deterministic FHIR, XHTML and plain-text output. The engine ships as an npm package with no DOM; this item is the Tailwind skin over it.",
       "categories": [
@@ -736,7 +736,7 @@
       "dependencies": [
         "clsx",
         "tailwind-merge",
-        "@oxygenui-design/clinical-note-core",
+        "@zoblocks/clinical-note-core",
         "prosemirror-view",
         "prosemirror-state",
         "prosemirror-model",
@@ -751,15 +751,15 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/clinical-note/clinical-note.tsx",
-          "type": "oxygen:component",
-          "target": "components/oxygen/clinical-note.tsx"
+          "path": "registry/zoblocks/clinical-note/clinical-note.tsx",
+          "type": "zoblocks:component",
+          "target": "components/zoblocks/clinical-note.tsx"
         }
       ]
     },
     {
       "name": "clinical-status",
-      "type": "oxygen:component",
+      "type": "zoblocks:component",
       "title": "Clinical Status",
       "description": "A chip, a dot, or a grid affix — three presentations of one datum, drawn from nine fixed scales with no free-text status. Each step pairs a tone with a CSS-drawn glyph and a word in both a clinician and a patient register, so the state survives greyscale, Windows high-contrast and monochrome print.",
       "categories": [
@@ -777,15 +777,15 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/clinical-status/clinical-status.tsx",
-          "type": "oxygen:component",
-          "target": "components/oxygen/clinical-status.tsx"
+          "path": "registry/zoblocks/clinical-status/clinical-status.tsx",
+          "type": "zoblocks:component",
+          "target": "components/zoblocks/clinical-status.tsx"
         }
       ]
     },
     {
       "name": "copilot",
-      "type": "oxygen:component",
+      "type": "zoblocks:component",
       "title": "Copilot",
       "description": "Model-agnostic clinical assistant with mode-level scope contracts, inline source attribution, a deterministic crisis interrupt, and FHIR audit output. The engine and the accessibility behaviour ship as npm packages; this item is the Tailwind skin over them.",
       "categories": [
@@ -795,8 +795,8 @@
       "dependencies": [
         "clsx",
         "tailwind-merge",
-        "@oxygenui-design/copilot-core",
-        "@oxygenui-design/copilot-react"
+        "@zoblocks/copilot-core",
+        "@zoblocks/copilot-react"
       ],
       "registryDependencies": [
         "utils",
@@ -804,15 +804,15 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/copilot/copilot.tsx",
-          "type": "oxygen:component",
-          "target": "components/oxygen/copilot.tsx"
+          "path": "registry/zoblocks/copilot/copilot.tsx",
+          "type": "zoblocks:component",
+          "target": "components/zoblocks/copilot.tsx"
         }
       ]
     },
     {
       "name": "data-grid",
-      "type": "oxygen:component",
+      "type": "zoblocks:component",
       "title": "Data Grid",
       "description": "A ruled ledger with role=\"grid\": coverage above the data rather than under it, a total that may honestly be unknown, absence said in words rather than an em dash, numbered footnotes naming the model behind a derived column, and results that arrive without anything moving under your hand.",
       "categories": [
@@ -830,15 +830,15 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/data-grid/data-grid.tsx",
-          "type": "oxygen:component",
-          "target": "components/oxygen/data-grid.tsx"
+          "path": "registry/zoblocks/data-grid/data-grid.tsx",
+          "type": "zoblocks:component",
+          "target": "components/zoblocks/data-grid.tsx"
         }
       ]
     },
     {
       "name": "date-picker",
-      "type": "oxygen:component",
+      "type": "zoblocks:component",
       "title": "Date Picker",
       "description": "Sixteen presentations of one value space, one keyboard model and one accessibility contract. `variant` picks the surface; the parts are separately testable components underneath.",
       "categories": [
@@ -856,15 +856,15 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/date-picker/date-picker.tsx",
-          "type": "oxygen:component",
-          "target": "components/oxygen/date-picker.tsx"
+          "path": "registry/zoblocks/date-picker/date-picker.tsx",
+          "type": "zoblocks:component",
+          "target": "components/zoblocks/date-picker.tsx"
         }
       ]
     },
     {
       "name": "helix-loader",
-      "type": "oxygen:component",
+      "type": "zoblocks:component",
       "title": "Helix Loader",
       "description": "Loader for genomics, pathology, and diagnostics surfaces. Depth comes from scale and opacity rather than a 3D transform, so the strands cross convincingly while staying cheap to composite.",
       "categories": [
@@ -882,15 +882,15 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/helix-loader/helix-loader.tsx",
-          "type": "oxygen:component",
-          "target": "components/oxygen/helix-loader.tsx"
+          "path": "registry/zoblocks/helix-loader/helix-loader.tsx",
+          "type": "zoblocks:component",
+          "target": "components/zoblocks/helix-loader.tsx"
         }
       ]
     },
     {
       "name": "infusion-loader",
-      "type": "oxygen:component",
+      "type": "zoblocks:component",
       "title": "Infusion Loader",
       "description": "Determinate and indeterminate progress in one component. Pass progress for a real 0–100 measurement with role=progressbar; omit it and the slug drifts as an honest unknown.",
       "categories": [
@@ -908,15 +908,15 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/infusion-loader/infusion-loader.tsx",
-          "type": "oxygen:component",
-          "target": "components/oxygen/infusion-loader.tsx"
+          "path": "registry/zoblocks/infusion-loader/infusion-loader.tsx",
+          "type": "zoblocks:component",
+          "target": "components/zoblocks/infusion-loader.tsx"
         }
       ]
     },
     {
       "name": "provenance-chip",
-      "type": "oxygen:component",
+      "type": "zoblocks:component",
       "title": "Provenance Chip",
       "description": "A 20px affix beside a value, never competing with it. Six source classes with CSS glyphs rather than colours, staleness folded in against a per-datum policy, and — for an AI-extracted value — the model, the source span and whether anybody has confirmed it.",
       "categories": [
@@ -934,15 +934,15 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/provenance-chip/provenance-chip.tsx",
-          "type": "oxygen:component",
-          "target": "components/oxygen/provenance-chip.tsx"
+          "path": "registry/zoblocks/provenance-chip/provenance-chip.tsx",
+          "type": "zoblocks:component",
+          "target": "components/zoblocks/provenance-chip.tsx"
         }
       ]
     },
     {
       "name": "pulse-loader",
-      "type": "oxygen:component",
+      "type": "zoblocks:component",
       "title": "Pulse Loader",
       "description": "Page and region loader: an open heart that draws itself once, then beats at a resting 60bpm while a monitor sweep crosses the rhythm line. Renders as Rhythm Loader below 40px, where the heart's detail would collapse.",
       "categories": [
@@ -961,15 +961,15 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/pulse-loader/pulse-loader.tsx",
-          "type": "oxygen:component",
-          "target": "components/oxygen/pulse-loader.tsx"
+          "path": "registry/zoblocks/pulse-loader/pulse-loader.tsx",
+          "type": "zoblocks:component",
+          "target": "components/zoblocks/pulse-loader.tsx"
         }
       ]
     },
     {
       "name": "recent-patient-stack",
-      "type": "oxygen:component",
+      "type": "zoblocks:component",
       "title": "Recent Patient Stack",
       "description": "Each open chart gets a hue derived from its id, so it is the same colour in every session. Two charts whose names look alike both grow an identifier. Per-chart badges carry the unfinished work, closing is graded rather than binary, and returning after fifteen minutes away re-asserts who the chart belongs to.",
       "categories": [
@@ -987,15 +987,15 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/recent-patient-stack/recent-patient-stack.tsx",
-          "type": "oxygen:component",
-          "target": "components/oxygen/recent-patient-stack.tsx"
+          "path": "registry/zoblocks/recent-patient-stack/recent-patient-stack.tsx",
+          "type": "zoblocks:component",
+          "target": "components/zoblocks/recent-patient-stack.tsx"
         }
       ]
     },
     {
       "name": "recorder",
-      "type": "oxygen:component",
+      "type": "zoblocks:component",
       "title": "Recorder",
       "description": "Ambient documentation, dictation, voice messaging and transcript review. Five arts — pulse, bars, strip, duet, stream — over one engine, with an analyser-driven meter, a silence budget and thirteen device faults.",
       "categories": [
@@ -1005,7 +1005,7 @@
       "dependencies": [
         "clsx",
         "tailwind-merge",
-        "@oxygenui-design/recorder-core"
+        "@zoblocks/recorder-core"
       ],
       "registryDependencies": [
         "utils",
@@ -1014,15 +1014,15 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/recorder/recorder.tsx",
-          "type": "oxygen:component",
-          "target": "components/oxygen/recorder.tsx"
+          "path": "registry/zoblocks/recorder/recorder.tsx",
+          "type": "zoblocks:component",
+          "target": "components/zoblocks/recorder.tsx"
         }
       ]
     },
     {
       "name": "result-value",
-      "type": "oxygen:component",
+      "type": "zoblocks:component",
       "title": "Result Value",
       "description": "Value, unit and interpretation on one line, qualifiers on a second only when they exist. Seven distinct absence reasons instead of an em dash, a stated interpretation that always beats a derived one, a reference range that says so when there isn't one, and a correction that shows the superseded value rather than a badge.",
       "categories": [
@@ -1041,15 +1041,15 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/result-value/result-value.tsx",
-          "type": "oxygen:component",
-          "target": "components/oxygen/result-value.tsx"
+          "path": "registry/zoblocks/result-value/result-value.tsx",
+          "type": "zoblocks:component",
+          "target": "components/zoblocks/result-value.tsx"
         }
       ]
     },
     {
       "name": "rhythm-loader",
-      "type": "oxygen:component",
+      "type": "zoblocks:component",
       "title": "Rhythm Loader",
       "description": "Loader drawn as a single PQRST complex on a baseline, swept once per beat by a bright head with a fading tail. Nothing scales and nothing grows, and it stays legible down to 20px.",
       "categories": [
@@ -1067,15 +1067,15 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/rhythm-loader/rhythm-loader.tsx",
-          "type": "oxygen:component",
-          "target": "components/oxygen/rhythm-loader.tsx"
+          "path": "registry/zoblocks/rhythm-loader/rhythm-loader.tsx",
+          "type": "zoblocks:component",
+          "target": "components/zoblocks/rhythm-loader.tsx"
         }
       ]
     },
     {
       "name": "risk-indicator",
-      "type": "oxygen:component",
+      "type": "zoblocks:component",
       "title": "Risk Indicator",
       "description": "The band leads and the numeral is demoted. Staleness is on the face rather than in a tooltip, an expired score offers recompute or acknowledge and no third option, and the not-a-diagnosis framing is a required prop rather than a convention.",
       "categories": [
@@ -1094,15 +1094,15 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/risk-indicator/risk-indicator.tsx",
-          "type": "oxygen:component",
-          "target": "components/oxygen/risk-indicator.tsx"
+          "path": "registry/zoblocks/risk-indicator/risk-indicator.tsx",
+          "type": "zoblocks:component",
+          "target": "components/zoblocks/risk-indicator.tsx"
         }
       ]
     },
     {
       "name": "safety-plan",
-      "type": "oxygen:component",
+      "type": "zoblocks:component",
       "title": "Safety Plan",
       "description": "A patient-facing safety plan: warning signs, coping, distraction, people to ask, professionals and agencies, and means restriction. The crisis step cannot be collapsed, empty steps say they are unfinished rather than disappearing, and the wording is a patient catalog throughout.",
       "categories": [
@@ -1121,15 +1121,15 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/safety-plan/safety-plan.tsx",
-          "type": "oxygen:component",
-          "target": "components/oxygen/safety-plan.tsx"
+          "path": "registry/zoblocks/safety-plan/safety-plan.tsx",
+          "type": "zoblocks:component",
+          "target": "components/zoblocks/safety-plan.tsx"
         }
       ]
     },
     {
       "name": "switch",
-      "type": "oxygen:component",
+      "type": "zoblocks:component",
       "title": "Switch",
       "description": "Switch with three independent axes: the value the record holds, the phase of the write, and whether you may change it. Models the request and the outcome separately, so it never renders a state it cannot substantiate.",
       "categories": [
@@ -1147,15 +1147,15 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/switch/switch.tsx",
-          "type": "oxygen:component",
-          "target": "components/oxygen/switch.tsx"
+          "path": "registry/zoblocks/switch/switch.tsx",
+          "type": "zoblocks:component",
+          "target": "components/zoblocks/switch.tsx"
         }
       ]
     },
     {
       "name": "timeline",
-      "type": "oxygen:component",
+      "type": "zoblocks:component",
       "title": "Timeline",
       "description": "An ordered list with a rail. The API matches Ant Design v6 exactly, including the v5 names it still accepts, and takes no dependency on it. Adds a required accessible name and drops the current-step behaviour a chronology has no use for.",
       "categories": [
@@ -1173,15 +1173,15 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/timeline/timeline.tsx",
-          "type": "oxygen:component",
-          "target": "components/oxygen/timeline.tsx"
+          "path": "registry/zoblocks/timeline/timeline.tsx",
+          "type": "zoblocks:component",
+          "target": "components/zoblocks/timeline.tsx"
         }
       ]
     },
     {
       "name": "trend-indicator",
-      "type": "oxygen:component",
+      "type": "zoblocks:component",
       "title": "Trend Indicator",
       "description": "Breaks the line wherever comparability breaks and says why in words. Renders no trend below three comparable points. Takes the valence as a required prop, so a falling PHQ-9 reads as improvement and a falling eGFR does not, and carries the reliable-change threshold so a two-point move renders as noise.",
       "categories": [
@@ -1199,9 +1199,9 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/trend-indicator/trend-indicator.tsx",
-          "type": "oxygen:component",
-          "target": "components/oxygen/trend-indicator.tsx"
+          "path": "registry/zoblocks/trend-indicator/trend-indicator.tsx",
+          "type": "zoblocks:component",
+          "target": "components/zoblocks/trend-indicator.tsx"
         }
       ]
     }

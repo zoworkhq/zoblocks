@@ -1,13 +1,13 @@
-# @oxygenui-design/signature-core
+# @zoblocks/signature-core
 
-**The capture engine behind Oxygen's Signature component.** Stroke model,
+**The capture engine behind Zoblocks's Signature component.** Stroke model,
 smoothing, vector export, and a value type that records what actually happened —
 including every time nobody signed.
 
 No React. No Ant Design. No DOM. No dependencies.
 
 ```bash
-npm install @oxygenui-design/signature-core
+npm install @zoblocks/signature-core
 ```
 
 ---
@@ -21,7 +21,7 @@ Two reasons, and the second is the load-bearing one.
 by feeding it synthetic sequences and diffing SVG text — no jsdom, no headless
 browser, no flake. 80 tests run in under 20 ms.
 
-**It survives the architecture decision.** Whether Oxygen ends up wrapping Ant
+**It survives the architecture decision.** Whether Zoblocks ends up wrapping Ant
 Design, matching it, or migrating to it, none of that reaches this package. The
 expensive half of a signature component is the engine, and this half is
 portable.
@@ -88,7 +88,7 @@ props.
 ## Usage
 
 ```ts
-import { SignatureCapture, toInk, toFhirBundle } from "@oxygenui-design/signature-core";
+import { SignatureCapture, toInk, toFhirBundle } from "@zoblocks/signature-core";
 
 const pad = new SignatureCapture();
 
@@ -183,6 +183,6 @@ integrator and their counsel, not a default inherited from us.
 
 ## Not a medical device
 
-Oxygen UI provides user-interface components. Signature capture does not by
+Zoblocks provides user-interface components. Signature capture does not by
 itself establish the legal validity of any record; that depends on the
 deployment, the jurisdiction, and the procedures around it.

@@ -1,13 +1,13 @@
-# @oxygenui-design/fhir
+# @zoblocks/fhir
 
 **FHIR R4 type contracts and pure read helpers for healthcare UI.**
 
 Zero runtime dependencies. This package is the data layer behind
-[Oxygen UI](https://oxygenui.design) — the components are installed as source
-through the Oxygen CLI, and they import their types and read helpers from here.
+[Zoblocks](https://zoblocks.design) — the components are installed as source
+through the Zoblocks CLI, and they import their types and read helpers from here.
 
 ```bash
-npm install @oxygenui-design/fhir
+npm install @zoblocks/fhir
 ```
 
 ## What it is
@@ -16,7 +16,7 @@ Narrow TypeScript types for the FHIR R4 resources a user interface actually
 renders, plus the read helpers that get the awkward cases right:
 
 ```ts
-import { resolvePatientName, getInterpretation, resolveAbsentReason } from "@oxygenui-design/fhir";
+import { resolvePatientName, getInterpretation, resolveAbsentReason } from "@zoblocks/fhir";
 
 // Prefers official/usual over nicknames, skips `old` names, undefined when
 // there is no name at all — never "Unknown".

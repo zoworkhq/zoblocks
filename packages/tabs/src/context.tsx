@@ -26,7 +26,7 @@ import type {
   TabVariant,
   TabsLocale,
   Tone,
-} from "@oxygenui-design/tabs-core";
+} from "@zoblocks/tabs-core";
 
 export interface RegisteredTrigger {
   value: string;

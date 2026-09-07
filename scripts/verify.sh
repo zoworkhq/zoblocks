@@ -92,6 +92,7 @@ step "dependency rules"     "see ARCHITECTURE.md"         pnpm deps
 # minutes of pipeline.
 step "dependency audit"     "pnpm audit --fix, or pin"    pnpm audit --audit-level=high
 step "synthetic data"       "use example.org fixtures"    bash scripts/no-phi.sh
+step "retired name"         "use the current name"        bash scripts/retired-names.sh
 
 if [ "$FAST" -eq 0 ]; then
   # One instrumented run, not two. `test:coverage` is a strict superset of

@@ -4,7 +4,7 @@ import { defineConfig } from "vitest/config";
 /**
  * Absolute, because a bare `src/**` glob is not anchored to this package.
  *
- * This package's tests import `@oxygenui-design/identity-core`, whose sources
+ * This package's tests import `@zoblocks/identity-core`, whose sources
  * also live under a `src/` directory. Vitest 3 reported only this package's
  * files; Vitest 4 matches the sibling's `src/` too and folds ten of its files
  * into this gate — which drops the reported branch coverage from 94% to 67%

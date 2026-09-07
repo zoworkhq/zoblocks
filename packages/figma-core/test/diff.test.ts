@@ -71,7 +71,7 @@ describe("running it twice writes nothing the second time", () => {
   it("is not fooled by a channel that came back with rounding applied", () => {
     const plan = toVariablePlan(theme());
     const snapshot = snapshotOf(plan);
-    const text = snapshot.variables.find((v) => v.token === "--ox-text")!;
+    const text = snapshot.variables.find((v) => v.token === "--zb-text")!;
 
     const value = text.values.light as {
       kind: "color";
@@ -91,12 +91,12 @@ describe("a renamed variable is updated, not duplicated", () => {
   it("matches on the stamped token rather than the label", () => {
     const plan = toVariablePlan(theme());
     const snapshot = snapshotOf(plan);
-    snapshot.variables.find((v) => v.token === "--ox-accent")!.name = "brand blue (do not touch)";
+    snapshot.variables.find((v) => v.token === "--zb-accent")!.name = "brand blue (do not touch)";
 
     const diff = diffPlan(plan, snapshot);
 
-    expect(diff.create.map((v) => v.token)).not.toContain("--ox-accent");
-    expect(diff.update.find((u) => u.variable.token === "--ox-accent")?.because).toContain("name");
+    expect(diff.create.map((v) => v.token)).not.toContain("--zb-accent");
+    expect(diff.update.find((u) => u.variable.token === "--zb-accent")?.because).toContain("name");
   });
 
   /**
@@ -109,11 +109,11 @@ describe("a renamed variable is updated, not duplicated", () => {
   it("never claims a variable it did not create", () => {
     const plan = toVariablePlan(theme());
     const diff = diffPlan(plan, {
-      variables: [{ name: "accent", collection: "Oxygen / Semantic", values: {} }],
+      variables: [{ name: "accent", collection: "Zoblocks / Semantic", values: {} }],
     });
 
     expect(diff.orphan).toEqual([]);
-    expect(diff.create.map((v) => v.token)).toContain("--ox-accent");
+    expect(diff.create.map((v) => v.token)).toContain("--zb-accent");
   });
 });
 
@@ -129,15 +129,15 @@ describe("what is no longer in the theme", () => {
     const plan = toVariablePlan(theme());
     const snapshot = snapshotOf(plan);
     snapshot.variables.push({
-      token: "--ox-accent-retired",
+      token: "--zb-accent-retired",
       name: "accent/retired",
-      collection: "Oxygen / Semantic",
+      collection: "Zoblocks / Semantic",
       values: {},
     });
 
     const diff = diffPlan(plan, snapshot);
 
-    expect(diff.orphan.map((v) => v.token)).toEqual(["--ox-accent-retired"]);
+    expect(diff.orphan.map((v) => v.token)).toEqual(["--zb-accent-retired"]);
     // Orphans are not writes, so a file holding one is still clean to sync.
     expect(diff.clean).toBe(true);
   });
@@ -147,18 +147,18 @@ describe("what counts as a change", () => {
   it("names the modes that differ, so a preview can say what moves", () => {
     const plan = toVariablePlan(theme());
     const snapshot = snapshotOf(plan);
-    const text = snapshot.variables.find((v) => v.token === "--ox-text")!;
+    const text = snapshot.variables.find((v) => v.token === "--zb-text")!;
     text.values.dark = { kind: "color", hex: "#ffffff", rgb: { r: 1, g: 1, b: 1 } };
 
     const diff = diffPlan(plan, snapshot);
-    expect(diff.update.find((u) => u.variable.token === "--ox-text")?.because).toEqual(["dark"]);
+    expect(diff.update.find((u) => u.variable.token === "--zb-text")?.because).toEqual(["dark"]);
   });
 
   it("treats an alias pointing somewhere else as a change", () => {
     const plan = toVariablePlan(theme());
     const snapshot = snapshotOf(plan);
-    const accent = snapshot.variables.find((v) => v.token === "--ox-accent")!;
-    accent.values.light = { kind: "alias", token: "--ox-ref-brand-600" };
+    const accent = snapshot.variables.find((v) => v.token === "--zb-accent")!;
+    accent.values.light = { kind: "alias", token: "--zb-ref-brand-600" };
 
     expect(diffPlan(plan, snapshot).clean).toBe(false);
   });
@@ -166,7 +166,7 @@ describe("what counts as a change", () => {
   it("treats a literal where an alias belongs as a change", () => {
     const plan = toVariablePlan(theme());
     const snapshot = snapshotOf(plan);
-    const accent = snapshot.variables.find((v) => v.token === "--ox-accent")!;
+    const accent = snapshot.variables.find((v) => v.token === "--zb-accent")!;
     // Same colour, severed link — which is exactly the degradation to catch.
     accent.values.light = {
       kind: "color",
@@ -182,14 +182,14 @@ describe("values that are not colours", () => {
   /** A collection may hold strings and numbers; the diff has to compare them. */
   const named = (token: string, value: PlannedValue): PlannedVariable => ({
     token,
-    name: token.replace("--ox-", ""),
+    name: token.replace("--zb-", ""),
     tier: "semantic",
-    collection: "Oxygen / Semantic",
+    collection: "Zoblocks / Semantic",
     values: { light: value },
   });
 
   const planOf = (variables: PlannedVariable[]): VariablePlan => ({
-    collections: [{ name: "Oxygen / Semantic", modes: ["light"] }],
+    collections: [{ name: "Zoblocks / Semantic", modes: ["light"] }],
     variables,
   });
 
@@ -197,8 +197,8 @@ describe("values that are not colours", () => {
     variables: [
       {
         token,
-        name: token.replace("--ox-", ""),
-        collection: "Oxygen / Semantic",
+        name: token.replace("--zb-", ""),
+        collection: "Zoblocks / Semantic",
         values: { light: value },
       },
     ],
@@ -206,15 +206,15 @@ describe("values that are not colours", () => {
 
   it("sees no change when a string is unchanged", () => {
     const value: PlannedValue = { kind: "string", value: "Inter" };
-    expect(diffPlan(planOf([named("--ox-font", value)]), fileOf("--ox-font", value)).clean).toBe(
+    expect(diffPlan(planOf([named("--zb-font", value)]), fileOf("--zb-font", value)).clean).toBe(
       true,
     );
   });
 
   it("sees a changed string", () => {
     const diff = diffPlan(
-      planOf([named("--ox-font", { kind: "string", value: "Inter" })]),
-      fileOf("--ox-font", { kind: "string", value: "Helvetica" }),
+      planOf([named("--zb-font", { kind: "string", value: "Inter" })]),
+      fileOf("--zb-font", { kind: "string", value: "Helvetica" }),
     );
     expect(diff.update[0]?.because).toEqual(["light"]);
   });
@@ -222,14 +222,14 @@ describe("values that are not colours", () => {
   it("sees no change when a number is unchanged", () => {
     const value: PlannedValue = { kind: "number", value: 8 };
     expect(
-      diffPlan(planOf([named("--ox-radius", value)]), fileOf("--ox-radius", value)).clean,
+      diffPlan(planOf([named("--zb-radius", value)]), fileOf("--zb-radius", value)).clean,
     ).toBe(true);
   });
 
   it("sees a changed number", () => {
     const diff = diffPlan(
-      planOf([named("--ox-radius", { kind: "number", value: 8 })]),
-      fileOf("--ox-radius", { kind: "number", value: 12 }),
+      planOf([named("--zb-radius", { kind: "number", value: 8 })]),
+      fileOf("--zb-radius", { kind: "number", value: 12 }),
     );
     expect(diff.update[0]?.because).toEqual(["light"]);
   });
@@ -239,8 +239,8 @@ describe("values that are not colours", () => {
     // by neither branch, and comparing `.value` across kinds would throw or,
     // worse, compare undefined to undefined and report no change.
     const diff = diffPlan(
-      planOf([named("--ox-accent", { kind: "alias", token: "--ox-ref-brand-700" })]),
-      fileOf("--ox-accent", { kind: "string", value: "--ox-ref-brand-700" }),
+      planOf([named("--zb-accent", { kind: "alias", token: "--zb-ref-brand-700" })]),
+      fileOf("--zb-accent", { kind: "string", value: "--zb-ref-brand-700" }),
     );
     expect(diff.update[0]?.because).toEqual(["light"]);
   });

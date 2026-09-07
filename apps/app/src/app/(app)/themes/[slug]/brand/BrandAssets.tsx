@@ -6,7 +6,7 @@ import {
   BRAND_ASSET_GROUPS,
   type BrandAssetFile,
   type BrandAssetSpec,
-} from "@oxygenui-design/theme";
+} from "@zoblocks/theme";
 import { removeBrandAssetAction, uploadBrandAssetAction } from "@/lib/actions";
 import { ActionForm } from "@/components/action-form";
 import { Callout, Field, Input, Panel, Select, SubmitButton } from "@/components/ui";

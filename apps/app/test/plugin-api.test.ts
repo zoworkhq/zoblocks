@@ -24,7 +24,7 @@ import { createTheme, publishTheme, saveOverrides, setThemeArchived } from "@/li
 import { hashToken, mintToken } from "@/lib/market/tokens";
 import type { Authorized } from "@/lib/authorize";
 import { loadTokenSource } from "../../../scripts/gen/tokens/load";
-import type { TokenSource } from "@oxygenui-design/tokens/validate";
+import type { TokenSource } from "@zoblocks/tokens/validate";
 import { twoOrgs } from "./harness";
 
 let cached: TokenSource;
@@ -68,7 +68,7 @@ describe("the credential", () => {
   });
 
   it("says nothing about an unknown one", async () => {
-    const response = await listRoute(get("/api/v1/themes", "oxy_live_nope"));
+    const response = await listRoute(get("/api/v1/themes", "zb_live_nope"));
     expect(response.status).toBe(404);
   });
 
@@ -244,11 +244,11 @@ describe("the resolved theme", () => {
     expect(Object.keys(body.ramp)).toHaveLength(11);
     expect(body.ramp["600"]).toBe("#1d63c9");
     expect(Object.keys(body.semantic).sort()).toEqual(["dark", "high-contrast", "light"]);
-    expect(body.semantic.light["--ox-accent"]).toMatch(/^#[0-9a-f]{6}$/);
+    expect(body.semantic.light["--zb-accent"]).toMatch(/^#[0-9a-f]{6}$/);
 
     // Pushed so a designer can see them, and carrying the reason they cannot be
     // edited — in the same words the app uses.
-    expect(body.locked["--ox-status-critical"]).toContain("hue separation");
+    expect(body.locked["--zb-status-critical"]).toContain("hue separation");
   });
 
   it("serves the draft before anything is published, and says so", async () => {
@@ -743,7 +743,7 @@ describe("states the happy path does not reach", () => {
     const { token } = await mintToken(nw, "Ada's Figma", "figma");
 
     const request = new Request(`${ORIGIN}/api/v1/themes`, {
-      headers: { authorization: `Bearer ${token}`, cookie: "oxygen_session=whatever" },
+      headers: { authorization: `Bearer ${token}`, cookie: "zoblocks_session=whatever" },
     });
     const { themes } = await (await listRoute(request)).json();
 

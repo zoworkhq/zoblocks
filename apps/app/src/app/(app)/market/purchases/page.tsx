@@ -67,7 +67,7 @@ export default async function PurchasesPage() {
                     {item ? (
                       <Link
                         href={`/market/${item.slug}`}
-                        className="font-medium hover:text-oxygen-deep"
+                        className="font-medium hover:text-brand-deep"
                       >
                         {item.title}
                       </Link>

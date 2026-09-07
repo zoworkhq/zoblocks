@@ -10,7 +10,7 @@
 
 import { MongoClient, ObjectId } from "mongodb";
 import bcrypt from "bcryptjs";
-import { VALIDATOR_VERSION } from "@oxygenui-design/theme";
+import { VALIDATOR_VERSION } from "@zoblocks/theme";
 import { loadEnvLocal } from "./env.mjs";
 
 // Next reads `.env.local`; a tsx script does not. Do it before touching env.
@@ -28,7 +28,7 @@ if (!/localhost|127\.0\.0\.1/.test(uri)) {
 
 const client = new MongoClient(uri);
 await client.connect();
-const db = client.db(process.env.APP_DB_NAME || "oxygen_console");
+const db = client.db(process.env.APP_DB_NAME || "zoblocks_console");
 
 const { ensureIndexes } = await import("../src/db/collections.ts");
 await ensureIndexes(db);
@@ -67,7 +67,7 @@ async function org(name, slug, brand) {
   });
 
   // An eleven-step ramp, the shape createTheme produces.
-  const { generateRamp } = await import("@oxygenui-design/theme");
+  const { generateRamp } = await import("@zoblocks/theme");
   const tokens = { ref: { brand: generateRamp(brand) } };
 
   const themeId = new ObjectId();

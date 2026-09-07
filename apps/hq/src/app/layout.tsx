@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
 // Component tokens first, so the app layer can override deliberately.
-import "@oxygenui-design/tokens/oxygen-tokens.css";
+import "@zoblocks/tokens/zoblocks-tokens.css";
 import "./globals.css";
 
 /**

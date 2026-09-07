@@ -1,12 +1,12 @@
 {
-  "name": "@oxygenui-design/intl",
+  "name": "@zoblocks/intl",
   "version": "0.1.0",
-  "description": "Messages and clinical register for Oxygen UI. Patient-facing and clinician-facing strings are different catalogs, not different tones.",
+  "description": "Messages and clinical register for Zoblocks. Patient-facing and clinician-facing strings are different catalogs, not different tones.",
   "license": "MIT",
-  "homepage": "https://oxygenui.design",
+  "homepage": "https://zoblocks.design",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zoworkhq/oxygenui.git",
+    "url": "git+https://github.com/zoworkhq/zoblocks.git",
     "directory": "packages/intl"
   },
   "keywords": [
@@ -55,7 +55,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
-    "@oxygenui-design/tsconfig": "workspace:*",
+    "@zoblocks/tsconfig": "workspace:*",
     "@testing-library/react": "^16",
     "@types/react": "^19.0.2",
     "jsdom": "^30",

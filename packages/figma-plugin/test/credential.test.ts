@@ -11,7 +11,7 @@ import { describe, expect, it } from "vitest";
 import { forgetCredential, loadCredential, saveCredential } from "../src/sandbox/credential";
 import { FakeFigma } from "./fake-figma";
 
-const credential = { origin: "https://app.example.test", token: "oxy_live_" + "a".repeat(30) };
+const credential = { origin: "https://app.example.test", token: "zb_live_" + "a".repeat(30) };
 
 describe("the credential store", () => {
   it("round-trips what was saved", async () => {
@@ -37,7 +37,7 @@ describe("the credential store", () => {
     // Shapes that could be there from an older version, or from a hand-edit.
     for (const stored of [
       null,
-      "oxy_live_loose",
+      "zb_live_loose",
       { origin: "https://c.example" },
       { token: credential.token },
       { origin: "not-a-url", token: credential.token },

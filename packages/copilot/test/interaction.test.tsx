@@ -209,7 +209,7 @@ describe("streaming region", () => {
     await user.type(field(), "AF?{Enter}");
 
     await waitFor(() => {
-      const region = container.querySelector(".ox-copilot-streaming");
+      const region = container.querySelector(".zb-copilot-streaming");
       expect(region).toHaveAttribute("aria-live", "off");
       expect(region).toHaveAttribute("aria-busy", "true");
     });

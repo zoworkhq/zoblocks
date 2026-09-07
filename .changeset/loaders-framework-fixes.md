@@ -1,5 +1,5 @@
 ---
-"@oxygenui-design/loaders": minor
+"@zoblocks/loaders": minor
 ---
 
 Fix two defects that made the elements unusable in React 19, Vue, and Angular,
@@ -11,7 +11,7 @@ binding whether to write a DOM property or an attribute, and both decide with
 which passes that test and then throws:
 
 ```
-TypeError: Cannot set property label of #<OxLoaderElement> which has only a getter
+TypeError: Cannot set property label of #<ZbLoaderElement> which has only a getter
 ```
 
 The elements did not render at all in React 19 or Vue. Setters now reflect to
@@ -20,9 +20,9 @@ afterwards and attributes remain the source of truth. `delay`, `minDuration`,
 `slowAfter`, `hint`, `slowHint`, `motion`, `scrim`, `announce`, and `size` are
 newly readable as properties too.
 
-**Events are hyphenated: `ox-loader-show`, `ox-loader-slow`, `ox-loader-hide`**
-(previously `ox-loader:show` and friends). Angular's `(event)` binding reserves
-the colon for its global-target syntax — `(window:resize)` — so `(ox-loader:show)`
+**Events are hyphenated: `zb-loader-show`, `zb-loader-slow`, `zb-loader-hide`**
+(previously `zb-loader:show` and friends). Angular's `(event)` binding reserves
+the colon for its global-target syntax — `(window:resize)` — so `(zb-loader:show)`
 does not compile, with no escape syntax available. Angular consumers would have
 had to drop to `addEventListener` for every subscription. The names are exported
 as `LOADER_EVENTS`. Breaking for anyone already subscribing, which is nobody:

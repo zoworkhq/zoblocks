@@ -1,7 +1,7 @@
 ---
-"@oxygenui-design/react": minor
-"@oxygenui-design/tokens": minor
-"@oxygenui-design/codemod": minor
+"@zoblocks/react": minor
+"@zoblocks/tokens": minor
+"@zoblocks/codemod": minor
 ---
 
 Accordion, Disclosure, ChartAccordion and SafetyPlan — a disclosure widget whose
@@ -13,7 +13,7 @@ gets collapsed in a behavioral health record.
 
 - **Collapsed is not absent.** Items take a `summary` rendered in the header and
   a `severity` that paints a rail down its leading edge. A new lint rule,
-  `@oxygenui/require-accordion-summary`, makes the pairing mandatory: a coloured
+  `@zoblocks/require-accordion-summary`, makes the pairing mandatory: a coloured
   rail with no words is a signal that forced-colors mode discards, monochrome
   printing discards, and roughly one in twelve men cannot resolve.
 - **Expanding is not disclosing.** `access` describes what stands between the
@@ -31,7 +31,7 @@ v6 names (`expandIconPlacement`, `size="medium"`, `destroyOnHidden`). One
 deviation is deliberate and is a bug fix: antd's `accordion` boolean switches the
 emitted markup from a disclosure widget to `role="tablist"`/`tab`/`tabpanel`, so
 a prop meaning "one open at a time" silently changes the accessibility contract.
-Here it changes the state policy and nothing else. `@oxygenui-design/codemod` ships
+Here it changes the state policy and nothing else. `@zoblocks/codemod` ships
 `antd-collapse` for the migration.
 
 Also fixes, relative to what antd's Collapse emits: a real `<button>` inside a

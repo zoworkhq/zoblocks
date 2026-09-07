@@ -1,4 +1,4 @@
-# Contributing to Oxygen UI
+# Contributing to Zoblocks
 
 Thank you for helping. This document covers the mechanics. The _standard_ your
 change is judged against is [ENGINEERING.md](ENGINEERING.md) — read its
@@ -13,7 +13,7 @@ than in a review.
 
 **Never put real patient data anywhere.** Not in a test, a fixture, a
 screenshot, an issue, or a commit message. Use
-`@oxygenui-design/fixtures`, or invent values on reserved `example.org`
+`@zoblocks/fixtures`, or invent values on reserved `example.org`
 systems. CI scans for non-synthetic identifiers, but the scan is a backstop for
 review, not a substitute.
 
@@ -82,7 +82,7 @@ if you find yourself editing a shared file by hand, something is wrong; the
 generator owns those. Then:
 
 1. Write the implementation. Every colour through a semantic token, every
-   user-visible string through `@oxygenui/intl`, no forbidden capabilities.
+   user-visible string through `@zoblocks/intl`, no forbidden capabilities.
 2. Fill in `*.meta.ts` honestly. `states` is the list a reviewer will check the
    stories against.
 3. Write stories covering **every state you declared**.

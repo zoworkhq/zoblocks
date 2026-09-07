@@ -41,7 +41,7 @@ export default async function MarketplacePage() {
       <main id="main">
         <section className="border-b border-rule">
           <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
-            <p className="eyebrow eyebrow-rule text-oxygen-deep" data-reveal>
+            <p className="eyebrow eyebrow-rule text-brand-deep" data-reveal>
               Marketplace
             </p>
             <h1 className="display-xl mt-5 max-w-4xl text-balance" data-reveal>
@@ -182,11 +182,11 @@ function PackCard({ item, index }: { item: ShelfItem; index: number }) {
       <article
         data-reveal
         style={{ "--reveal-delay": `${(index % 3) * 70}ms` } as React.CSSProperties}
-        data-ox-pack={item.slug}
+        data-zb-pack={item.slug}
         className={
           "group relative flex h-full flex-col rounded-2xl border border-rule bg-paper p-6 " +
           "transition-all duration-300 ease-[var(--ease-out-expo)] " +
-          "focus-within:border-oxygen/40 hover:-translate-y-0.5 hover:border-oxygen/40"
+          "focus-within:border-brand/40 hover:-translate-y-0.5 hover:border-brand/40"
         }
       >
         <div className="flex items-baseline justify-between gap-3">
@@ -274,10 +274,10 @@ function PackCard({ item, index }: { item: ShelfItem; index: number }) {
               // Above the title's overlay, so the card opens the detail page and
               // this one control goes to the console.
               className={
-                "relative z-10 inline-flex items-center gap-1.5 rounded-lg border border-oxygen/40 " +
-                "bg-oxygen/8 px-2.5 py-1.5 text-[0.6875rem] font-semibold text-oxygen-deep " +
-                "transition-colors hover:bg-oxygen/15 focus-visible:outline focus-visible:outline-2 " +
-                "focus-visible:outline-offset-2 focus-visible:outline-oxygen"
+                "relative z-10 inline-flex items-center gap-1.5 rounded-lg border border-brand/40 " +
+                "bg-brand/8 px-2.5 py-1.5 text-[0.6875rem] font-semibold text-brand-deep " +
+                "transition-colors hover:bg-brand/15 focus-visible:outline focus-visible:outline-2 " +
+                "focus-visible:outline-offset-2 focus-visible:outline-brand"
               }
             >
               Buy in the app

@@ -5,7 +5,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/lib/clock.ts. Edit that file, not this one.
+// Generated from registry/zoblocks/lib/clock.ts. Edit that file, not this one.
 /**
  * One date format, shared by every component that has to say "until when".
  *

@@ -19,14 +19,14 @@ import {
   type ProblemCode,
   type TabItem,
   type ValidateInput,
-} from "@oxygenui-design/tabs-core";
+} from "@zoblocks/tabs-core";
 
 /**
  * `useLayoutEffect` warns on the server, and the indicator genuinely needs to
  * measure before paint on the client. Swapping to `useEffect` where there is
  * no layout to read is the standard resolution and costs nothing: the
  * server-rendered strip paints selection from CSS alone (see `styles.css`,
- * `:not([data-ox-measured])`).
+ * `:not([data-zb-measured])`).
  */
 export const useIsoLayoutEffect =
   typeof window !== "undefined" ? React.useLayoutEffect : React.useEffect;
@@ -272,7 +272,7 @@ export function useDirection(ref: React.RefObject<HTMLElement | null>): boolean 
 /** Stable id that survives re-render and is unique per instance. */
 export function useBaseId(provided?: string): string {
   const generated = React.useId();
-  return provided ?? `ox-tabs-${generated.replace(/:/g, "")}`;
+  return provided ?? `zb-tabs-${generated.replace(/:/g, "")}`;
 }
 
 /**

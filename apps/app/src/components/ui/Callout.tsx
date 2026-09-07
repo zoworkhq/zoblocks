@@ -46,7 +46,7 @@ export function Callout({
     <div
       className={cn(
         "rounded-r-xl border border-l-[3px] px-4 py-3",
-        tone === "info" && "border-rule border-l-oxygen bg-paper",
+        tone === "info" && "border-rule border-l-zoblocks bg-paper",
         tone === "fail" && "border-fail/25 border-l-fail bg-fail-wash",
         tone === "warn" && "border-warn/25 border-l-warn bg-warn-wash",
         tone === "pass" && "border-pass/25 border-l-pass bg-pass-wash",

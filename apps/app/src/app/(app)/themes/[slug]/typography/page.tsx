@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { MAX_FONT_BYTES } from "@oxygenui-design/theme";
+import { MAX_FONT_BYTES } from "@zoblocks/theme";
 import { requireMember } from "@/lib/auth";
 import { scoped } from "@/db/scope";
 import { baseTokens } from "@/lib/base-tokens";
@@ -21,7 +21,7 @@ export const metadata = { title: "Typography" };
  * is why the preview shows some.
  *
  * The families and the base size are *not* edited here. They are
- * `--ox-font-sans`, `--ox-font-mono` and `--ox-text-base`: ordinary semantic
+ * `--zb-font-sans`, `--zb-font-mono` and `--zb-text-base`: ordinary semantic
  * tokens, edited on the token editor with the same live contrast and the same
  * gate as everything else. Duplicating them here would be a second place for
  * the same value, and the two would disagree.
@@ -38,8 +38,8 @@ export default async function TypographyPage({ params }: { params: Promise<{ slu
 
   // The specimen renders in whichever family the theme actually resolves to, so
   // what a customer judges is what their application will draw.
-  const sans = fonts[0]?.family ?? resolved["--ox-font-sans"];
-  const mono = resolved["--ox-font-mono"];
+  const sans = fonts[0]?.family ?? resolved["--zb-font-sans"];
+  const mono = resolved["--zb-font-mono"];
 
   return (
     <>
@@ -112,9 +112,9 @@ export default async function TypographyPage({ params }: { params: Promise<{ slu
           <Panel title="Resolved now" padded={false}>
             <dl className="divide-y divide-rule text-[0.75rem]">
               {[
-                ["--ox-font-sans", resolved["--ox-font-sans"]],
-                ["--ox-font-mono", resolved["--ox-font-mono"]],
-                ["--ox-text-base", resolved["--ox-text-base"]],
+                ["--zb-font-sans", resolved["--zb-font-sans"]],
+                ["--zb-font-mono", resolved["--zb-font-mono"]],
+                ["--zb-text-base", resolved["--zb-text-base"]],
               ].map(([token, value]) => (
                 <div key={token} className="px-4 py-2.5">
                   <dt className="font-mono text-[0.6875rem] text-graphite-soft">{token}</dt>

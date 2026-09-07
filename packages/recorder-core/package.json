@@ -1,12 +1,12 @@
 {
-  "name": "@oxygenui-design/recorder-core",
+  "name": "@zoblocks/recorder-core",
   "version": "0.1.0",
-  "description": "The signal engine behind Oxygen's Recorder. A peak envelope with instant attack and a 180 ms release, 30 Hz peak buckets, and the eleven-phase capture machine with the consent edge enforced in the engine — no React, no DOM, no dependencies.",
+  "description": "The signal engine behind Zoblocks's Recorder. A peak envelope with instant attack and a 180 ms release, 30 Hz peak buckets, and the eleven-phase capture machine with the consent edge enforced in the engine — no React, no DOM, no dependencies.",
   "license": "MIT",
-  "homepage": "https://oxygenui.design/components/recorder",
+  "homepage": "https://zoblocks.design/components/recorder",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zoworkhq/oxygenui.git",
+    "url": "git+https://github.com/zoworkhq/zoblocks.git",
     "directory": "packages/recorder-core"
   },
   "keywords": [
@@ -56,7 +56,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
-    "@oxygenui-design/tsconfig": "workspace:*",
+    "@zoblocks/tsconfig": "workspace:*",
     "@vitest/coverage-v8": "^4.1.10",
     "typescript": "^5.7.2",
     "vitest": "^4.1.10"

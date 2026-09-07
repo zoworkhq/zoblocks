@@ -17,6 +17,8 @@ import {
   resolveTarget,
   ConfigError,
   DEFAULT_ROOT,
+  CONFIG_FILE,
+  LEGACY_CONFIG_FILE,
 } from "../src/config.js";
 import { collectItems, resolveSpecifier, RegistryError } from "../src/registry.js";
 import {
@@ -31,7 +33,7 @@ import { bareName, missingDependencies, detectPackageManager, installCommand } f
 let dir: string;
 
 beforeEach(async () => {
-  dir = await mkdtemp(path.join(tmpdir(), "oxygen-cli-"));
+  dir = await mkdtemp(path.join(tmpdir(), "zoblocks-cli-"));
 });
 
 afterEach(async () => {
@@ -41,16 +43,16 @@ afterEach(async () => {
 /** A registry item, with only the fields a test cares about spelled out. */
 function item(overrides: Record<string, unknown> = {}) {
   return {
-    $schema: "https://oxygenui.design/schema/registry-item.json",
+    $schema: "https://zoblocks.design/schema/registry-item.json",
     name: "vitals-panel",
-    type: "oxygen:component",
+    type: "zoblocks:component",
     title: "Vitals panel",
     description: "A panel.",
     files: [
       {
-        path: "registry/oxygen/vitals-panel/vitals-panel.tsx",
-        type: "oxygen:component",
-        target: "components/oxygen/vitals-panel.tsx",
+        path: "registry/zoblocks/vitals-panel/vitals-panel.tsx",
+        type: "zoblocks:component",
+        target: "components/zoblocks/vitals-panel.tsx",
         content: "export const VitalsPanel = () => null;\n",
       },
     ],
@@ -79,7 +81,7 @@ function capture() {
   return { lines, write: (line: string) => lines.push(line), text: () => lines.join("\n") };
 }
 
-describe("oxygen init", () => {
+describe("zoblocks init", () => {
   it("writes a config and picks src/ when the project has one", async () => {
     await mkdir(path.join(dir, "src"));
     const out = capture();
@@ -94,7 +96,7 @@ describe("oxygen init", () => {
     });
 
     expect(code).toBe(0);
-    const config = JSON.parse(await readFile(path.join(dir, "oxygen.json"), "utf8"));
+    const config = JSON.parse(await readFile(path.join(dir, "zoblocks.json"), "utf8"));
     expect(config.root).toBe("src");
   });
 
@@ -108,12 +110,12 @@ describe("oxygen init", () => {
       err: out.write,
       version: "0.0.0",
     });
-    const config = JSON.parse(await readFile(path.join(dir, "oxygen.json"), "utf8"));
+    const config = JSON.parse(await readFile(path.join(dir, "zoblocks.json"), "utf8"));
     expect(config.root).toBe(".");
   });
 
   it("refuses to clobber an existing config without --force", async () => {
-    await writeFile(path.join(dir, "oxygen.json"), '{"marker":true}');
+    await writeFile(path.join(dir, "zoblocks.json"), '{"marker":true}');
     const out = capture();
 
     const code = await run({
@@ -126,13 +128,13 @@ describe("oxygen init", () => {
     });
 
     expect(code).toBe(1);
-    expect(await readFile(path.join(dir, "oxygen.json"), "utf8")).toContain("marker");
+    expect(await readFile(path.join(dir, "zoblocks.json"), "utf8")).toContain("marker");
   });
 });
 
-describe("oxygen add", () => {
+describe("zoblocks add", () => {
   async function project() {
-    await writeFile(path.join(dir, "oxygen.json"), JSON.stringify({ root: ".", registries: {} }));
+    await writeFile(path.join(dir, "zoblocks.json"), JSON.stringify({ root: ".", registries: {} }));
   }
 
   it("writes a component beneath the configured root", async () => {
@@ -146,11 +148,11 @@ describe("oxygen add", () => {
       out: out.write,
       err: out.write,
       version: "0.0.0",
-      fetchImpl: stubFetch({ "https://oxygenui.design/r/vitals-panel.json": item() }),
+      fetchImpl: stubFetch({ "https://zoblocks.design/r/vitals-panel.json": item() }),
     });
 
     expect(code).toBe(0);
-    const written = await readFile(path.join(dir, "components/oxygen/vitals-panel.tsx"), "utf8");
+    const written = await readFile(path.join(dir, "components/zoblocks/vitals-panel.tsx"), "utf8");
     expect(written).toContain("VitalsPanel");
   });
 
@@ -166,18 +168,18 @@ describe("oxygen add", () => {
       err: out.write,
       version: "0.0.0",
       fetchImpl: stubFetch({
-        "https://oxygenui.design/r/vitals-panel.json": item({
-          registryDependencies: ["https://oxygenui.design/r/utils.json"],
+        "https://zoblocks.design/r/vitals-panel.json": item({
+          registryDependencies: ["https://zoblocks.design/r/utils.json"],
         }),
-        "https://oxygenui.design/r/utils.json": {
+        "https://zoblocks.design/r/utils.json": {
           name: "utils",
-          type: "oxygen:lib",
+          type: "zoblocks:lib",
           title: "Utils",
           description: "",
           files: [
             {
-              path: "registry/oxygen/lib/utils.ts",
-              type: "oxygen:lib",
+              path: "registry/zoblocks/lib/utils.ts",
+              type: "zoblocks:lib",
               target: "lib/utils.ts",
               content: "export const cn = () => {};\n",
             },
@@ -188,17 +190,17 @@ describe("oxygen add", () => {
 
     expect(code).toBe(0);
     expect(existsSync(path.join(dir, "lib/utils.ts"))).toBe(true);
-    expect(existsSync(path.join(dir, "components/oxygen/vitals-panel.tsx"))).toBe(true);
+    expect(existsSync(path.join(dir, "components/zoblocks/vitals-panel.tsx"))).toBe(true);
     expect(out.text()).toContain("pulled in as dependencies");
   });
 
   it("leaves an existing file alone, and replaces it with --overwrite", async () => {
     await project();
-    await mkdir(path.join(dir, "components/oxygen"), { recursive: true });
-    const target = path.join(dir, "components/oxygen/vitals-panel.tsx");
+    await mkdir(path.join(dir, "components/zoblocks"), { recursive: true });
+    const target = path.join(dir, "components/zoblocks/vitals-panel.tsx");
     await writeFile(target, "// mine\n");
 
-    const registry = stubFetch({ "https://oxygenui.design/r/vitals-panel.json": item() });
+    const registry = stubFetch({ "https://zoblocks.design/r/vitals-panel.json": item() });
     const first = capture();
 
     await run({
@@ -239,23 +241,23 @@ describe("oxygen add", () => {
       out: out.write,
       err: out.write,
       version: "0.0.0",
-      fetchImpl: stubFetch({ "https://oxygenui.design/r/vitals-panel.json": item() }),
+      fetchImpl: stubFetch({ "https://zoblocks.design/r/vitals-panel.json": item() }),
     });
 
     expect(code).toBe(0);
-    expect(existsSync(path.join(dir, "components/oxygen/vitals-panel.tsx"))).toBe(false);
+    expect(existsSync(path.join(dir, "components/zoblocks/vitals-panel.tsx"))).toBe(false);
     expect(out.text()).toContain("Dry run");
   });
 
   it("sends the expanded bearer token to a namespaced registry", async () => {
     await writeFile(
-      path.join(dir, "oxygen.json"),
+      path.join(dir, "zoblocks.json"),
       JSON.stringify({
         root: ".",
         registries: {
-          "@oxygen-pro": {
-            url: "https://app.oxygenui.design/r/pro/{name}.json",
-            headers: { Authorization: "Bearer ${OXYGEN_TOKEN}" },
+          "@zoblocks-pro": {
+            url: "https://app.zoblocks.design/r/pro/{name}.json",
+            headers: { Authorization: "Bearer ${ZOBLOCKS_TOKEN}" },
           },
         },
       }),
@@ -265,20 +267,20 @@ describe("oxygen add", () => {
     const out = capture();
 
     const code = await run({
-      argv: ["add", "@oxygen-pro/vitals-flowsheet", "--no-deps"],
+      argv: ["add", "@zoblocks-pro/vitals-flowsheet", "--no-deps"],
       cwd: dir,
-      env: { OXYGEN_TOKEN: "oxy_live_secret" },
+      env: { ZOBLOCKS_TOKEN: "zb_live_secret" },
       out: out.write,
       err: out.write,
       version: "0.0.0",
       fetchImpl: stubFetch(
         {
-          "https://app.oxygenui.design/r/pro/vitals-flowsheet.json": item({
+          "https://app.zoblocks.design/r/pro/vitals-flowsheet.json": item({
             name: "vitals-flowsheet",
             files: [
               {
                 path: "vitals-flowsheet.tsx",
-                type: "oxygen:component",
+                type: "zoblocks:component",
                 target: "vitals-flowsheet.tsx",
                 content: "export const VitalsFlowsheet = () => null;\n",
               },
@@ -290,7 +292,7 @@ describe("oxygen add", () => {
     });
 
     expect(code).toBe(0);
-    expect(seen[0]?.headers.get("authorization")).toBe("Bearer oxy_live_secret");
+    expect(seen[0]?.headers.get("authorization")).toBe("Bearer zb_live_secret");
   });
 
   it("explains a missing config instead of failing obscurely", async () => {
@@ -305,15 +307,15 @@ describe("oxygen add", () => {
     });
 
     expect(code).toBe(1);
-    expect(out.text()).toContain("oxygen init");
+    expect(out.text()).toContain("zoblocks init");
   });
 
   it("names the unconfigured registry rather than 404ing", async () => {
-    await writeFile(path.join(dir, "oxygen.json"), JSON.stringify({ root: ".", registries: {} }));
+    await writeFile(path.join(dir, "zoblocks.json"), JSON.stringify({ root: ".", registries: {} }));
     const out = capture();
 
     const code = await run({
-      argv: ["add", "@oxygen-pro/x"],
+      argv: ["add", "@zoblocks-pro/x"],
       cwd: dir,
       env: {},
       out: out.write,
@@ -323,20 +325,72 @@ describe("oxygen add", () => {
     });
 
     expect(code).toBe(1);
-    expect(out.text()).toContain('Registry "@oxygen-pro" is not configured');
+    expect(out.text()).toContain('Registry "@zoblocks-pro" is not configured');
   });
 });
 
 describe("config", () => {
   it("refuses a literal token so it cannot be committed", () => {
     expect(() =>
-      expandHeaders({ Authorization: "Bearer oxy_live_abc123" }, {}, "@oxygen-pro"),
+      expandHeaders({ Authorization: "Bearer zb_live_abc123" }, {}, "@zoblocks-pro"),
     ).toThrowError(ConfigError);
+  });
+
+  it("still refuses a literal token minted before the rename", () => {
+    // The `oxy_` prefix was retired with the Zoblocks name, but tokens issued
+    // under it are live credentials. A guard that only knows the new prefix
+    // waves through exactly the ones most likely to be sitting in an old file.
+    expect(() =>
+      expandHeaders({ Authorization: "Bearer oxy_live_abc123" }, {}, "@zoblocks-pro"),
+    ).toThrowError(ConfigError);
+  });
+
+  it("keeps the legacy config name distinct from the current one", () => {
+    // The shim is only reachable when these differ. A repo-wide rename sweep
+    // collapsed them once: `readConfig` then resolved every project to the
+    // current name, took the non-legacy branch, and the shim did nothing —
+    // while the tests below still passed, because they used a literal the same
+    // sweep had rewritten. This assertion is what makes that state loud.
+    expect(LEGACY_CONFIG_FILE).not.toBe(CONFIG_FILE);
+    expect(CONFIG_FILE).toBe("zoblocks.json");
+  });
+
+  // These two name the retired file through LEGACY_CONFIG_FILE rather than as a
+  // string literal. A literal is exactly what a rename sweep rewrites, and a
+  // rewritten literal turns this into a test that writes the current name and
+  // asserts the legacy path — green in a way that proves nothing.
+  it("reads a pre-rename config file and says so", async () => {
+    await writeFile(
+      path.join(dir, LEGACY_CONFIG_FILE),
+      JSON.stringify({ root: "app", registries: {} }),
+    );
+
+    const warnings: string[] = [];
+    const warn = console.warn;
+    console.warn = (message: string) => warnings.push(message);
+    try {
+      const config = await readConfig(dir);
+      expect(config.root).toBe("app");
+    } finally {
+      console.warn = warn;
+    }
+
+    expect(warnings.join("\n")).toContain(CONFIG_FILE);
+  });
+
+  it("prefers the current name when both are present", async () => {
+    await writeFile(
+      path.join(dir, LEGACY_CONFIG_FILE),
+      JSON.stringify({ root: "old", registries: {} }),
+    );
+    await writeFile(path.join(dir, CONFIG_FILE), JSON.stringify({ root: "new", registries: {} }));
+
+    expect((await readConfig(dir)).root).toBe("new");
   });
 
   it("names the missing environment variable", () => {
     expect(() =>
-      expandHeaders({ Authorization: "Bearer ${NOPE}" }, {}, "@oxygen-pro"),
+      expandHeaders({ Authorization: "Bearer ${NOPE}" }, {}, "@zoblocks-pro"),
     ).toThrowError(/NOPE/);
   });
 
@@ -349,22 +403,25 @@ describe("config", () => {
   it("writes each target verbatim beneath the configured root", () => {
     const config = { root: "src", registries: {} };
     expect(
-      resolveTarget(config, { path: "r/o/timeline.tsx", target: "components/oxygen/timeline.tsx" }),
-    ).toBe("src/components/oxygen/timeline.tsx");
+      resolveTarget(config, {
+        path: "r/o/timeline.tsx",
+        target: "components/zoblocks/timeline.tsx",
+      }),
+    ).toBe("src/components/zoblocks/timeline.tsx");
     expect(resolveTarget(config, { path: "r/o/lib/utils.ts", target: "lib/utils.ts" })).toBe(
       "src/lib/utils.ts",
     );
     /*
      * The kind does not route. accordion-core is declared a hook and still
-     * belongs in lib/, because `@/lib/oxygen-accordion` is what the copied
+     * belongs in lib/, because `@/lib/zoblocks-accordion` is what the copied
      * source imports it by.
      */
     expect(
       resolveTarget(config, {
         path: "r/o/lib/accordion-core.tsx",
-        target: "lib/oxygen-accordion.tsx",
+        target: "lib/zoblocks-accordion.tsx",
       }),
-    ).toBe("src/lib/oxygen-accordion.tsx");
+    ).toBe("src/lib/zoblocks-accordion.tsx");
   });
 
   it("falls back to the basename for an item that states no target", () => {
@@ -372,13 +429,13 @@ describe("config", () => {
   });
 
   it("defaults the root when the file omits it", async () => {
-    await writeFile(path.join(dir, "oxygen.json"), JSON.stringify({ registries: {} }));
+    await writeFile(path.join(dir, "zoblocks.json"), JSON.stringify({ registries: {} }));
     expect((await readConfig(dir)).root).toBe(DEFAULT_ROOT);
   });
 
   it("rejects a registry url with no {name} placeholder", async () => {
     await writeFile(
-      path.join(dir, "oxygen.json"),
+      path.join(dir, "zoblocks.json"),
       JSON.stringify({ registries: { "@x": { url: "https://example.com/fixed.json" } } }),
     );
     await expect(readConfig(dir)).rejects.toThrowError(/\{name\}/);
@@ -394,7 +451,7 @@ describe("schema", () => {
   it("refuses an item whose file arrived empty", () => {
     expect(() =>
       parseRegistryItem(
-        item({ files: [{ path: "a.tsx", type: "oxygen:component", content: "  " }] }),
+        item({ files: [{ path: "a.tsx", type: "zoblocks:component", content: "  " }] }),
         "x",
       ),
     ).toThrowError(/empty file/);
@@ -420,7 +477,7 @@ describe("registry resolution", () => {
 
   it("treats a bare name as the public catalog", () => {
     expect(resolveSpecifier("vitals-panel", config, {}).url).toBe(
-      "https://oxygenui.design/r/vitals-panel.json",
+      "https://zoblocks.design/r/vitals-panel.json",
     );
   });
 
@@ -431,34 +488,34 @@ describe("registry resolution", () => {
   });
 
   it("rejects a namespace with no component", () => {
-    expect(() => resolveSpecifier("@oxygen-pro", config, {})).toThrowError(RegistryError);
+    expect(() => resolveSpecifier("@zoblocks-pro", config, {})).toThrowError(RegistryError);
   });
 
   it("orders a shared dependency before both of its dependents", async () => {
     const shared = {
       name: "core",
-      type: "oxygen:lib",
+      type: "zoblocks:lib",
       title: "Core",
       description: "",
-      files: [{ path: "core.ts", type: "oxygen:lib", target: "core.ts", content: "x\n" }],
+      files: [{ path: "core.ts", type: "zoblocks:lib", target: "core.ts", content: "x\n" }],
     };
     const dependent = (name: string) => ({
       name,
-      type: "oxygen:component",
+      type: "zoblocks:component",
       title: name,
       description: "",
-      registryDependencies: ["https://oxygenui.design/r/core.json"],
+      registryDependencies: ["https://zoblocks.design/r/core.json"],
       files: [
-        { path: `${name}.tsx`, type: "oxygen:component", target: `${name}.tsx`, content: "x\n" },
+        { path: `${name}.tsx`, type: "zoblocks:component", target: `${name}.tsx`, content: "x\n" },
       ],
     });
 
     const items = await collectItems(["timeline", "care-timeline"], config, {
       env: {},
       fetchImpl: stubFetch({
-        "https://oxygenui.design/r/timeline.json": dependent("timeline"),
-        "https://oxygenui.design/r/care-timeline.json": dependent("care-timeline"),
-        "https://oxygenui.design/r/core.json": shared,
+        "https://zoblocks.design/r/timeline.json": dependent("timeline"),
+        "https://zoblocks.design/r/care-timeline.json": dependent("care-timeline"),
+        "https://zoblocks.design/r/core.json": shared,
       }),
     });
 
@@ -470,7 +527,7 @@ describe("registry resolution", () => {
 
 describe("package manager", () => {
   it("strips a version range from a specifier", () => {
-    expect(bareName("@oxygenui-design/fhir@^1.2.3")).toBe("@oxygenui-design/fhir");
+    expect(bareName("@zoblocks/fhir@^1.2.3")).toBe("@zoblocks/fhir");
     expect(bareName("clsx")).toBe("clsx");
     expect(bareName("@scope/pkg")).toBe("@scope/pkg");
   });
@@ -495,19 +552,19 @@ describe("package manager", () => {
   });
 });
 
-describe("oxygen list", () => {
+describe("zoblocks list", () => {
   const index = {
-    $schema: "https://oxygenui.design/schema/registry.json",
-    name: "oxygenui",
-    homepage: "https://oxygenui.design",
+    $schema: "https://zoblocks.design/schema/registry.json",
+    name: "zoblocks",
+    homepage: "https://zoblocks.design",
     items: [
       {
         name: "vitals-panel",
-        type: "oxygen:component",
+        type: "zoblocks:component",
         title: "Vitals panel",
         description: "A panel.",
         categories: ["clinical"],
-        url: "https://oxygenui.design/r/vitals-panel.json",
+        url: "https://zoblocks.design/r/vitals-panel.json",
       },
     ],
   };
@@ -521,7 +578,7 @@ describe("oxygen list", () => {
       out: out.write,
       err: out.write,
       version: "0.0.0",
-      fetchImpl: stubFetch({ "https://oxygenui.design/r/index.json": index }),
+      fetchImpl: stubFetch({ "https://zoblocks.design/r/index.json": index }),
     });
 
     expect(code).toBe(0);
@@ -548,7 +605,7 @@ describe("oxygen list", () => {
   it("rejects an index whose entry has no url", () => {
     expect(() =>
       parseRegistryIndex(
-        { name: "x", items: [{ name: "a", type: "oxygen:lib", title: "A" }] },
+        { name: "x", items: [{ name: "a", type: "zoblocks:lib", title: "A" }] },
         "x",
       ),
     ).toThrowError(RegistryFormatError);
@@ -571,14 +628,14 @@ describe("registry errors are translated for the reader", () => {
   it("tells a public 404 apart from an entitlement 404", async () => {
     await expect(
       collectItems(["x"], config, { env: {}, fetchImpl: failing(404) }),
-    ).rejects.toThrowError(/not in the Oxygen catalog/);
+    ).rejects.toThrowError(/not in the Zoblocks catalog/);
 
     const withRegistry = {
       root: ".",
-      registries: { "@oxygen-pro": { url: "https://app.oxygenui.design/r/pro/{name}.json" } },
+      registries: { "@zoblocks-pro": { url: "https://app.zoblocks.design/r/pro/{name}.json" } },
     };
     await expect(
-      collectItems(["@oxygen-pro/x"], withRegistry, { env: {}, fetchImpl: failing(404) }),
+      collectItems(["@zoblocks-pro/x"], withRegistry, { env: {}, fetchImpl: failing(404) }),
     ).rejects.toThrowError(/nobody has purchased it yet/);
   });
 
@@ -676,7 +733,7 @@ describe("argument handling", () => {
   });
 
   it("refuses to add nothing", async () => {
-    await writeFile(path.join(dir, "oxygen.json"), JSON.stringify({ registries: {} }));
+    await writeFile(path.join(dir, "zoblocks.json"), JSON.stringify({ registries: {} }));
     const out = capture();
     const code = await run({
       argv: ["add"],
@@ -702,19 +759,19 @@ describe("argument handling", () => {
       err: out.write,
       version: "0.0.0",
     });
-    expect(existsSync(path.join(nested, "oxygen.json"))).toBe(true);
-    expect(existsSync(path.join(dir, "oxygen.json"))).toBe(false);
+    expect(existsSync(path.join(nested, "zoblocks.json"))).toBe(true);
+    expect(existsSync(path.join(dir, "zoblocks.json"))).toBe(false);
   });
 });
 
 describe("npm dependencies", () => {
   async function projectWith(packageJson: unknown) {
-    await writeFile(path.join(dir, "oxygen.json"), JSON.stringify({ registries: {} }));
+    await writeFile(path.join(dir, "zoblocks.json"), JSON.stringify({ registries: {} }));
     await writeFile(path.join(dir, "package.json"), JSON.stringify(packageJson));
   }
 
   const withDeps = stubFetch({
-    "https://oxygenui.design/r/vitals-panel.json": item({
+    "https://zoblocks.design/r/vitals-panel.json": item({
       dependencies: ["clsx", "tailwind-merge"],
     }),
   });
@@ -757,7 +814,7 @@ describe("npm dependencies", () => {
   });
 
   it("does not try to install when there is no package.json", async () => {
-    await writeFile(path.join(dir, "oxygen.json"), JSON.stringify({ registries: {} }));
+    await writeFile(path.join(dir, "zoblocks.json"), JSON.stringify({ registries: {} }));
     const out = capture();
 
     const code = await run({
@@ -792,7 +849,7 @@ describe("npm dependencies", () => {
   });
 
   it("survives a package.json that is not valid JSON", async () => {
-    await writeFile(path.join(dir, "oxygen.json"), JSON.stringify({ registries: {} }));
+    await writeFile(path.join(dir, "zoblocks.json"), JSON.stringify({ registries: {} }));
     await writeFile(path.join(dir, "package.json"), "{ broken");
     const out = capture();
 
@@ -813,8 +870,8 @@ describe("npm dependencies", () => {
 
 describe("writing", () => {
   it("reports a file that is already byte-identical rather than rewriting it", async () => {
-    await writeFile(path.join(dir, "oxygen.json"), JSON.stringify({ registries: {} }));
-    const registry = stubFetch({ "https://oxygenui.design/r/vitals-panel.json": item() });
+    await writeFile(path.join(dir, "zoblocks.json"), JSON.stringify({ registries: {} }));
+    const registry = stubFetch({ "https://zoblocks.design/r/vitals-panel.json": item() });
 
     const first = capture();
     await run({
@@ -842,16 +899,16 @@ describe("writing", () => {
   });
 
   it("refuses two items that claim the same path", async () => {
-    await writeFile(path.join(dir, "oxygen.json"), JSON.stringify({ registries: {} }));
+    await writeFile(path.join(dir, "zoblocks.json"), JSON.stringify({ registries: {} }));
     const out = capture();
 
     const collide = (name: string) => ({
       name,
-      type: "oxygen:component",
+      type: "zoblocks:component",
       title: name,
       description: "",
       files: [
-        { path: `${name}.tsx`, type: "oxygen:component", target: "same.tsx", content: "x\n" },
+        { path: `${name}.tsx`, type: "zoblocks:component", target: "same.tsx", content: "x\n" },
       ],
     });
 
@@ -864,8 +921,8 @@ describe("writing", () => {
         err: out.write,
         version: "0.0.0",
         fetchImpl: stubFetch({
-          "https://oxygenui.design/r/a.json": collide("a"),
-          "https://oxygenui.design/r/b.json": collide("b"),
+          "https://zoblocks.design/r/a.json": collide("a"),
+          "https://zoblocks.design/r/b.json": collide("b"),
         }),
       }),
     ).rejects.toThrowError(/want to write .*same\.tsx/);
@@ -880,11 +937,11 @@ describe("forward compatibility", () => {
   it("lists a catalog containing kinds this version has not heard of", () => {
     const index = parseRegistryIndex(
       {
-        name: "oxygenui",
-        homepage: "https://oxygenui.design",
+        name: "zoblocks",
+        homepage: "https://zoblocks.design",
         items: [
-          { name: "a", type: "oxygen:lib", title: "A", url: "https://x/a.json" },
-          { name: "b", type: "oxygen:something-new", title: "B", url: "https://x/b.json" },
+          { name: "a", type: "zoblocks:lib", title: "A", url: "https://x/a.json" },
+          { name: "b", type: "zoblocks:something-new", title: "B", url: "https://x/b.json" },
         ],
       },
       "x",
@@ -895,7 +952,7 @@ describe("forward compatibility", () => {
   it("still refuses to install an item whose file kind it does not understand", () => {
     expect(() =>
       parseRegistryItem(
-        item({ files: [{ path: "a", type: "oxygen:something-new", content: "x" }] }),
+        item({ files: [{ path: "a", type: "zoblocks:something-new", content: "x" }] }),
         "x",
       ),
     ).toThrowError(/does not understand/);
@@ -913,20 +970,20 @@ describe("forward compatibility", () => {
       env: {},
       roots,
       fetchImpl: stubFetch({
-        "https://oxygenui.design/r/thing.json": {
+        "https://zoblocks.design/r/thing.json": {
           name: "actually-called-something-else",
-          type: "oxygen:component",
+          type: "zoblocks:component",
           title: "Thing",
           description: "",
-          registryDependencies: ["https://oxygenui.design/r/dep.json"],
-          files: [{ path: "t.tsx", type: "oxygen:component", target: "t.tsx", content: "x\n" }],
+          registryDependencies: ["https://zoblocks.design/r/dep.json"],
+          files: [{ path: "t.tsx", type: "zoblocks:component", target: "t.tsx", content: "x\n" }],
         },
-        "https://oxygenui.design/r/dep.json": {
+        "https://zoblocks.design/r/dep.json": {
           name: "dep",
-          type: "oxygen:lib",
+          type: "zoblocks:lib",
           title: "Dep",
           description: "",
-          files: [{ path: "d.ts", type: "oxygen:lib", target: "d.ts", content: "x\n" }],
+          files: [{ path: "d.ts", type: "zoblocks:lib", target: "d.ts", content: "x\n" }],
         },
       }),
     });

@@ -12,7 +12,7 @@ import { describe, expect, it } from "vitest";
 import { OrganisationError, updateOrganisation } from "@/lib/organisation";
 import { createTheme, publishTheme } from "@/lib/themes";
 import { loadTokenSource } from "../../../scripts/gen/tokens/load";
-import type { TokenSource } from "@oxygenui-design/tokens/validate";
+import type { TokenSource } from "@zoblocks/tokens/validate";
 import { twoOrgs } from "./harness";
 
 let base: TokenSource;

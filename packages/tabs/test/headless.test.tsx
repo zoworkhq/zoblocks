@@ -2,7 +2,7 @@
  * `useTabs` — the escape hatch.
  *
  * It exists so a team whose design bears no resemblance to any of the eleven
- * skins keeps Oxygen's keyboard model and accessibility tree instead of
+ * skins keeps Zoblocks's keyboard model and accessibility tree instead of
  * reinventing both badly. These tests hold it to the same contract as the
  * components.
  */

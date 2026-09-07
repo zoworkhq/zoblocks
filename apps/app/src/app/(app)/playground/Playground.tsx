@@ -1,13 +1,8 @@
 "use client";
 
 import { useLayoutEffect, useState } from "react";
-import { Accordion, Switch, Timeline } from "@oxygenui-design/react";
-import {
-  VISION_KINDS,
-  VISION_LABELS,
-  simulateVision,
-  type VisionKind,
-} from "@oxygenui-design/theme";
+import { Accordion, Switch, Timeline } from "@zoblocks/react";
+import { VISION_KINDS, VISION_LABELS, simulateVision, type VisionKind } from "@zoblocks/theme";
 import {
   AxisGroup,
   Callout,
@@ -38,7 +33,7 @@ export interface PlaygroundTheme {
  * is the thing a reviewer most needs to check and cannot check by reading hex
  * values.
  *
- * What this screen deliberately does *not* do is render Oxygen components
+ * What this screen deliberately does *not* do is render Zoblocks components
  * inside Ant Design or Material UI. It could only do that by importing them,
  * and the app never resolves a UI framework — that is the architectural
  * claim the whole bridge design rests on, and an app that quietly broke it
@@ -193,7 +188,7 @@ export function Playground({ themes }: { themes: readonly PlaygroundTheme[] }) {
         tokens={tokens}
         theme={theme}
         density={density}
-        className={settling ? "ox-settling" : undefined}
+        className={settling ? "zb-settling" : undefined}
       >
         <div className="space-y-6">
           <section aria-labelledby="pg-flags" className="space-y-3">
@@ -279,7 +274,7 @@ export function Playground({ themes }: { themes: readonly PlaygroundTheme[] }) {
 /**
  * The setup, as a customer would paste it.
  *
- * Two attributes and a stylesheet. `data-ox-theme` and `data-ox-density` go on
+ * Two attributes and a stylesheet. `data-zb-theme` and `data-zb-density` go on
  * the *root* element rather than a wrapper, because the semantic and component
  * tiers are declared at `:root` and a `var()` resolves at the element that
  * declares it — scoping the attributes to a subtree moves the primitives and
@@ -292,6 +287,6 @@ function setupSnippet(theme: PlaygroundTheme): string {
     `<link rel="stylesheet" href="/t/{org}/${theme.slug}@${version}.css">`,
     "",
     "<!-- On <html>, not a wrapper: the token tiers are declared at :root. -->",
-    '<html data-ox-theme="light" data-ox-density="standard">',
+    '<html data-zb-theme="light" data-zb-density="standard">',
   ].join("\n");
 }

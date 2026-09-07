@@ -1,6 +1,6 @@
 # hq
 
-**Internal task management for the Zowork team.** Deployed at `hq.oxygenui.design`.
+**Internal task management for the Zowork team.** Deployed at `hq.zoblocks.design`.
 
 Not part of the public registry, not published to npm, and not covered by the
 MIT licence on the rest of this repository. It is a self-contained app under
@@ -9,16 +9,16 @@ the core is ever open-sourced — nothing outside this directory refers to it.
 
 ## Why it lives here
 
-It is the dogfood consumer of the registry. Screens import Oxygen components by
-the exact specifier the Oxygen CLI writes into a customer's project
-(`@/components/oxygen/app-shell`). A component that breaks breaks our own daily
+It is the dogfood consumer of the registry. Screens import Zoblocks components by
+the exact specifier the Zoblocks CLI writes into a customer's project
+(`@/components/zoblocks/app-shell`). A component that breaks breaks our own daily
 tool first.
 
 **Interim state (August 2026):** the proof-of-concept registry was cleared so
 the component library can be planned and rebuilt from scratch. Until the new
 components land, the two this app needs — `AppShell` and `ActionGate` — are
-vendored under `src/components/oxygen/`, which is exactly the layout a customer
-ends up with after `oxygen add`. When the rebuilt registry ships, delete those
+vendored under `src/components/zoblocks/`, which is exactly the layout a customer
+ends up with after `zoblocks add`. When the rebuilt registry ships, delete those
 copies and map the specifiers back to `registry/` source through tsconfig paths
 (see the comment in `tsconfig.json`).
 
@@ -29,8 +29,8 @@ so this validates the foundations layer only.
 
 ```bash
 cp .env.example .env.local          # point DATABASE_URL at MongoDB
-pnpm --filter @oxygenui-design/hq db:indexes
-pnpm --filter @oxygenui-design/hq dev      # http://localhost:6002
+pnpm --filter @zoblocks/hq db:indexes
+pnpm --filter @zoblocks/hq dev      # http://localhost:6002
 ```
 
 Optional, for a board that is not empty:
@@ -88,7 +88,7 @@ index deciding a duplicate signup, an atomic claim deciding the first admin, a
 that the code calls what it calls.
 
 ```bash
-pnpm --filter @oxygenui-design/hq test
+pnpm --filter @zoblocks/hq test
 ```
 
 ## Deploying
@@ -97,7 +97,7 @@ A second Vercel project on this repository, **Root Directory `apps/hq`**, with
 `DATABASE_URL` set to the MongoDB connection string the marketing site already
 uses. hq always opens the database named `hq` inside that cluster, never the
 site's — so the connection string can be shared without the data being shared. Add
-`hq.oxygenui.design` as its domain. DNS already sits on Vercel, so no records
+`hq.zoblocks.design` as its domain. DNS already sits on Vercel, so no records
 need editing.
 
 Indexes are not applied at build time on purpose — run `db:indexes` deliberately

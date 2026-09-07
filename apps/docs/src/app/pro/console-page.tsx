@@ -26,7 +26,7 @@ import { StageGate, VisionFilters } from "@/components/pro/stages";
  *
  * The page this replaces sold Team and Enterprise with a waitlist and six
  * bullet points. Pro is not a tier we are going to build — it is the
- * application already running at app.oxygenui.design, and a page listing what
+ * application already running at app.zoblocks.design, and a page listing what
  * a shipped product *will* do is weaker than one showing it doing it.
  *
  * So the argument is made by ten glances rather than by adjectives, and the
@@ -53,8 +53,8 @@ export function ConsolePage() {
         <section className="border-b border-rule">
           <div className="mx-auto grid max-w-6xl section-major gap-10 px-5 sm:px-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] lg:items-center lg:gap-16">
             <div>
-              <p className="eyebrow eyebrow-rule text-oxygen-deep" data-reveal>
-                Oxygen Pro
+              <p className="eyebrow eyebrow-rule text-brand-deep" data-reveal>
+                Zoblocks Pro
               </p>
               <h1 className="display-lg mt-5 text-balance" data-reveal>
                 Your brand, through a gate that will not let it fail.
@@ -78,7 +78,7 @@ export function ConsolePage() {
                 </a>
                 <a
                   href={signInHref}
-                  className="inline-flex items-center gap-2 rounded-xl border border-rule px-5 py-3.5 text-sm font-medium text-ink transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:border-oxygen/40"
+                  className="inline-flex items-center gap-2 rounded-xl border border-rule px-5 py-3.5 text-sm font-medium text-ink transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:border-brand/40"
                 >
                   Sign in
                 </a>
@@ -213,7 +213,7 @@ export function ConsolePage() {
                 <div key={item.role} className="bg-paper p-6">
                   <p className="eyebrow text-graphite">{item.role}</p>
                   <p className="mt-3 text-sm leading-relaxed text-ink">{item.line}</p>
-                  <p className="numeric mt-4 text-xs text-oxygen-deep">{item.proof}</p>
+                  <p className="numeric mt-4 text-xs text-brand-deep">{item.proof}</p>
                 </div>
               ))}
             </div>

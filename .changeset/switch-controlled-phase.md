@@ -1,5 +1,5 @@
 ---
-"@oxygenui-design/react": minor
+"@zoblocks/react": minor
 ---
 
 Switch: the controlled-phase escape hatch, and three phase guards.

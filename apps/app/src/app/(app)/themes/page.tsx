@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { themeHref } from "@oxygenui-design/theme";
+import { themeHref } from "@zoblocks/theme";
 import { requireMember } from "@/lib/auth";
 import { scoped } from "@/db/scope";
 import { can } from "@/lib/roles";

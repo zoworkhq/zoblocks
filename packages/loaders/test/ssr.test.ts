@@ -3,7 +3,7 @@
 /**
  * The package must be importable on a server.
  *
- * This suite exists because of a real defect: `class OxLoaderElement extends
+ * This suite exists because of a real defect: `class ZbLoaderElement extends
  * HTMLElement` was evaluated at module scope, so importing the package in Node
  * threw `ReferenceError: HTMLElement is not defined` — breaking Nuxt, Angular
  * Universal, Astro, SvelteKit, and Next.js server components, every one of
@@ -65,13 +65,13 @@ describe("server rendering", () => {
 
   it("exports the stylesheet, so a server can inline it", async () => {
     const { LOADER_CSS } = await import("../src/css.js");
-    expect(LOADER_CSS).toContain("@keyframes ox-loader-beat");
+    expect(LOADER_CSS).toContain("@keyframes zb-loader-beat");
   });
 
   it("defines the element class without constructing it", async () => {
     // The class is declared over an inert stand-in base on the server. It must
     // exist as a value (so `export class` resolves) and must never be `new`ed.
-    const { OxLoaderElement } = await import("../src/base.js");
-    expect(typeof OxLoaderElement).toBe("function");
+    const { ZbLoaderElement } = await import("../src/base.js");
+    expect(typeof ZbLoaderElement).toBe("function");
   });
 });

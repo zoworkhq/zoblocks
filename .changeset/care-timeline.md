@@ -1,6 +1,6 @@
 ---
-"@oxygenui-design/react": minor
-"@oxygenui-design/fhir": minor
+"@zoblocks/react": minor
+"@zoblocks/fhir": minor
 ---
 
 Timeline and CareTimeline — a chronology that cannot be rendered without saying
@@ -48,9 +48,9 @@ affordance means something instead: a dotted rail is a declared gap in coverage.
 `test/timeline-parity.test.ts` reads antd's own declarations and fails when it
 renames anything.
 
-**`@oxygenui-design/fhir`** gains `Encounter`, `Communication`,
+**`@zoblocks/fhir`** gains `Encounter`, `Communication`,
 `DiagnosticReport`, `Procedure`, `Immunization`, `QuestionnaireResponse` and
-`Task`, and **`@oxygenui-design/fixtures`** gains a `Patient/$everything`-shaped
+`Task`, and **`@zoblocks/fixtures`** gains a `Patient/$everything`-shaped
 bundle whose states are the ones a demo skips. The thirteen adapters in
 `timeline-fhir` report everything they could not map, by type and count: a
 silent drop in a data adapter is the same lie one layer further down.

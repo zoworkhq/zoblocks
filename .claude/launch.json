@@ -4,19 +4,19 @@
     {
       "name": "docs",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "@oxygenui-design/docs", "dev"],
+      "runtimeArgs": ["--filter", "@zoblocks/docs", "dev"],
       "port": 6001
     },
     {
       "name": "app",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "@oxygenui-design/app", "dev"],
+      "runtimeArgs": ["--filter", "@zoblocks/app", "dev"],
       "port": 6003
     },
     {
       "name": "docs-rec",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "@oxygenui-design/docs", "dev"],
+      "runtimeArgs": ["--filter", "@zoblocks/docs", "dev"],
       "port": 6021,
       "autoPort": false,
       "env": {

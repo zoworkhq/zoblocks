@@ -1,5 +1,5 @@
 {
-  "extends": "@oxygenui-design/tsconfig/base.json",
+  "extends": "@zoblocks/tsconfig/base.json",
   "compilerOptions": {
     "noEmit": true,
     "types": ["vitest/globals", "@testing-library/jest-dom"]

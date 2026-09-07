@@ -26,7 +26,7 @@ async function settle(page: Page) {
       .querySelectorAll("[data-reveal]")
       .forEach((el) => el.setAttribute("data-revealed", "true"));
   });
-  await expect(page.locator("[data-ox-recorder]").first()).toBeVisible();
+  await expect(page.locator("[data-zb-recorder]").first()).toBeVisible();
 }
 
 /** Select one of the state-browser scenarios by its rail label. */
@@ -55,7 +55,7 @@ test.describe("visual regression", () => {
     await settle(page);
     await scenario(page, "Who spoke when");
 
-    const art = page.locator('[data-ox-recorder="duet"]').first();
+    const art = page.locator('[data-zb-recorder="duet"]').first();
     await expect(art).toBeVisible();
     // Peaks in, pixels out: no clock anywhere in this art, so the frame is a
     // property of the data rather than of when the shot was taken.
@@ -66,7 +66,7 @@ test.describe("visual regression", () => {
     await page.goto(RECORDER);
     await settle(page);
     await scenario(page, "Who spoke when");
-    await expect(page.locator(".ox-rec-markbar")).toHaveScreenshot("recorder-markers.png");
+    await expect(page.locator(".zb-rec-markbar")).toHaveScreenshot("recorder-markers.png");
   });
 
   test("@vrt the disposition strip is visually stable", async ({ page }) => {
@@ -74,7 +74,7 @@ test.describe("visual regression", () => {
     await settle(page);
     await scenario(page, "Where the recording is");
     // No waveform and no transport, so nothing here has a clock either.
-    const strip = page.locator('[data-ox-recorder="disposition"]').first();
+    const strip = page.locator('[data-zb-recorder="disposition"]').first();
     await expect(strip).toBeVisible();
     await expect(strip).toHaveScreenshot("recorder-disposition-held.png");
   });
@@ -83,7 +83,7 @@ test.describe("visual regression", () => {
     await page.goto(RECORDER);
     await settle(page);
     await scenario(page, "Live transcript");
-    const art = page.locator('[data-ox-recorder="stream"]').first();
+    const art = page.locator('[data-zb-recorder="stream"]').first();
     await expect(art).toHaveScreenshot("recorder-stream.png");
   });
 });
@@ -94,7 +94,7 @@ test.describe("the art is a function of the signal", () => {
     await settle(page);
     await scenario(page, "Capturing");
 
-    const lane = page.locator(".ox-rec-lane").first();
+    const lane = page.locator(".zb-rec-lane").first();
     const read = () =>
       lane.evaluate((el) =>
         [...el.children].map((b) => (b as HTMLElement).style.getPropertyValue("--_h")).join(","),
@@ -126,7 +126,7 @@ test.describe("the art is a function of the signal", () => {
     // The distinction that keeps a pipeline from throwing away the expensive
     // artefact because the cheap one broke.
     await expect(alert).toContainText("not lost");
-    await expect(page.locator("[data-ox-recorder]").first()).toHaveAttribute(
+    await expect(page.locator("[data-zb-recorder]").first()).toHaveAttribute(
       "data-fault",
       "critical",
     );
@@ -149,7 +149,7 @@ test.describe("accessibility in a real layout engine", () => {
     await page.goto(RECORDER);
     await settle(page);
 
-    const bar = page.locator(".ox-rec-lane > i").first();
+    const bar = page.locator(".zb-rec-lane > i").first();
     const background = await bar.evaluate((el) => getComputedStyle(el).backgroundColor);
     // Forced colours discards every custom colour, and the lane is painted with
     // a gradient — which is discarded too. Without an explicit system-colour
@@ -170,7 +170,7 @@ test.describe("accessibility in a real layout engine", () => {
     await page.goto(RECORDER);
     await settle(page);
 
-    const tell = page.locator(".ox-rec-tell").first();
+    const tell = page.locator(".zb-rec-tell").first();
     const running = await tell.evaluate(
       (el) => getComputedStyle(el, "::before").animationName !== "none",
     );

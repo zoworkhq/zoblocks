@@ -22,7 +22,7 @@
 
 import * as React from "react";
 import { Alert, Button, Input, Modal, Radio, Select, Space } from "antd";
-import type { SignatureValue, Signer, UnableReason } from "@oxygenui-design/signature-core";
+import type { SignatureValue, Signer, UnableReason } from "@zoblocks/signature-core";
 import { useLocale, type SignatureLocale } from "./locale";
 
 type OutcomeKind = "declined" | "unable" | "verbal" | "on-paper";
@@ -59,7 +59,7 @@ export function OutcomeSheet({
 }: OutcomeSheetProps) {
   const t = useLocale(localeOverrides);
   const reactId = React.useId();
-  const titleId = `ox-outcome-${reactId.replace(/:/g, "")}`;
+  const titleId = `zb-outcome-${reactId.replace(/:/g, "")}`;
 
   const [kind, setKind] = React.useState<OutcomeKind>(outcomes[0] ?? "declined");
   const [reason, setReason] = React.useState("");

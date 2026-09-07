@@ -1,12 +1,12 @@
 {
-  "name": "@oxygenui-design/copilot",
+  "name": "@zoblocks/copilot",
   "version": "0.1.0",
   "description": "A floating clinical copilot for Ant Design. Model-agnostic, source-attributed, and designed so that checking the answer is cheaper than accepting it.",
   "license": "MIT",
-  "homepage": "https://oxygenui.design/components/copilot",
+  "homepage": "https://zoblocks.design/components/copilot",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zoworkhq/oxygenui.git",
+    "url": "git+https://github.com/zoworkhq/zoblocks.git",
     "directory": "packages/copilot"
   },
   "keywords": [
@@ -60,8 +60,8 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@oxygenui-design/copilot-core": "workspace:*",
-    "@oxygenui-design/copilot-react": "workspace:*"
+    "@zoblocks/copilot-core": "workspace:*",
+    "@zoblocks/copilot-react": "workspace:*"
   },
   "peerDependencies": {
     "antd": ">=5.20.0 || >=6.0.0",
@@ -69,7 +69,7 @@
     "react-dom": "^18.2.0 || ^19.0.0"
   },
   "devDependencies": {
-    "@oxygenui-design/tsconfig": "workspace:*",
+    "@zoblocks/tsconfig": "workspace:*",
     "@testing-library/dom": "^10",
     "@testing-library/jest-dom": "^7",
     "@testing-library/react": "^16",

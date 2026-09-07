@@ -121,7 +121,7 @@ describe("guards and editing survive StrictMode", () => {
         editable={{ onClose }}
       />,
     );
-    const close = screen.getByRole("tab").querySelector(".ox-tabs__close") as HTMLElement;
+    const close = screen.getByRole("tab").querySelector(".zb-tabs__close") as HTMLElement;
     await userEvent.setup().click(close);
     expect(onClose).toHaveBeenCalledWith("a");
   });

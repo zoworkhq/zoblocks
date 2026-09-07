@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://oxygenui.design/schema/registry.json",
-  "title": "Oxygen registry",
+  "$id": "https://zoblocks.design/schema/registry.json",
+  "title": "Zoblocks registry",
   "description": "The manifest of every item a registry serves.",
   "type": "object",
   "required": [
@@ -39,14 +39,14 @@
           },
           "type": {
             "enum": [
-              "oxygen:component",
-              "oxygen:lib",
-              "oxygen:hook",
-              "oxygen:ui",
-              "oxygen:block",
-              "oxygen:page",
-              "oxygen:file",
-              "oxygen:style"
+              "zoblocks:component",
+              "zoblocks:lib",
+              "zoblocks:hook",
+              "zoblocks:ui",
+              "zoblocks:block",
+              "zoblocks:page",
+              "zoblocks:file",
+              "zoblocks:style"
             ]
           },
           "title": {
@@ -87,18 +87,18 @@
               "properties": {
                 "path": {
                   "type": "string",
-                  "description": "Path in the Oxygen repository. Provenance, not a destination."
+                  "description": "Path in the Zoblocks repository. Provenance, not a destination."
                 },
                 "type": {
                   "enum": [
-                    "oxygen:component",
-                    "oxygen:lib",
-                    "oxygen:hook",
-                    "oxygen:ui",
-                    "oxygen:block",
-                    "oxygen:page",
-                    "oxygen:file",
-                    "oxygen:style"
+                    "zoblocks:component",
+                    "zoblocks:lib",
+                    "zoblocks:hook",
+                    "zoblocks:ui",
+                    "zoblocks:block",
+                    "zoblocks:page",
+                    "zoblocks:file",
+                    "zoblocks:style"
                   ]
                 },
                 "target": {

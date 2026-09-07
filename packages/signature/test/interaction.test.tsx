@@ -26,7 +26,7 @@ const NOW = "2026-08-16T14:36:02.000Z";
 
 /** The pad's box, which the setup shim reports as 600×200. */
 function surfaceOf(container: HTMLElement): HTMLElement {
-  const node = container.querySelector<HTMLElement>("[data-ox-signature-pad]");
+  const node = container.querySelector<HTMLElement>("[data-zb-signature-pad]");
   if (!node) throw new Error("no capture surface");
   return node;
 }
@@ -116,7 +116,7 @@ describe("drawing", () => {
   it("renders the ink it captured", () => {
     const { container } = render(<SignaturePad />);
     draw(surfaceOf(container), SIGNATURE);
-    expect(container.querySelector(".ox-signature__ink")?.innerHTML).toContain("<path");
+    expect(container.querySelector(".zb-signature__ink")?.innerHTML).toContain("<path");
   });
 
   it("takes pointer capture so a stroke leaving the pad still tracks", () => {
@@ -285,7 +285,7 @@ describe("the minimum-ink gate, through the UI", () => {
     await user.click(screen.getByRole("button", { name: /add signature/i }));
     const dialog = await screen.findByRole("dialog");
 
-    const surface = dialog.querySelector<HTMLElement>("[data-ox-signature-pad]");
+    const surface = dialog.querySelector<HTMLElement>("[data-zb-signature-pad]");
     fireEvent.pointerDown(surface!, { clientX: 100, clientY: 100, pointerId: 1, button: 0 });
     fireEvent.pointerUp(surface!, { clientX: 101, clientY: 100, pointerId: 1 });
 
@@ -306,7 +306,7 @@ describe("the minimum-ink gate, through the UI", () => {
 
     await user.click(screen.getByRole("button", { name: /add signature/i }));
     const dialog = await screen.findByRole("dialog");
-    draw(dialog.querySelector<HTMLElement>("[data-ox-signature-pad]")!, SIGNATURE);
+    draw(dialog.querySelector<HTMLElement>("[data-zb-signature-pad]")!, SIGNATURE);
 
     await user.click(within(dialog).getByRole("button", { name: /sign and continue/i }));
     await waitFor(() => expect(onChange).toHaveBeenCalled());
@@ -340,7 +340,7 @@ describe("the minimum-ink gate, through the UI", () => {
 
     await user.click(screen.getByRole("button", { name: /add signature/i }));
     const dialog = await screen.findByRole("dialog");
-    draw(dialog.querySelector<HTMLElement>("[data-ox-signature-pad]")!, SIGNATURE);
+    draw(dialog.querySelector<HTMLElement>("[data-zb-signature-pad]")!, SIGNATURE);
     await user.click(within(dialog).getByRole("button", { name: /sign and continue/i }));
 
     await waitFor(() => expect(onChange).toHaveBeenCalled());
@@ -583,13 +583,13 @@ function stubImage(width: number, height: number, options: { fail?: boolean } = 
 describe("pad variants", () => {
   it("can drop the baseline guide", () => {
     const { container } = render(<SignaturePad baseline={false} />);
-    expect(container.querySelector(".ox-signature__baseline")).toBeNull();
-    expect(container.querySelector(".ox-signature__cue")).toBeNull();
+    expect(container.querySelector(".zb-signature__baseline")).toBeNull();
+    expect(container.querySelector(".zb-signature__cue")).toBeNull();
   });
 
   it("shows the baseline and its cue by default", () => {
     const { container } = render(<SignaturePad />);
-    expect(container.querySelector(".ox-signature__baseline")).not.toBeNull();
+    expect(container.querySelector(".zb-signature__baseline")).not.toBeNull();
   });
 
   it("hides the label visually while keeping it announced", () => {
@@ -597,7 +597,7 @@ describe("pad variants", () => {
     // group unnamed.
     render(<SignaturePad hideLabel label="Patient signature" />);
     const group = screen.getByRole("group", { name: "Patient signature" });
-    expect(group.querySelector(".ox-signature__sr")).toHaveTextContent("Patient signature");
+    expect(group.querySelector(".zb-signature__sr")).toHaveTextContent("Patient signature");
   });
 
   it("applies a custom ink colour through currentColor, not into the path", () => {
@@ -608,13 +608,13 @@ describe("pad variants", () => {
     draw(surfaceOf(container), SIGNATURE);
 
     expect(surfaceOf(container).style.color).toBe("rgb(29, 57, 196)");
-    const path = container.querySelector(".ox-signature__ink path");
+    const path = container.querySelector(".zb-signature__ink path");
     expect(path).toHaveAttribute("stroke", "currentColor");
   });
 
   it("marks the frame and wires the message when there is an error", () => {
     const { container } = render(<SignaturePad error="Sign across the line." />);
-    expect(container.querySelector('[data-ox-error="true"]')).not.toBeNull();
+    expect(container.querySelector('[data-zb-error="true"]')).not.toBeNull();
     expect(screen.getByRole("group")).toHaveAccessibleDescription("Sign across the line.");
   });
 
@@ -627,21 +627,21 @@ describe("pad variants", () => {
 
   it("hides the placeholder once there is ink", () => {
     const { container } = render(<SignaturePad />);
-    expect(container.querySelector(".ox-signature__placeholder")).not.toBeNull();
+    expect(container.querySelector(".zb-signature__placeholder")).not.toBeNull();
     draw(surfaceOf(container), SIGNATURE);
-    expect(container.querySelector(".ox-signature__placeholder")).toBeNull();
+    expect(container.querySelector(".zb-signature__placeholder")).toBeNull();
   });
 
   it("shows no placeholder when disabled", () => {
     const { container } = render(<SignaturePad disabled />);
-    expect(container.querySelector(".ox-signature__placeholder")).toBeNull();
-    expect(container.querySelector(".ox-signature--disabled")).not.toBeNull();
+    expect(container.querySelector(".zb-signature__placeholder")).toBeNull();
+    expect(container.querySelector(".zb-signature--disabled")).not.toBeNull();
   });
 
   it("restores an existing signature for editing", () => {
     const { container } = render(<SignaturePad />);
     draw(surfaceOf(container), SIGNATURE);
-    const markup = container.querySelector(".ox-signature__ink")?.innerHTML ?? "";
+    const markup = container.querySelector(".zb-signature__ink")?.innerHTML ?? "";
 
     const restored = render(
       <SignaturePad
@@ -653,7 +653,7 @@ describe("pad variants", () => {
         ]}
       />,
     );
-    expect(restored.container.querySelector(".ox-signature__ink")?.innerHTML).toBeTruthy();
+    expect(restored.container.querySelector(".zb-signature__ink")?.innerHTML).toBeTruthy();
     expect(markup).toBeTruthy();
   });
 });
@@ -741,7 +741,7 @@ describe("the field, remaining paths", () => {
 
   it("takes an explicit error status without a Form", () => {
     const { container } = render(<Signature now={NOW} status="error" />);
-    expect(container.querySelector('[data-ox-status="error"]')).not.toBeNull();
+    expect(container.querySelector('[data-zb-status="error"]')).not.toBeNull();
   });
 
   it("offers only the methods it was given", async () => {
@@ -799,7 +799,7 @@ describe("the field, remaining paths", () => {
 
     await user.click(screen.getByRole("button", { name: /add signature/i }));
     const dialog = await screen.findByRole("dialog");
-    draw(dialog.querySelector<HTMLElement>("[data-ox-signature-pad]")!, SIGNATURE);
+    draw(dialog.querySelector<HTMLElement>("[data-zb-signature-pad]")!, SIGNATURE);
     await user.click(within(dialog).getByRole("button", { name: /sign and continue/i }));
 
     await waitFor(() => expect(onChange).toHaveBeenCalled());
@@ -827,7 +827,7 @@ describe("the field, remaining paths", () => {
 
     await user.click(screen.getByRole("button", { name: /add signature/i }));
     const dialog = await screen.findByRole("dialog");
-    draw(dialog.querySelector<HTMLElement>("[data-ox-signature-pad]")!, SIGNATURE);
+    draw(dialog.querySelector<HTMLElement>("[data-zb-signature-pad]")!, SIGNATURE);
     await user.click(within(dialog).getByRole("button", { name: /sign and continue/i }));
 
     await waitFor(() => expect(onChange).toHaveBeenCalled());
@@ -849,7 +849,7 @@ describe("the field, remaining paths", () => {
 
     await user.click(screen.getByRole("button", { name: /add signature/i }));
     const dialog = await screen.findByRole("dialog");
-    draw(dialog.querySelector<HTMLElement>("[data-ox-signature-pad]")!, SIGNATURE);
+    draw(dialog.querySelector<HTMLElement>("[data-zb-signature-pad]")!, SIGNATURE);
 
     expect(within(dialog).getByRole("button", { name: /sign and continue/i })).toBeDisabled();
     expect(onChange).not.toHaveBeenCalled();
@@ -990,7 +990,7 @@ describe("PNG export", () => {
 
     await user.click(screen.getByRole("button", { name: /add signature/i }));
     const dialog = await screen.findByRole("dialog");
-    draw(dialog.querySelector<HTMLElement>("[data-ox-signature-pad]")!, SIGNATURE);
+    draw(dialog.querySelector<HTMLElement>("[data-zb-signature-pad]")!, SIGNATURE);
     await user.click(within(dialog).getByRole("button", { name: /sign and continue/i }));
 
     await waitFor(() => expect(onChange).toHaveBeenCalled());
@@ -1014,7 +1014,7 @@ describe("PNG export", () => {
 
     await user.click(screen.getByRole("button", { name: /add signature/i }));
     const dialog = await screen.findByRole("dialog");
-    draw(dialog.querySelector<HTMLElement>("[data-ox-signature-pad]")!, SIGNATURE);
+    draw(dialog.querySelector<HTMLElement>("[data-zb-signature-pad]")!, SIGNATURE);
     await user.click(within(dialog).getByRole("button", { name: /sign and continue/i }));
 
     await waitFor(() => expect(onChange).toHaveBeenCalled());
@@ -1030,7 +1030,7 @@ describe("PNG export", () => {
     await user.click(screen.getByRole("button", { name: /add signature/i }));
     const dialog = await screen.findByRole("dialog");
     await user.click(within(dialog).getByRole("radio", { name: /blue/i }));
-    draw(dialog.querySelector<HTMLElement>("[data-ox-signature-pad]")!, SIGNATURE);
+    draw(dialog.querySelector<HTMLElement>("[data-zb-signature-pad]")!, SIGNATURE);
     await user.click(within(dialog).getByRole("button", { name: /sign and continue/i }));
 
     await waitFor(() => expect(onChange).toHaveBeenCalled());
@@ -1345,7 +1345,7 @@ describe("clearing asks first, but only when it matters", () => {
     await user.click(screen.getByRole("button", { name: /clear/i }));
 
     expect(screen.queryByText(/erase this signature/i)).not.toBeInTheDocument();
-    expect(container.querySelector(".ox-signature__ink")?.innerHTML).not.toContain("<path");
+    expect(container.querySelector(".zb-signature__ink")?.innerHTML).not.toContain("<path");
   });
 
   it("asks before erasing a real signature", async () => {
@@ -1357,7 +1357,7 @@ describe("clearing asks first, but only when it matters", () => {
 
     expect(screen.getByText(/erase this signature/i)).toBeInTheDocument();
     // Still there — asking is not doing.
-    expect(container.querySelector(".ox-signature__ink")?.innerHTML).toContain("<path");
+    expect(container.querySelector(".zb-signature__ink")?.innerHTML).toContain("<path");
   });
 
   it("erases when the erase is confirmed", async () => {
@@ -1370,7 +1370,7 @@ describe("clearing asks first, but only when it matters", () => {
     await user.click(screen.getByRole("button", { name: /^erase$/i }));
 
     expect(onChange.mock.calls.at(-1)?.[0]).toHaveLength(0);
-    expect(container.querySelector(".ox-signature__ink")?.innerHTML).not.toContain("<path");
+    expect(container.querySelector(".zb-signature__ink")?.innerHTML).not.toContain("<path");
   });
 
   it("keeps the signature when the question is declined", async () => {
@@ -1385,7 +1385,7 @@ describe("clearing asks first, but only when it matters", () => {
 
     expect(onChange.mock.calls.at(-1)?.[0]).toEqual(strokesBefore);
     expect(screen.getByRole("button", { name: /clear/i })).toBeInTheDocument();
-    expect(container.querySelector(".ox-signature__ink")?.innerHTML).toContain("<path");
+    expect(container.querySelector(".zb-signature__ink")?.innerHTML).toContain("<path");
   });
 
   it("moves focus to the question, not away from it", async () => {
@@ -1445,7 +1445,7 @@ describe("the kiosk case", () => {
     first.unmount();
 
     const second = render(<SignaturePad onChange={onChange} />);
-    expect(second.container.querySelector(".ox-signature__ink")?.innerHTML).not.toContain("<path");
+    expect(second.container.querySelector(".zb-signature__ink")?.innerHTML).not.toContain("<path");
     expect(screen.getByRole("button", { name: /clear/i })).toBeDisabled();
   });
 });
@@ -1457,7 +1457,7 @@ describe("the initials variant", () => {
     // Brief item 17. Initials are a signature with fewer letters — same model,
     // same evidence — so only the frame changes.
     const { container } = render(<SignaturePad variant="initials" />);
-    expect(container.querySelector(".ox-signature--initials")).toBeInTheDocument();
+    expect(container.querySelector(".zb-signature--initials")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /undo/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /clear/i })).toBeInTheDocument();
   });
@@ -1474,7 +1474,7 @@ describe("the initials variant", () => {
 
   it("takes an explicit height over the variant default", () => {
     const { container } = render(<SignaturePad variant="initials" height={64} />);
-    const surface = container.querySelector<HTMLElement>(".ox-signature__surface");
+    const surface = container.querySelector<HTMLElement>(".zb-signature__surface");
     expect(surface?.style.height).toBe("64px");
   });
 });

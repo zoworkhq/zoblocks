@@ -1,16 +1,16 @@
-# @oxygenui-design/tabs
+# @zoblocks/tabs
 
 **Tabs that know what they are.** Four semantic modes across eleven skins, with
 the WAI-ARIA keyboard model, priority-plus overflow, and the states a clinical
 surface actually hits.
 
 ```bash
-npm install @oxygenui-design/tabs
+npm install @zoblocks/tabs
 ```
 
 ```tsx
-import { Tabs } from "@oxygenui-design/tabs";
-import "@oxygenui-design/tabs/styles.css";
+import { Tabs } from "@zoblocks/tabs";
+import "@zoblocks/tabs/styles.css";
 
 <Tabs
   as="tabs"
@@ -25,7 +25,7 @@ import "@oxygenui-design/tabs/styles.css";
 ```
 
 antd is an **optional** peer dependency — the package works without it, and
-[`@oxygenui-design/tabs-core`](../tabs-core) has no dependency on React or antd
+[`@zoblocks/tabs-core`](../tabs-core) has no dependency on React or antd
 at all.
 
 ---
@@ -56,7 +56,7 @@ dress any of the four modes, because the skin is CSS and the mode is the
 accessibility tree.
 
 Enforced rather than documented: `validateTabsConfig` throws on a tablist of
-links, and `@oxygenui/tabs-semantic-mode` makes it a lint error before the code
+links, and `@zoblocks/tabs-semantic-mode` makes it a lint error before the code
 ever runs.
 
 ---
@@ -137,21 +137,21 @@ user must be able to discover which one they are looking at.
 
 ## Theming
 
-Every value resolves through `--ox-tabs-*` → `--ox-*` → `--ant-*` → a literal.
-That chain means the same stylesheet is correct in an Oxygen app, in a plain antd
+Every value resolves through `--zb-tabs-*` → `--zb-*` → `--ant-*` → a literal.
+That chain means the same stylesheet is correct in a Zoblocks app, in a plain antd
 app driven by `ConfigProvider` (no JavaScript required), and on a bare page.
 Rebranding is four lines:
 
 ```css
 [data-brand="northgate"] {
-  --ox-tabs-track-radius: 6px;
-  --ox-tabs-thumb-radius: 3px;
-  --ox-tabs-thumb-shadow: none;
-  --ox-tabs-thumb-border: var(--ox-border-strong);
+  --zb-tabs-track-radius: 6px;
+  --zb-tabs-thumb-radius: 3px;
+  --zb-tabs-thumb-shadow: none;
+  --zb-tabs-thumb-border: var(--zb-border-strong);
 }
 ```
 
-For a host on antd's non-`cssVar` theme, `@oxygenui-design/tabs/antd` exports
+For a host on antd's non-`cssVar` theme, `@zoblocks/tabs/antd` exports
 `<AntdTabsBridge>`, which maps antd's JavaScript tokens onto the same surface.
 
 ## What it will not do
@@ -165,6 +165,6 @@ For a host on antd's non-`cssVar` theme, `@oxygenui-design/tabs/antd` exports
 - Enforce your permissions. `disabled` and `availability` are presentation; a
   hidden panel is not a security control.
 
-Oxygen UI is not a compliance boundary. It does not make an application HIPAA,
+Zoblocks is not a compliance boundary. It does not make an application HIPAA,
 GDPR or DPDP compliant, and it is not a medical device or clinical decision
 support.

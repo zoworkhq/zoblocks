@@ -1,5 +1,5 @@
 /**
- * @oxygenui/eslint-plugin
+ * @zoblocks/eslint-plugin
  *
  * Rules that enforce architectural invariants which were previously kept by
  * comment. Each one corresponds to a decision record, and each one exists
@@ -31,7 +31,7 @@ import {
 import tabsSemanticMode from "./rules/tabs-semantic-mode.js";
 
 const plugin = {
-  meta: { name: "@oxygenui/eslint-plugin", version: "0.1.0" },
+  meta: { name: "@zoblocks/eslint-plugin", version: "0.1.0" },
   rules: {
     "identity-requires-stable-key": identityRequiresStableKey,
     "no-absence-placeholder": noAbsencePlaceholder,
@@ -62,54 +62,54 @@ const plugin = {
  */
 plugin.configs = {
   components: {
-    plugins: { "@oxygenui": plugin },
+    plugins: { "@zoblocks": plugin },
     rules: {
-      "@oxygenui/no-absence-placeholder": "error",
-      "@oxygenui/no-dynamic-class-name": "error",
-      "@oxygenui/no-forbidden-capability": "error",
-      "@oxygenui/no-primitive-token": "error",
+      "@zoblocks/no-absence-placeholder": "error",
+      "@zoblocks/no-dynamic-class-name": "error",
+      "@zoblocks/no-forbidden-capability": "error",
+      "@zoblocks/no-primitive-token": "error",
       // Three identity rules, all errors. Each one prevents a defect that
       // renders perfectly, passes every other check, and is wrong at exactly
       // the moment somebody uses it to confirm who they are treating.
-      "@oxygenui/identity-requires-stable-key": "error",
-      "@oxygenui/no-room-number-identifier": "error",
-      "@oxygenui/no-truncated-identity": "error",
+      "@zoblocks/identity-requires-stable-key": "error",
+      "@zoblocks/no-room-number-identifier": "error",
+      "@zoblocks/no-truncated-identity": "error",
       // An error, not a warning: a draw-only signature control is a WCAG
       // Level A failure that renders perfectly and passes every other test.
-      "@oxygenui/signature-requires-typed-path": "error",
+      "@zoblocks/signature-requires-typed-path": "error",
       // Same profile: a severity rail with no words beside it renders
       // perfectly and silently deletes the signal for anyone in forced-colors
       // mode, reading a print, or unable to separate red from green.
-      "@oxygenui/require-accordion-summary": "error",
+      "@zoblocks/require-accordion-summary": "error",
       // A switch inside a form that submits promises something it does not do,
       // and `disabled` beside a reason throws the reason away. Both are errors
       // because both render perfectly.
-      "@oxygenui/switch-needs-commit-strategy": "error",
-      "@oxygenui/no-disabled-with-reason": "error",
+      "@zoblocks/switch-needs-commit-strategy": "error",
+      "@zoblocks/no-disabled-with-reason": "error",
       // An audit event stamped with nothing is not an audit trail.
-      "@oxygenui/switch-audit-needs-now": "error",
+      "@zoblocks/switch-audit-needs-now": "error",
       // An error for the same reason: a tablist of links renders perfectly,
       // passes every automated checker, and destroys a keyboard user's focus
       // the first time they press an arrow key.
-      "@oxygenui/tabs-semantic-mode": "error",
+      "@zoblocks/tabs-semantic-mode": "error",
       // Warn: the rule can only see lexical nesting, so a nested accordion
       // composed through a variable or a wrapper component is invisible to it.
       // It catches the common inline shape, which is where the mistake is made.
-      "@oxygenui/no-heading-level-drift": "warn",
+      "@zoblocks/no-heading-level-drift": "warn",
       // Warn rather than error while the existing catalog is converted. Becomes
       // an error in Phase 1; see ADR 0008.
-      "@oxygenui/prefer-logical-properties": "warn",
+      "@zoblocks/prefer-logical-properties": "warn",
       // Warn by design, not by transition. Every phrase this catches has a
       // legitimate use somewhere — the rule exists to make the author look at
       // it once, not to forbid a word.
-      "@oxygenui/no-ambiguous-clinical-copy": "warn",
+      "@zoblocks/no-ambiguous-clinical-copy": "warn",
       // Same reasoning, higher stakes. A patient's own words are exempt, and
       // the alternative is always offered rather than the term merely banned.
-      "@oxygenui/no-stigmatising-language": "warn",
+      "@zoblocks/no-stigmatising-language": "warn",
       // Warn by design: a question-shaped label is sometimes the right words
       // for a control that genuinely holds one answer. The rule exists to make
       // the author reach for `segmented` deliberately rather than by default.
-      "@oxygenui/switch-not-for-questions": "warn",
+      "@zoblocks/switch-not-for-questions": "warn",
     },
   },
 };
@@ -130,13 +130,13 @@ plugin.configs = {
  * false positives, and nothing else is here until that is true of it too.
  */
 plugin.configs.product = {
-  plugins: { "@oxygenui": plugin },
+  plugins: { "@zoblocks": plugin },
   rules: {
     // Errors, both. Neither is a matter of taste, and neither is visible in a
     // diff — a count goes stale while nobody touches the file, and a vague
     // failure reads as finished copy right up until somebody hits it.
-    "@oxygenui/no-hardcoded-count": "error",
-    "@oxygenui/no-vague-failure": "error",
+    "@zoblocks/no-hardcoded-count": "error",
+    "@zoblocks/no-vague-failure": "error",
   },
 };
 

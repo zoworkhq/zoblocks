@@ -118,8 +118,8 @@ function componentFor(name: string): LoadedComponent {
     sourcePath: path.relative(ROOT, file),
     propsFile: file,
     extraPropsFiles: [],
-    consumerSpecifier: `@/components/oxygen/${name}`,
-    consumerTarget: `components/oxygen/${name}.tsx`,
+    consumerSpecifier: `@/components/zoblocks/${name}`,
+    consumerTarget: `components/zoblocks/${name}.tsx`,
     hasStory: false,
     hasTest: false,
     // The relationship graph is computed across the whole catalog; a fixture

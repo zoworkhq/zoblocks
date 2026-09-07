@@ -1,6 +1,6 @@
 ---
-"@oxygenui-design/theme": minor
-"@oxygenui-design/tokens": patch
+"@zoblocks/theme": minor
+"@zoblocks/tokens": patch
 ---
 
 Print artwork, an honest token surface, and one field removed

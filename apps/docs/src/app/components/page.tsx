@@ -40,7 +40,7 @@ export default function ComponentsPage() {
         <section className="border-b border-rule">
           <div className="mx-auto grid max-w-6xl section-major gap-10 px-5 sm:px-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:items-end lg:gap-16">
             <div>
-              <p className="eyebrow eyebrow-rule text-oxygen-deep" data-reveal>
+              <p className="eyebrow eyebrow-rule text-brand-deep" data-reveal>
                 Catalogue
               </p>
               <h1 className="display-lg mt-5 text-balance" data-reveal>
@@ -61,7 +61,7 @@ export default function ComponentsPage() {
               <div className="mt-8 max-w-md" data-reveal>
                 <InstallCommand
                   size="sm"
-                  command="npx @oxygenui-design/cli init"
+                  command="npx @zoblocks/cli init"
                   note={
                     <>
                       Run once per project. It records where your{" "}
@@ -91,7 +91,7 @@ export default function ComponentsPage() {
                   className="flex items-baseline justify-between border-b border-rule/70 py-2.5"
                 >
                   <dt className="axis-label">{stat.label}</dt>
-                  <dd className="numeric text-2xl font-semibold text-oxygen-deep">{stat.value}</dd>
+                  <dd className="numeric text-2xl font-semibold text-brand-deep">{stat.value}</dd>
                 </div>
               ))}
             </dl>
@@ -113,7 +113,7 @@ export default function ComponentsPage() {
             {CATALOG.length === 0 ? (
               <p className="max-w-xl rounded-2xl border border-dashed border-rule px-6 py-8 text-sm leading-relaxed text-graphite">
                 The catalogue failed to load. This is a build fault, not an empty library —{" "}
-                <a className="underline" href="https://github.com/zoworkhq/oxygenui/issues">
+                <a className="underline" href="https://github.com/zoworkhq/zoblocks/issues">
                   please report it
                 </a>
                 .
@@ -139,7 +139,7 @@ export default function ComponentsPage() {
 
               <div className="mt-6 grid gap-4 md:grid-cols-2" data-reveal>
                 <div className="surface-2 rounded-2xl p-6">
-                  <p className="axis-label text-oxygen-deep">{core.name}</p>
+                  <p className="axis-label text-brand-deep">{core.name}</p>
                   <p className="mt-2 font-display text-3xl font-semibold tracking-tight">
                     {core.price}
                   </p>
@@ -150,8 +150,8 @@ export default function ComponentsPage() {
                   </p>
                 </div>
 
-                <div className="surface-2 rounded-2xl border-oxygen/30 p-6">
-                  <p className="axis-label text-oxygen-deep">{marketplace.name}</p>
+                <div className="surface-2 rounded-2xl border-brand/30 p-6">
+                  <p className="axis-label text-brand-deep">{marketplace.name}</p>
                   <p className="mt-2 font-display text-3xl font-semibold tracking-tight">
                     {marketplace.price}
                     {marketplace.cadence ? (
@@ -165,7 +165,7 @@ export default function ComponentsPage() {
                   </p>
                   <Link
                     href={marketplace.href}
-                    className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-oxygen-deep transition-colors hover:text-ink"
+                    className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-brand-deep transition-colors hover:text-ink"
                   >
                     {marketplace.cta}
                     <ArrowUpRight aria-hidden="true" className="size-3.5" />
@@ -186,7 +186,7 @@ export default function ComponentsPage() {
               <p className="mt-4 text-xs text-graphite-soft" data-reveal>
                 Team and Enterprise add starter kits, shared design assets and support.{" "}
                 <a
-                  href="mailto:hello@zowork.com?subject=Oxygen%20UI%20Team%20and%20Enterprise"
+                  href="mailto:hello@zowork.com?subject=Zoblocks%20Team%20and%20Enterprise"
                   className="underline underline-offset-2 hover:text-ink"
                 >
                   Ask us for the current terms

@@ -86,13 +86,13 @@ export const TabsPanel = React.forwardRef<HTMLDivElement, TabsPanelProps>(functi
     <div
       {...rest}
       ref={ref}
-      className={["ox-tabs__panel", className].filter(Boolean).join(" ")}
+      className={["zb-tabs__panel", className].filter(Boolean).join(" ")}
       role="tabpanel"
       id={idFor(ctx.baseId, value, "panel")}
       aria-labelledby={idFor(ctx.baseId, value, "trigger")}
       hidden={!selected}
       tabIndex={selected && !focusable ? 0 : undefined}
-      data-ox-panel=""
+      data-zb-panel=""
     >
       {children}
     </div>
@@ -106,7 +106,7 @@ export const TabsPanels = React.forwardRef<HTMLDivElement, React.HTMLAttributes<
       <div
         {...rest}
         ref={ref}
-        className={["ox-tabs__panels", className].filter(Boolean).join(" ")}
+        className={["zb-tabs__panels", className].filter(Boolean).join(" ")}
       />
     );
   },

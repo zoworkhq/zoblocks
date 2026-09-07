@@ -129,7 +129,7 @@ describe("SignaturePad accessibility", () => {
     // failure. The surface is the affordance for one mode; the group is the
     // control.
     const { container } = render(<SignaturePad />);
-    const ink = container.querySelector(".ox-signature__ink");
+    const ink = container.querySelector(".zb-signature__ink");
     expect(ink).toHaveAttribute("aria-hidden", "true");
   });
 
@@ -153,7 +153,7 @@ describe("SignaturePad accessibility", () => {
     const user = userEvent.setup();
     const { container } = render(<SignaturePad label="Signature" />);
 
-    const surface = container.querySelector<HTMLElement>("[data-ox-signature-pad]");
+    const surface = container.querySelector<HTMLElement>("[data-zb-signature-pad]");
     if (!surface) throw new Error("no capture surface");
     // Long enough to clear the minimum-ink gate, which is also what decides
     // whether erasing is worth confirming.
@@ -285,7 +285,7 @@ describe("the typed path", () => {
   it("still renders when the typed path is removed, so the lint rule is the guard", () => {
     // A component that writes to a customer's app is forbidden here, and
     // the mistake is invisible at runtime anyway — it renders and passes every
-    // other test. `@oxygenui/signature-requires-typed-path` is what catches it,
+    // other test. `@zoblocks/signature-requires-typed-path` is what catches it,
     // with its own tests in the eslint plugin.
     render(<Signature now={NOW} methods={["draw"]} />);
     expect(screen.getByRole("button", { name: /add signature/i })).toBeInTheDocument();
@@ -555,7 +555,7 @@ describe("SignatureManifest", () => {
   it("shows the three things 21 CFR 11.50 requires", async () => {
     const { container } = render(<SignatureManifest value={SIGNED} />);
     // Printed name — scoped past the SVG, which also contains the typed name.
-    const printed = container.querySelector(".ox-signature-manifest__ink > div:last-child");
+    const printed = container.querySelector(".zb-signature-manifest__ink > div:last-child");
     expect(printed).toHaveTextContent("Josh Randall");
     // …the meaning…
     expect(screen.getByText(/consent — agreement/i)).toBeInTheDocument();
@@ -804,7 +804,7 @@ describe("SignatureManifest", () => {
 describe("the field", () => {
   it("shows the record once signed, not a blank box", () => {
     const { container } = render(<Signature now={NOW} value={SIGNED} />);
-    expect(container.querySelector(".ox-signature-manifest")).toHaveTextContent("Josh Randall");
+    expect(container.querySelector(".zb-signature-manifest")).toHaveTextContent("Josh Randall");
     expect(screen.queryByRole("button", { name: /add signature/i })).not.toBeInTheDocument();
   });
 
@@ -824,7 +824,7 @@ describe("the field", () => {
       pointerEventsCheck: 0,
     });
     const { container } = render(<Signature now={NOW} defaultValue={SIGNED} />);
-    expect(container.querySelector(".ox-signature-manifest")).toHaveTextContent("Josh Randall");
+    expect(container.querySelector(".zb-signature-manifest")).toHaveTextContent("Josh Randall");
     await user.click(screen.getByRole("button", { name: /change/i }));
     expect(await screen.findByRole("dialog")).toBeInTheDocument();
   });

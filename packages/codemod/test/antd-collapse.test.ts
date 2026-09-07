@@ -22,7 +22,7 @@ const messages = (code: string) => run(code).notes.map((n) => n.message);
 describe("imports", () => {
   it("replaces a lone Collapse import", () => {
     const { code } = run('import { Collapse } from "antd";\n<Collapse items={items} />;');
-    expect(code).toContain('import { Accordion } from "@oxygenui-design/react";');
+    expect(code).toContain('import { Accordion } from "@zoblocks/react";');
     expect(code).not.toContain('from "antd"');
   });
 
@@ -31,7 +31,7 @@ describe("imports", () => {
     // unrelated, and the team would stop trusting the tool.
     const { code } = run('import { Button, Collapse, Modal } from "antd";');
     expect(code).toContain('import { Button, Modal } from "antd";');
-    expect(code).toContain('import { Accordion } from "@oxygenui-design/react";');
+    expect(code).toContain('import { Accordion } from "@zoblocks/react";');
   });
 
   it("leaves single quotes as it found them", () => {

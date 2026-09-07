@@ -55,7 +55,7 @@ export class Emitter {
    * Deletes files in `dir` that this run did not produce.
    *
    * Without this, removing a component leaves its JSON on the CDN and the
-   * Oxygen CLI keeps installing a component that no longer exists in the
+   * Zoblocks CLI keeps installing a component that no longer exists in the
    * repository — source nobody maintains, reaching customers indefinitely.
    * Deprecation is supposed to be the sequence in ADR 0006, not an orphaned
    * file.

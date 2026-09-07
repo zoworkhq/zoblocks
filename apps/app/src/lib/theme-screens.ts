@@ -8,7 +8,7 @@ import {
   Shapes,
   Type as TypeIcon,
 } from "lucide-react";
-import { RAMP_STEPS, type ThemeTokens } from "@oxygenui-design/theme";
+import { RAMP_STEPS, type ThemeTokens } from "@zoblocks/theme";
 
 /**
  * The eight screens that operate on one theme — declared once.

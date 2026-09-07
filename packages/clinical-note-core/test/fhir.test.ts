@@ -99,10 +99,10 @@ describe("toComposition", () => {
   });
 
   it("keeps provenance out of the narrative unless asked", () => {
-    expect(JSON.stringify(toComposition(sampleNote(), base))).not.toContain("data-ox-origin");
+    expect(JSON.stringify(toComposition(sampleNote(), base))).not.toContain("data-zb-origin");
     expect(
       JSON.stringify(toComposition(sampleNote(), { ...base, narrative: { provenance: true } })),
-    ).toContain("data-ox-origin");
+    ).toContain("data-zb-origin");
   });
 });
 
@@ -202,7 +202,7 @@ describe("toProvenance", () => {
   it("advertises the extension as ours rather than pretending it is standard", () => {
     // The most valuable thing the component produces travels as a custom
     // extension. That is an acceptable trade only if it is stated.
-    expect(COMPOSITION_EXTENSION).toContain("oxygenui.design");
+    expect(COMPOSITION_EXTENSION).toContain("zoblocks.design");
   });
 });
 

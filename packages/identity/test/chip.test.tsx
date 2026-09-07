@@ -27,28 +27,28 @@ describe("PatientChip — on its own", () => {
 
   it("carries the whole person in one accessible string", () => {
     const { container } = F.renderWithPolicy(<PatientChip patient={F.amaraA} />);
-    expect(container.querySelector(".ox-visually-hidden")?.textContent).toContain(
+    expect(container.querySelector(".zb-visually-hidden")?.textContent).toContain(
       "Patient: Amara Chinelo Okonkwo",
     );
   });
 
   it("publishes which patient it references", () => {
     const { container } = F.renderWithPolicy(<PatientChip patient={F.amaraA} />);
-    expect(container.querySelector("[data-ox-patient-id]")).toHaveAttribute(
-      "data-ox-patient-id",
+    expect(container.querySelector("[data-zb-patient-id]")).toHaveAttribute(
+      "data-zb-patient-id",
       "pat-4471",
     );
   });
 
   it("renders a skeleton rather than a partial identity", () => {
     const { container } = F.renderWithPolicy(<PatientChip />);
-    expect(container.querySelector(".ox-patient-chip--loading")).toBeInTheDocument();
+    expect(container.querySelector(".zb-patient-chip--loading")).toBeInTheDocument();
     expect(screen.getByText("Loading patient")).toBeInTheDocument();
   });
 
   it("fills the inline axis on request, for worklists", () => {
     const { container } = F.renderWithPolicy(<PatientChip patient={F.amaraA} block />);
-    expect(container.querySelector(".ox-patient-chip--block")).toBeInTheDocument();
+    expect(container.querySelector(".zb-patient-chip--block")).toBeInTheDocument();
   });
 
   it("keeps the block modifier while loading, so a list does not reflow", () => {
@@ -56,17 +56,17 @@ describe("PatientChip — on its own", () => {
     // content and the loaded row fills the axis, every row jumps sideways the
     // moment the data lands.
     const { container } = F.renderWithPolicy(<PatientChip block />);
-    const chip = container.querySelector(".ox-patient-chip--loading");
-    expect(chip).toHaveClass("ox-patient-chip--block");
+    const chip = container.querySelector(".zb-patient-chip--loading");
+    expect(chip).toHaveClass("zb-patient-chip--block");
   });
 
   it("stays out of the accordion's badge namespace", () => {
-    // `.ox-chip` belongs to Accordion's severity badge. A chip that renders it
+    // `.zb-chip` belongs to Accordion's severity badge. A chip that renders it
     // inherits a border, a background and text padding on a box that has to
     // hold an avatar. See test/css-namespace.test.ts.
     const { container } = F.renderWithPolicy(<PatientChip patient={F.amaraA} />);
-    expect(container.querySelector(".ox-chip")).toBeNull();
-    expect(container.querySelector(".ox-patient-chip")).toBeInTheDocument();
+    expect(container.querySelector(".zb-chip")).toBeNull();
+    expect(container.querySelector(".zb-patient-chip")).toBeInTheDocument();
   });
 
   it("keeps a mononym whole", () => {
@@ -87,16 +87,16 @@ describe("PatientChip — on its own", () => {
 
   it("can hide the avatar for a dense table", () => {
     const { container } = F.renderWithPolicy(<PatientChip patient={F.amaraA} hideAvatar />);
-    expect(container.querySelector(".ox-avatar")).toBeNull();
+    expect(container.querySelector(".zb-avatar")).toBeNull();
   });
 
   it("stays within the DOM node budget", () => {
     // Avatar + wrapper + text wrapper + name = 4. The performance budget in the
     // brief is "no more than 4 nodes per chip".
     const { container } = F.renderWithPolicy(<PatientChip patient={F.amaraA} />);
-    const chip = container.querySelector(".ox-patient-chip") as HTMLElement;
+    const chip = container.querySelector(".zb-patient-chip") as HTMLElement;
     const visible = [...chip.querySelectorAll("*")].filter(
-      (el) => !el.classList.contains("ox-visually-hidden"),
+      (el) => !el.classList.contains("zb-visually-hidden"),
     );
     expect(visible.length).toBeLessThanOrEqual(4);
   });
@@ -134,10 +134,10 @@ describe("PatientChip — inside an IdentitySet", () => {
     await waitFor(() => expect(screen.getByText("Amara Chinelo Okonkwo")).toBeInTheDocument());
     // Ada may share a swatch, which escalates quietly; what must not happen is
     // her row being marked as a name collision.
-    const adaRow = [...container.querySelectorAll(".ox-patient-chip")].find((c) =>
+    const adaRow = [...container.querySelectorAll(".zb-patient-chip")].find((c) =>
       c.textContent?.includes("Lovelace"),
     );
-    expect(adaRow?.getAttribute("data-ox-escalated")).toBeNull();
+    expect(adaRow?.getAttribute("data-zb-escalated")).toBeNull();
   });
 
   it("raises a list-level notice that names the count and the action", async () => {
@@ -211,7 +211,7 @@ describe("PatientChip — inside an IdentitySet", () => {
   it("announces the escalation to a screen reader too", async () => {
     const { container } = rows([F.amaraA, F.amaraB]);
     await waitFor(() => {
-      const hidden = [...container.querySelectorAll(".ox-visually-hidden")]
+      const hidden = [...container.querySelectorAll(".zb-visually-hidden")]
         .map((n) => n.textContent)
         .join(" ");
       expect(hidden).toContain("Similar name on this list");
@@ -222,9 +222,9 @@ describe("PatientChip — inside an IdentitySet", () => {
 describe("PatientChip — states", () => {
   it("shows the visible state tag only when asked", () => {
     const plain = F.renderWithPolicy(<PatientChip patient={F.deceased} />);
-    expect(plain.container.querySelector("[data-ox-state]")).toBeNull();
+    expect(plain.container.querySelector("[data-zb-state]")).toBeNull();
     const withStates = F.renderWithPolicy(<PatientChip patient={F.deceased} showStates />);
-    expect(withStates.container.querySelector('[data-ox-state="deceased"]')).toBeInTheDocument();
+    expect(withStates.container.querySelector('[data-zb-state="deceased"]')).toBeInTheDocument();
   });
 
   it("always names the state in the accessible label, even when the tag is hidden", () => {
@@ -232,14 +232,14 @@ describe("PatientChip — states", () => {
     // know the patient has died. `showStates` is a density control, not a
     // disclosure one.
     const { container } = F.renderWithPolicy(<PatientChip patient={F.deceased} />);
-    expect(container.querySelector(".ox-visually-hidden")?.textContent).toContain("Deceased");
+    expect(container.querySelector(".zb-visually-hidden")?.textContent).toContain("Deceased");
   });
 });
 
 describe("IdentitySet — enabled", () => {
   it("escalates by default", () => {
     const { container } = rows([F.amaraA, F.amaraB]);
-    expect(container.querySelectorAll(".ox-patient-chip--escalated")).toHaveLength(2);
+    expect(container.querySelectorAll(".zb-patient-chip--escalated")).toHaveLength(2);
   });
 
   it("escalates nothing when the pass is turned off", () => {
@@ -255,8 +255,8 @@ describe("IdentitySet — enabled", () => {
         <IdentitySetNotice />
       </IdentitySet>,
     );
-    expect(container.querySelector(".ox-patient-chip--escalated")).toBeNull();
-    expect(container.querySelectorAll(".ox-patient-chip")).toHaveLength(2);
+    expect(container.querySelector(".zb-patient-chip--escalated")).toBeNull();
+    expect(container.querySelectorAll(".zb-patient-chip")).toHaveLength(2);
   });
 
   it("keeps the same DOM nodes when the pass is toggled", async () => {
@@ -282,8 +282,8 @@ describe("IdentitySet — enabled", () => {
       </IdentitySet>,
     );
 
-    const before = container.querySelector(".ox-patient-chip");
-    expect(before).toHaveClass("ox-patient-chip--escalated");
+    const before = container.querySelector(".zb-patient-chip");
+    expect(before).toHaveClass("zb-patient-chip--escalated");
 
     rerender(
       <IdentitySet enabled={false}>
@@ -298,9 +298,9 @@ describe("IdentitySet — enabled", () => {
     );
 
     await waitFor(() => {
-      const after = container.querySelector(".ox-patient-chip");
+      const after = container.querySelector(".zb-patient-chip");
       expect(after).toBe(before);
-      expect(after).not.toHaveClass("ox-patient-chip--escalated");
+      expect(after).not.toHaveClass("zb-patient-chip--escalated");
     });
   });
 
@@ -317,6 +317,6 @@ describe("IdentitySet — enabled", () => {
         <IdentitySetNotice />
       </IdentitySet>,
     );
-    expect(container.querySelector(".ox-identity-notice")).toBeNull();
+    expect(container.querySelector(".zb-identity-notice")).toBeNull();
   });
 });

@@ -26,7 +26,7 @@ import {
   indicatorGeometry,
   indicatorStyle,
   type IndicatorGeometry,
-} from "@oxygenui-design/tabs-core";
+} from "@zoblocks/tabs-core";
 import { useIsoLayoutEffect } from "./internal.js";
 
 export interface UseIndicatorOptions {
@@ -122,7 +122,7 @@ export function useIndicator({
       const selected = getSelectedRef.current();
       if (selected) observer.observe(selected);
     } else {
-      for (const child of Array.from(list.querySelectorAll("[data-ox-tab]"))) {
+      for (const child of Array.from(list.querySelectorAll("[data-zb-tab]"))) {
         observer.observe(child);
       }
     }

@@ -1,7 +1,7 @@
 /**
  * The component token surface — generated, so it cannot drift from the CSS.
  *
- * Every component reads its own `--ox-<component>-*` tokens and nothing else.
+ * Every component reads its own `--zb-<component>-*` tokens and nothing else.
  * That set is the override point a customer brands against, and the set a
  * theme bridge writes when it translates a host framework's theme. Until now
  * it existed only as a convention spread across a token file and seven
@@ -20,7 +20,7 @@
  *                  degrades and one that disappears.
  *
  *   `bridgeable` — false for anything resolving to clinical status. A bridge
- *                  that maps a host's `colorError` onto `--ox-status-critical`
+ *                  that maps a host's `colorError` onto `--zb-status-critical`
  *                  replaces a validated clinical signal with an arbitrary
  *                  brand colour. The flag is what lets that be a build failure
  *                  rather than a code review.
@@ -46,7 +46,7 @@ export interface SurfaceEntry {
   /** Where the declaration lives, for a reviewer following a diff. */
   source: string;
   kind: TokenKind;
-  /** The `--ox-*` token this falls through to, when it has one. */
+  /** The `--zb-*` token this falls through to, when it has one. */
   semantic?: string;
   /** Host-framework variables already in the chain, in order. */
   frameworks: string[];
@@ -62,7 +62,7 @@ export interface SurfaceEntry {
 /**
  * Stylesheets that declare component-tier tokens.
  *
- * `registry/oxygen/lib/*.css` is deliberately absent: it is the copy-source
+ * `registry/zoblocks/lib/*.css` is deliberately absent: it is the copy-source
  * twin of `packages/react/src/styles/*.css`, and `css-namespace` already holds
  * the two channels to each other. Listing both would double every entry and
  * make the manifest disagree with itself about where a token comes from.
@@ -79,7 +79,7 @@ const STYLESHEETS = [
 ];
 
 /** Semantic tokens a bridge must never write, and a customer may never override. */
-const CLINICAL = /^--ox-(status|flag)-/;
+const CLINICAL = /^--zb-(status|flag)-/;
 const CLINICAL_PATH = /^(status|flag)\./;
 
 /**
@@ -146,21 +146,21 @@ function walkChain(value: string): { vars: string[]; fallback: boolean } {
  * The component a declaration belongs to, taken from the block it sits in.
  *
  * Deriving it from the token *name* looked simpler and was wrong in both
- * directions: `--ox-care-timeline-divider` split to `care`, and `--ox-av-size`
- * and `--ox-sw-bg` are the avatar and its swatches, which no amount of prefix
- * parsing reveals. The selector already knows — `.ox-avatar` declares the
- * first, `.ox-avatar__swatch` the second — so the selector is the key.
+ * directions: `--zb-care-timeline-divider` split to `care`, and `--zb-av-size`
+ * and `--zb-sw-bg` are the avatar and its swatches, which no amount of prefix
+ * parsing reveals. The selector already knows — `.zb-avatar` declares the
+ * first, `.zb-avatar__swatch` the second — so the selector is the key.
  */
 function componentOfSelector(selector: string): string | undefined {
-  const match = /\.ox-([a-z0-9-]+)/.exec(selector);
+  const match = /\.zb-([a-z0-9-]+)/.exec(selector);
   if (!match?.[1]) return undefined;
-  // `.ox-tabs__panel` and `.ox-avatar--20` are a part and a modifier of one
+  // `.zb-tabs__panel` and `.zb-avatar--20` are a part and a modifier of one
   // component, not components of their own.
   const [base] = match[1].split("__");
   return base?.replace(/--.*$/, "") || undefined;
 }
 
-const DECLARATION = /^\s*(--ox-[a-z0-9-]+)\s*:\s*([^;]+);/;
+const DECLARATION = /^\s*(--zb-[a-z0-9-]+)\s*:\s*([^;]+);/;
 
 /**
  * Reads declarations together with the selector block they sit inside.
@@ -263,7 +263,7 @@ export async function buildSurface(source: TokenSource): Promise<SurfaceEntry[]>
 
   /*
    * Tier two: tokens a component declares directly in its own stylesheet.
-   * These carry the `var(--ox-*, var(--ant-*, literal))` chains, so this is
+   * These carry the `var(--zb-*, var(--ant-*, literal))` chains, so this is
    * where `fallback` and `frameworks` come from.
    */
   for (const relative of STYLESHEETS) {
@@ -280,8 +280,8 @@ export async function buildSurface(source: TokenSource): Promise<SurfaceEntry[]>
       if (entries.has(name)) continue;
 
       const { vars, fallback } = walkChain(value);
-      const semantic = vars.find((v) => v.startsWith("--ox-"));
-      const frameworks = vars.filter((v) => !v.startsWith("--ox-"));
+      const semantic = vars.find((v) => v.startsWith("--zb-"));
+      const frameworks = vars.filter((v) => !v.startsWith("--zb-"));
 
       entries.set(name, {
         name,
@@ -298,7 +298,7 @@ export async function buildSurface(source: TokenSource): Promise<SurfaceEntry[]>
 
   /*
    * `fallback` is about the *effective* chain, not the declaration.
-   * `--ox-tabs-indicator: var(--ox-tabs-accent)` names no literal of its own,
+   * `--zb-tabs-indicator: var(--zb-tabs-accent)` names no literal of its own,
    * but the token it points at terminates in one — so the indicator is safe on
    * a bare page. Resolving transitively is what stops the flag reporting ten
    * false alarms and being ignored.
@@ -325,12 +325,12 @@ export async function buildSurface(source: TokenSource): Promise<SurfaceEntry[]>
 }
 
 /**
- * Component tokens whose `--ox-*` fallback names a token nothing defines.
+ * Component tokens whose `--zb-*` fallback names a token nothing defines.
  *
  * This is the silent failure the manifest exists to catch. A declaration
- * reading `var(--ox-fg-muted, var(--ant-color-text-secondary, #475569))` looks
+ * reading `var(--zb-fg-muted, var(--ant-color-text-secondary, #475569))` looks
  * correct and renders correctly — against antd's colour or the literal. What it
- * never does is follow an Oxygen brand, because `--ox-fg-muted` is not a token
+ * never does is follow a Zoblocks brand, because `--zb-fg-muted` is not a token
  * the pipeline emits. The component silently opts out of the theming system it
  * appears to participate in, and no test notices because the pixels are fine.
  */
@@ -354,8 +354,8 @@ export function danglingReferences(
 /**
  * Component tokens whose chain does not reach a literal.
  *
- * A declaration reading `var(--ox-border)` and nothing else is correct in an
- * Oxygen application and renders as *nothing* on a page that has not loaded
+ * A declaration reading `var(--zb-border)` and nothing else is correct in an
+ * Zoblocks application and renders as *nothing* on a page that has not loaded
  * the token stylesheet — the component does not degrade, its rails and borders
  * disappear. That is a weaker failure than a dangling reference and still a
  * real one.
@@ -418,7 +418,7 @@ export async function emitSurface(
    * component tier happens to consume.
    *
    * `NOT_BRIDGEABLE` lists *component* tokens, so a clinical semantic token no
-   * component references yet is absent from it — `--ox-flag-provisional` was
+   * component references yet is absent from it — `--zb-flag-provisional` was
    * exactly that. A consumer deriving the rule from that list therefore
    * misclassifies it, which is how the theme app came to describe an
    * identity flag as an ordinary gap in Ant Design's palette. Publishing the
@@ -470,7 +470,7 @@ export interface SurfaceEntry {
   /** Where the declaration lives. */
   readonly source: string;
   readonly kind: TokenKind;
-  /** The \`--ox-*\` token this falls through to, when it has one. */
+  /** The \`--zb-*\` token this falls through to, when it has one. */
   readonly semantic?: string;
   /** Host-framework variables already in the chain, in order. */
   readonly frameworks: readonly string[];

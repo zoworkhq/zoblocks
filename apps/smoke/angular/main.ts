@@ -24,41 +24,41 @@ import "@angular/compiler";
 import "zone.js";
 import { Component, CUSTOM_ELEMENTS_SCHEMA, signal } from "@angular/core";
 import { bootstrapApplication } from "@angular/platform-browser";
-import "@oxygenui-design/loaders/pulse";
-import "@oxygenui-design/loaders/rhythm";
+import "@zoblocks/loaders/pulse";
+import "@zoblocks/loaders/rhythm";
 
 @Component({
-  selector: "ox-smoke-root",
+  selector: "zb-smoke-root",
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   host: {
-    "(ox-loader-show)": "bump()",
-    "(ox-loader-hide)": "bump()",
+    "(zb-loader-show)": "bump()",
+    "(zb-loader-hide)": "bump()",
   },
   template: `
     <h1>Framework: <span id="framework">angular</span></h1>
 
     <div class="row">
-      <ox-pulse-loader
+      <zb-pulse-loader
         id="loader"
         label="Loading patient record"
         mode="inline"
         min-duration="0"
         [attr.open]="open()"
-      ></ox-pulse-loader>
+      ></zb-pulse-loader>
       <button id="toggle" type="button" (click)="open.set(open() === 'true' ? 'false' : 'true')">
         Toggle
       </button>
     </div>
 
     <div class="row">
-      <ox-rhythm-loader
+      <zb-rhythm-loader
         id="determinate"
         label="Uploading study"
         mode="inline"
         min-duration="0"
         [attr.progress]="progress()"
-      ></ox-rhythm-loader>
+      ></zb-rhythm-loader>
       <button id="step" type="button" (click)="progress.set((progress() + 25) % 125)">Step</button>
     </div>
 

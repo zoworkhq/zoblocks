@@ -26,7 +26,7 @@ const provenance = () => ({
   },
   authorship: { method: "hand-drawn" as const, thirdPartyContent: [] },
   licence: {
-    id: "oxygen-pack-1.0",
+    id: "zoblocks-pack-1.0",
     grant: "per-organisation, perpetual",
     derivatives: "permitted",
     resale: "prohibited",

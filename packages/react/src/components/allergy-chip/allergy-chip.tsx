@@ -5,7 +5,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/allergy-chip/allergy-chip.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/allergy-chip/allergy-chip.tsx. Edit that file, not this one.
 /**
  * AllergyChip — the chip that refuses to conflate how bad the last reaction
  * was with how bad the next one could be.
@@ -25,7 +25,7 @@
  * to the second — because an empty list beside a prescribing button is a claim
  * the software has not earned.
  *
- * Styling lives in `styles/oxygen-allergy.css`, installed alongside.
+ * Styling lives in `styles/zoblocks-allergy.css`, installed alongside.
  */
 
 import * as React from "react";
@@ -106,35 +106,35 @@ export const AllergyChip = React.forwardRef<HTMLElement, AllergyChipProps>(funct
   const active = isActive(record.verification);
 
   const shell = {
-    className: cn("ox-allergy", className),
-    "data-ox-allergy": "",
-    "data-ox-kind": record.kind,
-    "data-ox-criticality": record.criticality ?? undefined,
-    "data-ox-verification": record.verification ?? undefined,
-    "data-ox-density": density,
+    className: cn("zb-allergy", className),
+    "data-zb-allergy": "",
+    "data-zb-kind": record.kind,
+    "data-zb-criticality": record.criticality ?? undefined,
+    "data-zb-verification": record.verification ?? undefined,
+    "data-zb-density": density,
     // Refuted and entered-in-error are not warnings any more, and the record
     // has to keep saying so rather than being deleted — a refuted allergy that
     // vanishes gets re-reported at the next intake.
-    "data-ox-inactive": active ? undefined : "",
+    "data-zb-inactive": active ? undefined : "",
     "aria-label": describeAllergy(record),
     ...rest,
   };
 
   const content = (
     <>
-      <span className="ox-allergy__head" aria-hidden="true">
-        <span className="ox-allergy__substance">{record.substance}</span>
+      <span className="zb-allergy__head" aria-hidden="true">
+        <span className="zb-allergy__substance">{record.substance}</span>
         {record.kind !== "allergy" ? (
-          <span className="ox-allergy__kind">{KIND_LABEL[record.kind]}</span>
+          <span className="zb-allergy__kind">{KIND_LABEL[record.kind]}</span>
         ) : null}
         {expansion ? (
-          <span className="ox-allergy__class">
+          <span className="zb-allergy__class">
             Class: {expansion.label} · {expansion.count} members
           </span>
         ) : null}
       </span>
 
-      <span className="ox-allergy__signals" aria-hidden="true">
+      <span className="zb-allergy__signals" aria-hidden="true">
         {/*
           Future risk, as the primary signal and with a shape.
           The two fields are rendered as different things on purpose: a chip
@@ -150,7 +150,7 @@ export const AllergyChip = React.forwardRef<HTMLElement, AllergyChipProps>(funct
         ) : null}
 
         {record.verification ? (
-          <span className="ox-allergy__verification">
+          <span className="zb-allergy__verification">
             {VERIFICATION_LABEL[record.verification]}
           </span>
         ) : null}
@@ -162,24 +162,24 @@ export const AllergyChip = React.forwardRef<HTMLElement, AllergyChipProps>(funct
         contradiction only until you know the two fields answer different
         questions, which is why both are always present when both are known.
       */}
-      <span className="ox-allergy__past" aria-hidden="true">
+      <span className="zb-allergy__past" aria-hidden="true">
         {worst ? (
           <>
-            <span className="ox-allergy__manifestation">{worst.manifestation}</span>
+            <span className="zb-allergy__manifestation">{worst.manifestation}</span>
             {worst.severity ? (
-              <span className="ox-allergy__severity" data-ox-severity={worst.severity}>
+              <span className="zb-allergy__severity" data-zb-severity={worst.severity}>
                 {SEVERITY_LABEL[worst.severity]}
               </span>
             ) : null}
-            {worst.onset ? <span className="ox-allergy__when">{worst.onset}</span> : null}
-            {worst.note ? <span className="ox-allergy__when">{worst.note}</span> : null}
+            {worst.onset ? <span className="zb-allergy__when">{worst.onset}</span> : null}
+            {worst.note ? <span className="zb-allergy__when">{worst.note}</span> : null}
           </>
         ) : record.criticality ? (
-          <span className="ox-allergy__manifestation" data-ox-none="">
+          <span className="zb-allergy__manifestation" data-zb-none="">
             No reaction recorded
           </span>
         ) : null}
-        {record.note ? <span className="ox-allergy__when">{record.note}</span> : null}
+        {record.note ? <span className="zb-allergy__when">{record.note}</span> : null}
       </span>
     </>
   );
@@ -259,8 +259,8 @@ export const AllergyList = React.forwardRef<HTMLDivElement, AllergyListProps>(fu
     <div
       {...rest}
       ref={ref}
-      className={cn("ox-allergy-list", className)}
-      data-ox-allergy-list={state.kind}
+      className={cn("zb-allergy-list", className)}
+      data-zb-allergy-list={state.kind}
     >
       {state.kind === "records" ? (
         state.records.map((record) => (
@@ -280,12 +280,12 @@ export const AllergyList = React.forwardRef<HTMLDivElement, AllergyListProps>(fu
          * to prescribe against — and the author and date are what separate it
          * from the state below.
          */
-        <div className="ox-allergy-none" role="group" aria-label={describeNoKnown(state.assertion)}>
-          <span className="ox-allergy-none__head" aria-hidden="true">
+        <div className="zb-allergy-none" role="group" aria-label={describeNoKnown(state.assertion)}>
+          <span className="zb-allergy-none__head" aria-hidden="true">
             <ClinicalStatus scale="criticality" step="normal" shape="dot" density="compact" />
             No known{state.assertion.scope ? ` ${state.assertion.scope}` : ""} allergies
           </span>
-          <span className="ox-allergy-none__meta" aria-hidden="true">
+          <span className="zb-allergy-none__meta" aria-hidden="true">
             Asserted by {state.assertion.asserter} · {state.assertion.assertedAt}
             {state.assertion.context ? ` · ${state.assertion.context}` : ""}
           </span>
@@ -299,16 +299,16 @@ export const AllergyList = React.forwardRef<HTMLDivElement, AllergyListProps>(fu
          * reading either, because the consequence of confusing them is a
          * prescription written against an allergy history nobody took.
          */
-        <div className="ox-allergy-unknown" role="group" aria-label={NOT_ASKED_SENTENCE}>
-          <span className="ox-allergy-unknown__head" aria-hidden="true">
+        <div className="zb-allergy-unknown" role="group" aria-label={NOT_ASKED_SENTENCE}>
+          <span className="zb-allergy-unknown__head" aria-hidden="true">
             <ClinicalStatus scale="criticality" step="not-assessed" shape="dot" density="compact" />
             Allergy status not recorded
           </span>
-          <span className="ox-allergy-unknown__meta" aria-hidden="true">
+          <span className="zb-allergy-unknown__meta" aria-hidden="true">
             No entry, and no assertion that there is nothing to enter.
           </span>
           {onAsk ? (
-            <button type="button" className="ox-allergy-unknown__ask" onClick={onAsk}>
+            <button type="button" className="zb-allergy-unknown__ask" onClick={onAsk}>
               {askLabel}
             </button>
           ) : null}

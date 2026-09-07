@@ -1,7 +1,7 @@
 /**
  * The accessibility gate, reading a Figma file.
  *
- * Every number this produces comes from `@oxygenui-design/tokens/validate` —
+ * Every number this produces comes from `@zoblocks/tokens/validate` —
  * the same module the build runs over the DTCG source, the same module the
  * app runs in the browser as a customer types, and the same module the
  * publish gate runs server-side before a theme ships. That is the entire point
@@ -13,7 +13,7 @@
  * sandbox reads and returns a plain report the panel renders.
  */
 
-import type { VariableSnapshot } from "@oxygenui-design/figma-core";
+import type { VariableSnapshot } from "@zoblocks/figma-core";
 import {
   CONTRAST_PAIRS,
   HUE_SEPARATION_FLOOR,
@@ -27,7 +27,7 @@ import {
   nearestPassing,
   parseHex,
   type Theme,
-} from "@oxygenui-design/tokens/validate";
+} from "@zoblocks/tokens/validate";
 
 import { colourAt, hasStamps, stampedTokens } from "./snapshot";
 
@@ -43,7 +43,7 @@ export interface PairReading {
   /** What a designer sees in the variables panel. */
   fg: string;
   bg: string;
-  /** The Oxygen token, when this pair came from the token list. */
+  /** The Zoblocks token, when this pair came from the token list. */
   fgToken?: string;
   bgToken?: string;
   fgValue: string;
@@ -70,20 +70,20 @@ export interface GateFinding {
   message: string;
 }
 
-export type GateMode = "oxygen" | "palette";
+export type GateMode = "zoblocks" | "palette";
 
 export interface GateReport {
   mode: GateMode;
   collection: string;
   /** The Figma mode read, by its name in the file. */
   figmaMode: string;
-  /** The Oxygen theme whose floors were applied. */
+  /** The Zoblocks theme whose floors were applied. */
   theme: Theme;
   readings: PairReading[];
   findings: GateFinding[];
   /** Pairs the token list names that this collection does not carry. */
   missing: string[];
-  /** Colour variables with no Oxygen stamp, by label. */
+  /** Colour variables with no Zoblocks stamp, by label. */
   unstamped: string[];
 }
 
@@ -108,22 +108,22 @@ const round = (ratio: number) => Math.round(ratio * 100) / 100;
 /**
  * Which reading this collection can support.
  *
- * A file carrying Oxygen stamps can be measured against the real pair list,
+ * A file carrying Zoblocks stamps can be measured against the real pair list,
  * because we know which colour is text and which is the ground it sits on. A
  * file of somebody's own swatches cannot: pairing them by guesswork would
  * report failures nobody can act on, and worse, would report passes.
  */
 export function gateModeFor(snapshot: VariableSnapshot, collection: string): GateMode {
-  return hasStamps(snapshot, collection) ? "oxygen" : "palette";
+  return hasStamps(snapshot, collection) ? "zoblocks" : "palette";
 }
 
 export function runGate(snapshot: VariableSnapshot, options: GateOptions): GateReport {
   const mode = gateModeFor(snapshot, options.collection);
-  return mode === "oxygen" ? oxygenGate(snapshot, options) : paletteGate(snapshot, options);
+  return mode === "zoblocks" ? zoblocksGate(snapshot, options) : paletteGate(snapshot, options);
 }
 
 /**
- * The real pair list, over a file this plugin (or an Oxygen theme) put there.
+ * The real pair list, over a file this plugin (or a Zoblocks theme) put there.
  *
  * `CONTRAST_PAIRS` and `STATUS_PAIRS` are imported rather than restated. A
  * hand-picked subset is how `flag.restricted` was once measured, printed, and
@@ -131,7 +131,7 @@ export function runGate(snapshot: VariableSnapshot, options: GateOptions): GateR
  * exactly that failure, one product surface further from anyone who would
  * notice.
  */
-function oxygenGate(snapshot: VariableSnapshot, options: GateOptions): GateReport {
+function zoblocksGate(snapshot: VariableSnapshot, options: GateOptions): GateReport {
   const theme = options.theme ?? themeFromModeName(options.figmaMode);
   const tokens = stampedTokens(snapshot, options.collection, options.figmaMode);
   const value = (path: string) => tokens.get(cssVar(path));
@@ -189,7 +189,7 @@ function oxygenGate(snapshot: VariableSnapshot, options: GateOptions): GateRepor
   }
 
   return {
-    mode: "oxygen",
+    mode: "zoblocks",
     collection: options.collection,
     figmaMode: options.figmaMode,
     theme,
@@ -352,7 +352,7 @@ function darkestOrLightest(colours: Map<string, string>): string | undefined {
 }
 
 /**
- * A Figma mode name read as an Oxygen theme.
+ * A Figma mode name read as a Zoblocks theme.
  *
  * Modes this plugin creates are named for the themes, so the common case is
  * exact. Anything else falls back to light, because guessing high-contrast

@@ -8,8 +8,8 @@
 
 ## Context
 
-Oxygen follows Ant Design. That was stated as a standing constraint on every
-new component, and `@oxygenui-design/signature` acted on it directly: it wraps
+Zoblocks follows Ant Design. That was stated as a standing constraint on every
+new component, and `@zoblocks/signature` acted on it directly: it wraps
 antd, with antd as a peer dependency.
 
 The note on that decision was explicit that it was a pilot, not a precedent:
@@ -25,7 +25,7 @@ component that contains one inherits.
 Three things make the wrap/own choice concrete here rather than philosophical.
 
 **1. The extension is not expressible as a wrapper.** antd's `checked` is
-`boolean`. Oxygen's Switch has a third value — `"unknown"`, carrying a FHIR
+`boolean`. Zoblocks's Switch has a third value — `"unknown"`, carrying a FHIR
 `dataAbsentReason` — because a binary control cannot distinguish "no" from
 "nobody asked", and that distinction is the component's main clinical
 contribution. Adding a third value to a wrapped control means shadowing the
@@ -59,7 +59,7 @@ Concretely:
 
    ```diff
    - import { Switch } from "antd";
-   + import { Switch } from "@oxygenui-design/react";
+   + import { Switch } from "@zoblocks/react";
    ```
 
    is the entire migration. Divergences are permitted only where antd's
@@ -77,9 +77,9 @@ Concretely:
    carries a props-parity table in its test suite. A rename in an antd major
    fails our build rather than a customer's.
 
-4. **An optional bridge, never a dependency.** `@oxygenui-design/react` may
+4. **An optional bridge, never a dependency.** `@zoblocks/react` may
    ship an `antd-bridge` subpath that reads `theme.useToken()` and writes the
-   `--ox-<component>-*` tokens, so an antd application gets Oxygen's behaviour
+   `--zb-<component>-*` tokens, so an antd application gets Zoblocks's behaviour
    in its own brand. antd is imported only by that subpath, so it stays out of
    the main module graph and out of every bundle that does not ask for it.
 

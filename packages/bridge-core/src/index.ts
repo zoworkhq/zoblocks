@@ -1,13 +1,13 @@
 /**
- * @oxygenui-design/bridge-core — the theme-bridge contract.
+ * @zoblocks/bridge-core — the theme-bridge contract.
  *
- * A bridge is the only sanctioned way a UI framework reaches an Oxygen
- * component: it reads that framework's resolved theme and writes Oxygen's
+ * A bridge is the only sanctioned way a UI framework reaches a Zoblocks
+ * component: it reads that framework's resolved theme and writes Zoblocks's
  * token surface. Nothing else crosses the boundary — no component is swapped,
  * no prop is remapped, and no capability is reduced to what two frameworks
  * happen to share.
  *
- * Implementations: `@oxygenui-design/bridge-antd`, `@oxygenui-design/bridge-mui`.
+ * Implementations: `@zoblocks/bridge-antd`, `@zoblocks/bridge-mui`.
  */
 
 export {
@@ -32,11 +32,11 @@ export {
 export {
   READABLE_TOKENS,
   THEME_ATTRIBUTES,
-  resolveOxygenTokens,
+  resolveZoblocksTokens,
   toMs,
   toPx,
-  type OxygenTokens,
+  type ZoblocksTokens,
   type ReadableToken,
 } from "./read";
 
-export { useOxygenTokens, type UseOxygenTokensOptions } from "./useOxygenTokens";
+export { useZoblocksTokens, type UseZoblocksTokensOptions } from "./useZoblocksTokens";

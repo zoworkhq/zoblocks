@@ -58,8 +58,8 @@ ruleTester.run("no-hardcoded-count", noHardcodedCount, {
     { code: "const a = <p>Eleven browser tabs whose titles truncate.</p>;" },
 
     // A version, an address and a command are not sentences.
-    { code: 'const u = "https://oxygenui.design/r/index.json";' },
-    { code: 'const i = "./components/oxygen";' },
+    { code: 'const u = "https://zoblocks.design/r/index.json";' },
+    { code: 'const i = "./components/zoblocks";' },
 
     // A property key is not copy.
     { code: 'const o = { "24 items": true };' },
@@ -77,7 +77,7 @@ ruleTester.run("no-hardcoded-count", noHardcodedCount, {
       errors: [{ messageId: "hardcoded" }],
     },
     {
-      code: 'const d = "Oxygen ships 27 components carrying 300-plus documented states.";',
+      code: 'const d = "Zoblocks ships 27 components carrying 300-plus documented states.";',
       errors: [{ messageId: "hardcoded" }],
     },
     {

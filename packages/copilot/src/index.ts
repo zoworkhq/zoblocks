@@ -1,8 +1,8 @@
 /**
- * @oxygenui-design/copilot — a floating clinical copilot for Ant Design.
+ * @zoblocks/copilot — a floating clinical copilot for Ant Design.
  *
- *     import { Copilot } from "@oxygenui-design/copilot";
- *     import "@oxygenui-design/copilot/styles.css";
+ *     import { Copilot } from "@zoblocks/copilot";
+ *     import "@zoblocks/copilot/styles.css";
  *
  *     <Copilot
  *       provider={ourEndpoint}
@@ -14,10 +14,10 @@
  *     />
  *
  * antd is a peer dependency, and a thin one — the engine
- * (`@oxygenui-design/copilot-core`) has no dependency on React or antd at all,
- * and the behaviour (`@oxygenui-design/copilot-react`) has no dependency on
+ * (`@zoblocks/copilot-core`) has no dependency on React or antd at all,
+ * and the behaviour (`@zoblocks/copilot-react`) has no dependency on
  * antd. An application with a different design system can use either directly,
- * and the Oxygen registry item is a second skin over the same two packages.
+ * and the Zoblocks registry item is a second skin over the same two packages.
  */
 
 export { Copilot, type CopilotProps } from "./Copilot.js";
@@ -64,6 +64,6 @@ export {
   type Source,
   type TelemetryEvent,
   type Withheld,
-} from "@oxygenui-design/copilot-react";
+} from "@zoblocks/copilot-react";
 
-export { useCopilot, type CopilotApi } from "@oxygenui-design/copilot-react";
+export { useCopilot, type CopilotApi } from "@zoblocks/copilot-react";

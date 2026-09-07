@@ -7,7 +7,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/clinical-note/clinical-note.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/clinical-note/clinical-note.tsx. Edit that file, not this one.
 /**
  * ClinicalNote — a note editor that knows who wrote every character.
  *
@@ -30,7 +30,7 @@
  * *visible*, which is the prerequisite — and it is what turns "I reviewed it"
  * from an unfalsifiable claim into something the sign button can check.
  *
- * The engine is `@oxygenui-design/clinical-note-core`: schema, provenance,
+ * The engine is `@zoblocks/clinical-note-core`: schema, provenance,
  * gate rules and serializers, with no DOM and no React. This file is the skin.
  */
 
@@ -52,7 +52,7 @@ import {
   type NoteTypeName,
   type Origin,
   type Phrase,
-} from "@oxygenui-design/clinical-note-core";
+} from "@zoblocks/clinical-note-core";
 import type { Node as PMNode } from "prosemirror-model";
 import { ORIGIN_LABEL, useClinicalNote, type ClinicalNoteApi } from "../../lib/clinical-note";
 
@@ -276,15 +276,15 @@ export interface ClinicalNoteProps extends Omit<React.HTMLAttributes<HTMLDivElem
 
 function Banner({ subject, status }: { subject: NoteSubject; status: React.ReactNode }) {
   return (
-    <div className="flex items-start justify-between gap-3 border-b border-[var(--ox-border)] px-5 py-3">
+    <div className="flex items-start justify-between gap-3 border-b border-[var(--zb-border)] px-5 py-3">
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="truncate text-sm font-semibold text-[var(--ox-text)]">
+          <span className="truncate text-sm font-semibold text-[var(--zb-text)]">
             {subject.display}
           </span>
           {status}
         </div>
-        <div className="mt-0.5 flex flex-wrap gap-x-2 text-xs tabular-nums text-[var(--ox-text-muted)]">
+        <div className="mt-0.5 flex flex-wrap gap-x-2 text-xs tabular-nums text-[var(--zb-text-muted)]">
           {subject.identifier ? <span>MRN {subject.identifier}</span> : null}
           {subject.birthDate ? <span>· DOB {subject.birthDate}</span> : null}
           {subject.detail ? <span>· {subject.detail}</span> : null}
@@ -319,11 +319,11 @@ function ToolButton({
       onClick={onClick}
       className={cn(
         "inline-flex h-7 min-w-7 items-center justify-center gap-1.5 rounded-md px-1.5",
-        "text-[var(--ox-text-muted)] transition-colors",
-        "hover:bg-[var(--ox-surface-raised)] hover:text-[var(--ox-text)]",
-        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ox-focus-ring)]",
+        "text-[var(--zb-text-muted)] transition-colors",
+        "hover:bg-[var(--zb-surface-raised)] hover:text-[var(--zb-text)]",
+        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--zb-focus-ring)]",
         "disabled:pointer-events-none disabled:opacity-40",
-        pressed && "bg-[var(--ox-accent-subtle)] text-[var(--ox-accent-hover)]",
+        pressed && "bg-[var(--zb-accent-subtle)] text-[var(--zb-accent-hover)]",
       )}
     >
       {children}
@@ -389,7 +389,7 @@ function Toolbar({ children, label }: { children: React.ReactNode; label: string
       aria-label={label}
       aria-orientation="horizontal"
       onKeyDown={onKeyDown}
-      className="flex flex-wrap items-center gap-1 border-b border-[var(--ox-border)] px-4 py-1.5"
+      className="flex flex-wrap items-center gap-1 border-b border-[var(--zb-border)] px-4 py-1.5"
     >
       {children}
     </div>
@@ -398,7 +398,7 @@ function Toolbar({ children, label }: { children: React.ReactNode; label: string
 
 function Cluster({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-0.5 rounded-lg bg-[var(--ox-bg-subtle)] p-0.5">
+    <span className="inline-flex items-center gap-0.5 rounded-lg bg-[var(--zb-bg-subtle)] p-0.5">
       {children}
     </span>
   );
@@ -409,7 +409,7 @@ function OriginBar({ ratio }: { ratio: Record<Origin, number> }) {
   const present = ORIGINS.filter((origin) => ratio[origin] > 0);
   return (
     <div
-      className="flex h-2 overflow-hidden rounded-full ring-1 ring-inset ring-[var(--ox-border)]"
+      className="flex h-2 overflow-hidden rounded-full ring-1 ring-inset ring-[var(--zb-border)]"
       role="img"
       aria-label={present
         .map((origin) => `${ORIGIN_LABEL[origin]} ${Math.round(ratio[origin] * 100)}%`)
@@ -419,7 +419,7 @@ function OriginBar({ ratio }: { ratio: Record<Origin, number> }) {
         <span
           key={origin}
           data-origin={origin}
-          className="ox-note-bar block h-full"
+          className="zb-note-bar block h-full"
           style={{ width: `${ratio[origin] * 100}%` }}
         />
       ))}
@@ -483,8 +483,8 @@ export function SignGate({
         className={cn(
           "flex items-center gap-2 rounded-md px-3 py-2 text-sm",
           blocking.length > 0
-            ? "bg-[var(--ox-status-critical-bg)] text-[var(--ox-status-critical)]"
-            : "bg-[var(--ox-status-normal-bg)] text-[var(--ox-status-normal)]",
+            ? "bg-[var(--zb-status-critical-bg)] text-[var(--zb-status-critical)]"
+            : "bg-[var(--zb-status-normal-bg)] text-[var(--zb-status-normal)]",
         )}
       >
         <SeverityIcon severity={blocking.length > 0 ? "block" : "pass"} />
@@ -494,36 +494,36 @@ export function SignGate({
         </span>
       </div>
 
-      <ul className="divide-y divide-[var(--ox-border)] overflow-hidden rounded-lg border border-[var(--ox-border)]">
+      <ul className="divide-y divide-[var(--zb-border)] overflow-hidden rounded-lg border border-[var(--zb-border)]">
         {findings.map((finding) => (
           <li
             key={finding.id}
             className={cn(
               "grid grid-cols-[auto_1fr_auto] items-start gap-3 px-3 py-2.5 text-sm",
               finding.severity === "block" &&
-                "bg-[color-mix(in_oklab,var(--ox-status-critical-bg)_30%,transparent)]",
+                "bg-[color-mix(in_oklab,var(--zb-status-critical-bg)_30%,transparent)]",
             )}
           >
             <span
               className={cn(
                 "mt-0.5",
-                finding.severity === "block" && "text-[var(--ox-status-critical)]",
-                finding.severity === "warn" && "text-[var(--ox-status-high)]",
-                finding.severity === "pass" && "text-[var(--ox-status-normal)]",
+                finding.severity === "block" && "text-[var(--zb-status-critical)]",
+                finding.severity === "warn" && "text-[var(--zb-status-high)]",
+                finding.severity === "pass" && "text-[var(--zb-status-normal)]",
               )}
             >
               <SeverityIcon severity={finding.severity} />
             </span>
             <span className="min-w-0">
-              <span className="text-[var(--ox-text)]">{finding.title}</span>
+              <span className="text-[var(--zb-text)]">{finding.title}</span>
               {finding.detail ? (
-                <span className="mt-0.5 block text-xs text-[var(--ox-text-muted)]">
+                <span className="mt-0.5 block text-xs text-[var(--zb-text-muted)]">
                   {finding.detail}{" "}
                   {finding.at && onNavigate ? (
                     <button
                       type="button"
                       onClick={() => onNavigate(finding)}
-                      className="text-[var(--ox-accent)] underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ox-focus-ring)]"
+                      className="text-[var(--zb-accent)] underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--zb-focus-ring)]"
                     >
                       Go to it
                     </button>
@@ -535,11 +535,11 @@ export function SignGate({
               className={cn(
                 "rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider",
                 finding.severity === "block" &&
-                  "bg-[var(--ox-status-critical-bg)] text-[var(--ox-status-critical)]",
+                  "bg-[var(--zb-status-critical-bg)] text-[var(--zb-status-critical)]",
                 finding.severity === "warn" &&
-                  "bg-[var(--ox-status-high-bg)] text-[var(--ox-status-high)]",
+                  "bg-[var(--zb-status-high-bg)] text-[var(--zb-status-high)]",
                 finding.severity === "pass" &&
-                  "bg-[var(--ox-status-normal-bg)] text-[var(--ox-status-normal)]",
+                  "bg-[var(--zb-status-normal-bg)] text-[var(--zb-status-normal)]",
               )}
             >
               {finding.severity === "block"
@@ -553,16 +553,16 @@ export function SignGate({
       </ul>
 
       {attestation ? (
-        <label className="flex items-start gap-2 border-t border-[var(--ox-border)] pt-4 text-sm">
+        <label className="flex items-start gap-2 border-t border-[var(--zb-border)] pt-4 text-sm">
           <input
             type="checkbox"
             checked={attested}
             onChange={(event) => setAttested(event.target.checked)}
-            className="mt-0.5 size-4 accent-[var(--ox-accent)]"
+            className="mt-0.5 size-4 accent-[var(--zb-accent)]"
           />
           <span>
-            <span className="text-[var(--ox-text)]">{attestation}</span>
-            <span className="mt-1 block text-xs text-[var(--ox-text-muted)]">
+            <span className="text-[var(--zb-text)]">{attestation}</span>
+            <span className="mt-1 block text-xs text-[var(--zb-text-muted)]">
               Signing as <strong className="font-medium">{author.display}</strong>
               {author.role ? ` · ${author.role}` : null}
               {author.requiresCosign ? " · a countersignature will be requested" : null}
@@ -575,7 +575,7 @@ export function SignGate({
         <button
           type="button"
           onClick={onCancel}
-          className="h-9 rounded-md px-3 text-sm text-[var(--ox-text-muted)] hover:bg-[var(--ox-surface-raised)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ox-focus-ring)]"
+          className="h-9 rounded-md px-3 text-sm text-[var(--zb-text-muted)] hover:bg-[var(--zb-surface-raised)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--zb-focus-ring)]"
         >
           Back to note
         </button>
@@ -585,9 +585,9 @@ export function SignGate({
           onClick={() => onSign?.(warnings.map((warning) => warning.id))}
           className={cn(
             "inline-flex h-9 items-center gap-2 rounded-md px-4 text-sm font-medium",
-            "bg-[var(--ox-accent)] text-[var(--ox-text-on-accent)]",
-            "hover:bg-[var(--ox-accent-hover)]",
-            "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ox-focus-ring)]",
+            "bg-[var(--zb-accent)] text-[var(--zb-text-on-accent)]",
+            "hover:bg-[var(--zb-accent-hover)]",
+            "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--zb-focus-ring)]",
             "disabled:pointer-events-none disabled:opacity-45",
           )}
         >
@@ -661,19 +661,19 @@ export function ClinicalNoteReader({
   return (
     <article
       className={cn(
-        "overflow-hidden rounded-xl border border-[var(--ox-border)] bg-[var(--ox-surface)]",
+        "overflow-hidden rounded-xl border border-[var(--zb-border)] bg-[var(--zb-surface)]",
         className,
       )}
       aria-label={`${title}, signed`}
       // A signed note is read in the same chart, at the same density, as the
       // editor that produced it.
-      data-ox-density="clinical"
+      data-zb-density="clinical"
       {...rest}
     >
       <Banner
         subject={subject}
         status={
-          <span className="inline-flex items-center gap-1 rounded-full bg-[var(--ox-status-normal-bg)] px-2 py-0.5 text-xs font-medium text-[var(--ox-status-normal)]">
+          <span className="inline-flex items-center gap-1 rounded-full bg-[var(--zb-status-normal-bg)] px-2 py-0.5 text-xs font-medium text-[var(--zb-status-normal)]">
             <ShieldIcon />
             Signed
           </span>
@@ -681,25 +681,25 @@ export function ClinicalNoteReader({
       />
 
       <div className="space-y-5 px-5 py-4">
-        <dl className="overflow-hidden rounded-lg border border-[var(--ox-border)] text-sm">
+        <dl className="overflow-hidden rounded-lg border border-[var(--zb-border)] text-sm">
           {attestations.map((attestation) => (
             <div
               key={`${attestation.who}-${attestation.when}`}
-              className="grid grid-cols-[minmax(7rem,10rem)_1fr] border-b border-[var(--ox-border)] last:border-b-0"
+              className="grid grid-cols-[minmax(7rem,10rem)_1fr] border-b border-[var(--zb-border)] last:border-b-0"
             >
-              <dt className="bg-[var(--ox-bg-subtle)] px-3 py-2 text-[var(--ox-text-muted)]">
+              <dt className="bg-[var(--zb-bg-subtle)] px-3 py-2 text-[var(--zb-text-muted)]">
                 {attestation.statement ? "Attestation" : "Signed by"}
               </dt>
               <dd className="px-3 py-2">
-                <span className="text-[var(--ox-text)]">
+                <span className="text-[var(--zb-text)]">
                   {attestation.who}
                   {attestation.role ? ` · ${attestation.role}` : null}
                 </span>
-                <span className="mt-0.5 block text-xs tabular-nums text-[var(--ox-text-muted)]">
+                <span className="mt-0.5 block text-xs tabular-nums text-[var(--zb-text-muted)]">
                   {attestation.when}
                 </span>
                 {attestation.statement ? (
-                  <span className="mt-1 block text-[var(--ox-text-muted)]">
+                  <span className="mt-1 block text-[var(--zb-text-muted)]">
                     “{attestation.statement}”
                   </span>
                 ) : null}
@@ -708,7 +708,7 @@ export function ClinicalNoteReader({
           ))}
         </dl>
 
-        <div className="ox-note-doc ox-note-read max-w-[74ch]">
+        <div className="zb-note-doc zb-note-read max-w-[74ch]">
           {sections(doc).map(({ node }) => {
             const { code, title } = sectionAttrs(node);
             // One section at a time through the same serializer the export
@@ -730,18 +730,18 @@ export function ClinicalNoteReader({
         </div>
 
         {addenda.map((addendum, i) => (
-          <div key={i} className="overflow-hidden rounded-lg border border-[var(--ox-border)]">
-            <div className="flex flex-wrap items-center justify-between gap-2 bg-[var(--ox-bg-subtle)] px-3 py-2 text-xs tabular-nums text-[var(--ox-text-muted)]">
+          <div key={i} className="overflow-hidden rounded-lg border border-[var(--zb-border)]">
+            <div className="flex flex-wrap items-center justify-between gap-2 bg-[var(--zb-bg-subtle)] px-3 py-2 text-xs tabular-nums text-[var(--zb-text-muted)]">
               <span>
-                <strong className="font-semibold text-[var(--ox-text)]">Addendum {i + 1}</strong> ·{" "}
+                <strong className="font-semibold text-[var(--zb-text)]">Addendum {i + 1}</strong> ·{" "}
                 {addendum.author} · {addendum.when}
               </span>
             </div>
-            <p className="px-3 py-3 text-sm text-[var(--ox-text)]">{addendum.text}</p>
+            <p className="px-3 py-3 text-sm text-[var(--zb-text)]">{addendum.text}</p>
           </div>
         ))}
 
-        <p className="rounded-md bg-[var(--ox-status-low-bg)] px-3 py-2 text-sm text-[var(--ox-text-muted)]">
+        <p className="rounded-md bg-[var(--zb-status-low-bg)] px-3 py-2 text-sm text-[var(--zb-text-muted)]">
           The signed note above cannot be edited. Corrections are made by adding a further addendum.
         </p>
       </div>
@@ -777,9 +777,9 @@ function SaveStateLine({ state }: { state?: SaveState }) {
       <span
         className={cn(
           "size-1.5 rounded-full",
-          tone === "success" && "bg-[var(--ox-status-normal)]",
-          tone === "warning" && "bg-[var(--ox-status-high)]",
-          tone === "danger" && "bg-[var(--ox-status-critical)]",
+          tone === "success" && "bg-[var(--zb-status-normal)]",
+          tone === "warning" && "bg-[var(--zb-status-high)]",
+          tone === "danger" && "bg-[var(--zb-status-critical)]",
         )}
       />
       <span className="tabular-nums">{text}</span>
@@ -837,16 +837,16 @@ export function ClinicalNote({
   return (
     <div
       className={cn(
-        "ox-note flex flex-col overflow-hidden rounded-xl border border-[var(--ox-border)] bg-[var(--ox-surface)]",
+        "zb-note flex flex-col overflow-hidden rounded-xl border border-[var(--zb-border)] bg-[var(--zb-surface)]",
         className,
       )}
-      data-ox-density="clinical"
+      data-zb-density="clinical"
       {...rest}
     >
       <Banner
         subject={subject}
         status={
-          <span className="rounded-full bg-[var(--ox-status-low-bg)] px-2 py-0.5 text-xs font-medium text-[var(--ox-status-low)]">
+          <span className="rounded-full bg-[var(--zb-status-low-bg)] px-2 py-0.5 text-xs font-medium text-[var(--zb-status-low)]">
             Draft
           </span>
         }
@@ -875,7 +875,7 @@ export function ClinicalNote({
             onClick={api.cmd.nextBlank}
           >
             <span className="font-mono text-[11px]">✳ {api.blankCount}</span>
-            <kbd className="rounded border border-[var(--ox-border)] px-1 font-mono text-[10px] text-[var(--ox-text-muted)]">
+            <kbd className="rounded border border-[var(--zb-border)] px-1 font-mono text-[10px] text-[var(--zb-text-muted)]">
               F2
             </kbd>
           </ToolButton>
@@ -891,21 +891,21 @@ export function ClinicalNote({
         </ToolButton>
       </Toolbar>
 
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-[var(--ox-border)] bg-[var(--ox-bg-subtle)] px-4 py-1.5 text-xs text-[var(--ox-text-muted)]">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-[var(--zb-border)] bg-[var(--zb-bg-subtle)] px-4 py-1.5 text-xs text-[var(--zb-text-muted)]">
         <SaveStateLine state={saveState} />
         <span>
-          <strong className="font-semibold text-[var(--ox-text)]">{author.display}</strong>
+          <strong className="font-semibold text-[var(--zb-text)]">{author.display}</strong>
           {author.role ? ` · ${author.role}` : null}
           {author.requiresCosign ? " · cosign required" : null}
         </span>
         <span className="flex-1" />
         {copied > 0 ? (
-          <span className="rounded-full bg-[var(--ox-status-high-bg)] px-2 py-0.5 tabular-nums text-[var(--ox-status-high)]">
+          <span className="rounded-full bg-[var(--zb-status-high-bg)] px-2 py-0.5 tabular-nums text-[var(--zb-status-high)]">
             {copied}% copied forward
           </span>
         ) : null}
         {unreviewed ? (
-          <span className="rounded-full bg-[var(--ox-status-normal-bg)] px-2 py-0.5 text-[var(--ox-status-normal)]">
+          <span className="rounded-full bg-[var(--zb-status-normal-bg)] px-2 py-0.5 text-[var(--zb-status-normal)]">
             {unreviewed.title}
           </span>
         ) : null}
@@ -914,9 +914,9 @@ export function ClinicalNote({
       <div className="flex min-h-[20rem] flex-col sm:flex-row">
         <nav
           aria-label="Sections"
-          className="shrink-0 border-b border-[var(--ox-border)] px-2 py-3 sm:w-56 sm:border-b-0 sm:border-e"
+          className="shrink-0 border-b border-[var(--zb-border)] px-2 py-3 sm:w-56 sm:border-b-0 sm:border-e"
         >
-          <p className="px-2 pb-2 text-[10px] font-medium uppercase tracking-wider text-[var(--ox-text-muted)]">
+          <p className="px-2 pb-2 text-[10px] font-medium uppercase tracking-wider text-[var(--zb-text-muted)]">
             {noteSections.length} sections
           </p>
           <ul>
@@ -931,15 +931,15 @@ export function ClinicalNote({
                     aria-current={api.activeSection === code ? "true" : undefined}
                     className={cn(
                       "relative flex w-full items-center justify-between gap-2 rounded-md py-1.5 ps-3 pe-2 text-start text-[13px]",
-                      "text-[var(--ox-text-muted)] hover:bg-[var(--ox-surface-raised)]",
-                      "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ox-focus-ring)]",
+                      "text-[var(--zb-text-muted)] hover:bg-[var(--zb-surface-raised)]",
+                      "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--zb-focus-ring)]",
                       api.activeSection === code &&
-                        "bg-[var(--ox-accent-subtle)] font-medium text-[var(--ox-accent-hover)] before:absolute before:inset-y-1.5 before:start-0 before:w-0.5 before:rounded before:bg-[var(--ox-accent)]",
+                        "bg-[var(--zb-accent-subtle)] font-medium text-[var(--zb-accent-hover)] before:absolute before:inset-y-1.5 before:start-0 before:w-0.5 before:rounded before:bg-[var(--zb-accent)]",
                     )}
                   >
                     <span className="truncate">{title}</span>
                     {required && empty ? (
-                      <span className="shrink-0 rounded-full bg-[var(--ox-status-critical-bg)] px-1.5 text-[10px] text-[var(--ox-status-critical)]">
+                      <span className="shrink-0 rounded-full bg-[var(--zb-status-critical-bg)] px-1.5 text-[10px] text-[var(--zb-status-critical)]">
                         required
                       </span>
                     ) : null}
@@ -950,15 +950,15 @@ export function ClinicalNote({
           </ul>
 
           {api.composition.total > 0 ? (
-            <div className="mt-4 border-t border-[var(--ox-border)] px-2 pt-3">
-              <p className="pb-2 text-[10px] font-medium uppercase tracking-wider text-[var(--ox-text-muted)]">
+            <div className="mt-4 border-t border-[var(--zb-border)] px-2 pt-3">
+              <p className="pb-2 text-[10px] font-medium uppercase tracking-wider text-[var(--zb-text-muted)]">
                 Origins
               </p>
               <OriginBar ratio={api.composition.ratio} />
-              <ul className="mt-2 space-y-1 text-[11px] tabular-nums text-[var(--ox-text-muted)]">
+              <ul className="mt-2 space-y-1 text-[11px] tabular-nums text-[var(--zb-text-muted)]">
                 {ORIGINS.filter((origin) => api.composition.ratio[origin] > 0).map((origin) => (
                   <li key={origin} className="flex items-center gap-2">
-                    <span data-origin={origin} className="ox-note-bar size-2 rounded-sm" />
+                    <span data-origin={origin} className="zb-note-bar size-2 rounded-sm" />
                     <span className="flex-1">{ORIGIN_LABEL[origin]}</span>
                     <span>{Math.round(api.composition.ratio[origin] * 100)}%</span>
                   </li>
@@ -973,24 +973,24 @@ export function ClinicalNote({
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--ox-border)] px-5 py-3">
-        <p className="text-xs tabular-nums text-[var(--ox-text-muted)]">{timestampLine}</p>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--zb-border)] px-5 py-3">
+        <p className="text-xs tabular-nums text-[var(--zb-text-muted)]">{timestampLine}</p>
         <div className="flex gap-2">
           <button
             type="button"
             onClick={() => onCommit?.("draft", api.doc, [])}
-            className="h-9 rounded-md border border-[var(--ox-border)] px-3 text-sm text-[var(--ox-text)] hover:bg-[var(--ox-surface-raised)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ox-focus-ring)]"
+            className="h-9 rounded-md border border-[var(--zb-border)] px-3 text-sm text-[var(--zb-text)] hover:bg-[var(--zb-surface-raised)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--zb-focus-ring)]"
           >
             Save draft
           </button>
           <button
             type="button"
             onClick={() => setGateOpen(true)}
-            aria-describedby={api.gate.canSign ? undefined : "ox-note-blocked"}
+            aria-describedby={api.gate.canSign ? undefined : "zb-note-blocked"}
             className={cn(
               "inline-flex h-9 items-center gap-2 rounded-md px-4 text-sm font-medium",
-              "bg-[var(--ox-accent)] text-[var(--ox-text-on-accent)] hover:bg-[var(--ox-accent-hover)]",
-              "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ox-focus-ring)]",
+              "bg-[var(--zb-accent)] text-[var(--zb-text-on-accent)] hover:bg-[var(--zb-accent-hover)]",
+              "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--zb-focus-ring)]",
               !api.gate.canSign && "opacity-60",
             )}
           >
@@ -998,7 +998,7 @@ export function ClinicalNote({
             Sign &amp; file
           </button>
           {!api.gate.canSign ? (
-            <span id="ox-note-blocked" className="sr-only">
+            <span id="zb-note-blocked" className="sr-only">
               {api.gate.blocking.length} item
               {api.gate.blocking.length === 1 ? "" : "s"} must be resolved before this note can be
               signed.
@@ -1008,7 +1008,7 @@ export function ClinicalNote({
       </div>
 
       {gateOpen ? (
-        <div className="border-t border-[var(--ox-border)] bg-[var(--ox-bg-subtle)] px-5 py-4">
+        <div className="border-t border-[var(--zb-border)] bg-[var(--zb-bg-subtle)] px-5 py-4">
           <SignGate
             findings={api.gate.findings}
             canSign={api.gate.canSign}

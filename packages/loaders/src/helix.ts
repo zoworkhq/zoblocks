@@ -1,16 +1,16 @@
 /**
- * `<ox-helix-loader>` — two strands of dots turning on a slow sine.
+ * `<zb-helix-loader>` — two strands of dots turning on a slow sine.
  *
  * For laboratory surfaces: genomics, pathology, diagnostics. Depth is faked
  * with scale and opacity rather than a 3D transform, so the strands cross
  * convincingly while staying compositor-cheap and identical across browsers.
  *
- *   import "@oxygenui-design/loaders/helix";
- *   <ox-helix-loader label="Running the panel"></ox-helix-loader>
+ *   import "@zoblocks/loaders/helix";
+ *   <zb-helix-loader label="Running the panel"></zb-helix-loader>
  */
 
 import { HELIX_COLUMNS, LOADER_VIEWBOX } from "./art.js";
-import { OxLoaderElement, define } from "./base.js";
+import { ZbLoaderElement, define } from "./base.js";
 
 const DOTS = Array.from({ length: HELIX_COLUMNS }, (_, index) => ({
   x: 12 + index * 17,
@@ -19,19 +19,19 @@ const DOTS = Array.from({ length: HELIX_COLUMNS }, (_, index) => ({
   phaseB: -(index / HELIX_COLUMNS) - 0.5,
 }));
 
-export class OxHelixLoader extends OxLoaderElement {
+export class ZbHelixLoader extends ZbLoaderElement {
   protected override defaultSize = "xl" as const;
   protected override variant = "helix";
 
   protected override vars(sizePx: number): Array<[string, string]> {
-    return [...super.vars(sizePx), ["--ox-loader-stroke", "1.5px"]];
+    return [...super.vars(sizePx), ["--zb-loader-stroke", "1.5px"]];
   }
 
   protected override renderArt(): string {
     const strand = (phase: (dot: (typeof DOTS)[number]) => number) =>
       DOTS.map(
         (dot) =>
-          `<circle class="fill dot" style="--ox-loader-phase:${phase(dot)}" cx="${dot.x}" cy="30" r="4.2"/>`,
+          `<circle class="fill dot" style="--zb-loader-phase:${phase(dot)}" cx="${dot.x}" cy="30" r="4.2"/>`,
       ).join("");
 
     return `<svg viewBox="${LOADER_VIEWBOX.helix}" focusable="false">
@@ -42,10 +42,10 @@ export class OxHelixLoader extends OxLoaderElement {
   }
 }
 
-define("ox-helix-loader", OxHelixLoader);
+define("zb-helix-loader", ZbHelixLoader);
 
 declare global {
   interface HTMLElementTagNameMap {
-    "ox-helix-loader": OxHelixLoader;
+    "zb-helix-loader": ZbHelixLoader;
   }
 }

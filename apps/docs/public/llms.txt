@@ -1,11 +1,11 @@
-# Oxygen UI
+# Zoblocks
 
 > React components for healthcare interfaces, typed to FHIR R4 and delivered as
-> source through the Oxygen registry. Components take FHIR resources as props
+> source through the Zoblocks registry. Components take FHIR resources as props
 > directly and render absence, preliminary status, restricted records, and
 > critical results as explicit states rather than as blanks.
 
-Oxygen UI is not a compliance boundary, not a medical device, and not clinical
+Zoblocks is not a compliance boundary, not a medical device, and not clinical
 decision support. Access control, audit, data residency, and clinical validation
 remain the implementing team's responsibility.
 
@@ -22,133 +22,133 @@ Rules that matter when generating code with these components:
 
 ## Primitive
 
-- [Accordion](https://oxygenui.design/components/accordion): A disclosure widget whose headers can be read while closed, with a per-section access model for content a reader may not simply be shown.
-  install: npx @oxygenui-design/cli add accordion
+- [Accordion](https://zoblocks.design/components/accordion): A disclosure widget whose headers can be read while closed, with a per-section access model for content a reader may not simply be shown.
+  install: npx @zoblocks/cli add accordion
   states: Closed, Open, Summary in the header, Severity on the leading edge, Pinned — cannot be closed, Advisory gate, Reason gate, Consent gate, Consent refused, Withheld, Single open at a time, Nested, with heading levels
   status: beta
-- [Breath Loader](https://oxygenui.design/components/breath-loader): Three rings expanding and fading from a soft core, paced at a resting breath rather than a spinner's tempo.
-  install: npx @oxygenui-design/cli add breath-loader
+- [Breath Loader](https://zoblocks.design/components/breath-loader): Three rings expanding and fading from a soft core, paced at a resting breath rather than a spinner's tempo.
+  install: npx @zoblocks/cli add breath-loader
   states: Indeterminate, Delayed (not yet shown), Slow wait, Reduced motion, With a brand mark in the core
   status: beta
-- [Clinical Status](https://oxygenui.design/components/clinical-status): One closed status vocabulary: nine scales whose every step carries a hue, a CSS shape and a word, emitted together or not at all.
-  install: npx @oxygenui-design/cli add clinical-status
+- [Clinical Status](https://zoblocks.design/components/clinical-status): One closed status vocabulary: nine scales whose every step carries a hue, a CSS shape and a word, emitted together or not at all.
+  install: npx @zoblocks/cli add clinical-status
   fhir: Observation, AllergyIntolerance, Consent
   states: Critical — the panic value, High — outside the range, not dangerous, Normal, Not assessed — absence as a fact, Preliminary — in flight, Corrected — the value changed, Entered in error, Restricted — present, gated, explained, Part 2 segmented, Break-glass open, Stale — true once, Self-reported, AI draft, awaiting a clinician, Disengaged — behavioral health, Dot, in a status column, Grid affix, at forty rows, Compact density, Explainable — the chip is a button
   status: stable
-- [Helix Loader](https://oxygenui.design/components/helix-loader): Two strands of dots turning on a slow sine. For the parts of a product that are laboratory rather than bedside.
-  install: npx @oxygenui-design/cli add helix-loader
+- [Helix Loader](https://zoblocks.design/components/helix-loader): Two strands of dots turning on a slow sine. For the parts of a product that are laboratory rather than bedside.
+  install: npx @zoblocks/cli add helix-loader
   states: Indeterminate, Delayed (not yet shown), Slow wait, Reduced motion
   status: beta
-- [Infusion Loader](https://oxygenui.design/components/infusion-loader): A capsule with a soft slug — the only loader in the set that can tell the truth about how much is left.
-  install: npx @oxygenui-design/cli add infusion-loader
+- [Infusion Loader](https://zoblocks.design/components/infusion-loader): A capsule with a soft slug — the only loader in the set that can tell the truth about how much is left.
+  install: npx @zoblocks/cli add infusion-loader
   states: Indeterminate, Determinate (0–100), Delayed (not yet shown), Slow wait, Reduced motion
   status: beta
-- [Pulse Loader](https://oxygenui.design/components/pulse-loader): An open heart with a rhythm line running through it, beating at a resting sixty. The library's signature wait.
-  install: npx @oxygenui-design/cli add pulse-loader
+- [Pulse Loader](https://zoblocks.design/components/pulse-loader): An open heart with a rhythm line running through it, beating at a resting sixty. The library's signature wait.
+  install: npx @zoblocks/cli add pulse-loader
   states: Indeterminate, Delayed (not yet shown), Slow wait, Reduced motion, Below 40px (renders as Rhythm Loader)
   status: beta
-- [Rhythm Loader](https://oxygenui.design/components/rhythm-loader): One rhythm strip, swept like a monitor. The quietest way for an interface to say it is still there.
-  install: npx @oxygenui-design/cli add rhythm-loader
+- [Rhythm Loader](https://zoblocks.design/components/rhythm-loader): One rhythm strip, swept like a monitor. The quietest way for an interface to say it is still there.
+  install: npx @zoblocks/cli add rhythm-loader
   states: Indeterminate, Delayed (not yet shown), Slow wait, Reduced motion, Inline
   status: beta
-- [Switch](https://oxygenui.design/components/switch): A binary control for a record that is shared, asynchronous, and often missing the fact you are asking it about.
-  install: npx @oxygenui-design/cli add switch
+- [Switch](https://zoblocks.design/components/switch): A binary control for a record that is shared, asynchronous, and often missing the fact you are asking it about.
+  install: npx @zoblocks/cli add switch
   states: On, Off, Unknown (absence, with a reason), Pending — the write is in flight, Committed, Reverted — the write failed, Blocked — refused before trying, Queued — offline, Stale — changed by someone else, Read-only, with a reason, Disabled, Time-boxed (until), Awaiting confirmation, Segmented — both answers visible, Chip — a filter bar, Row — the whole row is the target
   status: experimental
 - Timeline: Ant Design v6's Timeline, prop for prop, with the accessible name and the ordered-list semantics it does not ship.
-  install: npx @oxygenui-design/cli add timeline
+  install: npx @zoblocks/cli add timeline
   docs: no page yet — this component installs from the registry today
   states: Vertical, the default, Alternate, items on both sides, Horizontal, Filled and outlined variants, Custom node icons, Preset and custom node colours, A loading node, Reversed, Ant Design v5 prop names, still accepted
   status: experimental
-- [Tabs](https://oxygenui.design/components/tabs): Tabs that know what they are: a view switch, a link list, a form value or a wizard — four accessibility trees behind one silhouette.
-  install: pnpm add @oxygenui-design/tabs
+- [Tabs](https://zoblocks.design/components/tabs): Tabs that know what they are: a view switch, a link list, a form value or a wizard — four accessibility trees behind one silhouette.
+  install: pnpm add @zoblocks/tabs
   states: Selected, Unselected, Disabled with a stated reason, Restricted (present, gated, explained), Stale — showing cached data, Unavailable offline, Unsaved changes pending, Locked step, Completed step, Overflowing into a menu, Collapsed to a native picker, Awaiting an async guard
   status: stable
 
 ## Clinical
 
 - Allergy Chip: The chip that refuses to conflate how bad the last reaction was with how bad the next one could be.
-  install: npx @oxygenui-design/cli add allergy-chip
+  install: npx @zoblocks/cli add allergy-chip
   docs: no page yet — this component installs from the registry today
   fhir: AllergyIntolerance
   states: High criticality, mild past reaction, Low criticality, same manifestation, Intolerance, not an allergy, Refuted after a rechallenge, Entered in error, Unconfirmed — reported at intake, Unable to assess, No reaction recorded, Substance class expansion, Contraindication, No known allergies — asserted, Allergy status not recorded, An assertion with no author degrades, Compact, in a banner, Interactive — opens the history
   status: stable
 - Care Team Presence: Presence with clinical semantics: in session, on call, signed out to whom — and who else is in this chart right now.
-  install: npx @oxygenui-design/cli add care-team-presence
+  install: npx @zoblocks/cli add care-team-presence
   docs: no page yet — this component installs from the registry today
   fhir: CareTeam
   states: Available, In session — do not disturb, In group — eight patients, not one, On crisis line, On call, Signed out, with the cover named, Off shift, nobody covering, Presence degraded, with its age, Presence unknown, Assigned therapist, Compact — avatar only, Coverage resolved, Coverage gap, Someone else is documenting, Someone else is signing, Four in the chart, viewing only
   status: stable
 - Care Timeline: A patient's chronology that cannot be rendered without saying what it is a view of — the window, the sources, the filters and the order.
-  install: npx @oxygenui-design/cli add care-timeline
+  install: npx @zoblocks/cli add care-timeline
   docs: no page yet — this component installs from the registry today
   fhir: Encounter, Appointment, Communication, Observation, DiagnosticReport, Procedure, MedicationRequest, Immunization, DocumentReference, QuestionnaireResponse, Consent, Provenance
   states: Newest first, grouped by month, Planned, above the now marker, Lapsed — planned, and nothing recorded against it, Cancelled, Attempted and did not connect, Amended, with what changed, Entered in error, retained and struck, Restricted — it exists and you may not read it, Consent-gated, A thread with its own steps, A cluster, and a critical event promoted out of one, A stated gap in coverage, A source that could not be reached, Filtered, with the hidden count stated, New since last reviewed, An imprecise date, kept imprecise, No record · none in this window · none you may see, Patient-facing, with a result not yet reviewed
   status: experimental
 - Chart Accordion: A record's sections with their headers composed to the house rules, so a severity can never reach the screen without the words that explain it.
-  install: npx @oxygenui-design/cli add chart-accordion
+  install: npx @zoblocks/cli add chart-accordion
   docs: no page yet — this component installs from the registry today
   states: Closed, with summaries, Expanded, Severity across the scale, Consent gate, Withheld section, Section that failed to load, No sections
   status: beta
 - Chart Command Palette: A command palette that understands clinical verbs, scopes every search to a treatment relationship, and audits the searches it refuses.
-  install: npx @oxygenui-design/cli add chart-command-palette
+  install: npx @zoblocks/cli add chart-command-palette
   docs: no page yet — this component installs from the registry today
   fhir: Patient, Task
   states: Empty, before anything is typed, Actions ranked above records, A verb waiting for its argument, A significant action, first Enter, An action that cannot run, Out-of-scope patients, counted, Break-glass unavailable to this role, Nothing matches, Grouped results, Keyboard navigation, Frequency weighting, Every match named, with no scope
   status: stable
-- [Chart Context Menu](https://oxygenui.design/components/chart-context-menu): A context menu that names what it is about before it offers to change it, ranks verbs by consequence, and counts the actions it withholds.
-  install: npx @oxygenui-design/cli add chart-context-menu
+- [Chart Context Menu](https://zoblocks.design/components/chart-context-menu): A context menu that names what it is about before it offers to change it, ranks verbs by consequence, and counts the actions it withholds.
+  install: npx @zoblocks/cli add chart-context-menu
   fhir: Patient, MedicationRequest, Observation, DocumentReference, AuditEvent
   states: Routine actions only, A recorded action, saying what it writes, A clinical action, first activation, A clinical action, second step, A disclosure, reasons offered, Unavailable, with the reason in place, Withheld by policy, counted, An availability check still pending, A masked subject, A multiple selection, Checkbox and radio view state, A submenu, open beside its row, This record supports no actions, Every action withheld from this role
   status: beta
 - Chart Header: Persistent patient context that collapses to a safety bar rather than to a name, and never renders administrative gender beside a dose.
-  install: npx @oxygenui-design/cli add chart-header
+  install: npx @zoblocks/cli add chart-header
   docs: no page yet — this component installs from the registry today
   fhir: Patient, Encounter, EpisodeOfCare
   states: Expanded, Collapsed to the safety strip, No encounter is open, Three encounters open — choose one, Sex parameter, with its context, Sex parameter not recorded, on an order screen, Sex parameter withheld on an overview screen, Allergies not asked, Code status not recorded, Isolation and fall risk, Involuntary hold, with its expiry, Hold expired, Program and week, With actions
   status: stable
 - Clinical Note: A clinical note editor that records where every character came from, and refuses to let anyone sign what they have not read.
-  install: npx @oxygenui-design/cli add clinical-note
+  install: npx @zoblocks/cli add clinical-note
   docs: no page yet — this component installs from the registry today
   fhir: Composition, DocumentReference, Provenance, Narrative
   states: Empty draft, In progress, Origins ribbon, Unreviewed AI, Copied forward, Unfilled blanks, Stale pulled value, Gate blocking, Gate clear, Offline draft, Save failed, Signed, Signed with addendum, Awaiting countersignature
   status: experimental
-- [Data Grid](https://oxygenui.design/components/data-grid): A worklist that states what it is showing out of what, holds arriving results behind a line, and names the model when you sort by one.
-  install: npx @oxygenui-design/cli add data-grid
+- [Data Grid](https://zoblocks.design/components/data-grid): A worklist that states what it is showing out of what, holds arriving results behind a line, and names the model when you sort by one.
+  install: npx @zoblocks/cli add data-grid
   fhir: Bundle, Observation, Patient, RiskAssessment
   states: Coverage above the data, A total the source will not give, Absence, said five ways, Sorted by a derived column, Results arrived, nothing moved, The row the reader is on, Compact density, Everything, with nothing hidden, Too many rows to render honestly, Selected, with the verbs that reach them, Pinned identity, scrolled sideways, Loading more, and the end of what is known, Framed by the host, not by itself, The predicate matched nobody
   status: beta
-- [Date Picker](https://oxygenui.design/components/date-picker): One temporal control with sixteen variants: field, calendar, date and time ranges, birth date, session, slots, recurrence and the read-only record.
-  install: npx @oxygenui-design/cli add date-picker
+- [Date Picker](https://zoblocks.design/components/date-picker): One temporal control with sixteen variants: field, calendar, date and time ranges, birth date, session, slots, recurrence and the read-only record.
+  install: npx @zoblocks/cli add date-picker
   fhir: Patient, Slot, Schedule, PractitionerRole, Timing
   states: Picker — field with a calendar behind a button, Field — no popover at all, Calendar — inline month grid, Range — two clicks, never a drag, Date range — both ends typed, two months behind them, named periods down the side, Multiple dates — capped, click again to remove, Birth date — age, partial dates, stated absence, Time — and the ambiguity it refuses to resolve, Session — start, end, duration, visible driver, Time range — two columns, a filtered end, a derived length, Slots — grouped, counted, four states, Scheduler — provider, date and time on one surface, Recurrence — the rule in words, Series — conflicts resolved before anything is written, Group — the room, the roster and the real count, Read-only — the record a reviewer sees
   status: beta
 - Provenance Chip: Where a value came from, how it got here, and how much of it a human has actually looked at.
-  install: npx @oxygenui-design/cli add provenance-chip
+  install: npx @zoblocks/cli add provenance-chip
   docs: no page yet — this component installs from the registry today
   fhir: Provenance
   states: Clinic — measured in the room, Home device, with its caveats, Patient-reported — the instrument, External, with the exchange named, AI-extracted, unconfirmed, AI-extracted, confirmed by a clinician, Amended — the original retained, Stale against a per-datum policy, Observed long before it was recorded, Glyph only, in a dense grid, Chain reachable, Span reachable, No ledger entry — renders nothing
   status: stable
 - Recent Patient Stack: A multi-chart workspace that makes the active patient unmistakable, because the alternative is eleven identical browser tabs.
-  install: npx @oxygenui-design/cli add recent-patient-stack
+  install: npx @zoblocks/cli add recent-patient-stack
   docs: no page yet — this component installs from the registry today
   fhir: Patient, Task
   states: Four charts, one active, A pinned chart, An unsigned note, A draft order, Two charts with similar names, Closing a clean chart, Closing one with an unsigned note, Closing one with a draft order, Returning after fifteen minutes, Expanded panel, Keyboard reordering, Roving focus across the stack, One chart, Notes owed across the caseload
   status: stable
 - Result Value: A single observation rendered so that the four ways a number can lie to you are all impossible.
-  install: npx @oxygenui-design/cli add result-value
+  install: npx @zoblocks/cli add result-value
   docs: no page yet — this component installs from the registry today
   fhir: Observation
   states: Final, in range, Critical, with a delta, Preliminary — not verified by the laboratory, Corrected — the superseded value is shown, No reference range for this patient, A range that needs its qualification, Delta suppressed — the method changed, Patient-reported, Extracted by a model, Absent — never ordered, Absent — awaiting a result, Absent — cancelled, Absent — specimen problem, Absent — patient declined, Absent — restricted, and a value exists, Absent — no value and no reason, Compact, in a grid, Interactive — opens the report
   status: stable
 - Risk Indicator: A risk score that cannot be displayed without its date, its drivers, and the fact that it is not a diagnosis.
-  install: npx @oxygenui-design/cli add risk-indicator
+  install: npx @zoblocks/cli add risk-indicator
   docs: no page yet — this component installs from the registry today
   fhir: RiskAssessment
   states: High, with weighted drivers, Moderate, Low, Imminent, Not scored — the model could not, Expired — past its validity window, Unbounded — no validity window declared, One factor dominates the score, Drivers with no weights, from basis[], Percentile with its cohort, Model card reachable, Compact, in a panel list
   status: stable
 - Trend Indicator: A sparkline that refuses to draw a trend it cannot justify — across an assay change, a unit change, or two points.
-  install: npx @oxygenui-design/cli add trend-indicator
+  install: npx @zoblocks/cli add trend-indicator
   docs: no page yet — this component installs from the registry today
   fhir: Observation
   states: Rising, and worsening, Falling, and improving, Within the reliable-change threshold, Broken by an assay change, Broken by a silent unit change, Two points — no trend, One point, No results at all, Neutral valence, With a reference band, Narrow — glyph and delta only, Sixty points, Points reachable from the table
@@ -158,8 +158,8 @@ Rules that matter when generating code with these components:
   fhir: Patient
   states: Active, Inactive — discharged, transferred, or disengaged, Deceased, with the age frozen at age-at-death, Record merged — care is recorded elsewhere, Test patient (meta.security HTEST), Sensitive record, categories withheld pending an audited reveal, Photo on file, No photo on file, Photo could not be loaded, Photo withheld by site policy, Loading — a skeleton, never a half-identity, Could not load the record, Escalated: a similar name is on this list, Wrong patient — the form and the chart disagree, Identifier failing its check digit
   status: beta
-- [Signature](https://oxygenui.design/components/signature): Signature capture that records the times nobody signed — declined, unable, verbal, on paper — not just the times they did.
-  install: pnpm add @oxygenui-design/signature
+- [Signature](https://zoblocks.design/components/signature): Signature capture that records the times nobody signed — declined, unable, verbal, on paper — not just the times they did.
+  install: pnpm add @zoblocks/signature
   fhir: Provenance, Consent
   states: Signed, Declined to sign, Unable to sign (witnessed), Consented verbally (witnessed), Signed on paper, Awaiting countersignature, Consent withdrawn, Required and empty, Locked / read-only
   status: stable
@@ -167,26 +167,26 @@ Rules that matter when generating code with these components:
 ## Pattern
 
 - Copilot: A floating clinical copilot: a dock above the chart that takes a question and opens into a sourced, auditable thread.
-  install: npx @oxygenui-design/cli add copilot
+  install: npx @zoblocks/cli add copilot
   docs: no page yet — this component installs from the registry today
   fhir: AuditEvent, Provenance, QuestionnaireResponse
   states: Rest, Mode tray, Shortcuts, Dictating, Streaming, Grounded answer, General-knowledge answer, Sources open, Refused, Crisis, Error, Suppressed
   status: experimental
-- [Recorder](https://oxygenui.design/components/recorder): A capture surface that cannot lie about whether it is listening. Five arts over one signal engine, and thirteen failure modes it can tell apart.
-  install: npx @oxygenui-design/cli add recorder
+- [Recorder](https://zoblocks.design/components/recorder): A capture surface that cannot lie about whether it is listening. Five arts over one signal engine, and thirteen failure modes it can tell apart.
+  install: npx @zoblocks/cli add recorder
   states: Recording, Armed, awaiting consent, Microphone muted, Device lost, Held, not yet uploaded, Playback with speakers, Playback without diarisation, Live transcript, Inline dictation, Single control
   status: beta
 
 ## Block
 
 - Safety Plan: The six steps of the Stanley-Brown Safety Planning Intervention, in order, with the crisis step rendered open and uncloseable.
-  install: npx @oxygenui-design/cli add safety-plan
+  install: npx @zoblocks/cli add safety-plan
   docs: no page yet — this component installs from the registry today
   states: Complete plan, Crisis step pinned open, Unfinished step, Empty plan, Clinician editing view, nothing pinned
   status: beta
 
 ## Machine-readable catalog
 
-- Index: https://oxygenui.design/r/index.json
-- Item: https://oxygenui.design/r/{name}.json
-- Coverage: https://oxygenui.design/r/coverage.json
+- Index: https://zoblocks.design/r/index.json
+- Item: https://zoblocks.design/r/{name}.json
+- Coverage: https://zoblocks.design/r/coverage.json

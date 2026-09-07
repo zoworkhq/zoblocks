@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { OxygenMark } from "@/components/Rail";
+import { ZoblocksMark } from "@/components/Rail";
 import { ToastProvider } from "@/components/ui";
 
 /**
@@ -41,12 +41,12 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <header className="relative mx-auto w-full max-w-[26rem]">
           <Link
             href="/"
-            aria-label="Oxygen app home"
+            aria-label="Zoblocks app home"
             className="group inline-flex items-center gap-2.5 text-ink"
           >
-            <OxygenMark className="h-4 w-7 transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:rotate-180" />
+            <ZoblocksMark className="h-4 w-7 transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:rotate-180" />
             <span className="font-display text-[0.9375rem] font-semibold tracking-[-0.02em]">
-              Oxygen
+              Zoblocks
             </span>
             <span className="eyebrow text-[0.5625rem] text-graphite-soft">App</span>
           </Link>
@@ -59,15 +59,15 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         {/*
           The one link between the two halves of the product.
           
-          The app and oxygenui.design shared a palette, a type scale and a
+          The app and zoblocks.design shared a palette, a type scale and a
           mark, and not a single anchor in either direction — a customer arriving
           from the documentation had no way back, which is a strange thing for
           two sites that go to such lengths to feel like one.
         */}
         <footer className="relative mx-auto flex w-full max-w-[26rem] flex-wrap items-center justify-between gap-x-4 gap-y-1 text-[0.6875rem] text-graphite-soft">
           <span>WCAG 2.2 AA, verified on every build</span>
-          <a href="https://oxygenui.design" className="link">
-            oxygenui.design
+          <a href="https://zoblocks.design" className="link">
+            zoblocks.design
           </a>
         </footer>
       </div>

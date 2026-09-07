@@ -17,17 +17,17 @@
  */
 
 .oxw {
-  --oxw-line: var(--color-rule);
-  --oxw-line-strong: var(--color-rule-strong);
-  --oxw-ink: var(--color-ink);
-  --oxw-ink-2: var(--color-graphite);
-  --oxw-ink-3: var(--color-graphite-soft);
-  --oxw-surface: var(--color-paper);
-  --oxw-sunk: var(--color-paper-sunk);
-  --oxw-accent: var(--color-oxygen-deep);
-  --oxw-accent-bg: color-mix(in srgb, var(--color-oxygen) 10%, transparent);
-  --oxw-accent-line: color-mix(in srgb, var(--color-oxygen) 34%, transparent);
-  --oxw-danger: var(--color-critical);
+  --zbw-line: var(--color-rule);
+  --zbw-line-strong: var(--color-rule-strong);
+  --zbw-ink: var(--color-ink);
+  --zbw-ink-2: var(--color-graphite);
+  --zbw-ink-3: var(--color-graphite-soft);
+  --zbw-surface: var(--color-paper);
+  --zbw-sunk: var(--color-paper-sunk);
+  --zbw-accent: var(--color-brand-deep);
+  --zbw-accent-bg: color-mix(in srgb, var(--color-brand) 10%, transparent);
+  --zbw-accent-line: color-mix(in srgb, var(--color-brand) 34%, transparent);
+  --zbw-danger: var(--color-critical);
   /*
    * Critical, on a tint of critical.
    *
@@ -37,14 +37,14 @@
    * inside the chip clears 4.5:1 — and the word is what carries the meaning,
    * so it is the thing that has to be readable.
    */
-  --oxw-danger-ink: #8f1d14;
+  --zbw-danger-ink: #8f1d14;
   /* Same problem, same fix: --color-electric on a wash of itself measured
      4.48:1 against a 4.5 floor. Two hundredths is still a failure. */
-  --oxw-info-ink: #07596a;
+  --zbw-info-ink: #07596a;
 
-  border: 1px solid var(--oxw-line);
+  border: 1px solid var(--zbw-line);
   border-radius: 12px;
-  background: var(--oxw-surface);
+  background: var(--zbw-surface);
   box-shadow:
     0 1px 2px -1px rgb(2 20 17 / 0.05),
     0 22px 56px -30px rgb(2 20 17 / 0.24);
@@ -68,7 +68,7 @@
 
 /* The component sits inside the frame, so it drops its own edge rather than
    nesting two boxes with two radii. */
-.oxw .ox-grid {
+.oxw .zb-grid {
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -84,7 +84,7 @@
   align-items: flex-start;
   gap: 0.75rem 1rem;
   padding: 0.9rem 1.1rem 0.8rem;
-  border-block-end: 1px solid var(--oxw-line);
+  border-block-end: 1px solid var(--zbw-line);
 }
 
 .oxw__headtext {
@@ -102,7 +102,7 @@
 .oxw__sub {
   margin: 0.2rem 0 0;
   font-size: 0.78125rem;
-  color: var(--oxw-ink-3);
+  color: var(--zbw-ink-3);
 }
 
 /* ---------------------------------------------------------------- */
@@ -117,10 +117,10 @@
      thumb-sized target that made every header in this component too tall. */
   min-block-size: 1.875rem;
   padding-inline: 0.65rem;
-  border: 1px solid var(--oxw-line-strong);
+  border: 1px solid var(--zbw-line-strong);
   border-radius: 6px;
-  background: var(--oxw-surface);
-  color: var(--oxw-ink-2);
+  background: var(--zbw-surface);
+  color: var(--zbw-ink-2);
   font-size: 0.8125rem;
   font-weight: 500;
   white-space: nowrap;
@@ -128,18 +128,18 @@
 }
 
 .oxw__btn:hover {
-  background: var(--oxw-sunk);
-  color: var(--oxw-ink);
+  background: var(--zbw-sunk);
+  color: var(--zbw-ink);
 }
 
 .oxw__btn--ghost {
   border-color: transparent;
   background: none;
-  color: var(--oxw-accent);
+  color: var(--zbw-accent);
 }
 
 .oxw__btn--ghost:hover {
-  background: var(--oxw-accent-bg);
+  background: var(--zbw-accent-bg);
 }
 
 /* ---------------------------------------------------------------- */
@@ -151,7 +151,7 @@
   align-items: stretch;
   gap: 0.1rem;
   padding-inline: 1.1rem;
-  border-block-end: 1px solid var(--oxw-line);
+  border-block-end: 1px solid var(--zbw-line);
   overflow-x: auto;
   scrollbar-width: thin;
 }
@@ -166,7 +166,7 @@
   border-block-end: 2px solid transparent;
   margin-block-end: -1px;
   background: none;
-  color: var(--oxw-ink-3);
+  color: var(--zbw-ink-3);
   font-size: 0.8125rem;
   font-weight: 500;
   white-space: nowrap;
@@ -174,18 +174,18 @@
 }
 
 .oxw__view:hover {
-  color: var(--oxw-ink);
+  color: var(--zbw-ink);
 }
 
 .oxw__view[aria-current="true"] {
-  color: var(--oxw-ink);
-  border-block-end-color: var(--oxw-accent);
+  color: var(--zbw-ink);
+  border-block-end-color: var(--zbw-accent);
   font-weight: 600;
 }
 
 .oxw__viewn {
   font-size: 0.6875rem;
-  color: var(--oxw-ink-3);
+  color: var(--zbw-ink-3);
 }
 
 /* ---------------------------------------------------------------- */
@@ -218,8 +218,8 @@
   align-items: center;
   gap: 0.4rem;
   padding: 0.55rem 1.1rem;
-  border-block-end: 1px solid var(--oxw-line);
-  background: var(--oxw-sunk);
+  border-block-end: 1px solid var(--zbw-line);
+  background: var(--zbw-sunk);
 }
 
 .oxw__search {
@@ -229,16 +229,16 @@
   min-block-size: 1.875rem;
   min-inline-size: 15rem;
   padding-inline: 0.6rem;
-  border: 1px solid var(--oxw-line-strong);
+  border: 1px solid var(--zbw-line-strong);
   border-radius: 6px;
-  background: var(--oxw-surface);
-  color: var(--oxw-ink-3);
+  background: var(--zbw-surface);
+  color: var(--zbw-ink-3);
   font-size: 0.8125rem;
 }
 
 /* The ring goes on the box, not the input, so the glyph is inside it. */
 .oxw__search:focus-within {
-  outline: 2px solid var(--color-oxygen);
+  outline: 2px solid var(--color-brand);
   outline-offset: 2px;
 }
 
@@ -247,13 +247,13 @@
   min-inline-size: 0;
   border: 0;
   background: none;
-  color: var(--oxw-ink);
+  color: var(--zbw-ink);
   font: inherit;
   outline: none;
 }
 
 .oxw__search input::placeholder {
-  color: var(--oxw-ink-3);
+  color: var(--zbw-ink-3);
 }
 
 /* ---------------------------------------------------------------- */
@@ -275,9 +275,9 @@
   flex-direction: column;
   min-inline-size: 11rem;
   padding: 0.25rem;
-  border: 1px solid var(--oxw-line-strong);
+  border: 1px solid var(--zbw-line-strong);
   border-radius: 8px;
-  background: var(--oxw-surface);
+  background: var(--zbw-surface);
   box-shadow: 0 12px 28px -14px rgb(2 20 17 / 0.3);
 }
 
@@ -290,19 +290,19 @@
   border: 0;
   border-radius: 5px;
   background: none;
-  color: var(--oxw-ink-2);
+  color: var(--zbw-ink-2);
   font-size: 0.8125rem;
   text-align: start;
   cursor: pointer;
 }
 
 .oxw__addmenu button:hover {
-  background: var(--oxw-sunk);
-  color: var(--oxw-ink);
+  background: var(--zbw-sunk);
+  color: var(--zbw-ink);
 }
 
 .oxw__addmenu b {
-  color: var(--oxw-ink);
+  color: var(--zbw-ink);
   font-weight: 600;
 }
 
@@ -312,10 +312,10 @@
   gap: 0.3rem;
   min-block-size: 1.625rem;
   padding-inline: 0.55rem 0.2rem;
-  border: 1px solid var(--oxw-accent-line);
+  border: 1px solid var(--zbw-accent-line);
   border-radius: 999px;
-  background: var(--oxw-accent-bg);
-  color: var(--oxw-accent);
+  background: var(--zbw-accent-bg);
+  color: var(--zbw-accent);
   font-size: 0.75rem;
 }
 
@@ -367,7 +367,7 @@
   display: block;
   font-size: 0.625rem;
   line-height: 1.3;
-  color: var(--oxw-ink-3);
+  color: var(--zbw-ink-3);
 }
 
 .oxw__measure {
@@ -388,12 +388,12 @@
 /* The one colour in the grid, and it never travels alone — the band word sits
    beside it, so the meaning survives grayscale and forced colours. */
 .oxw__score--hot {
-  color: var(--oxw-danger-ink);
+  color: var(--zbw-danger-ink);
 }
 
 .oxw__band {
   font-size: 0.6875rem;
-  color: var(--oxw-ink-3);
+  color: var(--zbw-ink-3);
 }
 
 .oxw__up,
@@ -403,11 +403,11 @@
 }
 
 .oxw__up {
-  color: var(--oxw-danger-ink);
+  color: var(--zbw-danger-ink);
 }
 
 .oxw__down {
-  color: var(--oxw-ink-3);
+  color: var(--zbw-ink-3);
 }
 
 .oxw__chip {
@@ -425,18 +425,18 @@
 .oxw__chip--sev {
   background: color-mix(in srgb, var(--color-critical) 12%, transparent);
   border-color: color-mix(in srgb, var(--color-critical) 30%, transparent);
-  color: var(--oxw-danger-ink);
+  color: var(--zbw-danger-ink);
 }
 
 .oxw__chip--mod {
   background: color-mix(in srgb, var(--color-electric) 12%, transparent);
-  color: var(--oxw-info-ink);
+  color: var(--zbw-info-ink);
 }
 
 .oxw__chip--ok,
 .oxw__chip--plain {
-  background: var(--oxw-sunk);
-  color: var(--oxw-ink-2);
+  background: var(--zbw-sunk);
+  color: var(--zbw-ink-2);
   font-weight: 500;
 }
 
@@ -453,7 +453,7 @@
   inline-size: 2.75rem;
   block-size: 4px;
   border-radius: 2px;
-  background: var(--oxw-line);
+  background: var(--zbw-line);
   overflow: hidden;
 }
 
@@ -461,15 +461,15 @@
   display: block;
   block-size: 100%;
   border-radius: 2px;
-  background: var(--oxw-accent);
+  background: var(--zbw-accent);
 }
 
 .oxw__fill--hot {
-  background: var(--oxw-danger);
+  background: var(--zbw-danger);
 }
 
 .oxw__due--now {
-  color: var(--oxw-danger-ink);
+  color: var(--zbw-danger-ink);
   font-weight: 600;
 }
 
@@ -481,7 +481,7 @@
 .oxw__view:focus-visible,
 .oxw__pill button:focus-visible,
 .oxw__addmenu button:focus-visible {
-  outline: 2px solid var(--color-oxygen);
+  outline: 2px solid var(--color-brand);
   outline-offset: 2px;
 }
 
@@ -500,11 +500,11 @@
 /* The luminous red on dark grounds, and the AAA one under high contrast. The
    panel follows the page, so the pair has to follow it too. */
 .dark .oxw {
-  --oxw-danger-ink: #ffa8b4;
-  --oxw-info-ink: #9ddcf5;
+  --zbw-danger-ink: #ffa8b4;
+  --zbw-info-ink: #9ddcf5;
 }
 
-[data-ox-theme="high-contrast"] .oxw {
-  --oxw-danger-ink: #8c0000;
-  --oxw-info-ink: #003d52;
+[data-zb-theme="high-contrast"] .oxw {
+  --zbw-danger-ink: #8c0000;
+  --zbw-info-ink: #003d52;
 }

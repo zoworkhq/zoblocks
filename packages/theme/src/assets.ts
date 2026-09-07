@@ -99,7 +99,7 @@ export const BRAND_ASSETS: readonly BrandAssetSpec[] = [
     note: "The primary wordmark, over paper. Everything else is cut from this.",
     formats: ["svg", "png", "webp"],
     ground: "light",
-    delivery: "--ox-logo and --ox-logo-light",
+    delivery: "--zb-logo and --zb-logo-light",
     group: "mark",
   },
   {
@@ -108,7 +108,7 @@ export const BRAND_ASSETS: readonly BrandAssetSpec[] = [
     note: "Reversed. Not derived from the light one — a reversed mark is a decision its owner has already made.",
     formats: ["svg", "png", "webp"],
     ground: "dark",
-    delivery: "--ox-logo under the dark theme, and --ox-logo-dark",
+    delivery: "--zb-logo under the dark theme, and --zb-logo-dark",
     group: "mark",
   },
   {
@@ -117,7 +117,7 @@ export const BRAND_ASSETS: readonly BrandAssetSpec[] = [
     note: "For toner and fax. A discharge letter prints in one colour and a referral still travels by fax in places; this is what survives both.",
     formats: ["svg", "png"],
     ground: "neutral",
-    delivery: "--ox-logo-mono, and the print stylesheet",
+    delivery: "--zb-logo-mono, and the print stylesheet",
     group: "mark",
   },
   {
@@ -167,7 +167,7 @@ export const BRAND_ASSETS: readonly BrandAssetSpec[] = [
     formats: ["svg", "png", "webp"],
     ground: "both",
     shape: { width: 320, height: 220 },
-    delivery: "--ox-illustration-empty",
+    delivery: "--zb-illustration-empty",
     group: "illustration",
   },
   {
@@ -177,7 +177,7 @@ export const BRAND_ASSETS: readonly BrandAssetSpec[] = [
     formats: ["svg", "png", "webp"],
     ground: "both",
     shape: { width: 320, height: 220 },
-    delivery: "--ox-illustration-search",
+    delivery: "--zb-illustration-search",
     group: "illustration",
   },
   {
@@ -187,7 +187,7 @@ export const BRAND_ASSETS: readonly BrandAssetSpec[] = [
     formats: ["svg", "png", "webp"],
     ground: "both",
     shape: { width: 320, height: 220 },
-    delivery: "--ox-illustration-denied",
+    delivery: "--zb-illustration-denied",
     group: "illustration",
   },
   {
@@ -197,7 +197,7 @@ export const BRAND_ASSETS: readonly BrandAssetSpec[] = [
     formats: ["svg", "png", "webp"],
     ground: "both",
     shape: { width: 320, height: 220 },
-    delivery: "--ox-illustration-error",
+    delivery: "--zb-illustration-error",
     group: "illustration",
   },
   {
@@ -207,7 +207,7 @@ export const BRAND_ASSETS: readonly BrandAssetSpec[] = [
     formats: ["svg", "png"],
     ground: "light",
     shape: { width: 1600, height: 300 },
-    delivery: "--ox-letterhead, in the print stylesheet",
+    delivery: "--zb-letterhead, in the print stylesheet",
     group: "print",
   },
   {
@@ -217,7 +217,7 @@ export const BRAND_ASSETS: readonly BrandAssetSpec[] = [
     formats: ["svg", "png"],
     ground: "light",
     shape: { width: 600, height: 600, ratio: 1 },
-    delivery: "--ox-watermark-draft",
+    delivery: "--zb-watermark-draft",
     group: "print",
   },
 ];

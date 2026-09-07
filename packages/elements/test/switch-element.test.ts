@@ -6,23 +6,23 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import "../src/switch.js";
-import type { OxSwitchElement } from "../src/switch.js";
+import type { ZbSwitchElement } from "../src/switch.js";
 import { ABSENT_REASON_LABEL, STATE_LABEL_PRESETS, SWITCH_SIZE } from "../src/vocabulary.js";
 
-function mount(attributes: Record<string, string> = {}): OxSwitchElement {
-  const element = document.createElement("ox-switch");
+function mount(attributes: Record<string, string> = {}): ZbSwitchElement {
+  const element = document.createElement("zb-switch");
   for (const [name, value] of Object.entries(attributes)) element.setAttribute(name, value);
   document.body.append(element);
   return element;
 }
 
-const control = (element: OxSwitchElement) =>
-  element.shadowRoot!.querySelector<HTMLButtonElement>(".ox-switch__control")!;
-const stateWord = (element: OxSwitchElement) =>
-  element.shadowRoot!.querySelector(".ox-switch__state")!.textContent;
-const polite = (element: OxSwitchElement) =>
+const control = (element: ZbSwitchElement) =>
+  element.shadowRoot!.querySelector<HTMLButtonElement>(".zb-switch__control")!;
+const stateWord = (element: ZbSwitchElement) =>
+  element.shadowRoot!.querySelector(".zb-switch__state")!.textContent;
+const polite = (element: ZbSwitchElement) =>
   element.shadowRoot!.querySelector('[role="status"]')!.textContent;
-const assertive = (element: OxSwitchElement) =>
+const assertive = (element: ZbSwitchElement) =>
   element.shadowRoot!.querySelector('[role="alert"]')!.textContent;
 
 beforeEach(() => {
@@ -31,7 +31,7 @@ beforeEach(() => {
 
 describe("upgrade", () => {
   it("defines itself on import", () => {
-    expect(customElements.get("ox-switch")).toBeTruthy();
+    expect(customElements.get("zb-switch")).toBeTruthy();
   });
 
   it("upgrades with a shadow root and a real switch inside it", () => {
@@ -45,9 +45,9 @@ describe("upgrade", () => {
     // A role or a state buried in a shadow tree is reachable by assistive
     // technology but invisible to the host's own tests and queries.
     const element = mount({ label: "Contact precautions", value: "on", tone: "caution" });
-    expect(element.getAttribute("data-ox-state")).toBe("on");
-    expect(element.getAttribute("data-ox-tone")).toBe("caution");
-    expect(element.hasAttribute("data-ox-switch")).toBe(true);
+    expect(element.getAttribute("data-zb-state")).toBe("on");
+    expect(element.getAttribute("data-zb-tone")).toBe("caution");
+    expect(element.hasAttribute("data-zb-switch")).toBe(true);
   });
 });
 
@@ -55,7 +55,7 @@ describe("value", () => {
   it.each(["on", "off", "unknown"] as const)("reflects value=%s", (value) => {
     const element = mount({ label: "Advance directive", value });
     expect(element.value).toBe(value);
-    expect(element.getAttribute("data-ox-state")).toBe(value);
+    expect(element.getAttribute("data-zb-state")).toBe(value);
   });
 
   it("reports mixed for an absent value", () => {
@@ -91,7 +91,7 @@ describe("requests", () => {
   it("asks rather than deciding — the host owns the write", () => {
     const element = mount({ label: "Contact precautions", value: "off" });
     const spy = vi.fn();
-    element.addEventListener("ox-switch-request", spy);
+    element.addEventListener("zb-switch-request", spy);
 
     control(element).click();
 
@@ -105,16 +105,16 @@ describe("requests", () => {
   it("dispatches an event that crosses the shadow boundary and bubbles", () => {
     const element = mount({ label: "Contact", value: "off" });
     const spy = vi.fn();
-    document.addEventListener("ox-switch-request", spy);
+    document.addEventListener("zb-switch-request", spy);
     control(element).click();
     expect(spy).toHaveBeenCalledTimes(1);
-    document.removeEventListener("ox-switch-request", spy);
+    document.removeEventListener("zb-switch-request", spy);
   });
 
   it("commits the affirmative from unknown, and never returns to it", () => {
     const element = mount({ label: "Latex allergy", value: "unknown" });
     const spy = vi.fn();
-    element.addEventListener("ox-switch-request", spy);
+    element.addEventListener("zb-switch-request", spy);
 
     control(element).click();
     expect(spy.mock.calls[0][0].detail.value).toBe("on");
@@ -137,7 +137,7 @@ describe("requests", () => {
     expect(negative.hidden).toBe(false);
 
     const spy = vi.fn();
-    element.addEventListener("ox-switch-request", spy);
+    element.addEventListener("zb-switch-request", spy);
     negative.click();
     expect(spy.mock.calls[0][0].detail.value).toBe("off");
   });
@@ -151,7 +151,7 @@ describe("requests", () => {
     for (const attribute of ["readonly", "disabled"]) {
       const element = mount({ label: "Consent", value: "off", [attribute]: "" });
       const spy = vi.fn();
-      element.addEventListener("ox-switch-request", spy);
+      element.addEventListener("zb-switch-request", spy);
       control(element).click();
       expect(spy, attribute).not.toHaveBeenCalled();
     }
@@ -201,7 +201,7 @@ describe("phase", () => {
       "stale",
     ] as const) {
       element.phase = phase;
-      expect(element.getAttribute("data-ox-phase")).toBe(phase);
+      expect(element.getAttribute("data-zb-phase")).toBe(phase);
     }
   });
 });
@@ -234,14 +234,14 @@ describe("geometry", () => {
   it.each(Object.keys(SWITCH_SIZE))("size=%s writes the geometry custom properties", (size) => {
     const element = mount({ label: "NPO", value: "on", size });
     const { track, thumb } = SWITCH_SIZE[size as keyof typeof SWITCH_SIZE];
-    expect(element.style.getPropertyValue("--ox-switch-track-w")).toBe(`${track[0]}px`);
-    expect(element.style.getPropertyValue("--ox-switch-track-h")).toBe(`${track[1]}px`);
-    expect(element.style.getPropertyValue("--ox-switch-thumb-size")).toBe(`${thumb}px`);
+    expect(element.style.getPropertyValue("--zb-switch-track-w")).toBe(`${track[0]}px`);
+    expect(element.style.getPropertyValue("--zb-switch-track-h")).toBe(`${track[1]}px`);
+    expect(element.style.getPropertyValue("--zb-switch-thumb-size")).toBe(`${thumb}px`);
   });
 
   it("never writes the hit-area token, so density governs the target", () => {
     const element = mount({ label: "NPO", value: "on", size: "micro" });
-    expect(element.style.getPropertyValue("--ox-switch-target-min")).toBe("");
+    expect(element.style.getPropertyValue("--zb-switch-target-min")).toBe("");
   });
 });
 

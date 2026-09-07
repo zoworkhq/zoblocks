@@ -1,7 +1,7 @@
 /**
  * The host-primitive contract.
  *
- * Oxygen ships 28 components and none of them is a Button. That is deliberate
+ * Zoblocks ships 28 components and none of them is a Button. That is deliberate
  * — ADR 0010 puts primitives at Ant Design's public API and takes no
  * dependency on it — but it leaves a real gap in a demo: the chrome around a
  * clinical component (the acknowledge button, the note field, the tab strip)
@@ -15,13 +15,13 @@
  *
  * **Props are Ant Design's, per ADR 0010.** That is not a preference for antd:
  * it is the only choice that keeps one shape for the call site, because
- * Oxygen's own primitives already match antd exactly, so the antd adapter is a
+ * Zoblocks's own primitives already match antd exactly, so the antd adapter is a
  * pass-through and only MUI needs translation. Where the two frameworks
  * genuinely disagree the antd shape wins and the MUI adapter converts — each
  * conversion is named in `mui.tsx` rather than left for a reader to discover.
  *
  * **What is deliberately absent.** No Modal, no Tooltip, no DatePicker, no
- * Table. Each of those is either a clinical component Oxygen already owns
+ * Table. Each of those is either a clinical component Zoblocks already owns
  * (DatePicker, DataGrid) or an overlay whose focus-management differences
  * between the two frameworks are large enough that a shared prop shape would
  * be a lie. Six primitives is the set that translates honestly.
@@ -30,13 +30,13 @@
 import type * as React from "react";
 
 /** The three design languages a demo can render in. */
-export type HostId = "oxygen" | "antd" | "mui";
+export type HostId = "zoblocks" | "antd" | "mui";
 
 /** In switcher order: the default first, then the two frameworks. */
-export const HOST_IDS: readonly HostId[] = ["oxygen", "antd", "mui"];
+export const HOST_IDS: readonly HostId[] = ["zoblocks", "antd", "mui"];
 
 export const HOST_LABEL: Record<HostId, string> = {
-  oxygen: "Oxygen",
+  zoblocks: "Zoblocks",
   antd: "Ant Design",
   mui: "Material UI",
 };

@@ -10,7 +10,7 @@
 import { ObjectId } from "mongodb";
 import { db } from "@/db/client";
 import type { MemberRole, MemberStatus } from "@/db/collections";
-import { withTierDefaults, type ThemeTokens, type ThemeTokensInput } from "@oxygenui-design/theme";
+import { withTierDefaults, type ThemeTokens, type ThemeTokensInput } from "@zoblocks/theme";
 import { hashPassword } from "@/lib/auth";
 import { scoped } from "@/db/scope";
 import type { Authorized } from "@/lib/authorize";

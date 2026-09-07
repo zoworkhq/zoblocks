@@ -1,5 +1,5 @@
 {
-  "extends": "@oxygenui-design/tsconfig/react-library.json",
+  "extends": "@zoblocks/tsconfig/react-library.json",
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": "src",

@@ -35,7 +35,7 @@ import {
   emptyAssets,
   isServable,
   themeCacheHeaders,
-} from "@oxygenui-design/theme";
+} from "@zoblocks/theme";
 import { unscopedPublishedVersion } from "@/db/scope";
 
 /** `northwind-clinical@7.css` → slug, version and which representation. */

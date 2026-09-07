@@ -9,7 +9,7 @@
  * The component never writes to a customer's console — that capability is
  * forbidden repo-wide. Callers get the list back and decide: the React layer
  * throws in development and does nothing in production, and
- * `@oxygenui/tabs-semantic-mode` catches the two most common cases at lint
+ * `@zoblocks/tabs-semantic-mode` catches the two most common cases at lint
  * time, before the code ever runs.
  */
 
@@ -182,5 +182,5 @@ export function validateTabsConfig(input: ValidateInput): Problem[] {
 export function formatProblems(problems: readonly Problem[]): string {
   if (problems.length === 0) return "";
   const lines = problems.map((p) => `  • [${p.code}] ${p.message}`);
-  return `Oxygen Tabs found ${problems.length} configuration problem(s):\n${lines.join("\n")}`;
+  return `Zoblocks Tabs found ${problems.length} configuration problem(s):\n${lines.join("\n")}`;
 }

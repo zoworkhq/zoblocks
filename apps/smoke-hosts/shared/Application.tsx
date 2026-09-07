@@ -16,7 +16,7 @@
  */
 
 import * as React from "react";
-import { Switch, Timeline } from "@oxygenui-design/react";
+import { Switch, Timeline } from "@zoblocks/react";
 
 export function Application() {
   const [precautions, setPrecautions] = React.useState<boolean | "unknown">(true);

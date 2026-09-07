@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
  * whole thing is still one real `<input>` — same keyboard behaviour, same form
  * participation, same announcement. Nothing here is a `<div>` pretending.
  *
- * The fill is `oxygen-deep` rather than `oxygen`: the tick is white, and white
+ * The fill is `zoblocks-deep` rather than `zoblocks`: the tick is white, and white
  * on the lighter accent measures about 2.2:1 — below the 3:1 that SC 1.4.11
  * asks of a control's own parts. A checkbox whose tick is hard to see is a
  * checkbox that has to be clicked twice to be believed.

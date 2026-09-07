@@ -1,8 +1,8 @@
 /**
- * @oxygenui-design/bridge-mui — Oxygen components in a Material UI host's
+ * @zoblocks/bridge-mui — Zoblocks components in a Material UI host's
  * design language.
  *
- *     pnpm add @oxygenui-design/bridge-mui
+ *     pnpm add @zoblocks/bridge-mui
  *
  * `@mui/material` is a peer imported only by this package. A consumer on antd
  * never resolves it, and moving between the two means changing which bridge is
@@ -14,5 +14,5 @@
 export { MuiBridge, useMuiTokens, type MuiBridgeProps } from "./MuiBridge";
 export { muiBridge, type MuiTheme } from "./map";
 
-export { OxygenMuiProvider, type OxygenMuiProviderProps } from "./OxygenMuiProvider";
+export { ZoblocksMuiProvider, type ZoblocksMuiProviderProps } from "./ZoblocksMuiProvider";
 export { NOT_PUSHED_TO_MUI, toMuiTheme, type MuiThemeOptions } from "./inverse";

@@ -5,7 +5,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/lib/presence.ts. Edit that file, not this one.
+// Generated from registry/zoblocks/lib/presence.ts. Edit that file, not this one.
 /**
  * Presence with clinical semantics: not *online*, but in session, on call,
  * signed out to whom, and who else is in this chart right now.

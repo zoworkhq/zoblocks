@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 /* ===========================================================================
- * app.oxygenui.design
+ * app.zoblocks.design
  *
- * The design language is oxygenui.design's, not a new one. Palette, type
+ * The design language is zoblocks.design's, not a new one. Palette, type
  * scale, the eyebrow, the dark instrument panel and the ease curve are ported
  * from apps/docs/src/app/globals.css rather than reinterpreted — a customer
  * moves between the two in one click, and the fastest way to make a product
@@ -23,7 +23,7 @@
  *   that relationship flattens the whole thing into a generic admin grid.
  *
  * One rule this app adds: where a customer's own colours are on screen, the
- * surrounding chrome goes achromatic — an Oxygen-teal control beside a
+ * surrounding chrome goes achromatic — a Zoblocks-teal control beside a
  * customer's teal makes theirs look wrong. That is `.preview-region`, and it
  * applies there and nowhere else.
  * ======================================================================== */
@@ -39,10 +39,10 @@
   --color-graphite: var(--site-graphite);
   --color-graphite-soft: var(--site-graphite-soft);
 
-  --color-oxygen: var(--site-oxygen);
-  --color-oxygen-deep: var(--site-accent-text);
+  --color-brand: var(--site-brand);
+  --color-brand-deep: var(--site-accent-text);
   /* A filled accent surface, with the colour that is legible *on* it. Separate
-     from `oxygen-deep`, which is a text colour and inverts between themes. */
+     from `zoblocks-deep`, which is a text colour and inverts between themes. */
   --color-accent-solid: var(--site-accent-solid);
   --color-accent-on: var(--site-accent-on);
   --color-electric: var(--site-electric);
@@ -96,7 +96,7 @@
   --site-graphite: #5a6b67;
   --site-graphite-soft: #5c6d68;
 
-  --site-oxygen: #10b995;
+  --site-brand: #10b995;
   --site-accent-text: #067662;
   --site-accent-solid: #067662;
   --site-accent-on: #ffffff;
@@ -159,7 +159,7 @@
   /* The mark takes the saturated brand step; accent *text* takes the
      lighter one, so the two stay as distinguishable as they were when this
      pair was two different cyans. */
-  --site-oxygen: #2dd4b0;
+  --site-brand: #2dd4b0;
   --site-accent-text: #6ce7cb;
   /* Inverted here on purpose. `accent-text` is a *light* green in dark mode
      because it sits on a dark page; filling a shape with it and writing white
@@ -316,7 +316,7 @@ body {
  *
  * The one thing this app adds to the docs vocabulary. Where a customer's own
  * colours are being displayed, the surrounding chrome drops its hue: an
- * Oxygen-teal control sitting beside a customer's teal swatch makes the
+ * Zoblocks-teal control sitting beside a customer's teal swatch makes the
  * customer's swatch look wrong, and they will change a colour that was fine.
  */
 /*
@@ -330,13 +330,13 @@ body {
  *
  * Removed a frame later, so a deliberate press of "Dark" still animates.
  */
-.ox-settling,
-.ox-settling * {
+.zb-settling,
+.zb-settling * {
   transition: none !important;
 }
 
 .preview-region {
-  --color-oxygen-deep: var(--color-graphite);
+  --color-brand-deep: var(--color-graphite);
   --color-accent-wash: var(--color-paper-sunk);
   background: var(--color-paper-sunk);
   border: 1px solid var(--color-rule);
@@ -534,7 +534,7 @@ body {
  * already distinguish them.
  */
 .link {
-  color: var(--color-oxygen-deep);
+  color: var(--color-brand-deep);
   text-decoration: underline;
   text-underline-offset: 2px;
   text-decoration-thickness: 1px;
@@ -635,7 +635,7 @@ input:-webkit-autofill:focus {
  */
 @layer base {
   :focus-visible {
-    outline: 2px solid var(--color-oxygen-deep);
+    outline: 2px solid var(--color-brand-deep);
     outline-offset: 2px;
     border-radius: 4px;
   }
@@ -649,7 +649,7 @@ input:-webkit-autofill:focus {
  * Only its paint is ours, and the thumb is styled per engine because there is
  * still no standard pseudo-element for it.
  */
-.ox-hue {
+.zb-hue {
   background: linear-gradient(
     to right,
     #f00 0%,
@@ -662,7 +662,7 @@ input:-webkit-autofill:focus {
   );
 }
 
-.ox-hue::-webkit-slider-thumb {
+.zb-hue::-webkit-slider-thumb {
   appearance: none;
   width: 0.875rem;
   height: 0.875rem;
@@ -672,7 +672,7 @@ input:-webkit-autofill:focus {
   cursor: grab;
 }
 
-.ox-hue::-moz-range-thumb {
+.zb-hue::-moz-range-thumb {
   width: 0.875rem;
   height: 0.875rem;
   border-radius: 999px;
@@ -681,9 +681,9 @@ input:-webkit-autofill:focus {
   cursor: grab;
 }
 
-.ox-hue:focus-visible {
+.zb-hue:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px var(--color-oxygen, rgb(59 130 246 / 0.3));
+  box-shadow: 0 0 0 3px var(--color-brand, rgb(59 130 246 / 0.3));
 }
 
 /* ---------------------------------------------------------------------------
@@ -700,7 +700,7 @@ input:-webkit-autofill:focus {
  * catalogue that flickers is a catalogue nobody reads.
  * ------------------------------------------------------------------------ */
 
-@keyframes ox-fade {
+@keyframes zb-fade {
   0%,
   100% {
     opacity: 0.35;
@@ -710,7 +710,7 @@ input:-webkit-autofill:focus {
   }
 }
 
-@keyframes ox-sweep {
+@keyframes zb-sweep {
   0%,
   100% {
     transform: scaleY(0.72);
@@ -720,7 +720,7 @@ input:-webkit-autofill:focus {
   }
 }
 
-@keyframes ox-slide {
+@keyframes zb-slide {
   0%,
   100% {
     opacity: 0.4;
@@ -732,7 +732,7 @@ input:-webkit-autofill:focus {
   }
 }
 
-@keyframes ox-draw {
+@keyframes zb-draw {
   0% {
     stroke-dashoffset: 100;
   }
@@ -746,17 +746,17 @@ input:-webkit-autofill:focus {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .ox-fade {
-    animation: ox-fade 2.8s ease-in-out infinite;
+  .zb-fade {
+    animation: zb-fade 2.8s ease-in-out infinite;
   }
-  .ox-sweep {
-    animation: ox-sweep 3.2s ease-in-out infinite;
+  .zb-sweep {
+    animation: zb-sweep 3.2s ease-in-out infinite;
     transform-origin: bottom;
   }
-  .ox-slide {
-    animation: ox-slide 3s ease-in-out infinite;
+  .zb-slide {
+    animation: zb-slide 3s ease-in-out infinite;
   }
-  .ox-draw {
-    animation: ox-draw 4.5s ease-in-out infinite;
+  .zb-draw {
+    animation: zb-draw 4.5s ease-in-out infinite;
   }
 }

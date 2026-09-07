@@ -3,7 +3,7 @@
 /**
  * The React half of the Ant Design bridge.
  *
- *     import { AntdBridge } from "@oxygenui-design/bridge-antd";
+ *     import { AntdBridge } from "@zoblocks/bridge-antd";
  *
  *     <ConfigProvider theme={{ token: brand }}>
  *       <AntdBridge>
@@ -27,7 +27,7 @@
 
 import * as React from "react";
 import { theme } from "antd";
-import { assertBridgeOutput, resolvePatch, type TokenPatch } from "@oxygenui-design/bridge-core";
+import { assertBridgeOutput, resolvePatch, type TokenPatch } from "@zoblocks/bridge-core";
 import { antdBridge, type AntdTokens } from "./map";
 
 /**
@@ -63,5 +63,5 @@ export interface AntdBridgeProps {
 
 export function AntdBridge({ children, className, as = "div" }: AntdBridgeProps) {
   const style = useAntdTokens();
-  return React.createElement(as, { className, style, "data-ox-bridge": antdBridge.id }, children);
+  return React.createElement(as, { className, style, "data-zb-bridge": antdBridge.id }, children);
 }

@@ -7,7 +7,7 @@
  * answer them the same way.
  */
 
-import type { SnapshotVariable, VariableSnapshot } from "@oxygenui-design/figma-core";
+import type { SnapshotVariable, VariableSnapshot } from "@zoblocks/figma-core";
 
 /**
  * One variable's colour in one mode, as hex.
@@ -25,7 +25,7 @@ export function colourAt(variable: SnapshotVariable, mode: string): string | und
 }
 
 /**
- * Oxygen token to hex, for the variables in one collection that carry a stamp.
+ * Zoblocks token to hex, for the variables in one collection that carry a stamp.
  *
  * Keyed on the stamped token rather than the label, because the label belongs
  * to the designer. A file where somebody renamed `accent` to `Brand blue`
@@ -46,7 +46,7 @@ export function stampedTokens(
   return out;
 }
 
-/** Whether a collection carries any Oxygen identity at all, in any mode. */
+/** Whether a collection carries any Zoblocks identity at all, in any mode. */
 export function hasStamps(snapshot: VariableSnapshot, collection: string): boolean {
   return snapshot.variables.some((v) => v.collection === collection && Boolean(v.token));
 }

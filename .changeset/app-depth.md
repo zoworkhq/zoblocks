@@ -1,5 +1,5 @@
 ---
-"@oxygenui-design/theme": minor
+"@zoblocks/theme": minor
 ---
 
 Font asset hosting, and the component tier made editable.

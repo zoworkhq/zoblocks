@@ -28,9 +28,9 @@ import { CATALOG } from "@/lib/catalog";
 import { LoaderShowcase } from "@/components/site/loader-showcase";
 import { SignatureDrawing } from "@/components/site/signature-showcase";
 import { LiveSwitch } from "@/components/site/switch-gallery";
-import { Tabs } from "@oxygenui-design/tabs";
-import { Calendar } from "@/registry/oxygen/date-picker/date-picker";
-import { plainDate } from "@/lib/oxygen-datetime";
+import { Tabs } from "@zoblocks/tabs";
+import { Calendar } from "@/registry/zoblocks/date-picker/date-picker";
+import { plainDate } from "@/lib/zoblocks-datetime";
 import { cn } from "@/lib/utils";
 import { PatientPortrait } from "@/components/site/patient-portrait";
 import { facesFor } from "@/lib/faces";
@@ -38,7 +38,7 @@ import {
   ChartContextMenu,
   type ChartMenuAction,
   type MenuSubject,
-} from "@/registry/oxygen/chart-context-menu/chart-context-menu";
+} from "@/registry/zoblocks/chart-context-menu/chart-context-menu";
 
 /** Frozen so the demo says the same thing tomorrow. */
 const TODAY = plainDate(2026, 8, 26);
@@ -269,7 +269,7 @@ function ContextMenuDemo() {
         setStage(node);
       }}
       className="relative w-full pb-64"
-      data-ox-menu-stage=""
+      data-zb-menu-stage=""
     >
       <p className="numeric mb-3 text-xs text-graphite-soft">
         {still
@@ -320,8 +320,8 @@ function ContextMenuDemo() {
       {cursor && !still ? (
         <span
           aria-hidden="true"
-          data-ox-demo-cursor=""
-          /* Above `.ox-menu`, which sits at z-index 60. A pointer drawn under
+          data-zb-demo-cursor=""
+          /* Above `.zb-menu`, which sits at z-index 60. A pointer drawn under
              the thing it just opened is a pointer nobody can see. */
           /* `left-0 top-0` is not decoration: an absolutely positioned element with
              neither offset keeps its *static* position as the origin, so the
@@ -453,7 +453,7 @@ const dayNamed = (prefix: string) => (root: HTMLElement) =>
   ) ?? null;
 
 const actionNamed = (label: string) => (root: HTMLElement) =>
-  [...root.querySelectorAll<HTMLElement>(".ox-dt-cal__action")].find(
+  [...root.querySelectorAll<HTMLElement>(".zb-dt-cal__action")].find(
     (button) => button.textContent?.trim() === label,
   ) ?? null;
 
@@ -561,17 +561,17 @@ function DateDemo() {
   }, [playing, beat]);
 
   return (
-    <div className="ox-dt-card">
-      <div className="ox-dt-card__bar">
+    <div className="zb-dt-card">
+      <div className="zb-dt-card__bar">
         <button
           type="button"
-          className="ox-dt-card__toggle"
+          className="zb-dt-card__toggle"
           aria-pressed={playing}
           onClick={() => setPlaying((was) => !was)}
         >
           {playing ? "Pause" : "Play"}
         </button>
-        <p className="ox-dt-card__say" aria-live="polite">
+        <p className="zb-dt-card__say" aria-live="polite">
           {playing ? "Choosing a range — two clicks, with a preview between them." : "Paused."}
         </p>
       </div>
@@ -580,7 +580,7 @@ function DateDemo() {
           component sees the press rather than after it. */}
       <div
         ref={stageRef}
-        className="ox-dt-card__stage"
+        className="zb-dt-card__stage"
         onPointerDown={() => setPlaying(false)}
         onKeyDownCapture={() => setPlaying(false)}
       >
@@ -596,8 +596,8 @@ function DateDemo() {
         <span
           ref={cursorRef}
           aria-hidden="true"
-          className={cn("ox-dt-card__cursor", pressed && "ox-dt-card__cursor--press")}
-          data-ox-hidden={playing ? undefined : "true"}
+          className={cn("zb-dt-card__cursor", pressed && "zb-dt-card__cursor--press")}
+          data-zb-hidden={playing ? undefined : "true"}
         />
       </div>
     </div>
@@ -767,7 +767,7 @@ function FeaturedRow({ item, index }: { item: Featured; index: number }) {
   return (
     <article
       data-reveal
-      data-ox-featured={item.slug}
+      data-zb-featured={item.slug}
       className="grid items-center gap-8 border-t border-rule py-12 lg:grid-cols-[1fr_19rem] lg:gap-16 lg:py-20"
     >
       {/*
@@ -809,20 +809,20 @@ function FeaturedRow({ item, index }: { item: Featured; index: number }) {
             ? "flex flex-col justify-center"
             : "instrument instrument-demo flex flex-col justify-center p-8 sm:p-10"
         }
-        data-ox-stage={item.slug}
+        data-zb-stage={item.slug}
       >
         {item.demo()}
       </div>
 
       <div className="flex flex-col">
         <p className="eyebrow text-graphite">
-          <span className="numeric text-oxygen-deep">{String(index + 1).padStart(2, "0")}</span>
+          <span className="numeric text-brand-deep">{String(index + 1).padStart(2, "0")}</span>
           <span className="mx-2 text-rule-strong">/</span>
           {item.name}
         </p>
 
         {item.resource && item.resource !== "—" ? (
-          <p className="numeric mt-2 text-xs text-oxygen-deep">{item.resource}</p>
+          <p className="numeric mt-2 text-xs text-brand-deep">{item.resource}</p>
         ) : null}
 
         <p className="mt-4 text-pretty text-base leading-relaxed text-ink">{item.claim}</p>
@@ -837,7 +837,7 @@ function FeaturedRow({ item, index }: { item: Featured; index: number }) {
 
         <Link
           href={`/components/${item.slug}`}
-          className="group mt-7 inline-flex items-center gap-2 self-start text-sm font-medium text-ink transition-colors duration-200 hover:text-oxygen-deep"
+          className="group mt-7 inline-flex items-center gap-2 self-start text-sm font-medium text-ink transition-colors duration-200 hover:text-brand-deep"
         >
           View {item.name}
           <ArrowRight
@@ -883,7 +883,7 @@ export function HomeFeatured({ total }: { total: number }) {
         <div className="border-t border-rule pt-10" data-reveal>
           <Link
             href="/components"
-            className="group inline-flex items-center gap-2 rounded-xl border border-rule bg-paper px-5 py-3 text-sm font-medium text-ink transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:border-oxygen/40"
+            className="group inline-flex items-center gap-2 rounded-xl border border-rule bg-paper px-5 py-3 text-sm font-medium text-ink transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:border-brand/40"
           >
             {rest > 0 ? `${rest} more components in the catalogue` : "Browse the full catalogue"}
             <ArrowRight

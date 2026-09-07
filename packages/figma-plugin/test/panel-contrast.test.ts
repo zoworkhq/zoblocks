@@ -13,7 +13,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { contrastBetween } from "@oxygenui-design/tokens/validate";
+import { contrastBetween } from "@zoblocks/tokens/validate";
 
 const root = process.env.PLUGIN_ROOT ?? "";
 const css = readFileSync(join(root, "src/ui/panel.css"), "utf8");

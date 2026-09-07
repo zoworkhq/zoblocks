@@ -7,7 +7,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/switch/switch.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/switch/switch.tsx. Edit that file, not this one.
 /**
  * Switch — the binary control, for a record that is shared, asynchronous, and
  * frequently missing the fact you are asking it about.
@@ -19,7 +19,7 @@
  * outcome, and the gap between them — and never renders a state it cannot
  * substantiate.
  *
- * Three axes, all independent (see `@/lib/oxygen-switch`):
+ * Three axes, all independent (see `@/lib/zoblocks-switch`):
  *
  *   value         true · false · "unknown"          what the record says
  *   phase         idle · pending · committed ·      what the system is doing
@@ -28,7 +28,7 @@
  *   availability  editable · readOnly · disabled    whether you may change it
  *
  * The API matches Ant Design's Switch exactly, and takes no dependency on it.
- * `import { Switch } from "antd"` becomes `from "@oxygenui-design/react"` with
+ * `import { Switch } from "antd"` becomes `from "@zoblocks/react"` with
  * no other diff. The one deliberate divergence is `loading`, which maps to
  * `phase="pending"` and does *not* disable the control — see below.
  *
@@ -130,7 +130,7 @@ function Glyph({ kind }: { kind: "on" | "unknown" | "queued" | "locked" }) {
   };
 
   return (
-    <svg className="ox-switch__glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+    <svg className="zb-switch__glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
       {paths[kind]}
     </svg>
   );
@@ -249,7 +249,7 @@ export interface SwitchProps extends Omit<
 > {
   /* ---- antd-compatible core ------------------------------------- */
 
-  /** `"unknown"` is Oxygen's widening. antd's `boolean` shape is unchanged. */
+  /** `"unknown"` is Zoblocks's widening. antd's `boolean` shape is unchanged. */
   checked?: SwitchValue;
   /** Uncontrolled starting value. Ignored once `checked` is supplied. */
   defaultChecked?: SwitchValue;
@@ -284,7 +284,7 @@ export interface SwitchProps extends Omit<
 
   /**
    * Why the value is `"unknown"`. Structurally the output of
-   * `resolveAbsentReason()` in `@oxygenui-design/fhir`.
+   * `resolveAbsentReason()` in `@zoblocks/fhir`.
    */
   absentReason?: AbsentReason;
 
@@ -451,7 +451,7 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
   ref,
 ) {
   const reactId = React.useId();
-  const controlId = id ?? `ox-switch-${reactId}`;
+  const controlId = id ?? `zb-switch-${reactId}`;
   const labelId = `${controlId}-label`;
   const stateId = `${controlId}-state`;
   const noteId = `${controlId}-note`;
@@ -663,8 +663,8 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
 
   const stateAttr = isUnknown(shown) ? "unknown" : shown ? "on" : "off";
   const vars: SwitchVars = { ...sizeVars(resolvedSize), ...(style as SwitchVars) };
-  if (holdMs !== 600) vars["--ox-switch-hold-ms"] = `${holdMs}ms`;
-  if (hold.holding) vars["--ox-switch-hold-progress"] = hold.progress;
+  if (holdMs !== 600) vars["--zb-switch-hold-ms"] = `${holdMs}ms`;
+  if (hold.holding) vars["--zb-switch-hold-progress"] = hold.progress;
 
   const word = wordFor(shown, labels);
 
@@ -706,24 +706,24 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
 
   const glyph = glyphFor(shown, phase, readOnly);
   const thumb = (
-    <span className="ox-switch__thumb">
+    <span className="zb-switch__thumb">
       {slots?.thumb ? slots.thumb({ value: shown, phase }) : glyph ? <Glyph kind={glyph} /> : null}
     </span>
   );
 
   const track = (
-    <span className="ox-switch__track">
+    <span className="zb-switch__track">
       {resolvedAppearance === "labeled" ? (
-        <span className="ox-switch__words">
+        <span className="zb-switch__words">
           {/*
             Both words share one grid cell, so the track is sized by the longer
             of the two and never resizes as it toggles. In a table row, a
             resizing switch makes the whole row jump.
           */}
-          <span className="ox-switch__word ox-switch__word--on" aria-hidden="true">
+          <span className="zb-switch__word zb-switch__word--on" aria-hidden="true">
             {checkedChildren ?? labels.on}
           </span>
-          <span className="ox-switch__word ox-switch__word--off" aria-hidden="true">
+          <span className="zb-switch__word zb-switch__word--off" aria-hidden="true">
             {unCheckedChildren ?? labels.off}
           </span>
         </span>
@@ -735,15 +735,15 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
   const holdRing =
     confirm === "hold" && holdMs > 0 && hold.holding ? (
       <svg
-        className="ox-switch__ring"
+        className="zb-switch__ring"
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
         aria-hidden="true"
         focusable="false"
       >
-        <circle className="ox-switch__ring-track" cx="50" cy="50" r="46" pathLength={100} />
+        <circle className="zb-switch__ring-track" cx="50" cy="50" r="46" pathLength={100} />
         <circle
-          className="ox-switch__ring-value"
+          className="zb-switch__ring-value"
           cx="50"
           cy="50"
           r="46"
@@ -759,12 +759,12 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
 
   if (error) {
     notes.push(
-      <span key="error" className="ox-switch__note ox-switch__note--error">
+      <span key="error" className="zb-switch__note zb-switch__note--error">
         {error}
         {phase === "reverted" || phase === "blocked" ? (
           <>
             {" "}
-            <button type="button" className="ox-switch__action" onClick={machine.acknowledge}>
+            <button type="button" className="zb-switch__action" onClick={machine.acknowledge}>
               Dismiss
             </button>
           </>
@@ -775,9 +775,9 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
 
   if (phase === "queued") {
     notes.push(
-      <span key="queued" className="ox-switch__note ox-switch__note--pending">
+      <span key="queued" className="zb-switch__note zb-switch__note--pending">
         Not sent yet. It will apply when the connection returns.{" "}
-        <button type="button" className="ox-switch__action" onClick={machine.cancelQueued}>
+        <button type="button" className="zb-switch__action" onClick={machine.cancelQueued}>
           Cancel
         </button>
       </span>,
@@ -786,7 +786,7 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
 
   if (slow && phase === "pending") {
     notes.push(
-      <span key="slow" className="ox-switch__note ox-switch__note--pending">
+      <span key="slow" className="zb-switch__note zb-switch__note--pending">
         Still saving. The change has not been confirmed yet.
       </span>,
     );
@@ -794,7 +794,7 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
 
   if (commit === "deferred" && current !== defaultChecked) {
     notes.push(
-      <span key="deferred" className="ox-switch__note ox-switch__note--pending">
+      <span key="deferred" className="zb-switch__note zb-switch__note--pending">
         Not applied yet — this is saved when you submit the form.
       </span>,
     );
@@ -802,7 +802,7 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
 
   if (readOnly && lockedReason) {
     notes.push(
-      <span key="locked" className="ox-switch__note ox-switch__note--locked">
+      <span key="locked" className="zb-switch__note zb-switch__note--locked">
         {lockedReason}
       </span>,
     );
@@ -810,8 +810,8 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
 
   if (until && shown === true) {
     notes.push(
-      <span key="until" className="ox-switch__note">
-        <span className={cn("ox-switch__until", lapsed && "ox-switch__until--lapsed")}>
+      <span key="until" className="zb-switch__note">
+        <span className={cn("zb-switch__until", lapsed && "zb-switch__until--lapsed")}>
           {lapsed ? "lapsed" : "until"} {formatTime(until)}
         </span>{" "}
         {lapsed
@@ -825,7 +825,7 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
 
   if (impact?.length) {
     notes.push(
-      <span key="impact" className="ox-switch__impact">
+      <span key="impact" className="zb-switch__impact">
         Turning this on will:
         <span style={{ display: "block", marginBlockStart: "0.3rem" }}>
           {impact.map((item, index) => (
@@ -840,7 +840,7 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
 
   if (provenance) {
     notes.push(
-      <span key="prov" className="ox-switch__provenance">
+      <span key="prov" className="zb-switch__provenance">
         Last changed {formatTime(provenance.at)} by {provenance.by}
         {provenance.via ? `, ${provenance.via}` : ""}
       </span>,
@@ -853,7 +853,7 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
     notes.push(
       <span
         key="stale"
-        className="ox-switch__conflict"
+        className="zb-switch__conflict"
         role="group"
         aria-label="Conflicting change"
       >
@@ -869,10 +869,10 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
           merge problem — each of them had a reason, and picking a winner
           silently discards one of those reasons.
         */}
-        <span className="ox-switch__conflict-actions">
+        <span className="zb-switch__conflict-actions">
           <button
             type="button"
-            className="ox-switch__action"
+            className="zb-switch__action"
             onClick={() => {
               machine.resolveConflict("theirs");
               if (conflicting !== undefined) setCurrent(conflicting);
@@ -883,7 +883,7 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
           </button>
           <button
             type="button"
-            className="ox-switch__action"
+            className="zb-switch__action"
             onClick={() => {
               machine.resolveConflict("mine");
               onResolveConflict?.("mine");
@@ -907,7 +907,7 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
     notes.push(
       <span
         key="confirm"
-        className="ox-switch__dialog"
+        className="zb-switch__dialog"
         role="alertdialog"
         aria-label={heading}
         aria-modal="false"
@@ -926,7 +926,7 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
             <label htmlFor={`${controlId}-attest`}>Reason (recorded against your login)</label>
             <textarea
               id={`${controlId}-attest`}
-              className="ox-switch__attest"
+              className="zb-switch__attest"
               rows={2}
               value={attestation}
               onChange={(event) => setAttestation(event.target.value)}
@@ -935,30 +935,30 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
         ) : null}
 
         {confirm === "countersign" ? (
-          <span className="ox-switch__countersign">
+          <span className="zb-switch__countersign">
             <span>
               <strong>Requires a second qualified signature before this takes effect.</strong>
             </span>
-            <span className="ox-switch__countersign-row">
-              <span className="ox-switch__countersign-slot ox-switch__countersign-slot--done">
+            <span className="zb-switch__countersign-row">
+              <span className="zb-switch__countersign-slot zb-switch__countersign-slot--done">
                 Requested by {countersign?.requestedBy ?? countersign?.notSameAs}
               </span>
             </span>
-            <span className="ox-switch__countersign-row">
-              <span className="ox-switch__countersign-slot">
+            <span className="zb-switch__countersign-row">
+              <span className="zb-switch__countersign-slot">
                 Awaiting a {countersign?.role.replace(/-/g, " ")} other than the requester
               </span>
             </span>
             {countersignError ? (
-              <span className="ox-switch__note ox-switch__note--error">{countersignError}</span>
+              <span className="zb-switch__note zb-switch__note--error">{countersignError}</span>
             ) : null}
           </span>
         ) : null}
 
-        <span className="ox-switch__dialog-actions">
+        <span className="zb-switch__dialog-actions">
           <button
             type="button"
-            className="ox-switch__action"
+            className="zb-switch__action"
             disabled={confirm === "attest" && attestation.trim().length === 0}
             onClick={(event) => {
               if (confirm === "countersign") {
@@ -972,7 +972,7 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
           </button>
           <button
             type="button"
-            className="ox-switch__action"
+            className="zb-switch__action"
             onClick={() => {
               setAwaiting(undefined);
               setAttestation("");
@@ -990,19 +990,19 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
 
   const textColumn =
     label || description || showStateWord || notes.length ? (
-      <span className="ox-switch__text">
+      <span className="zb-switch__text">
         {label && resolvedAppearance !== "row" ? (
-          <span className="ox-switch__label" id={labelId}>
+          <span className="zb-switch__label" id={labelId}>
             {label}
           </span>
         ) : null}
         {description && resolvedAppearance !== "row" ? (
-          <span className="ox-switch__desc" id={`${controlId}-desc`}>
+          <span className="zb-switch__desc" id={`${controlId}-desc`}>
             {description}
           </span>
         ) : null}
         {showStateWord ? (
-          <span className="ox-switch__state" id={stateId}>
+          <span className="zb-switch__state" id={stateId}>
             {slots?.state ? slots.state({ value: shown, word }) : word}
           </span>
         ) : null}
@@ -1020,7 +1020,7 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
     isUnknown(shown) && editable ? (
       <button
         type="button"
-        className="ox-switch__sr"
+        className="zb-switch__sr"
         onClick={(event) => requestValue(false, event)}
       >
         Record {labels.off.toLowerCase()} for {plainLabel}
@@ -1031,17 +1031,17 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
 
   const rootProps = {
     ref,
-    className: cn("ox-switch", className),
+    className: cn("zb-switch", className),
     style: vars,
-    "data-ox-switch": "",
-    "data-ox-state": stateAttr,
-    "data-ox-phase": phase,
-    "data-ox-tone": tone,
-    "data-ox-size": resolvedSize,
-    "data-ox-appearance": resolvedAppearance,
-    "data-ox-audience": audience,
-    "data-ox-readonly": readOnly ? "true" : undefined,
-    "data-ox-disabled": disabled ? "true" : undefined,
+    "data-zb-switch": "",
+    "data-zb-state": stateAttr,
+    "data-zb-phase": phase,
+    "data-zb-tone": tone,
+    "data-zb-size": resolvedSize,
+    "data-zb-appearance": resolvedAppearance,
+    "data-zb-audience": audience,
+    "data-zb-readonly": readOnly ? "true" : undefined,
+    "data-zb-disabled": disabled ? "true" : undefined,
     ...rest,
     // The root is a decorative wrapper; the accessible name belongs on the
     // control, which reads it from `aria-labelledby` or the passed aria-label.
@@ -1051,10 +1051,10 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
 
   const liveRegions = (
     <>
-      <span className="ox-switch__sr" role="status" aria-live="polite">
+      <span className="zb-switch__sr" role="status" aria-live="polite">
         {announcement?.politeness === "polite" ? announcement.text : ""}
       </span>
-      <span className="ox-switch__sr" role="alert" aria-live="assertive">
+      <span className="zb-switch__sr" role="alert" aria-live="assertive">
         {announcement?.politeness === "assertive" ? announcement.text : ""}
       </span>
     </>
@@ -1067,7 +1067,7 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
       <span {...rootProps}>
         {labelPlacement === "start" ? textColumn : null}
         <span
-          className="ox-switch__segments"
+          className="zb-switch__segments"
           role="radiogroup"
           aria-labelledby={label ? labelId : undefined}
           aria-label={label ? undefined : ariaLabel}
@@ -1082,7 +1082,7 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
             <button
               key={String(option)}
               type="button"
-              className="ox-switch__segment"
+              className="zb-switch__segment"
               role="radio"
               aria-checked={shown === option}
               // `disabled` only when genuinely disabled: a read-only cell stays
@@ -1103,7 +1103,7 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
             A user may leave "unknown"; a user may never enter it.
           */}
           {isUnknown(shown) ? (
-            <span className="ox-switch__segment ox-switch__segment--unasked">{labels.unknown}</span>
+            <span className="zb-switch__segment zb-switch__segment--unasked">{labels.unknown}</span>
           ) : null}
         </span>
         {labelPlacement === "end" ? textColumn : null}
@@ -1117,7 +1117,7 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
   if (resolvedAppearance === "chip") {
     return (
       <span {...rootProps}>
-        <button {...controlProps} className="ox-switch__chip">
+        <button {...controlProps} className="zb-switch__chip">
           {glyph ? <Glyph kind={glyph} /> : null}
           {label ?? word}
         </button>
@@ -1133,15 +1133,15 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
   if (resolvedAppearance === "row") {
     return (
       <span {...rootProps}>
-        <button {...controlProps} className="ox-switch__control">
-          <span className="ox-switch__rowtext">
+        <button {...controlProps} className="zb-switch__control">
+          <span className="zb-switch__rowtext">
             {label ? (
-              <span className="ox-switch__label" id={labelId}>
+              <span className="zb-switch__label" id={labelId}>
                 {label}
               </span>
             ) : null}
             {description ? (
-              <span className="ox-switch__desc" id={`${controlId}-desc`}>
+              <span className="zb-switch__desc" id={`${controlId}-desc`}>
                 {description}
               </span>
             ) : null}
@@ -1160,7 +1160,7 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
   return (
     <span {...rootProps}>
       {labelPlacement === "start" ? textColumn : null}
-      <button {...controlProps} className="ox-switch__control">
+      <button {...controlProps} className="zb-switch__control">
         {holdRing}
         {track}
       </button>
@@ -1204,18 +1204,18 @@ export const SwitchField = React.forwardRef<HTMLDivElement, SwitchFieldProps>(fu
   ref,
 ) {
   const reactId = React.useId();
-  const id = props.id ?? `ox-switch-field-${reactId}`;
+  const id = props.id ?? `zb-switch-field-${reactId}`;
 
   return (
-    <div ref={ref} className={cn("ox-switch-field", className)}>
-      <div className="ox-switch-field__body">
+    <div ref={ref} className={cn("zb-switch-field", className)}>
+      <div className="zb-switch-field__body">
         <Switch
           {...props}
           id={id}
           label={label}
           description={description}
           labelPlacement="start"
-          className="ox-switch-field__control"
+          className="zb-switch-field__control"
         />
       </div>
     </div>
@@ -1247,7 +1247,7 @@ export const SwitchList = React.forwardRef<HTMLDivElement, SwitchListProps>(func
   ref,
 ) {
   const reactId = React.useId();
-  const titleId = `ox-switch-list-${reactId}`;
+  const titleId = `zb-switch-list-${reactId}`;
 
   const summary = counts
     ? [
@@ -1262,22 +1262,22 @@ export const SwitchList = React.forwardRef<HTMLDivElement, SwitchListProps>(func
   return (
     <div
       ref={ref}
-      className={cn("ox-switch-list", className)}
+      className={cn("zb-switch-list", className)}
       role="group"
       aria-labelledby={title ? titleId : undefined}
       {...rest}
     >
       {title || summary ? (
-        <div className="ox-switch-list__head">
+        <div className="zb-switch-list__head">
           {title ? (
-            <span className="ox-switch-list__title" id={titleId}>
+            <span className="zb-switch-list__title" id={titleId}>
               {title}
             </span>
           ) : null}
-          {summary ? <span className="ox-switch-list__summary">{summary}</span> : null}
+          {summary ? <span className="zb-switch-list__summary">{summary}</span> : null}
         </div>
       ) : null}
-      <div className="ox-switch-list__items">{children}</div>
+      <div className="zb-switch-list__items">{children}</div>
     </div>
   );
 });

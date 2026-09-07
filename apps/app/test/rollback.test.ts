@@ -8,11 +8,11 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { emptyAssets, VALIDATOR_VERSION } from "@oxygenui-design/theme";
+import { emptyAssets, VALIDATOR_VERSION } from "@zoblocks/theme";
 import { ThemeError, createTheme, publishTheme, rollbackTheme, saveOverrides } from "@/lib/themes";
 import { uploadFont } from "@/lib/fonts";
 import { loadTokenSource } from "../../../scripts/gen/tokens/load";
-import type { TokenSource } from "@oxygenui-design/tokens/validate";
+import type { TokenSource } from "@zoblocks/tokens/validate";
 import { twoOrgs, storedTokens } from "./harness";
 
 let base: TokenSource;

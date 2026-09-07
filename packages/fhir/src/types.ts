@@ -2,7 +2,7 @@
  * Narrow, structural subset of FHIR R4 types.
  *
  * Why a subset rather than a dependency on `@types/fhir`:
- * Oxygen components are copied into customer codebases. Every type they touch
+ * Zoblocks components are copied into customer codebases. Every type they touch
  * becomes a dependency the customer inherits. These declarations are
  * structurally compatible with FHIR R4 — a real `fhir.Patient` satisfies
  * `Patient` here — but carry zero runtime cost and no transitive deps.
@@ -158,7 +158,7 @@ export interface Patient extends Resource {
    * open by definition, and the alternative is a union that goes stale every
    * time an implementation guide ships.
    *
-   * Oxygen reads four: `individual-pronouns`, `individual-genderIdentity`,
+   * Zoblocks reads four: `individual-pronouns`, `individual-genderIdentity`,
    * `individual-recordedSexOrGender`, and `patient-sexParameterForClinicalUse`.
    */
   extension?: Extension[];
@@ -173,7 +173,7 @@ export interface PatientLink {
 /**
  * https://hl7.org/fhir/R4/extensibility.html
  *
- * Only the value types Oxygen actually reads are enumerated. Anything else is
+ * Only the value types Zoblocks actually reads are enumerated. Anything else is
  * reachable through `extension` nesting, which is how the complex extensions
  * in the Gender Harmony guide are shaped anyway.
  */

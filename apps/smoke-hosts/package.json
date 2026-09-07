@@ -1,8 +1,8 @@
 {
-  "name": "@oxygenui-design/smoke-hosts",
+  "name": "@zoblocks/smoke-hosts",
   "version": "0.0.0",
   "private": true,
-  "description": "The same Oxygen application source rendered under three UI-framework hosts, so the claim that application code is framework-independent can be executed rather than asserted.",
+  "description": "The same Zoblocks application source rendered under three UI-framework hosts, so the claim that application code is framework-independent can be executed rather than asserted.",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -14,10 +14,10 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/material": "^9.3.1",
-    "@oxygenui-design/bridge-antd": "workspace:*",
-    "@oxygenui-design/bridge-mui": "workspace:*",
-    "@oxygenui-design/react": "workspace:*",
-    "@oxygenui-design/tokens": "workspace:*",
+    "@zoblocks/bridge-antd": "workspace:*",
+    "@zoblocks/bridge-mui": "workspace:*",
+    "@zoblocks/react": "workspace:*",
+    "@zoblocks/tokens": "workspace:*",
     "antd": "^6.6.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

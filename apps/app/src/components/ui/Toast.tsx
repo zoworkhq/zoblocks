@@ -118,7 +118,7 @@ function ToastCard({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }
             "mt-0.5 size-4 shrink-0",
             toast.tone === "pass" && "text-pass",
             toast.tone === "fail" && "text-fail",
-            toast.tone === "info" && "text-oxygen-deep",
+            toast.tone === "info" && "text-brand-deep",
           )}
         />
 

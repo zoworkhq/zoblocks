@@ -5,17 +5,17 @@
  *
  *     const { Button, Input } = useHost();
  *
- * One context, seeded with the Oxygen implementation, so a subtree with no
+ * One context, seeded with the Zoblocks implementation, so a subtree with no
  * provider above it still renders — a demo that throws when nobody wrapped it
  * is a demo that breaks the page it is illustrating.
  */
 
 import * as React from "react";
 import type { HostPrimitives } from "./contract";
-import { oxygenPrimitives } from "./primitives-oxygen";
+import { zoblocksPrimitives } from "./primitives-zoblocks";
 
-const HostContext = React.createContext<HostPrimitives>(oxygenPrimitives);
-HostContext.displayName = "OxygenHost";
+const HostContext = React.createContext<HostPrimitives>(zoblocksPrimitives);
+HostContext.displayName = "ZoblocksHost";
 
 export function useHost(): HostPrimitives {
   return React.useContext(HostContext);

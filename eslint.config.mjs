@@ -11,7 +11,7 @@
 
 import next from "@next/eslint-plugin-next";
 import js from "@eslint/js";
-import oxygen from "@oxygenui-design/eslint-plugin";
+import zoblocks from "@zoblocks/eslint-plugin";
 import reactHooks from "eslint-plugin-react-hooks";
 import globals from "globals";
 import tseslint from "typescript-eslint";
@@ -33,20 +33,25 @@ export default tseslint.config(
        */
       ".claude/worktrees/**",
       /*
-       * Brief generators. `content/briefs/<name>/*.js` are standalone browser
-       * scripts inlined into a design document by a Python build — not library
-       * source, not bundled, and not typed. Linting them as if they were reports
-       * `window is not defined` on prose. The Python and the Markdown beside
-       * them are already outside eslint's reach; this puts the JS with them.
+       * Brief generators. `content/archive/briefs/<name>/*.js` are standalone
+       * browser scripts inlined into a design document by a Python build — not
+       * library source, not bundled, and not typed. Linting them as if they
+       * were reports `window is not defined` on prose. The Python and the
+       * Markdown beside them are already outside eslint's reach; this puts the
+       * JS with them.
+       *
+       * They moved under `content/archive/` with the rest of the pre-rename
+       * record in September 2026, and the whole directory is frozen, so the
+       * ignore covers it rather than just the briefs.
        */
-      "content/briefs/**/*.js",
+      "content/archive/**",
       // Generated. Lint the generator, not its output.
       "apps/docs/src/lib/generated/**",
       "apps/docs/public/**",
       // Written by Next on every build.
       "apps/docs/next-env.d.ts",
       "apps/hq/next-env.d.ts",
-      "oxygen-ui-component-library-proposal.html",
+      "zoblocks-ui-component-library-proposal.html",
     ],
   },
 
@@ -62,7 +67,7 @@ export default tseslint.config(
     // This used to name `packages/react/**` and `packages/pro-*/**`, neither of
     // which exists — so `packages/loaders`, the one package actually published,
     // received none of these rules. `eslint --print-config` reported
-    // "@oxygenui rules applied: NONE" for the source shipped to every non-React
+    // "@zoblocks rules applied: NONE" for the source shipped to every non-React
     // framework. Globs that match nothing fail silently, which is why the
     // negation below names what is excluded rather than listing what is included.
     files: [
@@ -83,7 +88,7 @@ export default tseslint.config(
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
     plugins: {
-      "@oxygenui": oxygen,
+      "@zoblocks": zoblocks,
       "react-hooks": reactHooks,
       // Components carry Next-specific disable directives so they lint
       // cleanly inside a consumer's Next app. The rules have to be live here
@@ -92,7 +97,7 @@ export default tseslint.config(
       "@next/next": next,
     },
     rules: {
-      ...oxygen.configs.components.rules,
+      ...zoblocks.configs.components.rules,
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn",
 
@@ -159,7 +164,7 @@ export default tseslint.config(
   // -------------------------------------------------------------------------
   {
     files: ["packages/figma-plugin/**/*.ts"],
-    rules: { "@oxygenui/no-forbidden-capability": "off" },
+    rules: { "@zoblocks/no-forbidden-capability": "off" },
   },
 
   // -------------------------------------------------------------------------
@@ -167,7 +172,7 @@ export default tseslint.config(
   //
   // It matches `packages/*/src/**` and inherits the component rules, two of
   // which it must break to do its job: it reads `process.env` to expand the
-  // `${OXYGEN_TOKEN}` reference out of `oxygen.json`, and it fetches registry
+  // `${ZOBLOCKS_TOKEN}` reference out of `zoblocks.json`, and it fetches registry
   // items over the network. Both are the entire point of an installer, and the
   // rule they violate exists to protect *copied component source* — code that
   // lands in a customer's repository, where their build has neither our
@@ -180,7 +185,7 @@ export default tseslint.config(
   // -------------------------------------------------------------------------
   {
     files: ["packages/cli/**/*.ts", "packages/cli/**/*.mjs"],
-    rules: { "@oxygenui/no-forbidden-capability": "off" },
+    rules: { "@zoblocks/no-forbidden-capability": "off" },
   },
 
   // -------------------------------------------------------------------------
@@ -218,7 +223,7 @@ export default tseslint.config(
   // -------------------------------------------------------------------------
   // Our own product surfaces — the docs site and the console.
   //
-  // These had no @oxygen rules at all, and that is exactly where the content
+  // These had no @zoblocks rules at all, and that is exactly where the content
   // rules were being broken: the console's root error boundary opened with
   // "Something went wrong", and four page descriptions carried counts that had
   // been accurate months earlier. `configs.components` is scoped to
@@ -253,7 +258,7 @@ export default tseslint.config(
       "apps/docs/src/components/site/*-showcase.tsx",
       "apps/docs/src/components/blocks/**",
     ],
-    ...oxygen.configs.product,
+    ...zoblocks.configs.product,
   },
 
   // -------------------------------------------------------------------------

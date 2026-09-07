@@ -1,11 +1,11 @@
 # Migrating from Ant Design's Timeline
 
-`@oxygenui/timeline` is Ant Design v6's `Timeline`, prop for prop, with no
+`@zoblocks/timeline` is Ant Design v6's `Timeline`, prop for prop, with no
 dependency on antd. A migration is one import.
 
 ```diff
 - import { Timeline } from "antd";
-+ import { Timeline } from "@/components/oxygen/timeline";
++ import { Timeline } from "@/components/zoblocks/timeline";
 ```
 
 `test/timeline-parity.test.ts` reads antd's own type declarations out of the
@@ -94,7 +94,7 @@ as antd does it.
   `list-style: none`. VoiceOver then announces neither the list nor its item
   count.
 - **Semantic tokens, not palette values.** `color="red"` resolves to
-  `--ox-status-critical`, so a brand override reaches it. Any other string is
+  `--zb-status-critical`, so a brand override reaches it. Any other string is
   passed through untouched.
 - **No antd in your bundle**, which is what keeps the component installable as
   copy-source.
@@ -103,5 +103,5 @@ as antd does it.
 
 `Timeline` has no clinical opinion, and it should not grow one. If you are
 rendering a patient's chronology, use
-[`CareTimeline`](../../registry/oxygen/care-timeline/), which states what it is
+[`CareTimeline`](../../registry/zoblocks/care-timeline/), which states what it is
 a view of — see [ADR 0011](../decisions/0011-summaries-declare-their-boundaries.md).

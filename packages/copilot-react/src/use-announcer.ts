@@ -29,7 +29,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import type { Answer, CopilotStatus } from "@oxygenui-design/copilot-core";
+import type { Answer, CopilotStatus } from "@zoblocks/copilot-core";
 
 export type AnnouncementMode = "summary" | "progressive";
 

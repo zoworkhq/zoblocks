@@ -1,7 +1,7 @@
 /**
  * The conversion that is quietly wrong at the edges.
  *
- * Figma stores each channel as a float from 0 to 1; Oxygen stores hex. Four
+ * Figma stores each channel as a float from 0 to 1; Zoblocks stores hex. Four
  * lines, and the failure mode is one value off in a file somebody has already
  * built on — invisible in review, invisible on screen, and only findable by
  * comparing two hex codes nobody has side by side.

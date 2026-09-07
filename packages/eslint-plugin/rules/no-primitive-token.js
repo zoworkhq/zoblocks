@@ -1,8 +1,8 @@
 /**
  * Components reference semantic tokens, never raw palette values.
  *
- *   --ox-status-critical   ✓  means something
- *   --ox-red-600           ✗  is a colour
+ *   --zb-status-critical   ✓  means something
+ *   --zb-red-600           ✗  is a colour
  *
  * This is the rule that makes multi-brand theming possible at all. A brand
  * overrides semantic tokens; if a component reaches past them to a primitive,
@@ -20,18 +20,18 @@
  * Two patterns, because there are two ways to get this wrong.
  *
  * The first is the current shape: every primitive the build emits is namespaced
- * `--ox-ref-*`, so the prefix alone is sufficient and stays correct as palette
+ * `--zb-ref-*`, so the prefix alone is sufficient and stays correct as palette
  * scales are added.
  *
  * The second is the shape primitives had before the token build existed
- * (`--ox-red-600`). Those names no longer resolve to anything, so a component
+ * (`--zb-red-600`). Those names no longer resolve to anything, so a component
  * still referencing one renders with no colour at all rather than the wrong
  * one — which on a status badge means the severity signal silently disappears.
  * Worth its own message.
  */
-const PRIMITIVE = /--ox-ref-[a-z0-9-]+/g;
+const PRIMITIVE = /--zb-ref-[a-z0-9-]+/g;
 const LEGACY_PRIMITIVE =
-  /--ox-(?:brand|slate|red|amber|blue|green|violet|cyan|ink|gray|grey|neutral)-\d{2,3}\b/g;
+  /--zb-(?:brand|slate|red|amber|blue|green|violet|cyan|ink|gray|grey|neutral)-\d{2,3}\b/g;
 
 /** @type {import("eslint").Rule.RuleModule} */
 export default {
@@ -44,9 +44,9 @@ export default {
     schema: [],
     messages: {
       primitive:
-        'Component references the primitive token "{{token}}". Components must reference semantic tokens (--ox-status-critical, --ox-text-muted) so that a brand override reaches them. Add a semantic token if none fits.',
+        'Component references the primitive token "{{token}}". Components must reference semantic tokens (--zb-status-critical, --zb-text-muted) so that a brand override reaches them. Add a semantic token if none fits.',
       legacy:
-        '"{{token}}" was a primitive before the token build; it is now "--ox-ref-{{suffix}}" and no longer resolves. This renders with no colour at all rather than the wrong one, which on a status badge means the severity signal disappears. Use the semantic token instead.',
+        '"{{token}}" was a primitive before the token build; it is now "--zb-ref-{{suffix}}" and no longer resolves. This renders with no colour at all rather than the wrong one, which on a status badge means the severity signal disappears. Use the semantic token instead.',
     },
   },
 
@@ -60,7 +60,7 @@ export default {
         context.report({
           node,
           messageId: "legacy",
-          data: { token: match[0], suffix: match[0].replace("--ox-", "") },
+          data: { token: match[0], suffix: match[0].replace("--zb-", "") },
         });
       }
     }

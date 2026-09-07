@@ -1,15 +1,15 @@
 ---
-"@oxygenui-design/bridge-core": minor
-"@oxygenui-design/bridge-antd": minor
-"@oxygenui-design/bridge-mui": minor
-"@oxygenui-design/tabs": minor
-"@oxygenui-design/react": patch
+"@zoblocks/bridge-core": minor
+"@zoblocks/bridge-antd": minor
+"@zoblocks/bridge-mui": minor
+"@zoblocks/tabs": minor
+"@zoblocks/react": patch
 ---
 
-Theme bridges: Oxygen components now take a host framework's design language
+Theme bridges: Zoblocks components now take a host framework's design language
 without importing that framework.
 
-Three new packages. `@oxygenui-design/bridge-core` is the contract — a bridge
+Three new packages. `@zoblocks/bridge-core` is the contract — a bridge
 is a pure function from a framework's resolved theme to a set of CSS custom
 properties, and it renders nothing. `bridge-antd` and `bridge-mui` implement it.
 
@@ -39,12 +39,12 @@ the E2E proves it with a host theme that sets its error colour to magenta.
 
 Also in this release:
 
-- **`@oxygenui-design/tabs/antd` is deprecated**, re-exporting its original
+- **`@zoblocks/tabs/antd` is deprecated**, re-exporting its original
   behaviour with a development warning. Removed in 0.3.0; use `bridge-antd`,
   which writes the semantic tier so one wrapper themes every component rather
   than only tabs.
 - **The high-contrast theme is reachable.** 59 tokens at a 7:1 floor had been
-  shipping under `[data-ox-theme="high-contrast"]`, an attribute nothing set,
+  shipping under `[data-zb-theme="high-contrast"]`, an attribute nothing set,
   audited by nothing. It is now a fourth option in the docs theme toggle, the
   site has a matching high-contrast palette, and `scripts/a11y.ts` covers three
   themes instead of two.

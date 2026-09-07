@@ -1,17 +1,16 @@
 {
-  "name": "@oxygenui-design/cli",
+  "name": "@zoblocks/cli",
   "version": "0.1.0",
-  "description": "Installs Oxygen UI components into your repository. Resolves the Oxygen registry, writes the source, and tells you what it touched.",
+  "description": "Installs Zoblocks components into your repository. Resolves the Zoblocks registry, writes the source, and tells you what it touched.",
   "license": "MIT",
-  "homepage": "https://oxygenui.design",
+  "homepage": "https://zoblocks.design",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zoworkhq/oxygenui.git",
+    "url": "git+https://github.com/zoworkhq/zoblocks.git",
     "directory": "packages/cli"
   },
   "keywords": [
-    "oxygen",
-    "oxygenui",
+    "zoblocks",
     "healthcare",
     "fhir",
     "design-system",
@@ -23,7 +22,7 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "bin": {
-    "oxygen": "./bin/oxygen.mjs"
+    "zoblocks": "./bin/zoblocks.mjs"
   },
   "exports": {
     ".": "./src/index.ts",
@@ -58,7 +57,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
-    "@oxygenui-design/tsconfig": "workspace:*",
+    "@zoblocks/tsconfig": "workspace:*",
     "@types/node": "^22.10.2",
     "@vitest/coverage-v8": "^4.1.10",
     "typescript": "^5.7.2",

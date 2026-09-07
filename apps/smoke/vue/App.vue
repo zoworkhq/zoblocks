@@ -5,7 +5,7 @@
  * Two things make this work and neither is obvious from the outside:
  *
  *   1. `isCustomElement` in vite.config.ts. Without it Vue's compiler treats
- *      <ox-pulse-loader> as a component, fails to resolve it, and warns at
+ *      <zb-pulse-loader> as a component, fails to resolve it, and warns at
  *      runtime — a warning, not an error, so it ships.
  *   2. `:progress="progress"` binds a number. Vue writes DOM properties when
  *      the key exists on the element and attributes otherwise; `progress` is a
@@ -22,12 +22,12 @@ const host = ref<HTMLElement | null>(null);
 const bump = () => (events.value += 1);
 
 onMounted(() => {
-  host.value?.addEventListener("ox-loader-show", bump);
-  host.value?.addEventListener("ox-loader-hide", bump);
+  host.value?.addEventListener("zb-loader-show", bump);
+  host.value?.addEventListener("zb-loader-hide", bump);
 });
 onBeforeUnmount(() => {
-  host.value?.removeEventListener("ox-loader-show", bump);
-  host.value?.removeEventListener("ox-loader-hide", bump);
+  host.value?.removeEventListener("zb-loader-show", bump);
+  host.value?.removeEventListener("zb-loader-hide", bump);
 });
 </script>
 
@@ -36,7 +36,7 @@ onBeforeUnmount(() => {
     <h1>Framework: <span id="framework">vue</span></h1>
 
     <div class="row">
-      <ox-pulse-loader
+      <zb-pulse-loader
         id="loader"
         label="Loading patient record"
         mode="inline"
@@ -47,7 +47,7 @@ onBeforeUnmount(() => {
     </div>
 
     <div class="row">
-      <ox-rhythm-loader
+      <zb-rhythm-loader
         id="determinate"
         label="Uploading study"
         mode="inline"

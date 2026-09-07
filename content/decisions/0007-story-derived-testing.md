@@ -17,7 +17,7 @@
 
 ## Context
 
-The repository has one test file, covering `@oxygenui-design/fhir` helpers. No
+The repository has one test file, covering `@zoblocks/fhir` helpers. No
 component has a test. Accessibility is checked by an axe run against the docs
 site, which catches page-level violations — its first run found four real ones,
 including a contrast failure on the footer's own legal statement — but says

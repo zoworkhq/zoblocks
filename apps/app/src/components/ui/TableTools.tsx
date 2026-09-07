@@ -158,7 +158,7 @@ export function SortHeader({
       <Icon
         aria-hidden="true"
         strokeWidth={2.5}
-        className={cn("size-3 shrink-0", active ? "text-oxygen-deep" : "text-graphite-soft/60")}
+        className={cn("size-3 shrink-0", active ? "text-brand-deep" : "text-graphite-soft/60")}
       />
     </Link>
   );

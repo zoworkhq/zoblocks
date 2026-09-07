@@ -9,7 +9,7 @@ for a brand: one palette file, compiled at build time, reaching every component
 through the semantic tier without any component knowing a brand exists.
 
 It is not a sufficient rule for a **customer theme**. The app exists so an
-enterprise customer can put Oxygen's components into their own design language,
+enterprise customer can put Zoblocks's components into their own design language,
 and two things they reliably want are outside a ramp:
 
 - **A semantic value that is not a shade of their brand.** `text-muted` against
@@ -55,7 +55,7 @@ Both were specified in the app mockups and neither was expressible:
    fails.
 
 5. **A component override is checked against the manifest, not just parsed.**
-   `--ox-badge-critcal-bg` is a typo that would style nothing at all, silently,
+   `--zb-badge-critcal-bg` is a typo that would style nothing at all, silently,
    which is worse than styling the wrong thing.
 
 ## Consequences
@@ -76,9 +76,9 @@ on parse and these documents are never re-parsed.
 
 **A scoped override does not reach the component tier**, and this surprised us
 in the live preview. The component tier is declared at `:root` —
-`--ox-switch-track-on-bg: var(--ox-accent)` — and a `var()` resolves at the
-element that _declares_ it. Setting `--ox-accent` on a subtree therefore changes
-`--ox-accent` there and leaves every component token holding the value it
+`--zb-switch-track-on-bg: var(--zb-accent)` — and a `var()` resolves at the
+element that _declares_ it. Setting `--zb-accent` on a subtree therefore changes
+`--zb-accent` there and leaves every component token holding the value it
 computed at the root.
 
 Publishing is unaffected: `emitThemeCss` writes to `:root`, where the component
@@ -87,7 +87,7 @@ declarations are. But it means two things are true and worth writing down:
 - The app's preview applies the dependent component tokens itself, from the
   manifest's `semantic` field.
 - **`EmitOptions.scope` was not sufficient for its documented multi-tenant use
-  case.** Emitting a customer's tokens under `[data-ox-brand="x"]` on a subtree
+  case.** Emitting a customer's tokens under `[data-zb-brand="x"]` on a subtree
   moved the primitives and left the semantic and component tiers behind.
   Applied at the root element it was correct, which is why it went unnoticed:
   `emitThemeCss` writes to `:root` unless asked otherwise, so publishing was

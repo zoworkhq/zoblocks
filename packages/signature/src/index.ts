@@ -1,18 +1,18 @@
 /**
- * @oxygenui-design/signature — healthcare signature capture for Ant Design.
+ * @zoblocks/signature — healthcare signature capture for Ant Design.
  *
  * Draw, type or upload — and record the times nobody signed, which is most of
  * what makes this different from a signature pad.
  *
- *     import { Signature, signatureRequired } from "@oxygenui-design/signature";
- *     import "@oxygenui-design/signature/styles.css";
+ *     import { Signature, signatureRequired } from "@zoblocks/signature";
+ *     import "@zoblocks/signature/styles.css";
  *
  *     <Form.Item name="consent" label="Patient signature" rules={[signatureRequired()]}>
  *       <Signature now={serverTime} meaning="consent" attestation="…" />
  *     </Form.Item>
  *
  * antd is a peer dependency. The engine underneath —
- * `@oxygenui-design/signature-core` — has no dependency on React or antd at
+ * `@zoblocks/signature-core` — has no dependency on React or antd at
  * all, so an application with a different design system can use it directly.
  */
 
@@ -63,4 +63,4 @@ export {
   type Signer,
   type Stroke,
   type Subject,
-} from "@oxygenui-design/signature-core";
+} from "@zoblocks/signature-core";

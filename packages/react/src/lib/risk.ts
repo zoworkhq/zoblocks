@@ -5,7 +5,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/lib/risk.ts. Edit that file, not this one.
+// Generated from registry/zoblocks/lib/risk.ts. Edit that file, not this one.
 /**
  * A risk score, and the three things that go wrong when one is rendered
  * casually.

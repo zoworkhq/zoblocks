@@ -5,7 +5,7 @@
  * every shared artifact the platform derives from them:
  *
  *   tsconfig.generated.json                     path mappings
- *   registry.json + apps/docs/public/r/*.json   the Oxygen registry
+ *   registry.json + apps/docs/public/r/*.json   the Zoblocks registry
  *   apps/docs/public/schema/*.json              the formats those declare
  *   apps/docs/src/lib/generated/catalog.ts      the docs catalog
  *   apps/docs/src/app/generated-sources.css     Tailwind source globs
@@ -80,7 +80,7 @@ async function main() {
   /*
    * Two audiences from here on.
    *
-   * `registryComponents` are the ones with source in registry/oxygen — the
+   * `registryComponents` are the ones with source in registry/zoblocks — the
    * files copied verbatim into a customer's repository. Everything that reads,
    * typechecks, or republishes that source takes this list.
    *
@@ -145,7 +145,7 @@ async function main() {
    */
   const surface = await buildSurface(tokenSource);
 
-  // A component token whose `--ox-*` fallback names nothing renders correctly
+  // A component token whose `--zb-*` fallback names nothing renders correctly
   // and silently ignores every brand. Nothing else in the build can see it:
   // the CSS is valid, the pixels are fine, and the component simply never
   // participates in the theming system it appears to be part of.

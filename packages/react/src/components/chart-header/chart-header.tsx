@@ -7,7 +7,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/chart-header/chart-header.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/chart-header/chart-header.tsx. Edit that file, not this one.
 /**
  * ChartHeader — patient context that collapses to a safety bar, not to a name.
  *
@@ -43,7 +43,7 @@
  *   shows the Sex Parameter for Clinical Use with the context it applies to,
  *   and says "not recorded" when there is none.
  *
- * Styling lives in `styles/oxygen-chart-header.css`, installed alongside.
+ * Styling lives in `styles/zoblocks-chart-header.css`, installed alongside.
  */
 
 import * as React from "react";
@@ -52,7 +52,7 @@ import {
   type IdentifierSpec,
   type PatientBannerProps,
   type TwoOrMore,
-} from "@oxygenui-design/identity";
+} from "@zoblocks/identity";
 import { cn } from "../../lib/utils";
 import { clockTime } from "../../lib/clock";
 import {
@@ -202,7 +202,7 @@ const SafetyStrip = React.memo(function SafetyStrip({
 
   return (
     <ul
-      className="ox-chart-header__strip"
+      className="zb-chart-header__strip"
       aria-label="Safety"
       {...(scrollable ? { tabIndex: 0 } : {})}
     >
@@ -214,14 +214,14 @@ const SafetyStrip = React.memo(function SafetyStrip({
           return (
             <li
               key={`${fact.kind}-${index}`}
-              className="ox-chart-header__fact"
-              data-ox-kind={fact.kind}
-              data-ox-tone={expired ? "critical" : fact.tone}
-              data-ox-expired={expired ? "" : undefined}
+              className="zb-chart-header__fact"
+              data-zb-kind={fact.kind}
+              data-zb-tone={expired ? "critical" : fact.tone}
+              data-zb-expired={expired ? "" : undefined}
             >
-              <span className="ox-chart-header__fact-label">{fact.label}</span>
+              <span className="zb-chart-header__fact-label">{fact.label}</span>
               {fact.detail ? (
-                <span className="ox-chart-header__fact-detail">{fact.detail}</span>
+                <span className="zb-chart-header__fact-detail">{fact.detail}</span>
               ) : null}
               {/*
                 An expired hold is shown as expired rather than removed.
@@ -229,7 +229,7 @@ const SafetyStrip = React.memo(function SafetyStrip({
                 02:00 that the legal basis for an admission ended at 20:00.
               */}
               {fact.until ? (
-                <span className="ox-chart-header__fact-until">
+                <span className="zb-chart-header__fact-until">
                   {expired ? "expired" : "until"} {clockTime(fact.until, now)}
                 </span>
               ) : null}
@@ -267,11 +267,11 @@ export function ChartHeader({
   const facts = React.useMemo(() => safetyStrip(safety), [safety]);
 
   return (
-    <div className={cn("ox-chart-header", className)} data-ox-chart-header="">
+    <div className={cn("zb-chart-header", className)} data-zb-chart-header="">
       <header
-        className="ox-chart-header__bar"
-        data-ox-collapsed={collapsed ? "" : undefined}
-        data-ox-surface={surface}
+        className="zb-chart-header__bar"
+        data-zb-collapsed={collapsed ? "" : undefined}
+        data-zb-surface={surface}
         // A banner landmark, so "skip to the patient" is a thing a screen
         // reader can offer without the application inventing it.
         role="banner"
@@ -283,10 +283,10 @@ export function ChartHeader({
           the tree at 44px would be the exact failure the collapse exists to
           avoid.
         */}
-        <div className="ox-chart-header__persistent">
+        <div className="zb-chart-header__persistent">
           <button
             type="button"
-            className="ox-chart-header__toggle"
+            className="zb-chart-header__toggle"
             aria-expanded={!collapsed}
             aria-controls={detailId}
             onClick={() => onCollapsedChange?.(!collapsed)}
@@ -302,7 +302,7 @@ export function ChartHeader({
           never worse off than a sighted one — and, just as importantly, focus
           can never land on something scrolled behind the sticky bar.
         */}
-        <div id={detailId} className="ox-chart-header__detail" hidden={collapsed}>
+        <div id={detailId} className="zb-chart-header__detail" hidden={collapsed}>
           <PatientBanner
             context="action"
             patient={patient}
@@ -311,18 +311,18 @@ export function ChartHeader({
             {...(actions ? { actions } : {})}
           />
 
-          <div className="ox-chart-header__context">
+          <div className="zb-chart-header__context">
             {/*
               The encounter is a control. A subtitle cannot be wrong on
               purpose, and this one has to be able to say "nothing is
               selected" and mean it.
             */}
             {onSelectEncounter ? (
-              <label className="ox-chart-header__encounter">
-                <span className="ox-chart-header__encounter-label">Documenting into</span>
+              <label className="zb-chart-header__encounter">
+                <span className="zb-chart-header__encounter-label">Documenting into</span>
                 <select
-                  className="ox-chart-header__encounter-select"
-                  data-ox-encounter={context.kind}
+                  className="zb-chart-header__encounter-select"
+                  data-zb-encounter={context.kind}
                   value={context.kind === "selected" ? context.encounter.id : ""}
                   onChange={(event) => onSelectEncounter(event.target.value || undefined)}
                 >
@@ -338,9 +338,9 @@ export function ChartHeader({
               // Read-only rather than a disabled control: a disabled select
               // leaves the tab order, so a keyboard user cannot reach the one
               // fact that says where their note is going.
-              <p className="ox-chart-header__encounter" data-ox-encounter={context.kind}>
-                <span className="ox-chart-header__encounter-label">Documenting into</span>
-                <span className="ox-chart-header__encounter-value">
+              <p className="zb-chart-header__encounter" data-zb-encounter={context.kind}>
+                <span className="zb-chart-header__encounter-label">Documenting into</span>
+                <span className="zb-chart-header__encounter-value">
                   {context.kind === "selected" ? context.encounter.label : "No encounter selected"}
                 </span>
               </p>
@@ -352,13 +352,13 @@ export function ChartHeader({
               choose one" decides what the clinician does next.
             */}
             {context.kind === "none" ? (
-              <p className="ox-chart-header__encounter-reason" role="status">
+              <p className="zb-chart-header__encounter-reason" role="status">
                 {describeEncounterContext(context)}
               </p>
             ) : null}
 
             {program ? (
-              <p className="ox-chart-header__program">{describeProgram(program)}</p>
+              <p className="zb-chart-header__program">{describeProgram(program)}</p>
             ) : null}
 
             {/*
@@ -368,8 +368,8 @@ export function ChartHeader({
             */}
             {spcu ? (
               <p
-                className="ox-chart-header__spcu"
-                data-ox-recorded={spcu.recorded ? "" : undefined}
+                className="zb-chart-header__spcu"
+                data-zb-recorded={spcu.recorded ? "" : undefined}
               >
                 {describeSpcu(spcu)}
               </p>

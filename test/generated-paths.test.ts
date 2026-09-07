@@ -1,8 +1,8 @@
 /**
  * The path mappings, checked in both places they have to exist.
  *
- * Registry components import each other by the path the Oxygen CLI writes into
- * a consumer's project — `@/components/oxygen/accordion`, `@/lib/oxygen-switch`
+ * Registry components import each other by the path the Zoblocks CLI writes into
+ * a consumer's project — `@/components/zoblocks/accordion`, `@/lib/zoblocks-switch`
  * — so those specifiers have to resolve in this repository too, and separately
  * in the docs app, which resolves from its own directory and cannot extend the
  * root file.
@@ -78,7 +78,7 @@ describe("every component is importable from the docs app", () => {
    * worth a test.
    *
    * Only the `@/` specifiers. A workspace package specifier in the generated map
-   * (`@oxygenui-design/fhir` and friends) is there so registry source typechecks
+   * (`@zoblocks/fhir` and friends) is there so registry source typechecks
    * at the root; the docs app resolves those through node_modules like any other
    * dependency and needs no mapping. Requiring one would be asserting a fact
    * about this repository's layout rather than about the code.
@@ -117,24 +117,26 @@ describe("every component is importable from the docs app", () => {
   const registryComponents = CATALOG.filter((c) => c.distribution !== "package").map((c) => c.name);
 
   it.each(registryComponents)("%s has a consumer specifier mapped", (name) => {
-    expect(specifiers).toContain(`@/components/oxygen/${name}`);
+    expect(specifiers).toContain(`@/components/zoblocks/${name}`);
   });
 });
 
 describe("the support modules registry components share", () => {
   /*
-   * These are installed into a consumer's project under `lib/` by the Oxygen
+   * These are installed into a consumer's project under `lib/` by the Zoblocks
    * CLI and imported by that path. A missing one does not fail loudly — the
    * component simply cannot be resolved by whichever project is missing it,
    * which is how the accordion family stayed out of the docs app.
    */
-  it.each(["@/lib/utils", "@/lib/oxygen-loader", "@/lib/oxygen-accordion", "@/lib/oxygen-switch"])(
-    "%s is mapped in both projects",
-    (specifier) => {
-      expect(Object.keys(rootPaths)).toContain(specifier);
-      expect(Object.keys(docsPaths)).toContain(specifier);
-    },
-  );
+  it.each([
+    "@/lib/utils",
+    "@/lib/zoblocks-loader",
+    "@/lib/zoblocks-accordion",
+    "@/lib/zoblocks-switch",
+  ])("%s is mapped in both projects", (specifier) => {
+    expect(Object.keys(rootPaths)).toContain(specifier);
+    expect(Object.keys(docsPaths)).toContain(specifier);
+  });
 });
 
 describe("stylesheets the support modules need are loaded by the docs app", () => {
@@ -151,7 +153,7 @@ describe("stylesheets the support modules need are loaded by the docs app", () =
   const globals = readFileSync(path.join(DOCS, "src", "app", "globals.css"), "utf8");
 
   it.each(["loader.css", "switch.css", "accordion.css"])("globals.css imports %s", (file) => {
-    expect(globals).toContain(`registry/oxygen/lib/${file}`);
+    expect(globals).toContain(`registry/zoblocks/lib/${file}`);
   });
 });
 
@@ -173,16 +175,14 @@ describe("workspace packages the docs app bundles", () => {
    * Workspace packages the docs source imports as a module.
    *
    * Derived from the imports rather than from the dependency list, because the
-   * rule is about module resolution: `@oxygenui-design/tokens` is a dependency
+   * rule is about module resolution: `@zoblocks/tokens` is a dependency
    * and is only ever imported as a stylesheet, so it needs neither treatment.
    * A subpath import is excluded for the same reason.
    */
   const imported = new Set<string>();
   const sources = ts.sys.readDirectory(path.join(DOCS, "src"), [".ts", ".tsx"]);
   for (const file of sources) {
-    for (const match of readFileSync(file, "utf8").matchAll(
-      /from\s+"(@oxygenui-design\/[a-z0-9-]+)"/g,
-    )) {
+    for (const match of readFileSync(file, "utf8").matchAll(/from\s+"(@zoblocks\/[a-z0-9-]+)"/g)) {
       imported.add(match[1]!);
     }
   }
@@ -224,7 +224,7 @@ describe("workspace packages the docs app bundles", () => {
   });
 
   it.each(aliasedDeps)("%s has been built, so the alias resolves", (name) => {
-    const dir = path.join(ROOT, "packages", name.replace("@oxygenui-design/", ""));
+    const dir = path.join(ROOT, "packages", name.replace("@zoblocks/", ""));
     expect(existsSync(path.join(dir, "dist", "index.js"))).toBe(true);
   });
 });

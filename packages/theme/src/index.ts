@@ -1,5 +1,5 @@
 /**
- * @oxygenui-design/theme — customer themes at runtime.
+ * @zoblocks/theme — customer themes at runtime.
  *
  * A customer theme is a built-in brand with an envelope: the same primitive
  * overrides, held to the same gate, delivered as an immutable version-pinned
@@ -7,7 +7,7 @@
  * — a theme authored in the app can be committed as a brand, and a brand
  * can be imported into the app, because there is one format.
  *
- * The React provider lives at `@oxygenui-design/theme/react` so a server that
+ * The React provider lives at `@zoblocks/theme/react` so a server that
  * only validates and serves never resolves React.
  *
  * See content/decisions/0012-token-surface-is-a-contract.md.
@@ -25,7 +25,7 @@ export {
 export { ICON_SLOTS, REPLACEABLE_SLOTS, iconSlot, iconVar, type IconSlot } from "./icons";
 
 /*
- * `imageSize` sits at `@oxygenui-design/theme/logo` with the checker that calls
+ * `imageSize` sits at `@zoblocks/theme/logo` with the checker that calls
  * it. It reads a width and a height out of the first few hundred bytes of an
  * upload, which is a thing you do on a server holding an upload — and it is
  * 6 kB of PNG, JPEG, WebP and SVG header parsing that no browser consumer has
@@ -70,7 +70,7 @@ export {
 } from "./vision";
 
 /**
- * The ramp moved to `@oxygenui-design/tokens/validate` so a Figma plugin
+ * The ramp moved to `@zoblocks/tokens/validate` so a Figma plugin
  * sandbox can offer "nearest passing" without pulling in zod and both
  * framework bridges. Re-exported here because it has been part of this
  * package's public surface since the app was written, and a move is not a
@@ -84,7 +84,7 @@ export {
   nearestPassing,
   rgbToHsl,
   type RampStep,
-} from "@oxygenui-design/tokens/validate";
+} from "@zoblocks/tokens/validate";
 
 export {
   UnsafeTokenValueError,
@@ -115,12 +115,12 @@ export {
 } from "./export";
 
 /*
- * `checkLogo` and its neighbours are at `@oxygenui-design/theme/logo`, not here.
+ * `checkLogo` and its neighbours are at `@zoblocks/theme/logo`, not here.
  *
  * They hash uploaded bytes with `node:crypto`, which is correct — the digest is
  * how an upload becomes an addressable asset — and it means the module cannot
  * be bundled for a browser. Re-exported from this barrel it dragged
- * `node:crypto` into every consumer of `@oxygenui-design/theme` and broke the
+ * `node:crypto` into every consumer of `@zoblocks/theme` and broke the
  * bundle budget, which is exactly what that budget is for.
  *
  * The type is still here because it is data about an image rather than code

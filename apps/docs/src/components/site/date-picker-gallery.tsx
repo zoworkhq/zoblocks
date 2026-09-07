@@ -40,7 +40,7 @@ import {
   relativeDateOptions,
   timeGrid,
   type DatePickerVariant,
-} from "@/registry/oxygen/date-picker/date-picker";
+} from "@/registry/zoblocks/date-picker/date-picker";
 import {
   addCalendarDays,
   classifyLocalTime,
@@ -50,12 +50,12 @@ import {
   plainTime,
   sessionFrom,
   withSessionEnd,
-  type OxDate,
-  type OxTime,
-  type OxTimeRange,
-} from "@/lib/oxygen-datetime";
-import { buildSlots, type AvailabilitySet, type Slot } from "@/lib/oxygen-availability";
-import { THERAPY_CADENCES, type OccurrenceVerdict } from "@/lib/oxygen-recurrence";
+  type ZbDate,
+  type ZbTime,
+  type ZbTimeRange,
+} from "@/lib/zoblocks-datetime";
+import { buildSlots, type AvailabilitySet, type Slot } from "@/lib/zoblocks-availability";
+import { THERAPY_CADENCES, type OccurrenceVerdict } from "@/lib/zoblocks-recurrence";
 import { cn } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ */
@@ -68,8 +68,8 @@ import { cn } from "@/lib/utils";
 /* would disagree with the page a day later.                           */
 /* ------------------------------------------------------------------ */
 
-const TODAY: OxDate = plainDate(2026, 8, 26);
-const NOW_TIME: OxTime = plainTime(10, 42);
+const TODAY: ZbDate = plainDate(2026, 8, 26);
+const NOW_TIME: ZbTime = plainTime(10, 42);
 const NOW = { date: TODAY, time: NOW_TIME };
 
 const SIGNED = {
@@ -87,7 +87,7 @@ const BANDS = [
 ];
 
 /** Weekends closed, a public holiday, and one provider-leave block. */
-function clinicClosed(date: OxDate): string | null {
+function clinicClosed(date: ZbDate): string | null {
   const day = (date.d + 5) % 7;
   if (day === 0 || day === 6) return "Weekend — clinic closed";
   if (date.m === 9 && date.d === 7) return "Labor Day — clinic closed";
@@ -95,7 +95,7 @@ function clinicClosed(date: OxDate): string | null {
   return null;
 }
 
-function dayLoad(date: OxDate): number | null {
+function dayLoad(date: ZbDate): number | null {
   if (clinicClosed(date)) return null;
   return [8, 2, 5, 0, 3, 11, 1][date.d % 7] ?? null;
 }
@@ -192,16 +192,16 @@ const VERDICTS: OccurrenceVerdict[] = [
 
 /** Demos that put two or three controls beside each other. */
 function Row({ children }: { children: React.ReactNode }) {
-  return <div className="ox-dt-demo-row">{children}</div>;
+  return <div className="zb-dt-demo-row">{children}</div>;
 }
 
 function Caption({ children }: { children: React.ReactNode }) {
-  return <span className="ox-dt-demo-cap">{children}</span>;
+  return <span className="zb-dt-demo-cap">{children}</span>;
 }
 
 function Labelled({ what, children }: { what: string; children: React.ReactNode }) {
   return (
-    <div className="ox-dt-demo-col">
+    <div className="zb-dt-demo-col">
       <Caption>{what}</Caption>
       {children}
     </div>
@@ -230,19 +230,19 @@ interface DemoProps {
  */
 function Demo({ id, name, api, tags, note, children, wide }: DemoProps) {
   return (
-    <figure id={id} className="ox-demo scroll-mt-28">
-      <figcaption className="ox-demo__head">
-        <span className="ox-demo__id">{id.toUpperCase()}</span>
-        <span className="ox-demo__name">{name}</span>
-        <code className="ox-demo__api">{api}</code>
+    <figure id={id} className="zb-demo scroll-mt-28">
+      <figcaption className="zb-demo__head">
+        <span className="zb-demo__id">{id.toUpperCase()}</span>
+        <span className="zb-demo__name">{name}</span>
+        <code className="zb-demo__api">{api}</code>
         <span className="grow" />
         {tags?.map((tag) => (
-          <span key={tag} className="ox-demo__tag">
+          <span key={tag} className="zb-demo__tag">
             {tag}
           </span>
         ))}
       </figcaption>
-      <div className={cn("ox-demo__stage", wide && "ox-demo__stage--wide")}>{children}</div>
+      <div className={cn("zb-demo__stage", wide && "zb-demo__stage--wide")}>{children}</div>
       <DemoNote>{note}</DemoNote>
     </figure>
   );
@@ -254,9 +254,9 @@ function Demo({ id, name, api, tags, note, children, wide }: DemoProps) {
 
 /** v01 — the default variant: a field with a calendar behind a button. */
 function PickerDemo() {
-  const [value, setValue] = React.useState<OxDate | null>(null);
+  const [value, setValue] = React.useState<ZbDate | null>(null);
   return (
-    <div className="ox-dt-demo-col">
+    <div className="zb-dt-demo-col">
       <DateField
         label="Appointment date"
         showCalendar
@@ -404,12 +404,12 @@ function RangePanelDemo() {
 
 /** c5 — the range as a field: both ends typed, the panel as the fallback. */
 function DateRangeFieldDemo() {
-  const [range, setRange] = React.useState<{ start: OxDate | null; end: OxDate | null }>({
+  const [range, setRange] = React.useState<{ start: ZbDate | null; end: ZbDate | null }>({
     start: plainDate(2026, 8, 24),
     end: plainDate(2026, 9, 11),
   });
   return (
-    <div className="ox-dt-demo-col">
+    <div className="zb-dt-demo-col">
       <DateRangeField
         label="Authorisation window"
         now={TODAY}
@@ -438,12 +438,12 @@ function DateRangeFieldDemo() {
 
 /** t2 — a time range, picked from two columns or typed into two halves. */
 function TimeRangeDemo() {
-  const [range, setRange] = React.useState<OxTimeRange>({
+  const [range, setRange] = React.useState<ZbTimeRange>({
     start: plainTime(7, 0),
     end: plainTime(10, 0),
   });
   return (
-    <div className="ox-dt-demo-col">
+    <div className="zb-dt-demo-col">
       <TimeRangeField
         label="Time range"
         stepMinutes={60}
@@ -601,7 +601,7 @@ function SlotsEmptyDemo() {
 /** v12 — provider, date and time on one surface. */
 function SchedulerDemo() {
   const [actorId, setActorId] = React.useState("osei");
-  const [date, setDate] = React.useState<OxDate>(addCalendarDays(TODAY, 1));
+  const [date, setDate] = React.useState<ZbDate>(addCalendarDays(TODAY, 1));
   const [value, setValue] = React.useState<string | null>(null);
   return (
     <AppointmentScheduler
@@ -735,7 +735,7 @@ function ReadoutDemo() {
  * time, and the component refuses to decide for it. What ships is the
  * classification, and it is the part nobody writes correctly by hand.
  */
-const DST_CASES: Array<{ zone: string; label: string; date: OxDate; time: OxTime }> = [
+const DST_CASES: Array<{ zone: string; label: string; date: ZbDate; time: ZbTime }> = [
   {
     zone: "America/New_York",
     label: "Spring forward",
@@ -777,18 +777,18 @@ function describeVerdict(verdict: ReturnType<typeof classifyLocalTime>): string 
 
 function DstDemo() {
   return (
-    <div className="ox-dt-demo-list">
+    <div className="zb-dt-demo-list">
       {DST_CASES.map((item) => {
         const verdict = classifyLocalTime(item.zone, item.date, item.time);
         return (
-          <div key={`${item.zone}-${item.label}`} className="ox-dt-demo-listrow">
+          <div key={`${item.zone}-${item.label}`} className="zb-dt-demo-listrow">
             <code>{item.zone}</code>
             <b>
               {formatPlainDate(item.date, "medium")} · {item.time.h}:
               {String(item.time.mi).padStart(2, "0")}
             </b>
             <Caption>{item.label}</Caption>
-            <span data-ox-verdict={verdict.kind}>{describeVerdict(verdict)}</span>
+            <span data-zb-verdict={verdict.kind}>{describeVerdict(verdict)}</span>
           </div>
         );
       })}
@@ -836,9 +836,9 @@ const COMPACT_VARIANTS: Array<{ variant: DatePickerVariant; render: () => React.
 
 function TargetDemo() {
   return (
-    <div className="ox-dt-demo-list">
+    <div className="zb-dt-demo-list">
       {COMPACT_VARIANTS.map((item) => (
-        <div key={item.variant} className="ox-dt-demo-listrow ox-dt-demo-listrow--stack">
+        <div key={item.variant} className="zb-dt-demo-listrow zb-dt-demo-listrow--stack">
           <code>variant=&quot;{item.variant}&quot;</code>
           <div>{item.render()}</div>
         </div>
@@ -869,14 +869,14 @@ function MatrixCell({
   const label = THEMES.find(([key]) => key === theme)?.[1] ?? theme;
   return (
     <div
-      className="ox-matrix__cell"
-      data-ox-theme={theme === "hc" ? "high-contrast" : theme}
-      data-ox-density={density}
+      className="zb-matrix__cell"
+      data-zb-theme={theme === "hc" ? "high-contrast" : theme}
+      data-zb-density={density}
     >
-      <div className="ox-matrix__label">
+      <div className="zb-matrix__label">
         {label} · {density}
       </div>
-      <div className="ox-matrix__body">
+      <div className="zb-matrix__body">
         <Calendar
           now={TODAY}
           defaultValue={TODAY}
@@ -943,28 +943,28 @@ const ANNOTATIONS: Annotation[] = [
   {
     id: "named",
     title: "Named in full, not by numeral",
-    find: first(".ox-dt-cal__day--in-range:not(.ox-dt-cal__day--selected)"),
+    find: first(".zb-dt-cal__day--in-range:not(.zb-dt-cal__day--selected)"),
     body: (el) =>
       `A screen reader announces this cell as “${el?.getAttribute("aria-label") ?? "…"}”. A cell in a grid has no column header in its accessible context, so a grid of bare numerals is navigable and useless.`,
   },
   {
     id: "caps",
     title: "The band is capped at every week",
-    find: first(".ox-dt-cal__day--week-hi"),
+    find: first(".zb-dt-cal__day--week-hi"),
     body: () =>
       "The band runs unbroken across a week and breaks between them, so it is capped here as well as at the two ends of the range. Left uncapped, a selection reads as one slab rather than as a set of weeks — and the columns close up while the rows open out precisely to make that difference visible.",
   },
   {
     id: "rail",
     title: "The rail is data, not a feature",
-    find: first(".ox-dt-cal__preset"),
+    find: first(".zb-dt-cal__preset"),
     body: () =>
       "Named periods come from the host: `dateRangePresets(now)` is a starting point, not a default. The right seven periods for a billing report and for an authorisation window are not the same seven, and a component that decides is one every host has to work around.",
   },
   {
     id: "commit",
     title: "Nothing leaves until Done",
-    find: first(".ox-dt-cal__action--primary"),
+    find: first(".zb-dt-cal__action--primary"),
     body: () =>
       "A range is two clicks and the first is often wrong. Every click above redraws the panel and none of them reaches your state — a parent already told about a half-built range has already filtered a report on a range nobody chose.",
   },
@@ -972,8 +972,8 @@ const ANNOTATIONS: Annotation[] = [
     id: "target",
     title: "24px, measured rather than claimed",
     find: (root) =>
-      root.querySelector<HTMLElement>(".ox-dt-cal__day--today") ??
-      root.querySelector<HTMLElement>(".ox-dt-cal__day"),
+      root.querySelector<HTMLElement>(".zb-dt-cal__day--today") ??
+      root.querySelector<HTMLElement>(".zb-dt-cal__day"),
     body: (el) => {
       const box = el?.getBoundingClientRect();
       const size = box ? `${Math.round(box.width)} × ${Math.round(box.height)}` : "…";
@@ -1077,26 +1077,26 @@ function AnatomyDemo() {
   const active = ANNOTATIONS[at];
 
   return (
-    <div className="ox-dt-tour">
-      <div className="ox-dt-tour__bar">
+    <div className="zb-dt-tour">
+      <div className="zb-dt-tour__bar">
         <button
           type="button"
-          className="ox-dt-tour__toggle"
+          className="zb-dt-tour__toggle"
           aria-pressed={playing}
           onClick={() => setPlaying((was) => !was)}
         >
           {playing ? "Pause" : "Play"}
         </button>
-        <p className="ox-dt-tour__count">
+        <p className="zb-dt-tour__count">
           {at + 1} of {ANNOTATIONS.length} · {active?.title}
         </p>
       </div>
 
-      <div className="ox-dt-tour__stage" ref={stageRef}>
+      <div className="zb-dt-tour__stage" ref={stageRef}>
         {/* The panel itself, and it never changes. A completed range is the
             state that has something to point at in every direction: two
             endpoints, a band, week caps, a pressed preset and a live Done. */}
-        <div className="ox-dt-tour__pick" ref={pickRef} onPointerDown={() => setPlaying(false)}>
+        <div className="zb-dt-tour__pick" ref={pickRef} onPointerDown={() => setPlaying(false)}>
           <Calendar
             mode="range"
             months={2}
@@ -1112,7 +1112,7 @@ function AnatomyDemo() {
 
           {box ? (
             <span
-              className="ox-dt-tour__halo"
+              className="zb-dt-tour__halo"
               aria-hidden="true"
               style={{
                 transform: `translate(${box.l - 4}px, ${box.t - 4}px)`,
@@ -1123,20 +1123,20 @@ function AnatomyDemo() {
           ) : null}
         </div>
 
-        <ol className="ox-dt-tour__list">
+        <ol className="zb-dt-tour__list">
           {ANNOTATIONS.map((note, index) => (
             <li key={note.id}>
               <button
                 type="button"
-                className={cn("ox-dt-tour__note", index === at && "ox-dt-tour__note--on")}
+                className={cn("zb-dt-tour__note", index === at && "zb-dt-tour__note--on")}
                 aria-current={index === at ? "true" : undefined}
                 onClick={() => {
                   setPlaying(false);
                   setAt(index);
                 }}
               >
-                <span className="ox-dt-tour__title">{note.title}</span>
-                <span className="ox-dt-tour__body">{bodies[index]}</span>
+                <span className="zb-dt-tour__title">{note.title}</span>
+                <span className="zb-dt-tour__body">{bodies[index]}</span>
               </button>
             </li>
           ))}
@@ -1196,7 +1196,7 @@ export function DatePickerGallery() {
 
   /*
    * The demo theme starts at whatever the site is showing, and follows it
-   * until the reader pins one here. The stages set their own literal `--ox-*`
+   * until the reader pins one here. The stages set their own literal `--zb-*`
    * values — that is the point of them, and why the matrix can show three
    * themes at once — so without this a dark site opens on a wall of white
    * slabs, which argues the opposite of what the page claims.
@@ -1217,13 +1217,13 @@ export function DatePickerGallery() {
   const active = CHAPTERS.find((item) => item.id === chapter) ?? CHAPTERS[0]!;
 
   return (
-    <div className="ox-gallery">
+    <div className="zb-gallery">
       {/* Control bar — the three axes nobody checks by hand, one click each. */}
       {/* Chapter navigation. A radiogroup, not a tablist: these are seven
           filters over one stage, and the stage is not a panel any one of
           them owns. */}
-      <div className="ox-gallery__chapters">
-        <div className="ox-dt-chapters" role="radiogroup" aria-label="Gallery chapter">
+      <div className="zb-gallery__chapters">
+        <div className="zb-dt-chapters" role="radiogroup" aria-label="Gallery chapter">
           {CHAPTERS.map((item) => (
             <button
               key={item.id}
@@ -1231,18 +1231,18 @@ export function DatePickerGallery() {
               role="radio"
               aria-checked={chapter === item.id}
               onClick={() => setChapter(item.id)}
-              className="ox-dt-chapter"
+              className="zb-dt-chapter"
             >
               {item.label}
             </button>
           ))}
         </div>
-        <p className="ox-gallery__blurb">{active.blurb}</p>
+        <p className="zb-gallery__blurb">{active.blurb}</p>
       </div>
 
-      <div className="ox-gallery__stage" data-ox-theme={theme === "hc" ? "high-contrast" : theme}>
+      <div className="zb-gallery__stage" data-zb-theme={theme === "hc" ? "high-contrast" : theme}>
         {chapter === "fields" ? (
-          <div className="ox-gallery__grid">
+          <div className="zb-gallery__grid">
             <Demo
               id="v01"
               name="Picker"
@@ -1321,7 +1321,7 @@ export function DatePickerGallery() {
         ) : null}
 
         {chapter === "calendars" ? (
-          <div className="ox-gallery__grid">
+          <div className="zb-gallery__grid">
             <Demo
               id="c0"
               name="Why it is shaped like this"
@@ -1389,7 +1389,7 @@ export function DatePickerGallery() {
         ) : null}
 
         {chapter === "sessions" ? (
-          <div className="ox-gallery__grid">
+          <div className="zb-gallery__grid">
             <Demo
               id="s1"
               name="Session"
@@ -1442,7 +1442,7 @@ export function DatePickerGallery() {
         ) : null}
 
         {chapter === "booking" ? (
-          <div className="ox-gallery__grid">
+          <div className="zb-gallery__grid">
             <Demo
               id="b1"
               name="Slots"
@@ -1478,7 +1478,7 @@ export function DatePickerGallery() {
         ) : null}
 
         {chapter === "series" ? (
-          <div className="ox-gallery__grid">
+          <div className="zb-gallery__grid">
             <Demo
               id="r1"
               name="Recurrence"
@@ -1525,7 +1525,7 @@ export function DatePickerGallery() {
         ) : null}
 
         {chapter === "rules" ? (
-          <div className="ox-gallery__grid">
+          <div className="zb-gallery__grid">
             <Demo
               id="t1"
               name="Daylight saving, classified"
@@ -1540,7 +1540,7 @@ export function DatePickerGallery() {
             <Demo
               id="t2"
               name="Density and direction, across the family"
-              api="data-ox-density · dir"
+              api="data-zb-density · dir"
               tags={["target ≥ 24px", "RTL"]}
               note="The six compact variants, side by side. Clinical density tightens the ink and never the target: no interactive element goes under 24px — the WCAG 2.2 SC 2.5.8 floor, held by the segments as well as the buttons, which is where it is usually lost. A mis-tap on a calendar cell is clinically consequential in a way it is not on a marketing site. The Theme × density chapter renders every combination if you want to measure it. dir=“ltr” stays pinned on the field itself, because letting the segments inherit RTL renders 26/08/2026 as 2026/08/26 — plausible, and the wrong date. The scheduler and the series surfaces are the width of a page and get their own chapters."
               wide
@@ -1551,7 +1551,7 @@ export function DatePickerGallery() {
         ) : null}
 
         {chapter === "matrix" ? (
-          <div className="ox-matrix">
+          <div className="zb-matrix">
             {THEMES.map(([themeKey]) =>
               DENSITIES.map((densityKey) => (
                 <MatrixCell

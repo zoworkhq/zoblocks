@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
  * The achromatic zone.
  *
  * The one addition this app makes to the docs vocabulary, and it exists
- * because of a real failure mode: an Oxygen-teal control sitting beside a
+ * because of a real failure mode: a Zoblocks-teal control sitting beside a
  * customer's teal swatch makes the customer's swatch look wrong, and they will
  * change a colour that was fine. So inside a preview the chrome drops its hue —
  * `.preview-region` redefines the accent tokens to neutrals — and the only
@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
  *
  * This is deliberately scoped. The instinct that produced it was right; applying
  * it to the whole product, which is what the first version of this app did,
- * produced a generic admin panel wearing none of Oxygen's identity.
+ * produced a generic admin panel wearing none of Zoblocks's identity.
  */
 export function Preview({
   label,
@@ -41,12 +41,12 @@ export function Preview({
         The preview paints itself with the theme it is previewing.
         
         It used to take the app's own `bg-paper` while applying the
-        customer's `--ox-text` on top — so a light theme previewed on a dark
+        customer's `--zb-text` on top — so a light theme previewed on a dark
         app page rendered near-black text on a near-black ground. The axe
         sweep caught it as a contrast failure on the switch label, which is
         exactly what a reader would have seen.
         
-        `--ox-bg` and `--ox-text` are set on this element by `tokens`, so
+        `--zb-bg` and `--zb-text` are set on this element by `tokens`, so
         reading them here is reading the draft rather than the chrome. The
         literal fallbacks matter for the same reason every component's do: a
         preview rendered before the token stylesheet loads should be legible
@@ -55,11 +55,11 @@ export function Preview({
       <div
         style={{
           ...style,
-          background: "var(--ox-bg, #ffffff)",
-          color: "var(--ox-text, #0f172a)",
+          background: "var(--zb-bg, #ffffff)",
+          color: "var(--zb-text, #0f172a)",
         }}
-        {...(theme ? { "data-ox-theme": theme } : {})}
-        {...(density ? { "data-ox-density": density } : {})}
+        {...(theme ? { "data-zb-theme": theme } : {})}
+        {...(density ? { "data-zb-density": density } : {})}
         className="rounded-lg p-4"
       >
         {children}

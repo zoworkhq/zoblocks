@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   // Derived. Both counts on this page said 27 against a catalogue of 30, which
   // undersells the only half of the product a reader can actually have today.
   description:
-    `The Oxygen theming console is built and gated, and not in the first release. ` +
+    `The Zoblocks theming console is built and gated, and not in the first release. ` +
     `The ${CATALOG.length} open-source components are.`,
   alternates: { canonical: "/pro" },
 };
@@ -89,7 +89,7 @@ const RAMP = [...RAMP_STEPS].reverse().concat(RAMP_STEPS.slice(1));
  * uses for the same reason.
  */
 const NOTIFY_HREF =
-  "mailto:hello@zowork.com?subject=" + encodeURIComponent("Notify me when Oxygen Pro ships");
+  "mailto:hello@zowork.com?subject=" + encodeURIComponent("Notify me when Zoblocks Pro ships");
 
 export default function ProPage() {
   return (
@@ -112,7 +112,7 @@ export default function ProPage() {
 
           <div className="soonInner">
             <div className="soonSay">
-              <p className="eyebrow eyebrow-rule soonEyebrow">Oxygen Pro</p>
+              <p className="eyebrow eyebrow-rule soonEyebrow">Zoblocks Pro</p>
               {/*
                 One span per letter is what staggers the entrance, and eleven
                 single-character nodes are not a heading — so the whole run is

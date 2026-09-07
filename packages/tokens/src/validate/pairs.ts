@@ -49,7 +49,7 @@ export function floorFor(theme: Theme): number {
  *
  *   focus-ring on bg      2.50:1  — the focus indicator for the whole library
  *   text-on-accent/accent 3.81:1  — every primary button label
- *   border-strong on bg   1.48:1  — backs --ox-field-border
+ *   border-strong on bg   1.48:1  — backs --zb-field-border
  *
  * The lesson is not "those three values were wrong". It is that a gate which
  * checks a hand-picked subset reports green while the system fails, and the

@@ -1,8 +1,8 @@
 ---
-"@oxygenui-design/clinical-note-core": minor
+"@zoblocks/clinical-note-core": minor
 ---
 
-Add `@oxygenui-design/clinical-note-core` — the engine behind ClinicalNote.
+Add `@zoblocks/clinical-note-core` — the engine behind ClinicalNote.
 
 Every character in a clinical note has an origin: typed, dictated, template,
 pulled, copied forward, or generated. In every EHR shipping today all of it

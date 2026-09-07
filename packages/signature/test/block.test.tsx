@@ -131,7 +131,7 @@ describe("an unsigned document cannot be mistaken for a signed one", () => {
        * away believing it was signed — which is the failure this component
        * exists to prevent, not a styling preference.
        */
-      expect(container.querySelector(".ox-signature-block__rule")).toBeNull();
+      expect(container.querySelector(".zb-signature-block__rule")).toBeNull();
       expect(screen.queryByRole("img")).not.toBeInTheDocument();
     });
   }
@@ -151,16 +151,16 @@ describe("integrity is shown only when it was checked", () => {
    */
   it("says nothing when the host did not check", () => {
     const { container } = render(<SignatureBlock value={SIGNED} />);
-    expect(container.querySelector(".ox-signature-block__integrity")).toBeNull();
+    expect(container.querySelector(".zb-signature-block__integrity")).toBeNull();
   });
 
   it("marks and names both verdicts, so monochrome print still reads", () => {
     const pass = render(<SignatureBlock value={SIGNED} verified />);
-    expect(pass.container.querySelector(".ox-signature-block__integrity")).not.toBeNull();
+    expect(pass.container.querySelector(".zb-signature-block__integrity")).not.toBeNull();
     pass.unmount();
 
     const fail = render(<SignatureBlock value={SIGNED} verified={false} />);
-    expect(fail.container.querySelector(".ox-signature-block__integrity--failed")).not.toBeNull();
+    expect(fail.container.querySelector(".zb-signature-block__integrity--failed")).not.toBeNull();
   });
 });
 

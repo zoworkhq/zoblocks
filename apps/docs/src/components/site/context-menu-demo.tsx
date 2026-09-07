@@ -24,7 +24,7 @@ import {
   ChartContextMenu,
   type ChartMenuAction,
   type MenuSubject,
-} from "@/registry/oxygen/chart-context-menu/chart-context-menu";
+} from "@/registry/zoblocks/chart-context-menu/chart-context-menu";
 
 /** Fixed, because the disclosure record takes its timestamp as a prop. */
 const NOW = "2026-08-31T09:24:00-04:00";
@@ -176,18 +176,18 @@ function Row(props: {
       {(trigger) => (
         <div
           {...trigger}
-          className="flex select-none items-center gap-3 rounded-md border border-[var(--ox-border)] bg-[var(--ox-surface)] px-3 py-2 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ox-focus-ring)]"
+          className="flex select-none items-center gap-3 rounded-md border border-[var(--zb-border)] bg-[var(--zb-surface)] px-3 py-2 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--zb-focus-ring)]"
         >
           <span className="min-w-0 flex-1">
-            <span className="block truncate text-sm font-medium text-[var(--ox-text)]">
+            <span className="block truncate text-sm font-medium text-[var(--zb-text)]">
               {subject.masked ? "Restricted record" : subject.label}
             </span>
-            <span className="block truncate text-xs text-[var(--ox-text-subtle)]">
+            <span className="block truncate text-xs text-[var(--zb-text-subtle)]">
               {subject.masked ? "42 CFR Part 2 · not disclosed" : subject.detail}
             </span>
           </span>
           {right ? (
-            <span className="shrink-0 text-xs tabular-nums text-[var(--ox-text-subtle)]">
+            <span className="shrink-0 text-xs tabular-nums text-[var(--zb-text-subtle)]">
               {right}
             </span>
           ) : null}
@@ -241,7 +241,7 @@ export function ContextMenuStage() {
           onEvent={setEvent}
         />
       </div>
-      <p className="m-0 min-h-5 text-xs text-[var(--ox-text-muted)]">
+      <p className="m-0 min-h-5 text-xs text-[var(--zb-text-muted)]">
         {event ?? "Right-click a row, or focus one and press Shift+F10."}
       </p>
     </div>
@@ -280,7 +280,7 @@ export function ContextMenuArt({ featured = false }: { featured?: boolean }) {
   return (
     <div
       ref={setStage}
-      className="relative overflow-hidden rounded-[10px] bg-[var(--ox-bg-subtle)] p-3"
+      className="relative overflow-hidden rounded-[10px] bg-[var(--zb-bg-subtle)] p-3"
       style={{
         inlineSize: "100%",
         maxInlineSize: featured ? 340 : 268,

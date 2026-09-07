@@ -30,7 +30,7 @@
  * equivalent alternative elsewhere on the page can disable the rule on that
  * line, which forces the claim to be written down next to the code.
  *
- * See oxygen-signature-brief.html §06.
+ * See zoblocks-signature-brief.html §06.
  */
 
 /** Components that take a `methods` array of capture modes. */

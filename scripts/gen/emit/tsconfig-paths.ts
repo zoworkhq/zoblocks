@@ -3,8 +3,8 @@
  * typecheck in this repository without being edited.
  *
  * Registry components import each other the way they will be laid out in a
- * consumer's project ("@/components/oxygen/absent-value"), because that is what
- * the Oxygen CLI writes. Those specifiers have to resolve here too.
+ * consumer's project ("@/components/zoblocks/absent-value"), because that is what
+ * the Zoblocks CLI writes. Those specifiers have to resolve here too.
  *
  * This file used to be maintained by hand in the root tsconfig, with a comment
  * asking authors to add a mapping per component. Four were missing when the
@@ -31,38 +31,38 @@ import type { Emitter } from "../write";
  * generator reported "cannot find module" for a path it had just written.
  */
 export const WORKSPACE_ALIASES: Record<string, string[]> = {
-  "@oxygenui-design/fhir": ["./packages/fhir/src/index.ts"],
-  "@oxygenui-design/fixtures": ["./packages/fixtures/src/index.ts"],
-  "@oxygenui-design/component-meta": ["./packages/component-meta/src/index.ts"],
-  "@/lib/utils": ["./registry/oxygen/lib/utils.ts"],
-  // Support modules under registry/oxygen/lib are installed into a consumer's
-  // project by the Oxygen CLI under lib/, and imported by that path. They
+  "@zoblocks/fhir": ["./packages/fhir/src/index.ts"],
+  "@zoblocks/fixtures": ["./packages/fixtures/src/index.ts"],
+  "@zoblocks/component-meta": ["./packages/component-meta/src/index.ts"],
+  "@/lib/utils": ["./registry/zoblocks/lib/utils.ts"],
+  // Support modules under registry/zoblocks/lib are installed into a consumer's
+  // project by the Zoblocks CLI under lib/, and imported by that path. They
   // resolve here the same way component specifiers do.
-  "@/lib/oxygen-loader": ["./registry/oxygen/lib/loader.tsx"],
-  "@/lib/oxygen-recorder": ["./registry/oxygen/lib/recorder.tsx"],
-  "@/lib/oxygen-accordion": ["./registry/oxygen/lib/accordion-core.tsx"],
-  "@/lib/oxygen-switch": ["./registry/oxygen/lib/switch.tsx"],
-  "@/lib/oxygen-clinical-note": ["./registry/oxygen/lib/clinical-note.tsx"],
-  "@/lib/oxygen-clinical-status": ["./registry/oxygen/lib/clinical-status.ts"],
-  "@/lib/oxygen-result-value": ["./registry/oxygen/lib/result-value.ts"],
-  "@/lib/oxygen-allergy": ["./registry/oxygen/lib/allergy.ts"],
-  "@/lib/oxygen-risk": ["./registry/oxygen/lib/risk.ts"],
-  "@/lib/oxygen-provenance": ["./registry/oxygen/lib/provenance.ts"],
-  "@/lib/oxygen-trend": ["./registry/oxygen/lib/trend.ts"],
-  "@/lib/oxygen-clock": ["./registry/oxygen/lib/clock.ts"],
-  "@/lib/oxygen-presence": ["./registry/oxygen/lib/presence.ts"],
-  "@/lib/oxygen-chart-header": ["./registry/oxygen/lib/chart-header.ts"],
-  "@/lib/oxygen-workspace": ["./registry/oxygen/lib/workspace.ts"],
-  "@/lib/oxygen-palette": ["./registry/oxygen/lib/palette.ts"],
-  "@/lib/oxygen-menu": ["./registry/oxygen/lib/menu.ts"],
-  "@/lib/oxygen-grid": ["./registry/oxygen/lib/grid.ts"],
-  "@/lib/oxygen-datetime": ["./registry/oxygen/lib/datetime.ts"],
-  "@/lib/oxygen-datetime-field": ["./registry/oxygen/lib/datetime-field.tsx"],
-  "@/lib/oxygen-datetime-parts": ["./registry/oxygen/lib/datetime-parts.tsx"],
-  "@/lib/oxygen-availability": ["./registry/oxygen/lib/availability.ts"],
-  "@/lib/oxygen-recurrence": ["./registry/oxygen/lib/recurrence.ts"],
-  "@/lib/timeline-core": ["./registry/oxygen/lib/timeline-core.ts"],
-  "@/lib/timeline-fhir": ["./registry/oxygen/lib/timeline-fhir.ts"],
+  "@/lib/zoblocks-loader": ["./registry/zoblocks/lib/loader.tsx"],
+  "@/lib/zoblocks-recorder": ["./registry/zoblocks/lib/recorder.tsx"],
+  "@/lib/zoblocks-accordion": ["./registry/zoblocks/lib/accordion-core.tsx"],
+  "@/lib/zoblocks-switch": ["./registry/zoblocks/lib/switch.tsx"],
+  "@/lib/zoblocks-clinical-note": ["./registry/zoblocks/lib/clinical-note.tsx"],
+  "@/lib/zoblocks-clinical-status": ["./registry/zoblocks/lib/clinical-status.ts"],
+  "@/lib/zoblocks-result-value": ["./registry/zoblocks/lib/result-value.ts"],
+  "@/lib/zoblocks-allergy": ["./registry/zoblocks/lib/allergy.ts"],
+  "@/lib/zoblocks-risk": ["./registry/zoblocks/lib/risk.ts"],
+  "@/lib/zoblocks-provenance": ["./registry/zoblocks/lib/provenance.ts"],
+  "@/lib/zoblocks-trend": ["./registry/zoblocks/lib/trend.ts"],
+  "@/lib/zoblocks-clock": ["./registry/zoblocks/lib/clock.ts"],
+  "@/lib/zoblocks-presence": ["./registry/zoblocks/lib/presence.ts"],
+  "@/lib/zoblocks-chart-header": ["./registry/zoblocks/lib/chart-header.ts"],
+  "@/lib/zoblocks-workspace": ["./registry/zoblocks/lib/workspace.ts"],
+  "@/lib/zoblocks-palette": ["./registry/zoblocks/lib/palette.ts"],
+  "@/lib/zoblocks-menu": ["./registry/zoblocks/lib/menu.ts"],
+  "@/lib/zoblocks-grid": ["./registry/zoblocks/lib/grid.ts"],
+  "@/lib/zoblocks-datetime": ["./registry/zoblocks/lib/datetime.ts"],
+  "@/lib/zoblocks-datetime-field": ["./registry/zoblocks/lib/datetime-field.tsx"],
+  "@/lib/zoblocks-datetime-parts": ["./registry/zoblocks/lib/datetime-parts.tsx"],
+  "@/lib/zoblocks-availability": ["./registry/zoblocks/lib/availability.ts"],
+  "@/lib/zoblocks-recurrence": ["./registry/zoblocks/lib/recurrence.ts"],
+  "@/lib/timeline-core": ["./registry/zoblocks/lib/timeline-core.ts"],
+  "@/lib/timeline-fhir": ["./registry/zoblocks/lib/timeline-fhir.ts"],
 };
 
 export async function emitTsconfigPaths(
@@ -83,7 +83,7 @@ export async function emitTsconfigPaths(
     `${JSON.stringify(
       {
         $schema: "https://json.schemastore.org/tsconfig",
-        display: "Oxygen generated path mappings",
+        display: "Zoblocks generated path mappings",
         _generated: banner("//")
           .split("\n")
           .map((l) => l.replace(/^\/\/ ?/, "")),

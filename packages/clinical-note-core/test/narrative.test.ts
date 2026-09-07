@@ -92,7 +92,7 @@ describe("sectionNarrative", () => {
     // attributes a conforming server may legitimately strip. Opting in is what
     // stops that being a surprise for someone else's integration engineer.
     expect(sectionNarrative(section({ code: "1", title: "S" }, p(t("x", "ai"))))).not.toContain(
-      "data-ox-",
+      "data-zb-",
     );
   });
 
@@ -105,7 +105,7 @@ describe("sectionNarrative", () => {
       { provenance: true },
     );
     expect(html).toContain(
-      '<span data-ox-origin="pulled" data-ox-source="Observation/1" data-ox-at="2026-08-16T06:12:00+05:30">x</span>',
+      '<span data-zb-origin="pulled" data-zb-source="Observation/1" data-zb-at="2026-08-16T06:12:00+05:30">x</span>',
     );
   });
 
@@ -113,11 +113,11 @@ describe("sectionNarrative", () => {
     const ai = sectionNarrative(section({ code: "1", title: "S" }, p(t("x", "ai"))), {
       provenance: true,
     });
-    expect(ai).toContain('data-ox-reviewed="false"');
+    expect(ai).toContain('data-zb-reviewed="false"');
     const typed = sectionNarrative(section({ code: "1", title: "S" }, p(t("x", "typed"))), {
       provenance: true,
     });
-    expect(typed).not.toContain("data-ox-reviewed");
+    expect(typed).not.toContain("data-zb-reviewed");
   });
 
   it("emits dictation confidence", () => {
@@ -125,7 +125,7 @@ describe("sectionNarrative", () => {
       section({ code: "1", title: "S" }, p(t("x", "dictated", { confidence: 0.62 }))),
       { provenance: true },
     );
-    expect(html).toContain('data-ox-confidence="0.62"');
+    expect(html).toContain('data-zb-confidence="0.62"');
   });
 
   it("nests marks in a fixed order, so the same document always hashes the same", () => {

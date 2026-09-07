@@ -1,5 +1,5 @@
 /**
- * @oxygenui-design/figma-core — Oxygen themes as Figma variable plans.
+ * @zoblocks/figma-core — Zoblocks themes as Figma variable plans.
  *
  * Pure by construction: no `figma.*`, no DOM, no network, no `node:*`. A Figma
  * plugin runs across two isolated contexts — a sandbox with the Figma API and
@@ -47,13 +47,13 @@ export {
   validateTokens,
   CONTRAST_PAIRS,
   STATUS_PAIRS,
-} from "@oxygenui-design/tokens/validate";
+} from "@zoblocks/tokens/validate";
 
 /*
  * One import, not two — the plan's own requirement, and the reason `theme` is
  * absent from this package's dependencies.
  *
- * `nearestPassing` used to live in `@oxygenui-design/theme/src/ramp.ts`. It was
+ * `nearestPassing` used to live in `@zoblocks/theme/src/ramp.ts`. It was
  * pure, but `theme` also carries the document schema, zod and both framework
  * bridges, and making a plugin sandbox depend on all of that to offer one
  * suggestion is the wrong trade. `ramp.ts` now sits in the validator beside the

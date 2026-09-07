@@ -4,7 +4,7 @@
  * This file exists because of a bug that reached the repository and was found
  * by apps/smoke, not by any unit test:
  *
- *     TypeError: Cannot set property label of #<OxLoaderElement>
+ *     TypeError: Cannot set property label of #<ZbLoaderElement>
  *                which has only a getter
  *
  * React 19 and Vue 3 both decide per binding whether to write a DOM property
@@ -25,22 +25,22 @@
  */
 
 import { beforeEach, describe, expect, it } from "vitest";
-import { COMMON_ATTRIBUTES, LOADER_EVENTS, OxLoaderElement } from "../src/base.js";
+import { COMMON_ATTRIBUTES, LOADER_EVENTS, ZbLoaderElement } from "../src/base.js";
 import "../src/index.js";
 
 const TAGS = [
-  "ox-pulse-loader",
-  "ox-rhythm-loader",
-  "ox-breath-loader",
-  "ox-helix-loader",
-  "ox-infusion-loader",
+  "zb-pulse-loader",
+  "zb-rhythm-loader",
+  "zb-breath-loader",
+  "zb-helix-loader",
+  "zb-infusion-loader",
 ] as const;
 
 /** `show-label` → `showLabel`, which is the name a framework binds to. */
 const camel = (attribute: string) =>
   attribute.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
 
-/** Walk the prototype chain: these live on OxLoaderElement, not the instance. */
+/** Walk the prototype chain: these live on ZbLoaderElement, not the instance. */
 function describeProperty(
   object: object,
   key: string,
@@ -61,7 +61,7 @@ describe("every observed attribute is reachable as a writable property", () => {
     const property = camel(attribute);
 
     it(`${attribute} → .${property} has both a getter and a setter`, () => {
-      const found = describeProperty(OxLoaderElement.prototype, property);
+      const found = describeProperty(ZbLoaderElement.prototype, property);
       expect(found, `.${property} is missing entirely`).not.toBeNull();
 
       const { descriptor } = found!;
@@ -78,10 +78,10 @@ describe("every observed attribute is reachable as a writable property", () => {
 });
 
 describe("assigning a property writes the attribute", () => {
-  let element: OxLoaderElement;
+  let element: ZbLoaderElement;
 
   beforeEach(() => {
-    element = document.createElement("ox-pulse-loader") as OxLoaderElement;
+    element = document.createElement("zb-pulse-loader") as ZbLoaderElement;
     document.body.append(element);
   });
 
@@ -174,7 +174,7 @@ describe("assigning a property writes the attribute", () => {
 
   it("applies to every loader, not just the one under test", () => {
     for (const tag of TAGS) {
-      const node = document.createElement(tag) as OxLoaderElement;
+      const node = document.createElement(tag) as ZbLoaderElement;
       document.body.append(node);
       node.label = `Loading ${tag}`;
       expect(node.getAttribute("label"), tag).toBe(`Loading ${tag}`);
@@ -198,7 +198,7 @@ describe("the framework property path", () => {
   }
 
   it("does not throw for any observed attribute", () => {
-    const element = document.createElement("ox-pulse-loader");
+    const element = document.createElement("zb-pulse-loader");
     document.body.append(element);
 
     const props = Object.fromEntries(COMMON_ATTRIBUTES.map((a) => [camel(a), "1"]));
@@ -206,8 +206,8 @@ describe("the framework property path", () => {
   });
 
   it("produces the same element state as the attribute path", () => {
-    const viaProperty = document.createElement("ox-pulse-loader") as OxLoaderElement;
-    const viaAttribute = document.createElement("ox-pulse-loader") as OxLoaderElement;
+    const viaProperty = document.createElement("zb-pulse-loader") as ZbLoaderElement;
+    const viaAttribute = document.createElement("zb-pulse-loader") as ZbLoaderElement;
     document.body.append(viaProperty, viaAttribute);
 
     setLikeReact19(viaProperty, { label: "Loading", mode: "overlay", progress: 25, open: false });
@@ -236,8 +236,8 @@ describe("the framework property path", () => {
 describe("event names are bindable in every framework's template syntax", () => {
   it("contains no colon — Angular cannot bind one", () => {
     // Angular parses the colon in `(event)` as its global-target separator, so
-    // `(ox-loader:show)` fails to compile with "Unexpected global target
-    // 'ox-loader'". There is no escape syntax. This was a real defect found by
+    // `(zb-loader:show)` fails to compile with "Unexpected global target
+    // 'zb-loader'". There is no escape syntax. This was a real defect found by
     // apps/smoke, not a hypothetical.
     for (const name of LOADER_EVENTS) {
       expect(name, `"${name}" is unbindable in an Angular template`).not.toContain(":");
@@ -249,7 +249,7 @@ describe("event names are bindable in every framework's template syntax", () => 
     // different, and it cannot collide with a native event.
     for (const name of LOADER_EVENTS) {
       expect(name).toMatch(/^[a-z]+(-[a-z]+)*$/);
-      expect(name.startsWith("ox-loader-"), `"${name}" must be namespaced`).toBe(true);
+      expect(name.startsWith("zb-loader-"), `"${name}" must be namespaced`).toBe(true);
     }
   });
 
@@ -257,7 +257,7 @@ describe("event names are bindable in every framework's template syntax", () => 
     // The constant and the dispatch sites are separate strings; if one is
     // renamed and not the other, consumers subscribe to an event that never
     // fires and nothing else notices.
-    const element = document.createElement("ox-pulse-loader") as OxLoaderElement;
+    const element = document.createElement("zb-pulse-loader") as ZbLoaderElement;
     const seen: string[] = [];
     for (const name of LOADER_EVENTS) {
       element.addEventListener(name, () => seen.push(name));
@@ -267,7 +267,7 @@ describe("event names are bindable in every framework's template syntax", () => 
     document.body.append(element);
     element.open = false;
 
-    expect(seen).toEqual(["ox-loader-show", "ox-loader-hide"]);
+    expect(seen).toEqual(["zb-loader-show", "zb-loader-hide"]);
   });
 
   it("bubbles and crosses the shadow boundary", () => {
@@ -275,13 +275,13 @@ describe("event names are bindable in every framework's template syntax", () => 
     // on document rather than on the element itself — which is how React, Vue,
     // and Angular host listeners are all written.
     const wrapper = document.createElement("div");
-    const element = document.createElement("ox-pulse-loader") as OxLoaderElement;
+    const element = document.createElement("zb-pulse-loader") as ZbLoaderElement;
     element.minDuration = 0;
     wrapper.append(element);
     document.body.append(wrapper);
 
     const seen: string[] = [];
-    wrapper.addEventListener("ox-loader-hide", () => seen.push("hide"));
+    wrapper.addEventListener("zb-loader-hide", () => seen.push("hide"));
     element.open = false;
 
     expect(seen).toEqual(["hide"]);

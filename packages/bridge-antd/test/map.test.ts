@@ -8,8 +8,8 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { resolvePatch, verifyPatch } from "@oxygenui-design/bridge-core";
-import { NOT_BRIDGEABLE } from "@oxygenui-design/tokens/surface";
+import { resolvePatch, verifyPatch } from "@zoblocks/bridge-core";
+import { NOT_BRIDGEABLE } from "@zoblocks/tokens/surface";
 import { antdBridge, type AntdTokens } from "../src/map";
 
 const patch = (token: AntdTokens) => resolvePatch(antdBridge, token);
@@ -17,10 +17,10 @@ const patch = (token: AntdTokens) => resolvePatch(antdBridge, token);
 describe("identity of the mapping", () => {
   it("puts colorPrimary on the accent, and not on something adjacent", () => {
     const out = patch({ colorPrimary: "#7c3aed" });
-    expect(out["--ox-accent"]).toBe("#7c3aed");
-    expect(out["--ox-focus-ring"]).toBe("#7c3aed");
-    expect(out["--ox-border"]).toBeUndefined();
-    expect(out["--ox-text"]).toBeUndefined();
+    expect(out["--zb-accent"]).toBe("#7c3aed");
+    expect(out["--zb-focus-ring"]).toBe("#7c3aed");
+    expect(out["--zb-border"]).toBeUndefined();
+    expect(out["--zb-text"]).toBeUndefined();
   });
 
   it("maps the text ramp in the right order of emphasis", () => {
@@ -29,28 +29,28 @@ describe("identity of the mapping", () => {
       colorTextSecondary: "#555555",
       colorTextTertiary: "#888888",
     });
-    expect(out["--ox-text"]).toBe("#111111");
-    expect(out["--ox-text-muted"]).toBe("#555555");
-    expect(out["--ox-text-subtle"]).toBe("#888888");
+    expect(out["--zb-text"]).toBe("#111111");
+    expect(out["--zb-text-muted"]).toBe("#555555");
+    expect(out["--zb-text-subtle"]).toBe("#888888");
   });
 
   it("distinguishes the container surface from the page ground", () => {
     const out = patch({ colorBgContainer: "#ffffff", colorBgLayout: "#f5f5f5" });
-    expect(out["--ox-surface"]).toBe("#ffffff");
-    expect(out["--ox-bg"]).toBe("#f5f5f5");
+    expect(out["--zb-surface"]).toBe("#ffffff");
+    expect(out["--zb-bg"]).toBe("#f5f5f5");
   });
 
   it("converts antd's numeric radii to CSS lengths", () => {
     const out = patch({ borderRadius: 8, borderRadiusLG: 12, borderRadiusSM: 4 });
-    expect(out["--ox-radius"]).toBe("8px");
-    expect(out["--ox-radius-lg"]).toBe("12px");
-    expect(out["--ox-radius-sm"]).toBe("4px");
+    expect(out["--zb-radius"]).toBe("8px");
+    expect(out["--zb-radius-lg"]).toBe("12px");
+    expect(out["--zb-radius-sm"]).toBe("4px");
   });
 
   it("carries motion through as the host declared it", () => {
     const out = patch({ motionDurationMid: "0.2s", motionEaseInOut: "ease-in-out" });
-    expect(out["--ox-duration"]).toBe("0.2s");
-    expect(out["--ox-ease"]).toBe("ease-in-out");
+    expect(out["--zb-duration"]).toBe("0.2s");
+    expect(out["--zb-ease"]).toBe("ease-in-out");
   });
 });
 
@@ -62,8 +62,8 @@ describe("the partial-mapping rule", () => {
    */
   it("omits keys entirely rather than writing undefined", () => {
     const out = patch({ colorPrimary: "#7c3aed" });
-    expect(Object.keys(out)).not.toContain("--ox-text");
-    expect("--ox-text" in out).toBe(false);
+    expect(Object.keys(out)).not.toContain("--zb-text");
+    expect("--zb-text" in out).toBe(false);
   });
 
   it("writes nothing at all for an empty theme", () => {
@@ -71,15 +71,15 @@ describe("the partial-mapping rule", () => {
   });
 
   it("declares what it cannot express instead of guessing", () => {
-    expect(antdBridge.unmapped).toContain("--ox-status-critical");
-    expect(antdBridge.unmapped).toContain("--ox-status-low");
-    expect(antdBridge.unmapped).toContain("--ox-border-strong");
+    expect(antdBridge.unmapped).toContain("--zb-status-critical");
+    expect(antdBridge.unmapped).toContain("--zb-status-low");
+    expect(antdBridge.unmapped).toContain("--zb-border-strong");
   });
 
   /**
-   * `--ox-text-on-accent` used to be in `unmapped`, on the belief that antd
+   * `--zb-text-on-accent` used to be in `unmapped`, on the belief that antd
    * exposed no such token. It exposes `colorTextLightSolid`, and the belief
-   * cost a rendering: Oxygen's dark label on antd's dark primary at 3.70:1,
+   * cost a rendering: Zoblocks's dark label on antd's dark primary at 3.70:1,
    * which antd never produces.
    *
    * The pairing is what matters. bridge-core only measures a contrast pair
@@ -88,9 +88,9 @@ describe("the partial-mapping rule", () => {
    */
   it("maps both halves of the button-label pair, so the gate can see it", () => {
     const out = patch({ colorPrimary: "#1677ff", colorTextLightSolid: "#fff" });
-    expect(out["--ox-accent"]).toBe("#1677ff");
-    expect(out["--ox-text-on-accent"]).toBe("#fff");
-    expect(antdBridge.unmapped).not.toContain("--ox-text-on-accent");
+    expect(out["--zb-accent"]).toBe("#1677ff");
+    expect(out["--zb-text-on-accent"]).toBe("#fff");
+    expect(antdBridge.unmapped).not.toContain("--zb-text-on-accent");
   });
 });
 
@@ -138,20 +138,20 @@ describe("derived geometry", () => {
    */
   it("keeps the tab track and thumb concentric", () => {
     const out = patch({ borderRadiusLG: 12 });
-    expect(out["--ox-tabs-thumb-radius"]).toBe("12px");
-    expect(out["--ox-tabs-track-radius"]).toBe("16px");
-    expect(out["--ox-tabs-track-pad"]).toBe("4px");
+    expect(out["--zb-tabs-thumb-radius"]).toBe("12px");
+    expect(out["--zb-tabs-track-radius"]).toBe("16px");
+    expect(out["--zb-tabs-track-pad"]).toBe("4px");
   });
 
   it("falls back to the base radius when the host defines no large one", () => {
     const out = patch({ borderRadius: 6 });
-    expect(out["--ox-tabs-thumb-radius"]).toBe("6px");
-    expect(out["--ox-tabs-track-radius"]).toBe("10px");
+    expect(out["--zb-tabs-thumb-radius"]).toBe("6px");
+    expect(out["--zb-tabs-track-radius"]).toBe("10px");
   });
 
   it("writes no geometry at all when the host declares no radius", () => {
     const out = patch({ colorPrimary: "#000" });
-    expect(out["--ox-tabs-track-radius"]).toBeUndefined();
+    expect(out["--zb-tabs-track-radius"]).toBeUndefined();
   });
 });
 
@@ -162,11 +162,11 @@ describe("accessibility floors survive a hostile host", () => {
    * value still wins.
    */
   it("clamps the hit target rather than copying it", () => {
-    expect(patch({ controlHeight: 24 })["--ox-density-target"]).toBe("max(44px, 24px)");
+    expect(patch({ controlHeight: 24 })["--zb-density-target"]).toBe("max(44px, 24px)");
   });
 
   it("keeps a generous host control at its own size", () => {
-    expect(patch({ controlHeight: 56 })["--ox-density-target"]).toBe("max(44px, 56px)");
+    expect(patch({ controlHeight: 56 })["--zb-density-target"]).toBe("max(44px, 56px)");
   });
 
   it("reports a host theme whose primary button label would be unreadable", () => {
@@ -174,7 +174,7 @@ describe("accessibility floors survive a hostile host", () => {
     // check is what says the host's theme is the problem.
     const result = verifyPatch({
       ...patch({ colorPrimary: "#9fd8c8" }),
-      "--ox-text-on-accent": "#ffffff",
+      "--zb-text-on-accent": "#ffffff",
     });
     expect(result.contrast).toHaveLength(1);
     expect(result.contrast[0]?.reason).toContain("the host's theme is what fails");

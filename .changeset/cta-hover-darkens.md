@@ -1,5 +1,5 @@
 ---
-"@oxygenui-design/tokens": patch
+"@zoblocks/tokens": patch
 ---
 
 A note on dimming a filled control

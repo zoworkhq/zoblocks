@@ -219,7 +219,7 @@ export function checkTextContrast(
   }
 }
 
-/** Every reference resolves, in every theme. An unresolved one emits `var(--ox-nothing)`. */
+/** Every reference resolves, in every theme. An unresolved one emits `var(--zb-nothing)`. */
 function checkReferencesResolve(source: TokenSource, problems: TokenProblem[]): void {
   for (const theme of THEMES) {
     const lookup = themeLookup(source, theme);

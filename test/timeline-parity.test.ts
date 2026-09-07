@@ -99,7 +99,7 @@ function propsOf(source: string, declaration: string): Set<string> {
 }
 
 const antdSource = read(path.join(antdTimeline, "Timeline.d.ts"));
-const ours = read(path.join(ROOT, "registry", "oxygen", "timeline", "timeline.tsx"));
+const ours = read(path.join(ROOT, "registry", "zoblocks", "timeline", "timeline.tsx"));
 
 /**
  * Props antd declares that we deliberately do not reproduce.

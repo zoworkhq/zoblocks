@@ -7,7 +7,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/infusion-loader/infusion-loader.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/infusion-loader/infusion-loader.tsx. Edit that file, not this one.
 /**
  * InfusionLoader — a capsule with a soft slug, named for the one device in a
  * hospital that displays a percentage and means it.
@@ -66,14 +66,14 @@ export function InfusionLoader({ speed = 1, size, progress, ...props }: Infusion
       progress={progress}
       variant="infusion"
       vars={{
-        "--ox-loader-size": `${px}px`,
-        "--ox-loader-cycle": `${cycleMs(4000, clamp(speed, 0.5, 2))}ms`,
-        "--ox-loader-stroke": "2.4px",
+        "--zb-loader-size": `${px}px`,
+        "--zb-loader-cycle": `${cycleMs(4000, clamp(speed, 0.5, 2))}ms`,
+        "--zb-loader-stroke": "2.4px",
       }}
       art={
         <svg viewBox={LOADER_VIEWBOX.infusion} focusable="false">
           <rect
-            className="ox-loader__stroke ox-loader__track"
+            className="zb-loader__stroke zb-loader__track"
             x="4"
             y="4"
             width="152"
@@ -81,7 +81,7 @@ export function InfusionLoader({ speed = 1, size, progress, ...props }: Infusion
             rx="20"
           />
           <rect
-            className="ox-loader__fill ox-loader__slug"
+            className="zb-loader__fill zb-loader__slug"
             x={TRACK_X}
             y="9"
             width={determinate ? slugWidth(value ?? 0) : DRIFT_WIDTH}

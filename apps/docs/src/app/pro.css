@@ -141,10 +141,10 @@
     0%,
     72%,
     100% {
-      box-shadow: 0 0 0 0 color-mix(in srgb, var(--site-oxygen) 60%, transparent);
+      box-shadow: 0 0 0 0 color-mix(in srgb, var(--site-brand) 60%, transparent);
     }
     84% {
-      box-shadow: 0 0 0 5px color-mix(in srgb, var(--site-oxygen) 0%, transparent);
+      box-shadow: 0 0 0 5px color-mix(in srgb, var(--site-brand) 0%, transparent);
     }
   }
 
@@ -329,7 +329,7 @@
     }
     66%,
     78% {
-      background: color-mix(in srgb, var(--site-oxygen) 20%, transparent);
+      background: color-mix(in srgb, var(--site-brand) 20%, transparent);
     }
     90%,
     100% {
@@ -502,7 +502,7 @@
   right: 13px;
   bottom: -1px;
   height: 2px;
-  background: var(--site-oxygen);
+  background: var(--site-brand);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.35s var(--p-ease);
@@ -554,7 +554,7 @@
   padding: 10px 12px;
   border-radius: 9px;
   background: var(--site-paper-sunk);
-  border-left: 2px solid var(--site-oxygen);
+  border-left: 2px solid var(--site-brand);
   color: var(--site-graphite);
 }
 .oxp .fStage {
@@ -600,8 +600,8 @@
   transform: translateY(-2px);
 }
 .oxp .tier[data-featured] {
-  border-color: color-mix(in srgb, var(--site-oxygen) 55%, transparent);
-  background: color-mix(in srgb, var(--site-oxygen) 6%, var(--site-paper-sunk));
+  border-color: color-mix(in srgb, var(--site-brand) 55%, transparent);
+  background: color-mix(in srgb, var(--site-brand) 6%, var(--site-paper-sunk));
 }
 .oxp .tier .tn {
   display: flex;
@@ -667,7 +667,7 @@
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: color-mix(in srgb, var(--site-oxygen) 70%, transparent);
+  background: color-mix(in srgb, var(--site-brand) 70%, transparent);
 }
 .oxp .tier .tcta {
   margin-top: 14px;
@@ -711,7 +711,7 @@
   padding: 28px 24px;
   border: 1px solid var(--site-rule);
   border-radius: 16px;
-  background: color-mix(in srgb, var(--site-oxygen) 5%, var(--site-paper-sunk));
+  background: color-mix(in srgb, var(--site-brand) 5%, var(--site-paper-sunk));
 }
 @media (max-width: 760px) {
   .oxp .authBand {

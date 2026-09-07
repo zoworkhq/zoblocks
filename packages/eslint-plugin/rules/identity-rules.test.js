@@ -93,9 +93,9 @@ ruleTester.run("no-truncated-identity", noTruncatedIdentity, {
   valid: [
     // Free text may truncate. A note is not an identifier.
     { code: `<p className="truncate">{note.text}</p>` },
-    { code: `<span className="ox-banner__name">{name}</span>` },
-    { code: `<span className="ox-chip__name">{name}</span>` },
-    { code: `<span data-ox-field="identifier">{mrn}</span>` },
+    { code: `<span className="zb-banner__name">{name}</span>` },
+    { code: `<span className="zb-chip__name">{name}</span>` },
+    { code: `<span data-zb-field="identifier">{mrn}</span>` },
     { code: `<span className="patient-name" style={{ textOverflow: "clip" }}>{name}</span>` },
   ],
   invalid: [
@@ -104,11 +104,11 @@ ruleTester.run("no-truncated-identity", noTruncatedIdentity, {
       errors: [{ messageId: "clipped" }],
     },
     {
-      code: `<span className="ox-banner__name text-ellipsis">{name}</span>`,
+      code: `<span className="zb-banner__name text-ellipsis">{name}</span>`,
       errors: [{ messageId: "clipped" }],
     },
     {
-      code: `<span data-ox-field="identifier" style={{ textOverflow: "ellipsis" }}>{mrn}</span>`,
+      code: `<span data-zb-field="identifier" style={{ textOverflow: "ellipsis" }}>{mrn}</span>`,
       errors: [{ messageId: "clipped" }],
     },
     {

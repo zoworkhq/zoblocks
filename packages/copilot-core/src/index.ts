@@ -1,5 +1,5 @@
 /**
- * @oxygenui-design/copilot-core — the engine behind Oxygen's clinical copilot.
+ * @zoblocks/copilot-core — the engine behind Zoblocks's clinical copilot.
  *
  * No React, no DOM, no dependencies. The whole package is importable in a Node
  * handler, an edge worker, or a test runner with no environment, which is the
@@ -7,7 +7,7 @@
  * browser runs client-side. A client classifier stops mistakes; a server one
  * stops attacks; a product with only one of them has chosen which to tolerate.
  *
- *     import { runExchange, lookUp, reduce, initialState } from "@oxygenui-design/copilot-core";
+ *     import { runExchange, lookUp, reduce, initialState } from "@zoblocks/copilot-core";
  *
  * The four ideas worth reading first:
  *

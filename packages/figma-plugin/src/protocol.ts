@@ -21,7 +21,7 @@ export interface CollectionSummary {
   name: string;
   /** Figma mode names, in the file's own order. */
   modes: string[];
-  /** How many of its variables carry an Oxygen token stamp. */
+  /** How many of its variables carry a Zoblocks token stamp. */
   stamped: number;
   /**
    * Colour variables in total. The picker states both, because the difference

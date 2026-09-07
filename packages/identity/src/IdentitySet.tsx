@@ -17,7 +17,7 @@ import {
   type DisambiguationResult,
   type Escalation,
   type Identity,
-} from "@oxygenui-design/identity-core";
+} from "@zoblocks/identity-core";
 import {
   createContext,
   useContext,
@@ -164,7 +164,7 @@ export function IdentitySetNotice(): ReactNode {
 
   if (!text) return null;
   return (
-    <div className="ox-identity-notice" role="status">
+    <div className="zb-identity-notice" role="status">
       <span aria-hidden="true">⚠</span> {text}
     </div>
   );

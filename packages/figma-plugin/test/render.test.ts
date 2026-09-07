@@ -13,9 +13,9 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { runGate, type GateReport } from "../src/gate";
 import { renderReport } from "../src/ui/render";
 import { wireCopy } from "../src/ui/copy";
-import { colour, oxygenFile, snapshot } from "./fixture";
+import { colour, zoblocksFile, snapshot } from "./fixture";
 
-const OXYGEN = "Oxygen / Semantic";
+const ZOBLOCKS = "Zoblocks / Semantic";
 
 let root: HTMLElement;
 
@@ -26,8 +26,8 @@ beforeEach(() => {
 });
 
 const failing = (): GateReport =>
-  runGate(oxygenFile({ "--ox-text-muted": "#a8b0bb" }), {
-    collection: OXYGEN,
+  runGate(zoblocksFile({ "--zb-text-muted": "#a8b0bb" }), {
+    collection: ZOBLOCKS,
     figmaMode: "light",
   });
 
@@ -40,13 +40,13 @@ describe("the summary", () => {
   });
 
   it("says everything passed when everything passed", () => {
-    renderReport(root, runGate(oxygenFile(), { collection: OXYGEN, figmaMode: "light" }));
+    renderReport(root, runGate(zoblocksFile(), { collection: ZOBLOCKS, figmaMode: "light" }));
     expect(root.querySelector(".count")!.textContent).toMatch(/^All \d+ pairs pass$/);
     expect(root.querySelector(".summary")!.getAttribute("data-state")).toBe("pass");
   });
 
   it("states which reading it gave", () => {
-    renderReport(root, runGate(oxygenFile(), { collection: OXYGEN, figmaMode: "light" }));
+    renderReport(root, runGate(zoblocksFile(), { collection: ZOBLOCKS, figmaMode: "light" }));
     expect(text()).toContain("the same list the build and the publish gate enforce");
 
     const palette = runGate(
@@ -60,11 +60,14 @@ describe("the summary", () => {
     // A passing palette measurement is not the same claim as a passing theme,
     // and a designer who does not know which they got will read it as the
     // stronger one.
-    expect(text()).toContain("No Oxygen tokens here");
+    expect(text()).toContain("No Zoblocks tokens here");
   });
 
   it("names the mode and the floors applied", () => {
-    renderReport(root, runGate(oxygenFile({}, "dark"), { collection: OXYGEN, figmaMode: "dark" }));
+    renderReport(
+      root,
+      runGate(zoblocksFile({}, "dark"), { collection: ZOBLOCKS, figmaMode: "dark" }),
+    );
     expect(root.querySelector(".where")!.textContent).toContain("dark");
   });
 });
@@ -177,8 +180,8 @@ describe("what the panel refuses to hide", () => {
   it("reports hue separation in the validator's own words", () => {
     renderReport(
       root,
-      runGate(oxygenFile({ "--ox-status-high": "#8a1c22", "--ox-status-low": "#a02216" }), {
-        collection: OXYGEN,
+      runGate(zoblocksFile({ "--zb-status-high": "#8a1c22", "--zb-status-low": "#a02216" }), {
+        collection: ZOBLOCKS,
         figmaMode: "light",
       }),
     );
@@ -189,8 +192,8 @@ describe("what the panel refuses to hide", () => {
 
   it("lists pairs it could not measure, and says they are not passes", () => {
     const report = runGate(
-      snapshot([colour("text", "#16181d", { token: "--ox-text", collection: OXYGEN })]),
-      { collection: OXYGEN, figmaMode: "light" },
+      snapshot([colour("text", "#16181d", { token: "--zb-text", collection: ZOBLOCKS })]),
+      { collection: ZOBLOCKS, figmaMode: "light" },
     );
     renderReport(root, report);
     expect(text()).toContain("Not in this collection");
@@ -205,7 +208,7 @@ describe("what the panel refuses to hide", () => {
 
   it("clears the previous report before drawing the next", () => {
     renderReport(root, failing());
-    renderReport(root, runGate(oxygenFile(), { collection: OXYGEN, figmaMode: "light" }));
+    renderReport(root, runGate(zoblocksFile(), { collection: ZOBLOCKS, figmaMode: "light" }));
     expect(root.querySelectorAll(".summary")).toHaveLength(1);
     expect(text()).not.toContain("pairs fail");
   });
@@ -217,8 +220,8 @@ describe("the rows with nothing to offer", () => {
     // axis `nearestPassing` moves along, so there is genuinely nothing to
     // suggest. Saying nothing would read as "no fix needed".
     const report: GateReport = {
-      mode: "oxygen",
-      collection: "Oxygen / Semantic",
+      mode: "zoblocks",
+      collection: "Zoblocks / Semantic",
       figmaMode: "light",
       theme: "light",
       findings: [],
@@ -249,13 +252,13 @@ describe("the rows with nothing to offer", () => {
       root,
       runGate(
         snapshot([
-          ...oxygenFile().variables,
-          colour("Scratch pink", "#ff00ff", { collection: OXYGEN }),
+          ...zoblocksFile().variables,
+          colour("Scratch pink", "#ff00ff", { collection: ZOBLOCKS }),
         ]),
-        { collection: OXYGEN, figmaMode: "light" },
+        { collection: ZOBLOCKS, figmaMode: "light" },
       ),
     );
-    expect(text()).toContain("Not Oxygen tokens (1)");
+    expect(text()).toContain("Not Zoblocks tokens (1)");
     expect(text()).toContain("They are left alone");
   });
 
@@ -272,7 +275,7 @@ describe("the rows with nothing to offer", () => {
         { collection: "Swatches", figmaMode: "light" },
       ),
     );
-    expect(text()).not.toContain("Not Oxygen tokens");
+    expect(text()).not.toContain("Not Zoblocks tokens");
   });
 });
 

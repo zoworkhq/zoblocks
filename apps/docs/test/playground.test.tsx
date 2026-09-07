@@ -24,7 +24,7 @@ import { render, cleanup, act } from "@testing-library/react";
 import { CATALOG } from "@/lib/generated/catalog";
 import { Playground } from "@/components/site/playground";
 import { PLAYGROUND_COMPONENTS } from "@/components/site/playground-registry";
-import type { Control } from "@oxygenui-design/component-meta";
+import type { Control } from "@zoblocks/component-meta";
 
 /**
  * The invariant is not "nothing throws".
@@ -73,7 +73,7 @@ function settings(control: Control): unknown[] {
 
 /** What the reader is left looking at. */
 function outcome(container: HTMLElement): "component" | "explained" | "blank" {
-  if (container.querySelector("[data-ox-tab], [data-ox-signature], [role='radiogroup'], nav")) {
+  if (container.querySelector("[data-zb-tab], [data-zb-signature], [role='radiogroup'], nav")) {
     return "component";
   }
   const status = container.querySelector("[role='status']");

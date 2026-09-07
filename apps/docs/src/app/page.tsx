@@ -21,7 +21,7 @@ import { TelemetryTrace } from "@/components/site/telemetry-trace";
  */
 export const metadata: Metadata = {
   title: {
-    absolute: "Oxygen UI — React healthcare components typed to FHIR",
+    absolute: "Zoblocks — React healthcare components typed to FHIR",
   },
   alternates: { canonical: "/" },
 };
@@ -70,7 +70,7 @@ function Hero() {
         >
           <span className="numeric">OX / 01</span>
           <span className="hidden sm:inline">Healthcare data systems · FHIR-native</span>
-          <span className="text-oxygen-deep">
+          <span className="text-brand-deep">
             Build on meaning <ArrowRight aria-hidden="true" className="inline size-3" />
           </span>
         </div>
@@ -78,7 +78,7 @@ function Hero() {
         <div className="grid gap-12 pt-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-center lg:gap-14 lg:pt-16">
           <div className="min-w-0">
             <p
-              className="eyebrow eyebrow-rule enter text-oxygen-deep"
+              className="eyebrow eyebrow-rule enter text-brand-deep"
               style={{ "--enter-delay": "90ms" } as React.CSSProperties}
             >
               FHIR R4 · source-first · MIT core
@@ -130,14 +130,14 @@ function Hero() {
                 Side by side, the command and the button split a 490px column
                 and the command's own box came out at 281px — its code area
                 138px against the 344px the line actually needs. The hero's
-                primary proof read "npx @oxygenui-des…" with the rest behind a
+                primary proof read "npx @zoblocks/cli…" with the rest behind a
                 scrollbar. Its own row gives it the full column.
               */
               className="enter mt-8 flex max-w-2xl flex-col items-start gap-3"
               style={{ "--enter-delay": "390ms" } as React.CSSProperties}
             >
               <InstallCommand
-                command="npx @oxygenui-design/cli add pulse-loader"
+                command="npx @zoblocks/cli add pulse-loader"
                 className="min-w-0 flex-1"
               />
               <Link
@@ -174,7 +174,7 @@ function Hero() {
                 { label: "No runtime deps", icon: Activity },
               ].map(({ label, icon: Icon }) => (
                 <span key={label} className="inline-flex items-center gap-1.5">
-                  <Icon aria-hidden="true" className="size-3.5 text-oxygen-deep" />
+                  <Icon aria-hidden="true" className="size-3.5 text-brand-deep" />
                   {label}
                 </span>
               ))}
@@ -237,7 +237,7 @@ function SignalField() {
 
       <div className="signal-field__stage" aria-hidden="true">
         <div className="signal-core">
-          <span className="signal-core__mark">O₂</span>
+          <span className="signal-core__mark">ZB</span>
           <span className="signal-core__label">FHIR → UI</span>
         </div>
 
@@ -352,7 +352,7 @@ function StatesArgument() {
               </div>
 
               <div className="state-fact__reading">
-                <div className="state-fact__number display-lg text-oxygen-deep">
+                <div className="state-fact__number display-lg text-brand-deep">
                   <Counter to={fact.value} suffix={fact.suffix} />
                 </div>
                 <span className="state-fact__unit numeric">{fact.unit}</span>
@@ -443,7 +443,7 @@ function DataGridSection() {
           </p>
           <Link
             href="/components/data-grid"
-            className="group inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-oxygen-deep"
+            className="group inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-brand-deep"
           >
             All {DATA_GRID_STATES} states
             <ArrowRight
@@ -476,7 +476,7 @@ const QUALITY = [
   },
   {
     title: "What this is not",
-    body: "Oxygen is not a compliance boundary. It does not make an application HIPAA, GDPR, or DPDP compliant, and it is not a medical device. It is well-built UI; the clinical and regulatory obligations remain yours.",
+    body: "Zoblocks is not a compliance boundary. It does not make an application HIPAA, GDPR, or DPDP compliant, and it is not a medical device. It is well-built UI; the clinical and regulatory obligations remain yours.",
   },
 ];
 
@@ -535,10 +535,10 @@ function ClosingCta() {
             </p>
             <div className="mx-auto mt-8 max-w-xl">
               <InstallCommand
-                command="npx @oxygenui-design/cli add pulse-loader"
+                command="npx @zoblocks/cli add pulse-loader"
                 note={
                   <>
-                    Run <code className="font-mono text-[0.6875rem] text-ink">oxygen init</code>{" "}
+                    Run <code className="font-mono text-[0.6875rem] text-ink">zoblocks init</code>{" "}
                     once to say where your{" "}
                     <code className="font-mono text-[0.6875rem] text-ink">@/</code> alias points.
                     The public catalogue needs no configuration and no account — paid components add

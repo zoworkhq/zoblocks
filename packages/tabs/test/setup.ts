@@ -93,4 +93,4 @@ globalThis.requestAnimationFrame = ((callback: FrameRequestCallback) => {
 globalThis.cancelAnimationFrame = ((id: number) => clearTimeout(id)) as typeof cancelAnimationFrame;
 
 // Kept so a test that genuinely wants the real thing can restore it.
-(globalThis as { __oxOriginalRaf?: typeof requestAnimationFrame }).__oxOriginalRaf = originalRaf;
+(globalThis as { __zbOriginalRaf?: typeof requestAnimationFrame }).__zbOriginalRaf = originalRaf;

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { THEME_NAMES, type ThemeName } from "@oxygenui-design/theme";
+import { THEME_NAMES, type ThemeName } from "@zoblocks/theme";
 import { requireMember } from "@/lib/auth";
 import { scoped } from "@/db/scope";
 import { baseTokens } from "@/lib/base-tokens";

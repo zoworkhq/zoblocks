@@ -3,22 +3,22 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { floorFor, floorForPair } from "@oxygenui-design/tokens/validate";
+import { floorFor, floorForPair } from "@zoblocks/tokens/validate";
 
 import { gateModeFor, runGate, themeFromModeName, type PairReading } from "../src/gate";
-import { colour, oxygenFile, snapshot, PASSING } from "./fixture";
+import { colour, zoblocksFile, snapshot, PASSING } from "./fixture";
 
-const OXYGEN = "Oxygen / Semantic";
+const ZOBLOCKS = "Zoblocks / Semantic";
 
 const find = (readings: PairReading[], fg: string, bg: string) =>
   readings.find((r) => r.fg === fg && r.bg === bg);
 
 describe("gateModeFor", () => {
   it("reads a stamped collection against the real pair list", () => {
-    expect(gateModeFor(oxygenFile(), OXYGEN)).toBe("oxygen");
+    expect(gateModeFor(zoblocksFile(), ZOBLOCKS)).toBe("zoblocks");
   });
 
-  it("falls back to a palette reading when nothing carries an Oxygen token", () => {
+  it("falls back to a palette reading when nothing carries a Zoblocks token", () => {
     const file = snapshot([
       colour("Ink", "#101010", { collection: "Swatches" }),
       colour("Paper", "#fefefe", { collection: "Swatches" }),
@@ -28,25 +28,25 @@ describe("gateModeFor", () => {
 
   it("decides per collection, not per file", () => {
     const file = snapshot([
-      ...oxygenFile().variables,
+      ...zoblocksFile().variables,
       colour("Ink", "#101010", { collection: "Swatches" }),
     ]);
-    expect(gateModeFor(file, OXYGEN)).toBe("oxygen");
+    expect(gateModeFor(file, ZOBLOCKS)).toBe("zoblocks");
     expect(gateModeFor(file, "Swatches")).toBe("palette");
   });
 });
 
-describe("the Oxygen reading", () => {
+describe("the Zoblocks reading", () => {
   it("passes a palette that passes", () => {
-    const report = runGate(oxygenFile(), { collection: OXYGEN, figmaMode: "light" });
-    expect(report.mode).toBe("oxygen");
+    const report = runGate(zoblocksFile(), { collection: ZOBLOCKS, figmaMode: "light" });
+    expect(report.mode).toBe("zoblocks");
     expect(report.readings.filter((r) => !r.passes)).toEqual([]);
     expect(report.missing).toEqual([]);
   });
 
   it("names a failing pair with the floor its own rule imposes", () => {
-    const report = runGate(oxygenFile({ "--ox-text-muted": "#a8b0bb" }), {
-      collection: OXYGEN,
+    const report = runGate(zoblocksFile({ "--zb-text-muted": "#a8b0bb" }), {
+      collection: ZOBLOCKS,
       figmaMode: "light",
     });
 
@@ -58,7 +58,7 @@ describe("the Oxygen reading", () => {
   });
 
   it("holds an interface component to 3:1, not to 4.5:1", () => {
-    const report = runGate(oxygenFile(), { collection: OXYGEN, figmaMode: "light" });
+    const report = runGate(zoblocksFile(), { collection: ZOBLOCKS, figmaMode: "light" });
     const ring = find(report.readings, "focus-ring", "bg");
     expect(ring!.kind).toBe("ui");
     expect(ring!.floor).toBe(3);
@@ -66,8 +66,8 @@ describe("the Oxygen reading", () => {
   });
 
   it("raises the floor for a high-contrast mode", () => {
-    const file = oxygenFile({}, "high-contrast");
-    const report = runGate(file, { collection: OXYGEN, figmaMode: "high-contrast" });
+    const file = zoblocksFile({}, "high-contrast");
+    const report = runGate(file, { collection: ZOBLOCKS, figmaMode: "high-contrast" });
     const text = find(report.readings, "text", "bg");
     expect(report.theme).toBe("high-contrast");
     expect(text!.floor).toBe(floorFor("high-contrast"));
@@ -75,8 +75,8 @@ describe("the Oxygen reading", () => {
   });
 
   it("offers a shade of the same colour that clears the floor", () => {
-    const report = runGate(oxygenFile({ "--ox-text-muted": "#a8b0bb" }), {
-      collection: OXYGEN,
+    const report = runGate(zoblocksFile({ "--zb-text-muted": "#a8b0bb" }), {
+      collection: ZOBLOCKS,
       figmaMode: "light",
     });
     const reading = find(report.readings, "text-muted", "bg")!;
@@ -84,8 +84,8 @@ describe("the Oxygen reading", () => {
 
     // The suggestion has to actually pass, or it is a worse colour offered with
     // more confidence than the one it replaces.
-    const check = runGate(oxygenFile({ "--ox-text-muted": reading.suggestion! }), {
-      collection: OXYGEN,
+    const check = runGate(zoblocksFile({ "--zb-text-muted": reading.suggestion! }), {
+      collection: ZOBLOCKS,
       figmaMode: "light",
     });
     expect(find(check.readings, "text-muted", "bg")!.passes).toBe(true);
@@ -94,9 +94,9 @@ describe("the Oxygen reading", () => {
   it("says so when no shade of a colour can clear the floor", () => {
     // White text on white: every shade of white is white.
     const report = runGate(
-      oxygenFile({ "--ox-text-on-accent": "#ffffff", "--ox-accent": "#ffffff" }),
+      zoblocksFile({ "--zb-text-on-accent": "#ffffff", "--zb-accent": "#ffffff" }),
       {
-        collection: OXYGEN,
+        collection: ZOBLOCKS,
         figmaMode: "light",
       },
     );
@@ -110,14 +110,14 @@ describe("the Oxygen reading", () => {
 
   it("lists a pair it could not measure rather than passing it", () => {
     const partial = { ...PASSING };
-    delete partial["--ox-focus-ring"];
+    delete partial["--zb-focus-ring"];
     const file = snapshot(
       Object.entries(partial).map(([token, hex]) =>
-        colour(token.replace("--ox-", ""), hex, { token, collection: OXYGEN }),
+        colour(token.replace("--zb-", ""), hex, { token, collection: ZOBLOCKS }),
       ),
     );
 
-    const report = runGate(file, { collection: OXYGEN, figmaMode: "light" });
+    const report = runGate(file, { collection: ZOBLOCKS, figmaMode: "light" });
     expect(report.missing).toContain("focus-ring on bg");
     expect(find(report.readings, "focus-ring", "bg")).toBeUndefined();
   });
@@ -126,8 +126,8 @@ describe("the Oxygen reading", () => {
     // Two reds: both clear 4.5:1 on their own grounds and are indistinguishable
     // to a reader with deuteranopia. Contrast alone cannot catch this.
     const report = runGate(
-      oxygenFile({ "--ox-status-high": "#8a1c22", "--ox-status-low": "#a02216" }),
-      { collection: OXYGEN, figmaMode: "light" },
+      zoblocksFile({ "--zb-status-high": "#8a1c22", "--zb-status-low": "#a02216" }),
+      { collection: ZOBLOCKS, figmaMode: "light" },
     );
     expect(report.findings).toHaveLength(1);
     expect(report.findings[0]!.message).toContain("apart in hue");
@@ -135,27 +135,29 @@ describe("the Oxygen reading", () => {
   });
 
   it("finds no hue problem in the shipped palette", () => {
-    expect(runGate(oxygenFile(), { collection: OXYGEN, figmaMode: "light" }).findings).toEqual([]);
+    expect(runGate(zoblocksFile(), { collection: ZOBLOCKS, figmaMode: "light" }).findings).toEqual(
+      [],
+    );
   });
 
   it("keys on the stamp, not on the label a designer owns", () => {
     const renamed = snapshot(
       Object.entries(PASSING).map(([token, hex]) =>
-        colour(`Brand ${token}`, hex, { token, collection: OXYGEN }),
+        colour(`Brand ${token}`, hex, { token, collection: ZOBLOCKS }),
       ),
     );
-    const report = runGate(renamed, { collection: OXYGEN, figmaMode: "light" });
+    const report = runGate(renamed, { collection: ZOBLOCKS, figmaMode: "light" });
     expect(report.readings.length).toBeGreaterThan(0);
     expect(report.missing).toEqual([]);
   });
 
   it("ignores a collection the designer did not ask about", () => {
     const file = snapshot([
-      ...oxygenFile().variables,
-      colour("Ink", "#000000", { token: "--ox-text", collection: "Other" }),
+      ...zoblocksFile().variables,
+      colour("Ink", "#000000", { token: "--zb-text", collection: "Other" }),
     ]);
-    const report = runGate(file, { collection: OXYGEN, figmaMode: "light" });
-    expect(find(report.readings, "text", "bg")!.fgValue).toBe(PASSING["--ox-text"]);
+    const report = runGate(file, { collection: ZOBLOCKS, figmaMode: "light" });
+    expect(find(report.readings, "text", "bg")!.fgValue).toBe(PASSING["--zb-text"]);
   });
 });
 
@@ -219,49 +221,49 @@ describe("the palette reading", () => {
 describe("what a reading skips", () => {
   it("does not measure an alias, which holds no value of its own", () => {
     const file = snapshot([
-      colour("text", "#16181d", { token: "--ox-text", collection: OXYGEN }),
+      colour("text", "#16181d", { token: "--zb-text", collection: ZOBLOCKS }),
       {
-        token: "--ox-bg",
+        token: "--zb-bg",
         name: "bg",
-        collection: OXYGEN,
+        collection: ZOBLOCKS,
         // Points at the brand tier. Following it would report a ratio for a
         // colour this variable does not hold, and would measure the same
         // colour twice under two names.
-        values: { light: { kind: "alias", token: "--ox-ref-brand-50" } },
+        values: { light: { kind: "alias", token: "--zb-ref-brand-50" } },
       },
     ]);
 
-    const report = runGate(file, { collection: OXYGEN, figmaMode: "light" });
+    const report = runGate(file, { collection: ZOBLOCKS, figmaMode: "light" });
     expect(report.missing).toContain("text on bg");
   });
 
   it("names the unstamped variables it left alone", () => {
     const file = snapshot([
-      ...oxygenFile().variables,
-      colour("Scratch pink", "#ff00ff", { collection: OXYGEN }),
+      ...zoblocksFile().variables,
+      colour("Scratch pink", "#ff00ff", { collection: ZOBLOCKS }),
     ]);
 
-    const report = runGate(file, { collection: OXYGEN, figmaMode: "light" });
+    const report = runGate(file, { collection: ZOBLOCKS, figmaMode: "light" });
     expect(report.unstamped).toEqual(["Scratch pink"]);
-    // Listed, not measured: a swatch with no Oxygen identity is somebody's own.
+    // Listed, not measured: a swatch with no Zoblocks identity is somebody's own.
     expect(report.readings.some((r) => r.fg === "Scratch pink")).toBe(false);
   });
 
   it("reads the mode asked for, not whichever came first", () => {
     const file = snapshot([
       {
-        token: "--ox-text",
+        token: "--zb-text",
         name: "text",
-        collection: OXYGEN,
+        collection: ZOBLOCKS,
         values: {
           light: { kind: "color", hex: "#16181d", rgb: { r: 0.086, g: 0.094, b: 0.114 } },
           dark: { kind: "color", hex: "#e8ecf1", rgb: { r: 0.91, g: 0.925, b: 0.945 } },
         },
       },
       {
-        token: "--ox-bg",
+        token: "--zb-bg",
         name: "bg",
-        collection: OXYGEN,
+        collection: ZOBLOCKS,
         values: {
           light: { kind: "color", hex: "#ffffff", rgb: { r: 1, g: 1, b: 1 } },
           dark: { kind: "color", hex: "#0e1116", rgb: { r: 0.055, g: 0.067, b: 0.086 } },
@@ -269,7 +271,7 @@ describe("what a reading skips", () => {
       },
     ]);
 
-    const dark = runGate(file, { collection: OXYGEN, figmaMode: "dark" });
+    const dark = runGate(file, { collection: ZOBLOCKS, figmaMode: "dark" });
     const reading = dark.readings.find((r) => r.fg === "text" && r.bg === "bg")!;
     // Measuring light's values under dark's floors is the quiet way a theme
     // passes a check it never took.
@@ -301,15 +303,15 @@ describe("colours the gate cannot measure", () => {
     // the panel prints "NaN:1" and the comparison silently passes.
     const file = snapshot([
       {
-        token: "--ox-text",
+        token: "--zb-text",
         name: "text",
-        collection: OXYGEN,
+        collection: ZOBLOCKS,
         values: { light: { kind: "color", hex: "not-a-colour", rgb: { r: 0, g: 0, b: 0 } } },
       },
-      colour("bg", "#ffffff", { token: "--ox-bg", collection: OXYGEN }),
+      colour("bg", "#ffffff", { token: "--zb-bg", collection: ZOBLOCKS }),
     ]);
 
-    const reading = runGate(file, { collection: OXYGEN, figmaMode: "light" }).readings.find(
+    const reading = runGate(file, { collection: ZOBLOCKS, figmaMode: "light" }).readings.find(
       (r) => r.fg === "text" && r.bg === "bg",
     )!;
     expect(Number.isFinite(reading.ratio)).toBe(true);
@@ -323,8 +325,8 @@ describe("colours the gate cannot measure", () => {
      * the unparseable value is the subject.
      */
     const file = snapshot(
-      oxygenFile().variables.map((v) =>
-        v.token === "--ox-status-high"
+      zoblocksFile().variables.map((v) =>
+        v.token === "--zb-status-high"
           ? {
               ...v,
               values: {
@@ -337,7 +339,7 @@ describe("colours the gate cannot measure", () => {
 
     // Better to say nothing about hue than to report a separation computed from
     // a colour nobody can read.
-    expect(runGate(file, { collection: OXYGEN, figmaMode: "light" }).findings).toEqual([]);
+    expect(runGate(file, { collection: ZOBLOCKS, figmaMode: "light" }).findings).toEqual([]);
   });
 
   it("ignores a colour it cannot parse when choosing a default ground", () => {
@@ -356,8 +358,8 @@ describe("colours the gate cannot measure", () => {
   });
 
   it("holds a status pair to 7:1 in high contrast, as `floorFor` does", () => {
-    const report = runGate(oxygenFile({}, "high-contrast"), {
-      collection: OXYGEN,
+    const report = runGate(zoblocksFile({}, "high-contrast"), {
+      collection: ZOBLOCKS,
       figmaMode: "high-contrast",
     });
     const status = report.readings.find((r) => r.fg === "status.critical")!;
@@ -368,18 +370,18 @@ describe("colours the gate cannot measure", () => {
   it("prefers a named mode over the default when a variable carries both", () => {
     const file = snapshot([
       {
-        token: "--ox-text",
+        token: "--zb-text",
         name: "text",
-        collection: OXYGEN,
+        collection: ZOBLOCKS,
         values: {
           default: { kind: "color", hex: "#888888", rgb: { r: 0.53, g: 0.53, b: 0.53 } },
           light: { kind: "color", hex: "#16181d", rgb: { r: 0.086, g: 0.094, b: 0.114 } },
         },
       },
-      colour("bg", "#ffffff", { token: "--ox-bg", collection: OXYGEN }),
+      colour("bg", "#ffffff", { token: "--zb-bg", collection: ZOBLOCKS }),
     ]);
 
-    const reading = runGate(file, { collection: OXYGEN, figmaMode: "light" }).readings.find(
+    const reading = runGate(file, { collection: ZOBLOCKS, figmaMode: "light" }).readings.find(
       (r) => r.fg === "text",
     )!;
     // Falling back to `default` when a named mode exists would measure a colour

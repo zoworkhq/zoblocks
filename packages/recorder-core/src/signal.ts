@@ -111,7 +111,7 @@ export function toDbfs(level: number): number {
 /**
  * A gate that opens `hz` times a second, fed the same deltas as the loop.
  *
- * This is how `ox-recorder-level` gets throttled to 10 Hz without a timer of
+ * This is how `zb-recorder-level` gets throttled to 10 Hz without a timer of
  * its own — the throttle is driven by the same clock as everything else, so a
  * paused loop emits nothing rather than continuing to fire.
  */

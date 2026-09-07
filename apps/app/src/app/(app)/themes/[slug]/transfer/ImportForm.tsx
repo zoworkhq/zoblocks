@@ -64,7 +64,7 @@ export function ImportForm({ themeId }: { themeId: string }) {
               }}
               className={cn(
                 "rounded-lg border border-dashed transition-colors duration-200",
-                over ? "border-oxygen bg-accent-wash" : "border-transparent",
+                over ? "border-brand bg-accent-wash" : "border-transparent",
               )}
             >
               <Textarea

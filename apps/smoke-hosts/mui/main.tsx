@@ -8,10 +8,10 @@
 
 import { createRoot } from "react-dom/client";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { MuiBridge } from "@oxygenui-design/bridge-mui";
+import { MuiBridge } from "@zoblocks/bridge-mui";
 import { Application } from "../shared/Application";
-import "@oxygenui-design/tokens/oxygen-tokens.css";
-import "@oxygenui-design/react/styles.css";
+import "@zoblocks/tokens/zoblocks-tokens.css";
+import "@zoblocks/react/styles.css";
 import "../shared/page.css";
 
 const theme = createTheme({

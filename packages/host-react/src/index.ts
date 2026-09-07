@@ -1,15 +1,15 @@
 /**
- * @oxygenui-design/host-react — the chrome around a clinical component,
+ * @zoblocks/host-react — the chrome around a clinical component,
  * resolved from whichever UI framework the host application runs.
  *
- *     pnpm add @oxygenui-design/host-react
+ *     pnpm add @zoblocks/host-react
  *
- * The root entry carries the contract, the context and the Oxygen
+ * The root entry carries the contract, the context and the Zoblocks
  * implementation, and imports no UI framework. The two framework hosts are
  * behind subpath exports:
  *
- *     import { AntdHost } from "@oxygenui-design/host-react/antd";
- *     import { MuiHost }  from "@oxygenui-design/host-react/mui";
+ *     import { AntdHost } from "@zoblocks/host-react/antd";
+ *     import { MuiHost }  from "@zoblocks/host-react/mui";
  *
  * so a consumer resolves antd or MUI only by mounting one — and, in an app
  * that code-splits, downloads it only then. Measured: antd's seven components
@@ -17,7 +17,7 @@
  * the split is structural rather than an optimisation.
  *
  * **This package must never be imported by a component.** ADR 0010 keeps
- * Oxygen's primitives free of any framework dependency, and that survives only
+ * Zoblocks's primitives free of any framework dependency, and that survives only
  * while `host-react` stays at the composition layer. A dependency-cruiser rule
  * enforces it; see `.dependency-cruiser.cjs`.
  */
@@ -40,4 +40,4 @@ export {
 } from "./contract";
 
 export { HostPrimitivesProvider, useHost, useHostId } from "./context";
-export { OxygenHost, oxygenPrimitives } from "./oxygen";
+export { ZoblocksHost, zoblocksPrimitives } from "./zoblocks";

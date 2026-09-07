@@ -1,5 +1,5 @@
 /**
- * OxLoaderElement — everything the five loader elements share.
+ * ZbLoaderElement — everything the five loader elements share.
  *
  * A subclass supplies its tag name and its art; this supplies the shadow root,
  * the attribute contract, the accessibility semantics, and the timing gate.
@@ -33,13 +33,13 @@ export type LoaderAnnounce = "polite" | "assertive" | "off";
  *
  * Hyphens, not colons, and that is not a style preference.
  *
- * These were `ox-loader:show` / `:slow` / `:hide` until apps/smoke tried to
+ * These were `zb-loader:show` / `:slow` / `:hide` until apps/smoke tried to
  * bind them in an Angular template. Angular reserves the colon in `(event)`
  * bindings for its *global target* syntax — `(window:resize)`, `(document:
- * click)` — so `(ox-loader:show)` is parsed as the event `show` on a target
- * named `ox-loader` and rejected at compile time:
+ * click)` — so `(zb-loader:show)` is parsed as the event `show` on a target
+ * named `zb-loader` and rejected at compile time:
  *
- *     Unexpected global target 'ox-loader' defined for 'show' event.
+ *     Unexpected global target 'zb-loader' defined for 'show' event.
  *     Supported list of global targets: window,document,body.
  *
  * There is no escape syntax. An Angular consumer would have had to drop to
@@ -51,7 +51,7 @@ export type LoaderAnnounce = "polite" | "assertive" | "off";
  * `packages/loaders/test/reflection.test.ts` fails on any event name
  * containing a colon, so this cannot come back by habit.
  */
-export const LOADER_EVENTS = ["ox-loader-show", "ox-loader-slow", "ox-loader-hide"] as const;
+export const LOADER_EVENTS = ["zb-loader-show", "zb-loader-slow", "zb-loader-hide"] as const;
 export type LoaderEvent = (typeof LOADER_EVENTS)[number];
 
 /** Attributes every loader observes. Subclasses append their own. */
@@ -129,7 +129,7 @@ export function resolveSize(raw: string | null, fallback: LoaderSize): number {
 const ElementBase: typeof HTMLElement =
   typeof HTMLElement === "undefined" ? (class {} as unknown as typeof HTMLElement) : HTMLElement;
 
-export abstract class OxLoaderElement extends ElementBase {
+export abstract class ZbLoaderElement extends ElementBase {
   static get observedAttributes(): string[] {
     return [...COMMON_ATTRIBUTES];
   }
@@ -137,7 +137,7 @@ export abstract class OxLoaderElement extends ElementBase {
   /** Default size step when none is given. */
   protected defaultSize: LoaderSize = "lg";
 
-  /** Name reported through `data-ox-loader`, for tests and host styling. */
+  /** Name reported through `data-zb-loader`, for tests and host styling. */
   protected abstract variant: string;
 
   /** The art, as an SVG string. Called on every render. */
@@ -146,9 +146,9 @@ export abstract class OxLoaderElement extends ElementBase {
   /** CSS custom properties the art needs, as [name, value] pairs. */
   protected vars(sizePx: number): Array<[string, string]> {
     return [
-      ["--ox-loader-size", `${sizePx}px`],
-      ["--ox-loader-cycle", `${cycleMs(4000, this.speed)}ms`],
-      ["--ox-loader-stroke", `${strokePx(sizePx)}px`],
+      ["--zb-loader-size", `${sizePx}px`],
+      ["--zb-loader-cycle", `${cycleMs(4000, this.speed)}ms`],
+      ["--zb-loader-stroke", `${strokePx(sizePx)}px`],
     ];
   }
 
@@ -160,7 +160,7 @@ export abstract class OxLoaderElement extends ElementBase {
    * True while the minimum on-screen time has not yet elapsed.
    *
    * A countdown rather than two clock readings, matching the React gate in
-   * registry/oxygen/lib/loader.tsx. Reading the wall clock to decide what to
+   * registry/zoblocks/lib/loader.tsx. Reading the wall clock to decide what to
    * render makes output depend on when it rendered, which is what makes a
    * visual-regression test flaky — and the two channels must agree exactly.
    */
@@ -189,7 +189,7 @@ export abstract class OxLoaderElement extends ElementBase {
    * test: `if (key in element)`. A getter with no setter passes that test and
    * then throws on assignment:
    *
-   *     TypeError: Cannot set property label of #<OxLoaderElement>
+   *     TypeError: Cannot set property label of #<ZbLoaderElement>
    *                which has only a getter
    *
    * which is what these elements did in React 19 and Vue 3 until
@@ -465,7 +465,7 @@ export abstract class OxLoaderElement extends ElementBase {
     }
 
     this.#render();
-    this.dispatchEvent(new CustomEvent("ox-loader-show", { bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent("zb-loader-show", { bubbles: true, composed: true }));
 
     const slowAfter = this.slowAfter;
     clearTimeout(this.#slowTimer);
@@ -473,7 +473,7 @@ export abstract class OxLoaderElement extends ElementBase {
       this.#slowTimer = setTimeout(() => {
         this.#slow = true;
         this.#render();
-        this.dispatchEvent(new CustomEvent("ox-loader-slow", { bubbles: true, composed: true }));
+        this.dispatchEvent(new CustomEvent("zb-loader-slow", { bubbles: true, composed: true }));
       }, slowAfter);
     }
   }
@@ -481,7 +481,7 @@ export abstract class OxLoaderElement extends ElementBase {
   #hide(): void {
     this.#visible = false;
     this.#applyVisibility();
-    this.dispatchEvent(new CustomEvent("ox-loader-hide", { bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent("zb-loader-hide", { bubbles: true, composed: true }));
   }
 
   #applyVisibility(): void {
@@ -533,8 +533,8 @@ export abstract class OxLoaderElement extends ElementBase {
 
     const progress = this.progress;
     const determinate = progress !== null;
-    this.setAttribute("data-ox-loader", this.variant);
-    this.setAttribute("data-ox-determinate", String(determinate));
+    this.setAttribute("data-zb-loader", this.variant);
+    this.setAttribute("data-zb-determinate", String(determinate));
 
     // Roles live on the host so the application's own queries can see them.
     if (determinate) {
@@ -587,8 +587,8 @@ export abstract class OxLoaderElement extends ElementBase {
 /**
  * Register an element, tolerating a second import of the same module.
  *
- * A page that imports both `@oxygenui-design/loaders` and
- * `@oxygenui-design/loaders/pulse` would otherwise throw on the duplicate
+ * A page that imports both `@zoblocks/loaders` and
+ * `@zoblocks/loaders/pulse` would otherwise throw on the duplicate
  * definition and take the host application down with it — over a loader.
  */
 export function define(tag: string, constructor: CustomElementConstructor): void {

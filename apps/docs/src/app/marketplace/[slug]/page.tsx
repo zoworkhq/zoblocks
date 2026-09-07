@@ -75,7 +75,7 @@ export default async function MarketplaceItemPage({
               Marketplace
             </Link>
 
-            <p className="eyebrow eyebrow-rule mt-8 text-oxygen-deep" data-reveal>
+            <p className="eyebrow eyebrow-rule mt-8 text-brand-deep" data-reveal>
               {KIND_LABEL[item.kind]}
             </p>
             <h1 className="display-xl mt-5 max-w-4xl text-balance" data-reveal>
@@ -138,7 +138,7 @@ export default async function MarketplaceItemPage({
               */}
               <Link
                 href="/marketplace"
-                className="inline-flex items-center gap-2 rounded-xl border border-rule px-5 py-3.5 text-sm font-medium text-ink transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:border-oxygen/40"
+                className="inline-flex items-center gap-2 rounded-xl border border-rule px-5 py-3.5 text-sm font-medium text-ink transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:border-brand/40"
               >
                 See the whole shelf
               </Link>
@@ -271,7 +271,7 @@ function Fact({ tone, children }: { tone: "pass" | "info"; children: React.React
         aria-hidden="true"
         className={
           tone === "pass"
-            ? "mt-0.5 size-4 shrink-0 text-oxygen-deep"
+            ? "mt-0.5 size-4 shrink-0 text-brand-deep"
             : "mt-0.5 size-4 shrink-0 text-graphite"
         }
       />

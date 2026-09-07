@@ -2,7 +2,7 @@
  * Reads the DTCG token source off disk.
  *
  * The *model* — types, constants, reference helpers, and the DTCG flattener —
- * now lives in `@oxygenui-design/tokens/validate`, because the theme app
+ * now lives in `@zoblocks/tokens/validate`, because the theme app
  * has to build a `TokenSource` from a payload a customer typed rather than
  * from files. This module is the filesystem half of that split and nothing
  * more.
@@ -25,7 +25,7 @@ import {
   type DtcgNode,
   type TokenMap,
   type TokenSource,
-} from "@oxygenui-design/tokens/validate";
+} from "@zoblocks/tokens/validate";
 
 export {
   DENSITIES,
@@ -35,7 +35,7 @@ export {
   referenceTarget,
   toCssValue,
   flattenDtcg,
-} from "@oxygenui-design/tokens/validate";
+} from "@zoblocks/tokens/validate";
 export type {
   Brand,
   DensityName,
@@ -44,7 +44,7 @@ export type {
   Token,
   TokenMap,
   TokenSource,
-} from "@oxygenui-design/tokens/validate";
+} from "@zoblocks/tokens/validate";
 
 export const TOKENS_DIR = path.join(ROOT, "packages", "tokens", "tokens");
 
@@ -82,7 +82,7 @@ async function loadBrands(): Promise<Brand[]> {
     const name = file.replace(/\.json$/, "");
     if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(name)) {
       throw new Error(
-        `brands/${file}: name must be kebab-case — it becomes the [data-ox-brand] value and a CSS attribute selector`,
+        `brands/${file}: name must be kebab-case — it becomes the [data-zb-brand] value and a CSS attribute selector`,
       );
     }
     const map = await load(path.join("brands", file));

@@ -27,8 +27,8 @@ export function renderReport(root: HTMLElement, report: GateReport): void {
   if (report.readings.length === 0) {
     root.append(
       note(
-        report.mode === "oxygen"
-          ? "This collection carries Oxygen tokens, but none of the pairs the gate checks resolved to a colour in this mode."
+        report.mode === "zoblocks"
+          ? "This collection carries Zoblocks tokens, but none of the pairs the gate checks resolved to a colour in this mode."
           : "No colour variables in this collection.",
       ),
     );
@@ -53,12 +53,12 @@ export function renderReport(root: HTMLElement, report: GateReport): void {
     );
   }
 
-  if (report.mode === "oxygen" && report.unstamped.length > 0) {
+  if (report.mode === "zoblocks" && report.unstamped.length > 0) {
     root.append(
       details(
-        `Not Oxygen tokens (${report.unstamped.length})`,
+        `Not Zoblocks tokens (${report.unstamped.length})`,
         report.unstamped,
-        "Variables in this collection with no Oxygen identity. They are left alone.",
+        "Variables in this collection with no Zoblocks identity. They are left alone.",
       ),
     );
   }
@@ -82,14 +82,14 @@ function summary(report: GateReport): HTMLElement {
   const where = document.createElement("p");
   where.className = "where";
   where.textContent =
-    report.mode === "oxygen"
+    report.mode === "zoblocks"
       ? `${report.collection} · mode “${report.figmaMode}” · held to the ${report.theme} floors`
       : `${report.collection} · mode “${report.figmaMode}” · measured against one ground`;
 
   /*
    * The panel says which reading it gave.
    *
-   * A designer who does not know their file carries no Oxygen stamps will read
+   * A designer who does not know their file carries no Zoblocks stamps will read
    * a palette measurement as the real gate, and a passing palette measurement
    * is not the same claim as a passing theme. Stating the mode is what keeps
    * the number honest.
@@ -97,9 +97,9 @@ function summary(report: GateReport): HTMLElement {
   const how = document.createElement("p");
   how.className = "how";
   how.textContent =
-    report.mode === "oxygen"
-      ? "Measured against Oxygen’s own pair list — the same list the build and the publish gate enforce."
-      : "No Oxygen tokens here, so the pairs are not known. Every colour is measured against the ground you choose.";
+    report.mode === "zoblocks"
+      ? "Measured against Zoblocks’s own pair list — the same list the build and the publish gate enforce."
+      : "No Zoblocks tokens here, so the pairs are not known. Every colour is measured against the ground you choose.";
 
   el.append(count, where, how);
   return el;

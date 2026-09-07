@@ -41,7 +41,7 @@ import {
   type Signer,
   type Stroke,
   type Subject,
-} from "@oxygenui-design/signature-core";
+} from "@zoblocks/signature-core";
 import { SignaturePad } from "./SignaturePad";
 import { OutcomeSheet } from "./OutcomeSheet";
 import { useLocale, type SignatureLocale } from "./locale";
@@ -126,7 +126,7 @@ export function SignatureModal({
 }: SignatureModalProps) {
   const t = useLocale(localeOverrides);
   const reactId = React.useId();
-  const base = `ox-sig-modal-${reactId.replace(/:/g, "")}`;
+  const base = `zb-sig-modal-${reactId.replace(/:/g, "")}`;
   const titleId = `${base}-title`;
   const tabsId = `${base}-tabs`;
 
@@ -607,7 +607,7 @@ function TypePane({
             </Button>
           ))}
         </div>
-        <div className="ox-signature__typed" data-style={style}>
+        <div className="zb-signature__typed" data-style={style}>
           {value || <span style={{ opacity: 0.3 }}>{t.typePlaceholder}</span>}
         </div>
       </div>

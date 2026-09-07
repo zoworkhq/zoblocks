@@ -1,8 +1,8 @@
 /**
- * @oxygenui-design/tabs — the tab system.
+ * @zoblocks/tabs — the tab system.
  *
- *     import { Tabs } from "@oxygenui-design/tabs";
- *     import "@oxygenui-design/tabs/styles.css";
+ *     import { Tabs } from "@zoblocks/tabs";
+ *     import "@zoblocks/tabs/styles.css";
  *
  *     <Tabs
  *       as="tabs"
@@ -22,7 +22,7 @@
  *               tree, the keyboard model and the event payload.
  *   `variant` — what it looks like. Eleven skins, all free to dress any mode.
  *
- * The engine underneath — `@oxygenui-design/tabs-core` — has no dependency on
+ * The engine underneath — `@zoblocks/tabs-core` — has no dependency on
  * React or antd, so a host on a different design system can take the keyboard
  * model and the ARIA contract without the skin.
  */
@@ -100,4 +100,4 @@ export {
   type Tone,
   type TransitionKind,
   type UrlAdapter,
-} from "@oxygenui-design/tabs-core";
+} from "@zoblocks/tabs-core";

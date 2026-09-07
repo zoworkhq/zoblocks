@@ -33,23 +33,23 @@ if (!uri) {
  * localhost guard has always been protecting a real database from, not the
  * content.
  *
- * `OXYGEN_PUBLISH=1` therefore does not merely lift the guard. It drops the
+ * `ZOBLOCKS_PUBLISH=1` therefore does not merely lift the guard. It drops the
  * clinical block entirely rather than writing a reviewer nobody can vouch for,
  * and it writes `stripePriceId: null`, which the checkout already treats as a
  * deliberate state — "sold as part of an engagement, ask for an invoice" —
  * rather than a fake id that would fail against Stripe at the till.
  */
-const PUBLISH = process.env.OXYGEN_PUBLISH === "1";
+const PUBLISH = process.env.ZOBLOCKS_PUBLISH === "1";
 
 if (!PUBLISH && !/localhost|127\.0\.0\.1/.test(uri)) {
   console.error("Refusing to seed anything that is not localhost.");
-  console.error("To publish the real content to a real database: OXYGEN_PUBLISH=1");
+  console.error("To publish the real content to a real database: ZOBLOCKS_PUBLISH=1");
   process.exit(1);
 }
 
 const client = new MongoClient(uri);
 await client.connect();
-const db = client.db(process.env.APP_DB_NAME || "oxygen_console");
+const db = client.db(process.env.APP_DB_NAME || "zoblocks_console");
 
 const { ensureIndexes } = await import("../src/db/collections.ts");
 await ensureIndexes(db);
@@ -122,7 +122,7 @@ async function upsertItem(rawItem, version) {
 
 /** Boilerplate every item carries, so the differences below are the content. */
 const licence = {
-  id: "oxygen-pack-1.0",
+  id: "zoblocks-pack-1.0",
   grant: "Perpetual, for every member of this organisation and every product it ships",
   derivatives: "permitted for the licensee's own products",
   resale: "prohibited, including inside a template or theme",
@@ -378,7 +378,7 @@ await upsertItem(
 );
 
 /* --------------------------------------------------------------------------
- * 4 · A paid component, installed by the Oxygen CLI.
+ * 4 · A paid component, installed by the Zoblocks CLI.
  * ----------------------------------------------------------------------- */
 await upsertItem(
   {
@@ -408,7 +408,7 @@ await upsertItem(
     registry: { dependencies: ["clsx", "tailwind-merge"] },
     files: [
       await file(
-        "components/oxygen/vitals-flowsheet.tsx",
+        "components/zoblocks/vitals-flowsheet.tsx",
         `/**
  * A vitals flowsheet.
  *

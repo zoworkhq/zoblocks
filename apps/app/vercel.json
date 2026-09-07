@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
   "installCommand": "pnpm install --frozen-lockfile",
-  "buildCommand": "pnpm -w exec turbo run build --filter='@oxygenui-design/app^...' && next build",
+  "buildCommand": "pnpm -w exec turbo run build --filter='@zoblocks/app^...' && next build",
 
   "regions": ["bom1"]
 }

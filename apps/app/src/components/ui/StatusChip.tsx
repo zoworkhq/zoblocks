@@ -35,7 +35,7 @@ export function StatusChip({
         tone === "pass" && "bg-pass-wash text-pass",
         tone === "fail" && "bg-fail-wash text-fail",
         tone === "warn" && "bg-warn-wash text-warn",
-        tone === "accent" && "bg-accent-wash text-oxygen-deep",
+        tone === "accent" && "bg-accent-wash text-brand-deep",
         tone === "locked" && "border border-rule bg-paper-sunk text-graphite-soft",
         className,
       )}

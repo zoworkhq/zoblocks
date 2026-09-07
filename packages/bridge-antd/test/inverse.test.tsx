@@ -1,12 +1,12 @@
 /**
- * An Oxygen brand pushed into Ant Design.
+ * A Zoblocks brand pushed into Ant Design.
  *
- * The forward bridge answers "make Oxygen look like our antd app". This
+ * The forward bridge answers "make Zoblocks look like our antd app". This
  * answers the one customers care about more: "we configured our brand — why do
  * our *own* buttons still look like antd's default blue?"
  *
  * Because it is the same correspondence read backwards, the round-trip test is
- * the one that keeps both honest: if `colorPrimary ↔ --ox-accent` is ever
+ * the one that keeps both honest: if `colorPrimary ↔ --zb-accent` is ever
  * wrong, it is wrong in both directions and this catches it.
  */
 
@@ -14,24 +14,24 @@ import * as React from "react";
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { theme as antdTheme, ConfigProvider } from "antd";
-import { resolvePatch, type OxygenTokens } from "@oxygenui-design/bridge-core";
-import { NOT_PUSHED_TO_ANTD, OxygenAntdProvider, antdBridge, toAntdTheme } from "../src/index";
+import { resolvePatch, type ZoblocksTokens } from "@zoblocks/bridge-core";
+import { NOT_PUSHED_TO_ANTD, ZoblocksAntdProvider, antdBridge, toAntdTheme } from "../src/index";
 
-const BRAND: OxygenTokens = {
-  "--ox-accent": "#1d63c9",
-  "--ox-accent-hover": "#1a53a8",
-  "--ox-text": "#0f172a",
-  "--ox-text-muted": "#475569",
-  "--ox-surface": "#ffffff",
-  "--ox-bg": "#f8fafc",
-  "--ox-border": "#e2e8f0",
-  "--ox-radius": "0.5rem",
-  "--ox-font-sans": "Georgia, serif",
-  "--ox-text-base": "0.875rem",
+const BRAND: ZoblocksTokens = {
+  "--zb-accent": "#1d63c9",
+  "--zb-accent-hover": "#1a53a8",
+  "--zb-text": "#0f172a",
+  "--zb-text-muted": "#475569",
+  "--zb-surface": "#ffffff",
+  "--zb-bg": "#f8fafc",
+  "--zb-border": "#e2e8f0",
+  "--zb-radius": "0.5rem",
+  "--zb-font-sans": "Georgia, serif",
+  "--zb-text-base": "0.875rem",
 };
 
 describe("toAntdTheme", () => {
-  it("puts the Oxygen accent on antd's primary", () => {
+  it("puts the Zoblocks accent on antd's primary", () => {
     const { token } = toAntdTheme(BRAND);
     expect(token?.colorPrimary).toBe("#1d63c9");
     expect(token?.colorPrimaryHover).toBe("#1a53a8");
@@ -45,7 +45,7 @@ describe("toAntdTheme", () => {
     expect(token?.colorBgLayout).toBe("#f8fafc");
   });
 
-  /** antd states radii and sizes as numbers of pixels; Oxygen uses rem. */
+  /** antd states radii and sizes as numbers of pixels; Zoblocks uses rem. */
   it("converts rem to the pixel numbers antd expects", () => {
     const { token } = toAntdTheme(BRAND);
     expect(token?.borderRadius).toBe(8);
@@ -57,7 +57,7 @@ describe("toAntdTheme", () => {
   });
 
   it("omits a token rather than writing an empty string", () => {
-    const { token } = toAntdTheme({ "--ox-accent": "" });
+    const { token } = toAntdTheme({ "--zb-accent": "" });
     expect("colorPrimary" in (token ?? {})).toBe(false);
   });
 
@@ -70,8 +70,8 @@ describe("toAntdTheme", () => {
   it("never pushes a clinical colour into a framework's semantics", () => {
     const { token } = toAntdTheme({
       ...BRAND,
-      "--ox-accent": "#1d63c9",
-    } as OxygenTokens);
+      "--zb-accent": "#1d63c9",
+    } as ZoblocksTokens);
 
     for (const forbidden of NOT_PUSHED_TO_ANTD) {
       expect(forbidden in (token ?? {}), forbidden).toBe(false);
@@ -90,14 +90,14 @@ describe("the two directions agree", () => {
     const back = resolvePatch(antdBridge, token ?? {});
 
     for (const key of [
-      "--ox-accent",
-      "--ox-accent-hover",
-      "--ox-text",
-      "--ox-text-muted",
-      "--ox-surface",
-      "--ox-bg",
-      "--ox-border",
-      "--ox-font-sans",
+      "--zb-accent",
+      "--zb-accent-hover",
+      "--zb-text",
+      "--zb-text-muted",
+      "--zb-surface",
+      "--zb-bg",
+      "--zb-border",
+      "--zb-font-sans",
     ] as const) {
       expect(back[key], key).toBe(BRAND[key]);
     }
@@ -107,23 +107,23 @@ describe("the two directions agree", () => {
     const { token } = toAntdTheme(BRAND);
     const back = resolvePatch(antdBridge, token ?? {});
     // 0.5rem → 8px → "8px". The unit changes, the size does not.
-    expect(back["--ox-radius"]).toBe("8px");
+    expect(back["--zb-radius"]).toBe("8px");
   });
 });
 
-describe("<OxygenAntdProvider>", () => {
+describe("<ZoblocksAntdProvider>", () => {
   function Probe() {
     const { token } = antdTheme.useToken();
     return <span data-testid="primary">{token.colorPrimary}</span>;
   }
 
   it("themes the host's own antd components", async () => {
-    document.documentElement.style.setProperty("--ox-accent", "#7c3aed");
+    document.documentElement.style.setProperty("--zb-accent", "#7c3aed");
 
     render(
-      <OxygenAntdProvider>
+      <ZoblocksAntdProvider>
         <Probe />
-      </OxygenAntdProvider>,
+      </ZoblocksAntdProvider>,
     );
 
     expect(await screen.findByText("#7c3aed")).toBeTruthy();
@@ -131,12 +131,12 @@ describe("<OxygenAntdProvider>", () => {
   });
 
   it("lets a host keep a deliberate exception", async () => {
-    document.documentElement.style.setProperty("--ox-accent", "#7c3aed");
+    document.documentElement.style.setProperty("--zb-accent", "#7c3aed");
 
     render(
-      <OxygenAntdProvider override={{ colorPrimary: "#b91c1c" }}>
+      <ZoblocksAntdProvider override={{ colorPrimary: "#b91c1c" }}>
         <Probe />
-      </OxygenAntdProvider>,
+      </ZoblocksAntdProvider>,
     );
 
     expect(await screen.findByText("#b91c1c")).toBeTruthy();
@@ -148,18 +148,18 @@ describe("<OxygenAntdProvider>", () => {
       const { token } = antdTheme.useToken();
       return <span data-testid="both">{`${token.colorPrimary}|${token.borderRadius}`}</span>;
     }
-    document.documentElement.style.setProperty("--ox-accent", "#7c3aed");
+    document.documentElement.style.setProperty("--zb-accent", "#7c3aed");
 
     render(
       <ConfigProvider theme={{ token: { borderRadius: 16 } }}>
-        <OxygenAntdProvider>
+        <ZoblocksAntdProvider>
           <SizeProbe />
-        </OxygenAntdProvider>
+        </ZoblocksAntdProvider>
       </ConfigProvider>,
     );
 
     // The outer radius survives because this bridge does not supply one when
-    // Oxygen has not defined it.
+    // Zoblocks has not defined it.
     expect(await screen.findByText(/#7c3aed\|16/)).toBeTruthy();
     document.documentElement.removeAttribute("style");
   });

@@ -1,7 +1,7 @@
 /**
- * @oxygenui-design/tokens/validate — the accessibility gate, as a module.
+ * @zoblocks/tokens/validate — the accessibility gate, as a module.
  *
- *     import { validateTokens } from "@oxygenui-design/tokens/validate";
+ *     import { validateTokens } from "@zoblocks/tokens/validate";
  *
  * Why this is a package rather than a build script: the same rules have to run
  * in three places, and three implementations would be three answers.

@@ -31,7 +31,7 @@ import {
   type AccordionPolicyName,
   type DisclosureEvent,
   type UseAccordionOptions,
-} from "../registry/oxygen/lib/accordion-core";
+} from "../registry/zoblocks/lib/accordion-core";
 
 afterEach(cleanup);
 
@@ -91,8 +91,8 @@ describe("useAccordion prop getters", () => {
     // reads this. It is the only way the hook can state a level without having
     // an opinion about markup.
     const view = render(<Harness options={{ items: items(1), headingLevel: 2 }} />);
-    const heading = view.container.querySelector("[data-ox-accordion-heading]");
-    expect(heading?.getAttribute("data-ox-accordion-heading")).toBe("2");
+    const heading = view.container.querySelector("[data-zb-accordion-heading]");
+    expect(heading?.getAttribute("data-zb-accordion-heading")).toBe("2");
     expect(heading?.tagName).toBe("H2");
   });
 

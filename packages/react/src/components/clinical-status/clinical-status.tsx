@@ -5,7 +5,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/clinical-status/clinical-status.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/clinical-status/clinical-status.tsx. Edit that file, not this one.
 /**
  * ClinicalStatus — one status vocabulary for the whole library.
  *
@@ -15,7 +15,7 @@
  *
  * Three presentations of one datum, nine scales, forty steps, and no
  * free text. The vocabulary and the FHIR adapters live in
- * `@/lib/oxygen-clinical-status`; this file is the rendering, and it is
+ * `@/lib/zoblocks-clinical-status`; this file is the rendering, and it is
  * deliberately almost nothing — a pure function of (scale, step, shape,
  * density) with no state, no context and no effects.
  *
@@ -24,7 +24,7 @@
  * shape. A reader on a screen reader hears the word, and hears it qualified by
  * the scale, because "Preliminary" alone does not say preliminary *what*.
  *
- * Styling lives in `styles/oxygen-clinical-status.css`, installed alongside.
+ * Styling lives in `styles/zoblocks-clinical-status.css`, installed alongside.
  */
 
 import * as React from "react";
@@ -127,7 +127,7 @@ export const ClinicalStatus = React.forwardRef<HTMLElement, ClinicalStatusProps>
     const label = describeStatus(scale, resolved, { audience, qualifier });
 
     const glyph = (
-      <span className="ox-cs__glyph" data-ox-glyph={resolved.glyph} aria-hidden="true" />
+      <span className="zb-cs__glyph" data-zb-glyph={resolved.glyph} aria-hidden="true" />
     );
 
     /*
@@ -139,26 +139,26 @@ export const ClinicalStatus = React.forwardRef<HTMLElement, ClinicalStatusProps>
      */
     const body =
       shape === "dot" ? null : shape === "affix" ? (
-        <span className="ox-cs__short">{resolved.short}</span>
+        <span className="zb-cs__short">{resolved.short}</span>
       ) : (
         <>
-          <span className="ox-cs__word" data-ox-full="">
+          <span className="zb-cs__word" data-zb-full="">
             {word}
           </span>
-          <span className="ox-cs__word" data-ox-abbr="">
+          <span className="zb-cs__word" data-zb-abbr="">
             {resolved.short}
           </span>
         </>
       );
 
     const shared = {
-      className: cn("ox-cs", className),
-      "data-ox-status": "",
-      "data-ox-scale": scale,
-      "data-ox-step": resolved.id,
-      "data-ox-tone": resolved.tone,
-      "data-ox-shape": shape,
-      "data-ox-density": density,
+      className: cn("zb-cs", className),
+      "data-zb-status": "",
+      "data-zb-scale": scale,
+      "data-zb-step": resolved.id,
+      "data-zb-tone": resolved.tone,
+      "data-zb-shape": shape,
+      "data-zb-density": density,
       "aria-label": label,
       ...rest,
     };
@@ -220,12 +220,12 @@ export const StatusLegend = React.forwardRef<HTMLDListElement, StatusLegendProps
       <dl
         {...rest}
         ref={ref}
-        className={cn("ox-cs-legend", className)}
-        data-ox-status-legend=""
+        className={cn("zb-cs-legend", className)}
+        data-zb-status-legend=""
         aria-label={`${SCALES[scale].label} legend`}
       >
         {SCALES[scale].steps.map((step: StatusStep) => (
-          <div key={step.id} className="ox-cs-legend__row">
+          <div key={step.id} className="zb-cs-legend__row">
             <dt>
               <ClinicalStatus scale={scale} step={step.id} shape="dot" density={density} />
             </dt>

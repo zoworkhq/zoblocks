@@ -6,7 +6,7 @@ import { defineConfig } from "vitest/config";
  * Coverage globs are anchored to this package.
  *
  * Vitest 4 resolves a relative `coverage.include` against the workspace root
- * rather than the config file, and every Oxygen package resolves its workspace
+ * rather than the config file, and every Zoblocks package resolves its workspace
  * siblings to their TypeScript source — so this package silently began
  * instrumenting its own core and reporting that core's coverage as its own.
  */

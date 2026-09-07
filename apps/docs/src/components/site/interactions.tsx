@@ -27,7 +27,7 @@ export function InstallCommand({
   size?: "sm" | "lg";
   /**
    * Rendered under the command. Used to state the `components.json` registry
-   * entry the CLI needs — without it `@oxygenui/…` resolves to nothing and the
+   * entry the CLI needs — without it `@zoblocks/…` resolves to nothing and the
    * add fails before it reaches the network, which reads as a broken library
    * rather than a missing line of config.
    */
@@ -71,7 +71,7 @@ export function InstallCommand({
 
         `whitespace-nowrap` with `overflow-x-auto` meant a command wider than
         its box was simply not shown: at 1024px the homepage hero rendered
-        "npx @oxygenui-des…" of a 344px line in 279px, and on a phone less than
+        "npx @zoblocks/cli…" of a 344px line in 279px, and on a phone less than
         three quarters of it. A scrollbar is not a disclosure — the reader has
         to discover there is more and then drag for it, and the thing hidden is
         the one instruction the page is asking them to run.

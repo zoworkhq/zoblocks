@@ -1,15 +1,15 @@
 {
-  "name": "Oxygen",
-  "id": "oxygen-design-system",
+  "name": "Zoblocks",
+  "id": "zoblocks-design-system",
   "api": "1.0.0",
   "main": "dist/code.js",
   "ui": "dist/ui.html",
   "editorType": ["figma", "dev"],
   "documentAccess": "dynamic-page",
   "networkAccess": {
-    "allowedDomains": ["https://app.oxygenui.design"],
+    "allowedDomains": ["https://app.zoblocks.design"],
     "devAllowedDomains": ["http://localhost:6003"],
-    "reasoning": "Reads your organisation's themes from the Oxygen app and proposes a brand colour as a draft. It sends one colour and can never publish. The app address and key are entered by you and held in figma.clientStorage on this machine, never in the document."
+    "reasoning": "Reads your organisation's themes from the Zoblocks app and proposes a brand colour as a draft. It sends one colour and can never publish. The app address and key are entered by you and held in figma.clientStorage on this machine, never in the document."
   },
   "permissions": []
 }

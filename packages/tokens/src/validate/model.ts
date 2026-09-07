@@ -18,7 +18,7 @@ export type Theme = (typeof THEMES)[number];
 export const DENSITIES = ["patient", "standard", "clinical"] as const;
 export type DensityName = (typeof DENSITIES)[number];
 
-/** The profile `:root` carries, so a page with no `data-ox-density` is still usable. */
+/** The profile `:root` carries, so a page with no `data-zb-density` is still usable. */
 export const DEFAULT_DENSITY: DensityName = "standard";
 
 export interface Token {
@@ -42,7 +42,7 @@ export type TokenMap = Map<string, Token>;
  * clinical design system does not delegate.
  */
 export interface Brand {
-  /** Directory-derived id, used as the `[data-ox-brand]` value. */
+  /** Directory-derived id, used as the `[data-zb-brand]` value. */
   name: string;
   description?: string;
   /** Primitive overrides, keyed like the base primitive map (`ref.brand.600`). */
@@ -68,9 +68,9 @@ export interface TokenSource {
 
 import { fromDtcg } from "./dtcg";
 
-/** `status.critical` → `--ox-status-critical`. One rule for every tier. */
+/** `status.critical` → `--zb-status-critical`. One rule for every tier. */
 export function cssVar(dotted: string): string {
-  return `--ox-${dotted.split(".").join("-")}`;
+  return `--zb-${dotted.split(".").join("-")}`;
 }
 
 const REFERENCE = /^\{([^}]+)\}$/;

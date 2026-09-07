@@ -1,7 +1,7 @@
 /**
- * @oxygenui-design/cli — the installer for Oxygen UI components.
+ * @zoblocks/cli — the installer for Zoblocks components.
  *
- * The binary is `oxygen`. This entry point exists so the same machinery is
+ * The binary is `zoblocks`. This entry point exists so the same machinery is
  * usable from a script: a build step that materialises components into a
  * generated app can call `collectItems` and `planInstall` directly rather than
  * shelling out and parsing our output.
@@ -20,7 +20,7 @@ export {
   readConfig,
   resolveTarget,
   writeConfig,
-  type OxygenConfig,
+  type ZoblocksConfig,
   type RegistryConfig,
 } from "./config.js";
 export {

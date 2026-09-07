@@ -13,7 +13,7 @@
  * to travel to discover a missing line in a config file.
  *
  * So the assertion is the wiring itself. A new stylesheet under
- * `registry/oxygen/lib/` now fails this test until the docs site loads it,
+ * `registry/zoblocks/lib/` now fails this test until the docs site loads it,
  * which is the moment the author is in a position to do something about it.
  */
 
@@ -23,7 +23,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const LIB = path.join(ROOT, "registry", "oxygen", "lib");
+const LIB = path.join(ROOT, "registry", "zoblocks", "lib");
 
 const globals = readFileSync(path.join(ROOT, "apps/docs/src/app/globals.css"), "utf8");
 const reactEmitter = readFileSync(path.join(ROOT, "scripts/gen/emit/react-package.ts"), "utf8");
@@ -43,8 +43,8 @@ describe("registry stylesheets are wired everywhere they have to be", () => {
     // same file a customer installs.
     expect(
       globals,
-      `add an @import for registry/oxygen/lib/${sheet} to apps/docs/src/app/globals.css`,
-    ).toContain(`registry/oxygen/lib/${sheet}`);
+      `add an @import for registry/zoblocks/lib/${sheet} to apps/docs/src/app/globals.css`,
+    ).toContain(`registry/zoblocks/lib/${sheet}`);
   });
 
   it.each(sheets)("%s is emitted into the React package", (sheet) => {

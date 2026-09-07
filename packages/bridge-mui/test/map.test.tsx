@@ -12,9 +12,9 @@ import * as React from "react";
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { resolvePatch, verifyPatch } from "@oxygenui-design/bridge-core";
-import { NOT_BRIDGEABLE } from "@oxygenui-design/tokens/surface";
-import { antdBridge } from "@oxygenui-design/bridge-antd";
+import { resolvePatch, verifyPatch } from "@zoblocks/bridge-core";
+import { NOT_BRIDGEABLE } from "@zoblocks/tokens/surface";
+import { antdBridge } from "@zoblocks/bridge-antd";
 import { MuiBridge, muiBridge, useMuiTokens, type MuiTheme } from "../src/index";
 
 const patch = (theme: MuiTheme) => resolvePatch(muiBridge, theme);
@@ -22,47 +22,47 @@ const patch = (theme: MuiTheme) => resolvePatch(muiBridge, theme);
 describe("identity of the mapping", () => {
   it("puts palette.primary.main on the accent", () => {
     const out = patch({ palette: { primary: { main: "#1976d2" } } });
-    expect(out["--ox-accent"]).toBe("#1976d2");
-    expect(out["--ox-focus-ring"]).toBe("#1976d2");
+    expect(out["--zb-accent"]).toBe("#1976d2");
+    expect(out["--zb-focus-ring"]).toBe("#1976d2");
   });
 
   it("maps the text ramp in the right order of emphasis", () => {
     const out = patch({
       palette: { text: { primary: "#111111", secondary: "#555555", disabled: "#999999" } },
     });
-    expect(out["--ox-text"]).toBe("#111111");
-    expect(out["--ox-text-muted"]).toBe("#555555");
-    expect(out["--ox-text-subtle"]).toBe("#999999");
+    expect(out["--zb-text"]).toBe("#111111");
+    expect(out["--zb-text-muted"]).toBe("#555555");
+    expect(out["--zb-text-subtle"]).toBe("#999999");
   });
 
   it("distinguishes the paper surface from the page ground", () => {
     const out = patch({ palette: { background: { default: "#fafafa", paper: "#ffffff" } } });
-    expect(out["--ox-bg"]).toBe("#fafafa");
-    expect(out["--ox-surface"]).toBe("#ffffff");
+    expect(out["--zb-bg"]).toBe("#fafafa");
+    expect(out["--zb-surface"]).toBe("#ffffff");
   });
 
   it("converts MUI's numeric durations to milliseconds", () => {
     const out = patch({ transitions: { duration: { standard: 300, shorter: 200, complex: 375 } } });
-    expect(out["--ox-duration"]).toBe("300ms");
-    expect(out["--ox-duration-fast"]).toBe("200ms");
-    expect(out["--ox-duration-slow"]).toBe("375ms");
+    expect(out["--zb-duration"]).toBe("300ms");
+    expect(out["--zb-duration-fast"]).toBe("200ms");
+    expect(out["--zb-duration-slow"]).toBe("375ms");
   });
 
-  /** MUI has 25 elevation steps and Oxygen has three. Sampled, not imported. */
+  /** MUI has 25 elevation steps and Zoblocks has three. Sampled, not imported. */
   it("samples three steps from the elevation scale", () => {
     const shadows = Array.from({ length: 25 }, (_, i) => `shadow-${i}`);
     const out = patch({ shadows });
-    expect(out["--ox-shadow-sm"]).toBe("shadow-1");
-    expect(out["--ox-shadow"]).toBe("shadow-4");
-    expect(out["--ox-shadow-lg"]).toBe("shadow-8");
+    expect(out["--zb-shadow-sm"]).toBe("shadow-1");
+    expect(out["--zb-shadow"]).toBe("shadow-4");
+    expect(out["--zb-shadow-lg"]).toBe("shadow-8");
   });
 
   it("treats elevation 0 as no shadow rather than a shadow called none", () => {
-    expect(patch({ shadows: ["none", "none"] })["--ox-shadow-sm"]).toBeUndefined();
+    expect(patch({ shadows: ["none", "none"] })["--zb-shadow-sm"]).toBeUndefined();
   });
 
   it("survives a theme with fewer elevation steps than MUI ships", () => {
-    expect(patch({ shadows: ["none", "a"] })["--ox-shadow-lg"]).toBeUndefined();
+    expect(patch({ shadows: ["none", "a"] })["--zb-shadow-lg"]).toBeUndefined();
   });
 });
 
@@ -74,23 +74,23 @@ describe("what MUI cannot express", () => {
    * harder to diagnose than one that is partly unthemed.
    */
   it("declares the background scale it does not have", () => {
-    expect(muiBridge.unmapped).toContain("--ox-bg-subtle");
-    expect(muiBridge.unmapped).toContain("--ox-bg-muted");
+    expect(muiBridge.unmapped).toContain("--zb-bg-subtle");
+    expect(muiBridge.unmapped).toContain("--zb-bg-muted");
     const out = patch({ palette: { background: { default: "#fafafa", paper: "#fff" } } });
-    expect(out["--ox-bg-subtle"]).toBeUndefined();
-    expect(out["--ox-bg-muted"]).toBeUndefined();
+    expect(out["--zb-bg-subtle"]).toBeUndefined();
+    expect(out["--zb-bg-muted"]).toBeUndefined();
   });
 
   it("maps only the base radius, because shape.borderRadius is one number", () => {
     const out = patch({ shape: { borderRadius: 8 } });
-    expect(out["--ox-radius"]).toBe("8px");
-    expect(out["--ox-radius-sm"]).toBeUndefined();
-    expect(out["--ox-radius-lg"]).toBeUndefined();
+    expect(out["--zb-radius"]).toBe("8px");
+    expect(out["--zb-radius-sm"]).toBeUndefined();
+    expect(out["--zb-radius-lg"]).toBeUndefined();
   });
 
-  it("leaves the hit target to Oxygen, since MUI sizes controls per component", () => {
-    expect(muiBridge.unmapped).toContain("--ox-density-target");
-    expect(patch({ shape: { borderRadius: 8 } })["--ox-density-target"]).toBeUndefined();
+  it("leaves the hit target to Zoblocks, since MUI sizes controls per component", () => {
+    expect(muiBridge.unmapped).toContain("--zb-density-target");
+    expect(patch({ shape: { borderRadius: 8 } })["--zb-density-target"]).toBeUndefined();
   });
 
   /**
@@ -103,7 +103,7 @@ describe("what MUI cannot express", () => {
    * primary is too pale for it.
    *
    * This assertion used to say antd had no equivalent at all. That was wrong,
-   * and the error had a visible cost: with the token unmapped, Oxygen's own
+   * and the error had a visible cost: with the token unmapped, Zoblocks's own
    * near-black dark label landed on antd's dark primary at 3.70:1, a button
    * antd would never render. Left here as a comparison rather than deleted,
    * because the difference between a derived value and a fixed one is the
@@ -111,9 +111,9 @@ describe("what MUI cannot express", () => {
    */
   it("derives the label colour, where antd supplies one fixed value", () => {
     const out = patch({ palette: { primary: { main: "#1976d2", contrastText: "#ffffff" } } });
-    expect(out["--ox-text-on-accent"]).toBe("#ffffff");
-    expect(muiBridge.unmapped).not.toContain("--ox-text-on-accent");
-    expect(antdBridge.unmapped).not.toContain("--ox-text-on-accent");
+    expect(out["--zb-text-on-accent"]).toBe("#ffffff");
+    expect(muiBridge.unmapped).not.toContain("--zb-text-on-accent");
+    expect(antdBridge.unmapped).not.toContain("--zb-text-on-accent");
   });
 });
 
@@ -148,16 +148,16 @@ describe("the two bridges agree where it matters", () => {
     });
 
     const core = [
-      "--ox-accent",
-      "--ox-accent-hover",
-      "--ox-text",
-      "--ox-text-muted",
-      "--ox-bg",
-      "--ox-surface",
-      "--ox-border",
-      "--ox-radius",
-      "--ox-font-sans",
-      "--ox-text-base",
+      "--zb-accent",
+      "--zb-accent-hover",
+      "--zb-text",
+      "--zb-text-muted",
+      "--zb-bg",
+      "--zb-surface",
+      "--zb-border",
+      "--zb-radius",
+      "--zb-font-sans",
+      "--zb-text-base",
     ];
     for (const token of core) {
       expect(Object.keys(mui), `mui: ${token}`).toContain(token);
@@ -181,8 +181,8 @@ describe("the two bridges agree where it matters", () => {
   it("both derive the same concentric geometry from the same radius", () => {
     const mui = patch({ shape: { borderRadius: 12 } });
     const antd = resolvePatch(antdBridge, { borderRadiusLG: 12 });
-    expect(mui["--ox-tabs-track-radius"]).toBe(antd["--ox-tabs-track-radius"]);
-    expect(mui["--ox-tabs-thumb-radius"]).toBe(antd["--ox-tabs-thumb-radius"]);
+    expect(mui["--zb-tabs-track-radius"]).toBe(antd["--zb-tabs-track-radius"]);
+    expect(mui["--zb-tabs-thumb-radius"]).toBe(antd["--zb-tabs-thumb-radius"]);
   });
 
   it("expose the same wrapper API, so switching is one import", () => {
@@ -198,7 +198,7 @@ describe("the partial-mapping rule", () => {
 
   it("omits keys entirely rather than writing undefined", () => {
     const out = patch({ palette: { primary: { main: "#1976d2" } } });
-    expect("--ox-text" in out).toBe(false);
+    expect("--zb-text" in out).toBe(false);
   });
 
   it("passes bridge-core's own verification", () => {
@@ -239,7 +239,7 @@ describe("driven through a real MUI theme", () => {
         <ThemeProvider theme={theme}>
           <Probe />
         </ThemeProvider>,
-      )["--ox-accent"],
+      )["--zb-accent"],
     ).toBe("#7c3aed");
   });
 
@@ -254,8 +254,8 @@ describe("driven through a real MUI theme", () => {
         <Probe />
       </ThemeProvider>,
     );
-    expect(dark["--ox-surface"]).not.toBe(light["--ox-surface"]);
-    expect(dark["--ox-text"]).not.toBe(light["--ox-text"]);
+    expect(dark["--zb-surface"]).not.toBe(light["--zb-surface"]);
+    expect(dark["--zb-text"]).not.toBe(light["--zb-text"]);
   });
 
   it("writes no clinical token from a real theme that defines palette.error", () => {
@@ -265,7 +265,7 @@ describe("driven through a real MUI theme", () => {
         <Probe />
       </ThemeProvider>,
     );
-    expect(Object.keys(tokens).some((k) => k.startsWith("--ox-status-"))).toBe(false);
+    expect(Object.keys(tokens).some((k) => k.startsWith("--zb-status-"))).toBe(false);
   });
 
   it("puts the tokens on one element and marks it", () => {
@@ -276,9 +276,9 @@ describe("driven through a real MUI theme", () => {
         </MuiBridge>
       </ThemeProvider>,
     );
-    const wrapper = container.querySelector("[data-ox-bridge='mui']") as HTMLElement;
+    const wrapper = container.querySelector("[data-zb-bridge='mui']") as HTMLElement;
     expect(wrapper).toBeTruthy();
-    expect(wrapper.style.getPropertyValue("--ox-accent")).toBe("#7c3aed");
+    expect(wrapper.style.getPropertyValue("--zb-accent")).toBe("#7c3aed");
   });
 
   it("adds nothing to the accessibility tree", () => {

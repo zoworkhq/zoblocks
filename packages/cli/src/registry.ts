@@ -5,16 +5,16 @@
  * rather than by a flag:
  *
  *   vitals-panel                    the public catalog
- *   @oxygen-pro/vitals-flowsheet    a namespace declared in oxygen.json
+ *   @zoblocks-pro/vitals-flowsheet    a namespace declared in zoblocks.json
  *   https://example.com/x.json      an absolute URL, taken literally
  *
  * The public catalog is built in rather than configured. A developer who has
  * just installed the CLI should be able to add a free component without first
  * writing a URL into a file, and a registry that cannot be shadowed by a local
- * config is also one that a compromised `oxygen.json` cannot redirect.
+ * config is also one that a compromised `zoblocks.json` cannot redirect.
  */
 
-import { PUBLIC_REGISTRY_URL, expandHeaders, type OxygenConfig } from "./config.js";
+import { PUBLIC_REGISTRY_URL, expandHeaders, type ZoblocksConfig } from "./config.js";
 import { ITEM_SCHEMA_URL, parseRegistryItem, type RegistryItem } from "./schema.js";
 
 export class RegistryError extends Error {
@@ -37,7 +37,7 @@ export interface ResolvedSpecifier {
 
 export function resolveSpecifier(
   specifier: string,
-  config: OxygenConfig,
+  config: ZoblocksConfig,
   env: NodeJS.ProcessEnv,
 ): ResolvedSpecifier {
   if (/^https?:\/\//.test(specifier)) {
@@ -58,7 +58,7 @@ export function resolveSpecifier(
     if (!registry) {
       const known = Object.keys(config.registries);
       throw new RegistryError(
-        `Registry "${namespace}" is not configured in oxygen.json.\n\n` +
+        `Registry "${namespace}" is not configured in zoblocks.json.\n\n` +
           (known.length
             ? `Configured: ${known.join(", ")}`
             : `Add it under "registries" — the console shows the exact block under Marketplace → Access tokens.`),
@@ -139,7 +139,7 @@ export async function fetchItem(
   if (response.status === 401) {
     throw new RegistryError(
       `The registry rejected the credential for "${resolved.raw}".\n\n` +
-        `Check that OXYGEN_TOKEN is set to a live token with the "registry" scope. ` +
+        `Check that ZOBLOCKS_TOKEN is set to a live token with the "registry" scope. ` +
         `A Figma-scoped token cannot install components.`,
     );
   }
@@ -150,8 +150,8 @@ export async function fetchItem(
         ? `"${resolved.raw}" is not available to your organisation.\n\n` +
             `Either the component does not exist, or nobody has purchased it yet. ` +
             `The console lists what you own under Marketplace.`
-        : `"${resolved.raw}" is not in the Oxygen catalog.\n\n` +
-            `Browse the catalog at https://oxygenui.design/components`,
+        : `"${resolved.raw}" is not in the Zoblocks catalog.\n\n` +
+            `Browse the catalog at https://zoblocks.design/components`,
     );
   }
 
@@ -207,7 +207,7 @@ export async function fetchItem(
  */
 export async function collectItems(
   specifiers: string[],
-  config: OxygenConfig,
+  config: ZoblocksConfig,
   options: FetchOptions = {},
 ): Promise<RegistryItem[]> {
   const env = options.env ?? process.env;

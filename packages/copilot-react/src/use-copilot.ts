@@ -42,7 +42,7 @@ import {
   type Source,
   type AuditSink,
   type TelemetrySink,
-} from "@oxygenui-design/copilot-core";
+} from "@zoblocks/copilot-core";
 import { useAnnouncer, type Announcer, type AnnouncementMode } from "./use-announcer.js";
 
 export interface UseCopilotOptions {
@@ -197,7 +197,7 @@ export interface CopilotApi {
    *
    * The switcher is real; persistence is not this component's job. A host that
    * wants threads to survive a reload writes them wherever its data already
-   * lives — Oxygen never picks the database, for the same reason it never
+   * lives — Zoblocks never picks the database, for the same reason it never
    * becomes a processor of clinical interaction data.
    */
   readonly threads: readonly CopilotThreadSummary[];

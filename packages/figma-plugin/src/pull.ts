@@ -21,9 +21,9 @@ import {
   type ResolvedTheme,
   type VariablePlan,
   type VariableSnapshot,
-} from "@oxygenui-design/figma-core";
+} from "@zoblocks/figma-core";
 
-import { contrastBetween, generateRamp } from "@oxygenui-design/tokens/validate";
+import { contrastBetween, generateRamp } from "@zoblocks/tokens/validate";
 
 import type { ResolvedPayload } from "./app";
 
@@ -191,7 +191,7 @@ export function applyOrder(variables: PlannedVariable[]): PlannedVariable[] {
  * returns nothing rather than guessing. No number beats a wrong one.
  */
 export function accentStep(payload: ResolvedPayload): string | undefined {
-  const accent = payload.semantic.light["--ox-accent"]?.toLowerCase();
+  const accent = payload.semantic.light["--zb-accent"]?.toLowerCase();
   if (!accent) return undefined;
   return Object.entries(payload.ramp).find(([, hex]) => hex.toLowerCase() === accent)?.[0];
 }
@@ -208,7 +208,7 @@ export function readAnchorLocally(
   anchor: string,
 ): LocalReading | undefined {
   const step = accentStep(payload);
-  const label = payload.semantic.light["--ox-text-on-accent"];
+  const label = payload.semantic.light["--zb-text-on-accent"];
   if (!step || !label) return undefined;
 
   const ramp = generateRamp(anchor.trim());

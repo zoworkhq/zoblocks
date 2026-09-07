@@ -25,8 +25,13 @@
 
 import * as React from "react";
 import { DemoNote } from "@/components/site/demo-note";
-import { Tabs } from "@oxygenui-design/tabs";
-import { Switch, SwitchField, SwitchList, type CommitPhase } from "@/registry/oxygen/switch/switch";
+import { Tabs } from "@zoblocks/tabs";
+import {
+  Switch,
+  SwitchField,
+  SwitchList,
+  type CommitPhase,
+} from "@/registry/zoblocks/switch/switch";
 import { cn } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ */
@@ -52,19 +57,19 @@ interface DemoProps {
  */
 function Demo({ id, name, api, tags, note, children, wide }: DemoProps) {
   return (
-    <figure id={`switch-${id}`} className="ox-demo scroll-mt-28">
-      <figcaption className="ox-demo__head">
-        <span className="ox-demo__id">{id.toUpperCase()}</span>
-        <span className="ox-demo__name">{name}</span>
-        <code className="ox-demo__api">{api}</code>
+    <figure id={`switch-${id}`} className="zb-demo scroll-mt-28">
+      <figcaption className="zb-demo__head">
+        <span className="zb-demo__id">{id.toUpperCase()}</span>
+        <span className="zb-demo__name">{name}</span>
+        <code className="zb-demo__api">{api}</code>
         <span className="grow" />
         {tags?.map((tag) => (
-          <span key={tag} className="ox-demo__tag">
+          <span key={tag} className="zb-demo__tag">
             {tag}
           </span>
         ))}
       </figcaption>
-      <div className={cn("ox-demo__stage", wide && "ox-demo__stage--wide")}>{children}</div>
+      <div className={cn("zb-demo__stage", wide && "zb-demo__stage--wide")}>{children}</div>
       <DemoNote>{note}</DemoNote>
     </figure>
   );
@@ -88,8 +93,8 @@ function Spec({
   return (
     <div className="grid gap-2 sm:grid-cols-[minmax(0,11rem)_minmax(0,1fr)] sm:items-start sm:gap-5">
       <div className="min-w-0">
-        <code className="ox-demo__api">{code}</code>
-        {note ? <p className="ox-demo__note mt-1 !p-0">{note}</p> : null}
+        <code className="zb-demo__api">{code}</code>
+        {note ? <p className="zb-demo__note mt-1 !p-0">{note}</p> : null}
       </div>
       <div className="min-w-0">{children}</div>
     </div>
@@ -186,7 +191,7 @@ export function SharedRecordSwitches() {
         <button
           type="button"
           onClick={() => setOnline((v) => !v)}
-          className="ox-gallery__switch self-start"
+          className="zb-gallery__switch self-start"
         >
           {online ? "connected — tap to go offline" : "offline — tap to reconnect"}
         </button>
@@ -205,7 +210,7 @@ export function SharedRecordSwitches() {
         <button
           type="button"
           onClick={() => setTheirs(theirs === undefined ? !mine : undefined)}
-          className="ox-gallery__switch self-start"
+          className="zb-gallery__switch self-start"
         >
           {theirs === undefined ? "simulate: S. Mehta changes it too" : "clear the conflict"}
         </button>
@@ -252,7 +257,7 @@ export function PhaseStepper() {
             type="button"
             aria-pressed={index === i}
             onClick={() => setI(index)}
-            className="ox-gallery__switch"
+            className="zb-gallery__switch"
           >
             {p.phase}
           </button>
@@ -278,7 +283,7 @@ export function PhaseStepper() {
         }
       />
 
-      <p className="ox-demo__note !p-0">
+      <p className="zb-demo__note !p-0">
         {active.phase} — {active.note}
       </p>
     </Stack>
@@ -318,7 +323,7 @@ export function AnatomyMatrix() {
           <tr>
             <th className="w-24" />
             {COLUMNS.map((c) => (
-              <th key={`${c.size}-${String(c.checked)}`} className="ox-demo__api px-3 pb-2">
+              <th key={`${c.size}-${String(c.checked)}`} className="zb-demo__api px-3 pb-2">
                 {c.size} · {c.checked ? "on" : "off"}
               </th>
             ))}
@@ -327,7 +332,7 @@ export function AnatomyMatrix() {
         <tbody>
           {ROWS.map((row) => (
             <tr key={row.key}>
-              <th className="ox-demo__api py-4 pr-3 text-left align-middle">{row.label}</th>
+              <th className="zb-demo__api py-4 pr-3 text-left align-middle">{row.label}</th>
               {COLUMNS.map((c) => (
                 <td key={`${row.key}-${c.size}-${String(c.checked)}`} className="px-3 py-4">
                   <Switch
@@ -397,8 +402,8 @@ export function SwitchGallery() {
   const active = CHAPTERS.find((item) => item.id === chapter) ?? CHAPTERS[0]!;
 
   return (
-    <div className="ox-gallery">
-      <div className="ox-gallery__chapters">
+    <div className="zb-gallery">
+      <div className="zb-gallery__chapters">
         <Tabs
           as="radiogroup"
           variant="segmented"
@@ -407,18 +412,18 @@ export function SwitchGallery() {
           onChange={(next) => setChapter(next as Chapter)}
           items={CHAPTERS.map((item) => ({ value: item.id, label: item.label }))}
         />
-        <p className="ox-gallery__blurb">{active.blurb}</p>
+        <p className="zb-gallery__blurb">{active.blurb}</p>
       </div>
 
-      <div className="ox-gallery__stage" data-ox-theme={theme === "hc" ? "high-contrast" : theme}>
+      <div className="zb-gallery__stage" data-zb-theme={theme === "hc" ? "high-contrast" : theme}>
         {chapter === "anatomy" && (
-          <div className="ox-gallery__grid">
+          <div className="zb-gallery__grid">
             <Demo
               id="a01"
               name="The matrix"
               api="size × checked × availability"
               tags={["16 live controls"]}
-              note="The specimen sheet this component started from, rebuilt with Oxygen's real token values. Read-only is a dashed border and a filled thumb — a different object, not a weaker one, because dimming reads as “inactive”, which is a value rather than an availability."
+              note="The specimen sheet this component started from, rebuilt with Zoblocks's real token values. Read-only is a dashed border and a filled thumb — a different object, not a weaker one, because dimming reads as “inactive”, which is a value rather than an availability."
               wide
             >
               <AnatomyMatrix />
@@ -467,7 +472,7 @@ export function SwitchGallery() {
         )}
 
         {chapter === "write" && (
-          <div className="ox-gallery__grid">
+          <div className="zb-gallery__grid">
             <Demo
               id="w01"
               name="The write, and the write that fails"
@@ -551,7 +556,7 @@ export function SwitchGallery() {
         )}
 
         {chapter === "meaning" && (
-          <div className="ox-gallery__grid">
+          <div className="zb-gallery__grid">
             <Demo
               id="m01"
               name="Off, and never asked"
@@ -791,7 +796,7 @@ export function SwitchGallery() {
         )}
 
         {chapter === "surfaces" && (
-          <div className="ox-gallery__grid">
+          <div className="zb-gallery__grid">
             <Demo
               id="s01"
               name="One value, five renderings"
@@ -941,7 +946,7 @@ export function SwitchGallery() {
             <Demo
               id="s04"
               name="Restyled without a fork"
-              api="--ox-switch-* · slots"
+              api="--zb-switch-* · slots"
               tags={["tokens first"]}
               note="Three layers, in the order to reach for them: tokens first, props second, slots last. All three here are one component and one state model — only the token values differ, so a brand restyles the control without editing the source it was shipped."
             >
@@ -950,9 +955,9 @@ export function SwitchGallery() {
                 <div
                   style={
                     {
-                      "--ox-switch-radius": "0.25rem",
-                      "--ox-switch-track-on-bg": "#4338ca",
-                      "--ox-switch-track-w": "64px",
+                      "--zb-switch-radius": "0.25rem",
+                      "--zb-switch-track-on-bg": "#4338ca",
+                      "--zb-switch-track-w": "64px",
                     } as React.CSSProperties
                   }
                 >

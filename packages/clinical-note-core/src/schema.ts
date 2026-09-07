@@ -178,14 +178,14 @@ const nodes: Record<string, NodeSpec> = {
     defining: true,
     parseDOM: [
       {
-        tag: "section[data-ox-code]",
+        tag: "section[data-zb-code]",
         getAttrs(dom: unknown) {
           const el = dom as { getAttribute(name: string): string | null };
           return {
-            code: el.getAttribute("data-ox-code") ?? "",
-            system: el.getAttribute("data-ox-system") ?? LOINC,
-            title: el.getAttribute("data-ox-title") ?? "",
-            required: el.getAttribute("data-ox-required") === "true",
+            code: el.getAttribute("data-zb-code") ?? "",
+            system: el.getAttribute("data-zb-system") ?? LOINC,
+            title: el.getAttribute("data-zb-title") ?? "",
+            required: el.getAttribute("data-zb-required") === "true",
           };
         },
       },
@@ -194,7 +194,7 @@ const nodes: Record<string, NodeSpec> = {
       const a = node.attrs as unknown as SectionAttrs;
       return [
         "section",
-        { "data-ox-code": a.code, "data-ox-system": a.system, "data-ox-title": a.title },
+        { "data-zb-code": a.code, "data-zb-system": a.system, "data-zb-title": a.title },
         0,
       ];
     },
@@ -252,16 +252,16 @@ const nodes: Record<string, NodeSpec> = {
     attrs: { hint: { default: "" } },
     parseDOM: [
       {
-        tag: "span[data-ox-wildcard]",
+        tag: "span[data-zb-wildcard]",
         getAttrs(dom: unknown) {
           const el = dom as { getAttribute(name: string): string | null };
-          return { hint: el.getAttribute("data-ox-wildcard") ?? "" };
+          return { hint: el.getAttribute("data-zb-wildcard") ?? "" };
         },
       },
     ],
     toDOM(node: PMNode) {
       const { hint } = node.attrs as unknown as { hint: string };
-      return ["span", { "data-ox-wildcard": hint }, hint === "" ? "***" : `***${hint}***`];
+      return ["span", { "data-zb-wildcard": hint }, hint === "" ? "***" : `***${hint}***`];
     },
   },
 

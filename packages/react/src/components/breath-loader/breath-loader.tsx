@@ -7,7 +7,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/breath-loader/breath-loader.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/breath-loader/breath-loader.tsx. Edit that file, not this one.
 /**
  * BreathLoader — three rings expanding and fading from a soft core.
  *
@@ -52,20 +52,20 @@ export function BreathLoader({ speed = 1, size, children, ...props }: BreathLoad
       {...props}
       variant="breath"
       vars={{
-        "--ox-loader-size": `${px}px`,
-        "--ox-loader-cycle": `${cycleMs(4000, clamp(speed, 0.5, 2))}ms`,
-        "--ox-loader-stroke": `${strokePx(px)}px`,
+        "--zb-loader-size": `${px}px`,
+        "--zb-loader-cycle": `${cycleMs(4000, clamp(speed, 0.5, 2))}ms`,
+        "--zb-loader-stroke": `${strokePx(px)}px`,
       }}
       art={
         <svg viewBox={LOADER_VIEWBOX.breath} focusable="false">
           {/* Three rings on one cycle, a third apart, so the field never empties. */}
-          <circle className="ox-loader__stroke ox-loader__ring" cx="60" cy="60" r="54" />
-          <circle className="ox-loader__stroke ox-loader__ring" cx="60" cy="60" r="54" />
-          <circle className="ox-loader__stroke ox-loader__ring" cx="60" cy="60" r="54" />
+          <circle className="zb-loader__stroke zb-loader__ring" cx="60" cy="60" r="54" />
+          <circle className="zb-loader__stroke zb-loader__ring" cx="60" cy="60" r="54" />
+          <circle className="zb-loader__stroke zb-loader__ring" cx="60" cy="60" r="54" />
           {/* The core is the slot: a supplied mark replaces it rather than
               sitting behind it. */}
           {children ? null : (
-            <circle className="ox-loader__fill ox-loader__core" cx="60" cy="60" r="11" />
+            <circle className="zb-loader__fill zb-loader__core" cx="60" cy="60" r="11" />
           )}
         </svg>
       }

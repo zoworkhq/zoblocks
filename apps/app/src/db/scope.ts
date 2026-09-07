@@ -355,7 +355,7 @@ export function unscopedMarketAsset(sha256: string) {
 /**
  * Resolve an organisation from a registry token.
  *
- * The Oxygen CLI sends `Authorization: Bearer …` and no cookie, so there is no
+ * The Zoblocks CLI sends `Authorization: Bearer …` and no cookie, so there is no
  * session to scope by — the token *is* the identity. Safe because the lookup
  * is by digest, the caller never names an organisation, and everything the
  * route does afterwards goes through `scoped(token.orgId)`.

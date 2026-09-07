@@ -6,15 +6,15 @@
  *
  * Two failure modes stacked, and both are silent by construction:
  *
- * **The v3 shorthand.** Tailwind 3 let `bg-[--ox-surface]` mean
- * `background-color: var(--ox-surface)`. Tailwind 4 removed it, so the same
- * class now emits `background-color: --ox-surface` — not a build error, not a
+ * **The v3 shorthand.** Tailwind 3 let `bg-[--zb-surface]` mean
+ * `background-color: var(--zb-surface)`. Tailwind 4 removed it, so the same
+ * class now emits `background-color: --zb-surface` — not a build error, not a
  * console warning, just an invalid declaration the browser drops. The element
- * renders transparent. In v4 the shorthand is `bg-(--ox-surface)`; the house
- * writes `bg-[var(--ox-surface)]`, which works in both.
+ * renders transparent. In v4 the shorthand is `bg-(--zb-surface)`; the house
+ * writes `bg-[var(--zb-surface)]`, which works in both.
  *
- * **Invented token names.** `--ox-rule`, `--ox-status-accent` and
- * `--ox-surface-2` were plausible, consistent with their neighbours, and had
+ * **Invented token names.** `--zb-rule`, `--zb-status-accent` and
+ * `--zb-surface-2` were plausible, consistent with their neighbours, and had
  * never been defined anywhere. An undefined custom property resolves to nothing
  * and the declaration is dropped — again silently.
  *
@@ -31,13 +31,13 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const REGISTRY = path.join(ROOT, "registry/oxygen");
+const REGISTRY = path.join(ROOT, "registry/zoblocks");
 
 /**
- * Every `--ox-*` a registry component may name.
+ * Every `--zb-*` a registry component may name.
  *
  * The theme sets plus the density and component scales — the tokens a consumer
- * gets from `@oxygenui-design/tokens` without opting into anything. A component
+ * gets from `@zoblocks/tokens` without opting into anything. A component
  * that reaches past this list is depending on a variable its own consumers will
  * not have, which is the same bug with a longer fuse.
  */
@@ -54,7 +54,7 @@ const DEFINED = new Set<string>(
 /**
  * Plus anything a shipped stylesheet declares.
  *
- * Component-scoped tokens (`--ox-accordion-font`, `--ox-switch-track-w`) are
+ * Component-scoped tokens (`--zb-accordion-font`, `--zb-switch-track-w`) are
  * declared in the CSS that ships beside the component rather than in
  * `tokens.json`, and they are just as real. Reading both is what keeps this
  * test a check on *existence* rather than on which file a token lives in.
@@ -67,7 +67,7 @@ function declaredIn(dir: string): string[] {
     if (statSync(full).isDirectory()) out = out.concat(declaredIn(full));
     else if (full.endsWith(".css")) {
       out = out.concat(
-        [...readFileSync(full, "utf8").matchAll(/^\s*(--ox-[a-z0-9-]+)\s*:/gm)].map(
+        [...readFileSync(full, "utf8").matchAll(/^\s*(--zb-[a-z0-9-]+)\s*:/gm)].map(
           (m) => m[1] as string,
         ),
       );
@@ -107,7 +107,7 @@ describe("registry components reference CSS variables correctly", () => {
   });
 
   it.each(FILES)("$name names only tokens that are defined", ({ text }) => {
-    const unknown = [...text.matchAll(/var\((--ox-[a-z0-9-]+)\)/g)]
+    const unknown = [...text.matchAll(/var\((--zb-[a-z0-9-]+)\)/g)]
       .map((m) => m[1] as string)
       .filter((name) => !DEFINED.has(name));
     expect([...new Set(unknown)]).toEqual([]);
@@ -117,7 +117,7 @@ describe("registry components reference CSS variables correctly", () => {
     // `bg-[var(--x)]/20` does not compose — the modifier is dropped and the
     // colour lands at full strength, which reads as a styling choice rather
     // than a bug. `color-mix()` is the form that survives.
-    const bad = [...text.matchAll(/\[var\(--ox-[a-z0-9-]+\)\]\/\d+/g)].map((m) => m[0]);
+    const bad = [...text.matchAll(/\[var\(--zb-[a-z0-9-]+\)\]\/\d+/g)].map((m) => m[0]);
     expect(bad).toEqual([]);
   });
 });

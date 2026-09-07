@@ -22,11 +22,11 @@ const payload: ResolvedPayload = {
   status: "published",
   ramp: { "600": "#1d63c9" },
   semantic: {
-    light: { "--ox-accent": "#1851a5", "--ox-status-critical": "#b4232b" },
-    dark: { "--ox-accent": "#5a94e7", "--ox-status-critical": "#f08b96" },
-    "high-contrast": { "--ox-accent": "#0f3568", "--ox-status-critical": "#8c0d16" },
+    light: { "--zb-accent": "#1851a5", "--zb-status-critical": "#b4232b" },
+    dark: { "--zb-accent": "#5a94e7", "--zb-status-critical": "#f08b96" },
+    "high-contrast": { "--zb-accent": "#0f3568", "--zb-status-critical": "#8c0d16" },
   },
-  locked: { "--ox-status-critical": "Clinical. Carries a validated contrast floor." },
+  locked: { "--zb-status-critical": "Clinical. Carries a validated contrast floor." },
 };
 
 const THEMES: ThemeSummary[] = [
@@ -67,10 +67,10 @@ describe("connecting", () => {
     renderConnect(root, { onConnect: (o, t) => got.push([o, t]), onDisconnect: noop });
 
     root.querySelector<HTMLInputElement>("input[name=origin]")!.value = "https://c.example";
-    root.querySelector<HTMLInputElement>("input[name=token]")!.value = "oxy_live_abc";
+    root.querySelector<HTMLInputElement>("input[name=token]")!.value = "zb_live_abc";
     root.querySelector("form")!.dispatchEvent(new Event("submit", { cancelable: true }));
 
-    expect(got).toEqual([["https://c.example", "oxy_live_abc"]]);
+    expect(got).toEqual([["https://c.example", "zb_live_abc"]]);
   });
 
   it("raises a refusal to a screen reader rather than only showing it", () => {
@@ -83,11 +83,11 @@ describe("connecting", () => {
   });
 
   it("offers to disconnect once connected, and never shows the key again", () => {
-    const credential = { origin: "https://c.example", token: "oxy_live_secret" };
+    const credential = { origin: "https://c.example", token: "zb_live_secret" };
     renderConnect(root, { credential, onConnect: noop, onDisconnect: noop });
 
     expect(text()).toContain("https://c.example");
-    expect(text()).not.toContain("oxy_live_secret");
+    expect(text()).not.toContain("zb_live_secret");
     expect(root.querySelector("button")!.textContent).toBe("Disconnect");
   });
 });
@@ -194,9 +194,9 @@ describe("the pull screen", () => {
   it("names what it is putting back, and why", () => {
     const edited = snapshot([
       {
-        token: "--ox-status-critical",
+        token: "--zb-status-critical",
         name: "status/critical",
-        collection: "Oxygen / Semantic",
+        collection: "Zoblocks / Semantic",
         values: { light: { kind: "color", hex: "#ff00ff", rgb: { r: 1, g: 0, b: 1 } } },
       },
     ]);
@@ -214,7 +214,7 @@ describe("the pull screen", () => {
 
   it("promises not to delete an orphan, in the place it lists them", () => {
     const stale = snapshot([
-      { token: "--ox-legacy", name: "legacy", collection: "Oxygen / Semantic", values: {} },
+      { token: "--zb-legacy", name: "legacy", collection: "Zoblocks / Semantic", values: {} },
     ]);
     renderPull(root, {
       themes: THEMES,

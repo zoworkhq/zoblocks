@@ -1,4 +1,4 @@
-# Oxygen UI — Engineering Standard
+# Zoblocks — Engineering Standard
 
 **This is the document every component, feature, bug fix, release, and
 contribution is evaluated against.** If a review and this document disagree,
@@ -54,7 +54,7 @@ Enforced by `pnpm gen --strict` in CI. **Nothing starts at `stable`.**
 
 ## 1. Purpose and scope
 
-Oxygen UI is a component library for healthcare interfaces. It is used by teams
+Zoblocks is a component library for healthcare interfaces. It is used by teams
 building software that clinicians and patients depend on. Two consequences run
 through everything below:
 
@@ -65,7 +65,7 @@ through everything below:
    _something_ wrong outranks a component that throws, because nobody
    investigates a screen that looks fine.
 
-Oxygen is **not a compliance boundary**, not a medical device, and not clinical
+Zoblocks is **not a compliance boundary**, not a medical device, and not clinical
 decision support. Say so on every surface that could be mistaken for a claim.
 
 ## 2. Architecture invariants
@@ -112,8 +112,8 @@ Scaffold with `pnpm gen:component <name>`. Never by hand.
 the URL slug, and the npm subpath; the generator fails if `meta.name` disagrees.
 
 **Symbols** — React components `PascalCase`; hooks `useCamelCase`; custom
-elements `ox-kebab-case`; CSS classes `ox-<component>__<part>`; custom
-properties `--ox-<component>-<property>`.
+elements `zb-kebab-case`; CSS classes `zb-<component>__<part>`; custom
+properties `--zb-<component>-<property>`.
 
 **Props**
 
@@ -166,7 +166,7 @@ A VPAT/ACR is published per release.
 - **Absence is stated, never punctuated.** Not `—`, not `N/A`.
 - **An uninterpreted result is not a normal one.**
 
-All user-visible strings go through `@oxygenui/intl`. Patient-facing and
+All user-visible strings go through `@zoblocks/intl`. Patient-facing and
 clinician-facing strings are **different catalogs**, not different tones.
 
 ## 8. Tokens and theming

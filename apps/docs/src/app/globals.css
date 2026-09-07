@@ -10,97 +10,97 @@
 @import "./generated-sources.css";
 
 /* Loader keyframes and structure. Shipped to customers as
-   styles/oxygen-loader.css by the `loader-core` registry item; imported here
+   styles/zoblocks-loader.css by the `loader-core` registry item; imported here
    so the docs render the same file a customer installs, not a copy of it. */
-/* Oxygen's reference host chrome — the Button, field, Switch, Checkbox and
+/* Zoblocks's reference host chrome — the Button, field, Switch, Checkbox and
    Tabs that surround a clinical component when no framework is mounted.
-   Shipped by `@oxygenui-design/host-react`; imported here so the previews
+   Shipped by `@zoblocks/host-react`; imported here so the previews
    render the package's own sheet rather than a copy of it. Structure only:
-   every colour and radius in it comes from `--ox-*`, which is what lets the
-   Oxygen state in the language switcher restyle under a bridge. */
+   every colour and radius in it comes from `--zb-*`, which is what lets the
+   Zoblocks state in the language switcher restyle under a bridge. */
 @import "../../../../packages/host-react/src/host.css";
 
-@import "../../../../registry/oxygen/lib/loader.css";
+@import "../../../../registry/zoblocks/lib/loader.css";
 
-/* Recorder ships styles/oxygen-recorder.css by the `recorder-core` registry
+/* Recorder ships styles/zoblocks-recorder.css by the `recorder-core` registry
    item; imported here so the docs render the same sheet a consumer installs. */
-@import "../../../../registry/oxygen/lib/recorder.css";
+@import "../../../../registry/zoblocks/lib/recorder.css";
 
 /* Switch structure, phases and forced-colours handling. Shipped to customers as
-   styles/oxygen-switch.css by the `switch-core` registry item; imported here so
+   styles/zoblocks-switch.css by the `switch-core` registry item; imported here so
    the previews render the same file a customer installs, not a copy of it. */
-@import "../../../../registry/oxygen/lib/switch.css";
+@import "../../../../registry/zoblocks/lib/switch.css";
 
 /* Disclosure structure, severity rails and access states. Shipped as
-   styles/oxygen-accordion.css by the `accordion-core` registry item, and
+   styles/zoblocks-accordion.css by the `accordion-core` registry item, and
    carrying Accordion, ChartAccordion and SafetyPlan between them. Missing here
    until now, which is the other half of why those three had no preview — the
    import could not resolve, and had it resolved it would have rendered a
    severity rail with no severity. */
-@import "../../../../registry/oxygen/lib/accordion.css";
+@import "../../../../registry/zoblocks/lib/accordion.css";
 
-/* Shipped to a consumer as styles/oxygen-clinical-note.css by the
+/* Shipped to a consumer as styles/zoblocks-clinical-note.css by the
    `clinical-note-core` registry item; imported here so the live previews
    render the same file a customer receives. It carries the document surface
    and the six provenance channels — each an underline style as well as a hue,
    so the distinction survives greyscale, forced colours and print. */
-@import "../../../../registry/oxygen/lib/clinical-note.css";
+@import "../../../../registry/zoblocks/lib/clinical-note.css";
 
 /* The closed status vocabulary: seven tones and eleven CSS-drawn glyphs.
-   Shipped as styles/oxygen-clinical-status.css by the `clinical-status-core`
+   Shipped as styles/zoblocks-clinical-status.css by the `clinical-status-core`
    registry item. Imported here so the previews render the file a customer
    installs — which matters more than usual for this one, since the whole
    claim is about what survives when the palette is stripped, and a copy could
    drift from the shipped rules without anyone seeing it. */
-@import "../../../../registry/oxygen/lib/clinical-status.css";
+@import "../../../../registry/zoblocks/lib/clinical-status.css";
 
 /* The value line, the seven absences and the superseded-value rule. Shipped as
-   styles/oxygen-result-value.css by the `result-value-core` registry item. */
-@import "../../../../registry/oxygen/lib/result-value.css";
+   styles/zoblocks-result-value.css by the `result-value-core` registry item. */
+@import "../../../../registry/zoblocks/lib/result-value.css";
 
 /* Criticality against reaction severity, and the two empty states that are not
-   the same fact. Shipped as styles/oxygen-allergy.css by `allergy-core`. */
-@import "../../../../registry/oxygen/lib/allergy.css";
+   the same fact. Shipped as styles/zoblocks-allergy.css by `allergy-core`. */
+@import "../../../../registry/zoblocks/lib/allergy.css";
 
 /* Band first, numeral demoted, staleness on the face. Shipped as
-   styles/oxygen-risk.css by `risk-core`. */
-@import "../../../../registry/oxygen/lib/risk.css";
+   styles/zoblocks-risk.css by `risk-core`. */
+@import "../../../../registry/zoblocks/lib/risk.css";
 
 /* Six source glyphs and the staleness affix. Shipped as
-   styles/oxygen-provenance.css by `provenance-core`. */
-@import "../../../../registry/oxygen/lib/provenance.css";
+   styles/zoblocks-provenance.css by `provenance-core`. */
+@import "../../../../registry/zoblocks/lib/provenance.css";
 
 /* The sparkline, the direction glyph and the break marker. Shipped as
-   styles/oxygen-trend.css by `trend-core`. */
-@import "../../../../registry/oxygen/lib/trend.css";
+   styles/zoblocks-trend.css by `trend-core`. */
+@import "../../../../registry/zoblocks/lib/trend.css";
 
 /* Nine presence rings drawn as shapes rather than hues, the rota gap and the
-   co-presence conflict. Shipped as styles/oxygen-presence.css by
+   co-presence conflict. Shipped as styles/zoblocks-presence.css by
    `presence-core`. */
-@import "../../../../registry/oxygen/lib/presence.css";
+@import "../../../../registry/zoblocks/lib/presence.css";
 
 /* Two heights and one rule: the safety strip is drawn identically in both.
-   Shipped as styles/oxygen-chart-header.css by `chart-header-core`. */
-@import "../../../../registry/oxygen/lib/chart-header.css";
+   Shipped as styles/zoblocks-chart-header.css by `chart-header-core`. */
+@import "../../../../registry/zoblocks/lib/chart-header.css";
 
 /* Eight chart accents, none of them the only identity. Shipped as
-   styles/oxygen-workspace.css by `workspace-core`. */
-@import "../../../../registry/oxygen/lib/workspace.css";
+   styles/zoblocks-workspace.css by `workspace-core`. */
+@import "../../../../registry/zoblocks/lib/workspace.css";
 
 /* One input, grouped results, and the row that counts what it may not name.
-   Shipped as styles/oxygen-palette.css by `palette-core`. */
-@import "../../../../registry/oxygen/lib/palette.css";
+   Shipped as styles/zoblocks-palette.css by `palette-core`. */
+@import "../../../../registry/zoblocks/lib/palette.css";
 
-/* ChartContextMenu. Shipped as styles/oxygen-menu.css by `menu-core`. */
-@import "../../../../registry/oxygen/lib/menu.css";
+/* ChartContextMenu. Shipped as styles/zoblocks-menu.css by `menu-core`. */
+@import "../../../../registry/zoblocks/lib/menu.css";
 
 /* DataGrid, set as a ruled ledger: the masthead rule, the tabular figures,
    the margin marker on the current row and the print block that keeps the
-   whole thing a document. Shipped as styles/oxygen-grid.css by `grid-core`. */
-@import "../../../../registry/oxygen/lib/grid.css";
+   whole thing a document. Shipped as styles/zoblocks-grid.css by `grid-core`. */
+@import "../../../../registry/zoblocks/lib/grid.css";
 
 /* The rail, the coverage footer and the two-column register split. Shipped as
-   styles/oxygen-timeline.css by the `timeline-core` registry item, carrying
+   styles/zoblocks-timeline.css by the `timeline-core` registry item, carrying
    Timeline and CareTimeline between them.
 
    Missing here for a whole session after both components landed, and nothing
@@ -108,17 +108,17 @@
    which applies no CSS at all. Both pages rendered a chronology with no rail,
    no dashed gap and no column split — perfectly accessible, perfectly
    functional, and invisible. `test/docs-stylesheets.test.ts` is the guard. */
-@import "../../../../registry/oxygen/lib/timeline.css";
+@import "../../../../registry/zoblocks/lib/timeline.css";
 
 /* The tab system's own stylesheet, imported from the package rather than
    copied — so the docs demo the exact file a customer installs. Its tokens
-   resolve through --ox-* to --ant-* to a literal, which is why it needs no
+   resolve through --zb-* to --ant-* to a literal, which is why it needs no
    theme wiring here to look right. */
 @import "../../../../packages/tabs/src/styles.css";
 
 /* Patient identity, same reasoning as tabs: the exact file a customer installs,
    not a copy of it. It takes no Ant Design dependency at all — every colour is
-   an --ox-* custom property with a literal fallback, so the demo is correct
+   an --zb-* custom property with a literal fallback, so the demo is correct
    with no theme wiring and stays correct inside an antd app that supplies one. */
 @import "../../../../packages/identity/src/styles.css";
 
@@ -145,9 +145,9 @@
 @import "./pro-soon.css";
 
 /* ===========================================================================
- * oxygenui.design — site design layer
+ * zoblocks.design — site design layer
  *
- * Distinct from the component tokens in @oxygenui-design/tokens. Those describe
+ * Distinct from the component tokens in @zoblocks/tokens. Those describe
  * clinical meaning; these describe the marketing surface.
  *
  * Direction: the page is a calm clinical document with dark *instruments*
@@ -173,8 +173,8 @@
   --color-graphite: var(--site-graphite);
   --color-graphite-soft: var(--site-graphite-soft);
 
-  --color-oxygen: var(--site-oxygen);
-  --color-oxygen-deep: var(--site-accent-text);
+  --color-brand: var(--site-brand);
+  --color-brand-deep: var(--site-accent-text);
   --color-electric: var(--site-electric);
   --color-critical: var(--site-critical);
 
@@ -242,7 +242,7 @@
      of the two so the soft step stays the soft one. */
   --site-graphite-soft: #51625d;
 
-  --site-oxygen: #10b995;
+  --site-brand: #10b995;
   /* Accent used on text. Deep here for contrast on paper; bright in dark. */
   --site-accent-text: #067662;
   --site-electric: #0b7285;
@@ -278,7 +278,7 @@
   /* The text-grade steps of the two panel hues, for when a panel is showing on
      a light ground.
 
-     Same split as `--site-oxygen` (the mark) and `--site-accent-text` (the
+     Same split as `--site-brand` (the mark) and `--site-accent-text` (the
      word): a tone that reads on a surface is not automatically a tone that
      reads as a letterform on it. These exist because the panels tint their own
      chips — a status pill is `text-X` on a 10–15% wash of X — and a wash of the
@@ -319,7 +319,7 @@
   /* The mark takes the saturated brand step; accent *text* takes the
      lighter one, so the two stay as distinguishable as they were when this
      pair was two different cyans. */
-  --site-oxygen: #2dd4b0;
+  --site-brand: #2dd4b0;
   --site-accent-text: #6ce7cb;
   --site-electric: #73d8ff;
   --site-critical: #fb7185;
@@ -352,7 +352,7 @@
  * High contrast — the theme that was emitted and never reachable.
  *
  * `packages/tokens` has shipped 59 high-contrast tokens at a 7:1 floor since
- * the pipeline landed, selected by `[data-ox-theme="high-contrast"]` — an
+ * the pipeline landed, selected by `[data-zb-theme="high-contrast"]` — an
  * attribute nothing in this repository ever set. So the components had a
  * high-contrast mode, no page could turn it on, and `scripts/a11y.ts` audited
  * two themes, which meant it was never checked either.
@@ -367,7 +367,7 @@
  * jumping to AAA would take the choice away from someone who had already
  * chosen dark. It is an option in the toggle, like the other three.
  * -------------------------------------------------------------------- */
-[data-ox-theme="high-contrast"] {
+[data-zb-theme="high-contrast"] {
   --site-paper: #ffffff;
   --site-paper-sunk: #f2f2f2;
   --site-rule: #595959;
@@ -377,7 +377,7 @@
   --site-graphite: #2b2b2b;
   --site-graphite-soft: #333333;
 
-  --site-oxygen: #00594a;
+  --site-brand: #00594a;
   --site-accent-text: #00443a;
   --site-electric: #003d52;
   --site-critical: #8c0000;
@@ -526,17 +526,17 @@ body {
 }
 
 ::selection {
-  background: var(--color-oxygen);
+  background: var(--color-brand);
   color: #fff;
 }
 
 /* Two-tone focus ring: a dark core against the page and a light halo against
    dark panels, so one rule stays visible on every surface in both themes. */
 :focus-visible {
-  outline: 2px solid var(--color-oxygen);
+  outline: 2px solid var(--color-brand);
   outline-offset: 3px;
   border-radius: 3px;
-  box-shadow: 0 0 0 5px color-mix(in oklab, var(--color-oxygen) 18%, transparent);
+  box-shadow: 0 0 0 5px color-mix(in oklab, var(--color-brand) 18%, transparent);
 }
 
 /* Opting out of that ring. The rule above is unlayered, and unlayered styles
@@ -806,7 +806,7 @@ body {
 }
 
 .rail-link[aria-current="true"]::before {
-  background: var(--color-oxygen);
+  background: var(--color-brand);
   width: 2px;
 }
 
@@ -977,7 +977,7 @@ body {
   display: block;
   width: 0.2rem;
   border-radius: 999px;
-  background: var(--color-oxygen);
+  background: var(--color-brand);
 }
 
 .state-fact__signal span:nth-child(1) {
@@ -1009,9 +1009,9 @@ body {
 
 .state-fact__unit {
   padding: 0.3rem 0.45rem;
-  border: 1px solid color-mix(in oklab, var(--color-oxygen) 28%, var(--color-rule));
+  border: 1px solid color-mix(in oklab, var(--color-brand) 28%, var(--color-rule));
   border-radius: 0.4rem;
-  color: var(--color-oxygen-deep);
+  color: var(--color-brand-deep);
   font-size: 0.5625rem;
   letter-spacing: 0.12em;
 }
@@ -1037,7 +1037,7 @@ body {
   display: block;
   width: 30%;
   height: 1px;
-  background: var(--color-oxygen);
+  background: var(--color-brand);
 }
 
 .state-fact:nth-child(2) .state-fact__baseline span {
@@ -1112,7 +1112,7 @@ body {
  * A word, and a colour behind it. Colour alone would be the exact failure the
  * table is reporting on — 1.4.1 is one of the rows.
  */
-[data-ox-check] {
+[data-zb-check] {
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
@@ -1123,7 +1123,7 @@ body {
   white-space: nowrap;
 }
 
-[data-ox-check]::before {
+[data-zb-check]::before {
   content: "";
   inline-size: 0.375rem;
   block-size: 0.375rem;
@@ -1131,30 +1131,30 @@ body {
   background: currentColor;
 }
 
-[data-ox-check="pass"] {
-  color: var(--color-oxygen-deep);
-  border-color: color-mix(in oklab, var(--color-oxygen) 35%, var(--color-rule));
-  background: color-mix(in oklab, var(--color-oxygen) 8%, transparent);
+[data-zb-check="pass"] {
+  color: var(--color-brand-deep);
+  border-color: color-mix(in oklab, var(--color-brand) 35%, var(--color-rule));
+  background: color-mix(in oklab, var(--color-brand) 8%, transparent);
 }
 
-[data-ox-check="partial"] {
+[data-zb-check="partial"] {
   color: var(--color-ink);
   border-color: var(--color-rule-strong);
 }
 
-[data-ox-check="fail"] {
+[data-zb-check="fail"] {
   color: var(--color-critical);
   border-color: color-mix(in oklab, var(--color-critical) 40%, var(--color-rule));
   background: color-mix(in oklab, var(--color-critical) 8%, transparent);
 }
 
 /* Not a smaller pass. The dot is dropped so it does not read as a result. */
-[data-ox-check="not-applicable"] {
+[data-zb-check="not-applicable"] {
   color: var(--color-graphite-soft);
   border-style: dashed;
 }
 
-[data-ox-check="not-applicable"]::before {
+[data-zb-check="not-applicable"]::before {
   display: none;
 }
 
@@ -1261,8 +1261,8 @@ body {
 }
 
 .hero-resource-chip:hover {
-  border-color: color-mix(in oklab, var(--color-oxygen) 45%, var(--color-rule));
-  background: color-mix(in oklab, var(--color-oxygen) 6%, transparent);
+  border-color: color-mix(in oklab, var(--color-brand) 45%, var(--color-rule));
+  background: color-mix(in oklab, var(--color-brand) 6%, transparent);
   color: var(--color-ink);
 }
 
@@ -1358,11 +1358,11 @@ html:not(.dark) .signal-field {
 }
 
 html:not(.dark) .signal-core {
-  border-color: color-mix(in oklab, var(--color-oxygen) 32%, var(--color-panel-rule));
+  border-color: color-mix(in oklab, var(--color-brand) 32%, var(--color-panel-rule));
   background: var(--color-panel-raised);
   box-shadow:
-    0 0 0 0.5rem color-mix(in oklab, var(--color-oxygen) 5%, transparent),
-    0 0 3rem color-mix(in oklab, var(--color-oxygen) 12%, transparent),
+    0 0 0 0.5rem color-mix(in oklab, var(--color-brand) 5%, transparent),
+    0 0 3rem color-mix(in oklab, var(--color-brand) 12%, transparent),
     0 20px 40px -18px rgb(2 20 17 / 0.18);
 }
 
@@ -1516,7 +1516,7 @@ html:not(.dark) .signal-status {
  * so `text-ink` and `text-graphite-soft` inside one are the page's colours on a
  * ground the page never has. It only looked fine in dark, where the document is
  * dark too, and that coincidence is what kept it: on the light home page the
- * closing CTA's paragraph measured 3.50:1 and the `oxygen init` code inside it
+ * closing CTA's paragraph measured 3.50:1 and the `zoblocks init` code inside it
  * measured 1:1 — near-black on near-black, invisible rather than merely dim, and
  * reported by axe as `incomplete` because the trace behind it obscures the
  * sample. High contrast was the loudest at 1.66:1 but the least surprising: the
@@ -1783,8 +1783,8 @@ html:not(.dark) .instrument-demo [class*="bg-panel"] {
 }
 
 /* The date, time and session family. Shipped to a consumer as
-   styles/oxygen-datetime.css by the `datetime-core` registry item, and
+   styles/zoblocks-datetime.css by the `datetime-core` registry item, and
    imported here so the docs render the same chrome the CLI installs.
-   Every input in it spends the shared --ox-field-* tokens, so a date field
+   Every input in it spends the shared --zb-field-* tokens, so a date field
    and a dose field cannot drift apart in a customer's theme. */
-@import "../../../../registry/oxygen/lib/datetime.css";
+@import "../../../../registry/zoblocks/lib/datetime.css";

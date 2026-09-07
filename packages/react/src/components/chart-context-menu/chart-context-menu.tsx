@@ -7,7 +7,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/chart-context-menu/chart-context-menu.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/chart-context-menu/chart-context-menu.tsx. Edit that file, not this one.
 /**
  * ChartContextMenu — a right-click menu that names what it is about before it
  * offers to change it.
@@ -24,7 +24,7 @@
  *     </ChartContextMenu>
  *
  * Three behaviours are the component rather than decoration on it, and all
- * three live in `@/lib/oxygen-menu` so they can be tested without a DOM.
+ * three live in `@/lib/zoblocks-menu` so they can be tested without a DOM.
  *
  *   The menu states its subject, and the subject row is the safe landing. The
  *   pixel under the pointer at the moment of opening is never a verb.
@@ -41,7 +41,7 @@
  * grid the trigger is a `<tr>` you do not own, and a component that wraps it
  * in a `<div>` has broken the table.
  *
- * Styling lives in `styles/oxygen-menu.css`, installed alongside.
+ * Styling lives in `styles/zoblocks-menu.css`, installed alongside.
  */
 
 import * as React from "react";
@@ -156,10 +156,10 @@ export interface MenuTriggerProps {
   /**
    * Identity, always present — a styling hook for "this row owns a menu", and
    * the marker the story harness looks for to prove a story rendered
-   * something of ours. `data-ox-menu-open` is the state and comes and goes.
+   * something of ours. `data-zb-menu-open` is the state and comes and goes.
    */
-  "data-ox-menu": "";
-  "data-ox-menu-open"?: "";
+  "data-zb-menu": "";
+  "data-zb-menu-open"?: "";
 }
 
 export interface ChartContextMenuProps {
@@ -456,7 +456,7 @@ function placeBeside(rect: DOMRect, width: number): Placement {
 function scopeOf(element: HTMLElement | null): Record<string, string> {
   if (!element || typeof element.closest !== "function") return {};
   const scope: Record<string, string> = {};
-  for (const attribute of ["data-ox-theme", "data-ox-density", "data-ox-brand", "dir"]) {
+  for (const attribute of ["data-zb-theme", "data-zb-density", "data-zb-brand", "dir"]) {
     const value = element.closest(`[${attribute}]`)?.getAttribute(attribute);
     if (value) scope[attribute] = value;
   }
@@ -483,7 +483,7 @@ function initialsOf(label: string): string {
 /** A 16px slot that is always there, so every label starts at the same x. */
 function Glyph({ children }: { children?: React.ReactNode }) {
   return (
-    <span className="ox-menu__icon" aria-hidden="true">
+    <span className="zb-menu__icon" aria-hidden="true">
       {children}
     </span>
   );
@@ -518,7 +518,7 @@ function Chevron() {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="ox-menu__chevron"
+      className="zb-menu__chevron"
       aria-hidden="true"
     >
       <path d="m9.5 5.5 6.5 6.5-6.5 6.5" />
@@ -936,8 +936,8 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
     tabIndex: 0,
     role: "button",
     "aria-haspopup": "menu",
-    "data-ox-menu": "",
-    ...(open !== null ? { "data-ox-menu-open": "" as const } : {}),
+    "data-zb-menu": "",
+    ...(open !== null ? { "data-zb-menu-open": "" as const } : {}),
 
     onContextMenu: (event) => {
       if (disabled) return;
@@ -1377,9 +1377,9 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
       aria-labelledby={subjectId}
       aria-orientation="vertical"
       className={cn(
-        "ox-menu",
-        isSheet && "ox-menu--sheet",
-        open.presentation === "anchored" && "ox-menu--anchored",
+        "zb-menu",
+        isSheet && "zb-menu--sheet",
+        open.presentation === "anchored" && "zb-menu--anchored",
         className,
       )}
       style={
@@ -1391,25 +1391,25 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
                 left: box.left,
                 maxBlockSize: box.maxHeight,
                 // A custom property, which `CSSProperties` has no room for.
-                "--ox-menu-origin": box.origin,
+                "--zb-menu-origin": box.origin,
               } as unknown as React.CSSProperties)
             : ({ visibility: "hidden", top: 0, left: 0 } as React.CSSProperties)
       }
       onKeyDown={onPanelKeyDown}
-      {...(contained ? { "data-ox-contained": "" } : {})}
+      {...(contained ? { "data-zb-contained": "" } : {})}
       {...scopeOf(triggerRef.current)}
-      {...(density ? { "data-ox-density": density } : {})}
+      {...(density ? { "data-zb-density": density } : {})}
     >
-      {isSheet ? <div className="ox-menu__grip" aria-hidden="true" /> : null}
+      {isSheet ? <div className="zb-menu__grip" aria-hidden="true" /> : null}
 
       {/* Region one. Always. Never interactive. Names the popup. */}
       <div
         id={subjectId}
-        className="ox-menu__subject"
+        className="zb-menu__subject"
         role="presentation"
-        {...(resolved.subject.masked ? { "data-ox-masked": "" } : {})}
+        {...(resolved.subject.masked ? { "data-zb-masked": "" } : {})}
       >
-        <span className="ox-menu__avatar" aria-hidden="true">
+        <span className="zb-menu__avatar" aria-hidden="true">
           {resolved.subject.bulk > 1 ? (
             <People />
           ) : resolved.subject.masked ? (
@@ -1427,16 +1427,16 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
           )}
         </span>
         <span>
-          <span className="ox-menu__who">{resolved.subject.who}</span>
+          <span className="zb-menu__who">{resolved.subject.who}</span>
           {resolved.subject.what ? (
-            <span className="ox-menu__what">{resolved.subject.what}</span>
+            <span className="zb-menu__what">{resolved.subject.what}</span>
           ) : null}
         </span>
       </div>
 
-      <div className="ox-menu__list">
+      <div className="zb-menu__list">
         {resolved.sections.length === 0 ? (
-          <p className="ox-menu__empty">
+          <p className="zb-menu__empty">
             {resolved.withheld
               ? "No action on this record is available to you."
               : "This record supports no actions."}
@@ -1445,8 +1445,8 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
 
         {resolved.sections.map((section, sectionIndex) => (
           <React.Fragment key={`${section.tier}-${section.label ?? ""}`}>
-            {sectionIndex > 0 ? <hr className="ox-menu__separator" /> : null}
-            {section.label ? <div className="ox-menu__group">{section.label}</div> : null}
+            {sectionIndex > 0 ? <hr className="zb-menu__separator" /> : null}
+            {section.label ? <div className="zb-menu__group">{section.label}</div> : null}
             {section.items.map((row) => {
               flat += 1;
               const index = flat;
@@ -1479,10 +1479,10 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
                           : "menuitem"
                     }
                     tabIndex={active === index ? 0 : -1}
-                    className="ox-menu__item"
-                    data-ox-tier={tier}
-                    {...(pending ? { "data-ox-pending": "" } : {})}
-                    {...(active === index ? { "data-ox-active": "" } : {})}
+                    className="zb-menu__item"
+                    data-zb-tier={tier}
+                    {...(pending ? { "data-zb-pending": "" } : {})}
+                    {...(active === index ? { "data-zb-active": "" } : {})}
                     {...(toggle ? { "aria-checked": Boolean(action.checked) } : {})}
                     {...(action.submenu?.length
                       ? {
@@ -1523,8 +1523,8 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
                   >
                     {toggle ? (
                       <span
-                        className="ox-menu__indicator"
-                        data-ox-shape={action.kind === "radio" ? "radio" : "checkbox"}
+                        className="zb-menu__indicator"
+                        data-zb-shape={action.kind === "radio" ? "radio" : "checkbox"}
                         aria-hidden="true"
                       >
                         {action.kind === "checkbox" ? <Check /> : null}
@@ -1534,15 +1534,15 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
                     )}
 
                     {pending ? (
-                      <span className="ox-menu__skeleton" aria-hidden="true" />
+                      <span className="zb-menu__skeleton" aria-hidden="true" />
                     ) : (
-                      <span className="ox-menu__label">{action.label}</span>
+                      <span className="zb-menu__label">{action.label}</span>
                     )}
 
                     {action.submenu?.length ? (
                       <Chevron />
                     ) : (
-                      <span className="ox-menu__shortcut">{action.shortcut ?? ""}</span>
+                      <span className="zb-menu__shortcut">{action.shortcut ?? ""}</span>
                     )}
 
                     {/*
@@ -1550,7 +1550,7 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
                     keyboard user, and this is exactly the text that person
                     needs most: what the action writes, or why it will not run.
                   */}
-                    {note ? <span className="ox-menu__note">{note}</span> : null}
+                    {note ? <span className="zb-menu__note">{note}</span> : null}
                   </div>
 
                   {confirming === action.id ? (
@@ -1586,15 +1586,15 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
       </div>
 
       {withheldSentence ? (
-        <p className="ox-menu__withheld">
-          <span className="ox-menu__icon" aria-hidden="true">
+        <p className="zb-menu__withheld">
+          <span className="zb-menu__icon" aria-hidden="true">
             <Lock />
           </span>
           <span>{withheldSentence}</span>
         </p>
       ) : null}
 
-      <span className="ox-menu__live" aria-live="polite">
+      <span className="zb-menu__live" aria-live="polite">
         {announcement}
       </span>
     </div>
@@ -1605,7 +1605,7 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
       {children(trigger)}
       {createPortal(
         <>
-          {isSheet ? <div className="ox-menu__backdrop" onClick={() => close()} /> : null}
+          {isSheet ? <div className="zb-menu__backdrop" onClick={() => close()} /> : null}
           {panel}
         </>,
         container ?? document.body,
@@ -1663,14 +1663,14 @@ function ConfirmStrip(props: {
   if (outcome.kind !== "confirm") return null;
 
   return (
-    <div className="ox-menu__confirm" role="group" aria-label={outcome.verb}>
-      <p className="ox-menu__prompt">{outcome.prompt}</p>
-      {outcome.bulkPrompt ? <p className="ox-menu__bulk-prompt">{outcome.bulkPrompt}</p> : null}
-      <div className="ox-menu__actions">
+    <div className="zb-menu__confirm" role="group" aria-label={outcome.verb}>
+      <p className="zb-menu__prompt">{outcome.prompt}</p>
+      {outcome.bulkPrompt ? <p className="zb-menu__bulk-prompt">{outcome.bulkPrompt}</p> : null}
+      <div className="zb-menu__actions">
         <button
           type="button"
-          className="ox-menu__button"
-          data-ox-primary=""
+          className="zb-menu__button"
+          data-zb-primary=""
           onClick={(event) => {
             event.stopPropagation();
             onGo();
@@ -1680,7 +1680,7 @@ function ConfirmStrip(props: {
         </button>
         <button
           type="button"
-          className="ox-menu__button"
+          className="zb-menu__button"
           onClick={(event) => {
             event.stopPropagation();
             onKeep();
@@ -1705,25 +1705,25 @@ function ReasonList(props: { action: ChartMenuAction; onPick: (reason: string) =
   const reasons = action.reasons ?? [];
 
   return (
-    <div className="ox-menu__reasons" role="group" aria-label={`Reason for ${action.label}`}>
-      <p className="ox-menu__reasons-head">
+    <div className="zb-menu__reasons" role="group" aria-label={`Reason for ${action.label}`}>
+      <p className="zb-menu__reasons-head">
         This reveals data you are not currently entitled to. <strong>Record a reason.</strong>
       </p>
       {reasons.map((reason) => (
         <button
           key={reason}
           type="button"
-          className="ox-menu__reason"
+          className="zb-menu__reason"
           onClick={(event) => {
             event.stopPropagation();
             onPick(reason);
           }}
         >
-          <span className="ox-menu__indicator" data-ox-shape="radio" aria-hidden="true" />
+          <span className="zb-menu__indicator" data-zb-shape="radio" aria-hidden="true" />
           <span>{reason}</span>
         </button>
       ))}
-      <p className="ox-menu__reasons-foot">
+      <p className="zb-menu__reasons-foot">
         Recorded either way — including if you close this menu now.
       </p>
     </div>
@@ -1841,15 +1841,15 @@ function Submenu(props: {
       tabIndex={-1}
       aria-labelledby={labelledBy}
       aria-orientation="vertical"
-      className={cn("ox-menu", "ox-menu--sub")}
-      data-ox-submenu=""
+      className={cn("zb-menu", "zb-menu--sub")}
+      data-zb-submenu=""
       style={
         box
           ? ({
               ...(box.top === undefined ? { bottom: box.bottom } : { top: box.top }),
               left: box.left,
               maxBlockSize: box.maxHeight,
-              "--ox-menu-origin": box.origin,
+              "--zb-menu-origin": box.origin,
             } as unknown as React.CSSProperties)
           : ({ visibility: "hidden", top: 0, left: 0 } as React.CSSProperties)
       }
@@ -1887,9 +1887,9 @@ function Submenu(props: {
         }
       }}
       {...scope}
-      {...(compact ? { "data-ox-density": "compact" } : {})}
+      {...(compact ? { "data-zb-density": "compact" } : {})}
     >
-      <div className="ox-menu__list">
+      <div className="zb-menu__list">
         {items.map((item, index) => (
           <div
             key={item.id}
@@ -1899,9 +1899,9 @@ function Submenu(props: {
             }}
             role="menuitem"
             tabIndex={active === index ? 0 : -1}
-            className="ox-menu__item"
-            data-ox-tier="routine"
-            {...(active === index ? { "data-ox-active": "" } : {})}
+            className="zb-menu__item"
+            data-zb-tier="routine"
+            {...(active === index ? { "data-zb-active": "" } : {})}
             onMouseEnter={() => setActive(index)}
             onClick={(event) => {
               event.stopPropagation();
@@ -1909,8 +1909,8 @@ function Submenu(props: {
             }}
           >
             <Glyph>{item.icon}</Glyph>
-            <span className="ox-menu__label">{item.label}</span>
-            <span className="ox-menu__shortcut">{item.shortcut ?? ""}</span>
+            <span className="zb-menu__label">{item.label}</span>
+            <span className="zb-menu__shortcut">{item.shortcut ?? ""}</span>
           </div>
         ))}
       </div>

@@ -2,7 +2,7 @@
  * The claim that makes this package worth extracting, asserted rather than
  * stated in a comment.
  *
- * `@oxygenui-design/tokens/validate` has to run in three places: the build,
+ * `@zoblocks/tokens/validate` has to run in three places: the build,
  * a server action, and a browser. A single `import { readFile } from
  * "node:fs/promises"` anywhere in the graph breaks the third one — and it
  * breaks it at the customer's bundler, not here, unless something checks.

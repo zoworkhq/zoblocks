@@ -5,7 +5,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/lib/workspace.ts. Edit that file, not this one.
+// Generated from registry/zoblocks/lib/workspace.ts. Edit that file, not this one.
 /**
  * A multi-chart workspace, and the reason one exists at all.
  *

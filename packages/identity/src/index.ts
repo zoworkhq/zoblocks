@@ -1,8 +1,8 @@
 /**
- * @oxygenui-design/identity — patient identity for Ant Design.
+ * @zoblocks/identity — patient identity for Ant Design.
  *
- *     import { IdentityProvider, PatientBanner, PatientGuard } from "@oxygenui-design/identity";
- *     import "@oxygenui-design/identity/styles.css";
+ *     import { IdentityProvider, PatientBanner, PatientGuard } from "@zoblocks/identity";
+ *     import "@zoblocks/identity/styles.css";
  *
  *     <IdentityProvider disclosure="clinical" photos="allow">
  *       <PatientBanner
@@ -16,7 +16,7 @@
  *     </IdentityProvider>
  *
  * The engine — name resolution, deterministic swatches, script-aware initials,
- * and the disambiguation pass — lives in `@oxygenui-design/identity-core` and
+ * and the disambiguation pass — lives in `@zoblocks/identity-core` and
  * has no React and no Ant Design in it.
  */
 
@@ -88,4 +88,4 @@ export type {
   IdentityState,
   PhotoState,
   SensitivityCode,
-} from "@oxygenui-design/identity-core";
+} from "@zoblocks/identity-core";

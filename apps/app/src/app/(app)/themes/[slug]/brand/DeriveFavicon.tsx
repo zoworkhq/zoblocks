@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Scissors } from "lucide-react";
-import type { BrandAssetFile } from "@oxygenui-design/theme";
+import type { BrandAssetFile } from "@zoblocks/theme";
 import { uploadBrandAssetAction } from "@/lib/actions";
 import { Button, Callout, Field, Panel, Select, SubmitButton } from "@/components/ui";
 import { ActionForm } from "@/components/action-form";

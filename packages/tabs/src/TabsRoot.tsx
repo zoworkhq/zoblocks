@@ -36,7 +36,7 @@ import {
   type TabVariant,
   type TabsLocale,
   type TransitionKind,
-} from "@oxygenui-design/tabs-core";
+} from "@zoblocks/tabs-core";
 import {
   TabsContext,
   ValidatedByParent,
@@ -510,17 +510,17 @@ export const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps>(function
       <div
         {...rest}
         ref={forwardedRef}
-        className={["ox-tabs", className].filter(Boolean).join(" ")}
-        data-ox-variant={variant}
-        data-ox-mode={mode}
-        data-ox-orientation={orientation}
-        data-ox-size={size}
-        data-ox-fill={fill}
-        data-ox-overflow={overflow}
-        data-ox-transition={transition}
-        data-ox-virtualised={virtualise || undefined}
-        data-ox-indicator={resolveIndicator(indicator, variant)}
-        data-ox-pending={pending || undefined}
+        className={["zb-tabs", className].filter(Boolean).join(" ")}
+        data-zb-variant={variant}
+        data-zb-mode={mode}
+        data-zb-orientation={orientation}
+        data-zb-size={size}
+        data-zb-fill={fill}
+        data-zb-overflow={overflow}
+        data-zb-transition={transition}
+        data-zb-virtualised={virtualise || undefined}
+        data-zb-indicator={resolveIndicator(indicator, variant)}
+        data-zb-pending={pending || undefined}
       >
         {children}
       </div>

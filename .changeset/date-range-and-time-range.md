@@ -1,5 +1,5 @@
 ---
-"@oxygenui-design/react": minor
+"@zoblocks/react": minor
 ---
 
 DatePicker — the range half of the component, which was previously a
@@ -84,7 +84,7 @@ previous control and one next for the whole window, not a pair per month — two
 buttons both announced "Previous month" and both doing the same thing is a
 riddle for anybody reading the dialog through its names.
 
-**`@oxygenui-design/react` engine additions:** `startOfWeek`, `endOfWeek`,
+**`@zoblocks/react` engine additions:** `startOfWeek`, `endOfWeek`,
 `startOfMonth`, `endOfMonth`, `startOfYear`, `endOfYear`, `normalizeDateRange`,
 `rangeDayCount`, `rangeContains`, `isSameRange`, `isCompleteRange`,
 `dateRangePresets`, `matchRangePreset`, `timeRangeMinutes`, a `DateShortcut`

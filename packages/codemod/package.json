@@ -1,12 +1,12 @@
 {
-  "name": "@oxygenui-design/codemod",
+  "name": "@zoblocks/codemod",
   "version": "0.1.0",
-  "description": "Migration codemods for Oxygen UI. Rewrites what it can prove and reports what it cannot, rather than guessing.",
+  "description": "Migration codemods for Zoblocks. Rewrites what it can prove and reports what it cannot, rather than guessing.",
   "license": "MIT",
-  "homepage": "https://oxygenui.design",
+  "homepage": "https://zoblocks.design",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zoworkhq/oxygenui.git",
+    "url": "git+https://github.com/zoworkhq/zoblocks.git",
     "directory": "packages/codemod"
   },
   "keywords": [
@@ -23,7 +23,7 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "bin": {
-    "oxygen-codemod": "./bin/oxygen-codemod.mjs"
+    "zoblocks-codemod": "./bin/zoblocks-codemod.mjs"
   },
   "exports": {
     ".": "./src/index.ts",
@@ -58,7 +58,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
-    "@oxygenui-design/tsconfig": "workspace:*",
+    "@zoblocks/tsconfig": "workspace:*",
     "@vitest/coverage-v8": "^4.1.10",
     "typescript": "^5.7.2",
     "vitest": "^4.1.10"

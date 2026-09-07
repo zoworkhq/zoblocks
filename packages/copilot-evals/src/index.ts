@@ -1,12 +1,12 @@
 /**
- * @oxygenui-design/copilot-evals — the harness and the gate.
+ * @zoblocks/copilot-evals — the harness and the gate.
  *
  * Shipped as a package rather than described in a document, because the whole
  * argument of this component is that verification should be cheaper than
  * acceptance, and that has to apply to the component itself.
  *
  *     import { assertReleaseGate, buildReport, crisisResponse, CRISIS_CASES }
- *       from "@oxygenui-design/copilot-evals";
+ *       from "@zoblocks/copilot-evals";
  *
  *     it("clears the release gate", () => {
  *       const report = buildReport([crisisResponse({ cases: OUR_CASES })]);

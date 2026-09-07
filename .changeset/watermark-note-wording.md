@@ -1,5 +1,5 @@
 ---
-"@oxygenui-design/theme": patch
+"@zoblocks/theme": patch
 ---
 
 Reword the draft-watermark note so it says what it means.

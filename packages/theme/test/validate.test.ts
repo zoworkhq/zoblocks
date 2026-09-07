@@ -8,7 +8,7 @@
 
 import { describe, expect, it } from "vitest";
 import { loadTokenSource } from "../../../scripts/gen/tokens/load";
-import type { TokenSource } from "@oxygenui-design/tokens/validate";
+import type { TokenSource } from "@zoblocks/tokens/validate";
 import {
   VALIDATOR_VERSION,
   isServable,
@@ -171,7 +171,7 @@ describe("semantic overrides", () => {
    * reported against their brand, so `validateTheme` filtered on that prefix. An
    * override changes the *base* palette instead, and the gate reports those with
    * no prefix at all — so the first version of this let a customer make body
-   * text unreadable and publish it, with the failure attributed to Oxygen and
+   * text unreadable and publish it, with the failure attributed to Zoblocks and
    * shown to nobody.
    */
   it("fails an override that makes body text unreadable", async () => {
@@ -231,7 +231,7 @@ describe("component overrides", () => {
       "nw",
       // Accordion rather than badge: every badge colour is a status colour, so
       // the whole component is clinical and none of it is a legal example.
-      withComponent({ "--ox-accordion-header-bg": "#0b5aa8" }),
+      withComponent({ "--zb-accordion-header-bg": "#0b5aa8" }),
       NOW,
     );
     expect(result.problems).toEqual([]);
@@ -241,7 +241,7 @@ describe("component overrides", () => {
     const result = validateTheme(
       await tokens(),
       "nw",
-      withComponent({ "--ox-badge-critcal-bg": "#0b5aa8" }),
+      withComponent({ "--zb-badge-critcal-bg": "#0b5aa8" }),
       NOW,
     );
 
@@ -255,7 +255,7 @@ describe("component overrides", () => {
     const result = validateTheme(
       await tokens(),
       "nw",
-      withComponent({ "--ox-badge-critical-bg": "#0b5aa8" }),
+      withComponent({ "--zb-badge-critical-bg": "#0b5aa8" }),
       NOW,
     );
 
@@ -267,7 +267,7 @@ describe("component overrides", () => {
     const result = validateTheme(
       await tokens(),
       "nw",
-      withComponent({ "--ox-accordion-header-bg": "3px" }),
+      withComponent({ "--zb-accordion-header-bg": "3px" }),
       NOW,
     );
 

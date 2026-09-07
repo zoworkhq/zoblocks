@@ -31,7 +31,7 @@ export default function GlobalError({
   return (
     <html lang="en-GB">
       <head>
-        <title>Something went wrong · Oxygen app</title>
+        <title>Something went wrong · Zoblocks app</title>
       </head>
       <body
         style={{
@@ -54,14 +54,14 @@ export default function GlobalError({
         <style>{`
           @media (prefers-color-scheme: dark) {
             body { background: #080b10 !important; color: #edf2f7 !important; }
-            .ox-panel { background: #0e1614 !important; border-color: #1f2b28 !important; }
-            .ox-muted { color: #9aaba4 !important; }
-            .ox-btn { background: #6ce7cb !important; color: #08110f !important; }
+            .zb-panel { background: #0e1614 !important; border-color: #1f2b28 !important; }
+            .zb-muted { color: #9aaba4 !important; }
+            .zb-btn { background: #6ce7cb !important; color: #08110f !important; }
           }
         `}</style>
 
         <main
-          className="ox-panel"
+          className="zb-panel"
           style={{
             maxWidth: "30rem",
             width: "100%",
@@ -83,7 +83,7 @@ export default function GlobalError({
             The app could not start
           </h1>
 
-          <p className="ox-muted" style={{ margin: 0, fontSize: "0.875rem", color: "#5a6b67" }}>
+          <p className="zb-muted" style={{ margin: 0, fontSize: "0.875rem", color: "#5a6b67" }}>
             This is a failure in the application shell rather than in one screen. Nothing you were
             working on has been changed or published.
           </p>
@@ -91,7 +91,7 @@ export default function GlobalError({
           <button
             type="button"
             onClick={() => retry()}
-            className="ox-btn"
+            className="zb-btn"
             style={{
               marginTop: "1.5rem",
               font: "inherit",
@@ -110,7 +110,7 @@ export default function GlobalError({
 
           {error.digest && (
             <p
-              className="ox-muted"
+              className="zb-muted"
               style={{
                 marginTop: "1.5rem",
                 paddingTop: "1rem",

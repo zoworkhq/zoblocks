@@ -11,11 +11,11 @@ import { fileURLToPath } from "node:url";
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 
-export const HOMEPAGE = "https://oxygenui.design";
-export const REGISTRY_NAME = "oxygenui";
+export const HOMEPAGE = "https://zoblocks.design";
+export const REGISTRY_NAME = "zoblocks";
 
 /** Where component source lives today. Phase 1 moves this to packages/react/src/components. */
-export const COMPONENTS_DIR = path.join(ROOT, "registry", "oxygen");
+export const COMPONENTS_DIR = path.join(ROOT, "registry", "zoblocks");
 
 /** Directories under COMPONENTS_DIR that are not components. */
 export const NON_COMPONENT_DIRS = new Set(["lib"]);
@@ -55,14 +55,14 @@ export const SUPPORT_ITEM_NAMES: ReadonlySet<string> = new Set([
   "recorder-core",
 ]);
 
-/** Prefix the Oxygen CLI writes component files under, inside the consumer's project. */
-export const CONSUMER_COMPONENT_DIR = "components/oxygen";
+/** Prefix the Zoblocks CLI writes component files under, inside the consumer's project. */
+export const CONSUMER_COMPONENT_DIR = "components/zoblocks";
 
 export const paths = {
   registryJson: path.join(ROOT, "registry.json"),
   registryOut: path.join(ROOT, "apps", "docs", "public", "r"),
   /**
-   * The JSON Schema documents every registry item and every `oxygen.json`
+   * The JSON Schema documents every registry item and every `zoblocks.json`
    * points at. Served from the docs site, so the `$schema` URLs resolve.
    */
   schemaOut: path.join(ROOT, "apps", "docs", "public", "schema"),

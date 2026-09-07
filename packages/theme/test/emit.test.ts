@@ -30,8 +30,8 @@ describe("themeHref", () => {
 describe("emitThemeCss", () => {
   it("writes the primitive ramp as custom properties", () => {
     const css = emitThemeCss(publishedTheme());
-    expect(css).toContain("--ox-ref-brand-600: #1d63c9;");
-    expect(css).toContain("--ox-ref-brand-700: #1a53a8;");
+    expect(css).toContain("--zb-ref-brand-600: #1d63c9;");
+    expect(css).toContain("--zb-ref-brand-700: #1a53a8;");
   });
 
   /**
@@ -46,11 +46,11 @@ describe("emitThemeCss", () => {
   it("emits no clinical token, so a theme cannot redefine what critical means", () => {
     const theme = publishedTheme();
     theme.tokens.semantic.light["accent"] = "#0b6bcb";
-    theme.tokens.component.dark["--ox-badge-accent-bg"] = "#123456";
+    theme.tokens.component.dark["--zb-badge-accent-bg"] = "#123456";
 
     const css = emitThemeCss(theme);
-    expect(css).not.toContain("--ox-status-");
-    expect(css).not.toContain("--ox-flag-");
+    expect(css).not.toContain("--zb-status-");
+    expect(css).not.toContain("--zb-flag-");
   });
 
   it("writes semantic overrides, scoped to the theme they belong to", () => {
@@ -60,17 +60,17 @@ describe("emitThemeCss", () => {
 
     const css = emitThemeCss(theme, { header: false });
 
-    // Light rides the bare scope: a page that sets no `data-ox-theme` is light.
-    expect(css).toContain(":root {\n  --ox-accent: #0b6bcb;\n}");
-    expect(css).toContain(':root[data-ox-theme="dark"] {\n  --ox-accent: #7dd3fc;\n}');
+    // Light rides the bare scope: a page that sets no `data-zb-theme` is light.
+    expect(css).toContain(":root {\n  --zb-accent: #0b6bcb;\n}");
+    expect(css).toContain(':root[data-zb-theme="dark"] {\n  --zb-accent: #7dd3fc;\n}');
   });
 
   it("writes component overrides under the same theme scope", () => {
     const theme = publishedTheme();
-    theme.tokens.component["high-contrast"]["--ox-badge-accent-bg"] = "#000000";
+    theme.tokens.component["high-contrast"]["--zb-badge-accent-bg"] = "#000000";
 
     expect(emitThemeCss(theme, { header: false })).toContain(
-      ':root[data-ox-theme="high-contrast"] {\n  --ox-badge-accent-bg: #000000;\n}',
+      ':root[data-zb-theme="high-contrast"] {\n  --zb-badge-accent-bg: #000000;\n}',
     );
   });
 
@@ -85,22 +85,22 @@ describe("emitThemeCss", () => {
     (theme as { tokens: unknown }).tokens = { ref: { brand: { "600": "#1d63c9" } } };
 
     expect(() => emitThemeCss(theme)).not.toThrow();
-    expect(emitThemeCss(theme)).toContain("--ox-ref-brand-600: #1d63c9;");
+    expect(emitThemeCss(theme)).toContain("--zb-ref-brand-600: #1d63c9;");
   });
 
   it("scopes to :root by default and to a brand selector on request", () => {
     expect(emitThemeCss(publishedTheme())).toContain(":root {");
     expect(
-      emitThemeCss(publishedTheme(), { scope: '[data-ox-brand="northwind-clinical"]' }),
-    ).toContain('[data-ox-brand="northwind-clinical"] {');
+      emitThemeCss(publishedTheme(), { scope: '[data-zb-brand="northwind-clinical"]' }),
+    ).toContain('[data-zb-brand="northwind-clinical"] {');
   });
 
   /**
    * The defect recorded in ADR 0014, now closed.
    *
    * A `var()` resolves at the element that *declares* it, and the component
-   * tier is declared once at `:root` — `--ox-switch-track-on-bg:
-   * var(--ox-accent)`. Overriding `--ox-accent` on a subtree moved the accent
+   * tier is declared once at `:root` — `--zb-switch-track-on-bg:
+   * var(--zb-accent)`. Overriding `--zb-accent` on a subtree moved the accent
    * there and left every component token holding the value it had already
    * computed at the root, so a scoped payload produced a subtree with a new
    * brand and components that ignored it.
@@ -109,7 +109,7 @@ describe("emitThemeCss", () => {
    * unless asked otherwise — which is exactly why it went unnoticed.
    */
   describe("a scoped payload", () => {
-    const SCOPE = '[data-ox-brand="northwind-clinical"]';
+    const SCOPE = '[data-zb-brand="northwind-clinical"]';
 
     const withAccent = () => {
       const theme = publishedTheme();
@@ -127,7 +127,7 @@ describe("emitThemeCss", () => {
 
       // Not merely present — resolved *inside* the scope, which is the only
       // place the local value exists.
-      expect(css).toMatch(/--ox-[a-z0-9-]+:\s*var\(--ox-accent\);/);
+      expect(css).toMatch(/--zb-[a-z0-9-]+:\s*var\(--zb-accent\);/);
       expect(css).toContain(SCOPE);
     });
 
@@ -136,7 +136,7 @@ describe("emitThemeCss", () => {
 
       // Doubling the payload to redeclare what the base stylesheet already
       // says would cost every customer bytes for nothing.
-      expect(css).not.toMatch(/--ox-[a-z0-9-]+:\s*var\(--ox-accent\);/);
+      expect(css).not.toMatch(/--zb-[a-z0-9-]+:\s*var\(--zb-accent\);/);
     });
 
     it("leaves an explicit component override alone", () => {
@@ -162,7 +162,7 @@ describe("emitThemeCss", () => {
 
   it("sorts declarations, so a version diff is a diff in values not in order", () => {
     const css = emitThemeCss(publishedTheme(), { header: false });
-    const lines = css.split("\n").filter((l) => l.includes("--ox-"));
+    const lines = css.split("\n").filter((l) => l.includes("--zb-"));
     expect(lines).toEqual([...lines].sort());
   });
 
@@ -189,7 +189,7 @@ describe("emitThemeCss", () => {
     expect(css).toContain("@font-face");
     expect(css).toContain('font-family: "Northwind Sans"');
     expect(css).toContain("font-display: swap");
-    expect(css).toContain("--ox-font-sans:");
+    expect(css).toContain("--zb-font-sans:");
   });
 
   /**
@@ -222,31 +222,31 @@ describe("emitThemeCss", () => {
     ];
 
     const css = emitThemeCss(theme);
-    const root = css.slice(css.indexOf(":root {"), css.indexOf('[data-ox-theme="dark"]'));
-    const dark = css.slice(css.indexOf('[data-ox-theme="dark"]'));
+    const root = css.slice(css.indexOf(":root {"), css.indexOf('[data-zb-theme="dark"]'));
+    const dark = css.slice(css.indexOf('[data-zb-theme="dark"]'));
 
     // The light mark is the default, and both are addressable by name.
-    expect(root).toContain(`--ox-logo: url("/f/northwind/${"a".repeat(64)}.svg")`);
-    expect(root).toContain("--ox-logo-light:");
-    expect(root).toContain("--ox-logo-dark:");
+    expect(root).toContain(`--zb-logo: url("/f/northwind/${"a".repeat(64)}.svg")`);
+    expect(root).toContain("--zb-logo-light:");
+    expect(root).toContain("--zb-logo-dark:");
 
     // The reversed one only applies where the dark ground does.
-    expect(dark).toContain(`--ox-logo: url("/f/northwind/${"b".repeat(64)}.svg")`);
-    expect(root).not.toContain(`--ox-logo: url("/f/northwind/${"b".repeat(64)}.svg")`);
+    expect(dark).toContain(`--zb-logo: url("/f/northwind/${"b".repeat(64)}.svg")`);
+    expect(root).not.toContain(`--zb-logo: url("/f/northwind/${"b".repeat(64)}.svg")`);
 
     /*
      * High-contrast gets no rule on purpose. Its `bg` is `ref.white`, so the
      * light mark is already correct there and inherits; substituting the mono
      * mark would be a guess wearing a feature's clothes.
      */
-    const hc = css.slice(css.indexOf('[data-ox-theme="high-contrast"]'));
-    expect(hc).not.toContain("--ox-logo:");
+    const hc = css.slice(css.indexOf('[data-zb-theme="high-contrast"]'));
+    expect(hc).not.toContain("--zb-logo:");
   });
 
   /**
    * A replaced glyph reaches the stylesheet a customer's application fetches.
    *
-   * The whole mechanism is one `var()` fallback — `mask-image: var(--ox-icon-send,
+   * The whole mechanism is one `var()` fallback — `mask-image: var(--zb-icon-send,
    * <built-in>)` — so the only thing this end has to do is declare the property.
    * If it does not, every part of the feature still works: the upload succeeds,
    * the file is stored, the app grid shows the new glyph, and the customer's
@@ -264,11 +264,11 @@ describe("emitThemeCss", () => {
     ] as typeof theme.assets.icons;
 
     const css = emitThemeCss(theme);
-    expect(css).toContain(`--ox-icon-send: url("/f/northwind/${"d".repeat(64)}.svg")`);
+    expect(css).toContain(`--zb-icon-send: url("/f/northwind/${"d".repeat(64)}.svg")`);
 
     // At the root and once: a glyph is a shape, and a shape does not change
     // between light and dark — only the colour does, and that is currentColor.
-    expect(css.match(/--ox-icon-send:/g)).toHaveLength(1);
+    expect(css.match(/--zb-icon-send:/g)).toHaveLength(1);
   });
 
   /**
@@ -292,10 +292,10 @@ describe("emitThemeCss", () => {
     ];
 
     const css = emitThemeCss(theme);
-    expect(css.match(/--ox-illustration-empty:/g)).toHaveLength(1);
+    expect(css.match(/--zb-illustration-empty:/g)).toHaveLength(1);
 
-    const root = css.slice(css.indexOf(":root {"), css.indexOf('[data-ox-theme="dark"]'));
-    expect(root).toContain("--ox-illustration-empty:");
+    const root = css.slice(css.indexOf(":root {"), css.indexOf('[data-zb-theme="dark"]'));
+    expect(root).toContain("--zb-illustration-empty:");
   });
 });
 
@@ -374,7 +374,7 @@ describe("values cannot escape their declaration", () => {
       hostile("red; }")();
       expect.unreachable("should have thrown");
     } catch (error) {
-      expect((error as UnsafeTokenValueError).token).toBe("--ox-ref-brand-600");
+      expect((error as UnsafeTokenValueError).token).toBe("--zb-ref-brand-600");
       expect((error as Error).message).toContain("escape its declaration");
     }
   });
@@ -383,7 +383,7 @@ describe("values cannot escape their declaration", () => {
     const theme = publishedTheme();
     theme.tokens.ref.brand = { "600": "#1d63c9", "700": "  #1a53a8  " };
     expect(() => emitThemeCss(theme)).not.toThrow();
-    expect(emitThemeCss(theme)).toContain("--ox-ref-brand-700: #1a53a8;");
+    expect(emitThemeCss(theme)).toContain("--zb-ref-brand-700: #1a53a8;");
   });
 });
 

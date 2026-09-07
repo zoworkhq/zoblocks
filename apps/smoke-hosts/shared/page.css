@@ -6,9 +6,9 @@
 body {
   margin: 0;
   padding: 1.5rem;
-  font-family: var(--ox-font-sans, system-ui, sans-serif);
-  background: var(--ox-bg, #ffffff);
-  color: var(--ox-text, #0f172a);
+  font-family: var(--zb-font-sans, system-ui, sans-serif);
+  background: var(--zb-bg, #ffffff);
+  color: var(--zb-text, #0f172a);
 }
 main {
   max-width: 40rem;

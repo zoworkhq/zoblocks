@@ -19,7 +19,7 @@
  * and which this repo has explicitly decided against: `process.env` does not
  * exist in a copy-source consumer's build, and a component that writes to the
  * app writes PHI onward to whatever error reporter the customer installed.
- * See `@oxygenui/no-forbidden-capability` and ADR 0009.
+ * See `@zoblocks/no-forbidden-capability` and ADR 0009.
  *
  * A violation does two things instead, both of which are better: it renders a
  * blocking, non-dismissible state in place of the children, and it calls a
@@ -29,7 +29,7 @@
  * development builds.
  */
 
-import type { Identity } from "@oxygenui-design/identity-core";
+import type { Identity } from "@zoblocks/identity-core";
 import { createContext, useContext, useEffect, useRef, type ReactNode } from "react";
 
 const PatientContext = createContext<Identity | null>(null);
@@ -177,11 +177,11 @@ export function PatientGuard(props: PatientGuardProps): ReactNode {
   if (fallback) return <>{fallback(mismatch)}</>;
 
   return (
-    <div className="ox-guard" role="alert" data-ox-guard="mismatch">
-      <span className="ox-guard__rail" aria-hidden="true" />
+    <div className="zb-guard" role="alert" data-zb-guard="mismatch">
+      <span className="zb-guard__rail" aria-hidden="true" />
       <div>
-        <p className="ox-guard__title">Wrong patient</p>
-        <p className="ox-guard__body">
+        <p className="zb-guard__title">Wrong patient</p>
+        <p className="zb-guard__body">
           This form was opened for <strong>{mismatch.expectedName ?? mismatch.expected}</strong>.
           The chart currently displayed is <strong>{mismatch.displayedName}</strong>. Nothing has
           been submitted.

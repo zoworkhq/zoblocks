@@ -66,20 +66,20 @@ export interface ${pascal}Props extends React.HTMLAttributes<HTMLDivElement> {
 
 export function ${pascal}({ placeholder, className, ...props }: ${pascal}Props) {
   return (
-    <div className={cn("text-[var(--ox-text)]", className)} {...props}>
+    <div className={cn("text-[var(--zb-text)]", className)} {...props}>
       {placeholder}
     </div>
   );
 }
 `;
 
-const meta = `import { defineComponentMeta } from "@oxygenui-design/component-meta";
+const meta = `import { defineComponentMeta } from "@zoblocks/component-meta";
 
 export default defineComponentMeta({
   name: "${name}",
   title: "${title}",
   tier: "free",
-  // Starts experimental: it ships from @oxygenui/react/experimental and may
+  // Starts experimental: it ships from @zoblocks/react/experimental and may
   // break in any minor until it is promoted. See ADR 0006.
   status: "experimental",
   since: "0.0.0",
@@ -117,7 +117,7 @@ export default defineComponentMeta({
   dependencies: ["clsx", "tailwind-merge"],
   registryDependencies: ["utils", "tokens"],
 
-  usage: \`import { ${pascal} } from "@/components/oxygen/${name}";
+  usage: \`import { ${pascal} } from "@/components/zoblocks/${name}";
 
 <${pascal} />\`,
 });

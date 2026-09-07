@@ -21,7 +21,7 @@ if (!uri) {
 
 const client = new MongoClient(uri);
 await client.connect();
-const db = client.db(process.env.APP_DB_NAME || "oxygen_console");
+const db = client.db(process.env.APP_DB_NAME || "zoblocks_console");
 
 const { ensureIndexes } = await import("../src/db/collections.ts");
 await ensureIndexes(db);

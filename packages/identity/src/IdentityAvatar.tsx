@@ -13,7 +13,7 @@
  *      element and three is ten thousand elements of decoration.
  */
 
-import type { Identity, PhotoState } from "@oxygenui-design/identity-core";
+import type { Identity, PhotoState } from "@zoblocks/identity-core";
 import { type CSSProperties, type ReactNode } from "react";
 
 export type AvatarSize = 20 | 24 | 32 | 40 | 56 | "auto";
@@ -23,31 +23,31 @@ export type AvatarSize = 20 | 24 | 32 | 40 | 56 | "auto";
  *
  * Tailwind resolves classes by scanning source text; a name built at runtime
  * produces no CSS and renders an untinted circle that looks exactly like a
- * loading state. See `@oxygenui/no-dynamic-class-name`.
+ * loading state. See `@zoblocks/no-dynamic-class-name`.
  */
 const SWATCH_CLASS = [
-  "ox-avatar--sw1",
-  "ox-avatar--sw2",
-  "ox-avatar--sw3",
-  "ox-avatar--sw4",
-  "ox-avatar--sw5",
-  "ox-avatar--sw6",
+  "zb-avatar--sw1",
+  "zb-avatar--sw2",
+  "zb-avatar--sw3",
+  "zb-avatar--sw4",
+  "zb-avatar--sw5",
+  "zb-avatar--sw6",
 ] as const;
 
 const SIZE_CLASS: Record<string, string> = {
-  "20": "ox-avatar--20",
-  "24": "ox-avatar--24",
-  "32": "ox-avatar--32",
-  "40": "ox-avatar--40",
-  "56": "ox-avatar--56",
-  auto: "ox-avatar--auto",
+  "20": "zb-avatar--20",
+  "24": "zb-avatar--24",
+  "32": "zb-avatar--32",
+  "40": "zb-avatar--40",
+  "56": "zb-avatar--56",
+  auto: "zb-avatar--auto",
 };
 
 const PHOTO_CLASS: Record<string, string> = {
-  "none-on-file": "ox-avatar--none-on-file",
-  unavailable: "ox-avatar--unavailable",
-  withheld: "ox-avatar--withheld",
-  loading: "ox-avatar--loading",
+  "none-on-file": "zb-avatar--none-on-file",
+  unavailable: "zb-avatar--unavailable",
+  withheld: "zb-avatar--withheld",
+  loading: "zb-avatar--loading",
 };
 
 /** Wraps out-of-range indices, so a caller-supplied bucket count cannot crash. */
@@ -134,15 +134,15 @@ export function IdentityAvatar(props: IdentityAvatarProps): ReactNode {
   const { identity, size = "auto", photo, className, label, style } = props;
   const state = photo ?? identity.photo;
 
-  const classes = ["ox-avatar", swatchClass(identity.swatch)];
-  classes.push(SIZE_CLASS[String(size)] ?? SIZE_CLASS.auto ?? "ox-avatar--auto");
+  const classes = ["zb-avatar", swatchClass(identity.swatch)];
+  classes.push(SIZE_CLASS[String(size)] ?? SIZE_CLASS.auto ?? "zb-avatar--auto");
   if (state.kind !== "present") {
     const photoClass = PHOTO_CLASS[state.kind];
     if (photoClass) classes.push(photoClass);
   }
   for (const s of identity.states) {
-    if (s.kind === "deceased") classes.push("ox-avatar--deceased");
-    if (s.kind === "test") classes.push("ox-avatar--test");
+    if (s.kind === "deceased") classes.push("zb-avatar--deceased");
+    if (s.kind === "test") classes.push("zb-avatar--test");
   }
   if (className) classes.push(className);
 
@@ -162,14 +162,14 @@ export function IdentityAvatar(props: IdentityAvatarProps): ReactNode {
       <span
         {...a11y}
         className={classes.join(" ")}
-        data-ox-photo="present"
+        data-zb-photo="present"
         style={{ ...inline, backgroundImage: `url("${state.src}")` }}
       />
     );
   }
 
   return (
-    <span {...a11y} className={classes.join(" ")} data-ox-photo={state.kind} style={inline}>
+    <span {...a11y} className={classes.join(" ")} data-zb-photo={state.kind} style={inline}>
       {state.kind === "loading" || state.kind === "none-on-file"
         ? state.kind === "loading"
           ? null
@@ -197,16 +197,16 @@ export function BannerAvatar(props: BannerAvatarProps): ReactNode {
   if (state.kind !== "present") return <IdentityAvatar {...props} size={size} />;
 
   const classes = [
-    "ox-avatar",
+    "zb-avatar",
     swatchClass(identity.swatch),
-    SIZE_CLASS[String(size)] ?? "ox-avatar--auto",
-    "ox-avatar--img",
+    SIZE_CLASS[String(size)] ?? "zb-avatar--auto",
+    "zb-avatar--img",
   ];
 
   return (
     <span
       className={classes.join(" ")}
-      data-ox-photo="present"
+      data-zb-photo="present"
       {...(label ? { role: "img", "aria-label": label } : { "aria-hidden": true })}
     >
       {/*

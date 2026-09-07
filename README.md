@@ -1,6 +1,6 @@
 <div align="center">
 
-<h1>Oxygen&nbsp;UI</h1>
+<h1>Zoblocks</h1>
 
 **Healthcare components that already know what the data means.**
 
@@ -8,7 +8,7 @@ React components typed to FHIR R4, delivered as source you own.<br />
 Built for the states a demo skips — the preliminary result, the missing<br />
 reference range, the restricted record, the patient who refused to sign.
 
-[![CI](https://github.com/zoworkhq/oxygenui/actions/workflows/ci.yml/badge.svg)](https://github.com/zoworkhq/oxygenui/actions/workflows/ci.yml)
+[![CI](https://github.com/zoworkhq/zoblocks/actions/workflows/ci.yml/badge.svg)](https://github.com/zoworkhq/zoblocks/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6.svg?logo=typescript&logoColor=white)](packages/tsconfig/base.json)
 [![Tests](https://img.shields.io/badge/tests-1%2C635%20passing-brightgreen.svg)](#quality-is-a-gate-not-a-goal)
@@ -18,7 +18,7 @@ reference range, the restricted record, the patient who refused to sign.
 [![Status](https://img.shields.io/badge/status-pre--release-orange.svg)](#status)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-[**Documentation**](https://oxygenui.design) · [**Architecture**](ARCHITECTURE.md) · [**Engineering standard**](ENGINEERING.md) · [**Decisions**](content/decisions/)
+[**Documentation**](https://zoblocks.design) · [**Architecture**](ARCHITECTURE.md) · [**Engineering standard**](ENGINEERING.md) · [**Decisions**](content/decisions/)
 
 </div>
 
@@ -36,12 +36,12 @@ false.** A blank cell is indistinguishable from a rendering bug. An empty
 signature field is indistinguishable from a patient who refused. A severity
 carried by colour alone disappears in forced-colors mode.
 
-Oxygen UI is built around those states rather than around the happy path, and
+Zoblocks is built around those states rather than around the happy path, and
 the invariants are enforced by lint rules and failing builds rather than by code
 review.
 
 ```tsx
-import { Signature, signatureRequired } from "@oxygenui-design/signature";
+import { Signature, signatureRequired } from "@zoblocks/signature";
 
 <Form.Item name="consent" rules={[signatureRequired()]}>
   <Signature now={serverTime} meaning="consent" attestation="I agree to…" />
@@ -58,10 +58,10 @@ is the kind of defect this library exists to make unwritable.
 
 |                                    | The idea                                                                                         | What enforces it                                                                |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
-| **Absence is a state**             | A missing value renders as explicitly missing, and _why_ it is missing is part of the value.     | `@oxygenui/no-absence-placeholder` — `{value ?? "—"}` is a lint error.          |
+| **Absence is a state**             | A missing value renders as explicitly missing, and _why_ it is missing is part of the value.     | `@zoblocks/no-absence-placeholder` — `{value ?? "—"}` is a lint error.          |
 | **Never colour alone**             | Every severity carries an icon, a text label, and a second structural cue.                       | Contrast gate in the token build; forced-colors tested in three engines.        |
 | **Don't infer clinical meaning**   | A stated interpretation always wins. Otherwise it is derived only from the value's own range.    | Component contract tests assert the safety claim, not the render.               |
-| **Semantic tokens, never palette** | A component reaching past `--ox-status-critical` to `--ox-red-600` ignores every brand override. | `@oxygenui/no-primitive-token`; the brand axis has a worked example and a gate. |
+| **Semantic tokens, never palette** | A component reaching past `--zb-status-critical` to `--zb-red-600` ignores every brand override. | `@zoblocks/no-primitive-token`; the brand axis has a worked example and a gate. |
 
 ---
 
@@ -125,7 +125,7 @@ conflating them silently degrades a control that measurably reduces
 wrong-patient orders.
 
 **Not React?** The loaders also ship as dependency-free custom elements for Vue,
-Angular, Svelte, or plain HTML — see [`@oxygenui-design/loaders`](packages/loaders/README.md).
+Angular, Svelte, or plain HTML — see [`@zoblocks/loaders`](packages/loaders/README.md).
 
 ---
 
@@ -137,13 +137,13 @@ your project, pulls in anything they share, and adds any runtime dependencies.
 Run once, to say where your `@/` import alias points:
 
 ```bash
-npx @oxygenui-design/cli init
+npx @zoblocks/cli init
 ```
 
 Then add components by name:
 
 ```bash
-npx @oxygenui-design/cli add pulse-loader
+npx @zoblocks/cli add pulse-loader
 ```
 
 The public catalog needs no configuration, no namespace, and no account.
@@ -153,20 +153,20 @@ The public catalog needs no configuration, no namespace, and no account.
 
 Pro components come from an authenticated registry. Mint a token with the
 `registry` scope in the console under **Marketplace → Access tokens**, add the
-namespace to `oxygen.json`, and keep the token in your environment:
+namespace to `zoblocks.json`, and keep the token in your environment:
 
 ```jsonc
-// oxygen.json — committed; the token is not
+// zoblocks.json — committed; the token is not
 "registries": {
-  "@oxygen-pro": {
-    "url": "https://app.oxygenui.design/r/pro/{name}.json",
-    "headers": { "Authorization": "Bearer ${OXYGEN_TOKEN}" }
+  "@zoblocks-pro": {
+    "url": "https://app.zoblocks.design/r/pro/{name}.json",
+    "headers": { "Authorization": "Bearer ${ZOBLOCKS_TOKEN}" }
   }
 }
 ```
 
 ```bash
-OXYGEN_TOKEN=oxy_live_… npx @oxygenui-design/cli add @oxygen-pro/vitals-flowsheet
+ZOBLOCKS_TOKEN=zb_live_… npx @zoblocks/cli add @zoblocks-pro/vitals-flowsheet
 ```
 
 </details>
@@ -178,57 +178,57 @@ Any registry item can be named by its full URL instead, which is what a mirror
 or a vendored copy of the catalog needs:
 
 ```bash
-npx @oxygenui-design/cli add https://oxygenui.design/r/pulse-loader.json
+npx @zoblocks/cli add https://zoblocks.design/r/pulse-loader.json
 ```
 
 </details>
 
 Installing from the registry means you have forked, deliberately: the source is
 yours to read and change, and no release we publish will reach it. For semver
-and patches, install [`@oxygenui-design/react`](packages/react/README.md)
+and patches, install [`@zoblocks/react`](packages/react/README.md)
 instead. Both channels are generated from the same source.
 
 ---
 
 ## Packages
 
-| Package                           | What it is                                                                |
-| --------------------------------- | ------------------------------------------------------------------------- |
-| `@oxygenui-design/cli`            | Installs components into your repo. Zero runtime dependencies.            |
-| `@oxygenui-design/loaders`        | The five loaders as custom elements. Zero dependencies, SSR-safe.         |
-| `@oxygenui-design/signature`      | Signature capture for Ant Design. antd is a peer dependency.              |
-| `@oxygenui-design/signature-core` | The capture engine. No React, no antd, no DOM, no dependencies.           |
-| `@oxygenui-design/identity`       | Patient avatar, chip and banner. No antd dependency; inherits its tokens. |
-| `@oxygenui-design/identity-core`  | The identity engine. No React, no antd, no DOM.                           |
-| `@oxygenui-design/tabs`           | Tabs that know what they are. Four semantic modes, eleven skins.          |
-| `@oxygenui-design/tabs-core`      | The selection engine. No React, no DOM, no dependencies.                  |
-| `@oxygenui-design/tabs-testing`   | Assertions that read a tab strip's accessibility tree.                    |
-| `@oxygenui-design/react`          | Generated React package — same source as the registry, one build.         |
-| `@oxygenui-design/fhir`           | FHIR R4 types and pure read helpers.                                      |
-| `@oxygenui-design/tokens`         | Semantic clinical tokens: 3 themes × 3 densities × a brand axis.          |
-| `@oxygenui-design/theme`          | Customer themes: the document model, ramp generator, validation and CSS.  |
-| `@oxygenui-design/bridge-core`    | The theme-bridge contract. No framework, no React, no DOM.                |
-| `@oxygenui-design/bridge-antd`    | Ant Design ↔ Oxygen, both directions. antd is an optional peer.           |
-| `@oxygenui-design/bridge-mui`     | Material UI ↔ Oxygen, both directions. MUI is an optional peer.           |
-| `@oxygenui-design/intl`           | Terminology that requires both a clinician and a patient phrasing.        |
-| `@oxygenui-design/eslint-plugin`  | Eighteen rules enforcing the invariants above.                            |
-| `@oxygenui-design/fixtures`       | Synthetic, non-PHI FHIR fixtures that over-represent the hard states.     |
+| Package                    | What it is                                                                |
+| -------------------------- | ------------------------------------------------------------------------- |
+| `@zoblocks/cli`            | Installs components into your repo. Zero runtime dependencies.            |
+| `@zoblocks/loaders`        | The five loaders as custom elements. Zero dependencies, SSR-safe.         |
+| `@zoblocks/signature`      | Signature capture for Ant Design. antd is a peer dependency.              |
+| `@zoblocks/signature-core` | The capture engine. No React, no antd, no DOM, no dependencies.           |
+| `@zoblocks/identity`       | Patient avatar, chip and banner. No antd dependency; inherits its tokens. |
+| `@zoblocks/identity-core`  | The identity engine. No React, no antd, no DOM.                           |
+| `@zoblocks/tabs`           | Tabs that know what they are. Four semantic modes, eleven skins.          |
+| `@zoblocks/tabs-core`      | The selection engine. No React, no DOM, no dependencies.                  |
+| `@zoblocks/tabs-testing`   | Assertions that read a tab strip's accessibility tree.                    |
+| `@zoblocks/react`          | Generated React package — same source as the registry, one build.         |
+| `@zoblocks/fhir`           | FHIR R4 types and pure read helpers.                                      |
+| `@zoblocks/tokens`         | Semantic clinical tokens: 3 themes × 3 densities × a brand axis.          |
+| `@zoblocks/theme`          | Customer themes: the document model, ramp generator, validation and CSS.  |
+| `@zoblocks/bridge-core`    | The theme-bridge contract. No framework, no React, no DOM.                |
+| `@zoblocks/bridge-antd`    | Ant Design ↔ Zoblocks, both directions. antd is an optional peer.         |
+| `@zoblocks/bridge-mui`     | Material UI ↔ Zoblocks, both directions. MUI is an optional peer.         |
+| `@zoblocks/intl`           | Terminology that requires both a clinician and a patient phrasing.        |
+| `@zoblocks/eslint-plugin`  | Eighteen rules enforcing the invariants above.                            |
+| `@zoblocks/fixtures`       | Synthetic, non-PHI FHIR fixtures that over-represent the hard states.     |
 
 ### Theme bridges
 
-A bridge is the only sanctioned way a UI framework reaches an Oxygen component.
-It reads that framework's resolved theme and writes Oxygen's token surface —
+A bridge is the only sanctioned way a UI framework reaches a Zoblocks component.
+It reads that framework's resolved theme and writes Zoblocks's token surface —
 nothing else crosses the boundary, so no component is swapped and no capability
 is reduced to what two frameworks happen to share.
 
 ```tsx
-// Oxygen components in your antd app's design language
+// Zoblocks components in your antd app's design language
 <ConfigProvider theme={brand}>
   <AntdBridge>{app}</AntdBridge>
 </ConfigProvider>
 
-// ...and the inverse: your own antd components in your Oxygen brand
-<OxygenAntdProvider>{app}</OxygenAntdProvider>
+// ...and the inverse: your own antd components in your Zoblocks brand
+<ZoblocksAntdProvider>{app}</ZoblocksAntdProvider>
 ```
 
 Switching framework changes the wrapper and nothing inside it —
@@ -282,13 +282,13 @@ lint error, because it renders perfectly and passes every other test.
 ## Repository layout
 
 ```
-oxygenui/
+zoblocks/
 ├─ apps/
-│  ├─ docs/              # oxygenui.design — site, catalog, registry host
+│  ├─ docs/              # zoblocks.design — site, catalog, registry host
 │  ├─ smoke/             # HTML · React 19 · Vue · Angular · Svelte
 │  └─ smoke-react18/     # React 18, which cannot share a node_modules with 19
 ├─ packages/             # the published packages (see the table above)
-├─ registry/oxygen/      # component source — this is what customers receive
+├─ registry/zoblocks/      # component source — this is what customers receive
 ├─ content/decisions/    # nine architecture decision records
 ├─ scripts/gen/          # the generator
 ├─ e2e/                  # Playwright: VRT, a11y, reflow, cross-framework
@@ -355,7 +355,7 @@ it("shows an uninterpreted result as uninterpreted, never as normal", () => {
 
 Three conventions: start from the component's own doc comment (its prose states
 the rules, and those sentences are the test list); use
-`@oxygenui-design/fixtures`, which deliberately over-represents critical,
+`@zoblocks/fixtures`, which deliberately over-represents critical,
 uninterpreted, masked, refuted and expired; and assert the meaning is **in
 words** — `expectStatedInWords` checks a state is readable without colour.
 
@@ -369,13 +369,13 @@ resources as props directly, with no adapter and no bespoke prop shape — follo
 
 Nothing is published to npm yet; the release pipeline is gated and ready.
 Progress against the enterprise-readiness audit is tracked in
-[`OXYGEN-UI-AUDIT.md`](OXYGEN-UI-AUDIT.md).
+[`ZOBLOCKS-UI-AUDIT.md`](ZOBLOCKS-UI-AUDIT.md).
 
 ---
 
 ## What this is not
 
-Oxygen UI is **not a compliance boundary**. Installing it does not make an
+Zoblocks is **not a compliance boundary**. Installing it does not make an
 application HIPAA, GDPR, or DPDP compliant, and it is not a medical device or
 clinical decision support. Access control, audit, data residency, and clinical
 validation remain yours.
@@ -409,6 +409,6 @@ introduced, will carry a separate commercial license stated on each item.
 
 <div align="center">
 
-Built by [Zowork](https://github.com/zoworkhq) · [oxygenui.design](https://oxygenui.design)
+Built by [Zowork](https://github.com/zoworkhq) · [zoblocks.design](https://zoblocks.design)
 
 </div>

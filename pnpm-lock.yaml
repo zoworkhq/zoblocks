@@ -52,40 +52,40 @@ importers:
       '@next/eslint-plugin-next':
         specifier: ^16.3.0
         version: 16.3.0(eslint@10.8.1(jiti@2.7.0))
-      '@oxygenui-design/cli':
+      '@zoblocks/cli':
         specifier: workspace:*
         version: link:packages/cli
-      '@oxygenui-design/clinical-note-core':
+      '@zoblocks/clinical-note-core':
         specifier: workspace:*
         version: link:packages/clinical-note-core
-      '@oxygenui-design/component-meta':
+      '@zoblocks/component-meta':
         specifier: workspace:*
         version: link:packages/component-meta
-      '@oxygenui-design/copilot-core':
+      '@zoblocks/copilot-core':
         specifier: workspace:*
         version: link:packages/copilot-core
-      '@oxygenui-design/copilot-react':
+      '@zoblocks/copilot-react':
         specifier: workspace:*
         version: link:packages/copilot-react
-      '@oxygenui-design/eslint-plugin':
+      '@zoblocks/eslint-plugin':
         specifier: workspace:^
         version: link:packages/eslint-plugin
-      '@oxygenui-design/fhir':
+      '@zoblocks/fhir':
         specifier: workspace:*
         version: link:packages/fhir
-      '@oxygenui-design/fixtures':
+      '@zoblocks/fixtures':
         specifier: workspace:*
         version: link:packages/fixtures
-      '@oxygenui-design/identity':
+      '@zoblocks/identity':
         specifier: workspace:*
         version: link:packages/identity
-      '@oxygenui-design/recorder-core':
+      '@zoblocks/recorder-core':
         specifier: workspace:*
         version: link:packages/recorder-core
-      '@oxygenui-design/theme':
+      '@zoblocks/theme':
         specifier: workspace:*
         version: link:packages/theme
-      '@oxygenui-design/tokens':
+      '@zoblocks/tokens':
         specifier: workspace:*
         version: link:packages/tokens
       '@playwright/test':
@@ -196,28 +196,28 @@ importers:
       '@mui/material':
         specifier: ^9.3.1
         version: 9.3.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      '@oxygenui-design/bridge-antd':
+      '@zoblocks/bridge-antd':
         specifier: workspace:*
         version: link:../../packages/bridge-antd
-      '@oxygenui-design/bridge-core':
+      '@zoblocks/bridge-core':
         specifier: workspace:*
         version: link:../../packages/bridge-core
-      '@oxygenui-design/bridge-mui':
+      '@zoblocks/bridge-mui':
         specifier: workspace:*
         version: link:../../packages/bridge-mui
-      '@oxygenui-design/cli':
+      '@zoblocks/cli':
         specifier: workspace:*
         version: link:../../packages/cli
-      '@oxygenui-design/copilot-react':
+      '@zoblocks/copilot-react':
         specifier: workspace:*
         version: link:../../packages/copilot-react
-      '@oxygenui-design/react':
+      '@zoblocks/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@oxygenui-design/theme':
+      '@zoblocks/theme':
         specifier: workspace:*
         version: link:../../packages/theme
-      '@oxygenui-design/tokens':
+      '@zoblocks/tokens':
         specifier: workspace:*
         version: link:../../packages/tokens
       antd:
@@ -251,7 +251,7 @@ importers:
         specifier: ^3.24.1
         version: 3.25.76
     devDependencies:
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../../packages/tsconfig
       '@tailwindcss/postcss':
@@ -305,37 +305,37 @@ importers:
       '@mui/material':
         specifier: ^9.3.1
         version: 9.3.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      '@oxygenui-design/clinical-note-core':
+      '@zoblocks/clinical-note-core':
         specifier: workspace:*
         version: link:../../packages/clinical-note-core
-      '@oxygenui-design/component-meta':
+      '@zoblocks/component-meta':
         specifier: workspace:*
         version: link:../../packages/component-meta
-      '@oxygenui-design/copilot-core':
+      '@zoblocks/copilot-core':
         specifier: workspace:*
         version: link:../../packages/copilot-core
-      '@oxygenui-design/copilot-react':
+      '@zoblocks/copilot-react':
         specifier: workspace:*
         version: link:../../packages/copilot-react
-      '@oxygenui-design/fhir':
+      '@zoblocks/fhir':
         specifier: workspace:*
         version: link:../../packages/fhir
-      '@oxygenui-design/fixtures':
+      '@zoblocks/fixtures':
         specifier: workspace:*
         version: link:../../packages/fixtures
-      '@oxygenui-design/host-react':
+      '@zoblocks/host-react':
         specifier: workspace:*
         version: link:../../packages/host-react
-      '@oxygenui-design/identity':
+      '@zoblocks/identity':
         specifier: workspace:*
         version: link:../../packages/identity
-      '@oxygenui-design/signature':
+      '@zoblocks/signature':
         specifier: workspace:*
         version: link:../../packages/signature
-      '@oxygenui-design/tabs':
+      '@zoblocks/tabs':
         specifier: workspace:*
         version: link:../../packages/tabs
-      '@oxygenui-design/tokens':
+      '@zoblocks/tokens':
         specifier: workspace:*
         version: link:../../packages/tokens
       antd:
@@ -363,7 +363,7 @@ importers:
         specifier: ^2.5.5
         version: 2.6.1
     devDependencies:
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../../packages/tsconfig
       '@tailwindcss/postcss':
@@ -408,7 +408,7 @@ importers:
 
   apps/hq:
     dependencies:
-      '@oxygenui-design/tokens':
+      '@zoblocks/tokens':
         specifier: workspace:*
         version: link:../../packages/tokens
       bcryptjs:
@@ -439,7 +439,7 @@ importers:
         specifier: ^3.24.1
         version: 3.25.76
     devDependencies:
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../../packages/tsconfig
       '@tailwindcss/postcss':
@@ -472,10 +472,10 @@ importers:
 
   apps/smoke:
     dependencies:
-      '@oxygenui-design/loaders':
+      '@zoblocks/loaders':
         specifier: workspace:*
         version: link:../../packages/loaders
-      '@oxygenui-design/tokens':
+      '@zoblocks/tokens':
         specifier: workspace:*
         version: link:../../packages/tokens
     devDependencies:
@@ -542,16 +542,16 @@ importers:
       '@mui/material':
         specifier: ^9.3.1
         version: 9.3.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      '@oxygenui-design/bridge-antd':
+      '@zoblocks/bridge-antd':
         specifier: workspace:*
         version: link:../../packages/bridge-antd
-      '@oxygenui-design/bridge-mui':
+      '@zoblocks/bridge-mui':
         specifier: workspace:*
         version: link:../../packages/bridge-mui
-      '@oxygenui-design/react':
+      '@zoblocks/react':
         specifier: workspace:*
         version: link:../../packages/react
-      '@oxygenui-design/tokens':
+      '@zoblocks/tokens':
         specifier: workspace:*
         version: link:../../packages/tokens
       antd:
@@ -582,10 +582,10 @@ importers:
 
   apps/smoke-react18:
     dependencies:
-      '@oxygenui-design/loaders':
+      '@zoblocks/loaders':
         specifier: workspace:*
         version: link:../../packages/loaders
-      '@oxygenui-design/tokens':
+      '@zoblocks/tokens':
         specifier: workspace:*
         version: link:../../packages/tokens
     devDependencies:
@@ -613,11 +613,11 @@ importers:
 
   packages/bridge-antd:
     dependencies:
-      '@oxygenui-design/bridge-core':
+      '@zoblocks/bridge-core':
         specifier: workspace:*
         version: link:../bridge-core
     devDependencies:
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@testing-library/react':
@@ -650,11 +650,11 @@ importers:
 
   packages/bridge-core:
     dependencies:
-      '@oxygenui-design/tokens':
+      '@zoblocks/tokens':
         specifier: workspace:*
         version: link:../tokens
     devDependencies:
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@testing-library/react':
@@ -684,7 +684,7 @@ importers:
 
   packages/bridge-mui:
     dependencies:
-      '@oxygenui-design/bridge-core':
+      '@zoblocks/bridge-core':
         specifier: workspace:*
         version: link:../bridge-core
     devDependencies:
@@ -697,10 +697,10 @@ importers:
       '@mui/material':
         specifier: ^9.3.1
         version: 9.3.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      '@oxygenui-design/bridge-antd':
+      '@zoblocks/bridge-antd':
         specifier: workspace:*
         version: link:../bridge-antd
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@testing-library/react':
@@ -730,7 +730,7 @@ importers:
 
   packages/cli:
     devDependencies:
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@types/node':
@@ -755,7 +755,7 @@ importers:
         specifier: ^1.10.4
         version: 1.12.0
     devDependencies:
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@vitest/coverage-v8':
@@ -770,7 +770,7 @@ importers:
 
   packages/codemod:
     devDependencies:
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@vitest/coverage-v8':
@@ -789,7 +789,7 @@ importers:
         specifier: ^3.24.1
         version: 3.25.76
     devDependencies:
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       typescript:
@@ -801,14 +801,14 @@ importers:
 
   packages/copilot:
     dependencies:
-      '@oxygenui-design/copilot-core':
+      '@zoblocks/copilot-core':
         specifier: workspace:*
         version: link:../copilot-core
-      '@oxygenui-design/copilot-react':
+      '@zoblocks/copilot-react':
         specifier: workspace:*
         version: link:../copilot-react
     devDependencies:
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@testing-library/dom':
@@ -856,7 +856,7 @@ importers:
 
   packages/copilot-core:
     devDependencies:
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@vitest/coverage-v8':
@@ -871,11 +871,11 @@ importers:
 
   packages/copilot-evals:
     dependencies:
-      '@oxygenui-design/copilot-core':
+      '@zoblocks/copilot-core':
         specifier: workspace:*
         version: link:../copilot-core
     devDependencies:
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@vitest/coverage-v8':
@@ -890,11 +890,11 @@ importers:
 
   packages/copilot-react:
     dependencies:
-      '@oxygenui-design/copilot-core':
+      '@zoblocks/copilot-core':
         specifier: workspace:*
         version: link:../copilot-core
     devDependencies:
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@testing-library/dom':
@@ -939,7 +939,7 @@ importers:
 
   packages/elements:
     devDependencies:
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       jsdom:
@@ -960,7 +960,7 @@ importers:
 
   packages/fhir:
     devDependencies:
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       typescript:
@@ -972,11 +972,11 @@ importers:
 
   packages/figma-core:
     dependencies:
-      '@oxygenui-design/tokens':
+      '@zoblocks/tokens':
         specifier: workspace:*
         version: link:../tokens
     devDependencies:
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@vitest/coverage-v8':
@@ -991,14 +991,14 @@ importers:
 
   packages/figma-plugin:
     dependencies:
-      '@oxygenui-design/figma-core':
+      '@zoblocks/figma-core':
         specifier: workspace:*
         version: link:../figma-core
-      '@oxygenui-design/tokens':
+      '@zoblocks/tokens':
         specifier: workspace:*
         version: link:../tokens
     devDependencies:
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@vitest/coverage-v8':
@@ -1019,11 +1019,11 @@ importers:
 
   packages/fixtures:
     dependencies:
-      '@oxygenui-design/fhir':
+      '@zoblocks/fhir':
         specifier: workspace:*
         version: link:../fhir
     devDependencies:
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       typescript:
@@ -1032,13 +1032,13 @@ importers:
 
   packages/host-react:
     dependencies:
-      '@oxygenui-design/bridge-antd':
+      '@zoblocks/bridge-antd':
         specifier: workspace:*
         version: link:../bridge-antd
-      '@oxygenui-design/bridge-core':
+      '@zoblocks/bridge-core':
         specifier: workspace:*
         version: link:../bridge-core
-      '@oxygenui-design/bridge-mui':
+      '@zoblocks/bridge-mui':
         specifier: workspace:*
         version: link:../bridge-mui
     devDependencies:
@@ -1051,7 +1051,7 @@ importers:
       '@mui/material':
         specifier: ^9.3.1
         version: 9.3.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@testing-library/react':
@@ -1090,14 +1090,14 @@ importers:
 
   packages/identity:
     dependencies:
-      '@oxygenui-design/identity-core':
+      '@zoblocks/identity-core':
         specifier: workspace:*
         version: link:../identity-core
     devDependencies:
-      '@oxygenui-design/fhir':
+      '@zoblocks/fhir':
         specifier: workspace:*
         version: link:../fhir
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@testing-library/dom':
@@ -1142,11 +1142,11 @@ importers:
 
   packages/identity-core:
     dependencies:
-      '@oxygenui-design/fhir':
+      '@zoblocks/fhir':
         specifier: workspace:*
         version: link:../fhir
     devDependencies:
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@vitest/coverage-v8':
@@ -1161,7 +1161,7 @@ importers:
 
   packages/intl:
     devDependencies:
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@testing-library/react':
@@ -1188,7 +1188,7 @@ importers:
 
   packages/loaders:
     devDependencies:
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       jsdom:
@@ -1210,7 +1210,7 @@ importers:
         specifier: ^2.5.5
         version: 2.6.1
     devDependencies:
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@testing-library/jest-dom':
@@ -1240,7 +1240,7 @@ importers:
 
   packages/recorder-core:
     devDependencies:
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@vitest/coverage-v8':
@@ -1255,17 +1255,17 @@ importers:
 
   packages/signature:
     dependencies:
-      '@oxygenui-design/signature-core':
+      '@zoblocks/signature-core':
         specifier: workspace:*
         version: link:../signature-core
     devDependencies:
-      '@oxygenui-design/component-meta':
+      '@zoblocks/component-meta':
         specifier: workspace:*
         version: link:../component-meta
-      '@oxygenui-design/fixtures':
+      '@zoblocks/fixtures':
         specifier: workspace:*
         version: link:../fixtures
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@testing-library/dom':
@@ -1313,7 +1313,7 @@ importers:
 
   packages/signature-core:
     devDependencies:
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@vitest/coverage-v8':
@@ -1328,20 +1328,20 @@ importers:
 
   packages/tabs:
     dependencies:
-      '@oxygenui-design/tabs-core':
+      '@zoblocks/tabs-core':
         specifier: workspace:*
         version: link:../tabs-core
     devDependencies:
-      '@oxygenui-design/component-meta':
+      '@zoblocks/component-meta':
         specifier: workspace:*
         version: link:../component-meta
-      '@oxygenui-design/fixtures':
+      '@zoblocks/fixtures':
         specifier: workspace:*
         version: link:../fixtures
-      '@oxygenui-design/tabs-testing':
+      '@zoblocks/tabs-testing':
         specifier: workspace:*
         version: link:../tabs-testing
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@testing-library/dom':
@@ -1389,7 +1389,7 @@ importers:
 
   packages/tabs-core:
     devDependencies:
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@vitest/coverage-v8':
@@ -1404,7 +1404,7 @@ importers:
 
   packages/tabs-testing:
     devDependencies:
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@vitest/coverage-v8':
@@ -1422,23 +1422,23 @@ importers:
 
   packages/theme:
     dependencies:
-      '@oxygenui-design/bridge-antd':
+      '@zoblocks/bridge-antd':
         specifier: workspace:*
         version: link:../bridge-antd
-      '@oxygenui-design/bridge-core':
+      '@zoblocks/bridge-core':
         specifier: workspace:*
         version: link:../bridge-core
-      '@oxygenui-design/bridge-mui':
+      '@zoblocks/bridge-mui':
         specifier: workspace:*
         version: link:../bridge-mui
-      '@oxygenui-design/tokens':
+      '@zoblocks/tokens':
         specifier: workspace:*
         version: link:../tokens
       zod:
         specifier: ^3.24.1
         version: 3.25.76
     devDependencies:
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@testing-library/react':
@@ -1468,7 +1468,7 @@ importers:
 
   packages/tokens:
     devDependencies:
-      '@oxygenui-design/tsconfig':
+      '@zoblocks/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@vitest/coverage-v8':

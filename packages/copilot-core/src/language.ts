@@ -11,7 +11,7 @@
  *
  * This list is used in two places, and the second is the interesting one:
  *
- *   1. As an ESLint rule over Oxygen's own message catalogue, so the component
+ *   1. As an ESLint rule over Zoblocks's own message catalogue, so the component
  *      never ships the language itself.
  *   2. As a **post-stream check on the model's output**, because the model was
  *      trained on decades of clinical text that used these terms freely, and
@@ -28,7 +28,7 @@
  * an unhelpful result: a list of terms to avoid has to contain the terms.
  * Disabled here and nowhere else.
  */
-/* eslint-disable @oxygenui/no-stigmatising-language -- this IS the term list */
+/* eslint-disable @zoblocks/no-stigmatising-language -- this IS the term list */
 
 export interface StigmaTerm {
   /** Matched case-insensitively on word boundaries. */

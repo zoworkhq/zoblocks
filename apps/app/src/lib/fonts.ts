@@ -1,7 +1,7 @@
 /**
  * Accepting a customer's font file.
  *
- * The checking is not here — it is `checkFont` in `@oxygenui-design/theme`,
+ * The checking is not here — it is `checkFont` in `@zoblocks/theme`,
  * which works from the bytes rather than the filename and is tested against
  * a PNG renamed to `.woff2`. This module is the part that has a database: store
  * the bytes under their digest, attach a `@font-face` to the theme, and record
@@ -19,7 +19,7 @@
  */
 
 import { Binary, ObjectId } from "mongodb";
-import { emptyAssets, MAX_FONT_BYTES, checkFont, type FontFace } from "@oxygenui-design/theme";
+import { emptyAssets, MAX_FONT_BYTES, checkFont, type FontFace } from "@zoblocks/theme";
 import type { Authorized } from "./authorize";
 import { ThemeError } from "./themes";
 
@@ -85,7 +85,7 @@ export async function uploadFont(
     // fetching a stylesheet from a CDN needs an origin it can resolve.
     src: new URL(
       fontHref(organisation.slug, check.sha256, check.format),
-      process.env.CONSOLE_ASSET_ORIGIN ?? "https://assets.oxygenui.design",
+      process.env.CONSOLE_ASSET_ORIGIN ?? "https://assets.zoblocks.design",
     ).toString(),
     weight: input.weight?.trim() || "400",
     style: "normal",

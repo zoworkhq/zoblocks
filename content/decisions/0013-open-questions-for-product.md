@@ -39,7 +39,7 @@ moment.
 > and refuses them on the way back — the same treatment the framework bridges
 > give the same tokens.
 
-**Current implementation: no.** `--ox-status-*` and `--ox-flag-*` are marked
+**Current implementation: no.** `--zb-status-*` and `--zb-flag-*` are marked
 `bridgeable: false` in the generated surface, the theme emitter is structurally
 incapable of writing them, a bridge that tries throws, and the app renders
 them locked.
@@ -80,7 +80,7 @@ question worth answering instead.
 
 ## 2. Is Material UI a commitment or a hedge?
 
-**Current implementation: built.** `@oxygenui-design/bridge-mui` exists, is
+**Current implementation: built.** `@zoblocks/bridge-mui` exists, is
 tested to the same standard as the antd bridge, and ships in the same release.
 
 **Why it was built with no customer asking.** A second bridge is the only way to
@@ -150,7 +150,7 @@ inherits Modal focus management and Input's composition handling for dictation.
 Both are genuinely expensive to rebuild well, and rebuilding them badly would
 undermine components whose argument is accessibility.
 
-If the count ever needs to grow, that is the moment to build Oxygen's own
+If the count ever needs to grow, that is the moment to build Zoblocks's own
 overlay primitives instead — a real project, and one that should be scheduled
 rather than arrived at.
 

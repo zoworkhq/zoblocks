@@ -13,7 +13,7 @@
  *     the last one who can catch it.
  */
 
-import type { Identifier } from "@oxygenui-design/fhir";
+import type { Identifier } from "@zoblocks/fhir";
 import type { DisclosureLevel, IdentifierSystemSpec, ResolvedIdentifier } from "./types.js";
 
 // ---------------------------------------------------------------------------

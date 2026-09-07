@@ -25,7 +25,7 @@ import bcrypt from "bcryptjs";
 import { db } from "@/db/client";
 import type { MemberDoc, MemberRole, MemberStatus } from "@/db/collections";
 
-const COOKIE = "oxygen_console_session";
+const COOKIE = "zoblocks_console_session";
 const SESSION_DAYS = 14;
 const BCRYPT_COST = 12;
 

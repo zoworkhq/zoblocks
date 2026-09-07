@@ -4,7 +4,7 @@
  * Two jobs, and they are worth keeping separate in your head:
  *
  *   1. The frame — the site's instrument aesthetic around each demo.
- *   2. The demo theme scope — `[data-ox-theme]`, the product's own attribute,
+ *   2. The demo theme scope — `[data-zb-theme]`, the product's own attribute,
  *      set per stage so the same strip can be shown in light, dark and
  *      high-contrast side by side on one page.
  *
@@ -16,7 +16,7 @@
  * working, which makes the matrix a live test of the token contract.
  */
 
-.ox-gallery {
+.zb-gallery {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -30,7 +30,7 @@
    subject is the components underneath it. The controls still work and still
    group; they just stop announcing themselves. */
 
-.ox-gallery__switch {
+.zb-gallery__switch {
   font-family: var(--font-mono);
   font-size: 0.6875rem;
   padding: 0.2rem 0.5rem;
@@ -48,10 +48,10 @@
     color 180ms var(--ease-out-expo);
   cursor: pointer;
 }
-.ox-gallery__switch:hover {
+.zb-gallery__switch:hover {
   color: var(--color-ink);
 }
-.ox-gallery__switch[aria-pressed="true"] {
+.zb-gallery__switch[aria-pressed="true"] {
   background: var(--color-ink);
   color: var(--color-paper);
 }
@@ -62,39 +62,39 @@
  * tokens and follows light/dark with the rest of the page, rather than sitting
  * in a demo theme that has nothing to do with the surrounding surface.
  */
-.ox-gallery__chapters {
-  --ox-bg: var(--color-paper);
-  --ox-bg-subtle: var(--color-paper-sunk);
-  --ox-bg-muted: var(--color-paper-sunk);
-  --ox-surface: var(--color-paper);
-  --ox-surface-raised: var(--color-paper);
-  --ox-text: var(--color-ink);
-  --ox-text-muted: var(--color-graphite);
-  --ox-text-subtle: var(--color-graphite-soft);
-  --ox-border: var(--color-rule);
-  --ox-border-strong: var(--color-rule-strong);
-  --ox-accent: var(--color-oxygen);
-  --ox-accent-hover: var(--color-oxygen-deep);
-  --ox-accent-subtle: color-mix(in oklab, var(--color-oxygen) 12%, transparent);
-  --ox-accent-border: color-mix(in oklab, var(--color-oxygen) 45%, transparent);
-  --ox-focus-ring: var(--color-oxygen);
+.zb-gallery__chapters {
+  --zb-bg: var(--color-paper);
+  --zb-bg-subtle: var(--color-paper-sunk);
+  --zb-bg-muted: var(--color-paper-sunk);
+  --zb-surface: var(--color-paper);
+  --zb-surface-raised: var(--color-paper);
+  --zb-text: var(--color-ink);
+  --zb-text-muted: var(--color-graphite);
+  --zb-text-subtle: var(--color-graphite-soft);
+  --zb-border: var(--color-rule);
+  --zb-border-strong: var(--color-rule-strong);
+  --zb-accent: var(--color-brand);
+  --zb-accent-hover: var(--color-brand-deep);
+  --zb-accent-subtle: color-mix(in oklab, var(--color-brand) 12%, transparent);
+  --zb-accent-border: color-mix(in oklab, var(--color-brand) 45%, transparent);
+  --zb-focus-ring: var(--color-brand);
 
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem 1rem;
 }
-.ox-gallery__blurb {
+.zb-gallery__blurb {
   font-size: 0.8125rem;
   color: var(--color-graphite);
   margin: 0;
 }
 
 /* ---- stage ------------------------------------------------------- */
-.ox-gallery__stage {
+.zb-gallery__stage {
   border-radius: 1rem;
 }
-.ox-gallery__grid {
+.zb-gallery__grid {
   display: grid;
   gap: 1.25rem;
   /* `min()` in the floor is load-bearing: a bare minmax(30rem, 1fr) cannot
@@ -111,22 +111,22 @@
 }
 /* A demo that needs the room takes the whole row rather than being squeezed
    into a column where its own content would wrap into nonsense. */
-.ox-gallery__grid > .ox-demo:has(.ox-demo__stage--wide) {
+.zb-gallery__grid > .zb-demo:has(.zb-demo__stage--wide) {
   grid-column: 1 / -1;
 }
 
 /* Motion off, applied to the component rather than the page.
    Named per component rather than `*`, so the switch used to toggle motion
    never freezes itself mid-travel while the reader is watching it. */
-.ox-gallery__stage[data-ox-motion="off"] .ox-tabs *,
-.ox-gallery__stage[data-ox-motion="off"] .ox-tabs *::before,
-.ox-gallery__stage[data-ox-motion="off"] .ox-tabs *::after,
-.ox-gallery__stage[data-ox-motion="off"] .ox-switch *,
-.ox-gallery__stage[data-ox-motion="off"] .ox-switch *::before,
-.ox-gallery__stage[data-ox-motion="off"] .ox-switch *::after,
-.ox-gallery__stage[data-ox-motion="off"] [class*="ox-dt-"],
-.ox-gallery__stage[data-ox-motion="off"] [class*="ox-dt-"]::before,
-.ox-gallery__stage[data-ox-motion="off"] [class*="ox-dt-"]::after {
+.zb-gallery__stage[data-zb-motion="off"] .zb-tabs *,
+.zb-gallery__stage[data-zb-motion="off"] .zb-tabs *::before,
+.zb-gallery__stage[data-zb-motion="off"] .zb-tabs *::after,
+.zb-gallery__stage[data-zb-motion="off"] .zb-switch *,
+.zb-gallery__stage[data-zb-motion="off"] .zb-switch *::before,
+.zb-gallery__stage[data-zb-motion="off"] .zb-switch *::after,
+.zb-gallery__stage[data-zb-motion="off"] [class*="zb-dt-"],
+.zb-gallery__stage[data-zb-motion="off"] [class*="zb-dt-"]::before,
+.zb-gallery__stage[data-zb-motion="off"] [class*="zb-dt-"]::after {
   transition-duration: 1ms !important;
   animation-duration: 1ms !important;
 }
@@ -144,12 +144,12 @@
    column allows, and a segmented control that scrolls is a worse chapter
    nav than a wrapping one. A radiogroup, because the stage below is not a
    panel any single chapter owns. */
-.ox-dt-chapters {
+.zb-dt-chapters {
   display: flex;
   flex-wrap: wrap;
   gap: 0.375rem;
 }
-.ox-dt-chapter {
+.zb-dt-chapter {
   min-block-size: 2rem;
   border: 1px solid var(--color-rule);
   border-radius: 999px;
@@ -163,24 +163,24 @@
     color 140ms ease,
     background-color 140ms ease;
 }
-.ox-dt-chapter:hover {
+.zb-dt-chapter:hover {
   border-color: var(--color-rule-strong, var(--color-rule));
   color: var(--color-ink, inherit);
 }
-.ox-dt-chapter[aria-checked="true"] {
+.zb-dt-chapter[aria-checked="true"] {
   border-color: currentColor;
   background: var(--color-ink);
   color: var(--color-paper);
   font-weight: 600;
 }
 
-.ox-dt-demo-row {
+.zb-dt-demo-row {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
   gap: 1.5rem 2rem;
 }
-.ox-dt-demo-col {
+.zb-dt-demo-col {
   display: grid;
   gap: 0.375rem;
   /* Without this a long caption sets the column's min-content width and one
@@ -194,8 +194,8 @@
    so `precision="year"` and "Date of birth" competed and the eye had to decide
    which was the component. The annotation is scaffolding; it should be legible
    and lose. */
-.ox-dt-demo-cap {
-  font-family: var(--ox-font-mono, ui-monospace, monospace);
+.zb-dt-demo-cap {
+  font-family: var(--zb-font-mono, ui-monospace, monospace);
   font-size: 0.625rem;
   letter-spacing: 0.04em;
   /* Recede by scale and tracking, never by colour.
@@ -205,99 +205,99 @@
      more contrast, not less, so dimming while shrinking was wrong twice. The
      size drop alone puts the annotation behind the field label it sits above,
      which was the whole point. */
-  color: var(--ox-text-muted, var(--color-graphite));
+  color: var(--zb-text-muted, var(--color-graphite));
 }
 
-.ox-dt-demo-list {
+.zb-dt-demo-list {
   display: grid;
   gap: 0.5rem;
   /* A nowrap <code> in one row would otherwise set the width of every row
      and of the card around them. */
   grid-auto-columns: minmax(0, 1fr);
 }
-.ox-dt-demo-listrow {
+.zb-dt-demo-listrow {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   gap: 0.5rem 1rem;
-  border-block-end: 1px solid var(--ox-border, transparent);
+  border-block-end: 1px solid var(--zb-border, transparent);
   padding-block-end: 0.5rem;
   font-size: 0.8125rem;
-  color: var(--ox-text, inherit);
+  color: var(--zb-text, inherit);
 }
-.ox-dt-demo-listrow--stack {
+.zb-dt-demo-listrow--stack {
   align-items: center;
 }
-.ox-dt-demo-listrow:last-child {
+.zb-dt-demo-listrow:last-child {
   border-block-end: 0;
   padding-block-end: 0;
 }
-.ox-dt-demo-listrow > code {
+.zb-dt-demo-listrow > code {
   min-inline-size: 12rem;
-  font-family: var(--ox-font-mono, ui-monospace, monospace);
+  font-family: var(--zb-font-mono, ui-monospace, monospace);
   font-size: 0.75rem;
-  color: var(--ox-text-muted, inherit);
+  color: var(--zb-text-muted, inherit);
 }
-.ox-dt-demo-listrow > b {
+.zb-dt-demo-listrow > b {
   min-inline-size: 13rem;
   font-variant-numeric: tabular-nums;
   font-weight: 600;
 }
 /* The verdict is the point of the DST demo, so it carries a weight of its
    own — and never colour alone. */
-.ox-dt-demo-listrow [data-ox-verdict="nonexistent"],
-.ox-dt-demo-listrow [data-ox-verdict="ambiguous"] {
+.zb-dt-demo-listrow [data-zb-verdict="nonexistent"],
+.zb-dt-demo-listrow [data-zb-verdict="ambiguous"] {
   font-weight: 600;
-  color: var(--ox-status-high, inherit);
+  color: var(--zb-status-high, inherit);
 }
-.ox-dt-demo-listrow [data-ox-verdict="unknown-zone"] {
+.zb-dt-demo-listrow [data-zb-verdict="unknown-zone"] {
   font-weight: 600;
-  color: var(--ox-status-critical, inherit);
+  color: var(--zb-status-critical, inherit);
 }
 
 /* ---- one demo ----------------------------------------------------- */
-.ox-demo {
+.zb-demo {
   margin: 0;
   border: 1px solid var(--color-rule);
   border-radius: 0.875rem;
   background: var(--color-paper);
   overflow: hidden;
 }
-.ox-demo__head {
+.zb-demo__head {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   gap: 0.5rem;
   padding: 0.9rem 1.25rem 0;
 }
-.ox-demo__id {
+.zb-demo__id {
   font-family: var(--font-mono);
   font-size: 0.625rem;
   letter-spacing: 0.06em;
   color: var(--color-graphite-soft);
 }
-.ox-demo__name {
+.zb-demo__name {
   font-weight: 600;
   font-size: 0.875rem;
 }
-.ox-demo__api {
+.zb-demo__api {
   font-family: var(--font-mono);
   font-size: 0.6875rem;
   color: var(--color-graphite);
 }
-.ox-demo__tag {
+.zb-demo__tag {
   font-family: var(--font-mono);
   font-size: 0.625rem;
   color: var(--color-graphite-soft);
 }
-.ox-demo__tag + .ox-demo__tag::before {
+.zb-demo__tag + .zb-demo__tag::before {
   content: "·";
   margin-inline-end: 0.4rem;
   color: var(--color-rule-strong);
 }
-.ox-demo__stage {
+.zb-demo__stage {
   padding: 1.75rem 1.25rem 2rem;
-  background: var(--ox-bg);
+  background: var(--zb-bg);
   container-type: inline-size;
 }
 
@@ -309,11 +309,11 @@
  * apart. Form fields keep their left edge, because that is where a form puts
  * them and a centred input is the thing that would look wrong.
  */
-.ox-demo__stage > [data-ox-calendar] {
+.zb-demo__stage > [data-zb-calendar] {
   display: flex;
   justify-content: center;
 }
-.ox-demo__note {
+.zb-demo__note {
   margin: 0 1.25rem;
   padding: 0.85rem 0 1rem;
   border-top: 1px solid var(--color-rule);
@@ -322,7 +322,7 @@
   color: var(--color-graphite);
 }
 
-.ox-demo__note p {
+.zb-demo__note p {
   margin: 0;
 }
 
@@ -333,11 +333,11 @@
    sentence stays, the remainder moves in here, and nothing is deleted — this is
    the most valuable writing on the site and it should be one click away, not
    the first thing between a reader and the component. */
-.ox-demo__more {
+.zb-demo__more {
   margin-top: 0.5rem;
 }
 
-.ox-demo__more > summary {
+.zb-demo__more > summary {
   cursor: pointer;
   list-style: none;
   display: inline-flex;
@@ -353,32 +353,32 @@
   transition: color 0.2s;
 }
 
-.ox-demo__more > summary::-webkit-details-marker {
+.zb-demo__more > summary::-webkit-details-marker {
   display: none;
 }
 
-.ox-demo__more > summary::before {
+.zb-demo__more > summary::before {
   content: "+";
   font-size: 0.85rem;
   line-height: 1;
-  color: var(--color-oxygen);
+  color: var(--color-brand);
 }
 
-.ox-demo__more[open] > summary::before {
+.zb-demo__more[open] > summary::before {
   content: "−";
 }
 
-.ox-demo__more > summary:hover {
+.zb-demo__more > summary:hover {
   color: var(--color-ink);
 }
 
-.ox-demo__more > summary:focus-visible {
-  outline: 2px solid var(--color-oxygen);
+.zb-demo__more > summary:focus-visible {
+  outline: 2px solid var(--color-brand);
   outline-offset: 3px;
   border-radius: 3px;
 }
 
-.ox-demo__more > p {
+.zb-demo__more > p {
   margin-top: 0.5rem;
   padding-left: 0.7rem;
   border-left: 2px solid var(--color-rule);
@@ -387,46 +387,46 @@
 /* Procurement prints these pages. A collapsed disclosure that prints collapsed
    silently drops the argument from the copy somebody actually reads. */
 @media print {
-  .ox-demo__more > summary {
+  .zb-demo__more > summary {
     display: none;
   }
-  .ox-demo__more > p {
+  .zb-demo__more > p {
     display: block;
   }
 }
 
 /* ---- furniture inside a demo -------------------------------------- */
-.ox-demo-panel {
-  border: 1px dashed var(--ox-border);
+.zb-demo-panel {
+  border: 1px dashed var(--zb-border);
   border-radius: 0.75rem;
   padding: 0.85rem 1rem;
   font-size: 0.8125rem;
-  color: var(--ox-text-muted);
-  background: var(--ox-bg-subtle);
+  color: var(--zb-text-muted);
+  background: var(--zb-bg-subtle);
 }
-.ox-demo-panel b {
-  color: var(--ox-text);
+.zb-demo-panel b {
+  color: var(--zb-text);
 }
 
-.ox-demo-btn {
+.zb-demo-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
   font-size: 0.8125rem;
   padding: 0.35rem 0.7rem;
   border-radius: 0.5rem;
-  border: 1px solid var(--ox-border);
-  background: var(--ox-surface);
-  color: var(--ox-text);
+  border: 1px solid var(--zb-border);
+  background: var(--zb-surface);
+  color: var(--zb-text);
   cursor: pointer;
 }
-.ox-demo-btn--primary {
-  background: var(--ox-accent);
-  border-color: var(--ox-accent);
-  color: var(--ox-text-on-accent, #fff);
+.zb-demo-btn--primary {
+  background: var(--zb-accent);
+  border-color: var(--zb-accent);
+  color: var(--zb-text-on-accent, #fff);
 }
 
-.ox-alert {
+.zb-alert {
   display: flex;
   gap: 0.5rem;
   padding: 0.65rem 0.85rem;
@@ -434,61 +434,61 @@
   border-radius: 0.5rem;
   font-size: 0.8125rem;
   line-height: 1.5;
-  border: 1px solid var(--ox-status-critical-border);
-  background: var(--ox-status-critical-bg);
-  color: var(--ox-text);
+  border: 1px solid var(--zb-status-critical-border);
+  background: var(--zb-status-critical-bg);
+  color: var(--zb-text);
 }
 
-.ox-log {
+.zb-log {
   list-style: none;
   margin: 0.75rem 0 0;
   padding: 0.5rem 0.65rem;
-  border: 1px solid var(--ox-border);
+  border: 1px solid var(--zb-border);
   border-radius: 0.5rem;
-  background: var(--ox-bg-subtle);
+  background: var(--zb-bg-subtle);
   font-family: var(--font-mono);
   font-size: 0.6875rem;
-  color: var(--ox-text-muted);
+  color: var(--zb-text-muted);
   display: grid;
   gap: 0.2rem;
 }
-.ox-log li:first-child {
-  color: var(--ox-text);
+.zb-log li:first-child {
+  color: var(--zb-text);
 }
 
-.ox-sheet {
+.zb-sheet {
   margin-block-start: 0.9rem;
   padding: 0.9rem 1rem;
-  border: 1px solid var(--ox-border);
+  border: 1px solid var(--zb-border);
   border-radius: 0.75rem;
-  background: var(--ox-surface);
+  background: var(--zb-surface);
   max-width: 26rem;
 }
-.ox-sheet h5 {
+.zb-sheet h5 {
   margin: 0 0 0.3rem;
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--ox-text);
+  color: var(--zb-text);
 }
-.ox-sheet p {
+.zb-sheet p {
   margin: 0 0 0.75rem;
   font-size: 0.8125rem;
-  color: var(--ox-text-muted);
+  color: var(--zb-text-muted);
 }
-.ox-sheet__actions {
+.zb-sheet__actions {
   display: flex;
   gap: 0.5rem;
   justify-content: flex-end;
 }
 
-.ox-chart {
-  border: 1px solid var(--ox-border);
+.zb-chart {
+  border: 1px solid var(--zb-border);
   border-radius: 0.75rem;
-  background: var(--ox-surface);
+  background: var(--zb-surface);
   padding: 1rem 1.1rem 0;
   width: 100%;
 }
-.ox-chart__head {
+.zb-chart__head {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
@@ -496,125 +496,125 @@
   justify-content: space-between;
   margin-block-end: 0.85rem;
 }
-.ox-chart__name {
+.zb-chart__name {
   font-size: 1.05rem;
   font-weight: 600;
-  color: var(--ox-text);
+  color: var(--zb-text);
 }
-.ox-chart__mrn {
+.zb-chart__mrn {
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  color: var(--ox-text-muted);
+  color: var(--zb-text-muted);
 }
-.ox-chart__actions {
+.zb-chart__actions {
   display: flex;
   gap: 0.5rem;
 }
 
-.ox-card {
+.zb-card {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
   text-align: start;
 }
-.ox-card__title {
+.zb-card__title {
   font-weight: 600;
   font-size: 0.9rem;
-  color: var(--ox-text);
+  color: var(--zb-text);
 }
-.ox-card__body {
+.zb-card__body {
   font-size: 0.8rem;
   font-weight: 400;
   line-height: 1.45;
-  color: var(--ox-text-muted);
+  color: var(--zb-text-muted);
   white-space: normal;
 }
 
-.ox-stat {
+.zb-stat {
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
   text-align: start;
 }
-.ox-stat__key {
+.zb-stat__key {
   font-size: 0.75rem;
   font-weight: 500;
-  color: var(--ox-text-muted);
+  color: var(--zb-text-muted);
 }
-.ox-stat__value {
+.zb-stat__value {
   font-family: var(--font-mono);
   font-size: 1.4rem;
   font-weight: 600;
   line-height: 1.1;
-  color: var(--ox-text);
+  color: var(--zb-text);
   font-variant-numeric: tabular-nums;
 }
-.ox-stat__delta {
+.zb-stat__delta {
   font-size: 0.7rem;
   font-weight: 400;
 }
-.ox-stat__delta.is-good {
-  color: var(--ox-status-normal);
+.zb-stat__delta.is-good {
+  color: var(--zb-status-normal);
 }
-.ox-stat__delta.is-bad {
-  color: var(--ox-status-critical);
+.zb-stat__delta.is-bad {
+  color: var(--zb-status-critical);
 }
 
 /* A small animated chart, so switching a stat tile is worth doing. */
-.ox-spark {
+.zb-spark {
   display: flex;
   align-items: flex-end;
   gap: 4px;
   height: 110px;
   padding: 0.75rem;
-  border: 1px dashed var(--ox-border);
+  border: 1px dashed var(--zb-border);
   border-radius: 0.75rem;
-  background: var(--ox-bg-subtle);
+  background: var(--zb-bg-subtle);
 }
-.ox-spark > span {
+.zb-spark > span {
   flex: 1;
   border-radius: 3px 3px 0 0;
-  background: var(--ox-accent);
+  background: var(--zb-accent);
   opacity: 0.45;
   transform-origin: bottom;
-  animation: ox-spark-rise 520ms var(--ease-out-expo) both;
+  animation: zb-spark-rise 520ms var(--ease-out-expo) both;
 }
-.ox-spark > span:last-child {
+.zb-spark > span:last-child {
   opacity: 1;
 }
-@keyframes ox-spark-rise {
+@keyframes zb-spark-rise {
   from {
     transform: scaleY(0.05);
     opacity: 0;
   }
 }
 
-.ox-variants {
+.zb-variants {
   display: grid;
   gap: 1rem;
 }
-.ox-variants__row {
+.zb-variants__row {
   display: grid;
   gap: 0.45rem;
 }
-.ox-variants__row > code {
+.zb-variants__row > code {
   font-family: var(--font-mono);
   font-size: 0.6875rem;
-  color: var(--ox-text-muted);
+  color: var(--zb-text-muted);
 }
 
 /* ---- the nine-cell matrix ----------------------------------------- */
-.ox-matrix {
+.zb-matrix {
   display: grid;
   gap: 0.85rem;
   grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
 }
-.ox-matrix__cell {
+.zb-matrix__cell {
   border: 1px solid var(--color-rule);
   border-radius: 0.75rem;
   overflow: hidden;
 }
-.ox-matrix__label {
+.zb-matrix__label {
   font-family: var(--font-mono);
   font-size: 0.625rem;
   letter-spacing: 0.08em;
@@ -624,26 +624,26 @@
   border-bottom: 1px solid var(--color-rule);
   background: var(--color-paper-sunk);
 }
-.ox-matrix__body {
+.zb-matrix__body {
   display: grid;
   gap: 0.85rem;
   padding: 1rem 0.85rem;
-  background: var(--ox-bg);
+  background: var(--zb-bg);
 }
 
 /* ===================================================================
  * Demo theme scopes — deleted, and that is the fix.
  *
- * They used to be three hand-written palettes under `[data-ox-demo-theme]`,
+ * They used to be three hand-written palettes under `[data-zb-demo-theme]`,
  * redefining the *semantic* tier only, on the stated theory that component
  * tokens resolve to semantic ones and would follow. They do not. A `var()` in
  * a custom-property declaration is substituted where it is declared, so
- * `--ox-field-bg: var(--ox-surface)` was resolved once on `:root` against the
+ * `--zb-field-bg: var(--zb-surface)` was resolved once on `:root` against the
  * light palette, and every descendant inherited that literal. Switching the
  * bar to dark repainted the stage and left every field, input and popover
  * white on it.
  *
- * The stages now carry `data-ox-theme`, which is the product's own theming
+ * The stages now carry `data-zb-theme`, which is the product's own theming
  * attribute, and `packages/tokens` re-declares the component tier inside each
  * theme block the same way it already did for density. So the demos are
  * themed by the shipped mechanism rather than by a copy of it — which is also
@@ -651,54 +651,54 @@
  * shows up here instead of being papered over.
  * ================================================================== */
 
-[data-ox-theme="high-contrast"] .ox-tabs {
-  --ox-tabs-thumb-shadow: none;
-  --ox-tabs-weight-selected: 700;
-  --ox-tabs-indicator-size: 3px;
+[data-zb-theme="high-contrast"] .zb-tabs {
+  --zb-tabs-thumb-shadow: none;
+  --zb-tabs-weight-selected: 700;
+  --zb-tabs-indicator-size: 3px;
 }
-[data-ox-theme="high-contrast"] .ox-tabs__tab[data-ox-selected] {
+[data-zb-theme="high-contrast"] .zb-tabs__tab[data-zb-selected] {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
 /* Density, scoped to the demo rather than the page. */
-[data-ox-density="patient"] {
-  --ox-density-pad-x: 1.125rem;
-  --ox-density-pad-y: 0.875rem;
-  --ox-density-font: 1rem;
-  --ox-density-target: 3rem;
+[data-zb-density="patient"] {
+  --zb-density-pad-x: 1.125rem;
+  --zb-density-pad-y: 0.875rem;
+  --zb-density-font: 1rem;
+  --zb-density-target: 3rem;
 }
-[data-ox-density="standard"] {
-  --ox-density-pad-x: 0.875rem;
-  --ox-density-pad-y: 0.625rem;
-  --ox-density-font: 0.875rem;
-  --ox-density-target: 2.75rem;
+[data-zb-density="standard"] {
+  --zb-density-pad-x: 0.875rem;
+  --zb-density-pad-y: 0.625rem;
+  --zb-density-font: 0.875rem;
+  --zb-density-target: 2.75rem;
 }
-[data-ox-density="clinical"] {
-  --ox-density-pad-x: 0.5rem;
-  --ox-density-pad-y: 0.25rem;
-  --ox-density-font: 0.8125rem;
-  --ox-density-target: 1.875rem;
+[data-zb-density="clinical"] {
+  --zb-density-pad-x: 0.5rem;
+  --zb-density-pad-y: 0.25rem;
+  --zb-density-font: 0.8125rem;
+  --zb-density-target: 1.875rem;
 }
 
 /* ------------------------------------------------------------------ */
 /* The anatomy tour                                                    */
 /* ------------------------------------------------------------------ */
 
-.ox-dt-tour {
+.zb-dt-tour {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.ox-dt-tour__bar {
+.zb-dt-tour__bar {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   min-block-size: 2rem;
 }
 
-.ox-dt-tour__toggle {
+.zb-dt-tour__toggle {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -706,24 +706,24 @@
   min-block-size: 2rem;
   padding-inline: 0.875rem;
   border: 1px solid var(--color-rule);
-  border-radius: var(--ox-radius, 0.5rem);
-  background: var(--ox-surface);
-  color: var(--ox-text);
+  border-radius: var(--zb-radius, 0.5rem);
+  background: var(--zb-surface);
+  color: var(--zb-text);
   font-size: 0.8125rem;
   font-weight: 600;
   cursor: pointer;
 }
 
-.ox-dt-tour__toggle:hover {
-  background: var(--ox-bg-muted);
+.zb-dt-tour__toggle:hover {
+  background: var(--zb-bg-muted);
 }
 
-.ox-dt-tour__toggle:focus-visible {
-  outline: 2px solid var(--ox-field-border-focus);
+.zb-dt-tour__toggle:focus-visible {
+  outline: 2px solid var(--zb-field-border-focus);
   outline-offset: 2px;
 }
 
-.ox-dt-tour__count {
+.zb-dt-tour__count {
   margin: 0;
   font-size: 0.8125rem;
   color: var(--color-graphite);
@@ -738,7 +738,7 @@
  * two-thirds empty. Below the breakpoint it stacks, because a 280px column of
  * prose beside a 757px panel is neither.
  */
-.ox-dt-tour__stage {
+.zb-dt-tour__stage {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
@@ -746,12 +746,12 @@
   gap: 2rem;
 }
 
-.ox-dt-tour__pick {
+.zb-dt-tour__pick {
   position: relative;
   flex: none;
 }
 
-.ox-dt-tour__list {
+.zb-dt-tour__list {
   flex: 1 1 20rem;
   max-inline-size: 26rem;
   margin: 0;
@@ -763,51 +763,51 @@
   gap: 0.25rem;
 }
 
-.ox-dt-tour__note {
+.zb-dt-tour__note {
   display: grid;
   gap: 0.1875rem;
   inline-size: 100%;
   padding: 0.625rem 0.75rem;
   border: 1px solid transparent;
-  border-radius: var(--ox-radius, 0.5rem);
+  border-radius: var(--zb-radius, 0.5rem);
   background: none;
   text-align: start;
   cursor: pointer;
   transition:
-    background-color var(--ox-duration-fast, 90ms) var(--ox-ease, ease),
-    border-color var(--ox-duration-fast, 90ms) var(--ox-ease, ease);
+    background-color var(--zb-duration-fast, 90ms) var(--zb-ease, ease),
+    border-color var(--zb-duration-fast, 90ms) var(--zb-ease, ease);
 }
 
-.ox-dt-tour__note:hover {
-  background: var(--ox-bg-muted);
+.zb-dt-tour__note:hover {
+  background: var(--zb-bg-muted);
 }
 
-.ox-dt-tour__note:focus-visible {
-  outline: 2px solid var(--ox-field-border-focus);
+.zb-dt-tour__note:focus-visible {
+  outline: 2px solid var(--zb-field-border-focus);
   outline-offset: -1px;
 }
 
 /* Weight and a rail, not only a tint — the active note has to survive
    greyscale and a print, like everything else in this system. */
-.ox-dt-tour__note--on {
-  border-color: var(--ox-accent-border);
-  background: var(--ox-accent-subtle);
+.zb-dt-tour__note--on {
+  border-color: var(--zb-accent-border);
+  background: var(--zb-accent-subtle);
 }
 
-.ox-dt-tour__title {
+.zb-dt-tour__title {
   counter-increment: tour;
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--ox-text);
+  color: var(--zb-text);
 }
 
-.ox-dt-tour__title::before {
+.zb-dt-tour__title::before {
   content: counter(tour) " · ";
-  color: var(--ox-text-muted);
+  color: var(--zb-text-muted);
   font-variant-numeric: tabular-nums;
 }
 
-.ox-dt-tour__body {
+.zb-dt-tour__body {
   font-size: 0.8125rem;
   line-height: 1.5;
   color: var(--color-graphite);
@@ -815,16 +815,16 @@
 
 /* Dimmed until it is the one being pointed at, so the column reads as one
    active note rather than six competing paragraphs. */
-.ox-dt-tour__note:not(.ox-dt-tour__note--on) .ox-dt-tour__body {
+.zb-dt-tour__note:not(.zb-dt-tour__note--on) .zb-dt-tour__body {
   opacity: 0.72;
 }
 
-.ox-dt-tour__halo {
+.zb-dt-tour__halo {
   position: absolute;
   inset-block-start: 0;
   inset-inline-start: 0;
-  border: 2px solid var(--ox-accent);
-  border-radius: var(--ox-radius, 0.5rem);
+  border: 2px solid var(--zb-accent);
+  border-radius: var(--zb-radius, 0.5rem);
   pointer-events: none;
   transition:
     transform 320ms cubic-bezier(0.32, 0.72, 0, 1),
@@ -833,8 +833,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ox-dt-tour__halo,
-  .ox-dt-tour__note {
+  .zb-dt-tour__halo,
+  .zb-dt-tour__note {
     transition-duration: 1ms;
   }
 }
@@ -843,21 +843,21 @@
 /* The home card's date demo                                           */
 /* ------------------------------------------------------------------ */
 
-.ox-dt-card {
+.zb-dt-card {
   display: flex;
   flex-direction: column;
   gap: 0.875rem;
   inline-size: 100%;
 }
 
-.ox-dt-card__bar {
+.zb-dt-card__bar {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   min-block-size: 2rem;
 }
 
-.ox-dt-card__toggle {
+.zb-dt-card__toggle {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -865,27 +865,27 @@
   min-block-size: 2rem;
   padding-inline: 0.875rem;
   border: 1px solid var(--color-rule);
-  border-radius: var(--ox-radius, 0.5rem);
-  background: var(--ox-surface);
-  color: var(--ox-text);
+  border-radius: var(--zb-radius, 0.5rem);
+  background: var(--zb-surface);
+  color: var(--zb-text);
   font-size: 0.8125rem;
   font-weight: 600;
   cursor: pointer;
   flex: none;
 }
 
-.ox-dt-card__toggle:hover {
-  background: var(--ox-bg-muted);
+.zb-dt-card__toggle:hover {
+  background: var(--zb-bg-muted);
 }
 
-.ox-dt-card__toggle:focus-visible {
-  outline: 2px solid var(--ox-field-border-focus);
+.zb-dt-card__toggle:focus-visible {
+  outline: 2px solid var(--zb-field-border-focus);
   outline-offset: 2px;
 }
 
 /* Holds its line whether or not there is a sentence in it, so the calendar
    below never steps up and down as the script talks. */
-.ox-dt-card__say {
+.zb-dt-card__say {
   margin: 0;
   min-block-size: 1.25rem;
   font-size: 0.8125rem;
@@ -893,7 +893,7 @@
   color: var(--color-graphite);
 }
 
-.ox-dt-card__stage {
+.zb-dt-card__stage {
   position: relative;
   display: flex;
   justify-content: flex-start;
@@ -907,7 +907,7 @@
  * component as glitching rather than as being driven. `translate` is animated
  * rather than `left`/`top`, so the travel stays on the compositor.
  */
-.ox-dt-card__cursor {
+.zb-dt-card__cursor {
   position: absolute;
   inset-block-start: 0;
   inset-inline-start: 0;
@@ -915,13 +915,13 @@
   block-size: 1.125rem;
   margin-block-start: -0.5rem;
   margin-inline-start: -0.5rem;
-  border: 2px solid var(--ox-accent);
+  border: 2px solid var(--zb-accent);
   border-radius: 50%;
-  background: color-mix(in srgb, var(--ox-accent) 22%, transparent);
+  background: color-mix(in srgb, var(--zb-accent) 22%, transparent);
   /* A second ring in the surface colour, so the pointer still reads when it
      lands on an accent-filled chip — which is exactly where it lands twice,
      on each end of the range it is drawing. */
-  box-shadow: 0 0 0 2px var(--ox-surface);
+  box-shadow: 0 0 0 2px var(--zb-surface);
   pointer-events: none;
   transition:
     translate 320ms cubic-bezier(0.32, 0.72, 0, 1),
@@ -929,11 +929,11 @@
     opacity 200ms ease;
 }
 
-.ox-dt-card__cursor--press {
+.zb-dt-card__cursor--press {
   scale: 0.62;
 }
 
-.ox-dt-card__cursor[data-ox-hidden="true"] {
+.zb-dt-card__cursor[data-zb-hidden="true"] {
   opacity: 0;
 }
 
@@ -945,7 +945,7 @@
  * be given a third of a second of sliding.
  */
 @media (prefers-reduced-motion: reduce) {
-  .ox-dt-card__cursor {
+  .zb-dt-card__cursor {
     transition-duration: 1ms;
   }
 }

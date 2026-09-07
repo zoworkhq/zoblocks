@@ -17,9 +17,9 @@
  * clock is neither — so the stories do not either.
  */
 
-import type { Meta, StoryObj } from "@oxygenui-design/component-meta";
-import { patientRoutine, practitionerSigner } from "@oxygenui-design/fixtures";
-import type { SignatureValue, SignedValue } from "@oxygenui-design/signature-core";
+import type { Meta, StoryObj } from "@zoblocks/component-meta";
+import { patientRoutine, practitionerSigner } from "@zoblocks/fixtures";
+import type { SignatureValue, SignedValue } from "@zoblocks/signature-core";
 import { expect, userEvent, waitFor, within } from "../../../test/story-kit";
 import { Signature } from "./Signature";
 
@@ -89,7 +89,7 @@ export const Signed: Story = {
     expect(canvasElement.textContent).toContain("Amara Okonkwo");
     // 21 CFR 11.50(a)(3): the manifestation states the meaning.
     expect(canvasElement.textContent).toContain(ATTESTATION);
-    expect(canvasElement.querySelector("[data-ox-signature]")).toBeTruthy();
+    expect(canvasElement.querySelector("[data-zb-signature]")).toBeTruthy();
   },
 };
 
@@ -226,8 +226,8 @@ export const RequiredAndEmpty: Story = {
   parameters: { state: "Required and empty" },
   args: { status: "error" },
   play: async ({ canvasElement }) => {
-    const root = canvasElement.querySelector("[data-ox-signature]");
-    expect(root?.getAttribute("data-ox-status")).toBe("error");
+    const root = canvasElement.querySelector("[data-zb-signature]");
+    expect(root?.getAttribute("data-zb-status")).toBe("error");
 
     // The operable path is a real button, not a canvas. WCAG 2.1.1 is about
     // the underlying function — recording assent — being reachable without a

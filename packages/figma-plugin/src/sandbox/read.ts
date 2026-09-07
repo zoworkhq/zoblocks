@@ -3,7 +3,7 @@
  *
  * This is the whole of the adapter. It resolves mode ids to the names a
  * designer sees, turns Figma's `{r,g,b}` floats into the colour shape the core
- * uses, keeps an alias as an alias, and recovers Oxygen identity from plugin
+ * uses, keeps an alias as an alias, and recovers Zoblocks identity from plugin
  * data rather than from the label.
  *
  * The alias case is the one worth stating. Figma returns an alias as a
@@ -19,7 +19,7 @@ import {
   type PlannedValue,
   type SnapshotVariable,
   type VariableSnapshot,
-} from "@oxygenui-design/figma-core";
+} from "@zoblocks/figma-core";
 
 import type { CollectionSummary } from "../protocol";
 

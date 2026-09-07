@@ -2,8 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { Check, Lock, RotateCcw, Wand2, X } from "lucide-react";
-import { contrastBetween } from "@oxygenui-design/tokens/validate";
-import { nearestPassing } from "@oxygenui-design/theme";
+import { contrastBetween } from "@zoblocks/tokens/validate";
+import { nearestPassing } from "@zoblocks/theme";
 import { saveOverridesAction } from "@/lib/actions";
 import { ActionForm } from "@/components/action-form";
 import {
@@ -101,7 +101,7 @@ export function TokenEditor({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="body-sm text-graphite">
             {overrideCount === 0
-              ? "No overrides — this theme is your brand ramp and Oxygen's defaults."
+              ? "No overrides — this theme is your brand ramp and Zoblocks's defaults."
               : `${overrideCount} override${overrideCount === 1 ? "" : "s"} across three themes.`}
           </p>
           <SubmitButton reason={reason} pendingLabel="Checking…">
@@ -221,7 +221,7 @@ function TierNavigator({
           { label: "Component", n: model.counts.component, where: "Components screen" },
         ].map((tier) => (
           <div key={tier.label} className="flex items-baseline justify-between gap-2 px-3 py-2">
-            <dt className={cn(tier.where === "Here" && "font-medium text-oxygen-deep")}>
+            <dt className={cn(tier.where === "Here" && "font-medium text-brand-deep")}>
               {tier.label}
             </dt>
             <dd className="tabular font-mono text-[0.6875rem] text-graphite-soft">{tier.n}</dd>
@@ -245,7 +245,7 @@ function TierNavigator({
                     "flex w-full items-center justify-between gap-2 rounded-lg px-2.5 py-1.5",
                     "text-left text-[0.8125rem] transition-colors duration-200",
                     active
-                      ? "bg-accent-wash font-medium text-oxygen-deep"
+                      ? "bg-accent-wash font-medium text-brand-deep"
                       : "text-graphite hover:bg-paper-sunk hover:text-ink",
                   )}
                 >

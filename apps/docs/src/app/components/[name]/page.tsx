@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, CircleAlert } from "lucide-react";
-import type { Alternative, ComponentDoc, FrameworkRelation } from "@oxygenui-design/component-meta";
+import type { Alternative, ComponentDoc, FrameworkRelation } from "@zoblocks/component-meta";
 import { CATALOG, STATUS_LABEL, getComponent } from "@/lib/catalog";
 import { SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { PropsTable } from "@/components/site/props-table";
@@ -117,8 +117,8 @@ function structuredData(component: ComponentDoc) {
     description: seo?.description ?? component.summary,
     programmingLanguage: "TypeScript",
     runtimePlatform: "React",
-    codeRepository: "https://github.com/oxygenui-design/oxygen",
-    url: `https://oxygenui.design/components/${seo?.slug ?? component.name}`,
+    codeRepository: "https://github.com/zoblocks-design/zoblocks",
+    url: `https://zoblocks.design/components/${seo?.slug ?? component.name}`,
     keywords: [seo?.primaryKeyword, ...(seo?.secondaryKeywords ?? [])].filter(Boolean).join(", "),
     isAccessibleForFree: component.tier === "free",
     license: "https://opensource.org/licenses/MIT",
@@ -140,18 +140,18 @@ function breadcrumbData(component: ComponentDoc) {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Oxygen UI", item: "https://oxygenui.design" },
+      { "@type": "ListItem", position: 1, name: "Zoblocks", item: "https://zoblocks.design" },
       {
         "@type": "ListItem",
         position: 2,
         name: "Components",
-        item: "https://oxygenui.design/components",
+        item: "https://zoblocks.design/components",
       },
       {
         "@type": "ListItem",
         position: 3,
         name: component.title,
-        item: `https://oxygenui.design/components/${slug}`,
+        item: `https://zoblocks.design/components/${slug}`,
       },
     ],
   };
@@ -161,7 +161,7 @@ function breadcrumbData(component: ComponentDoc) {
  * Read the component's source from the generated registry JSON rather than
  * from the .tsx file directly. The registry is what customers actually
  * receive, so documenting it guarantees the page can never show source that
- * differs from what `oxygen add` installs.
+ * differs from what `zoblocks add` installs.
  */
 /**
  * What this component weighs, gzipped, including everything installed with it.
@@ -173,7 +173,7 @@ function breadcrumbData(component: ComponentDoc) {
  * The walk over `registryDependencies` is the whole point. A first version
  * measured only the component's own file and reported Date Picker at 3.0 KB,
  * which is true of `date-picker.tsx` and badly false about installing it: the
- * control is a thin switch over `datetime-core`, and `oxygen add date-picker`
+ * control is a thin switch over `datetime-core`, and `zoblocks add date-picker`
  * copies that too. A number that shrinks the more work you move into a shared
  * module is worse than no number.
  *
@@ -416,7 +416,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
 
                 <div className="mt-6 flex flex-wrap items-center gap-3">
                   <h1 className="display-lg text-balance">{component.title}</h1>
-                  <span className="rounded-full border border-oxygen/30 bg-oxygen/8 px-2.5 py-1 font-mono text-[0.6875rem] uppercase tracking-wider text-oxygen-deep">
+                  <span className="rounded-full border border-brand/30 bg-brand/8 px-2.5 py-1 font-mono text-[0.6875rem] uppercase tracking-wider text-brand-deep">
                     {STATUS_LABEL[component.status]}
                   </span>
                 </div>
@@ -431,7 +431,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                     <a
                       key={resource.url}
                       href={resource.url}
-                      className="numeric inline-flex items-center gap-1 text-oxygen-deep transition-colors hover:text-ink"
+                      className="numeric inline-flex items-center gap-1 text-brand-deep transition-colors hover:text-ink"
                     >
                       {resource.name}
                       <ArrowUpRight aria-hidden="true" className="size-3" />
@@ -461,7 +461,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                     <>
                       <span aria-hidden="true">·</span>
                       <span
-                        title={`Gzipped source copied by \`oxygen add\`: ${weight.files} files across this component and ${weight.shared} shared registry modules. A ceiling, not a bundle delta.`}
+                        title={`Gzipped source copied by \`zoblocks add\`: ${weight.files} files across this component and ${weight.shared} shared registry modules. A ceiling, not a bundle delta.`}
                       >
                         {(weight.gzip / 1024).toFixed(1)} KB installed
                       </span>
@@ -491,7 +491,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
               Ant Design itself so a second framework around it would either
               fight its own provider or show an antd control inside a Material
               frame. That was the wrong call: the second half of it is *true
-              and worth showing*. `@oxygenui-design/signature` declares antd as
+              and worth showing*. `@zoblocks/signature` declares antd as
               a peer, so a Material UI shop installing it really does get antd
               components in their palette, and a demo that hides that is a demo
               that misleads about what the package costs.
@@ -509,7 +509,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                   {/*
                 Two channels, and the command has to match the one this
                 component actually uses. A package component shown an
-                `oxygen add` line sends the reader to a registry item that does
+                `zoblocks add` line sends the reader to a registry item that does
                 not exist — which is worse than no install instructions.
               */}
                   {component.distribution === "package" ? (
@@ -535,11 +535,11 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                     />
                   ) : (
                     <InstallCommand
-                      command={`npx @oxygenui-design/cli add ${component.name}`}
+                      command={`npx @zoblocks/cli add ${component.name}`}
                       note={
                         <>
                           First install? Run{" "}
-                          <code className="font-mono text-[0.6875rem] text-ink">oxygen init</code>{" "}
+                          <code className="font-mono text-[0.6875rem] text-ink">zoblocks init</code>{" "}
                           once to say where your{" "}
                           <code className="font-mono text-[0.6875rem] text-ink">@/</code> alias
                           points. The source is copied into your repository, along with anything it
@@ -881,7 +881,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                         <div key={name}>
                           {apiTables.length > 1 && (
                             <h3 className="mb-3 flex flex-wrap items-baseline gap-x-2 font-display text-sm font-semibold tracking-tight">
-                              <code className="numeric text-oxygen-deep">{name}</code>
+                              <code className="numeric text-brand-deep">{name}</code>
                               <span className="text-xs font-normal text-graphite-soft">
                                 {exportProps.length} {exportProps.length === 1 ? "prop" : "props"}
                                 {tableIndex === 0 && component.exports.length > 1
@@ -1065,7 +1065,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                               <td className="py-3 pr-4 align-top">
                                 <span
                                   className="numeric text-[0.625rem] uppercase tracking-wide"
-                                  data-ox-check={check.status}
+                                  data-zb-check={check.status}
                                 >
                                   {check.status === "not-applicable" ? "n/a" : check.status}
                                 </span>
@@ -1142,7 +1142,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                               {target ? (
                                 <Link
                                   href={`/components/${target.name}`}
-                                  className="font-medium text-ink underline decoration-rule-strong underline-offset-4 hover:decoration-oxygen"
+                                  className="font-medium text-ink underline decoration-rule-strong underline-offset-4 hover:decoration-brand"
                                 >
                                   {target.title}
                                 </Link>
@@ -1162,12 +1162,12 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                           key={item!.name}
                           href={`/components/${item!.name}`}
                           data-reveal
-                          className="group surface-2 lift rounded-2xl p-5 hover:border-oxygen/45"
+                          className="group surface-2 lift rounded-2xl p-5 hover:border-brand/45"
                         >
                           <h3 className="font-display text-base font-semibold tracking-tight">
                             {item!.title}
                           </h3>
-                          <p className="numeric mt-1 text-xs text-oxygen-deep">{item!.resource}</p>
+                          <p className="numeric mt-1 text-xs text-brand-deep">{item!.resource}</p>
                           <p className="mt-2 text-sm leading-relaxed text-graphite">
                             {item!.summary}
                           </p>
@@ -1234,7 +1234,7 @@ function ComponentLinks({ label, names }: { label: string; names: readonly strin
             <Link
               key={name}
               href={`/components/${name}`}
-              className="underline decoration-rule-strong underline-offset-4 hover:text-ink hover:decoration-oxygen"
+              className="underline decoration-rule-strong underline-offset-4 hover:text-ink hover:decoration-brand"
             >
               {label}
             </Link>

@@ -30,7 +30,7 @@
  */
 
 import * as React from "react";
-import { assessInk, toInkPaths, type Stroke } from "@oxygenui-design/signature-core";
+import { assessInk, toInkPaths, type Stroke } from "@zoblocks/signature-core";
 import { useSignatureCapture, type UseSignatureCaptureOptions } from "./use-signature-capture";
 import { useLocale, type SignatureLocale } from "./locale";
 
@@ -64,7 +64,7 @@ export interface SignaturePadProps extends UseSignatureCaptureOptions {
 }
 
 let seq = 0;
-const nextId = () => `ox-sig-${++seq}`;
+const nextId = () => `zb-sig-${++seq}`;
 
 export function SignaturePad({
   id,
@@ -162,9 +162,9 @@ export function SignaturePad({
   return (
     <div
       className={[
-        "ox-signature",
-        variant === "initials" ? "ox-signature--initials" : "",
-        disabled ? "ox-signature--disabled" : "",
+        "zb-signature",
+        variant === "initials" ? "zb-signature--initials" : "",
+        disabled ? "zb-signature--disabled" : "",
         className ?? "",
       ]
         .filter(Boolean)
@@ -177,12 +177,12 @@ export function SignaturePad({
       {...(describedBy ? { "aria-describedby": describedBy } : {})}
       aria-disabled={disabled || undefined}
     >
-      <span id={labelId} className={hideLabel ? "ox-signature__sr" : "ox-signature__label"}>
+      <span id={labelId} className={hideLabel ? "zb-signature__sr" : "zb-signature__label"}>
         {label ?? t.padLabel}
       </span>
 
-      <div className="ox-signature__frame" data-ox-error={error ? "true" : undefined}>
-        <div className="ox-signature__toolbar">
+      <div className="zb-signature__frame" data-zb-error={error ? "true" : undefined}>
+        <div className="zb-signature__toolbar">
           <PadButton
             onClick={capture.undo}
             disabled={disabled || !canUndo}
@@ -195,14 +195,14 @@ export function SignaturePad({
             label={t.redo}
             icon="↷"
           />
-          <span className="ox-signature__divider" aria-hidden="true" />
+          <span className="zb-signature__divider" aria-hidden="true" />
           {confirmingClear ? (
-            <span className="ox-signature__confirm" role="group" aria-label={t.confirmClear}>
-              <span className="ox-signature__confirm-text">{t.confirmClear}</span>
+            <span className="zb-signature__confirm" role="group" aria-label={t.confirmClear}>
+              <span className="zb-signature__confirm-text">{t.confirmClear}</span>
               <button
                 ref={confirmRef}
                 type="button"
-                className="ox-signature__confirm-yes"
+                className="zb-signature__confirm-yes"
                 onClick={() => {
                   capture.clear();
                   setConfirmingClear(false);
@@ -212,7 +212,7 @@ export function SignaturePad({
               </button>
               <button
                 type="button"
-                className="ox-signature__confirm-no"
+                className="zb-signature__confirm-no"
                 onClick={() => setConfirmingClear(false)}
               >
                 {t.cancel}
@@ -232,19 +232,19 @@ export function SignaturePad({
           {...capture.bind}
           // Marks the box the setup shim gives a size to in jsdom, and the
           // hook measures for coordinate mapping.
-          data-ox-signature-pad=""
-          className="ox-signature__surface"
+          data-zb-signature-pad=""
+          className="zb-signature__surface"
           style={{ height: boxHeight, ...(ink ? { color: ink } : {}) }}
         >
-          {baseline ? <span className="ox-signature__baseline" aria-hidden="true" /> : null}
+          {baseline ? <span className="zb-signature__baseline" aria-hidden="true" /> : null}
           {baseline ? (
-            <span className="ox-signature__cue" aria-hidden="true">
+            <span className="zb-signature__cue" aria-hidden="true">
               ✕
             </span>
           ) : null}
 
           <svg
-            className="ox-signature__ink"
+            className="zb-signature__ink"
             // The surface is the affordance for one mode, not the control. Its
             // contents are decorative; the accessible story is the group, the
             // live region, and the typed alternative.
@@ -266,7 +266,7 @@ export function SignaturePad({
           </svg>
 
           {isEmpty && !disabled ? (
-            <span className="ox-signature__placeholder" aria-hidden="true">
+            <span className="zb-signature__placeholder" aria-hidden="true">
               {t.drawHere}
             </span>
           ) : null}
@@ -278,17 +278,17 @@ export function SignaturePad({
         Without this, a screen-reader user has no way to know whether anything
         was captured at all.
       */}
-      <div className="ox-signature__sr" role="status" aria-live="polite">
+      <div className="zb-signature__sr" role="status" aria-live="polite">
         {announcement}
       </div>
 
       {hint ? (
-        <div id={hintId} className="ox-signature__hint">
+        <div id={hintId} className="zb-signature__hint">
           {hint}
         </div>
       ) : null}
       {error ? (
-        <div id={errorId} className="ox-signature__error">
+        <div id={errorId} className="zb-signature__error">
           {error}
         </div>
       ) : null}
@@ -320,13 +320,13 @@ function PadButton({
   return (
     <button
       type="button"
-      className="ox-signature__tool"
+      className="zb-signature__tool"
       onClick={onClick}
       disabled={disabled}
       title={label}
     >
       <span aria-hidden="true">{icon}</span>
-      <span className="ox-signature__sr">{label}</span>
+      <span className="zb-signature__sr">{label}</span>
     </button>
   );
 }

@@ -1,13 +1,13 @@
-# @oxygenui-design/tabs-core
+# @zoblocks/tabs-core
 
-**The selection engine behind Oxygen Tabs.** No React, no DOM, no dependencies —
+**The selection engine behind Zoblocks Tabs.** No React, no DOM, no dependencies —
 every export is a pure function or a small state machine over plain data.
 
 ```bash
-npm install @oxygenui-design/tabs-core
+npm install @zoblocks/tabs-core
 ```
 
-It exists so a host on a different design system can take Oxygen's keyboard
+It exists so a host on a different design system can take Zoblocks's keyboard
 model and accessibility contract without the skin, and so that contract can be
 tested exhaustively without rendering anything.
 
@@ -70,7 +70,7 @@ through every tab they glanced at.
 ## Using it directly
 
 ```ts
-import { keyToIntent, rolesFor, fitTabs } from "@oxygenui-design/tabs-core";
+import { keyToIntent, rolesFor, fitTabs } from "@zoblocks/tabs-core";
 
 const spec = rolesFor("radiogroup");
 // { listRole: "radiogroup", triggerRole: "radio", selectedAttr: "aria-checked", … }
@@ -87,4 +87,4 @@ const { visible, overflow } = fitTabs({
 });
 ```
 
-The React bindings live in [`@oxygenui-design/tabs`](../tabs).
+The React bindings live in [`@zoblocks/tabs`](../tabs).

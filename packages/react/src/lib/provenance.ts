@@ -5,7 +5,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/lib/provenance.ts. Edit that file, not this one.
+// Generated from registry/zoblocks/lib/provenance.ts. Edit that file, not this one.
 /**
  * Where a value came from, how it got here, and how much of it a human has
  * actually looked at.

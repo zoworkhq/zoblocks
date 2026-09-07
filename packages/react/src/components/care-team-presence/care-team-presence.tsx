@@ -5,7 +5,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/care-team-presence/care-team-presence.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/care-team-presence/care-team-presence.tsx. Edit that file, not this one.
 /**
  * CareTeamPresence — presence with clinical semantics.
  *
@@ -26,7 +26,7 @@
  *
  * Transport-agnostic. The host subscribes once and passes presence down.
  *
- * Styling lives in `styles/oxygen-presence.css`, installed alongside.
+ * Styling lives in `styles/zoblocks-presence.css`, installed alongside.
  */
 
 import * as React from "react";
@@ -128,28 +128,28 @@ export const PresenceChip = React.forwardRef<HTMLDivElement, PresenceChipProps>(
       <div
         {...rest}
         ref={ref}
-        className={cn("ox-presence", className)}
-        data-ox-presence=""
-        data-ox-state={state}
-        data-ox-dnd={dnd ? "" : undefined}
-        data-ox-compact={compact ? "" : undefined}
+        className={cn("zb-presence", className)}
+        data-zb-presence=""
+        data-zb-state={state}
+        data-zb-dnd={dnd ? "" : undefined}
+        data-zb-compact={compact ? "" : undefined}
         role="group"
         aria-label={describePresence(presence, now)}
       >
         <span
-          className="ox-presence__avatar"
-          data-ox-ring={PRESENCE_RING[state]}
+          className="zb-presence__avatar"
+          data-zb-ring={PRESENCE_RING[state]}
           aria-hidden="true"
         >
           {initials(clinician.display)}
         </span>
 
         {compact ? null : (
-          <span className="ox-presence__body" aria-hidden="true">
-            <span className="ox-presence__name">
+          <span className="zb-presence__body" aria-hidden="true">
+            <span className="zb-presence__name">
               {clinician.display}
               {clinician.assignedTherapist ? (
-                <span className="ox-presence__assigned">assigned therapist</span>
+                <span className="zb-presence__assigned">assigned therapist</span>
               ) : null}
             </span>
 
@@ -158,19 +158,19 @@ export const PresenceChip = React.forwardRef<HTMLDivElement, PresenceChipProps>(
               "Attending, night coverage until 07:00" is, and the difference is
               whether a reader knows they have found the right person.
             */}
-            <span className="ox-presence__meta">
-              {clinician.role ? <span className="ox-presence__role">{clinician.role}</span> : null}
-              <span className="ox-presence__state">{PRESENCE_LABEL[state]}</span>
+            <span className="zb-presence__meta">
+              {clinician.role ? <span className="zb-presence__role">{clinician.role}</span> : null}
+              <span className="zb-presence__state">{PRESENCE_LABEL[state]}</span>
               {presence.detail ? (
-                <span className="ox-presence__detail">{presence.detail}</span>
+                <span className="zb-presence__detail">{presence.detail}</span>
               ) : null}
               {presence.until ? (
-                <span className="ox-presence__until">until {clockTime(presence.until, now)}</span>
+                <span className="zb-presence__until">until {clockTime(presence.until, now)}</span>
               ) : null}
             </span>
 
             {presence.coveredBy ? (
-              <span className="ox-presence__cover">
+              <span className="zb-presence__cover">
                 → covered by {presence.coveredBy.display}
                 {presence.until ? ` until ${clockTime(presence.until, now)}` : ""}
               </span>
@@ -182,7 +182,7 @@ export const PresenceChip = React.forwardRef<HTMLDivElement, PresenceChipProps>(
               to prevent.
             */}
             {state === "degraded" && now && presence.since ? (
-              <span className="ox-presence__degraded">
+              <span className="zb-presence__degraded">
                 Last seen {describeElapsedShort(Date.parse(now) - Date.parse(presence.since))} ago ·
                 channel lost
               </span>
@@ -193,8 +193,8 @@ export const PresenceChip = React.forwardRef<HTMLDivElement, PresenceChipProps>(
         {onContact ? (
           <button
             type="button"
-            className="ox-presence__contact"
-            data-ox-escalation={escalation.kind}
+            className="zb-presence__contact"
+            data-zb-escalation={escalation.kind}
             onClick={() => onContact(escalation)}
           >
             {escalation.kind === "covering"
@@ -246,15 +246,15 @@ export const CoverageCard = React.forwardRef<HTMLDivElement, CoverageCardProps>(
         <div
           {...rest}
           ref={ref}
-          className={cn("ox-coverage ox-coverage--gap", className)}
-          data-ox-coverage="gap"
+          className={cn("zb-coverage zb-coverage--gap", className)}
+          data-zb-coverage="gap"
           role="alert"
           aria-label="Nobody is covering this patient right now. Escalate to the on-call supervisor."
         >
-          <span className="ox-coverage__title" aria-hidden="true">
+          <span className="zb-coverage__title" aria-hidden="true">
             Nobody is covering right now
           </span>
-          <span className="ox-coverage__detail" aria-hidden="true">
+          <span className="zb-coverage__detail" aria-hidden="true">
             No rota window covers this moment. Escalate to the on-call supervisor.
           </span>
         </div>
@@ -278,22 +278,22 @@ export const CoverageCard = React.forwardRef<HTMLDivElement, CoverageCardProps>(
       <div
         {...rest}
         ref={ref}
-        className={cn("ox-coverage", className)}
-        data-ox-coverage="covered"
+        className={cn("zb-coverage", className)}
+        data-zb-coverage="covered"
         role="group"
         aria-label={`${label}.`}
       >
-        <span className="ox-coverage__title" aria-hidden="true">
+        <span className="zb-coverage__title" aria-hidden="true">
           Responsible right now
         </span>
 
-        <div className="ox-coverage__who" aria-hidden="true">
-          <span className="ox-presence__avatar" data-ox-ring="solid">
+        <div className="zb-coverage__who" aria-hidden="true">
+          <span className="zb-presence__avatar" data-zb-ring="solid">
             {initials(coverage.responsible.display)}
           </span>
           <span>
-            <span className="ox-coverage__name">{coverage.responsible.display}</span>
-            <span className="ox-coverage__meta">
+            <span className="zb-coverage__name">{coverage.responsible.display}</span>
+            <span className="zb-coverage__meta">
               {coverage.responsible.role ? `${coverage.responsible.role} · ` : ""}
               {coverage.reason ?? "Covering"}
               {` · until ${clockTime(coverage.until, now)}`}
@@ -302,7 +302,7 @@ export const CoverageCard = React.forwardRef<HTMLDivElement, CoverageCardProps>(
         </div>
 
         {coverage.backup ? (
-          <span className="ox-coverage__backup" aria-hidden="true">
+          <span className="zb-coverage__backup" aria-hidden="true">
             Back-up: {coverage.backup.display}
             {coverage.backup.role ? `, ${coverage.backup.role}` : ""}
             {coverage.backup.contact ? ` · ${coverage.backup.contact}` : ""}
@@ -312,7 +312,7 @@ export const CoverageCard = React.forwardRef<HTMLDivElement, CoverageCardProps>(
         {onPage ? (
           <button
             type="button"
-            className="ox-coverage__page"
+            className="zb-coverage__page"
             onClick={() => onPage(coverage.responsible)}
           >
             Page {coverage.responsible.display}
@@ -400,30 +400,30 @@ export const ChartCoPresence = React.forwardRef<HTMLDivElement, ChartCoPresenceP
       <div
         {...rest}
         ref={ref}
-        className={cn("ox-copresence", className)}
-        data-ox-copresence=""
-        data-ox-conflict={conflict ? "" : undefined}
+        className={cn("zb-copresence", className)}
+        data-zb-copresence=""
+        data-zb-conflict={conflict ? "" : undefined}
       >
-        <span className="ox-copresence__stack" aria-hidden="true">
+        <span className="zb-copresence__stack" aria-hidden="true">
           {others.slice(0, 4).map((other) => (
             <span
               key={other.clinician.id}
-              className="ox-presence__avatar"
-              data-ox-ring="solid"
-              data-ox-activity={other.activity}
+              className="zb-presence__avatar"
+              data-zb-ring="solid"
+              data-zb-activity={other.activity}
               title={`${other.clinician.display} — ${ACTIVITY_LABEL[other.activity]}`}
             >
               {initials(other.clinician.display)}
             </span>
           ))}
           {others.length > 4 ? (
-            <span className="ox-copresence__more">+{others.length - 4}</span>
+            <span className="zb-copresence__more">+{others.length - 4}</span>
           ) : null}
         </span>
 
         {conflict ? (
-          <div className="ox-copresence__conflict">
-            <p className="ox-copresence__message" aria-hidden="true">
+          <div className="zb-copresence__conflict">
+            <p className="zb-copresence__message" aria-hidden="true">
               {describeConflict(conflict, now)}
             </p>
             {/*
@@ -431,7 +431,7 @@ export const ChartCoPresence = React.forwardRef<HTMLDivElement, ChartCoPresenceP
               Told before you type, this is a choice; told at save, it is a
               merge problem with somebody else's unsigned note.
             */}
-            <div className="ox-copresence__actions">
+            <div className="zb-copresence__actions">
               {onOpenTheirs ? (
                 <button type="button" onClick={() => onOpenTheirs(conflict)}>
                   Open theirs read-only
@@ -453,7 +453,7 @@ export const ChartCoPresence = React.forwardRef<HTMLDivElement, ChartCoPresenceP
 
         {/* Polite and throttled. The component exists to prevent an
             interruption, not to become one. */}
-        <p className="ox-presence__sr" aria-live="polite">
+        <p className="zb-presence__sr" aria-live="polite">
           {announced}
         </p>
       </div>

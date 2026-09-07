@@ -4,7 +4,7 @@ import { defineConfig } from "vitest/config";
 /**
  * Absolute, because a bare `src/**` glob is not anchored to this package.
  *
- * These tests import `@oxygenui-design/tabs-core`, whose sources also live
+ * These tests import `@zoblocks/tabs-core`, whose sources also live
  * under a `src/` directory. Vitest 3 reported only this package's files;
  * Vitest 4 matches the sibling's too and folds eight of its files into this
  * gate — which drops the reported numbers to 91% statements / 85% branches and

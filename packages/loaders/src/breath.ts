@@ -1,15 +1,15 @@
 /**
- * `<ox-breath-loader>` — three rings expanding and fading from a soft core,
+ * `<zb-breath-loader>` — three rings expanding and fading from a soft core,
  * paced at a resting breath rather than a spinner's tempo.
  *
- *   import "@oxygenui-design/loaders/breath";
- *   <ox-breath-loader mode="page" label="Loading your information"></ox-breath-loader>
+ *   import "@zoblocks/loaders/breath";
+ *   <zb-breath-loader mode="page" label="Loading your information"></zb-breath-loader>
  */
 
 import { LOADER_VIEWBOX } from "./art.js";
-import { OxLoaderElement, define } from "./base.js";
+import { ZbLoaderElement, define } from "./base.js";
 
-export class OxBreathLoader extends OxLoaderElement {
+export class ZbBreathLoader extends ZbLoaderElement {
   protected override defaultSize = "lg" as const;
   protected override variant = "breath";
 
@@ -25,10 +25,10 @@ export class OxBreathLoader extends OxLoaderElement {
   }
 }
 
-define("ox-breath-loader", OxBreathLoader);
+define("zb-breath-loader", ZbBreathLoader);
 
 declare global {
   interface HTMLElementTagNameMap {
-    "ox-breath-loader": OxBreathLoader;
+    "zb-breath-loader": ZbBreathLoader;
   }
 }

@@ -3,7 +3,7 @@ import { expect, it } from "vitest";
 import type { ReactElement } from "react";
 
 /**
- * Invariants every Oxygen component is held to, regardless of what it renders.
+ * Invariants every Zoblocks component is held to, regardless of what it renders.
  *
  * These are the library's own stated rules, turned into assertions. They are
  * cheap, they apply everywhere, and each one corresponds to a failure that is

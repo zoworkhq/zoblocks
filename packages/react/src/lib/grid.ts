@@ -5,7 +5,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/lib/grid.ts. Edit that file, not this one.
+// Generated from registry/zoblocks/lib/grid.ts. Edit that file, not this one.
 /**
  * The engine behind DataGrid, and the reason it can be trusted.
  *

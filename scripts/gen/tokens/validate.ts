@@ -1,5 +1,5 @@
 /**
- * The token gate — now owned by `@oxygenui-design/tokens/validate`.
+ * The token gate — now owned by `@zoblocks/tokens/validate`.
  *
  * This file used to hold 604 lines of contrast, parity and tier checking. It
  * was reachable only by running the generator, which meant the theme app
@@ -23,4 +23,4 @@ export {
   resolveTheme,
   type ContrastReading,
   type TokenProblem,
-} from "@oxygenui-design/tokens/validate";
+} from "@zoblocks/tokens/validate";

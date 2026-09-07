@@ -30,7 +30,7 @@ import {
   type TimelineEvent,
   type TimelineKind,
   type TimelineStatus,
-} from "../registry/oxygen/lib/timeline-core";
+} from "../registry/zoblocks/lib/timeline-core";
 
 const NOW = "2026-08-18T10:40:00+05:30";
 const SOURCE = { id: "ehr", label: "Northside EHR", status: "ok" } as const;

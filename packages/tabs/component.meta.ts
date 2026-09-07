@@ -1,4 +1,4 @@
-import { defineComponentMeta } from "@oxygenui-design/component-meta";
+import { defineComponentMeta } from "@zoblocks/component-meta";
 
 /**
  * Tabs is the second `package` component, and it is one for a different
@@ -28,7 +28,7 @@ export default defineComponentMeta({
   },
 
   distribution: "package",
-  packageName: "@oxygenui-design/tabs",
+  packageName: "@zoblocks/tabs",
 
   summary:
     "Tabs that know what they are: a view switch, a link list, a form value or a wizard — four accessibility trees behind one silhouette.",
@@ -61,7 +61,7 @@ export default defineComponentMeta({
     {
       label: "The mode is declared, not guessed",
       detail:
-        '`as` selects the accessibility tree: tablist of buttons, a real nav of anchors, a radiogroup, or a gated tablist. It has no default, `@oxygenui/tabs-semantic-mode` makes omitting it a lint error, and passing an href under as="tabs" throws. A tablist of links passes every automated checker and then destroys focus on the first arrow key.',
+        '`as` selects the accessibility tree: tablist of buttons, a real nav of anchors, a radiogroup, or a gated tablist. It has no default, `@zoblocks/tabs-semantic-mode` makes omitting it a lint error, and passing an href under as="tabs" throws. A tablist of links passes every automated checker and then destroys focus on the first arrow key.',
     },
     {
       label: "One tab stop, and it follows selection",
@@ -128,8 +128,8 @@ export default defineComponentMeta({
 
   related: ["accordion", "chart-accordion", "switch"],
 
-  usage: `import { Tabs } from "@oxygenui-design/tabs";
-import "@oxygenui-design/tabs/styles.css";
+  usage: `import { Tabs } from "@zoblocks/tabs";
+import "@zoblocks/tabs/styles.css";
 
 // \`as\` is required and has no default: it selects the accessibility tree.
 // \`variant\` is orthogonal and changes no ARIA at all.
@@ -363,9 +363,9 @@ import "@oxygenui-design/tabs/styles.css";
       description:
         "The common case: a view switch over a patient chart, with a critical count on Labs that reaches the accessible name as a word.",
       fixture: "patientRoutine",
-      code: `import { Tabs } from "@oxygenui-design/tabs";
-import { allergyList, medicationList, observationPanel } from "@oxygenui-design/fixtures";
-import "@oxygenui-design/tabs/styles.css";
+      code: `import { Tabs } from "@zoblocks/tabs";
+import { allergyList, medicationList, observationPanel } from "@zoblocks/fixtures";
+import "@zoblocks/tabs/styles.css";
 
 const critical = observationPanel.filter(isCritical);
 
@@ -395,7 +395,7 @@ const critical = observationPanel.filter(isCritical);
       description:
         "A disabled tab requires a reason. Omitting the section entirely would tell the clinician it does not exist; greying it silently tells them nothing.",
       fixture: "patientRestricted",
-      code: `import { patientRestricted } from "@oxygenui-design/fixtures";
+      code: `import { patientRestricted } from "@zoblocks/fixtures";
 
 <Tabs
   as="tabs"
@@ -467,6 +467,6 @@ const critical = observationPanel.filter(isCritical);
     ogImage: "generated",
   },
 
-  dependencies: ["@oxygenui-design/tabs-core"],
+  dependencies: ["@zoblocks/tabs-core"],
   registryDependencies: [],
 });

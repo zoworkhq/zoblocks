@@ -138,7 +138,7 @@ export async function install(
     case "component":
       return {
         message:
-          "Components install with the Oxygen CLI. Mint an access token and add the @oxygen-pro registry to oxygen.json.",
+          "Components install with the Zoblocks CLI. Mint an access token and add the @zoblocks-pro registry to zoblocks.json.",
         href: "/market/tokens",
       };
 

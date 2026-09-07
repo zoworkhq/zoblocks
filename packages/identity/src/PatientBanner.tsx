@@ -24,8 +24,8 @@ import {
   shortName,
   switchAnnouncement,
   type Identity,
-} from "@oxygenui-design/identity-core";
-import type { OperationOutcome, Patient } from "@oxygenui-design/fhir";
+} from "@zoblocks/identity-core";
+import type { OperationOutcome, Patient } from "@zoblocks/fhir";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { BannerAvatar } from "./IdentityAvatar.js";
 import { useIdentity, useIdentityPolicy } from "./IdentityProvider.js";
@@ -153,34 +153,34 @@ export type PatientBannerProps = ContextProps &
  * How many rungs of the field list survive at each container width.
  *
  * The breakpoints live in CSS; this array is what the accessible label and the
- * `data-ox-fields` attribute report, so tests and audit tooling can see what a
+ * `data-zb-fields` attribute report, so tests and audit tooling can see what a
  * given width actually rendered.
  */
 /** Literal rail classes. See the note in `states.tsx`. */
 const RAIL_CLASS: Record<string, string> = {
-  neutral: "ox-banner__rail--neutral",
-  warn: "ox-banner__rail--warn",
-  restricted: "ox-banner__rail--restricted",
-  error: "ox-banner__rail--error",
-  none: "ox-banner__rail--none",
+  neutral: "zb-banner__rail--neutral",
+  warn: "zb-banner__rail--warn",
+  restricted: "zb-banner__rail--restricted",
+  error: "zb-banner__rail--error",
+  none: "zb-banner__rail--none",
 };
 
 const BANNER_RAIL_CLASS: Record<string, string> = {
-  neutral: "ox-banner--rail-neutral",
-  warn: "ox-banner--rail-warn",
-  restricted: "ox-banner--rail-restricted",
-  error: "ox-banner--rail-error",
-  none: "ox-banner--rail-none",
+  neutral: "zb-banner--rail-neutral",
+  warn: "zb-banner--rail-warn",
+  restricted: "zb-banner--rail-restricted",
+  error: "zb-banner--rail-error",
+  none: "zb-banner--rail-none",
 };
 
 const DROP_CLASS: Record<string, string> = {
-  ward: "ox-drop-4",
-  spcu: "ox-drop-3",
-  "gender-identity": "ox-drop-3",
-  "recorded-sex-or-gender": "ox-drop-3",
-  age: "ox-drop-3",
-  pronouns: "ox-drop-2",
-  identifier: "ox-drop-1",
+  ward: "zb-drop-4",
+  spcu: "zb-drop-3",
+  "gender-identity": "zb-drop-3",
+  "recorded-sex-or-gender": "zb-drop-3",
+  age: "zb-drop-3",
+  pronouns: "zb-drop-2",
+  identifier: "zb-drop-1",
 };
 
 export function PatientBanner(props: PatientBannerProps): ReactNode {
@@ -207,19 +207,19 @@ export function PatientBanner(props: PatientBannerProps): ReactNode {
   if ("error" in props && props.error) {
     return (
       <div
-        className={joined("ox-banner ox-banner--error", className)}
+        className={joined("zb-banner zb-banner--error", className)}
         // Marked like every other root in the library. Without it the failure
         // states are the two a visual-regression harness cannot target and a
         // host's CSS cannot reach — which is the wrong two to leave out.
-        data-ox-banner="error"
+        data-zb-banner="error"
         role="alert"
       >
-        <span className="ox-banner__rail ox-banner__rail--error" aria-hidden="true" />
-        <div className="ox-banner__block">
-          <div className="ox-banner__line1">
-            <span className="ox-banner__name">Could not load the patient record</span>
+        <span className="zb-banner__rail zb-banner__rail--error" aria-hidden="true" />
+        <div className="zb-banner__block">
+          <div className="zb-banner__line1">
+            <span className="zb-banner__name">Could not load the patient record</span>
           </div>
-          <div className="ox-banner__line2">
+          <div className="zb-banner__line2">
             Nothing below this point is confirmed to belong to anyone. Do not act on it.
           </div>
         </div>
@@ -232,16 +232,16 @@ export function PatientBanner(props: PatientBannerProps): ReactNode {
   if (!identity) {
     return (
       <div
-        className={joined("ox-banner ox-banner--loading", className)}
-        data-ox-banner="loading"
+        className={joined("zb-banner zb-banner--loading", className)}
+        data-zb-banner="loading"
         aria-busy="true"
       >
-        <span className="ox-avatar ox-avatar--40 ox-avatar--loading" aria-hidden="true" />
-        <div className="ox-banner__block">
-          <span className="ox-banner__skeleton ox-banner__skeleton--name" aria-hidden="true" />
-          <span className="ox-banner__skeleton ox-banner__skeleton--line" aria-hidden="true" />
+        <span className="zb-avatar zb-avatar--40 zb-avatar--loading" aria-hidden="true" />
+        <div className="zb-banner__block">
+          <span className="zb-banner__skeleton zb-banner__skeleton--name" aria-hidden="true" />
+          <span className="zb-banner__skeleton zb-banner__skeleton--line" aria-hidden="true" />
         </div>
-        <span className="ox-visually-hidden">Loading patient</span>
+        <span className="zb-visually-hidden">Loading patient</span>
       </div>
     );
   }
@@ -310,20 +310,20 @@ export function PatientBanner(props: PatientBannerProps): ReactNode {
       */}
       <section
         aria-label={label}
-        data-ox-banner="ready"
-        data-ox-patient-id={identity.key}
-        data-ox-context={context}
-        data-ox-fields={rendered.join(",")}
+        data-zb-banner="ready"
+        data-zb-patient-id={identity.key}
+        data-zb-context={context}
+        data-zb-fields={rendered.join(",")}
         className={joined(
-          "ox-banner",
+          "zb-banner",
           BANNER_RAIL_CLASS[railTone(identity)],
-          restricted ? "ox-banner--restricted" : "",
-          identity.states.some((s) => s.kind === "test") ? "ox-banner--test" : "",
+          restricted ? "zb-banner--restricted" : "",
+          identity.states.some((s) => s.kind === "test") ? "zb-banner--test" : "",
           className,
         )}
       >
         <span
-          className={joined("ox-banner__rail", RAIL_CLASS[railTone(identity)])}
+          className={joined("zb-banner__rail", RAIL_CLASS[railTone(identity)])}
           aria-hidden="true"
         />
         {showPhoto && (
@@ -334,17 +334,17 @@ export function PatientBanner(props: PatientBannerProps): ReactNode {
             onPhotoError={() => setPhotoFailed(true)}
           />
         )}
-        <div className="ox-banner__block">
-          <div className="ox-banner__line1">
-            <span className="ox-banner__name">
+        <div className="zb-banner__block">
+          <div className="zb-banner__line1">
+            <span className="zb-banner__name">
               {allow.name === "short" ? shortName(identity.name) : identity.name.text}
             </span>
             {showPronouns && (
-              <span className="ox-banner__pronouns ox-drop-2">{identity.pronouns}</span>
+              <span className="zb-banner__pronouns zb-drop-2">{identity.pronouns}</span>
             )}
             <StateTags identity={identity} size="xs" showActive />
           </div>
-          <div className="ox-banner__line2">
+          <div className="zb-banner__line2">
             {showDob && identity.birthDate && (
               <Fld field="dob" label="DOB" value={identity.birthDate.text} />
             )}
@@ -399,26 +399,26 @@ export function PatientBanner(props: PatientBannerProps): ReactNode {
             unmask whatever else it holds and write the audit entry.
           */}
           {restricted?.kind === "restricted" && (
-            <div className="ox-banner__withheld">
+            <div className="zb-banner__withheld">
               {withheld ? (
                 <>
                   <span>
                     This record carries sensitivity labels. Revealing which ones is recorded against
                     your account.
                   </span>
-                  <button type="button" className="ox-banner__reveal" onClick={reveal}>
+                  <button type="button" className="zb-banner__reveal" onClick={reveal}>
                     Reveal
                   </button>
                 </>
               ) : (
-                <span data-ox-field="sensitivity">
+                <span data-zb-field="sensitivity">
                   Sensitivity: {restricted.codes.map((c) => SENSITIVITY_LABEL[c]).join(", ")}
                 </span>
               )}
             </div>
           )}
         </div>
-        {actions && <div className="ox-banner__actions">{actions}</div>}
+        {actions && <div className="zb-banner__actions">{actions}</div>}
       </section>
       {children}
     </PatientContextProvider>
@@ -435,12 +435,12 @@ function Fld(props: {
   const { field, label, value, assigner, invalid } = props;
   const drop = DROP_CLASS[field];
   return (
-    <span className={joined("ox-banner__fld", drop)} data-ox-field={field}>
-      <span className="ox-banner__lbl">{label}</span>
-      <span className="ox-banner__val">{value}</span>
-      {assigner && <span className="ox-banner__assigner">{assigner}</span>}
+    <span className={joined("zb-banner__fld", drop)} data-zb-field={field}>
+      <span className="zb-banner__lbl">{label}</span>
+      <span className="zb-banner__val">{value}</span>
+      {assigner && <span className="zb-banner__assigner">{assigner}</span>}
       {invalid && (
-        <span className="ox-banner__invalid" title="This identifier fails its check digit">
+        <span className="zb-banner__invalid" title="This identifier fails its check digit">
           ⚠
         </span>
       )}
@@ -487,7 +487,7 @@ function PatientSwitchAnnouncer({ identity }: { identity: Identity }): ReactNode
   }, [identity]);
 
   return (
-    <div aria-live="polite" aria-atomic="true" className="ox-visually-hidden">
+    <div aria-live="polite" aria-atomic="true" className="zb-visually-hidden">
       {message}
     </div>
   );

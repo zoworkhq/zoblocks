@@ -5,7 +5,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/lib/recurrence.ts. Edit that file, not this one.
+// Generated from registry/zoblocks/lib/recurrence.ts. Edit that file, not this one.
 /**
  * Recurrence: an RFC 5545 subset, stated as a subset.
  *
@@ -35,8 +35,8 @@ import {
   isSameDate,
   weekdayOf,
   WEEKDAY_NAMES,
-  type OxDate,
-  type OxTime,
+  type ZbDate,
+  type ZbTime,
 } from "../lib/datetime";
 
 /* ------------------------------------------------------------------ */
@@ -69,7 +69,7 @@ export interface RecurrenceRule {
   /** Stop after N occurrences. Mutually exclusive with `until`. */
   count?: number;
   /** Stop on or before this date. Mutually exclusive with `count`. */
-  until?: OxDate;
+  until?: ZbDate;
   /**
    * Dates the series skips — facility closures, holidays.
    *
@@ -78,7 +78,7 @@ export interface RecurrenceRule {
    * scheduler that prints the naive occurrence count has told the billing
    * team a number that does not match reality.
    */
-  exceptions?: OxDate[];
+  exceptions?: ZbDate[];
 }
 
 const WEEKDAY_CODES = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"] as const;
@@ -88,7 +88,7 @@ const WEEKDAY_CODES = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"] as const;
 /* ------------------------------------------------------------------ */
 
 export interface Occurrence {
-  date: OxDate;
+  date: ZbDate;
   /** 1-based position in the series, counting only kept dates. */
   index: number;
   /** Set when the date is in `exceptions`; the occurrence is not counted. */
@@ -105,7 +105,7 @@ const HARD_CAP = 400;
  * closures, 24 sessions" is the sentence a scheduler needs, and a list that
  * has quietly dropped two rows cannot produce it.
  */
-export function expandRule(rule: RecurrenceRule, start: OxDate, cap = 60): Occurrence[] {
+export function expandRule(rule: RecurrenceRule, start: ZbDate, cap = 60): Occurrence[] {
   const limit = Math.min(cap, HARD_CAP);
   const interval = Math.max(1, rule.interval ?? 1);
   const out: Occurrence[] = [];
@@ -128,10 +128,10 @@ export function expandRule(rule: RecurrenceRule, start: OxDate, cap = 60): Occur
   /** 1-based session number, which skipped dates do not advance. */
   let sessions = 0;
 
-  const isException = (date: OxDate) =>
+  const isException = (date: ZbDate) =>
     (rule.exceptions ?? []).some((exception) => isSameDate(exception, date));
 
-  const push = (date: OxDate): boolean => {
+  const push = (date: ZbDate): boolean => {
     if (rule.until && compareDates(date, rule.until) > 0) return false;
     emitted += 1;
     if (isException(date)) {
@@ -188,7 +188,7 @@ export function expandRule(rule: RecurrenceRule, start: OxDate, cap = 60): Occur
 }
 
 /** The nth weekday of a month, or a clamped day-of-month. */
-function monthlyDate(anchor: OxDate, rule: RecurrenceRule): OxDate | null {
+function monthlyDate(anchor: ZbDate, rule: RecurrenceRule): ZbDate | null {
   if (rule.bySetPos && rule.byWeekday?.length) {
     const weekday = rule.byWeekday[0];
     if (weekday === undefined) return null;
@@ -198,7 +198,7 @@ function monthlyDate(anchor: OxDate, rule: RecurrenceRule): OxDate | null {
       while (weekdayOf(date) !== weekday) date = addCalendarDays(date, -1);
       return date;
     }
-    let date: OxDate = { kind: "date", y: anchor.y, m: anchor.m, d: 1 };
+    let date: ZbDate = { kind: "date", y: anchor.y, m: anchor.m, d: 1 };
     while (weekdayOf(date) !== weekday) date = addCalendarDays(date, 1);
     return addCalendarDays(date, 7 * (rule.bySetPos - 1));
   }
@@ -212,7 +212,7 @@ function monthlyDate(anchor: OxDate, rule: RecurrenceRule): OxDate | null {
   return null;
 }
 
-function clampToMonth(y: number, m: number, day: number): OxDate {
+function clampToMonth(y: number, m: number, day: number): ZbDate {
   const last = addCalendarDays(addCalendarMonths({ kind: "date", y, m, d: 1 }, 1), -1).d;
   return { kind: "date", y, m, d: Math.min(day, last) };
 }
@@ -267,7 +267,7 @@ export function describeRule(rule: RecurrenceRule): string {
 /** The whole series as one sentence, which is what gets read back before a save. */
 export function describeSeries(
   rule: RecurrenceRule,
-  options: { at?: OxTime; timeLabel?: string } = {},
+  options: { at?: ZbTime; timeLabel?: string } = {},
 ): string {
   let sentence = describeRule(rule);
   if (options.timeLabel) sentence += ` at ${options.timeLabel}`;
@@ -281,7 +281,7 @@ export function describeSeries(
 /* RFC 5545                                                           */
 /* ------------------------------------------------------------------ */
 
-function isoBasic(date: OxDate): string {
+function isoBasic(date: ZbDate): string {
   return formatPlainDate(date, "iso").replace(/-/g, "");
 }
 
@@ -421,7 +421,7 @@ export interface OccurrenceVerdict {
   date: string;
   reason: string;
   /** An alternative the host proposes. Offered, never applied. */
-  alternative?: { date: OxDate; label: string };
+  alternative?: { date: ZbDate; label: string };
 }
 
 export interface SeriesReview {

@@ -1,4 +1,4 @@
-import { defineComponentMeta } from "@oxygenui-design/component-meta";
+import { defineComponentMeta } from "@zoblocks/component-meta";
 
 /**
  * Signature is the first `package` component.
@@ -6,7 +6,7 @@ import { defineComponentMeta } from "@oxygenui-design/component-meta";
  * It wraps Ant Design, and a component that copied antd's Modal, Tabs and Form
  * into someone's repository would not be "source you own" — it would be a fork
  * of a framework. So it ships on npm with antd as a peer dependency, which is
- * why this metadata lives beside the package rather than in `registry/oxygen`.
+ * why this metadata lives beside the package rather than in `registry/zoblocks`.
  */
 export default defineComponentMeta({
   name: "signature",
@@ -28,7 +28,7 @@ export default defineComponentMeta({
   },
 
   distribution: "package",
-  packageName: "@oxygenui-design/signature",
+  packageName: "@zoblocks/signature",
 
   summary:
     "Signature capture that records the times nobody signed — declined, unable, verbal, on paper — not just the times they did.",
@@ -119,7 +119,7 @@ export default defineComponentMeta({
   },
 
   limitations: [
-    "Ant Design is a peer dependency. This is the only Oxygen component that is not distributed as copy-as-source, because copying antd's Modal and Form into a consumer's repository would be a fork rather than a component.",
+    "Ant Design is a peer dependency. This is the only Zoblocks component that is not distributed as copy-as-source, because copying antd's Modal and Form into a consumer's repository would be a fork rather than a component.",
     "Signature.data is a graphical signature only — an image of a mark. Deployments needing non-repudiation add a second Signature entry carrying a JWS.",
     "The timestamp is a required prop, not read from the clock. A browser clock is not evidence, and 42 CFR 482.24(c)(1) wants entries dated by whoever is accountable.",
     "Stroke biometrics are captured into the model but never emitted unless explicitly opted in, because whether stroke dynamics are a 'writing sample' is unsettled under BIPA and CUBI.",
@@ -129,8 +129,8 @@ export default defineComponentMeta({
   related: ["clinical-note", "safety-plan", "identity"],
 
   usage: `import { Form } from "antd";
-import { Signature, signatureRequired } from "@oxygenui-design/signature";
-import "@oxygenui-design/signature/styles.css";
+import { Signature, signatureRequired } from "@zoblocks/signature";
+import "@zoblocks/signature/styles.css";
 
 // signatureRequired() accepts a decline as an answer. A rule demanding
 // outcome === "signed" would make refusal impossible to submit.
@@ -331,8 +331,8 @@ import "@oxygenui-design/signature/styles.css";
         'The common case. `signatureRequired()` treats a decline as a valid answer — a rule demanding outcome === "signed" would make refusal impossible to submit.',
       fixture: "patientRoutine",
       code: `import { Form } from "antd";
-import { Signature, signatureRequired } from "@oxygenui-design/signature";
-import "@oxygenui-design/signature/styles.css";
+import { Signature, signatureRequired } from "@zoblocks/signature";
+import "@zoblocks/signature/styles.css";
 
 <Form.Item name="consent" rules={[signatureRequired()]}>
   <Signature
@@ -366,8 +366,8 @@ switch (value.outcome) {
       description:
         "Consent carries no signature element in R4 or R5 — only Provenance.signature does. The component emits a transaction Bundle so the two land together or not at all.",
       fixture: "provenanceConsent",
-      code: `import { toFhirBundle } from "@oxygenui-design/signature";
-import { patientRoutine } from "@oxygenui-design/fixtures";
+      code: `import { toFhirBundle } from "@zoblocks/signature";
+import { patientRoutine } from "@zoblocks/fixtures";
 
 // A transaction Bundle: the Consent and the Provenance that signs it, posted
 // together or not at all. Emitting the Consent alone would store an agreement
@@ -417,6 +417,6 @@ const bundle = toFhirBundle(value, {
     ogImage: "generated",
   },
 
-  dependencies: ["antd", "@oxygenui-design/signature-core"],
+  dependencies: ["antd", "@zoblocks/signature-core"],
   registryDependencies: [],
 });

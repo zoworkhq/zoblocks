@@ -42,15 +42,34 @@ import { cn } from "@/lib/utils";
  * lie. Playground, Brand and Members join their groups when they are built.
  */
 
-export function OxygenMark({ className = "h-4 w-7" }: { className?: string }) {
-  // Two bonded circles — O₂. The docs site's mark, verbatim: a customer arrives
-  // here from oxygenui.design in one click, and a different mark at the
-  // boundary is the fastest way to make one product feel like two.
+export function ZoblocksMark({ className = "h-4 w-7" }: { className?: string }) {
+  // Two blocks and the tenon that joins them. The docs site's mark, verbatim:
+  // a customer arrives here from zoblocks.design in one click, and a different
+  // mark at the boundary is the fastest way to make one product feel like two.
+  // Keep this in step with `ZoblocksMark` in the docs app's chrome.tsx.
   return (
     <svg viewBox="0 0 28 16" className={className} aria-hidden="true">
-      <line x1="8" y1="8" x2="20" y2="8" stroke="var(--color-oxygen)" strokeWidth="2.5" />
-      <circle cx="8" cy="8" r="5.5" fill="none" stroke="currentColor" strokeWidth="2" />
-      <circle cx="20" cy="8" r="5.5" fill="none" stroke="currentColor" strokeWidth="2" />
+      <rect x="11.5" y="5.5" width="5" height="5" rx="1.25" fill="var(--color-brand)" />
+      <rect
+        x="2.5"
+        y="3"
+        width="9.5"
+        height="10"
+        rx="2"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
+      <rect
+        x="16"
+        y="3"
+        width="9.5"
+        height="10"
+        rx="2"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
     </svg>
   );
 }
@@ -243,12 +262,12 @@ export function Rail({
       <div className="flex items-center justify-between gap-3">
         <Link
           href="/themes"
-          aria-label="Oxygen app home"
+          aria-label="Zoblocks app home"
           className="group flex items-center gap-2.5 text-ink"
         >
-          <OxygenMark className="h-4 w-7 transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:rotate-180" />
+          <ZoblocksMark className="h-4 w-7 transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:rotate-180" />
           <span className="font-display text-[0.9375rem] font-semibold tracking-[-0.02em]">
-            Oxygen
+            Zoblocks
           </span>
           <span className="eyebrow text-[0.5625rem] text-graphite-soft">App</span>
         </Link>
@@ -399,14 +418,14 @@ function NavLink({ item, current }: { item: Item; current: string | undefined })
           "group flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[0.8125rem]",
           "transition-colors duration-200",
           active
-            ? "bg-accent-wash font-medium text-oxygen-deep"
+            ? "bg-accent-wash font-medium text-brand-deep"
             : "text-graphite hover:bg-paper-sunk hover:text-ink",
         )}
       >
         <item.Icon
           aria-hidden="true"
           strokeWidth={2}
-          className={cn("size-3.5 shrink-0", active ? "text-oxygen-deep" : "text-graphite-soft")}
+          className={cn("size-3.5 shrink-0", active ? "text-brand-deep" : "text-graphite-soft")}
         />
         <span className="min-w-0 flex-1 truncate">{item.label}</span>
         {item.count !== undefined && (

@@ -12,7 +12,7 @@
     "limit": "11 KB"
   },
   {
-    "name": "elements \u2014 <ox-switch>",
+    "name": "elements \u2014 <zb-switch>",
     "path": "packages/elements/dist/switch.js",
     "import": "*",
     "limit": "8 KB"
@@ -40,12 +40,12 @@
   },
   {
     "name": "tokens \u2014 the stylesheet every consumer loads",
-    "path": "packages/tokens/src/oxygen-tokens.css",
+    "path": "packages/tokens/src/zoblocks-tokens.css",
     "limit": "5 KB"
   },
   {
     "name": "loader stylesheet",
-    "path": "registry/oxygen/lib/loader.css",
+    "path": "registry/zoblocks/lib/loader.css",
     "limit": "4 KB"
   },
   {
@@ -64,12 +64,12 @@
   },
   {
     "name": "accordion stylesheet",
-    "path": "registry/oxygen/lib/accordion.css",
+    "path": "registry/zoblocks/lib/accordion.css",
     "limit": "6 KB"
   },
   {
     "name": "switch stylesheet",
-    "path": "registry/oxygen/lib/switch.css",
+    "path": "registry/zoblocks/lib/switch.css",
     "limit": "12 KB"
   },
   {
@@ -134,7 +134,7 @@
   },
   {
     "name": "timeline stylesheet",
-    "path": "registry/oxygen/lib/timeline.css",
+    "path": "registry/zoblocks/lib/timeline.css",
     "limit": "3 KB"
   },
   {

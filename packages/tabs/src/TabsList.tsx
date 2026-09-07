@@ -18,7 +18,7 @@ import {
   resolveIndicator,
   textOf,
   type TabItem,
-} from "@oxygenui-design/tabs-core";
+} from "@zoblocks/tabs-core";
 import { useTabsContext } from "./context.js";
 import { useDirection, useIsoLayoutEffect, useTabsKeyboard } from "./internal.js";
 import { useIndicator } from "./use-indicator.js";
@@ -177,21 +177,21 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(function
     <ListTag
       {...rest}
       ref={listRef}
-      className={["ox-tabs__list", className].filter(Boolean).join(" ")}
+      className={["zb-tabs__list", className].filter(Boolean).join(" ")}
       hidden={collapsed || undefined}
       role={ctx.roles.listRole ?? undefined}
       aria-orientation={ctx.roles.arrowKeys ? ctx.orientation : undefined}
       aria-busy={ctx.pending || undefined}
-      data-ox-measured={indicator.measured ? "" : undefined}
-      data-ox-list=""
+      data-zb-measured={indicator.measured ? "" : undefined}
+      data-zb-list=""
       style={indicator.style}
       onKeyDown={onKeyDown}
     >
       {indicatorKind !== "none" ? (
         <span
-          className={indicatorKind === "thumb" ? "ox-tabs__thumb" : "ox-tabs__line"}
+          className={indicatorKind === "thumb" ? "zb-tabs__thumb" : "zb-tabs__line"}
           aria-hidden="true"
-          data-ox-indicator={indicatorKind}
+          data-zb-indicator={indicatorKind}
         />
       ) : null}
       {children}
@@ -201,33 +201,33 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(function
   // Everything that is not a tab lives outside the tablist element.
   const beside =
     ctx.overflow === "menu" && hiddenItems.length > 0 ? (
-      <div className="ox-tabs__more">
+      <div className="zb-tabs__more">
         <button
           ref={menuButtonRef}
           type="button"
-          className="ox-tabs__more-button"
+          className="zb-tabs__more-button"
           aria-haspopup="menu"
           aria-expanded={menuOpen}
-          data-ox-has-selected={hidden.includes(selectedIndex) || undefined}
+          data-zb-has-selected={hidden.includes(selectedIndex) || undefined}
           onClick={() => setMenuOpen((open) => !open)}
         >
           {ctx.locale.more}
-          <span className="ox-tabs__count" aria-hidden="true">
+          <span className="zb-tabs__count" aria-hidden="true">
             {hiddenItems.length}
           </span>
-          <span className="ox-tabs__sr">
+          <span className="zb-tabs__sr">
             {interpolate(ctx.locale.moreWithCount, { count: hiddenItems.length })}
           </span>
         </button>
         {/* A real menu, not a second tablist. A tablist split across two
               containers reports an incoherent "n of m". */}
-        <ul ref={menuRef} className="ox-tabs__menu" role="menu" hidden={!menuOpen}>
+        <ul ref={menuRef} className="zb-tabs__menu" role="menu" hidden={!menuOpen}>
           {hiddenItems.map((item) => (
             <li key={item.value} role="none">
               <button
                 type="button"
                 role="menuitem"
-                className="ox-tabs__menu-item"
+                className="zb-tabs__menu-item"
                 aria-disabled={item.disabled || undefined}
                 onClick={() => {
                   setMenuOpen(false);
@@ -236,7 +236,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(function
               >
                 {textOf(item)}
                 {typeof item.count === "number" ? (
-                  <span className="ox-tabs__count">{item.count}</span>
+                  <span className="zb-tabs__count">{item.count}</span>
                 ) : null}
               </button>
             </li>
@@ -247,18 +247,18 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(function
 
   return (
     <div
-      className="ox-tabs__bar"
-      data-ox-start={scrollable ? String(overflow.atStart) : undefined}
-      data-ox-end={scrollable ? String(overflow.atEnd) : undefined}
-      data-ox-scrollable={scrollable && !collapsed ? "" : undefined}
-      data-ox-collapsed={collapsed || undefined}
+      className="zb-tabs__bar"
+      data-zb-start={scrollable ? String(overflow.atStart) : undefined}
+      data-zb-end={scrollable ? String(overflow.atEnd) : undefined}
+      data-zb-scrollable={scrollable && !collapsed ? "" : undefined}
+      data-zb-collapsed={collapsed || undefined}
     >
       {collapsed ? (
         /* A native select, deliberately. It is the only control that already
            has a platform picker on every phone, and re-implementing that in a
            listbox is how you lose the wheel on iOS. */
         <select
-          className="ox-tabs__select"
+          className="zb-tabs__select"
           aria-label={rest["aria-label"]}
           value={ctx.value ?? ""}
           disabled={ctx.pending}
@@ -279,7 +279,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(function
            see that the strip scrolls. */
         <button
           type="button"
-          className="ox-tabs__nudge"
+          className="zb-tabs__nudge"
           tabIndex={-1}
           aria-hidden="true"
           disabled={overflow.atStart}
@@ -292,7 +292,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(function
       {scrollable && !collapsed ? (
         <button
           type="button"
-          className="ox-tabs__nudge"
+          className="zb-tabs__nudge"
           tabIndex={-1}
           aria-hidden="true"
           disabled={overflow.atEnd}

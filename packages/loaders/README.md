@@ -1,23 +1,23 @@
-# @oxygenui-design/loaders
+# @zoblocks/loaders
 
 **Healthcare page loaders as dependency-free custom elements.** Five marks drawn
 from clinical instruments rather than from spinners — a heartbeat, a rhythm
 strip, a breath, a helix, and an infusion — themeable, accessible, and honest
 about how long a wait has taken.
 
-Part of [Oxygen UI](https://oxygenui.design). Zero runtime dependencies. Works
+Part of [Zoblocks](https://zoblocks.design). Zero runtime dependencies. Works
 in React, Vue, Angular, Svelte, Solid, Rails, Django, or a plain HTML file.
 
 ```bash
-npm install @oxygenui-design/loaders
+npm install @zoblocks/loaders
 ```
 
 ```html
 <script type="module">
-  import "@oxygenui-design/loaders/pulse";
+  import "@zoblocks/loaders/pulse";
 </script>
 
-<ox-pulse-loader label="Loading your records"></ox-pulse-loader>
+<zb-pulse-loader label="Loading your records"></zb-pulse-loader>
 ```
 
 ---
@@ -26,13 +26,13 @@ npm install @oxygenui-design/loaders
 
 | Element                | Mark                         | Cadence  | Best for                                    |
 | ---------------------- | ---------------------------- | -------- | ------------------------------------------- |
-| `<ox-pulse-loader>`    | Open heart + rhythm line     | 60 bpm   | App boot, patient portals, the brand moment |
-| `<ox-rhythm-loader>`   | One rhythm strip, swept      | 60 bpm   | Clinical density, inline, tables            |
-| `<ox-breath-loader>`   | Three rings from a soft core | 15 / min | Patient-facing screens, long waits          |
-| `<ox-helix-loader>`    | Two strands of dots          | 23 / min | Labs, genomics, diagnostics                 |
-| `<ox-infusion-loader>` | Capsule with a soft slug     | 21 / min | **Determinate progress** — imports, uploads |
+| `<zb-pulse-loader>`    | Open heart + rhythm line     | 60 bpm   | App boot, patient portals, the brand moment |
+| `<zb-rhythm-loader>`   | One rhythm strip, swept      | 60 bpm   | Clinical density, inline, tables            |
+| `<zb-breath-loader>`   | Three rings from a soft core | 15 / min | Patient-facing screens, long waits          |
+| `<zb-helix-loader>`    | Two strands of dots          | 23 / min | Labs, genomics, diagnostics                 |
+| `<zb-infusion-loader>` | Capsule with a soft slug     | 21 / min | **Determinate progress** — imports, uploads |
 
-`<ox-pulse-loader>` renders the rhythm line alone below 40px, where the heart's
+`<zb-pulse-loader>` renders the rhythm line alone below 40px, where the heart's
 detail collapses. That is the correct rendering of the mark at that size, not a
 fallback.
 
@@ -74,40 +74,40 @@ Angular, for three different reasons.
 
 ```ts
 // main.ts
-import "@oxygenui-design/loaders/breath";
+import "@zoblocks/loaders/breath";
 ```
 
 ```ts
 // vite.config.ts — tell the compiler these are custom elements
-vue({ template: { compilerOptions: { isCustomElement: (tag) => tag.startsWith("ox-") } } });
+vue({ template: { compilerOptions: { isCustomElement: (tag) => tag.startsWith("zb-") } } });
 ```
 
 ```vue
-<ox-breath-loader mode="page" label="Loading your information" :open="pending" />
+<zb-breath-loader mode="page" label="Loading your information" :open="pending" />
 ```
 
 ### Angular 17+
 
 ```ts
 // main.ts
-import "@oxygenui-design/loaders/pulse";
+import "@zoblocks/loaders/pulse";
 
 // component
 @Component({ schemas: [CUSTOM_ELEMENTS_SCHEMA] })
 ```
 
 ```html
-<ox-pulse-loader
+<zb-pulse-loader
   mode="overlay"
   label="Loading results"
   [attr.progress]="progress()"
-  (ox-loader-slow)="onSlow()"
+  (zb-loader-slow)="onSlow()"
 >
-</ox-pulse-loader>
+</zb-pulse-loader>
 ```
 
 Angular's `(event)` syntax reserves the colon for its global-target form —
-`(window:resize)` — so an event named `ox-loader:slow` would not compile. That
+`(window:resize)` — so an event named `zb-loader:slow` would not compile. That
 is why these events are hyphenated; see [Events](#events).
 
 ### Svelte, Solid, Lit, plain HTML
@@ -126,14 +126,14 @@ For a React project we still recommend the registry components — they are copi
 into your repo as readable source:
 
 ```bash
-npx @oxygenui-design/cli add pulse-loader
+npx @zoblocks/cli add pulse-loader
 ```
 
 ### Before the bundle loads
 
 The elements need their module. For a boot screen that must render before any
 JavaScript, copy the static markup and stylesheet from the
-[loader documentation](https://oxygenui.design/components/pulse-loader) instead.
+[loader documentation](https://zoblocks.design/components/pulse-loader) instead.
 
 ---
 
@@ -151,7 +151,7 @@ JavaScript, copy the static markup and stylesheet from the
 | `speed`        | 0.5–2                    | 1                     | Cadence multiplier for every loader. Clamped.                             |
 | `delay`        | ms                       | 0                     | Wait before appearing, so a fast response never flashes a loader.         |
 | `min-duration` | ms                       | 400                   | Once shown, stay at least this long.                                      |
-| `slow-after`   | ms, 0 = off              | 8000                  | Show the stall hint and fire `ox-loader-slow`.                            |
+| `slow-after`   | ms, 0 = off              | 8000                  | Show the stall hint and fire `zb-loader-slow`.                            |
 | `slow-hint`    | string                   | see below             | Replaces the stall wording.                                               |
 | `open`         | `"false"` to close       | open                  | Controlled visibility; respects `min-duration`.                           |
 | `motion`       | `auto\|reduced\|full`    | `auto`                | `auto` follows the OS; `full` opts out of it.                             |
@@ -183,12 +183,12 @@ throws, which is what these elements did before `apps/smoke` existed.
 
 ## Events
 
-`ox-loader-show`, `ox-loader-slow`, `ox-loader-hide` — exported as
+`zb-loader-show`, `zb-loader-slow`, `zb-loader-hide` — exported as
 `LOADER_EVENTS`. All bubble and cross the shadow boundary, so you can listen on
 a wrapper rather than on the element.
 
 ```js
-loader.addEventListener("ox-loader-slow", () => analytics.track("slow_wait"));
+loader.addEventListener("zb-loader-slow", () => analytics.track("slow_wait"));
 ```
 
 Hyphens rather than colons, because Angular's `(event)` binding reserves the
@@ -196,15 +196,15 @@ colon for global targets and cannot bind a name that contains one.
 
 ## Styling
 
-Every colour resolves through Oxygen's semantic tokens, falling back to
+Every colour resolves through Zoblocks's semantic tokens, falling back to
 `currentColor` when the token stylesheet is absent.
 
 ```css
-ox-pulse-loader {
-  --ox-loader-color: var(--brand-500);
-  --ox-loader-size: 120px;
-  --ox-loader-scrim: rgb(0 0 0 / 0.6);
-  --ox-loader-z: 9999;
+zb-pulse-loader {
+  --zb-loader-color: var(--brand-500);
+  --zb-loader-size: 120px;
+  --zb-loader-scrim: rgb(0 0 0 / 0.6);
+  --zb-loader-z: 9999;
 }
 ```
 
@@ -230,7 +230,7 @@ Shadow parts: `::part(art)`, `::part(label)`, `::part(hint)`, `::part(progress)`
 
 ## What this is not
 
-Oxygen UI is not a compliance boundary. It does not make an application HIPAA,
+Zoblocks is not a compliance boundary. It does not make an application HIPAA,
 GDPR, or DPDP compliant, and it is not a medical device or clinical decision
 support. These loaders display no patient data and depict no real rhythm — a
 `bpm` value is a cadence for an animation, never a measurement of a person.

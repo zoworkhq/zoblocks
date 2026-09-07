@@ -94,7 +94,7 @@ export function TaskPanel({ task, onClose }: { task: TaskDetail | null; onClose:
             <dt className="text-muted">Due</dt>
             <dd
               className="num"
-              style={{ color: due.overdue ? "var(--ox-status-critical)" : "var(--color-ink)" }}
+              style={{ color: due.overdue ? "var(--zb-status-critical)" : "var(--color-ink)" }}
             >
               {due.overdue ? `Overdue — ${due.label}` : due.label}
             </dd>

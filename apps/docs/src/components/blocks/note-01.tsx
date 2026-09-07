@@ -151,7 +151,7 @@ export function Note01() {
             <span>
               <i
                 className="sw"
-                style={{ background: "color-mix(in srgb, var(--site-oxygen) 35%, transparent)" }}
+                style={{ background: "color-mix(in srgb, var(--site-brand) 35%, transparent)" }}
               />
               Copilot draft
             </span>

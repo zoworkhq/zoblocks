@@ -3,7 +3,7 @@
 /**
  * The Data Grid on the home page, as the screen it is actually part of.
  *
- * This is the shipped component — `registry/oxygen/data-grid` — inside the
+ * This is the shipped component — `registry/zoblocks/data-grid` — inside the
  * application chrome a caseload worklist has in a real product: saved views,
  * filter state with counts, a search field, a density control, and the
  * header with the actions a supervisor reaches for. The nav, the views and the
@@ -32,9 +32,9 @@
 
 import * as React from "react";
 import { CASELOAD_COLUMNS_WIDE } from "@/components/site/caseload-columns";
-import { DataGrid, type GridSort } from "@/registry/oxygen/data-grid/data-grid";
-import { isGridAbsent } from "@/lib/oxygen-grid";
-import { CASELOAD_FULL, type CaseloadRow } from "@/registry/oxygen/data-grid/data-grid.fixtures";
+import { DataGrid, type GridSort } from "@/registry/zoblocks/data-grid/data-grid";
+import { isGridAbsent } from "@/lib/zoblocks-grid";
+import { CASELOAD_FULL, type CaseloadRow } from "@/registry/zoblocks/data-grid/data-grid.fixtures";
 
 /**
  * Results waiting to come in.

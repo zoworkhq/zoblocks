@@ -35,7 +35,7 @@ const FORMATS = [
   {
     id: "antd" as const,
     name: "antd ConfigProvider",
-    body: "Theme your own antd components with this brand — not only Oxygen's.",
+    body: "Theme your own antd components with this brand — not only Zoblocks's.",
     /*
       Offered only to an organisation that runs it.
       
@@ -226,7 +226,7 @@ export default async function TransferPage({ params }: { params: Promise<{ slug:
                     panel in both themes.
                   */}
                   <details className="mt-3">
-                    <summary className="flex min-h-6 cursor-pointer items-center text-[0.75rem] text-oxygen-deep">
+                    <summary className="flex min-h-6 cursor-pointer items-center text-[0.75rem] text-brand-deep">
                       Preview
                     </summary>
                     <pre className="instrument mt-2 max-h-48 overflow-auto p-3 font-mono text-[0.625rem] leading-relaxed">

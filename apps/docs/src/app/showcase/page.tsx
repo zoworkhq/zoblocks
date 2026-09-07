@@ -7,9 +7,9 @@ import { RevealRoot } from "@/components/site/interactions";
 import { BlockGallery } from "@/components/site/block-gallery";
 
 export const metadata: Metadata = {
-  title: "Blocks — clinical screens built from Oxygen UI",
+  title: "Blocks — clinical screens built from Zoblocks",
   description:
-    "Production-shaped clinical screens built from Oxygen UI: caseload dashboard, progress note with provenance, patient view, sourced copilot. Live, synthetic data.",
+    "Production-shaped clinical screens built from Zoblocks: caseload dashboard, progress note with provenance, patient view, sourced copilot. Live, synthetic data.",
   alternates: { canonical: "/showcase" },
 };
 
@@ -22,7 +22,7 @@ export default function ShowcasePage() {
         <section className="border-b border-rule">
           <div className="mx-auto grid max-w-6xl section-major gap-10 px-5 sm:px-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:items-end lg:gap-16">
             <div>
-              <p className="eyebrow eyebrow-rule text-oxygen-deep" data-reveal>
+              <p className="eyebrow eyebrow-rule text-brand-deep" data-reveal>
                 Blocks
               </p>
               <h1 className="display-lg mt-5 text-balance" data-reveal>
@@ -47,7 +47,7 @@ export default function ShowcasePage() {
                 <FlaskConical aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-graphite" />
                 <p className="body-sm text-graphite">
                   <strong className="text-ink">Reference implementations, not customers.</strong>{" "}
-                  Oxygen is new and has none yet. Every block below is built by us on synthetic
+                  Zoblocks is new and has none yet. Every block below is built by us on synthetic
                   data. When customers ship, their work appears here with their names on it.
                 </p>
               </div>
@@ -107,7 +107,7 @@ export default function ShowcasePage() {
           <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
             <div className="max-w-2xl">
               <h2 className="display-lg text-balance" data-reveal>
-                Built something with Oxygen?
+                Built something with Zoblocks?
               </h2>
               <p className="lede mt-5 text-pretty" data-reveal>
                 We would rather show your product than ours. Send a link and a sentence about the
@@ -116,7 +116,7 @@ export default function ShowcasePage() {
               </p>
               <div className="mt-8 flex flex-wrap gap-3" data-reveal>
                 <a
-                  href="mailto:hello@zowork.com?subject=Oxygen%20UI%20showcase%20submission"
+                  href="mailto:hello@zowork.com?subject=Zoblocks%20showcase%20submission"
                   className="group inline-flex items-center gap-2 rounded-xl bg-cta px-5 py-3.5 text-sm font-medium text-paper transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:bg-cta-hover"
                 >
                   Submit your build
@@ -127,7 +127,7 @@ export default function ShowcasePage() {
                 </a>
                 <Link
                   href="/components"
-                  className="inline-flex items-center gap-2 rounded-xl border border-rule px-5 py-3.5 text-sm font-medium text-ink transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:border-oxygen/40"
+                  className="inline-flex items-center gap-2 rounded-xl border border-rule px-5 py-3.5 text-sm font-medium text-ink transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:border-brand/40"
                 >
                   Browse components
                 </Link>

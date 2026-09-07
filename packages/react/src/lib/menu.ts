@@ -5,7 +5,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/lib/menu.ts. Edit that file, not this one.
+// Generated from registry/zoblocks/lib/menu.ts. Edit that file, not this one.
 /**
  * A context menu for a place where the shortest path is also the fastest way
  * to do something irreversible.
@@ -819,7 +819,7 @@ export function matchFirstLetter<A extends MenuAction>(
 /* ------------------------------------------------------------------ */
 
 /**
- * Structurally `PaletteItem` from `@/lib/oxygen-palette`, declared here rather
+ * Structurally `PaletteItem` from `@/lib/zoblocks-palette`, declared here rather
  * than imported.
  *
  * The brief proposed importing the type and declaring `palette-core` as a

@@ -5,7 +5,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/lib/availability.ts. Edit that file, not this one.
+// Generated from registry/zoblocks/lib/availability.ts. Edit that file, not this one.
 /**
  * The availability engine: slots, holds, buffers and conflicts.
  *
@@ -38,8 +38,8 @@ import {
   minutesOfTime,
   timeFromMinutes,
   weekdayOf,
-  type OxDate,
-  type OxTime,
+  type ZbDate,
+  type ZbTime,
 } from "../lib/datetime";
 
 /* ------------------------------------------------------------------ */
@@ -84,14 +84,14 @@ export type SlotState =
 export interface Slot {
   /** Stable across a refresh, so a selection survives new availability. */
   id: string;
-  start: OxTime;
+  start: ZbTime;
   durationMinutes: number;
   state: SlotState;
 }
 
 /** Somebody else's appointment, for conflict detection. */
 export interface BusyInterval {
-  start: OxTime;
+  start: ZbTime;
   durationMinutes: number;
   label?: string;
 }
@@ -117,7 +117,7 @@ export interface Buffers {
  */
 export interface AvailabilitySet {
   /** The instant the host read this. Shown when it goes stale. */
-  asOf: { date: OxDate; time: OxTime };
+  asOf: { date: ZbDate; time: ZbTime };
   /** Seconds after which the set is presented as stale rather than replaced. */
   staleAfterSeconds?: number;
   slots: Slot[];
@@ -147,7 +147,7 @@ export function intervalsOverlap(
  * means.
  */
 export function findConflicts(
-  start: OxTime,
+  start: ZbTime,
   durationMinutes: number,
   busy: readonly BusyInterval[],
   buffers: Buffers = {},
@@ -166,7 +166,7 @@ export function findConflicts(
 
 /** The first minute a following appointment could start. */
 export function nextBookableMinute(
-  start: OxTime,
+  start: ZbTime,
   durationMinutes: number,
   buffers: Buffers = {},
   gridMinutes = 15,
@@ -189,7 +189,7 @@ export const DAY_PART_WORDS: Record<DayPart, string> = {
   evening: "Evening",
 };
 
-export function dayPartOf(time: OxTime): DayPart {
+export function dayPartOf(time: ZbTime): DayPart {
   if (time.h < 12) return "morning";
   if (time.h < 17) return "afternoon";
   return "evening";
@@ -240,12 +240,12 @@ export function openSlots(set: AvailabilitySet): Slot[] {
  * the wall clock, and a staleness banner that appears on its own schedule
  * cannot be visually regression-tested.
  */
-export function secondsSince(set: AvailabilitySet, now: { date: OxDate; time: OxTime }): number {
+export function secondsSince(set: AvailabilitySet, now: { date: ZbDate; time: ZbTime }): number {
   const days = compareDates(now.date, set.asOf.date);
   return (days * 1440 + minutesOfTime(now.time) - minutesOfTime(set.asOf.time)) * 60;
 }
 
-export function isStale(set: AvailabilitySet, now: { date: OxDate; time: OxTime }): boolean {
+export function isStale(set: AvailabilitySet, now: { date: ZbDate; time: ZbTime }): boolean {
   if (set.staleAfterSeconds == null) return false;
   return secondsSince(set, now) >= set.staleAfterSeconds;
 }
@@ -348,8 +348,8 @@ export function coversWorkingTime(
     availableStartTime?: string;
     availableEndTime?: string;
   },
-  date: OxDate,
-  time: OxTime,
+  date: ZbDate,
+  time: ZbTime,
 ): boolean {
   const day = FHIR_WEEKDAYS[weekdayOf(date)];
   if (entry.daysOfWeek && day && !entry.daysOfWeek.includes(day)) return false;
@@ -385,7 +385,7 @@ export function buildSlots(options: {
   everyMinutes: number;
   durationMinutes: number;
   /** Returns the reason a start is unavailable, or null. */
-  blocked?: (start: OxTime) => SlotBlockReason | null;
+  blocked?: (start: ZbTime) => SlotBlockReason | null;
   idPrefix?: string;
 }): Slot[] {
   const {
@@ -418,7 +418,7 @@ export function describeSlot(slot: Slot, options: { hour24?: boolean } = {}): st
 }
 
 /** The day a slot's end falls on, which is not always the day it starts. */
-export function slotEndDate(slot: Slot, date: OxDate): OxDate {
+export function slotEndDate(slot: Slot, date: ZbDate): ZbDate {
   const landed = timeFromMinutes(minutesOfTime(slot.start) + slot.durationMinutes);
   return landed.dayOffset > 0 ? addCalendarDays(date, landed.dayOffset) : date;
 }

@@ -1,5 +1,5 @@
 ---
-"@oxygenui-design/identity": minor
+"@zoblocks/identity": minor
 ---
 
 Put Patient identity in the catalog, and make its stylesheet actually themeable.
@@ -11,13 +11,13 @@ docs-coverage gate requires.
 
 Two real defects surfaced while wiring it up:
 
-- **The stylesheet ignored the theme.** It declared `--ox-fg`, `--ox-bg` and
-  `--ox-radius` locally — shadowing the semantic tier for everything nested
+- **The stylesheet ignored the theme.** It declared `--zb-fg`, `--zb-bg` and
+  `--zb-radius` locally — shadowing the semantic tier for everything nested
   inside a banner — and read three names that do not exist
-  (`--ox-bg-container`, `--ox-text-secondary`, `--ox-fill-tertiary`). It looked
+  (`--zb-bg-container`, `--zb-text-secondary`, `--zb-fill-tertiary`). It looked
   correct on a white page and was light chrome on a dark app, with no response
   to a brand at all. Rewired to the repo's three-tier chain with
-  `--ox-identity-*` as the documented override surface.
+  `--zb-identity-*` as the documented override surface.
 
 - **`antd` was a required peer that the package never imports.** Nothing under
   `src/` references it, so a non-antd consumer was being asked to install it

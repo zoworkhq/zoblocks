@@ -14,30 +14,30 @@
   const bump = () => (events += 1);
 </script>
 
-<svelte:document on:ox-loader-show={bump} on:ox-loader-hide={bump} />
+<svelte:document on:zb-loader-show={bump} on:zb-loader-hide={bump} />
 
 <div>
   <h1>Framework: <span id="framework">svelte</span></h1>
 
   <div class="row">
-    <ox-pulse-loader
+    <zb-pulse-loader
       id="loader"
       label="Loading patient record"
       mode="inline"
       min-duration="0"
       open={String(open)}
-    ></ox-pulse-loader>
+    ></zb-pulse-loader>
     <button id="toggle" type="button" onclick={() => (open = !open)}>Toggle</button>
   </div>
 
   <div class="row">
-    <ox-rhythm-loader
+    <zb-rhythm-loader
       id="determinate"
       label="Uploading study"
       mode="inline"
       min-duration="0"
       {progress}
-    ></ox-rhythm-loader>
+    ></zb-rhythm-loader>
     <button id="step" type="button" onclick={() => (progress = (progress + 25) % 125)}>Step</button>
   </div>
 

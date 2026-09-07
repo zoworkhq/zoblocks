@@ -2,7 +2,7 @@
  * Two components must not claim the same class name.
  *
  * This is not hypothetical tidiness. `PatientChip` shipped rendering
- * `.ox-chip`, which Accordion already owned as a severity badge. Nothing
+ * `.zb-chip`, which Accordion already owned as a severity badge. Nothing
  * failed: both packages built, every unit test passed, and each stylesheet was
  * correct read on its own. The defect only existed once a page loaded both,
  * and then the patient chips silently wore the badge's skin — a border and a
@@ -31,7 +31,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
  *
  * Two kinds of file are deliberately absent, both because they are copies
  * rather than owners: `packages/react/src/styles.css`, which the generator
- * concatenates from the sheets below, and the `registry/oxygen` copies, which
+ * concatenates from the sheets below, and the `registry/zoblocks` copies, which
  * are the same sources again for copy-as-source consumers. Including either
  * would report every class as colliding with itself and the suite would be
  * deleted within the week.
@@ -70,13 +70,13 @@ const SHEETS: ReadonlyArray<{ owner: string; file: string }> = [
 function classesIn(css: string): Set<string> {
   const withoutComments = css.replace(/\/\*[\s\S]*?\*\//g, " ");
   const found = new Set<string>();
-  for (const match of withoutComments.matchAll(/\.(ox-[a-z0-9-]+(?:__[a-z0-9-]+)?)/g)) {
+  for (const match of withoutComments.matchAll(/\.(zb-[a-z0-9-]+(?:__[a-z0-9-]+)?)/g)) {
     found.add(match[1]!);
   }
   return found;
 }
 
-/** `.ox-chip--escalated` and `.ox-chip` are the same claim on the same name. */
+/** `.zb-chip--escalated` and `.zb-chip` are the same claim on the same name. */
 function base(className: string): string {
   return className.split("--")[0]!.split("__")[0]!;
 }
@@ -106,8 +106,8 @@ describe("stylesheet namespaces", () => {
   it("keeps the patient chip out of the accordion's badge", () => {
     // Named explicitly, because this is the pair that actually shipped broken
     // and a future rename should have to delete this line on purpose.
-    expect(owned.get("identity")).toContain("ox-patient-chip");
-    expect(owned.get("identity")).not.toContain("ox-chip");
-    expect(owned.get("react/accordion")).toContain("ox-chip");
+    expect(owned.get("identity")).toContain("zb-patient-chip");
+    expect(owned.get("identity")).not.toContain("zb-chip");
+    expect(owned.get("react/accordion")).toContain("zb-chip");
   });
 });

@@ -20,10 +20,10 @@
 
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { Accordion } from "../registry/oxygen/accordion/accordion";
-import { ChartAccordion } from "../registry/oxygen/chart-accordion/chart-accordion";
-import { SafetyPlan } from "../registry/oxygen/safety-plan/safety-plan";
-import type { AccordionItem } from "../registry/oxygen/lib/accordion-core";
+import { Accordion } from "../registry/zoblocks/accordion/accordion";
+import { ChartAccordion } from "../registry/zoblocks/chart-accordion/chart-accordion";
+import { SafetyPlan } from "../registry/zoblocks/safety-plan/safety-plan";
+import type { AccordionItem } from "../registry/zoblocks/lib/accordion-core";
 
 const SECRET = "INTENSIVE_OUTPATIENT_PROGRAMME";
 
@@ -102,7 +102,7 @@ describe("server rendering", () => {
     // Not yet findable — that is the post-commit upgrade — but hidden, so the
     // first paint is not an expanded record.
     const html = renderToString(<Accordion items={GOVERNED} />);
-    const panels = html.match(/class="ox-accordion__panel"/g) ?? [];
+    const panels = html.match(/class="zb-accordion__panel"/g) ?? [];
     const hidden = html.match(/hidden=""/g) ?? [];
     expect(panels.length).toBe(GOVERNED.length);
     expect(hidden.length).toBe(GOVERNED.length);

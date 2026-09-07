@@ -67,7 +67,7 @@ export function PageHeader({
             <p className="mb-2">
               <Link
                 href={eyebrowHref}
-                className="eyebrow group inline-flex items-center gap-1.5 text-oxygen-deep"
+                className="eyebrow group inline-flex items-center gap-1.5 text-brand-deep"
               >
                 <ArrowLeft
                   aria-hidden="true"
@@ -78,7 +78,7 @@ export function PageHeader({
               </Link>
             </p>
           ) : (
-            <p className="eyebrow mb-2 text-oxygen-deep">{eyebrow}</p>
+            <p className="eyebrow mb-2 text-brand-deep">{eyebrow}</p>
           ))}
         <h1 className="display-sm">{title}</h1>
         {/*

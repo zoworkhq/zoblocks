@@ -1,5 +1,5 @@
 {
-  "extends": "@oxygenui-design/tsconfig/base.json",
+  "extends": "@zoblocks/tsconfig/base.json",
   "compilerOptions": {
     "noEmit": true
   },

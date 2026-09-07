@@ -1,6 +1,6 @@
 ---
-"@oxygenui-design/react": patch
-"@oxygenui-design/tokens": patch
+"@zoblocks/react": patch
+"@zoblocks/tokens": patch
 ---
 
 DatePicker — the calendar and the clock, matched to the design they were built
@@ -37,7 +37,7 @@ changes are corrections rather than preferences.
   across a week, and the rows open out so it breaks cleanly between them. At a
   1px row gap every week's band touched the next and a selection read as one
   slab rather than a set of weeks.
-- **`--ox-datetime-cell-size` 2rem → 2.25rem and `--ox-datetime-cell-radius`
+- **`--zb-datetime-cell-size` 2rem → 2.25rem and `--zb-datetime-cell-radius`
   `radius-sm` → `radius`,** with the panel, rail, heading and commit buttons
   moved to match. The cells were wider than they were tall and cornered more
   tightly than anything else on the surface.
@@ -52,7 +52,7 @@ surface, so on a full-width stage it left-aligned against six hundred pixels of
 nothing; inline calendars now centre in their stage while form fields keep
 their left edge, because that is where a form puts them. Three demos sat alone
 in a two-column row with an empty half beside them — the two single-month grids
-are now adjacent so they pair, and the rest are full width. `.ox-dt-demo-chip`
+are now adjacent so they pair, and the rest are full width. `.zb-dt-demo-chip`
 went with the Picker's relative-date chips when they became a rail.
 
 Measured after the change: 0 contrast failures across 454 text nodes and 0

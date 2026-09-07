@@ -70,7 +70,7 @@ describe("PatientGuard", () => {
       </PatientBanner>,
     );
     expect(screen.queryByText("order form")).not.toBeInTheDocument();
-    expect(screen.getByRole("alert")).toHaveAttribute("data-ox-guard", "mismatch");
+    expect(screen.getByRole("alert")).toHaveAttribute("data-zb-guard", "mismatch");
   });
 
   it("accepts a caller-supplied fallback", () => {

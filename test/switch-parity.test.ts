@@ -22,7 +22,7 @@ import {
   STATE_LABEL_PRESETS as REGISTRY_PRESETS,
   SWITCH_SIZE as REGISTRY_SIZE,
   nextValueFor as registryNext,
-} from "../registry/oxygen/lib/switch";
+} from "../registry/zoblocks/lib/switch";
 import {
   ABSENT_REASON_LABEL as ELEMENT_ABSENT,
   COMMIT_PHASES,
@@ -66,7 +66,7 @@ describe("the two channels share one vocabulary", () => {
   });
 
   it("names the same seven commit phases", () => {
-    const registrySource = read("registry/oxygen/lib/switch.tsx");
+    const registrySource = read("registry/zoblocks/lib/switch.tsx");
     for (const phase of COMMIT_PHASES) {
       expect(registrySource, `registry source does not name the "${phase}" phase`).toContain(
         `"${phase}"`,
@@ -77,7 +77,7 @@ describe("the two channels share one vocabulary", () => {
 });
 
 describe("the two stylesheets share their load-bearing behaviour", () => {
-  const registryCss = read("registry/oxygen/lib/switch.css");
+  const registryCss = read("registry/zoblocks/lib/switch.css");
   const elementCss = read("packages/elements/src/switch-css.ts");
 
   it("defines the same keyframes", () => {

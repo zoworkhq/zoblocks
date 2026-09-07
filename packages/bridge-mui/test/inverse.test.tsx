@@ -1,5 +1,5 @@
 /**
- * An Oxygen brand pushed into Material UI.
+ * A Zoblocks brand pushed into Material UI.
  *
  * Deliberately the mirror of the antd inverse, down to the prop names: a
  * customer moving between frameworks should change a provider and nothing
@@ -10,20 +10,20 @@ import * as React from "react";
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { ThemeProvider, createTheme, useTheme } from "@mui/material/styles";
-import { resolvePatch, type OxygenTokens } from "@oxygenui-design/bridge-core";
-import { OxygenAntdProvider } from "@oxygenui-design/bridge-antd";
-import { NOT_PUSHED_TO_MUI, OxygenMuiProvider, muiBridge, toMuiTheme } from "../src/index";
+import { resolvePatch, type ZoblocksTokens } from "@zoblocks/bridge-core";
+import { ZoblocksAntdProvider } from "@zoblocks/bridge-antd";
+import { NOT_PUSHED_TO_MUI, ZoblocksMuiProvider, muiBridge, toMuiTheme } from "../src/index";
 
-const BRAND: OxygenTokens = {
-  "--ox-accent": "#1d63c9",
-  "--ox-accent-hover": "#1a53a8",
-  "--ox-text": "#0f172a",
-  "--ox-text-muted": "#475569",
-  "--ox-surface": "#ffffff",
-  "--ox-bg": "#f8fafc",
-  "--ox-border": "#e2e8f0",
-  "--ox-radius": "0.5rem",
-  "--ox-font-sans": "Georgia, serif",
+const BRAND: ZoblocksTokens = {
+  "--zb-accent": "#1d63c9",
+  "--zb-accent-hover": "#1a53a8",
+  "--zb-text": "#0f172a",
+  "--zb-text-muted": "#475569",
+  "--zb-surface": "#ffffff",
+  "--zb-bg": "#f8fafc",
+  "--zb-border": "#e2e8f0",
+  "--zb-radius": "0.5rem",
+  "--zb-font-sans": "Georgia, serif",
 };
 
 describe("toMuiTheme", () => {
@@ -38,20 +38,20 @@ describe("toMuiTheme", () => {
    */
   it("omits primary entirely rather than emitting shades with no main", () => {
     const options = toMuiTheme({
-      "--ox-accent-hover": "#1a53a8",
-      "--ox-accent-subtle": "#eef4fd",
+      "--zb-accent-hover": "#1a53a8",
+      "--zb-accent-subtle": "#eef4fd",
     });
     expect(options.palette?.primary).toBeUndefined();
   });
 
   it("keeps the rest of the palette when the accent is missing", () => {
     // The absence of one entry must not take the others with it.
-    const options = toMuiTheme({ "--ox-text": "#16181d", "--ox-bg": "#ffffff" });
+    const options = toMuiTheme({ "--zb-text": "#16181d", "--zb-bg": "#ffffff" });
     expect(options.palette?.text?.primary).toBe("#16181d");
     expect(options.palette?.background?.default).toBe("#ffffff");
   });
 
-  it("puts the Oxygen accent on MUI's primary", () => {
+  it("puts the Zoblocks accent on MUI's primary", () => {
     const options = toMuiTheme(BRAND);
     expect(options.palette?.primary?.main).toBe("#1d63c9");
     expect(options.palette?.primary?.dark).toBe("#1a53a8");
@@ -94,37 +94,37 @@ describe("the two directions agree", () => {
   it("round-trips the brand", () => {
     const back = resolvePatch(muiBridge, toMuiTheme(BRAND));
     for (const key of [
-      "--ox-accent",
-      "--ox-accent-hover",
-      "--ox-text",
-      "--ox-text-muted",
-      "--ox-surface",
-      "--ox-bg",
-      "--ox-border",
-      "--ox-font-sans",
+      "--zb-accent",
+      "--zb-accent-hover",
+      "--zb-text",
+      "--zb-text-muted",
+      "--zb-surface",
+      "--zb-bg",
+      "--zb-border",
+      "--zb-font-sans",
     ] as const) {
       expect(back[key], key).toBe(BRAND[key]);
     }
   });
 
   it("round-trips the radius through pixels", () => {
-    expect(resolvePatch(muiBridge, toMuiTheme(BRAND))["--ox-radius"]).toBe("8px");
+    expect(resolvePatch(muiBridge, toMuiTheme(BRAND))["--zb-radius"]).toBe("8px");
   });
 });
 
-describe("<OxygenMuiProvider>", () => {
+describe("<ZoblocksMuiProvider>", () => {
   function Probe() {
     const theme = useTheme();
     return <span data-testid="primary">{theme.palette.primary.main}</span>;
   }
 
   it("themes the host's own MUI components", async () => {
-    document.documentElement.style.setProperty("--ox-accent", "#7c3aed");
+    document.documentElement.style.setProperty("--zb-accent", "#7c3aed");
     render(
       <ThemeProvider theme={createTheme()}>
-        <OxygenMuiProvider>
+        <ZoblocksMuiProvider>
           <Probe />
-        </OxygenMuiProvider>
+        </ZoblocksMuiProvider>
       </ThemeProvider>,
     );
     expect(await screen.findByText("#7c3aed")).toBeTruthy();
@@ -140,13 +140,13 @@ describe("<OxygenMuiProvider>", () => {
       const theme = useTheme();
       return <span data-testid="both">{`${theme.palette.primary.main}|${theme.spacing(1)}`}</span>;
     }
-    document.documentElement.style.setProperty("--ox-accent", "#7c3aed");
+    document.documentElement.style.setProperty("--zb-accent", "#7c3aed");
 
     render(
       <ThemeProvider theme={createTheme({ spacing: 10 })}>
-        <OxygenMuiProvider>
+        <ZoblocksMuiProvider>
           <SpacingProbe />
-        </OxygenMuiProvider>
+        </ZoblocksMuiProvider>
       </ThemeProvider>,
     );
 
@@ -155,12 +155,12 @@ describe("<OxygenMuiProvider>", () => {
   });
 
   it("lets a host keep a deliberate exception", async () => {
-    document.documentElement.style.setProperty("--ox-accent", "#7c3aed");
+    document.documentElement.style.setProperty("--zb-accent", "#7c3aed");
     render(
       <ThemeProvider theme={createTheme()}>
-        <OxygenMuiProvider override={{ palette: { primary: { main: "#b91c1c" } } }}>
+        <ZoblocksMuiProvider override={{ palette: { primary: { main: "#b91c1c" } } }}>
           <Probe />
-        </OxygenMuiProvider>
+        </ZoblocksMuiProvider>
       </ThemeProvider>,
     );
     expect(await screen.findByText("#b91c1c")).toBeTruthy();
@@ -175,8 +175,8 @@ describe("the two inverse bridges are the same shape", () => {
    * quietly make that false.
    */
   it("take the same props", () => {
-    const antdProps = OxygenAntdProvider.length;
-    const muiProps = OxygenMuiProvider.length;
+    const antdProps = ZoblocksAntdProvider.length;
+    const muiProps = ZoblocksMuiProvider.length;
     expect(antdProps).toBe(muiProps);
   });
 });

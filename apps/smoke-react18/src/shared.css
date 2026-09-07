@@ -1,7 +1,7 @@
 /* Deliberately plain. The smoke apps test integration, not design; anything
    fancy here would be one more thing that can break for reasons unrelated to
    the claim under test. */
-@import "@oxygenui-design/tokens/oxygen-tokens.css";
+@import "@zoblocks/tokens/zoblocks-tokens.css";
 
 body {
   margin: 0;
@@ -10,8 +10,8 @@ body {
     15px/1.5 ui-sans-serif,
     system-ui,
     sans-serif;
-  background: var(--ox-bg, #fff);
-  color: var(--ox-text, #111);
+  background: var(--zb-bg, #fff);
+  color: var(--zb-text, #111);
 }
 h1 {
   font-size: 1.1rem;
@@ -27,9 +27,9 @@ h1 {
 button {
   font: inherit;
   padding: 0.4rem 0.9rem;
-  border: 1px solid var(--ox-border-strong, #888);
+  border: 1px solid var(--zb-border-strong, #888);
   border-radius: 6px;
-  background: var(--ox-surface, #fff);
+  background: var(--zb-surface, #fff);
   color: inherit;
   cursor: pointer;
 }

@@ -1,16 +1,16 @@
 /**
- * `<ox-infusion-loader>` — a capsule with a soft slug.
+ * `<zb-infusion-loader>` — a capsule with a soft slug.
  *
  * The only loader that can tell the truth about how much is left. Set
  * `progress` and it becomes a real 0–100 measurement with role="progressbar";
  * leave it off and the slug drifts as an honest unknown.
  *
- *   import "@oxygenui-design/loaders/infusion";
- *   <ox-infusion-loader progress="42" label="Importing records"></ox-infusion-loader>
+ *   import "@zoblocks/loaders/infusion";
+ *   <zb-infusion-loader progress="42" label="Importing records"></zb-infusion-loader>
  */
 
 import { INFUSION, LOADER_VIEWBOX } from "./art.js";
-import { OxLoaderElement, clamp, define } from "./base.js";
+import { ZbLoaderElement, clamp, define } from "./base.js";
 
 /**
  * Width of the determinate slug at a given percentage.
@@ -22,12 +22,12 @@ export function slugWidth(percent: number): number {
   return INFUSION.slugMin + (clamp(percent, 0, 100) / 100) * (INFUSION.slugMax - INFUSION.slugMin);
 }
 
-export class OxInfusionLoader extends OxLoaderElement {
+export class ZbInfusionLoader extends ZbLoaderElement {
   protected override defaultSize = "xl" as const;
   protected override variant = "infusion";
 
   protected override vars(sizePx: number): Array<[string, string]> {
-    return [...super.vars(sizePx), ["--ox-loader-stroke", "2.4px"]];
+    return [...super.vars(sizePx), ["--zb-loader-stroke", "2.4px"]];
   }
 
   protected override renderArt(): string {
@@ -41,10 +41,10 @@ export class OxInfusionLoader extends OxLoaderElement {
   }
 }
 
-define("ox-infusion-loader", OxInfusionLoader);
+define("zb-infusion-loader", ZbInfusionLoader);
 
 declare global {
   interface HTMLElementTagNameMap {
-    "ox-infusion-loader": OxInfusionLoader;
+    "zb-infusion-loader": ZbInfusionLoader;
   }
 }

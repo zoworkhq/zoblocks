@@ -1,12 +1,12 @@
 {
-  "name": "@oxygenui-design/identity",
+  "name": "@zoblocks/identity",
   "version": "0.1.0",
   "description": "Patient identity for Ant Design: an avatar that says why a photo is missing, a chip that keeps two patients with one name apart, and a banner that knows what it is guarding. WCAG 2.2 AA, FHIR-shaped.",
   "license": "MIT",
-  "homepage": "https://oxygenui.design/components/patient-banner",
+  "homepage": "https://zoblocks.design/components/patient-banner",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zoworkhq/oxygenui.git",
+    "url": "git+https://github.com/zoworkhq/zoblocks.git",
     "directory": "packages/identity"
   },
   "keywords": [
@@ -63,15 +63,15 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@oxygenui-design/identity-core": "workspace:*"
+    "@zoblocks/identity-core": "workspace:*"
   },
   "peerDependencies": {
     "react": "^18.2.0 || ^19.0.0",
     "react-dom": "^18.2.0 || ^19.0.0"
   },
   "devDependencies": {
-    "@oxygenui-design/fhir": "workspace:*",
-    "@oxygenui-design/tsconfig": "workspace:*",
+    "@zoblocks/fhir": "workspace:*",
+    "@zoblocks/tsconfig": "workspace:*",
     "@testing-library/dom": "^10",
     "@testing-library/jest-dom": "^7",
     "@testing-library/react": "^16",

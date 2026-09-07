@@ -23,7 +23,7 @@ import {
   toExDate,
   toRRule,
   type RecurrenceRule,
-} from "@/lib/oxygen-recurrence";
+} from "@/lib/zoblocks-recurrence";
 import {
   addBusinessDays,
   addCalendarDays,
@@ -59,11 +59,11 @@ import {
   withSessionEnd,
   withSessionStart,
   zoneOffsetMinutes,
-  type OxDate,
-} from "../registry/oxygen/lib/datetime";
+  type ZbDate,
+} from "../registry/zoblocks/lib/datetime";
 
 /** Every date from 1900 to 2100 — about 73,000 of them. */
-function* everyDate(fromYear = 1900, toYear = 2100): Generator<OxDate> {
+function* everyDate(fromYear = 1900, toYear = 2100): Generator<ZbDate> {
   for (let y = fromYear; y <= toYear; y += 1) {
     for (let m = 1; m <= 12; m += 1) {
       for (let d = 1, last = daysInMonth(y, m); d <= last; d += 1) yield plainDate(y, m, d);
@@ -143,7 +143,7 @@ describe("calendar arithmetic", () => {
 });
 
 describe("business days", () => {
-  const closed = (date: OxDate) => formatPlainDate(date, "iso") === "2026-09-07"; // Labor Day
+  const closed = (date: ZbDate) => formatPlainDate(date, "iso") === "2026-09-07"; // Labor Day
 
   it("skips weekends", () => {
     // Friday plus one business day is Monday, not Saturday.

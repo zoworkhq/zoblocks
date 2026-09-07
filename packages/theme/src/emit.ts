@@ -14,8 +14,8 @@
  * and open another. Values are parsed and re-serialised, never interpolated.
  */
 
-import { cssVar } from "@oxygenui-design/tokens/validate";
-import { TOKEN_SURFACE } from "@oxygenui-design/tokens/surface";
+import { cssVar } from "@zoblocks/tokens/validate";
+import { TOKEN_SURFACE } from "@zoblocks/tokens/surface";
 import { iconVar } from "./icons";
 import {
   withTierDefaults,
@@ -62,7 +62,7 @@ export interface EmitOptions {
    * The selector the declarations are scoped to.
    *
    * `:root` for a single-tenant application, which is the common case.
-   * `[data-ox-brand="…"]` when one page renders two customers' branding, where
+   * `[data-zb-brand="…"]` when one page renders two customers' branding, where
    * a root-scoped payload would make the last stylesheet loaded win.
    */
   scope?: string;
@@ -89,11 +89,11 @@ function fontFace(face: FontFace): string {
 /**
  * Brand artwork, as custom properties.
  *
- * Three named marks plus `--ox-logo`, which is the one a host actually uses:
+ * Three named marks plus `--zb-logo`, which is the one a host actually uses:
  * it holds the light mark on the base scope and is redeclared to the dark one
- * under `[data-ox-theme="dark"]`, so a header that writes
+ * under `[data-zb-theme="dark"]`, so a header that writes
  *
- *     background-image: var(--ox-logo);
+ *     background-image: var(--zb-logo);
  *
  * follows the theme without the host writing a single conditional.
  *
@@ -128,12 +128,12 @@ function logoDeclarations(assets: readonly BrandAssetFile[]): {
      * their alternative text can travel.
      */
     if (asset.role === "mark-light") {
-      base.push(`  --ox-logo-light: ${url};`, `  --ox-logo: ${url};`);
+      base.push(`  --zb-logo-light: ${url};`, `  --zb-logo: ${url};`);
     } else if (asset.role === "mark-dark") {
-      base.push(`  --ox-logo-dark: ${url};`);
-      dark.push(`  --ox-logo: ${url};`);
+      base.push(`  --zb-logo-dark: ${url};`);
+      dark.push(`  --zb-logo: ${url};`);
     } else if (asset.role === "mark-mono") {
-      base.push(`  --ox-logo-mono: ${url};`);
+      base.push(`  --zb-logo-mono: ${url};`);
     } else if (asset.role === "letterhead" || asset.role === "watermark-draft") {
       /*
        * Declared like an illustration and used only by `@media print`.
@@ -143,7 +143,7 @@ function logoDeclarations(assets: readonly BrandAssetFile[]): {
        * and a letterhead that followed the screen theme would come out
        * reversed on the page.
        */
-      base.push(`  --ox-${asset.role}: ${url};`);
+      base.push(`  --zb-${asset.role}: ${url};`);
     } else if (asset.role.startsWith("illustration-")) {
       /*
        * One declaration, at the root, for every theme.
@@ -153,7 +153,7 @@ function logoDeclarations(assets: readonly BrandAssetFile[]): {
        * is exactly why the app previews it on both. Emitting a dark
        * override here would invent a second file nobody uploaded.
        */
-      base.push(`  --ox-${asset.role}: ${url};`);
+      base.push(`  --zb-${asset.role}: ${url};`);
     }
   }
 
@@ -163,18 +163,18 @@ function logoDeclarations(assets: readonly BrandAssetFile[]): {
 /**
  * Where each theme's overrides are scoped.
  *
- * The shipped `oxygen-tokens.css` switches themes on `[data-ox-theme]`, and a
+ * The shipped `zoblocks-tokens.css` switches themes on `[data-zb-theme]`, and a
  * customer's overrides have to land in the same place or they would apply in
  * all three — which is exactly the failure the per-theme shape exists to
  * prevent, reintroduced at the last step.
  *
  * Light is written to the bare scope as well as its attribute, because light is
- * the default: a page that sets no `data-ox-theme` still gets it.
+ * the default: a page that sets no `data-zb-theme` still gets it.
  */
 const THEME_SELECTOR = {
   light: "",
-  dark: '[data-ox-theme="dark"]',
-  "high-contrast": '[data-ox-theme="high-contrast"]',
+  dark: '[data-zb-theme="dark"]',
+  "high-contrast": '[data-zb-theme="high-contrast"]',
 } as const;
 
 /**
@@ -184,7 +184,7 @@ const THEME_SELECTOR = {
  * resolves them: the primitive ramp first, then semantic overrides, then
  * component ones. Each is more specific than the last in *meaning* rather than
  * in selector weight, so a customer who overrides both `accent` and
- * `--ox-badge-accent-bg` gets the badge value on the badge and the accent
+ * `--zb-badge-accent-bg` gets the badge value on the badge and the accent
  * everywhere else, which is what they asked for.
  *
  * What the emitter still cannot write is a clinical token, in any tier. That is
@@ -227,7 +227,7 @@ export function emitThemeCss(theme: ThemeDocument, options: EmitOptions = {}): s
     const family = theme.assets.fonts[0]?.family;
     if (family) {
       declarations.push(
-        `  --ox-font-sans: ${JSON.stringify(safeValue("--ox-font-sans", family))}, ui-sans-serif, system-ui, sans-serif;`,
+        `  --zb-font-sans: ${JSON.stringify(safeValue("--zb-font-sans", family))}, ui-sans-serif, system-ui, sans-serif;`,
       );
     }
   }
@@ -239,7 +239,7 @@ export function emitThemeCss(theme: ThemeDocument, options: EmitOptions = {}): s
    * Replaced glyphs, as mask sources.
    *
    * One declaration per slot and nothing else: the component stylesheet reads
-   * `mask-image: var(--ox-icon-send, <built-in>)`, so an unset property means
+   * `mask-image: var(--zb-icon-send, <built-in>)`, so an unset property means
    * the shipped glyph and a set one means theirs. The switching is the same
    * `var()` fallback every token in this system already relies on, which is
    * why this needs no runtime and reaches the copied Tailwind skin and any
@@ -261,7 +261,7 @@ export function emitThemeCss(theme: ThemeDocument, options: EmitOptions = {}): s
   /*
    * Semantic and component overrides, per theme.
    *
-   * Emitted after the ramp block and scoped by `data-ox-theme`, so the light
+   * Emitted after the ramp block and scoped by `data-zb-theme`, so the light
    * set rides on the base scope and the other two only apply where the host has
    * actually selected them.
    */
@@ -287,9 +287,9 @@ export function emitThemeCss(theme: ThemeDocument, options: EmitOptions = {}): s
      * The dependent component tokens, but only when this is not the root.
      *
      * A `var()` resolves at the element that *declares* it, and the component
-     * tier is declared once at `:root` — `--ox-switch-track-on-bg:
-     * var(--ox-accent)`. Overriding `--ox-accent` on a subtree therefore
-     * changes `--ox-accent` there and leaves every component token holding the
+     * tier is declared once at `:root` — `--zb-switch-track-on-bg:
+     * var(--zb-accent)`. Overriding `--zb-accent` on a subtree therefore
+     * changes `--zb-accent` there and leaves every component token holding the
      * value it already computed at the root. The subtree gets a new accent and
      * components that ignore it.
      *

@@ -1,5 +1,5 @@
 /**
- * Ant Design's resolved theme, mapped onto Oxygen's token surface.
+ * Ant Design's resolved theme, mapped onto Zoblocks's token surface.
  *
  * The mapping rule, inherited from the bridge this generalises: **map a token
  * only where the meaning genuinely matches.** Where it does not, write nothing
@@ -11,7 +11,7 @@
  * Two categories are deliberately absent and both are load-bearing:
  *
  * **Clinical status.** antd has `colorError`, `colorWarning` and
- * `colorSuccess`. Oxygen has `status.critical`, `status.high`, `status.low`,
+ * `colorSuccess`. Zoblocks has `status.critical`, `status.high`, `status.low`,
  * `status.normal` and `status.unknown`, and the difference is not vocabulary.
  * Ours carry a validated contrast floor in three themes and a 60° hue
  * separation between `high` and `low`, so the *direction* of an abnormal
@@ -21,7 +21,7 @@
  * refuses these at runtime; this file simply never offers them.
  *
  * **Locale and motion preferences.** `ConfigProvider locale` is not bridged:
- * `@oxygenui-design/intl` owns Oxygen's strings because clinical copy is
+ * `@zoblocks/intl` owns Zoblocks's strings because clinical copy is
  * reviewed content, not a framework's message catalog.
  */
 
@@ -31,7 +31,7 @@ import {
   targetFloor,
   type BridgeDefinition,
   type TokenPatch,
-} from "@oxygenui-design/bridge-core";
+} from "@zoblocks/bridge-core";
 
 /**
  * The subset of antd's token set this bridge reads.
@@ -49,11 +49,11 @@ export interface AntdTokens {
   /**
    * The label colour on a filled surface.
    *
-   * antd's own name for it, and the reason `--ox-text-on-accent` is no longer
+   * antd's own name for it, and the reason `--zb-text-on-accent` is no longer
    * in `unmapped`: it was listed there on the belief that antd computed the
    * label per component and exposed nothing to read. It does expose this, the
    * docs site's playground was already using it, and the cost of the mistake
-   * was visible — with the token unmapped, Oxygen's *dark* label (#071014,
+   * was visible — with the token unmapped, Zoblocks's *dark* label (#071014,
    * near-black) landed on antd's dark primary at 3.70:1, which is not a
    * rendering antd would ever produce. Mapped, it is antd's own #fff at
    * 5.19:1.
@@ -108,71 +108,71 @@ const px = (value: number | undefined): string | undefined =>
 function semantic(token: AntdTokens): TokenPatch {
   return {
     /* Brand ------------------------------------------------------------- */
-    "--ox-accent": token.colorPrimary,
-    "--ox-accent-hover": token.colorPrimaryHover,
-    "--ox-accent-subtle": token.colorPrimaryBg,
-    "--ox-accent-border": token.colorPrimaryBorder,
+    "--zb-accent": token.colorPrimary,
+    "--zb-accent-hover": token.colorPrimaryHover,
+    "--zb-accent-subtle": token.colorPrimaryBg,
+    "--zb-accent-border": token.colorPrimaryBorder,
     // antd has no separate focus colour; it draws focus in the primary hue,
     // which is a real correspondence rather than an approximation.
-    "--ox-focus-ring": token.colorPrimary,
+    "--zb-focus-ring": token.colorPrimary,
     /*
      * Mapping both halves of this pair is the point, not a convenience.
      *
      * `contrastViolations` in bridge-core only checks a pair when the bridge
      * supplies *both* sides — anything else would be guessing at a value it
      * cannot see. So a half-mapped pair is invisible to the gate by
-     * construction: with the fill mapped and the label left to Oxygen, the
+     * construction: with the fill mapped and the label left to Zoblocks, the
      * ratio was never measured by anything. Now it is, and antd's own default
      * duly reports 4.10:1 against its primary — a real AA failure in antd's
      * palette, which is antd's to own and ours to surface rather than hide.
      */
-    "--ox-text-on-accent": token.colorTextLightSolid,
+    "--zb-text-on-accent": token.colorTextLightSolid,
 
     /* Text --------------------------------------------------------------- */
-    "--ox-text": token.colorText,
-    "--ox-text-muted": token.colorTextSecondary,
-    "--ox-text-subtle": token.colorTextTertiary,
+    "--zb-text": token.colorText,
+    "--zb-text-muted": token.colorTextSecondary,
+    "--zb-text-subtle": token.colorTextTertiary,
 
     /* Surfaces ----------------------------------------------------------- */
-    "--ox-bg": token.colorBgLayout,
-    "--ox-bg-subtle": token.colorFillQuaternary,
-    "--ox-bg-muted": token.colorFillTertiary,
-    "--ox-surface": token.colorBgContainer,
-    "--ox-surface-raised": token.colorBgElevated,
-    "--ox-surface-overlay": token.colorBgElevated,
+    "--zb-bg": token.colorBgLayout,
+    "--zb-bg-subtle": token.colorFillQuaternary,
+    "--zb-bg-muted": token.colorFillTertiary,
+    "--zb-surface": token.colorBgContainer,
+    "--zb-surface-raised": token.colorBgElevated,
+    "--zb-surface-overlay": token.colorBgElevated,
 
     /* Lines -------------------------------------------------------------- */
-    "--ox-border": token.colorBorder,
+    "--zb-border": token.colorBorder,
 
     /* Shape -------------------------------------------------------------- */
-    "--ox-radius-sm": px(token.borderRadiusSM),
-    "--ox-radius": px(token.borderRadius),
-    "--ox-radius-lg": px(token.borderRadiusLG),
+    "--zb-radius-sm": px(token.borderRadiusSM),
+    "--zb-radius": px(token.borderRadius),
+    "--zb-radius-lg": px(token.borderRadiusLG),
 
     /* Type --------------------------------------------------------------- */
-    "--ox-font-sans": token.fontFamily,
-    "--ox-font-mono": token.fontFamilyCode,
-    "--ox-text-base": px(token.fontSize),
+    "--zb-font-sans": token.fontFamily,
+    "--zb-font-mono": token.fontFamilyCode,
+    "--zb-text-base": px(token.fontSize),
 
     /* Motion. `prefers-reduced-motion` still wins: the token stylesheet
        zeroes these under the media query, and a media rule beats an inline
        custom property's *value* because the component reads the token the
        stylesheet redefines. Asserted in the test suite. -------------------- */
-    "--ox-duration-fast": token.motionDurationFast,
-    "--ox-duration": token.motionDurationMid,
-    "--ox-duration-slow": token.motionDurationSlow,
-    "--ox-ease": token.motionEaseInOut,
+    "--zb-duration-fast": token.motionDurationFast,
+    "--zb-duration": token.motionDurationMid,
+    "--zb-duration-slow": token.motionDurationSlow,
+    "--zb-ease": token.motionEaseInOut,
 
     /* Elevation ----------------------------------------------------------- */
-    "--ox-shadow-sm": token.boxShadowTertiary,
-    "--ox-shadow": token.boxShadowSecondary,
-    "--ox-shadow-lg": token.boxShadow,
+    "--zb-shadow-sm": token.boxShadowTertiary,
+    "--zb-shadow": token.boxShadowSecondary,
+    "--zb-shadow-lg": token.boxShadow,
 
     /* Density. A floor rather than a mapping: a host asking for 24px
        controls does not get to shrink a clinical control below WCAG 2.5.5. */
-    "--ox-density-target":
+    "--zb-density-target":
       token.controlHeight === undefined ? undefined : targetFloor(token.controlHeight),
-    "--ox-density-font": px(token.fontSize),
+    "--zb-density-font": px(token.fontSize),
   };
 }
 
@@ -192,9 +192,9 @@ function tabs(token: AntdTokens): TokenPatch {
   const inset = 4;
   const { outer, inner } = concentric(radius, inset);
   return {
-    "--ox-tabs-track-radius": outer,
-    "--ox-tabs-thumb-radius": inner,
-    "--ox-tabs-track-pad": `${inset}px`,
+    "--zb-tabs-track-radius": outer,
+    "--zb-tabs-thumb-radius": inner,
+    "--zb-tabs-track-pad": `${inset}px`,
   };
 }
 
@@ -208,7 +208,7 @@ export const antdBridge: BridgeDefinition<AntdTokens> = {
    * v6 renamed a substantial part of the token surface. A bridge written
    * against v6 names reads `undefined` on a v5 host, and `undefined` in a
    * custom property means "fall through" — so the failure is a component
-   * quietly wearing Oxygen's defaults instead of the customer's brand. No
+   * quietly wearing Zoblocks's defaults instead of the customer's brand. No
    * error, no warning, nothing to notice. A single major turns that into a
    * peer-resolution error at install time.
    */
@@ -219,16 +219,16 @@ export const antdBridge: BridgeDefinition<AntdTokens> = {
 
   unmapped: [
     // Clinical. Nothing in antd carries the direction of an abnormal result.
-    "--ox-status-critical",
-    "--ox-status-high",
-    "--ox-status-low",
-    "--ox-status-normal",
-    "--ox-status-unknown",
-    "--ox-flag-deceased",
-    "--ox-flag-restricted",
-    "--ox-flag-provisional",
+    "--zb-status-critical",
+    "--zb-status-high",
+    "--zb-status-low",
+    "--zb-status-normal",
+    "--zb-status-unknown",
+    "--zb-flag-deceased",
+    "--zb-flag-restricted",
+    "--zb-flag-provisional",
     // antd has one border weight; `border-strong` delimits a field and has to
     // clear 3:1, which `colorBorder` does not.
-    "--ox-border-strong",
+    "--zb-border-strong",
   ],
 };

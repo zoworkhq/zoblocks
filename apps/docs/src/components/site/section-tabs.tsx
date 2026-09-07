@@ -209,7 +209,7 @@ export function SectionTabs({
                     <span
                       aria-hidden="true"
                       className={cn(
-                        "absolute inset-x-3 bottom-0 h-px origin-left bg-oxygen transition-transform duration-400 ease-[var(--ease-out-expo)]",
+                        "absolute inset-x-3 bottom-0 h-px origin-left bg-brand transition-transform duration-400 ease-[var(--ease-out-expo)]",
                         current ? "scale-x-100" : "scale-x-0",
                       )}
                     />

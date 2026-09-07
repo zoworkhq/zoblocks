@@ -86,10 +86,10 @@ export function BlockGallery({ blocks }: { blocks: readonly BlockDoc[] }) {
             <Link
               href={`/showcase/${block.slug}`}
               onClick={(e) => intercept(e, block)}
-              className="group block overflow-hidden rounded-2xl border border-rule bg-paper-sunk transition-all duration-500 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:border-rule-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-oxygen"
+              className="group block overflow-hidden rounded-2xl border border-rule bg-paper-sunk transition-all duration-500 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:border-rule-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
             >
               <div className="flex items-center justify-between gap-3 border-b border-rule px-4 py-3">
-                <span className="numeric text-[0.6875rem] tracking-wide text-oxygen-deep">
+                <span className="numeric text-[0.6875rem] tracking-wide text-brand-deep">
                   {block.slug}
                 </span>
                 <span className="inline-flex items-center gap-1.5 text-[0.6875rem] text-graphite-soft transition-colors group-hover:text-ink">
@@ -147,7 +147,7 @@ export function BlockGallery({ blocks }: { blocks: readonly BlockDoc[] }) {
         >
           <div className="flex items-center justify-between gap-4 border-b border-rule bg-paper-sunk px-4 py-3">
             <div className="flex min-w-0 items-center gap-3">
-              <span className="numeric text-xs text-oxygen-deep">{open.slug}</span>
+              <span className="numeric text-xs text-brand-deep">{open.slug}</span>
               <span id="oxb-viewer-title" className="truncate font-semibold tracking-tight">
                 {open.title}
               </span>

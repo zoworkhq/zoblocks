@@ -7,9 +7,9 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { withTierDefaults } from "@oxygenui-design/theme";
+import { withTierDefaults } from "@zoblocks/theme";
 import { loadTokenSource } from "../../../scripts/gen/tokens/load";
-import type { TokenSource } from "@oxygenui-design/tokens/validate";
+import type { TokenSource } from "@zoblocks/tokens/validate";
 import { ThemeError, createTheme, publishTheme, saveOverrides, versionCss } from "@/lib/themes";
 import { twoOrgs, storedTokens } from "./harness";
 
@@ -93,7 +93,7 @@ describe("saving overrides", () => {
 
     await expect(
       saveOverrides(nw, await tokens(), id, {
-        component: { light: { "--ox-accordion-header-bgg": "#0b5aa8" } },
+        component: { light: { "--zb-accordion-header-bgg": "#0b5aa8" } },
       }),
     ).rejects.toThrow(/cannot be saved/);
   });
@@ -127,19 +127,19 @@ describe("overrides reach the published stylesheet", () => {
 
     await saveOverrides(nw, await tokens(), id, {
       semantic: { light: { accent: "#0b5aa8" }, dark: { accent: "#7dd3fc" } },
-      component: { light: { "--ox-accordion-header-bg": "#eef3f1" } },
+      component: { light: { "--zb-accordion-header-bg": "#eef3f1" } },
     });
     const { version } = await publishTheme(nw, await tokens(), id);
     const css = await versionCss(nw, id, version);
 
-    expect(css).toContain("--ox-accent: #0b5aa8;");
-    expect(css).toContain('[data-ox-theme="dark"]');
-    expect(css).toContain("--ox-accent: #7dd3fc;");
-    expect(css).toContain("--ox-accordion-header-bg: #eef3f1;");
+    expect(css).toContain("--zb-accent: #0b5aa8;");
+    expect(css).toContain('[data-zb-theme="dark"]');
+    expect(css).toContain("--zb-accent: #7dd3fc;");
+    expect(css).toContain("--zb-accordion-header-bg: #eef3f1;");
 
     // The rule that survives every tier: no clinical token, ever.
-    expect(css).not.toContain("--ox-status-");
-    expect(css).not.toContain("--ox-flag-");
+    expect(css).not.toContain("--zb-status-");
+    expect(css).not.toContain("--zb-flag-");
   });
 });
 
@@ -198,24 +198,24 @@ describe("two screens, one document", () => {
 
     await saveOverrides(nw, await tokens(), id, { semantic: { light: { accent: "#0b5aa8" } } });
     await saveOverrides(nw, await tokens(), id, {
-      component: { light: { "--ox-accordion-header-bg": "#eef3f1" } },
+      component: { light: { "--zb-accordion-header-bg": "#eef3f1" } },
     });
 
     const theme = await nw.data.themes.findOne({ _id: id });
     expect(storedTokens(theme).semantic.light["accent"]).toBe("#0b5aa8");
-    expect(storedTokens(theme).component.light["--ox-accordion-header-bg"]).toBe("#eef3f1");
+    expect(storedTokens(theme).component.light["--zb-accordion-header-bg"]).toBe("#eef3f1");
   });
 
   it("a semantic save leaves component overrides alone", async () => {
     const { nw, id } = await aTheme();
 
     await saveOverrides(nw, await tokens(), id, {
-      component: { light: { "--ox-accordion-header-bg": "#eef3f1" } },
+      component: { light: { "--zb-accordion-header-bg": "#eef3f1" } },
     });
     await saveOverrides(nw, await tokens(), id, { semantic: { light: { accent: "#0b5aa8" } } });
 
     const theme = await nw.data.themes.findOne({ _id: id });
-    expect(storedTokens(theme).component.light["--ox-accordion-header-bg"]).toBe("#eef3f1");
+    expect(storedTokens(theme).component.light["--zb-accordion-header-bg"]).toBe("#eef3f1");
     expect(storedTokens(theme).semantic.light["accent"]).toBe("#0b5aa8");
   });
 

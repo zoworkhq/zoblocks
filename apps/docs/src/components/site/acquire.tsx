@@ -34,7 +34,7 @@ import { cn } from "@/lib/utils";
 /**
  * The exact line, from the component's own distribution channel.
  *
- * A package component shown an `oxygen add` line sends the reader to a
+ * A package component shown an `zoblocks add` line sends the reader to a
  * registry item that does not exist, which is worse than no instructions —
  * the detail page already learned this, and the card must not relearn it.
  */
@@ -75,10 +75,10 @@ export function AcquireAction({
         // Above the card's overlay link, so the whole card still opens the
         // component and this one corner does something else.
         className={cn(
-          "relative z-10 inline-flex items-center gap-1.5 rounded-lg border border-oxygen/40 bg-oxygen/8",
-          "px-2.5 py-1.5 text-[0.6875rem] font-semibold text-oxygen-deep",
-          "transition-colors hover:bg-oxygen/15 focus-visible:outline focus-visible:outline-2",
-          "focus-visible:outline-offset-2 focus-visible:outline-oxygen",
+          "relative z-10 inline-flex items-center gap-1.5 rounded-lg border border-brand/40 bg-brand/8",
+          "px-2.5 py-1.5 text-[0.6875rem] font-semibold text-brand-deep",
+          "transition-colors hover:bg-brand/15 focus-visible:outline focus-visible:outline-2",
+          "focus-visible:outline-offset-2 focus-visible:outline-brand",
           className,
         )}
       >
@@ -150,13 +150,13 @@ export function AcquireAction({
       className={cn(
         "relative z-10 inline-flex items-center gap-1.5 rounded-lg border border-rule px-2.5 py-1.5",
         "font-mono text-[0.6875rem] text-graphite transition-colors",
-        "hover:border-oxygen/45 hover:text-ink",
-        "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-oxygen",
+        "hover:border-brand/45 hover:text-ink",
+        "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand",
         className,
       )}
     >
       {copied ? (
-        <Check aria-hidden="true" className="size-3 text-oxygen-deep" />
+        <Check aria-hidden="true" className="size-3 text-brand-deep" />
       ) : (
         <Copy aria-hidden="true" className="size-3" />
       )}
@@ -187,7 +187,7 @@ export function PriceTag({ component }: { component: ComponentDoc }) {
     <span
       className={cn(
         "rounded-full px-2 py-0.5 font-mono text-[0.625rem] uppercase tracking-wider",
-        pro ? "bg-oxygen/12 text-oxygen-deep" : "border border-rule text-graphite-soft",
+        pro ? "bg-brand/12 text-brand-deep" : "border border-rule text-graphite-soft",
       )}
     >
       {pro ? "Marketplace" : "Free · MIT"}

@@ -189,9 +189,9 @@ function connectTo(rawOrigin: string, rawToken: string): void {
 
   // Checked before a round trip, so a typo is a correction rather than a 404.
   state.invalid = !origin
-    ? "That is not an app address. It should look like https://app.oxygenui.design."
+    ? "That is not an app address. It should look like https://app.zoblocks.design."
     : !token
-      ? "That is not a Figma key. They start oxy_live_ and are minted in the app."
+      ? "That is not a Figma key. They start zb_live_ and are minted in the app."
       : undefined;
 
   if (state.invalid || !origin || !token) {

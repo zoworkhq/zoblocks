@@ -1,13 +1,13 @@
 /**
  * `resolveIdentity` — one FHIR `Patient` in, one renderable identity out.
  *
- * Every component in `@oxygenui-design/identity` is a renderer of this
+ * Every component in `@zoblocks/identity` is a renderer of this
  * function's output. Nothing downstream reads FHIR, which is what makes the
  * renderers small and this file the one worth reviewing carefully.
  */
 
-import type { Extension, HumanName, Patient } from "@oxygenui-design/fhir";
-import { codeableText } from "@oxygenui-design/fhir";
+import type { Extension, HumanName, Patient } from "@zoblocks/fhir";
+import { codeableText } from "@zoblocks/fhir";
 import { precise, resolveAge } from "./dates.js";
 import { resolveIdentifiers, DEFAULT_IDENTIFIER_SYSTEMS } from "./identifiers.js";
 import { identityInitials, isFamilyFirstLocale } from "./initials.js";

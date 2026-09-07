@@ -1,4 +1,4 @@
-# Oxygen UI — Platform Architecture
+# Zoblocks — Platform Architecture
 
 **Status:** proposed · 6 August 2026
 **Horizon:** the structure below is intended to hold from 24 components to 500+
@@ -16,7 +16,7 @@ arguments.
 
 ## 1. The scaling problem, stated concretely
 
-The repository today ships 24 components through the Oxygen registry and works
+The repository today ships 24 components through the Zoblocks registry and works
 well at that size. Three properties of it do not survive multiplication.
 
 ### 1.1 Adding one component edits five shared files
@@ -55,7 +55,7 @@ This is the load-bearing one, and it is in direct tension with four of the
 brief's requirements: versioning, backward compatibility, migration paths, and
 deprecation strategy.
 
-Once the Oxygen CLI writes a file into a customer's repository, that file is
+Once the Zoblocks CLI writes a file into a customer's repository, that file is
 theirs. There is no channel to reach it. A bug in `ClinicalValue` that
 misrenders a comparator ships to every customer who installed it and can never
 be recalled — not by a patch release, not by a security advisory, not by a
@@ -75,7 +75,7 @@ choosing ownership means they have forked. See
 ### 1.4 What is absent entirely
 
 No ESLint configuration exists (`packages/*` scripts read
-`echo "lint: configured in Phase 1"`). One test file covers `@oxygenui-design/fhir`
+`echo "lint: configured in Phase 1"`). One test file covers `@zoblocks/fhir`
 helpers; no component has a test. There is no Storybook, no visual regression,
 no per-component accessibility check (the axe run is page-level on the docs
 site), no internationalisation, no bundle budget, and no public API surface
@@ -94,7 +94,7 @@ that.
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
-│  L4  Distribution   npm channels · Oxygen registry · CDN · Figma │
+│  L4  Distribution   npm channels · Zoblocks registry · CDN · Figma │
 ├──────────────────────────────────────────────────────────────────┤
 │  L3  Composition    blocks · patterns · app shells · templates   │
 ├──────────────────────────────────────────────────────────────────┤
@@ -121,8 +121,8 @@ Two consequences worth naming:
   opinion about markup. When a customer needs their own visual language, they
   rebuild L2 and keep L1 — which is where the accessibility correctness lives,
   and the part they should not be rewriting.
-- **L0 holds no React.** `@oxygenui-design/fhir`, `@oxygenui-design/tokens`, and
-  `@oxygenui-design/intl` are consumable by a Vue app, a server, or a test harness.
+- **L0 holds no React.** `@zoblocks/fhir`, `@zoblocks/tokens`, and
+  `@zoblocks/intl` are consumable by a Vue app, a server, or a test harness.
   This is what keeps a future non-React target from being a rewrite.
 
 ---
@@ -135,12 +135,12 @@ Radix-style per-component packages give precise versioning and minimal installs.
 They also mean 500 `package.json` files, 500 changelogs, and — the disqualifier
 — a shared-internals problem. `StatusBadge` is imported by most of the catalog.
 Under per-component packaging, either every package inlines its own copy or 400
-packages take a dependency on `@oxygenui-design/status-badge`, and every consumer
+packages take a dependency on `@zoblocks/status-badge`, and every consumer
 resolves version skew across them. Radix itself consolidated for this reason.
 
 ### 3.2 Why not one package
 
-A single `@oxygenui-design/react` gives one version for everything: a patch to a
+A single `@zoblocks/react` gives one version for everything: a patch to a
 scheduling component bumps the version of the patient banner, every release note
 is noise for most consumers, and there is no seam to put the free/Pro boundary
 on.
@@ -148,25 +148,25 @@ on.
 ### 3.3 Domain-scoped packages with subpath exports
 
 ```
-@oxygenui-design/tokens        L0   design tokens — generated, multi-brand
-@oxygenui-design/fhir          L0   FHIR R4 types + pure helpers        (exists)
-@oxygenui-design/intl          L0   locale, units, dates, message catalog
-@oxygenui-design/utils         L0   cn, id generation, invariant
+@zoblocks/tokens        L0   design tokens — generated, multi-brand
+@zoblocks/fhir          L0   FHIR R4 types + pure helpers        (exists)
+@zoblocks/intl          L0   locale, units, dates, message catalog
+@zoblocks/utils         L0   cn, id generation, invariant
 
-@oxygenui-design/primitives    L1   headless behaviour hooks, unstyled
-@oxygenui-design/system        L1   variant engine, polymorphism, slots, density ctx
+@zoblocks/primitives    L1   headless behaviour hooks, unstyled
+@zoblocks/system        L1   variant engine, polymorphism, slots, density ctx
 
-@oxygenui-design/react         L2   free core components
-@oxygenui-design/icons         L2   icon set — generated from SVG source
+@zoblocks/react         L2   free core components
+@zoblocks/icons         L2   icon set — generated from SVG source
 
-@oxygenui-design/pro-charts    L2   commercial: clinical charting, trends, flowsheets
-@oxygenui-design/pro-forms     L2   commercial: FHIR Questionnaire renderer
-@oxygenui-design/pro-scheduling L2  commercial: availability, booking, calendars
-@oxygenui-design/blocks        L3   composed screens and templates
-@oxygenui-design/pro-blocks    L3   commercial: full EHR-shaped screens
+@zoblocks/pro-charts    L2   commercial: clinical charting, trends, flowsheets
+@zoblocks/pro-forms     L2   commercial: FHIR Questionnaire renderer
+@zoblocks/pro-scheduling L2  commercial: availability, booking, calendars
+@zoblocks/blocks        L3   composed screens and templates
+@zoblocks/pro-blocks    L3   commercial: full EHR-shaped screens
 
-@oxygenui-design/codemod       —    migration codemods
-@oxygenui-design/cli           —    scaffolding, registry install, license auth
+@zoblocks/codemod       —    migration codemods
+@zoblocks/cli           —    scaffolding, registry install, license auth
 ```
 
 Roughly 15 packages at maturity, not 500 and not 1. Each is a coherent unit that
@@ -185,8 +185,8 @@ per-component subpaths:
 }
 ```
 
-Both `import { VitalsPanel } from "@oxygenui-design/react"` and
-`from "@oxygenui-design/react/vitals-panel"` shake correctly under any modern bundler.
+Both `import { VitalsPanel } from "@zoblocks/react"` and
+`from "@zoblocks/react/vitals-panel"` shake correctly under any modern bundler.
 The barrel is generated, so it stays complete and correctly ordered.
 
 Bundle size is defended by budget, not by hope: `size-limit` asserts a per-subpath
@@ -262,12 +262,12 @@ scaffolds it; nothing shared is edited by hand.
 ### 4.3 Import direction is fixed
 
 Today, registry source is written with consumer-shaped specifiers
-(`@/lib/utils`, `@/components/oxygen/status-badge`) and mapped _backwards_ via
+(`@/lib/utils`, `@/components/zoblocks/status-badge`) and mapped _backwards_ via
 root `tsconfig.json` paths so it typechecks in this repo. That is the reason the
 path map needs a manual entry per shared component.
 
 Under the target architecture the direction reverses. Source is written with
-real package specifiers — `import { cn } from "@oxygenui-design/utils"` — which
+real package specifiers — `import { cn } from "@zoblocks/utils"` — which
 typecheck natively with no path mapping. The **registry generator rewrites them**
 to `@/` form when it emits copy-source output. The rewrite is one function with
 a test, rather than a growing hand-maintained map.
@@ -278,7 +278,7 @@ a test, rather than a growing hand-maintained map.
 
 ### 5.1 Two channels, one source
 
-|                                | npm                       | Registry (Oxygen CLI)           |
+|                                | npm                       | Registry (Zoblocks CLI)         |
 | ------------------------------ | ------------------------- | ------------------------------- |
 | Upgrade path                   | semver, patches, codemods | none — the customer has forked  |
 | Security fixes reach customers | yes                       | no                              |
@@ -298,17 +298,17 @@ notices.
 
 `tier` in `*.meta.ts` drives the boundary mechanically:
 
-- **Free** → public npm under `@oxygenui-design/*`, public registry JSON on the CDN.
+- **Free** → public npm under `@zoblocks/*`, public registry JSON on the CDN.
 - **Pro** → private npm dist-tag with per-customer access tokens; registry items
   served from an authenticated endpoint keyed to the same license.
 
-The npm scope is `@oxygenui-design`, not `@oxygenui`. The shorter one is not
-available: `oxygen-ui` is already published by an unrelated project, and npm
-rejects names that differ from an existing package only by punctuation, so every
-variant of it is blocked. Registry installs name a component directly
-(`oxygen add pulse-loader`) and need no namespace at all; the namespaces that do
-appear — `@oxygen-pro` — are registry aliases declared in the consumer's
-`oxygen.json` and are unconstrained by npm.
+The npm scope is `@zoblocks`, unhyphenated. The project shipped its first two
+packages under `@zoblocks-design`, a scope forced on it by an unrelated
+`zoblocks-ui` already on npm; the rename to Zoblocks retired that constraint along
+with the name, and the shorter scope was free. Registry installs name a
+component directly (`zoblocks add pulse-loader`) and need no namespace at all;
+the namespaces that do appear — `@zoblocks-pro` — are registry aliases declared
+in the consumer's `zoblocks.json` and are unconstrained by npm.
 
 Pro source never reaches the public CDN, and CI asserts that: a check walks the
 generated public registry output and fails if any item's meta says `tier: "pro"`.
@@ -326,8 +326,8 @@ model.
 
 ### 6.1 The problem with the current file
 
-`packages/tokens/src/oxygen-tokens.css` is 292 hand-written lines mixing raw
-palette (`--ox-red-600`) with semantics (`--ox-status-critical`). It is
+`packages/tokens/src/zoblocks-tokens.css` is 292 hand-written lines mixing raw
+palette (`--zb-red-600`) with semantics (`--zb-status-critical`). It is
 well-organised and correctly commented, but it is a single artifact in a single
 format. Multi-brand, Figma sync, JS access to token values, and high-contrast
 themes each want a different output from the same data.
@@ -338,9 +338,9 @@ Tokens are authored as W3C DTCG-format JSON and built to every output.
 
 | Tier          | Example                  | Who references it                |
 | ------------- | ------------------------ | -------------------------------- |
-| **Primitive** | `--ox-ref-red-600`       | nothing outside the token build  |
-| **Semantic**  | `--ox-status-critical`   | components                       |
-| **Component** | `--ox-badge-critical-bg` | one component, an override point |
+| **Primitive** | `--zb-ref-red-600`       | nothing outside the token build  |
+| **Semantic**  | `--zb-status-critical`   | components                       |
+| **Component** | `--zb-badge-critical-bg` | one component, an override point |
 
 Components reference semantic tokens only. This is already the repo's stated
 rule; making it a lint rule is what keeps it true at 500 components.
@@ -349,19 +349,19 @@ rule; making it a lint rule is what keeps it true at 500 components.
 
 ```
 brand   × theme                         × density
-oxygen  │ light / dark / high-contrast   │ patient / standard / clinical
+zoblocks  │ light / dark / high-contrast   │ patient / standard / clinical
 acme    │ light / dark / high-contrast   │ patient / standard / clinical
 ```
 
 A brand overrides **semantic tokens only** and may replace the primitive palette
 wholesale. Themes are value sets over the same semantic key space. Density is
-already implemented via `data-ox-density` and is generalised as the third axis.
+already implemented via `data-zb-density` and is generalised as the third axis.
 
 **A new brand is therefore a data file, not code** — which is the concrete
 meaning of "future customisation without architectural changes."
 
-Applied at runtime through CSS custom properties on `[data-ox-brand]`,
-`[data-ox-theme]`, `[data-ox-density]`. No JavaScript, no flash of unstyled
+Applied at runtime through CSS custom properties on `[data-zb-brand]`,
+`[data-zb-theme]`, `[data-zb-density]`. No JavaScript, no flash of unstyled
 content, works under SSR and React Server Components.
 
 ### 6.4 Build outputs
@@ -411,12 +411,12 @@ is how the standard holds without a human reviewing 500 components.
 
 `status` in `*.meta.ts` is a contract with consumers, not a label:
 
-| Status         | Export path                           | Breaking-change policy                      |
-| -------------- | ------------------------------------- | ------------------------------------------- |
-| `experimental` | `@oxygenui-design/react/experimental` | may break in any minor                      |
-| `beta`         | main barrel, flagged in docs          | may break in a minor, with a changeset note |
-| `stable`       | main barrel                           | breaks only in a major                      |
-| `deprecated`   | main barrel, dev-time warning         | removed in the next major                   |
+| Status         | Export path                    | Breaking-change policy                      |
+| -------------- | ------------------------------ | ------------------------------------------- |
+| `experimental` | `@zoblocks/react/experimental` | may break in any minor                      |
+| `beta`         | main barrel, flagged in docs   | may break in a minor, with a changeset note |
+| `stable`       | main barrel                    | breaks only in a major                      |
+| `deprecated`   | main barrel, dev-time warning  | removed in the next major                   |
 
 Routing experimental components through a separate export path is what lets the
 library ship new ideas without either freezing them prematurely or making the
@@ -429,7 +429,7 @@ A deprecation is not an announcement, it is a sequence:
 1. `status: "deprecated"` with `deprecatedIn`, `removeIn`, and a `replacement`.
 2. A development-only `console.warn` naming the replacement, stripped from
    production builds by the `NODE_ENV` guard.
-3. A codemod in `@oxygenui-design/codemod`, shipped in the same release.
+3. A codemod in `@zoblocks/codemod`, shipped in the same release.
 4. Minimum two minor versions of overlap.
 5. Removal in the next major, listed in the migration guide.
 
@@ -480,7 +480,7 @@ the right instinct and should be preserved.
 CSS custom properties and class names, so no `unsafe-inline` is required; the
 docs state a nonce strategy for the one place a style tag is unavoidable.
 
-**The boundary statement stays.** Oxygen UI is not a compliance boundary and not
+**The boundary statement stays.** Zoblocks is not a compliance boundary and not
 a medical device. That claim is in the README, and it belongs in the
 architecture too, because it constrains what components are allowed to do:
 nothing in this library may present itself as clinical decision support.
@@ -497,7 +497,7 @@ documented screen-reader support matrix (NVDA, JAWS, VoiceOver) per component.
 **Internationalisation is the one item that must land early or become
 prohibitive.** Components currently hardcode user-visible English —
 `"Not interpreted"`, `"milligrams per decilitre"`. Retrofitting 500 components
-is an enormous project; retrofitting 24 is a week. `@oxygenui-design/intl` provides a
+is an enormous project; retrofitting 24 is a week. `@zoblocks/intl` provides a
 provider and a message catalog with English defaults, so the change is
 mechanical and non-breaking.
 
@@ -576,7 +576,7 @@ Two defects surfaced during the work and are fixed:
 - `IdentityToken` drew its avatar swatches from clinical status tokens, so a
   hash of someone's name could tint their avatar with the amber that means
   "high" — a false severity cue beside real results. Decorative
-  `--ox-swatch-*` tokens now exist, constrained to hues that carry no clinical
+  `--zb-swatch-*` tokens now exist, constrained to hues that carry no clinical
   meaning.
 
 Still open in this phase: the coverage gate is wired and reporting but not
@@ -586,8 +586,8 @@ against arrives in Phase 2.
 ### Phase 1 — foundations
 
 Token pipeline with the three-tier model and brand/theme/density axes. Package
-topology: `@oxygenui-design/utils`, `@oxygenui-design/system`, `@oxygenui-design/primitives`, and
-`@oxygenui-design/react` carved out; import direction reversed so the registry
+topology: `@zoblocks/utils`, `@zoblocks/system`, `@zoblocks/primitives`, and
+`@zoblocks/react` carved out; import direction reversed so the registry
 generator rewrites specifiers rather than tsconfig mapping them back.
 
 ### Phase 2 — quality infrastructure
@@ -602,7 +602,7 @@ distribution; provenance and SBOM; support-window policy published.
 
 ### Phase 4 — internationalisation
 
-`@oxygenui-design/intl` and the message-catalog retrofit across the catalog. Kept as a
+`@zoblocks/intl` and the message-catalog retrofit across the catalog. Kept as a
 distinct phase because it is mechanical and wide, but it must not slip past
 roughly 50 components.
 

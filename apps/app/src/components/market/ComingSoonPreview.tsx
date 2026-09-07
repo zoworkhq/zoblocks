@@ -39,8 +39,8 @@ function Grid() {
           style={delay(i)}
           className={cn(
             "h-1.5 rounded-[1px]",
-            i % 4 === 3 ? "bg-oxygen/70" : "bg-panel-muted/35",
-            "ox-fade",
+            i % 4 === 3 ? "bg-brand/70" : "bg-panel-muted/35",
+            "zb-fade",
           )}
         />
       ))}
@@ -56,7 +56,7 @@ function Ramp() {
         <span
           key={i}
           style={{ animationDelay: `${i * 0.08}s`, opacity: 0.25 + i * 0.07 }}
-          className="h-5 flex-1 rounded-[1px] bg-oxygen ox-sweep"
+          className="h-5 flex-1 rounded-[1px] bg-brand zb-sweep"
         />
       ))}
     </div>
@@ -72,7 +72,7 @@ function Glyphs() {
         <span
           key={i}
           style={delay(i)}
-          className={cn("size-3.5 border border-oxygen/60", shape, "ox-fade")}
+          className={cn("size-3.5 border border-brand/60", shape, "zb-fade")}
         />
       ))}
     </div>
@@ -82,7 +82,7 @@ function Glyphs() {
 /** Illustration: a line drawing itself. */
 function Stroke() {
   return (
-    <svg viewBox="0 0 120 40" className="w-full max-w-[9rem] text-oxygen" aria-hidden="true">
+    <svg viewBox="0 0 120 40" className="w-full max-w-[9rem] text-brand" aria-hidden="true">
       <path
         d="M4 30 C 22 30, 26 10, 44 10 S 70 30, 88 30 S 110 14, 116 14"
         fill="none"
@@ -90,7 +90,7 @@ function Stroke() {
         strokeWidth="1.5"
         strokeLinecap="round"
         pathLength={100}
-        className="ox-draw [stroke-dasharray:100] [stroke-dashoffset:0]"
+        className="zb-draw [stroke-dasharray:100] [stroke-dashoffset:0]"
       />
     </svg>
   );
@@ -105,7 +105,7 @@ function Stream() {
         <span
           key={i}
           style={delay(i)}
-          className={cn("h-1 rounded-[1px] bg-panel-muted/45", w, "ox-slide")}
+          className={cn("h-1 rounded-[1px] bg-panel-muted/45", w, "zb-slide")}
         />
       ))}
     </div>
@@ -118,8 +118,8 @@ function Ticks() {
     <div className="flex w-full max-w-[9rem] flex-col gap-1.5" aria-hidden="true">
       {[0, 1, 2].map((i) => (
         <span key={i} className="flex items-center gap-2">
-          <span style={delay(i)} className="size-2 shrink-0 rounded-[1px] bg-oxygen/70 ox-fade" />
-          <span style={delay(i)} className="h-1 flex-1 rounded-[1px] bg-panel-muted/35 ox-fade" />
+          <span style={delay(i)} className="size-2 shrink-0 rounded-[1px] bg-brand/70 zb-fade" />
+          <span style={delay(i)} className="h-1 flex-1 rounded-[1px] bg-panel-muted/35 zb-fade" />
         </span>
       ))}
     </div>
@@ -138,8 +138,8 @@ function Scale() {
             style={delay(i)}
             className={cn(
               "h-3 flex-1 rounded-[2px] border",
-              i === 2 ? "border-oxygen/70 bg-oxygen/50" : "border-panel-muted/30",
-              i === 2 && "ox-fade",
+              i === 2 ? "border-brand/70 bg-brand/50" : "border-panel-muted/30",
+              i === 2 && "zb-fade",
             )}
           />
         ))}
@@ -160,8 +160,8 @@ function Bars() {
           className={cn(
             "flex-1 rounded-[1px]",
             h,
-            i >= 4 ? "bg-oxygen/70" : "bg-panel-muted/40",
-            "ox-sweep",
+            i >= 4 ? "bg-brand/70" : "bg-panel-muted/40",
+            "zb-sweep",
           )}
         />
       ))}
@@ -179,7 +179,7 @@ function Calendar() {
           style={delay(i % 7)}
           className={cn(
             "aspect-square rounded-[1px]",
-            i === 10 ? "bg-oxygen/80 ox-fade" : "bg-panel-muted/25",
+            i === 10 ? "bg-brand/80 zb-fade" : "bg-panel-muted/25",
           )}
         />
       ))}
@@ -196,7 +196,7 @@ function Lines() {
         <span key={i} className={cn("h-1 rounded-[1px] bg-panel-muted/40", w)} />
       ))}
       <span className="my-0.5 h-px w-full bg-panel-muted/30" />
-      <span className="h-1 w-[60%] rounded-[1px] bg-oxygen/70 ox-slide" />
+      <span className="h-1 w-[60%] rounded-[1px] bg-brand/70 zb-slide" />
     </div>
   );
 }

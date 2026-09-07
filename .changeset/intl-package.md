@@ -1,5 +1,5 @@
 ---
-"@oxygenui-design/intl": minor
+"@zoblocks/intl": minor
 ---
 
 First release: messages and clinical register.

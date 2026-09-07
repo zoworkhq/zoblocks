@@ -17,8 +17,8 @@ import {
   type IdentityPolicy,
   type LegalNameReason,
   type PhotoPolicy,
-} from "@oxygenui-design/identity-core";
-import type { Patient } from "@oxygenui-design/fhir";
+} from "@zoblocks/identity-core";
+import type { Patient } from "@zoblocks/fhir";
 import { createContext, useContext, useMemo, useRef, type ReactNode } from "react";
 
 /**

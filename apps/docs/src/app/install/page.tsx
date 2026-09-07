@@ -16,7 +16,7 @@ import { InstallCommand, RevealRoot } from "@/components/site/interactions";
  *
  * That probe found a real defect on its first run — `lib/result-value.ts`
  * imported a sibling relatively, and the registry renames files as it installs
- * them, so `oxygen add result-value` produced a tree that did not compile. The
+ * them, so `zoblocks add result-value` produced a tree that did not compile. The
  * fix and the guard that prevents a recurrence both came out of writing this
  * page, which is the argument for building the matrix before the prose.
  *
@@ -27,7 +27,7 @@ import { InstallCommand, RevealRoot } from "@/components/site/interactions";
 export const metadata: Metadata = {
   title: "Install — Next.js, Vite and Tailwind setup",
   description:
-    "Install Oxygen UI components into a React project. Verified setup for Next.js App Router and Vite, with Tailwind v4 config and client boundary rules.",
+    "Install Zoblocks components into a React project. Verified setup for Next.js App Router and Vite, with Tailwind v4 config and client boundary rules.",
   alternates: { canonical: "/install" },
 };
 
@@ -61,7 +61,7 @@ const MATRIX: ReadonlyArray<{
      * string, so it is stated here.
      */
     detail:
-      // eslint-disable-next-line @oxygenui/no-hardcoded-count -- historical record; see above
+      // eslint-disable-next-line @zoblocks/no-hardcoded-count -- historical record; see above
       "Four components installed from the registry, then vite build and tsc --noEmit, both clean. 40 modules, no polyfills, no shims.",
   },
   {
@@ -96,14 +96,14 @@ export default function InstallPage() {
               className="mt-5 max-w-2xl text-lg font-medium tracking-tight text-graphite"
               data-reveal
             >
-              Setting up Oxygen UI in a Next.js or Vite project with Tailwind v4.
+              Setting up Zoblocks in a Next.js or Vite project with Tailwind v4.
             </h2>
             <div className="mt-8 max-w-2xl" data-reveal>
-              <InstallCommand command="npx @oxygenui-design/cli init" />
+              <InstallCommand command="npx @zoblocks/cli init" />
             </div>
             <p className="mt-4 max-w-2xl text-sm leading-relaxed text-graphite" data-reveal>
               <code className="font-mono text-[0.8125rem]">init</code> writes{" "}
-              <code className="font-mono text-[0.8125rem]">oxygen.json</code>, which records where
+              <code className="font-mono text-[0.8125rem]">zoblocks.json</code>, which records where
               your <code className="font-mono text-[0.8125rem]">@/</code> alias points. Every later{" "}
               <code className="font-mono text-[0.8125rem]">add</code> copies source relative to it.
             </p>
@@ -162,10 +162,10 @@ resolve: { alias: { "@": path.resolve(__dirname, "src") } }`}
                 body="Tailwind v4 finds classes by scanning files it knows about. Components installed outside your existing content roots are invisible to it until you say where they went — which shows up as a component that renders with no styling at all."
                 code={`/* your global stylesheet */
 @import "tailwindcss";
-@source "./components/oxygen";      /* or wherever oxygen.json put them */
+@source "./components/zoblocks";      /* or wherever zoblocks.json put them */
 
-@import "./styles/oxygen-tokens.css";      /* required — the design tokens */
-@import "./styles/oxygen-result-value.css"; /* one per component that ships CSS */`}
+@import "./styles/zoblocks-tokens.css";      /* required — the design tokens */
+@import "./styles/zoblocks-result-value.css"; /* one per component that ships CSS */`}
               />
 
               <Step
@@ -173,7 +173,7 @@ resolve: { alias: { "@": path.resolve(__dirname, "src") } }`}
                 title="The client boundary"
                 body="About half the registry declares its own “use client” boundary, so components work unchanged in a React Server Component tree. The ones that do not are pure presentation and render on the server."
                 code={`// app/page.tsx — a Server Component
-import { ResultValue } from "@/components/oxygen/result-value";
+import { ResultValue } from "@/components/zoblocks/result-value";
 
 // Works. ResultValue declares its own boundary where it needs one.
 // You do not need to mark your page "use client" to use these.`}
@@ -205,7 +205,7 @@ import { ResultValue } from "@/components/oxygen/result-value";
                     <span
                       className={`numeric rounded px-2 py-0.5 text-[0.625rem] uppercase tracking-wider ${
                         row.status === "verified"
-                          ? "bg-oxygen/10 text-oxygen-deep"
+                          ? "bg-brand/10 text-brand-deep"
                           : row.status === "partial"
                             ? "border border-rule-strong text-ink"
                             : "bg-rule/60 text-graphite"
@@ -237,10 +237,10 @@ import { ResultValue } from "@/components/oxygen/result-value";
                 },
                 {
                   q: "Severity colours are missing, but layout is fine.",
-                  a: "The component's own stylesheet is not imported. Clinical severity is carried by CSS custom properties in styles/oxygen-*.css, not by Tailwind utilities, so it fails independently of the rest.",
+                  a: "The component's own stylesheet is not imported. Clinical severity is carried by CSS custom properties in styles/zoblocks-*.css, not by Tailwind utilities, so it fails independently of the rest.",
                 },
                 {
-                  q: "Cannot find module '@/lib/oxygen-…'",
+                  q: "Cannot find module '@/lib/zoblocks-…'",
                   a: "The @ alias is missing or points somewhere else. Vite needs it in vite.config.ts as well as tsconfig.json — TypeScript resolving it is not enough for the bundler.",
                 },
                 {
@@ -288,7 +288,7 @@ function Step({ n, title, body, code }: { n: string; title: string; body: string
   return (
     <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-10">
       <div>
-        <p className="numeric text-xs text-oxygen-deep">{n}</p>
+        <p className="numeric text-xs text-brand-deep">{n}</p>
         <h3 className="mt-2 text-lg font-semibold tracking-tight">{title}</h3>
         <p className="mt-2.5 text-sm leading-relaxed text-graphite">{body}</p>
       </div>

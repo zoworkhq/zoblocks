@@ -37,7 +37,7 @@ Three consequences worth stating explicitly:
   and severs the link, so moving the brand stops moving the accent — which is
   the problem a token system exists to prevent, rebuilt inside a design file.
 - **Identity is stamped, not named.** Every variable this plugin creates carries
-  its Oxygen token name in `setPluginData`. A designer will rename things; the
+  its Zoblocks token name in `setPluginData`. A designer will rename things; the
   label is theirs and the plugin data is the key.
 
 ## Distribution, and the plan the REST API needs
@@ -129,7 +129,7 @@ tree on 21 August. Three were wrong, and one of them changes the mapping:
   component collection can only carry the 169.** Pushing the rest would mean
   inventing values for properties that deliberately have none.
 - **`nearestPassing` is not in the validator.** It lives in
-  `@oxygenui-design/theme/src/ramp.ts`, whose only import is that validator — so
+  `@zoblocks/theme/src/ramp.ts`, whose only import is that validator — so
   it is pure and could move, but `theme` also carries the document schema, zod
   and both framework bridges. Making a plugin sandbox depend on all of that for
   one suggestion is the wrong trade. Moving `ramp.ts` into the token package is

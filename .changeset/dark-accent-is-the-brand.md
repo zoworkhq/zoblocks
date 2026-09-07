@@ -1,5 +1,5 @@
 ---
-"@oxygenui-design/tokens": minor
+"@zoblocks/tokens": minor
 ---
 
 The dark theme's accent is the brand green, not a cyan
@@ -20,6 +20,6 @@ order of magnitude above their floors, and the swap is the same step of a
 different ramp rather than a new colour.
 
 `ref.cyan.*` is left in the palette and no longer referenced by the semantic
-tier. It is still emitted as `--ox-ref-cyan-*`, so nothing a consumer uses
+tier. It is still emitted as `--zb-ref-cyan-*`, so nothing a consumer uses
 disappears; `swatch.cyan.*`, which is a member of the distinguishable-swatch
 palette rather than a brand colour, is unaffected.

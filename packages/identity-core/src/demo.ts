@@ -14,7 +14,7 @@
  * components render, not what the rest of the application holds.
  */
 
-import type { Patient } from "@oxygenui-design/fhir";
+import type { Patient } from "@zoblocks/fhir";
 import { fnv1a } from "./swatch.js";
 
 const GIVEN = [

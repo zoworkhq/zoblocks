@@ -14,14 +14,14 @@ import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AntdHost } from "./antd";
 import { MuiHost } from "./mui";
-import { OxygenHost } from "./oxygen";
+import { ZoblocksHost } from "./zoblocks";
 import { useHost } from "./context";
 import type { HostProviderProps } from "./contract";
 
 afterEach(cleanup);
 
 const HOSTS: Array<[string, React.ComponentType<HostProviderProps>]> = [
-  ["oxygen", OxygenHost],
+  ["zoblocks", ZoblocksHost],
   ["antd", AntdHost],
   ["mui", MuiHost],
 ];
@@ -92,9 +92,9 @@ describe.each(HOSTS)("the %s host", (id, Host) => {
         <Demo />
       </Host>,
     );
-    const marked = container.querySelector("[data-ox-bridge], [data-ox-host]");
+    const marked = container.querySelector("[data-zb-bridge], [data-zb-host]");
     expect(marked).not.toBeNull();
-    expect(marked?.getAttribute("data-ox-bridge") ?? marked?.getAttribute("data-ox-host")).toBe(id);
+    expect(marked?.getAttribute("data-zb-bridge") ?? marked?.getAttribute("data-zb-host")).toBe(id);
   });
 });
 
@@ -110,17 +110,17 @@ describe("the antd host", () => {
     expect(container.querySelector(".ant-switch-checked")).not.toBeNull();
   });
 
-  it("writes antd's tokens onto Oxygen's surface but not its clinical ones", () => {
+  it("writes antd's tokens onto Zoblocks's surface but not its clinical ones", () => {
     const { container } = render(
       <AntdHost mode="light">
         <Demo />
       </AntdHost>,
     );
-    const bridged = container.querySelector<HTMLElement>('[data-ox-bridge="antd"]');
-    expect(bridged?.style.getPropertyValue("--ox-accent")).toBe("#1677ff");
+    const bridged = container.querySelector<HTMLElement>('[data-zb-bridge="antd"]');
+    expect(bridged?.style.getPropertyValue("--zb-accent")).toBe("#1677ff");
     // The refusal that makes the whole thing safe: a host's brand never
     // reaches a status colour.
-    expect(bridged?.style.getPropertyValue("--ox-status-critical")).toBe("");
+    expect(bridged?.style.getPropertyValue("--zb-status-critical")).toBe("");
   });
 });
 
@@ -172,20 +172,20 @@ describe("the MUI host", () => {
         <Demo />
       </MuiHost>,
     );
-    const bridged = container.querySelector<HTMLElement>('[data-ox-bridge="mui"]');
+    const bridged = container.querySelector<HTMLElement>('[data-zb-bridge="mui"]');
     // MUI's dark primary. A host that ignored `mode` would send #1976d2.
-    expect(bridged?.style.getPropertyValue("--ox-accent")).toBe("#90caf9");
+    expect(bridged?.style.getPropertyValue("--zb-accent")).toBe("#90caf9");
   });
 });
 
-describe("the Oxygen host", () => {
+describe("the Zoblocks host", () => {
   it("renders reference chrome drawn from tokens", () => {
     const { container } = render(
-      <OxygenHost mode="light">
+      <ZoblocksHost mode="light">
         <Demo />
-      </OxygenHost>,
+      </ZoblocksHost>,
     );
-    expect(container.querySelector(".ox-host-btn")).not.toBeNull();
+    expect(container.querySelector(".zb-host-btn")).not.toBeNull();
     // No framework class anywhere: this host must stay dependency-free.
     expect(container.querySelector("[class*='ant-']")).toBeNull();
     expect(container.querySelector("[class*='Mui']")).toBeNull();

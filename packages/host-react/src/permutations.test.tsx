@@ -9,7 +9,7 @@
  * Run against all three rather than only MUI, because a translation is only
  * correct if the same call produces the equivalent control everywhere. The
  * MUI adapter is where the conversions live, so it is where a regression would
- * appear; the antd and Oxygen cases are what say "equivalent" out loud.
+ * appear; the antd and Zoblocks cases are what say "equivalent" out loud.
  */
 
 import * as React from "react";
@@ -18,14 +18,14 @@ import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AntdHost } from "./antd";
 import { MuiHost } from "./mui";
-import { OxygenHost } from "./oxygen";
+import { ZoblocksHost } from "./zoblocks";
 import { useHost } from "./context";
 import type { HostProviderProps } from "./contract";
 
 afterEach(cleanup);
 
 const HOSTS: Array<[string, React.ComponentType<HostProviderProps>]> = [
-  ["oxygen", OxygenHost],
+  ["zoblocks", ZoblocksHost],
   ["antd", AntdHost],
   ["mui", MuiHost],
 ];
@@ -37,7 +37,7 @@ function mount(Host: React.ComponentType<HostProviderProps>, children: React.Rea
 /**
  * Whether a toggle reads as on, in whichever way its framework says so.
  *
- * antd and the Oxygen host draw a `role="switch"` button and carry the state
+ * antd and the Zoblocks host draw a `role="switch"` button and carry the state
  * in `aria-checked`. MUI renders a real `<input type="checkbox">` and carries
  * it in the DOM *property* — the `checked` attribute never moves, so reading
  * the attribute reports the initial value forever and a working control looks

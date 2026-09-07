@@ -1,7 +1,7 @@
 {
   // Build-only. The exclude is declared here rather than inherited: TypeScript
   // resolves relative paths in an extended config against the directory it came
-  // from, so an exclude in @oxygenui-design/tsconfig globs that package and
+  // from, so an exclude in @zoblocks/tsconfig globs that package and
   // silently ships the test suite.
   "extends": "./tsconfig.json",
   "exclude": ["**/*.test.ts"]

@@ -1,12 +1,12 @@
 ---
-"@oxygenui-design/theme": minor
+"@zoblocks/theme": minor
 ---
 
 Empty-state illustrations, and cutting a favicon out of the wordmark
 
 Four more asset roles — `illustration-empty`, `illustration-search`,
 `illustration-denied`, `illustration-error` — reaching CSS as
-`--ox-illustration-*` and the manifest with their alternative text.
+`--zb-illustration-*` and the manifest with their alternative text.
 
 They are four and not one because the states are genuinely different messages:
 "nothing here yet" and "not yours to see" look nothing alike to a reader and

@@ -5,7 +5,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/lib/result-value.ts. Edit that file, not this one.
+// Generated from registry/zoblocks/lib/result-value.ts. Edit that file, not this one.
 /**
  * The four ways a rendered number lies, and the shapes that make each one
  * impossible.
@@ -34,10 +34,10 @@
 /*
  * The alias, not a relative path.
  *
- * This file installs as `lib/oxygen-result-value.ts` and its sibling installs
- * as `lib/oxygen-clinical-status.ts` — the registry renames both. A relative
+ * This file installs as `lib/zoblocks-result-value.ts` and its sibling installs
+ * as `lib/zoblocks-clinical-status.ts` — the registry renames both. A relative
  * `./clinical-status` resolves here in the monorepo and resolves to nothing in
- * a consumer's project, so `oxygen add result-value` produced a tree that did
+ * a consumer's project, so `zoblocks add result-value` produced a tree that did
  * not compile. Every other file in this directory already imports its siblings
  * by the installed name; this one did not.
  */

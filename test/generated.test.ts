@@ -32,7 +32,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const ARTIFACTS = [
   "apps/docs/src/lib/generated/catalog.ts",
   "packages/tokens/src/tokens.json",
-  "packages/tokens/src/oxygen-tokens.css",
+  "packages/tokens/src/zoblocks-tokens.css",
   "packages/tokens/src/tailwind.css",
   "packages/tokens/src/contrast.json",
   "registry.json",
@@ -107,7 +107,7 @@ describe("the published registry", () => {
   const registryDir = path.join(ROOT, "apps/docs/public/r");
 
   it("serves no file containing an absolute path", () => {
-    // These are fetched by the Oxygen CLI and written into a customer's repo,
+    // These are fetched by the Zoblocks CLI and written into a customer's repo,
     // so anything machine-specific here ends up in their source tree.
     const offenders: string[] = [];
     for (const name of readdirSync(registryDir).filter((f) => f.endsWith(".json"))) {

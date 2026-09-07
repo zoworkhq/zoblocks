@@ -38,8 +38,8 @@ describe("useAntdTabsTokens", () => {
         <Probe />
       </ConfigProvider>,
     );
-    expect(tokens["--ox-tabs-accent"]).toBe("#7c3aed");
-    expect(tokens["--ox-tabs-focus"]).toBe("#7c3aed");
+    expect(tokens["--zb-tabs-accent"]).toBe("#7c3aed");
+    expect(tokens["--zb-tabs-focus"]).toBe("#7c3aed");
   });
 
   it("keeps the track and thumb radii concentric", () => {
@@ -51,9 +51,9 @@ describe("useAntdTabsTokens", () => {
     // outer = inner + inset. A thumb that simply reuses the track radius looks
     // subtly wrong at every size, which is why this is arithmetic and not two
     // independent tokens.
-    const pad = Number.parseFloat(String(tokens["--ox-tabs-track-pad"]));
-    const inner = Number.parseFloat(String(tokens["--ox-tabs-thumb-radius"]));
-    const outer = Number.parseFloat(String(tokens["--ox-tabs-track-radius"]));
+    const pad = Number.parseFloat(String(tokens["--zb-tabs-track-pad"]));
+    const inner = Number.parseFloat(String(tokens["--zb-tabs-thumb-radius"]));
+    const outer = Number.parseFloat(String(tokens["--zb-tabs-track-radius"]));
     expect(inner).toBe(12);
     expect(outer).toBe(inner + pad);
   });
@@ -64,7 +64,7 @@ describe("useAntdTabsTokens", () => {
         <Probe />
       </ConfigProvider>,
     );
-    expect(tokens["--ox-tabs-min-h"]).toBe("40px");
+    expect(tokens["--zb-tabs-min-h"]).toBe("40px");
   });
 
   it("follows the dark algorithm", () => {
@@ -80,7 +80,7 @@ describe("useAntdTabsTokens", () => {
     );
     // A bridge that ignored the algorithm would produce a light strip on a
     // dark host, which is the whole failure it exists to prevent.
-    expect(dark["--ox-tabs-fg-selected"]).not.toBe(light["--ox-tabs-fg-selected"]);
+    expect(dark["--zb-tabs-fg-selected"]).not.toBe(light["--zb-tabs-fg-selected"]);
   });
 
   it("maps the status colours antd already has", () => {
@@ -89,8 +89,8 @@ describe("useAntdTabsTokens", () => {
         <Probe />
       </ConfigProvider>,
     );
-    expect(tokens["--ox-tabs-critical"]).toBe("#dc2626");
-    expect(tokens["--ox-tabs-high"]).toBe("#d97706");
+    expect(tokens["--zb-tabs-critical"]).toBe("#dc2626");
+    expect(tokens["--zb-tabs-high"]).toBe("#d97706");
   });
 });
 
@@ -103,10 +103,10 @@ describe("AntdTabsBridge", () => {
         </AntdTabsBridge>
       </ConfigProvider>,
     );
-    const bridge = container.querySelector("[data-ox-antd-bridge]") as HTMLElement;
+    const bridge = container.querySelector("[data-zb-antd-bridge]") as HTMLElement;
     expect(bridge).toBeInTheDocument();
     expect(bridge).toHaveClass("host");
-    expect(bridge.style.getPropertyValue("--ox-tabs-accent")).toBe("#0ea5e9");
+    expect(bridge.style.getPropertyValue("--zb-tabs-accent")).toBe("#0ea5e9");
     expect(bridge).toHaveTextContent("inside");
   });
 

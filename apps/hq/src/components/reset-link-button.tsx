@@ -36,7 +36,7 @@ export function ResetLinkButton({ userId, name }: { userId: string; name: string
       </form>
 
       {state.error && (
-        <p role="alert" className="row-popover text-[0.6875rem] text-[var(--ox-status-critical)]">
+        <p role="alert" className="row-popover text-[0.6875rem] text-[var(--zb-status-critical)]">
           {state.error}
         </p>
       )}

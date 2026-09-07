@@ -1,16 +1,16 @@
 /**
- * @oxygenui-design/loaders — healthcare loaders as custom elements.
+ * @zoblocks/loaders — healthcare loaders as custom elements.
  *
  * Importing this module defines all five elements. To ship only the one you
  * use, import its subpath instead:
  *
- *   import "@oxygenui-design/loaders/pulse";     // ~1 kB
- *   import "@oxygenui-design/loaders";           // all five
+ *   import "@zoblocks/loaders/pulse";     // ~1 kB
+ *   import "@zoblocks/loaders";           // all five
  *
- * React users should prefer the Oxygen registry components, which are copied
+ * React users should prefer the Zoblocks registry components, which are copied
  * into the project as readable source:
  *
- *   npx @oxygenui-design/cli add pulse-loader
+ *   npx @zoblocks/cli add pulse-loader
  */
 
 import "./pulse.js";
@@ -19,15 +19,15 @@ import "./breath.js";
 import "./helix.js";
 import "./infusion.js";
 
-export { OxPulseLoader } from "./pulse.js";
-export { OxRhythmLoader, rhythmArt } from "./rhythm.js";
-export { OxBreathLoader } from "./breath.js";
-export { OxHelixLoader } from "./helix.js";
-export { OxInfusionLoader, slugWidth } from "./infusion.js";
+export { ZbPulseLoader } from "./pulse.js";
+export { ZbRhythmLoader, rhythmArt } from "./rhythm.js";
+export { ZbBreathLoader } from "./breath.js";
+export { ZbHelixLoader } from "./helix.js";
+export { ZbInfusionLoader, slugWidth } from "./infusion.js";
 
 export {
   LOADER_EVENTS,
-  OxLoaderElement,
+  ZbLoaderElement,
   beatMs,
   clamp,
   cycleMs,

@@ -7,7 +7,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/chart-accordion/chart-accordion.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/chart-accordion/chart-accordion.tsx. Edit that file, not this one.
 /**
  * ChartAccordion — the record's sections, readable while closed.
  *
@@ -106,11 +106,11 @@ export interface ChartAccordionProps extends Omit<
 }
 
 const SEVERITY_CLASS: Record<AccordionSeverity, string> = {
-  critical: "ox-chip--critical",
-  high: "ox-chip--high",
-  low: "ox-chip--low",
-  normal: "ox-chip--normal",
-  unknown: "ox-chip--unknown",
+  critical: "zb-chip--critical",
+  high: "zb-chip--high",
+  low: "zb-chip--low",
+  normal: "zb-chip--normal",
+  unknown: "zb-chip--unknown",
 };
 
 /**
@@ -122,12 +122,12 @@ const SEVERITY_CLASS: Record<AccordionSeverity, string> = {
  *
  * This should route through StatusBadge once that component lands, so that
  * critical reads identically here, on a lab result, and on a medication. Until
- * then it uses the same `--ox-badge-*` tokens, which is what makes that a
+ * then it uses the same `--zb-badge-*` tokens, which is what makes that a
  * refactor rather than a re-design.
  */
 function Chip({ severity, children }: { severity?: AccordionSeverity; children: React.ReactNode }) {
   return (
-    <span className={cn("ox-chip", severity ? SEVERITY_CLASS[severity] : undefined)}>
+    <span className={cn("zb-chip", severity ? SEVERITY_CLASS[severity] : undefined)}>
       {children}
     </span>
   );
@@ -145,14 +145,14 @@ function summaryFor(section: ChartSection): React.ReactNode {
   }
   if (section.count !== undefined && section.count !== null) {
     parts.push(
-      <span key="count" className="ox-chart-accordion__count">
+      <span key="count" className="zb-chart-accordion__count">
         {section.count}
       </span>,
     );
   }
   if (section.updatedAt) {
     parts.push(
-      <time key="time" className="ox-chart-accordion__time" dateTime={section.updatedAt}>
+      <time key="time" className="zb-chart-accordion__time" dateTime={section.updatedAt}>
         {section.updatedAt}
       </time>,
     );
@@ -233,21 +233,21 @@ export function ChartAccordion({
   );
 
   return (
-    <div className={cn("ox-chart-accordion", className)}>
+    <div className={cn("zb-chart-accordion", className)}>
       {toolbar ? (
-        <div className="ox-chart-accordion__toolbar">
+        <div className="zb-chart-accordion__toolbar">
           {toolbarLabel ? (
-            <span className="ox-chart-accordion__toolbar-label">{toolbarLabel}</span>
+            <span className="zb-chart-accordion__toolbar-label">{toolbarLabel}</span>
           ) : null}
-          <span className="ox-chart-accordion__toolbar-actions">
+          <span className="zb-chart-accordion__toolbar-actions">
             <button
               type="button"
-              className="ox-chart-accordion__action"
+              className="zb-chart-accordion__action"
               onClick={() => commit([...expandable])}
             >
               {locale.expandAll}
             </button>
-            <button type="button" className="ox-chart-accordion__action" onClick={() => commit([])}>
+            <button type="button" className="zb-chart-accordion__action" onClick={() => commit([])}>
               {locale.collapseAll}
             </button>
           </span>

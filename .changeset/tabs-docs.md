@@ -1,7 +1,7 @@
 ---
-"@oxygenui-design/tabs": patch
-"@oxygenui-design/tabs-core": patch
-"@oxygenui-design/tabs-testing": minor
+"@zoblocks/tabs": patch
+"@zoblocks/tabs-core": patch
+"@zoblocks/tabs-testing": minor
 ---
 
 Three defects found by mounting Tabs in a real application and a real browser,
@@ -35,7 +35,7 @@ New in this release, completing the component brief:
   from the DOM: a tablist whose children come and go tells a screen reader
   there are twenty tabs when there are two hundred and forty.
 
-`@oxygenui-design/tabs-testing` is new: assertions that read a tab strip's
+`@zoblocks/tabs-testing` is new: assertions that read a tab strip's
 accessibility tree rather than its props, so they catch what a snapshot cannot
 — a tablist of links, a strip with no tab stop, a dangling `aria-controls`, a
 nested interactive close button. The shipped component is held to them across

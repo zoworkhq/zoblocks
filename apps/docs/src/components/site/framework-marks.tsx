@@ -7,8 +7,8 @@
  *
  * **Provenance, because these are other projects' trademarks.**
  *
- * - Oxygen's mark is ours: the same two bonded circles as `OxygenMark` in
- *   `chrome.tsx`, at the size this control needs.
+ * - Zoblocks's mark is ours: the same two blocks and tenon as `ZoblocksMark`
+ *   in `chrome.tsx`, at the size this control needs.
  * - Ant Design's is the project's own `AntDesignOutlined` glyph, copied from
  *   `@ant-design/icons-svg` (MIT). The path is unmodified. It is inlined
  *   rather than imported because that package is a transitive dependency of
@@ -21,19 +21,37 @@
  *   published clear space, before this ships publicly.
  *
  * All three are used only to name their own framework, and none is recoloured
- * to Oxygen's palette. Oxygen UI is not affiliated with either project.
+ * to Zoblocks's palette. Zoblocks is not affiliated with either project.
  */
 
 import type { DesignLanguage } from "@/lib/design-language";
 
 const SIZE = "size-4";
 
-export function OxygenLanguageMark({ className = SIZE }: { className?: string }) {
+export function ZoblocksLanguageMark({ className = SIZE }: { className?: string }) {
   return (
     <svg viewBox="0 0 28 16" className={className} aria-hidden="true">
-      <line x1="8" y1="8" x2="20" y2="8" stroke="var(--color-oxygen)" strokeWidth="2.5" />
-      <circle cx="8" cy="8" r="5.5" fill="none" stroke="currentColor" strokeWidth="2" />
-      <circle cx="20" cy="8" r="5.5" fill="none" stroke="currentColor" strokeWidth="2" />
+      <rect x="11.5" y="5.5" width="5" height="5" rx="1.25" fill="var(--color-brand)" />
+      <rect
+        x="2.5"
+        y="3"
+        width="9.5"
+        height="10"
+        rx="2"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
+      <rect
+        x="16"
+        y="3"
+        width="9.5"
+        height="10"
+        rx="2"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
     </svg>
   );
 }
@@ -62,7 +80,7 @@ export const LANGUAGE_MARK: Record<
   DesignLanguage,
   (props: { className?: string }) => React.JSX.Element
 > = {
-  oxygen: OxygenLanguageMark,
+  zoblocks: ZoblocksLanguageMark,
   antd: AntDesignMark,
   mui: MaterialUiMark,
 };

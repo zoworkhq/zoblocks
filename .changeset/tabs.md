@@ -1,9 +1,9 @@
 ---
-"@oxygenui-design/tabs": minor
-"@oxygenui-design/tabs-core": minor
+"@zoblocks/tabs": minor
+"@zoblocks/tabs-core": minor
 ---
 
-New package: `@oxygenui-design/tabs`, a tab system built on the framework-free
+New package: `@zoblocks/tabs`, a tab system built on the framework-free
 engine in `tabs-core`.
 
 The design premise is that "tabs" is four different components sharing one
@@ -16,7 +16,7 @@ Three things worth knowing:
 - **`as` is required, and a tablist of links is an error.** A `role="tablist"`
   wrapped around anchors announces "tab, 2 of 5", then destroys the user's focus
   when an arrow key navigates the page. Every attribute is spelled correctly, so
-  axe passes it. The new `@oxygenui/tabs-semantic-mode` rule catches it at lint
+  axe passes it. The new `@zoblocks/tabs-semantic-mode` rule catches it at lint
   time, and `validateTabsConfig` throws at runtime — the same posture as
   `signature-requires-typed-path`, and for the same reason.
 - **Colour never carries a status alone.** `count` + `tone` reaches the
@@ -32,7 +32,7 @@ Three things worth knowing:
 Also included: `onBeforeChange` with async veto and an inert strip while
 pending, editable tabs with deterministic close-focus order and keyboard
 reordering, `availability` for offline/degraded panels, `syncTo` URL adapters,
-audit events, a `--ox-tabs-*` token surface that falls through to `--ant-*`, and
+audit events, a `--zb-tabs-*` token surface that falls through to `--ant-*`, and
 `useTabs()` prop-getters for hosts that want the behaviour without the skin.
 
 `tabs-core` ships the parts with no React dependency: the role table, the

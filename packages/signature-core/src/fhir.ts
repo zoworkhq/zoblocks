@@ -19,7 +19,7 @@
  * The relaxation is not an invitation to omit `who` — that is the element that
  * makes a signature attributable at all.
  *
- * No dependency on `@oxygenui-design/fhir`: this emits plain JSON objects, so
+ * No dependency on `@zoblocks/fhir`: this emits plain JSON objects, so
  * the engine stays dependency-free and a consumer can validate them with
  * whatever they already use.
  */
@@ -301,7 +301,7 @@ export function toFhirProvenance(
  */
 function activity(code: string, display: string) {
   return {
-    coding: [{ system: "https://oxygenui.design/fhir/signature-outcome", code, display }],
+    coding: [{ system: "https://zoblocks.design/fhir/signature-outcome", code, display }],
   };
 }
 

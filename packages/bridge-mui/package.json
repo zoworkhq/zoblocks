@@ -1,12 +1,12 @@
 {
-  "name": "@oxygenui-design/bridge-mui",
+  "name": "@zoblocks/bridge-mui",
   "version": "0.1.0",
-  "description": "Theme bridge for Material UI: reads a host's resolved MUI theme and writes Oxygen's component token surface, so Oxygen components take the host's design language without importing MUI.",
+  "description": "Theme bridge for Material UI: reads a host's resolved MUI theme and writes Zoblocks's component token surface, so Zoblocks components take the host's design language without importing MUI.",
   "license": "MIT",
-  "homepage": "https://oxygenui.design",
+  "homepage": "https://zoblocks.design",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zoworkhq/oxygenui.git",
+    "url": "git+https://github.com/zoworkhq/zoblocks.git",
     "directory": "packages/bridge-mui"
   },
   "keywords": [
@@ -61,7 +61,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@oxygenui-design/bridge-core": "workspace:*"
+    "@zoblocks/bridge-core": "workspace:*"
   },
   "peerDependencies": {
     "@mui/material": "^9.0.0",
@@ -71,8 +71,8 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/material": "^9.3.1",
-    "@oxygenui-design/bridge-antd": "workspace:*",
-    "@oxygenui-design/tsconfig": "workspace:*",
+    "@zoblocks/bridge-antd": "workspace:*",
+    "@zoblocks/tsconfig": "workspace:*",
     "@testing-library/react": "^16",
     "@types/react": "^19.0.2",
     "@vitest/coverage-v8": "^4.1.10",

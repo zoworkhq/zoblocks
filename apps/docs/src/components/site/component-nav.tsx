@@ -95,7 +95,7 @@ function Highlight({ text, needle }: { text: string; needle: string }) {
   return (
     <>
       {text.slice(0, index)}
-      <mark className="bg-transparent font-semibold text-oxygen-deep">
+      <mark className="bg-transparent font-semibold text-brand-deep">
         {text.slice(index, index + n.length)}
       </mark>
       {text.slice(index + n.length)}
@@ -273,7 +273,7 @@ export function ComponentNav({
             aria-controls={`${id}-results`}
             className={cn(
               "w-full rounded-lg border border-rule bg-paper-sunk py-2 pl-8 pr-8 text-sm text-ink",
-              "placeholder:text-graphite-soft focus:border-oxygen focus:outline-none focus:ring-[3px] focus:ring-oxygen/15",
+              "placeholder:text-graphite-soft focus:border-brand focus:outline-none focus:ring-[3px] focus:ring-brand/15",
             )}
           />
           <kbd
@@ -323,9 +323,8 @@ export function ComponentNav({
                           className={cn(
                             "relative flex items-center justify-between gap-2 rounded-md px-2.5 py-1.5 text-[0.875rem] text-graphite",
                             "transition-colors duration-150 hover:bg-paper-sunk hover:text-ink",
-                            active && "bg-oxygen/10 font-medium text-ink",
-                            index === cursor &&
-                              "outline outline-2 -outline-offset-2 outline-oxygen",
+                            active && "bg-brand/10 font-medium text-ink",
+                            index === cursor && "outline outline-2 -outline-offset-2 outline-brand",
                           )}
                         >
                           {/* The bar. With the wash and the weight, that is
@@ -334,7 +333,7 @@ export function ComponentNav({
                           {active ? (
                             <span
                               aria-hidden="true"
-                              className="absolute -left-px bottom-1.5 top-1.5 w-0.5 rounded-full bg-oxygen"
+                              className="absolute -left-px bottom-1.5 top-1.5 w-0.5 rounded-full bg-brand"
                             />
                           ) : null}
                           <span className="truncate">

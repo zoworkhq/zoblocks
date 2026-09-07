@@ -153,7 +153,7 @@ export default async function MarketPage() {
               <div className="flex items-start justify-between gap-2">
                 <Link
                   href={`/market/${item.slug}`}
-                  className="font-display text-[0.9375rem] font-semibold tracking-[-0.015em] hover:text-oxygen-deep"
+                  className="font-display text-[0.9375rem] font-semibold tracking-[-0.015em] hover:text-brand-deep"
                 >
                   {item.title}
                 </Link>

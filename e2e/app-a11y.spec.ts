@@ -20,7 +20,7 @@ import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { test, expect, type Page } from "@playwright/test";
 
-const BASE = process.env.OXYGEN_APP_URL ?? "http://localhost:6003";
+const BASE = process.env.ZOBLOCKS_APP_URL ?? "http://localhost:6003";
 const AXE_SOURCE = readFileSync(
   createRequire(`${process.cwd()}/`).resolve("axe-core/axe.min.js"),
   "utf8",
@@ -107,7 +107,7 @@ test.describe("@a11y the app", () => {
        * real reader would never see — the same trap `scripts/a11y.ts` documents.
        */
       await page.addInitScript((choice) => {
-        localStorage.setItem("oxygen-app-theme", choice);
+        localStorage.setItem("zoblocks-app-theme", choice);
       }, theme);
 
       await page.goto(`${BASE}/login`);

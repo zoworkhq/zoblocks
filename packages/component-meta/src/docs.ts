@@ -66,7 +66,7 @@ export interface ComponentDoc {
   layer: Layer;
   /**
    * How a consumer gets it. Drives the install command the docs page shows —
-   * an `oxygen add` line for a registry component, `npm install` for a package.
+   * an `zoblocks add` line for a registry component, `npm install` for a package.
    */
   distribution: Distribution;
   /** npm package name. Present only for `package` components. */
@@ -147,7 +147,7 @@ export interface ComponentDoc {
   fixtures?: string[];
   seo?: Seo;
   relationships?: Relationships;
-  /** Registry install command, e.g. `npx @oxygenui-design/cli add vitals-panel`. */
+  /** Registry install command, e.g. `npx @zoblocks/cli add vitals-panel`. */
   install: string;
 }
 
@@ -163,7 +163,7 @@ export const STATUS_LABEL: Record<Stability, string> = {
  * nothing to a reader deciding whether to depend on it.
  */
 export const STATUS_CONTRACT: Record<Stability, string> = {
-  experimental: "API may change in any minor release. Imported from @oxygenui/react/experimental.",
+  experimental: "API may change in any minor release. Imported from @zoblocks/react/experimental.",
   beta: "API may change in a minor release, with a migration note.",
   stable: "API changes only in a major release.",
   deprecated: "Scheduled for removal. A codemod is available.",
@@ -278,7 +278,7 @@ export const DISTRIBUTION_CONTRACT: Record<DistributionState, string> = {
 /**
  * The install line, from the component's own distribution channel.
  *
- * A package component shown an `oxygen add` line sends the reader to a registry
+ * A package component shown an `zoblocks add` line sends the reader to a registry
  * item that does not exist. The card learned this and computed the right line
  * locally; the generated metadata and `llms.txt` did not, so three components
  * carried two different commands depending on which surface you read.
@@ -290,5 +290,5 @@ export function installCommandFor(meta: {
 }): string {
   return meta.distribution === "package" && meta.packageName
     ? `pnpm add ${meta.packageName}`
-    : `npx @oxygenui-design/cli add ${meta.name}`;
+    : `npx @zoblocks/cli add ${meta.name}`;
 }

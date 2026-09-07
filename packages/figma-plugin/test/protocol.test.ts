@@ -21,7 +21,7 @@ describe("readPluginMessage", () => {
   });
 
   it("passes the three it knows", () => {
-    const inspect = { type: "inspect", collection: "Oxygen / Semantic", mode: "light" };
+    const inspect = { type: "inspect", collection: "Zoblocks / Semantic", mode: "light" };
     expect(readPluginMessage(inspect)).toEqual(inspect);
     expect(readPluginMessage({ type: "resize", width: 400, height: 600 })).toMatchObject({
       type: "resize",

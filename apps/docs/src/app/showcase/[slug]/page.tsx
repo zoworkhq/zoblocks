@@ -29,7 +29,7 @@ export async function generateMetadata({
   const block = getBlock(slug);
   if (!block) return {};
   return {
-    title: `${block.title} — Oxygen UI blocks`,
+    title: `${block.title} — Zoblocks blocks`,
     description: block.blurb,
     alternates: { canonical: `/showcase/${block.slug}` },
   };
@@ -53,7 +53,7 @@ export default async function BlockPage({ params }: { params: Promise<{ slug: st
               <ArrowLeft aria-hidden="true" className="size-4" />
               All blocks
             </Link>
-            <p className="numeric mt-6 text-xs text-oxygen-deep">{block.slug}</p>
+            <p className="numeric mt-6 text-xs text-brand-deep">{block.slug}</p>
             <h1 className="display-sm mt-2 text-balance">{block.title}</h1>
             <p className="mt-4 max-w-2xl text-pretty leading-relaxed text-graphite">
               {block.blurb}
@@ -64,7 +64,7 @@ export default async function BlockPage({ params }: { params: Promise<{ slug: st
                   <Link
                     key={item}
                     href={`/components/${item}`}
-                    className="numeric rounded-md border border-rule px-2 py-1 text-[0.6875rem] text-graphite transition-colors hover:border-oxygen/40 hover:text-oxygen-deep"
+                    className="numeric rounded-md border border-rule px-2 py-1 text-[0.6875rem] text-graphite transition-colors hover:border-brand/40 hover:text-brand-deep"
                   >
                     {item}
                   </Link>
@@ -86,7 +86,7 @@ export default async function BlockPage({ params }: { params: Promise<{ slug: st
             <div className="overflow-hidden rounded-2xl border border-rule bg-paper">
               <BlockBody slug={block.slug} />
             </div>
-            <p className="mt-4 max-w-3xl border-l-2 border-oxygen/40 pl-4 text-sm leading-relaxed text-graphite">
+            <p className="mt-4 max-w-3xl border-l-2 border-brand/40 pl-4 text-sm leading-relaxed text-graphite">
               <span className="font-medium text-ink">What to look at: </span>
               {block.demonstrates}
             </p>

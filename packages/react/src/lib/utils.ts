@@ -5,7 +5,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/lib/utils.ts. Edit that file, not this one.
+// Generated from registry/zoblocks/lib/utils.ts. Edit that file, not this one.
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 

@@ -44,7 +44,7 @@ const ITEM: MarketItem = {
     },
     authorship: { method: "hand-drawn", thirdPartyContent: [] },
     licence: {
-      id: "oxygen-pack-1.0",
+      id: "zoblocks-pack-1.0",
       grant: "per-organisation, perpetual",
       derivatives: "permitted",
       resale: "prohibited",
@@ -290,7 +290,7 @@ describe("what happens when the app is not there", () => {
     // The rest of the record survives: this drops one field, it does not
     // discard the provenance a buyer is paying for.
     expect(item?.provenance.accessibility.contrastPairs.passed).toBe(17);
-    expect(item?.provenance.licence.id).toBe("oxygen-pack-1.0");
+    expect(item?.provenance.licence.id).toBe("zoblocks-pack-1.0");
   });
 
   /*

@@ -1,5 +1,5 @@
 {
-  "extends": "@oxygenui-design/tsconfig/base.json",
+  "extends": "@zoblocks/tsconfig/base.json",
   "compilerOptions": {
     "noEmit": true,
     "declaration": false,
@@ -16,93 +16,103 @@
       "@/lib/utils": ["./src/lib/utils.ts"],
       "@/registry/*": ["../../registry/*"],
       // Registry components import each other, and their shared library, by the
-      // paths the Oxygen CLI writes in a consumer's project. Mapped back to the
+      // paths the Zoblocks CLI writes in a consumer's project. Mapped back to the
       // registry source so the previews render the real files, unedited.
       //
       // The per-component entries are generated — see tsconfig.generated.json,
       // spread below. They were hand-kept until three of ten were mapped and
       // the rest were simply unimportable, which is why several components had
       // no live preview: not a decision, a missing line in this file.
-      "@/lib/oxygen-loader": ["../../registry/oxygen/lib/loader.tsx"],
-      "@/lib/oxygen-recorder": ["../../registry/oxygen/lib/recorder.tsx"],
-      "@/lib/oxygen-switch": ["../../registry/oxygen/lib/switch.tsx"],
-      "@/lib/oxygen-accordion": ["../../registry/oxygen/lib/accordion-core.tsx"],
-      "@/lib/oxygen-clinical-note": ["../../registry/oxygen/lib/clinical-note.tsx"],
-      "@/lib/oxygen-clinical-status": ["../../registry/oxygen/lib/clinical-status.ts"],
-      "@/lib/oxygen-result-value": ["../../registry/oxygen/lib/result-value.ts"],
-      "@/lib/oxygen-allergy": ["../../registry/oxygen/lib/allergy.ts"],
-      "@/lib/oxygen-risk": ["../../registry/oxygen/lib/risk.ts"],
-      "@/lib/oxygen-provenance": ["../../registry/oxygen/lib/provenance.ts"],
-      "@/lib/oxygen-trend": ["../../registry/oxygen/lib/trend.ts"],
-      "@/lib/oxygen-clock": ["../../registry/oxygen/lib/clock.ts"],
-      "@/lib/oxygen-presence": ["../../registry/oxygen/lib/presence.ts"],
-      "@/lib/oxygen-chart-header": ["../../registry/oxygen/lib/chart-header.ts"],
-      "@/lib/oxygen-workspace": ["../../registry/oxygen/lib/workspace.ts"],
-      "@/lib/oxygen-palette": ["../../registry/oxygen/lib/palette.ts"],
-      "@/lib/oxygen-menu": ["../../registry/oxygen/lib/menu.ts"],
-      "@/lib/oxygen-grid": ["../../registry/oxygen/lib/grid.ts"],
-      "@/lib/oxygen-datetime": ["../../registry/oxygen/lib/datetime.ts"],
-      "@/lib/oxygen-datetime-field": ["../../registry/oxygen/lib/datetime-field.tsx"],
-      "@/lib/oxygen-datetime-parts": ["../../registry/oxygen/lib/datetime-parts.tsx"],
-      "@/lib/oxygen-availability": ["../../registry/oxygen/lib/availability.ts"],
-      "@/lib/oxygen-recurrence": ["../../registry/oxygen/lib/recurrence.ts"],
-      "@/lib/timeline-core": ["../../registry/oxygen/lib/timeline-core.ts"],
-      "@/lib/timeline-fhir": ["../../registry/oxygen/lib/timeline-fhir.ts"],
-      "@/components/oxygen/clinical-note": [
-        "../../registry/oxygen/clinical-note/clinical-note.tsx"
+      "@/lib/zoblocks-loader": ["../../registry/zoblocks/lib/loader.tsx"],
+      "@/lib/zoblocks-recorder": ["../../registry/zoblocks/lib/recorder.tsx"],
+      "@/lib/zoblocks-switch": ["../../registry/zoblocks/lib/switch.tsx"],
+      "@/lib/zoblocks-accordion": ["../../registry/zoblocks/lib/accordion-core.tsx"],
+      "@/lib/zoblocks-clinical-note": ["../../registry/zoblocks/lib/clinical-note.tsx"],
+      "@/lib/zoblocks-clinical-status": ["../../registry/zoblocks/lib/clinical-status.ts"],
+      "@/lib/zoblocks-result-value": ["../../registry/zoblocks/lib/result-value.ts"],
+      "@/lib/zoblocks-allergy": ["../../registry/zoblocks/lib/allergy.ts"],
+      "@/lib/zoblocks-risk": ["../../registry/zoblocks/lib/risk.ts"],
+      "@/lib/zoblocks-provenance": ["../../registry/zoblocks/lib/provenance.ts"],
+      "@/lib/zoblocks-trend": ["../../registry/zoblocks/lib/trend.ts"],
+      "@/lib/zoblocks-clock": ["../../registry/zoblocks/lib/clock.ts"],
+      "@/lib/zoblocks-presence": ["../../registry/zoblocks/lib/presence.ts"],
+      "@/lib/zoblocks-chart-header": ["../../registry/zoblocks/lib/chart-header.ts"],
+      "@/lib/zoblocks-workspace": ["../../registry/zoblocks/lib/workspace.ts"],
+      "@/lib/zoblocks-palette": ["../../registry/zoblocks/lib/palette.ts"],
+      "@/lib/zoblocks-menu": ["../../registry/zoblocks/lib/menu.ts"],
+      "@/lib/zoblocks-grid": ["../../registry/zoblocks/lib/grid.ts"],
+      "@/lib/zoblocks-datetime": ["../../registry/zoblocks/lib/datetime.ts"],
+      "@/lib/zoblocks-datetime-field": ["../../registry/zoblocks/lib/datetime-field.tsx"],
+      "@/lib/zoblocks-datetime-parts": ["../../registry/zoblocks/lib/datetime-parts.tsx"],
+      "@/lib/zoblocks-availability": ["../../registry/zoblocks/lib/availability.ts"],
+      "@/lib/zoblocks-recurrence": ["../../registry/zoblocks/lib/recurrence.ts"],
+      "@/lib/timeline-core": ["../../registry/zoblocks/lib/timeline-core.ts"],
+      "@/lib/timeline-fhir": ["../../registry/zoblocks/lib/timeline-fhir.ts"],
+      "@/components/zoblocks/clinical-note": [
+        "../../registry/zoblocks/clinical-note/clinical-note.tsx"
       ],
-      "@/components/oxygen/clinical-status": [
-        "../../registry/oxygen/clinical-status/clinical-status.tsx"
+      "@/components/zoblocks/clinical-status": [
+        "../../registry/zoblocks/clinical-status/clinical-status.tsx"
       ],
-      "@/components/oxygen/date-picker": ["../../registry/oxygen/date-picker/date-picker.tsx"],
-      "@/components/oxygen/result-value": ["../../registry/oxygen/result-value/result-value.tsx"],
-      "@/components/oxygen/allergy-chip": ["../../registry/oxygen/allergy-chip/allergy-chip.tsx"],
-      "@/components/oxygen/risk-indicator": [
-        "../../registry/oxygen/risk-indicator/risk-indicator.tsx"
+      "@/components/zoblocks/date-picker": ["../../registry/zoblocks/date-picker/date-picker.tsx"],
+      "@/components/zoblocks/result-value": [
+        "../../registry/zoblocks/result-value/result-value.tsx"
       ],
-      "@/components/oxygen/provenance-chip": [
-        "../../registry/oxygen/provenance-chip/provenance-chip.tsx"
+      "@/components/zoblocks/allergy-chip": [
+        "../../registry/zoblocks/allergy-chip/allergy-chip.tsx"
       ],
-      "@/components/oxygen/trend-indicator": [
-        "../../registry/oxygen/trend-indicator/trend-indicator.tsx"
+      "@/components/zoblocks/risk-indicator": [
+        "../../registry/zoblocks/risk-indicator/risk-indicator.tsx"
       ],
-      "@/components/oxygen/care-team-presence": [
-        "../../registry/oxygen/care-team-presence/care-team-presence.tsx"
+      "@/components/zoblocks/provenance-chip": [
+        "../../registry/zoblocks/provenance-chip/provenance-chip.tsx"
       ],
-      "@/components/oxygen/chart-header": ["../../registry/oxygen/chart-header/chart-header.tsx"],
-      "@/components/oxygen/recent-patient-stack": [
-        "../../registry/oxygen/recent-patient-stack/recent-patient-stack.tsx"
+      "@/components/zoblocks/trend-indicator": [
+        "../../registry/zoblocks/trend-indicator/trend-indicator.tsx"
       ],
-      "@/components/oxygen/chart-context-menu": [
-        "../../registry/oxygen/chart-context-menu/chart-context-menu.tsx"
+      "@/components/zoblocks/care-team-presence": [
+        "../../registry/zoblocks/care-team-presence/care-team-presence.tsx"
       ],
-      "@/components/oxygen/data-grid": ["../../registry/oxygen/data-grid/data-grid.tsx"],
-      "@/components/oxygen/chart-command-palette": [
-        "../../registry/oxygen/chart-command-palette/chart-command-palette.tsx"
+      "@/components/zoblocks/chart-header": [
+        "../../registry/zoblocks/chart-header/chart-header.tsx"
       ],
-      "@/components/oxygen/accordion": ["../../registry/oxygen/accordion/accordion.tsx"],
-      "@/components/oxygen/care-timeline": [
-        "../../registry/oxygen/care-timeline/care-timeline.tsx"
+      "@/components/zoblocks/recent-patient-stack": [
+        "../../registry/zoblocks/recent-patient-stack/recent-patient-stack.tsx"
       ],
-      "@/components/oxygen/timeline": ["../../registry/oxygen/timeline/timeline.tsx"],
-      "@/components/oxygen/breath-loader": [
-        "../../registry/oxygen/breath-loader/breath-loader.tsx"
+      "@/components/zoblocks/chart-context-menu": [
+        "../../registry/zoblocks/chart-context-menu/chart-context-menu.tsx"
       ],
-      "@/components/oxygen/chart-accordion": [
-        "../../registry/oxygen/chart-accordion/chart-accordion.tsx"
+      "@/components/zoblocks/data-grid": ["../../registry/zoblocks/data-grid/data-grid.tsx"],
+      "@/components/zoblocks/chart-command-palette": [
+        "../../registry/zoblocks/chart-command-palette/chart-command-palette.tsx"
       ],
-      "@/components/oxygen/copilot": ["../../registry/oxygen/copilot/copilot.tsx"],
-      "@/components/oxygen/helix-loader": ["../../registry/oxygen/helix-loader/helix-loader.tsx"],
-      "@/components/oxygen/infusion-loader": [
-        "../../registry/oxygen/infusion-loader/infusion-loader.tsx"
+      "@/components/zoblocks/accordion": ["../../registry/zoblocks/accordion/accordion.tsx"],
+      "@/components/zoblocks/care-timeline": [
+        "../../registry/zoblocks/care-timeline/care-timeline.tsx"
       ],
-      "@/components/oxygen/pulse-loader": ["../../registry/oxygen/pulse-loader/pulse-loader.tsx"],
-      "@/components/oxygen/recorder": ["../../registry/oxygen/recorder/recorder.tsx"],
-      "@/components/oxygen/rhythm-loader": [
-        "../../registry/oxygen/rhythm-loader/rhythm-loader.tsx"
+      "@/components/zoblocks/timeline": ["../../registry/zoblocks/timeline/timeline.tsx"],
+      "@/components/zoblocks/breath-loader": [
+        "../../registry/zoblocks/breath-loader/breath-loader.tsx"
       ],
-      "@/components/oxygen/safety-plan": ["../../registry/oxygen/safety-plan/safety-plan.tsx"],
-      "@/components/oxygen/switch": ["../../registry/oxygen/switch/switch.tsx"]
+      "@/components/zoblocks/chart-accordion": [
+        "../../registry/zoblocks/chart-accordion/chart-accordion.tsx"
+      ],
+      "@/components/zoblocks/copilot": ["../../registry/zoblocks/copilot/copilot.tsx"],
+      "@/components/zoblocks/helix-loader": [
+        "../../registry/zoblocks/helix-loader/helix-loader.tsx"
+      ],
+      "@/components/zoblocks/infusion-loader": [
+        "../../registry/zoblocks/infusion-loader/infusion-loader.tsx"
+      ],
+      "@/components/zoblocks/pulse-loader": [
+        "../../registry/zoblocks/pulse-loader/pulse-loader.tsx"
+      ],
+      "@/components/zoblocks/recorder": ["../../registry/zoblocks/recorder/recorder.tsx"],
+      "@/components/zoblocks/rhythm-loader": [
+        "../../registry/zoblocks/rhythm-loader/rhythm-loader.tsx"
+      ],
+      "@/components/zoblocks/safety-plan": ["../../registry/zoblocks/safety-plan/safety-plan.tsx"],
+      "@/components/zoblocks/switch": ["../../registry/zoblocks/switch/switch.tsx"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

@@ -27,37 +27,37 @@ const nextConfig: NextConfig = {
    * the package, which is how Copilot reached this app without one.
    */
   transpilePackages: [
-    "@oxygenui-design/component-meta",
-    "@oxygenui-design/fhir",
-    "@oxygenui-design/fixtures",
+    "@zoblocks/component-meta",
+    "@zoblocks/fhir",
+    "@zoblocks/fixtures",
     // host-react resolves the two bridges from source as well, because all
     // three publish `main: src/index.ts` for local development and swap to
     // `dist` only in `publishConfig`. A missing entry here does not warn — the
     // module simply fails to resolve and the page 500s.
-    "@oxygenui-design/host-react",
-    "@oxygenui-design/bridge-core",
-    "@oxygenui-design/bridge-antd",
-    "@oxygenui-design/bridge-mui",
-    "@oxygenui-design/signature",
-    "@oxygenui-design/signature-core",
+    "@zoblocks/host-react",
+    "@zoblocks/bridge-core",
+    "@zoblocks/bridge-antd",
+    "@zoblocks/bridge-mui",
+    "@zoblocks/signature",
+    "@zoblocks/signature-core",
   ],
 
   turbopack: {
     resolveAlias: {
-      "@oxygenui-design/tabs": "../../packages/tabs/dist/index.js",
-      "@oxygenui-design/tabs-core": "../../packages/tabs-core/dist/index.js",
-      "@oxygenui-design/copilot-core": "../../packages/copilot-core/dist/index.js",
-      "@oxygenui-design/copilot-react": "../../packages/copilot-react/dist/index.js",
-      "@oxygenui-design/clinical-note-core": "../../packages/clinical-note-core/dist/index.js",
-      "@oxygenui-design/identity": "../../packages/identity/dist/index.js",
-      "@oxygenui-design/identity-core": "../../packages/identity-core/dist/index.js",
+      "@zoblocks/tabs": "../../packages/tabs/dist/index.js",
+      "@zoblocks/tabs-core": "../../packages/tabs-core/dist/index.js",
+      "@zoblocks/copilot-core": "../../packages/copilot-core/dist/index.js",
+      "@zoblocks/copilot-react": "../../packages/copilot-react/dist/index.js",
+      "@zoblocks/clinical-note-core": "../../packages/clinical-note-core/dist/index.js",
+      "@zoblocks/identity": "../../packages/identity/dist/index.js",
+      "@zoblocks/identity-core": "../../packages/identity-core/dist/index.js",
     },
   },
 
   async headers() {
     return [
       {
-        // Registry JSON is fetched by the Oxygen CLI from any origin.
+        // Registry JSON is fetched by the Zoblocks CLI from any origin.
         source: "/r/:path*",
         headers: [
           { key: "Access-Control-Allow-Origin", value: "*" },

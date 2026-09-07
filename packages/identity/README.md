@@ -1,12 +1,12 @@
-# @oxygenui-design/identity
+# @zoblocks/identity
 
 Patient identity for Ant Design: an avatar that says _why_ a photograph is
 missing, a chip that keeps two patients with one name apart, and a banner that
 knows what it is guarding.
 
 ```tsx
-import { IdentityProvider, PatientBanner, PatientGuard } from "@oxygenui-design/identity";
-import "@oxygenui-design/identity/styles.css";
+import { IdentityProvider, PatientBanner, PatientGuard } from "@zoblocks/identity";
+import "@zoblocks/identity/styles.css";
 
 <IdentityProvider disclosure="clinical" photos="allow" onSensitiveReveal={audit.write}>
   <PatientBanner
@@ -79,10 +79,10 @@ zero rather than shortening it.
 ## Peer dependencies
 
 `antd` (>= 5.20 or >= 6), `react`, `react-dom`. The engine
-(`@oxygenui-design/identity-core`) has none of these.
+(`@zoblocks/identity-core`) has none of these.
 
 ---
 
-Oxygen UI is not a compliance boundary and is not a medical device. These
+Zoblocks is not a compliance boundary and is not a medical device. These
 components reduce the chance of a _display_ error; they make no claim about
 care.

@@ -31,7 +31,7 @@ import {
   type SignatureValue,
   type Signer,
   type Subject,
-} from "@oxygenui-design/signature-core";
+} from "@zoblocks/signature-core";
 import { SignatureModal } from "./SignatureModal";
 import { SignatureManifest } from "./SignatureManifest";
 import { useLocale, type SignatureLocale } from "./locale";
@@ -86,7 +86,7 @@ export interface SignatureProps {
    * drawing is a path-dependent input technique, and without the typed path
    * this control is not operable without a pointer. It is permitted because a
    * host may have a genuinely equivalent alternative elsewhere on the page,
-   * but it is never the default — and `@oxygenui/signature-requires-typed-path`
+   * but it is never the default — and `@zoblocks/signature-requires-typed-path`
    * makes it a lint error rather than a runtime app message, because a
    * component has no business writing to a customer's app.
    */
@@ -178,15 +178,15 @@ export function Signature({
 
   return (
     <div
-      className={["ox-signature-field", className ?? ""].filter(Boolean).join(" ")}
+      className={["zb-signature-field", className ?? ""].filter(Boolean).join(" ")}
       /*
        * Namespaced, like every other root in the library. A bare
        * `data-status` on a public component root is a name a host page is
        * entitled to use for its own purposes, and the collision would style
        * this field from somewhere nobody thinks to look.
        */
-      data-ox-signature=""
-      data-ox-status={effectiveStatus}
+      data-zb-signature=""
+      data-zb-status={effectiveStatus}
     >
       {value ? (
         <div style={{ display: "grid", gap: 8 }}>

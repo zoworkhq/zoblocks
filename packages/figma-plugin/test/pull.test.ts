@@ -8,9 +8,9 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { hexToFigmaRgb } from "@oxygenui-design/figma-core";
+import { hexToFigmaRgb } from "@zoblocks/figma-core";
 
-import { contrastBetween, generateRamp } from "@oxygenui-design/tokens/validate";
+import { contrastBetween, generateRamp } from "@zoblocks/tokens/validate";
 
 import {
   accentStep,
@@ -35,18 +35,18 @@ function payload(over: Partial<ResolvedPayload> = {}): ResolvedPayload {
     ramp: { "600": "#1d63c9", "700": "#1851a5" },
     semantic: {
       light: {
-        "--ox-accent": "#1851a5",
-        "--ox-text": "#16181d",
-        "--ox-status-critical": "#b4232b",
+        "--zb-accent": "#1851a5",
+        "--zb-text": "#16181d",
+        "--zb-status-critical": "#b4232b",
       },
-      dark: { "--ox-accent": "#5a94e7", "--ox-text": "#e8ecf1", "--ox-status-critical": "#f08b96" },
+      dark: { "--zb-accent": "#5a94e7", "--zb-text": "#e8ecf1", "--zb-status-critical": "#f08b96" },
       "high-contrast": {
-        "--ox-accent": "#0f3568",
-        "--ox-text": "#000000",
-        "--ox-status-critical": "#8c0d16",
+        "--zb-accent": "#0f3568",
+        "--zb-text": "#000000",
+        "--zb-status-critical": "#8c0d16",
       },
     },
-    locked: { "--ox-status-critical": CLINICAL },
+    locked: { "--zb-status-critical": CLINICAL },
     ...over,
   };
 }
@@ -54,7 +54,7 @@ function payload(over: Partial<ResolvedPayload> = {}): ResolvedPayload {
 const rgb = (hex: string) => hexToFigmaRgb(hex)!;
 
 /** A variable as the sandbox would have read it back out of a file. */
-function inFile(token: string, name: string, light: string, collection = "Oxygen / Semantic") {
+function inFile(token: string, name: string, light: string, collection = "Zoblocks / Semantic") {
   return {
     token,
     name,
@@ -76,7 +76,7 @@ describe("the first pull into an empty file", () => {
   it("plans the brand tier in one mode and the semantic tier in three", () => {
     const preview = previewPull(payload(), snapshot([]));
     const brand = preview.diff.create.find((v) => v.tier === "brand")!;
-    const semantic = preview.diff.create.find((v) => v.token === "--ox-accent")!;
+    const semantic = preview.diff.create.find((v) => v.token === "--zb-accent")!;
 
     // The ramp is the palette the themes select *from*; three identical modes
     // would imply a choice that does not exist.
@@ -86,7 +86,7 @@ describe("the first pull into an empty file", () => {
 
   it("carries the reason a clinical variable cannot be edited", () => {
     const preview = previewPull(payload(), snapshot([]));
-    const critical = preview.diff.create.find((v) => v.token === "--ox-status-critical")!;
+    const critical = preview.diff.create.find((v) => v.token === "--zb-status-critical")!;
     expect(critical.locked).toBe(CLINICAL);
   });
 
@@ -124,17 +124,17 @@ describe("pulling the same version twice", () => {
 
 describe("a designer's edits", () => {
   it("updates a renamed variable rather than creating a second one", () => {
-    const file = snapshot([inFile("--ox-accent", "Brand blue", "#1851a5")]);
+    const file = snapshot([inFile("--zb-accent", "Brand blue", "#1851a5")]);
     const preview = previewPull(payload(), file);
 
-    expect(preview.diff.create.some((v) => v.token === "--ox-accent")).toBe(false);
-    const update = preview.diff.update.find((u) => u.variable.token === "--ox-accent")!;
+    expect(preview.diff.create.some((v) => v.token === "--zb-accent")).toBe(false);
+    const update = preview.diff.update.find((u) => u.variable.token === "--zb-accent")!;
     expect(update.because).toContain("name");
   });
 
   it("names a clinical variable it is putting back, with the reason", () => {
     // A colour a customer cannot change in the app, changed here.
-    const file = snapshot([inFile("--ox-status-critical", "status/critical", "#ff00ff")]);
+    const file = snapshot([inFile("--zb-status-critical", "status/critical", "#ff00ff")]);
     const preview = previewPull(payload(), file);
 
     expect(preview.restores).toEqual([{ name: "status/critical", reason: CLINICAL }]);
@@ -143,15 +143,15 @@ describe("a designer's edits", () => {
   it("does not call a rename a restoration", () => {
     // Renaming a clinical variable is a label change, and the label is the
     // designer's. Reporting it as a restored clinical signal would cry wolf.
-    const file = snapshot([inFile("--ox-status-critical", "Critical (ours)", "#b4232b")]);
+    const file = snapshot([inFile("--zb-status-critical", "Critical (ours)", "#b4232b")]);
     const preview = previewPull(payload(), file);
 
-    expect(preview.diff.update.some((u) => u.variable.token === "--ox-status-critical")).toBe(true);
+    expect(preview.diff.update.some((u) => u.variable.token === "--zb-status-critical")).toBe(true);
     expect(preview.restores).toEqual([]);
   });
 
   it("lists a variable that is ours and no longer in the theme, and never deletes it", () => {
-    const file = snapshot([inFile("--ox-legacy-accent", "legacy/accent", "#123456")]);
+    const file = snapshot([inFile("--zb-legacy-accent", "legacy/accent", "#123456")]);
     const preview = previewPull(payload(), file);
 
     expect(preview.diff.orphan.map((o) => o.name)).toEqual(["legacy/accent"]);
@@ -168,8 +168,8 @@ describe("a designer's edits", () => {
 describe("the sentence the preview leads with", () => {
   it("counts each kind separately, because they mean different things", () => {
     const file = snapshot([
-      inFile("--ox-accent", "accent", "#ff0000"),
-      inFile("--ox-legacy", "legacy", "#00ff00"),
+      inFile("--zb-accent", "accent", "#ff0000"),
+      inFile("--zb-legacy", "legacy", "#00ff00"),
     ]);
     const summary = summarise(previewPull(payload(), file).diff);
     expect(summary).toMatch(/\d+ created/);
@@ -202,8 +202,8 @@ describe("the order things are written in", () => {
   });
 
   it("gives brand one mode and the themed tiers three", () => {
-    expect(modesFor("Oxygen / Brand")).toEqual(["Default"]);
-    expect(modesFor("Oxygen / Semantic")).toEqual(["light", "dark", "high-contrast"]);
+    expect(modesFor("Zoblocks / Brand")).toEqual(["Default"]);
+    expect(modesFor("Zoblocks / Semantic")).toEqual(["light", "dark", "high-contrast"]);
   });
 });
 
@@ -213,8 +213,8 @@ describe("the one pair measured in the panel", () => {
     ramp: Object.fromEntries(Object.entries(generateRamp("#1d63c9")!).map(([k, v]) => [k, v])),
     semantic: {
       light: {
-        "--ox-accent": generateRamp("#1d63c9")![700],
-        "--ox-text-on-accent": "#ffffff",
+        "--zb-accent": generateRamp("#1d63c9")![700],
+        "--zb-text-on-accent": "#ffffff",
       },
       dark: {},
       "high-contrast": {},
@@ -251,7 +251,7 @@ describe("the one pair measured in the panel", () => {
     // one, and the app is still authoritative.
     const overridden = payload({
       semantic: {
-        light: { "--ox-accent": "#123456", "--ox-text-on-accent": "#ffffff" },
+        light: { "--zb-accent": "#123456", "--zb-text-on-accent": "#ffffff" },
         dark: {},
         "high-contrast": {},
       } as never,

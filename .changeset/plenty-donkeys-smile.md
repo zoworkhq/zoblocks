@@ -1,6 +1,6 @@
 ---
-"@oxygenui-design/react": minor
-"@oxygenui-design/tokens": minor
+"@zoblocks/react": minor
+"@zoblocks/tokens": minor
 ---
 
 Add `Switch`, `SwitchField` and `SwitchList` — a binary control for a record
@@ -27,10 +27,10 @@ not read as brand-affirmative green, `until` for an on-state that is not
 forever, and `confirm="hold" | "dialog" | "attest" | "countersign"`.
 
 The API matches Ant Design's Switch and takes no dependency on it, so
-`import { Switch } from "antd"` becomes `from "@oxygenui-design/react"` with no
+`import { Switch } from "antd"` becomes `from "@zoblocks/react"` with no
 other diff. One deliberate divergence: `loading` maps to `phase="pending"` and
 does not disable the control. See ADR 0010.
 
-Tokens: adds the `--ox-switch-*` component group, including `target-min`, which
+Tokens: adds the `--zb-switch-*` component group, including `target-min`, which
 decouples the hit area from the pill so density can shrink one without the
 other.

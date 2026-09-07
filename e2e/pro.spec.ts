@@ -203,8 +203,8 @@ test.describe("the Pro holding page @a11y", () => {
       page.evaluate((theme) => {
         const e = document.documentElement;
         e.classList.toggle("dark", theme === "dark");
-        if (theme === "high-contrast") e.setAttribute("data-ox-theme", "high-contrast");
-        else e.removeAttribute("data-ox-theme");
+        if (theme === "high-contrast") e.setAttribute("data-zb-theme", "high-contrast");
+        else e.removeAttribute("data-zb-theme");
       }, t);
 
     await setTheme("light");

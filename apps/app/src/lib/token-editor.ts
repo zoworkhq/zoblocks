@@ -18,21 +18,21 @@ import {
   floorForPair,
   resolveTheme,
   type TokenSource,
-} from "@oxygenui-design/tokens/validate";
-import { CLINICAL_SEMANTIC, TOKEN_SURFACE, surfaceEntry } from "@oxygenui-design/tokens/surface";
+} from "@zoblocks/tokens/validate";
+import { CLINICAL_SEMANTIC, TOKEN_SURFACE, surfaceEntry } from "@zoblocks/tokens/surface";
 import {
   THEME_NAMES,
   themeAsBrand,
   withTierDefaults,
   type ThemeTokensInput,
   type ThemeName,
-} from "@oxygenui-design/theme";
+} from "@zoblocks/theme";
 
 /** A semantic token as one editable row. */
 export interface EditorToken {
   /** `accent`, `text-muted`, `status.critical`. */
   path: string;
-  /** `--ox-accent`. What lands in the stylesheet. */
+  /** `--zb-accent`. What lands in the stylesheet. */
   cssVar: string;
   /** The value in force right now — the customer's override, or ours. */
   resolved: string;
@@ -75,8 +75,8 @@ export interface EditorModel {
    * Every semantic token resolved for this theme, keyed by custom property.
    *
    * The preview needs the *whole* set, not only the overridden ones. A theme
-   * carries a brand ramp, and the app's own page resolves `--ox-accent`
-   * from Oxygen's palette rather than the customer's — so a preview that
+   * carries a brand ramp, and the app's own page resolves `--zb-accent`
+   * from Zoblocks's palette rather than the customer's — so a preview that
    * applied only the overrides would show a customer their edits against our
    * colours.
    */
@@ -85,11 +85,11 @@ export interface EditorModel {
    * Component tokens that fall through to each semantic token.
    *
    * Load-bearing, and it took a rendered preview to notice. The component tier
-   * is declared at `:root` — `--ox-switch-track-on-bg: var(--ox-accent)` — and
+   * is declared at `:root` — `--zb-switch-track-on-bg: var(--zb-accent)` — and
    * a `var()` resolves at the element that *declares* it. So setting
-   * `--ox-accent` on a subtree changes `--ox-accent` there and leaves every
+   * `--zb-accent` on a subtree changes `--zb-accent` there and leaves every
    * component token still holding the value it computed at the root. The
-   * switch stays Oxygen's teal while the swatch beside it goes red.
+   * switch stays Zoblocks's teal while the swatch beside it goes red.
    *
    * Publishing is unaffected: `emitThemeCss` writes to `:root`, where the
    * component declarations are, so the chain resolves normally. This is
@@ -99,11 +99,11 @@ export interface EditorModel {
   dependents: Record<string, string[]>;
 }
 
-const CLINICAL = new Set(CLINICAL_SEMANTIC.map((name) => name.replace(/^--ox-/, "")));
+const CLINICAL = new Set(CLINICAL_SEMANTIC.map((name) => name.replace(/^--zb-/, "")));
 
-/** `status.critical` → `--ox-status-critical`; `text-muted` → `--ox-text-muted`. */
+/** `status.critical` → `--zb-status-critical`; `text-muted` → `--zb-text-muted`. */
 function toCssVar(path: string): string {
-  return `--ox-${path.replace(/\./g, "-")}`;
+  return `--zb-${path.replace(/\./g, "-")}`;
 }
 
 function isHex(value: string): boolean {
@@ -221,7 +221,7 @@ export function buildEditorModel(
    *
    * Propagating them changes nothing a customer controls: `resolved` takes
    * clinical values from the base palette, and the schema refuses a clinical
-   * override, so what is copied here is always Oxygen's own value for the
+   * override, so what is copied here is always Zoblocks's own value for the
    * theme being previewed.
    */
   const dependents: Record<string, string[]> = {};

@@ -51,7 +51,7 @@ export function FrameworkBoard({
         <div className="flex flex-wrap items-center justify-between gap-3 pb-1">
           <p className="body-sm text-graphite">
             {selected.length === 0
-              ? "No framework selected — Oxygen components use their own tokens."
+              ? "No framework selected — Zoblocks components use their own tokens."
               : `${selected.length} of ${frameworks.length} enabled.`}
           </p>
           {/*
@@ -110,7 +110,7 @@ function FrameworkCard({
       padded={false}
       className={cn(
         "transition-[border-color,box-shadow] duration-300",
-        checked && "border-oxygen/40 shadow-[0_0_0_1px_var(--color-oxygen)]",
+        checked && "border-brand/40 shadow-[0_0_0_1px_var(--color-brand)]",
       )}
     >
       {/*
@@ -137,7 +137,7 @@ function FrameworkCard({
             {framework.name}
           </span>
           <span className="tabular mt-0.5 block font-mono text-[0.6875rem] text-graphite-soft">
-            @oxygenui-design/bridge-{framework.id} · peer {framework.supports}
+            @zoblocks/bridge-{framework.id} · peer {framework.supports}
           </span>
         </span>
         <StatusChip tone={checked ? "pass" : "neutral"} icon={checked ? <Check size={10} /> : null}>
@@ -172,7 +172,7 @@ function FrameworkCard({
             icon={<Minus aria-hidden="true" className="size-3" />}
             tone="neutral"
             title={`${gaps.length} with no counterpart in ${framework.name}`}
-            body="Declared rather than approximated. Each falls through to Oxygen's own value, which is a better answer than a guess — and a future major of the host may close some of these."
+            body="Declared rather than approximated. Each falls through to Zoblocks's own value, which is a better answer than a guess — and a future major of the host may close some of these."
             tokens={gaps.map((token) => token.token)}
           />
         )}

@@ -6,8 +6,8 @@
  * truncated. Names and identifiers are never ellipsised here, at any width.
  */
 
-import { identityLabel, shortName, type Identity } from "@oxygenui-design/identity-core";
-import type { Patient } from "@oxygenui-design/fhir";
+import { identityLabel, shortName, type Identity } from "@zoblocks/identity-core";
+import type { Patient } from "@zoblocks/fhir";
 import { type ReactNode } from "react";
 import { IdentityAvatar, type AvatarSize } from "./IdentityAvatar.js";
 import { useIdentity, useIdentityPolicy } from "./IdentityProvider.js";
@@ -30,11 +30,11 @@ export interface PatientChipProps {
    * content-width chips is a staircase with no left edge to scan, and the
    * ragged right edge reads as a rendering fault rather than as information.
    *
-   * To stagger the escalation down a list, set `--ox-row` to the row index on
+   * To stagger the escalation down a list, set `--zb-row` to the row index on
    * each row's wrapper — the value inherits, so the chip needs no prop for it:
    *
    * ```tsx
-   * <li style={{ "--ox-row": i } as React.CSSProperties}>
+   * <li style={{ "--zb-row": i } as React.CSSProperties}>
    *   <PatientChip patient={p} block />
    * </li>
    * ```
@@ -67,17 +67,17 @@ export function PatientChip(props: PatientChipProps): ReactNode {
     return (
       <span
         className={[
-          "ox-patient-chip",
-          "ox-patient-chip--loading",
-          block ? "ox-patient-chip--block" : "",
+          "zb-patient-chip",
+          "zb-patient-chip--loading",
+          block ? "zb-patient-chip--block" : "",
           className,
         ]
           .filter(Boolean)
           .join(" ")}
       >
-        <span className="ox-avatar ox-avatar--24 ox-avatar--loading" aria-hidden="true" />
-        <span className="ox-patient-chip__skeleton" aria-hidden="true" />
-        <span className="ox-visually-hidden">Loading patient</span>
+        <span className="zb-avatar zb-avatar--24 zb-avatar--loading" aria-hidden="true" />
+        <span className="zb-patient-chip__skeleton" aria-hidden="true" />
+        <span className="zb-visually-hidden">Loading patient</span>
       </span>
     );
   }
@@ -99,16 +99,16 @@ export function PatientChip(props: PatientChipProps): ReactNode {
     detail.push(`${id.label} ${id.text}`);
   }
 
-  const classes = ["ox-patient-chip"];
-  if (block) classes.push("ox-patient-chip--block");
-  if (escalation?.mark) classes.push("ox-patient-chip--escalated");
+  const classes = ["zb-patient-chip"];
+  if (block) classes.push("zb-patient-chip--block");
+  if (escalation?.mark) classes.push("zb-patient-chip--escalated");
   if (className) classes.push(className);
 
   return (
     <span
       className={classes.join(" ")}
-      data-ox-patient-id={identity.key}
-      data-ox-escalated={escalation?.mark ? escalation.reason : undefined}
+      data-zb-patient-id={identity.key}
+      data-zb-escalated={escalation?.mark ? escalation.reason : undefined}
     >
       {!hideAvatar && (
         <IdentityAvatar
@@ -119,9 +119,9 @@ export function PatientChip(props: PatientChipProps): ReactNode {
             : {})}
         />
       )}
-      <span className="ox-patient-chip__text">
-        <span className="ox-patient-chip__name">{displayName}</span>
-        {detail.length > 0 && <span className="ox-patient-chip__detail">{detail.join(" · ")}</span>}
+      <span className="zb-patient-chip__text">
+        <span className="zb-patient-chip__name">{displayName}</span>
+        {detail.length > 0 && <span className="zb-patient-chip__detail">{detail.join(" · ")}</span>}
         {showStates && <StateTags identity={identity} size="xs" />}
       </span>
       {/*
@@ -130,7 +130,7 @@ export function PatientChip(props: PatientChipProps): ReactNode {
         the engine — the label and the pixels are two projections of one value
         and must not be allowed to disagree.
       */}
-      <span className="ox-visually-hidden">
+      <span className="zb-visually-hidden">
         {identityLabel(identity, policy, { identifiers: showIdentifier })}
         {escalation?.mark ? " Similar name on this list." : ""}
       </span>

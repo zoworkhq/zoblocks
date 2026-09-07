@@ -9,7 +9,7 @@
  * rewrites specifiers, so `tsc` emits whatever the source said.
  *
  * The obvious fix — writing `./types.js` in `src` — is the documented TS ESM
- * convention, but it breaks this repo: `@oxygenui-design/fhir` is consumed
+ * convention, but it breaks this repo: `@zoblocks/fhir` is consumed
  * inside the workspace as raw TypeScript (`main: ./src/index.ts` plus
  * `transpilePackages`), and neither webpack nor Turbopack maps `.js` back to
  * `.ts` under `moduleResolution: Bundler`. Both the docs build and `next dev`

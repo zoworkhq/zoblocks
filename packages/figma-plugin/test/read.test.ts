@@ -47,13 +47,13 @@ function fakeFigma(collections: FigmaVariableCollection[], specs: Spec[]): Figma
 
 const BRAND: FigmaVariableCollection = {
   id: "c1",
-  name: "Oxygen / Brand",
+  name: "Zoblocks / Brand",
   modes: [{ modeId: "m1", name: "Default" }],
 };
 
 const SEMANTIC: FigmaVariableCollection = {
   id: "c2",
-  name: "Oxygen / Semantic",
+  name: "Zoblocks / Semantic",
   modes: [
     { modeId: "m2", name: "light" },
     { modeId: "m3", name: "dark" },
@@ -69,7 +69,7 @@ describe("readFile", () => {
           id: "v1",
           name: "accent",
           collection: "c2",
-          token: "--ox-accent",
+          token: "--zb-accent",
           values: { m2: rgb("#1851a5"), m3: rgb("#5a94e7") },
         },
       ],
@@ -89,7 +89,7 @@ describe("readFile", () => {
           id: "v1",
           name: "Brand blue",
           collection: "c2",
-          token: "--ox-accent",
+          token: "--zb-accent",
           values: { m2: rgb("#1851a5") },
         },
         { id: "v2", name: "accent", collection: "c2", values: { m2: rgb("#ff00ff") } },
@@ -97,7 +97,7 @@ describe("readFile", () => {
     );
 
     const { snapshot } = await readFile(figma);
-    expect(snapshot.variables[0]!.token).toBe("--ox-accent");
+    expect(snapshot.variables[0]!.token).toBe("--zb-accent");
     expect(snapshot.variables[0]!.name).toBe("Brand blue");
     // Named `accent` and claiming nothing. A gate that matched on labels would
     // have measured this magenta as the brand.
@@ -112,22 +112,22 @@ describe("readFile", () => {
           id: "v1",
           name: "brand/700",
           collection: "c1",
-          token: "--ox-ref-brand-700",
+          token: "--zb-ref-brand-700",
           values: { m1: rgb("#1851a5") },
         },
         {
           id: "v2",
           name: "accent",
           collection: "c2",
-          token: "--ox-accent",
+          token: "--zb-accent",
           values: { m2: { type: "VARIABLE_ALIAS", id: "v1" } },
         },
       ],
     );
 
     const { snapshot } = await readFile(figma);
-    const accent = snapshot.variables.find((v) => v.token === "--ox-accent")!;
-    expect(accent.values.light).toEqual({ kind: "alias", token: "--ox-ref-brand-700" });
+    const accent = snapshot.variables.find((v) => v.token === "--zb-accent")!;
+    expect(accent.values.light).toEqual({ kind: "alias", token: "--zb-ref-brand-700" });
   });
 
   it("drops an alias that points at nothing this file can see", async () => {
@@ -138,7 +138,7 @@ describe("readFile", () => {
           id: "v2",
           name: "accent",
           collection: "c2",
-          token: "--ox-accent",
+          token: "--zb-accent",
           values: { m2: { type: "VARIABLE_ALIAS", id: "gone" } },
         },
       ],
@@ -158,7 +158,7 @@ describe("readFile", () => {
           id: "v1",
           name: "brand/600",
           collection: "c1",
-          token: "--ox-ref-brand-600",
+          token: "--zb-ref-brand-600",
           values: { m1: rgb("#1d63c9") },
         },
       ],
@@ -202,14 +202,14 @@ describe("readFile", () => {
           id: "v1",
           name: "brand/600",
           collection: "c1",
-          token: "--ox-ref-brand-600",
+          token: "--zb-ref-brand-600",
           values: { m1: rgb("#1d63c9") },
         },
         {
           id: "v2",
           name: "accent",
           collection: "c2",
-          token: "--ox-accent",
+          token: "--zb-accent",
           values: { m2: rgb("#1851a5") },
         },
         { id: "v3", name: "Scratch", collection: "c2", values: { m2: rgb("#ff00ff") } },
@@ -218,8 +218,8 @@ describe("readFile", () => {
 
     const { collections } = await readFile(figma);
     expect(collections).toEqual([
-      { id: "c1", name: "Oxygen / Brand", modes: ["Default"], stamped: 1, colours: 1 },
-      { id: "c2", name: "Oxygen / Semantic", modes: ["light", "dark"], stamped: 1, colours: 2 },
+      { id: "c1", name: "Zoblocks / Brand", modes: ["Default"], stamped: 1, colours: 1 },
+      { id: "c2", name: "Zoblocks / Semantic", modes: ["light", "dark"], stamped: 1, colours: 2 },
     ]);
   });
 
@@ -228,7 +228,7 @@ describe("readFile", () => {
     // A designer who selected an empty collection should be told it is empty,
     // not shown a picker that silently lacks the thing they clicked.
     expect(collections).toEqual([
-      { id: "c1", name: "Oxygen / Brand", modes: ["Default"], stamped: 0, colours: 0 },
+      { id: "c1", name: "Zoblocks / Brand", modes: ["Default"], stamped: 0, colours: 0 },
     ]);
   });
 });

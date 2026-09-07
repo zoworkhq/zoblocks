@@ -14,7 +14,7 @@
  */
 
 import * as React from "react";
-import type { Patient } from "@oxygenui-design/fhir";
+import type { Patient } from "@zoblocks/fhir";
 import {
   IdentityProvider,
   IdentitySet,
@@ -25,7 +25,7 @@ import {
   PatientVerify,
   useIdentity,
   type DisclosureLevel,
-} from "@oxygenui-design/identity";
+} from "@zoblocks/identity";
 
 const MRN = "urn:oid:2.16.840.1.113883.4.1";
 const NHS = "https://fhir.nhs.uk/Id/nhs-number";
@@ -258,7 +258,7 @@ export function IdentityWorklistDemo() {
         has nothing to transition between: the pass appeared to snap because
         the rows it acted on were, literally, different rows.
 
-        `--ox-row` is the index. The package reads it to stagger, so the eye
+        `--zb-row` is the index. The package reads it to stagger, so the eye
         follows the pass down the list rather than being handed the result.
       */}
       <IdentityProvider now={NOW} disclosure="clinical" photos="deny">
@@ -269,7 +269,7 @@ export function IdentityWorklistDemo() {
           <div className="max-w-[26rem]">
             <ul className="flex list-none flex-col gap-0.5 p-0">
               {WORKLIST.map((p, i) => (
-                <li key={p.id} style={{ "--ox-row": i } as React.CSSProperties}>
+                <li key={p.id} style={{ "--zb-row": i } as React.CSSProperties}>
                   <PatientChip patient={p} block />
                 </li>
               ))}

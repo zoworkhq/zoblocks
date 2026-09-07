@@ -1,9 +1,9 @@
 {
-  "name": "@oxygenui-design/figma-plugin",
+  "name": "@zoblocks/figma-plugin",
   "version": "0.1.0",
   "type": "module",
   "private": true,
-  "description": "Oxygen's accessibility gate, inside Figma. Reads the open file's variables; no network, no account, no sync.",
+  "description": "Zoblocks's accessibility gate, inside Figma. Reads the open file's variables; no network, no account, no sync.",
   "exports": {
     ".": "./src/gate.ts",
     "./package.json": "./package.json"
@@ -15,11 +15,11 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@oxygenui-design/figma-core": "workspace:*",
-    "@oxygenui-design/tokens": "workspace:*"
+    "@zoblocks/figma-core": "workspace:*",
+    "@zoblocks/tokens": "workspace:*"
   },
   "devDependencies": {
-    "@oxygenui-design/tsconfig": "workspace:*",
+    "@zoblocks/tsconfig": "workspace:*",
     "@vitest/coverage-v8": "^4.1.10",
     "esbuild": "^0.28.2",
     "jsdom": "^30",

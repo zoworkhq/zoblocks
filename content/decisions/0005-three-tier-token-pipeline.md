@@ -6,7 +6,7 @@
 
 ## Context
 
-`packages/tokens/src/oxygen-tokens.css` is 292 hand-written lines. It is well
+`packages/tokens/src/zoblocks-tokens.css` is 292 hand-written lines. It is well
 structured, correctly commented, and states the right rule — components
 reference semantic tokens, never raw palette values.
 
@@ -26,12 +26,12 @@ Three tiers, with a strict reference rule:
 
 | Tier      | Example                  | May be referenced by |
 | --------- | ------------------------ | -------------------- |
-| Primitive | `--ox-ref-red-600`       | semantic tokens only |
-| Semantic  | `--ox-status-critical`   | components           |
-| Component | `--ox-badge-critical-bg` | its own component    |
+| Primitive | `--zb-ref-red-600`       | semantic tokens only |
+| Semantic  | `--zb-status-critical`   | components           |
+| Component | `--zb-badge-critical-bg` | its own component    |
 
 Three axes: **brand** × **theme** (light, dark, high-contrast) × **density**
-(patient, standard, clinical). Density already exists as `data-ox-density` and
+(patient, standard, clinical). Density already exists as `data-zb-density` and
 is generalised rather than replaced.
 
 Supporting decisions:
@@ -46,7 +46,7 @@ Supporting decisions:
    > **Corrected 19 August 2026.** This clause originally read "overrides
    > semantic tokens only", which is the opposite of what was built and of what
    > `packages/tokens/tokens/brands/README.md` has always said. The
-   > implementation — `themeTokensSchema`, the emitted `[data-ox-brand]` blocks,
+   > implementation — `themeTokensSchema`, the emitted `[data-zb-brand]` blocks,
    > and the brand key-space check — has only ever accepted primitives. The
    > wording is fixed here rather than in a new ADR because nothing was decided
    > differently; the record was simply wrong.
@@ -60,8 +60,8 @@ Supporting decisions:
    a default is unacceptable when the token means "critical" — a brand that
    forgets to define it must fail the build, not render the default green.
 
-3. **Applied through CSS custom properties** on `[data-ox-brand]`,
-   `[data-ox-theme]`, `[data-ox-density]`. No JavaScript, no flash of unstyled
+3. **Applied through CSS custom properties** on `[data-zb-brand]`,
+   `[data-zb-theme]`, `[data-zb-density]`. No JavaScript, no flash of unstyled
    content, correct under SSR and React Server Components.
 
 4. **Components referencing a primitive token is a lint error**, so the rule

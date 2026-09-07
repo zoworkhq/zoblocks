@@ -76,10 +76,10 @@ module.exports = {
       },
       to: {
         path: "^packages/",
-        // `@oxygenui-design/fhir` is the one exception, and it is a resolution
+        // `@zoblocks/fhir` is the one exception, and it is a resolution
         // artefact rather than a real coupling: the package is published, and
         // every registry item that imports it declares it in `dependencies`, so
-        // the Oxygen CLI installs it and the specifier resolves from npm in the
+        // the Zoblocks CLI installs it and the specifier resolves from npm in the
         // customer's project. It only appears here as a workspace path because
         // the package's `main` points at `src` for this repository's benefit,
         // where every other published package points at `dist`.
@@ -91,7 +91,7 @@ module.exports = {
       name: "host-react-stays-at-composition",
       severity: "error",
       comment:
-        "ADR 0010 keeps Oxygen's primitives at Ant Design's API and free of any dependency on it, which is what preserves copy-as-source distribution for the whole form family (ADR 0002). `@oxygenui-design/host-react` imports antd and MUI behind its subpath exports; the moment a component or a registry item reaches it, both frameworks enter the graph of everything downstream and that channel closes. It belongs to composition — apps and demos — and nothing below.",
+        "ADR 0010 keeps Zoblocks's primitives at Ant Design's API and free of any dependency on it, which is what preserves copy-as-source distribution for the whole form family (ADR 0002). `@zoblocks/host-react` imports antd and MUI behind its subpath exports; the moment a component or a registry item reaches it, both frameworks enter the graph of everything downstream and that channel closes. It belongs to composition — apps and demos — and nothing below.",
       from: {
         path: "^(packages/(?!host-react)[^/]+/src|registry)/",
       },
@@ -99,21 +99,21 @@ module.exports = {
         /*
          * Two spellings, because only one of them is a file path.
          *
-         * `registry/` is not inside any package, so `@oxygenui-design/host-react`
+         * `registry/` is not inside any package, so `@zoblocks/host-react`
          * does not resolve from there at all — dependency-cruiser reports the
          * bare specifier with `dependencyTypes: ["unknown"]`, and a rule matching
          * only `^packages/host-react/` silently never fires. That was the first
          * version of this rule, and it passed a deliberate violation.
          */
-        path: "^packages/host-react/|^@oxygenui-design/host-react($|/)",
+        path: "^packages/host-react/|^@zoblocks/host-react($|/)",
       },
     },
     {
-      name: "no-framework-in-oxygen-host",
+      name: "no-framework-in-zoblocks-host",
       severity: "error",
       comment:
-        "The Oxygen host is the switch's third state and its whole claim is that it is ours: structure of our own, drawn from `--ox-*`. A framework import here would make it antd or MUI wearing our colours, and the switcher would be comparing two things that were the same thing.",
-      from: { path: "^packages/host-react/src/(primitives-oxygen|contract|context|index)\\." },
+        "The Zoblocks host is the switch's third state and its whole claim is that it is ours: structure of our own, drawn from `--zb-*`. A framework import here would make it antd or MUI wearing our colours, and the switcher would be comparing two things that were the same thing.",
+      from: { path: "^packages/host-react/src/(primitives-zoblocks|contract|context|index)\\." },
       to: { path: "node_modules/(antd|@mui|@ant-design)/" },
     },
     {

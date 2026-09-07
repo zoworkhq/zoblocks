@@ -17,14 +17,14 @@ platform. No Tailwind-native, copy-and-own, platform-agnostic equivalent exists.
 
 ## Decision
 
-Oxygen components take FHIR R4 resources directly as props. `PatientBanner`
+Zoblocks components take FHIR R4 resources directly as props. `PatientBanner`
 takes a `Patient`. `ObservationPanel` takes `Observation[]`.
 
 Supporting decisions:
 
 1. **Types are a narrow structural subset, not `@types/fhir`.** Components are
    copied into customer codebases; every type they touch becomes a dependency
-   the customer inherits. `@oxygenui-design/fhir` declares only what components read,
+   the customer inherits. `@zoblocks/fhir` declares only what components read,
    is structurally compatible with real FHIR, and has zero runtime dependencies.
 
 2. **Every field is optional.** Real payloads are sparse. Components render

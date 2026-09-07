@@ -19,7 +19,7 @@ import {
   resolveOpenKeys,
   type AccordionItem,
   type AccordionPolicyName,
-} from "../registry/oxygen/lib/accordion-core";
+} from "../registry/zoblocks/lib/accordion-core";
 
 const POLICY_NAMES: AccordionPolicyName[] = ["multiple", "single", "exclusive", "atLeastOne"];
 

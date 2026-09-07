@@ -7,12 +7,12 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/lib/datetime-field.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/lib/datetime-field.tsx. Edit that file, not this one.
 /**
  * The React core shared by every date and time control: the segmented field,
  * the calendar grid, and the small pieces both of them render.
  *
- * Split from `@/lib/oxygen-datetime` on purpose. That module is the temporal
+ * Split from `@/lib/zoblocks-datetime` on purpose. That module is the temporal
  * engine — pure, synchronous, serialisable in and out, and testable to the
  * year 2400 without a DOM. This one is the behaviour: roving tabstops, typing
  * buffers, focus management and ARIA. Keeping them apart is what lets four
@@ -46,7 +46,7 @@ import {
   weekdayOrder,
   type CalendarCell,
   type MonthRef,
-  type OxDate,
+  type ZbDate,
 } from "../lib/datetime";
 
 /* ------------------------------------------------------------------ */
@@ -486,11 +486,11 @@ export const SegmentedField = React.forwardRef<SegmentedFieldHandle, SegmentedFi
         dir="ltr"
         tabIndex={disabled || readOnly ? -1 : 0}
         className={cn(
-          "ox-dt-field",
-          invalid && "ox-dt-field--invalid",
-          disabled && "ox-dt-field--disabled",
-          readOnly && "ox-dt-field--readonly",
-          bare && "ox-dt-field--bare",
+          "zb-dt-field",
+          invalid && "zb-dt-field--invalid",
+          disabled && "zb-dt-field--disabled",
+          readOnly && "zb-dt-field--readonly",
+          bare && "zb-dt-field--bare",
           className,
         )}
         onFocus={() => {
@@ -531,7 +531,7 @@ export const SegmentedField = React.forwardRef<SegmentedFieldHandle, SegmentedFi
           return (
             <React.Fragment key={segment.key}>
               {position > 0 && !segment.noSeparator ? (
-                <span className="ox-dt-field__sep" aria-hidden="true">
+                <span className="zb-dt-field__sep" aria-hidden="true">
                   {separator}
                 </span>
               ) : null}
@@ -549,12 +549,12 @@ export const SegmentedField = React.forwardRef<SegmentedFieldHandle, SegmentedFi
                 // user in two different fields.
                 aria-valuetext={value == null && !buffered ? `${segment.label} not entered` : text}
                 className={cn(
-                  "ox-dt-field__seg",
-                  segment.wide && "ox-dt-field__seg--year",
-                  segment.align === "end" && "ox-dt-field__seg--end",
-                  segment.align === "start" && "ox-dt-field__seg--start",
-                  value == null && !buffered && "ox-dt-field__seg--empty",
-                  active && "ox-dt-field__seg--active",
+                  "zb-dt-field__seg",
+                  segment.wide && "zb-dt-field__seg--year",
+                  segment.align === "end" && "zb-dt-field__seg--end",
+                  segment.align === "start" && "zb-dt-field__seg--start",
+                  value == null && !buffered && "zb-dt-field__seg--empty",
+                  active && "zb-dt-field__seg--active",
                 )}
                 onMouseDown={(event) => {
                   if (disabled || readOnly) return;
@@ -574,7 +574,7 @@ export const SegmentedField = React.forwardRef<SegmentedFieldHandle, SegmentedFi
         {trigger ? (
           <button
             type="button"
-            className="ox-dt-field__trigger"
+            className="zb-dt-field__trigger"
             aria-label={trigger.label}
             aria-haspopup="dialog"
             aria-expanded={trigger.expanded ?? undefined}
@@ -675,7 +675,7 @@ export function LockGlyph() {
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
-      className="ox-dt-driver__glyph"
+      className="zb-dt-driver__glyph"
     >
       <rect x="4.5" y="10.5" width="15" height="10" rx="2" />
       <path d="M8 10.5V7a4 4 0 0 1 8 0v3.5" />
@@ -690,19 +690,19 @@ export function LockGlyph() {
 export type CalendarMode = "single" | "range" | "multiple";
 
 export interface DateRangeValue {
-  start: OxDate | null;
-  end: OxDate | null;
+  start: ZbDate | null;
+  end: ZbDate | null;
 }
 
 export interface CalendarGridProps {
   mode?: CalendarMode;
-  value?: OxDate | null;
+  value?: ZbDate | null;
   range?: DateRangeValue | null;
-  dates?: OxDate[];
+  dates?: ZbDate[];
   /** The leftmost month on screen. With `months > 1` the rest follow it. */
   month: MonthRef;
   onMonth: (month: MonthRef) => void;
-  onSelect: (date: OxDate) => void;
+  onSelect: (date: ZbDate) => void;
   /**
    * How many months to show side by side.
    *
@@ -714,11 +714,11 @@ export interface CalendarGridProps {
    */
   months?: number;
   /** The day marked "today". Required: nothing here reads the clock. */
-  today?: OxDate | null;
+  today?: ZbDate | null;
   /** Returns the reason a date is unavailable, or null. The reason is spoken. */
-  unavailable?: (date: OxDate) => string | null;
+  unavailable?: (date: ZbDate) => string | null;
   /** Open-slot count under the numeral, so density is visible before a click. */
-  load?: (date: OxDate) => number | null;
+  load?: (date: ZbDate) => number | null;
   /**
    * Renders the leading and trailing days of the adjacent months.
    *
@@ -730,9 +730,9 @@ export interface CalendarGridProps {
    */
   showOutsideDays?: boolean;
   /** Earliest month reachable by the header controls. */
-  min?: OxDate;
+  min?: ZbDate;
   /** Latest month reachable by the header controls. */
-  max?: OxDate;
+  max?: ZbDate;
   weekStart?: number;
   /** Locale narrow weekday labels. Two-letter or one, whatever the locale uses. */
   weekdayLabels?: readonly string[];
@@ -793,8 +793,8 @@ export function CalendarGrid(props: CalendarGridProps) {
   // Which panel opened the month/year pane, so choosing March from the second
   // panel puts March in the second panel rather than the first.
   const [paneIndex, setPaneIndex] = React.useState(0);
-  const [focusDate, setFocusDate] = React.useState<OxDate | null>(null);
-  const [hover, setHover] = React.useState<OxDate | null>(null);
+  const [focusDate, setFocusDate] = React.useState<ZbDate | null>(null);
+  const [hover, setHover] = React.useState<ZbDate | null>(null);
   const gridRef = React.useRef<HTMLDivElement>(null);
   const shouldRefocus = React.useRef(false);
 
@@ -805,7 +805,7 @@ export function CalendarGrid(props: CalendarGridProps) {
 
   /** Whether a date falls in one of the months currently on screen. */
   const isShown = React.useCallback(
-    (date: OxDate) => {
+    (date: ZbDate) => {
       const offset = monthDistance(month, { y: date.y, m: date.m });
       return offset >= 0 && offset < monthCount;
     },
@@ -822,7 +822,7 @@ export function CalendarGrid(props: CalendarGridProps) {
    * than stored. With two months on screen the window is two months wide, so
    * a focus date in either of them is kept rather than thrown away.
    */
-  const effectiveFocus = React.useMemo<OxDate>(() => {
+  const effectiveFocus = React.useMemo<ZbDate>(() => {
     const candidate = focusDate ?? value ?? range?.start ?? dates[0] ?? today;
     if (candidate && isShown(candidate)) return candidate;
     const total = daysInMonth(month.y, month.m);
@@ -836,7 +836,7 @@ export function CalendarGrid(props: CalendarGridProps) {
   React.useEffect(() => {
     if (!shouldRefocus.current) return;
     shouldRefocus.current = false;
-    gridRef.current?.querySelector<HTMLButtonElement>('[data-ox-dt-focus="true"]')?.focus();
+    gridRef.current?.querySelector<HTMLButtonElement>('[data-zb-dt-focus="true"]')?.focus();
   });
 
   const order = React.useMemo(() => weekdayOrder(weekStart), [weekStart]);
@@ -862,7 +862,7 @@ export function CalendarGrid(props: CalendarGridProps) {
   };
 
   /** Pages the window by the least it takes to bring `date` into view. */
-  const revealMonth = (date: OxDate) => {
+  const revealMonth = (date: ZbDate) => {
     const offset = monthDistance(month, { y: date.y, m: date.m });
     if (offset >= 0 && offset < monthCount) return;
     onMonth(
@@ -872,7 +872,7 @@ export function CalendarGrid(props: CalendarGridProps) {
     );
   };
 
-  const moveFocus = (next: OxDate) => {
+  const moveFocus = (next: ZbDate) => {
     setFocusDate(next);
     revealMonth(next);
     shouldRefocus.current = true;
@@ -880,7 +880,7 @@ export function CalendarGrid(props: CalendarGridProps) {
 
   const onGridKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     const current = effectiveFocus;
-    let next: OxDate;
+    let next: ZbDate;
     switch (event.key) {
       case "ArrowRight":
         next = addCalendarDays(current, 1);
@@ -918,7 +918,7 @@ export function CalendarGrid(props: CalendarGridProps) {
     moveFocus(next);
   };
 
-  const isSelected = (date: OxDate): boolean => {
+  const isSelected = (date: ZbDate): boolean => {
     if (mode === "multiple") return dates.some((d) => isSameDate(d, date));
     if (mode === "range") return isSameDate(date, range?.start) || isSameDate(date, range?.end);
     return isSameDate(date, value);
@@ -966,17 +966,17 @@ export function CalendarGrid(props: CalendarGridProps) {
         type="button"
         role="gridcell"
         tabIndex={focused ? 0 : -1}
-        data-ox-dt-focus={focused ? "true" : undefined}
+        data-zb-dt-focus={focused ? "true" : undefined}
         aria-label={name}
         aria-selected={mode === "multiple" ? selected : selected || undefined}
         aria-disabled={reason ? true : undefined}
         title={reason ?? undefined}
         className={cn(
-          "ox-dt-cal__day",
-          !cell.inMonth && "ox-dt-cal__day--outside",
-          reason && "ox-dt-cal__day--unavailable",
-          isSameDate(cell.date, today) && "ox-dt-cal__day--today",
-          selected && "ox-dt-cal__day--selected",
+          "zb-dt-cal__day",
+          !cell.inMonth && "zb-dt-cal__day--outside",
+          reason && "zb-dt-cal__day--unavailable",
+          isSameDate(cell.date, today) && "zb-dt-cal__day--today",
+          selected && "zb-dt-cal__day--selected",
           /*
            * The band covers the whole span, endpoints included, and the
            * selected chip is drawn on top of it. Excluding the endpoints —
@@ -984,14 +984,14 @@ export function CalendarGrid(props: CalendarGridProps) {
            * each end and reading as though the first and last day were not in
            * the range they bound.
            */
-          inRange && "ox-dt-cal__day--in-range",
-          rangeBounds?.provisional && inRange && "ox-dt-cal__day--previewed",
-          isLo && "ox-dt-cal__day--range-lo",
-          isHi && "ox-dt-cal__day--range-hi",
+          inRange && "zb-dt-cal__day--in-range",
+          rangeBounds?.provisional && inRange && "zb-dt-cal__day--previewed",
+          isLo && "zb-dt-cal__day--range-lo",
+          isHi && "zb-dt-cal__day--range-hi",
           // The band breaks at the end of every week, so it needs a cap there
           // as well as at the ends of the range itself.
-          inRange && position === 0 && "ox-dt-cal__day--week-lo",
-          inRange && position === 6 && "ox-dt-cal__day--week-hi",
+          inRange && position === 0 && "zb-dt-cal__day--week-lo",
+          inRange && position === 6 && "zb-dt-cal__day--week-hi",
         )}
         onClick={() => {
           if (reason) return;
@@ -1002,7 +1002,7 @@ export function CalendarGrid(props: CalendarGridProps) {
       >
         {cell.date.d}
         {openings != null && openings > 0 ? (
-          <span className="ox-dt-cal__load" aria-hidden="true">
+          <span className="zb-dt-cal__load" aria-hidden="true">
             {Array.from({ length: Math.min(3, openings) }, (_, i) => (
               <i key={i} />
             ))}
@@ -1037,7 +1037,7 @@ export function CalendarGrid(props: CalendarGridProps) {
     return (
       <button
         type="button"
-        className="ox-dt-cal__nav"
+        className="zb-dt-cal__nav"
         aria-label={
           primary
             ? monthCount > 1
@@ -1052,7 +1052,7 @@ export function CalendarGrid(props: CalendarGridProps) {
         aria-hidden={primary ? undefined : true}
         tabIndex={primary ? undefined : -1}
         aria-disabled={primary && blocked ? true : undefined}
-        data-ox-dt-blocked={blocked ? "true" : undefined}
+        data-zb-dt-blocked={blocked ? "true" : undefined}
         onClick={() => {
           if (!blocked) step(back ? -1 : 1);
         }}
@@ -1064,11 +1064,11 @@ export function CalendarGrid(props: CalendarGridProps) {
 
   function renderHead(ref: MonthRef, index: number) {
     return (
-      <div className="ox-dt-cal__head">
+      <div className="zb-dt-cal__head">
         {navButton("left", index)}
         <button
           type="button"
-          className="ox-dt-cal__title"
+          className="zb-dt-cal__title"
           aria-label={`${titleOf(ref)} — choose month and year`}
           aria-expanded={pane !== "days" && paneIndex === index}
           onClick={() => {
@@ -1099,7 +1099,7 @@ export function CalendarGrid(props: CalendarGridProps) {
      * The panels are positional; only their contents change.
      */
     return (
-      <div className="ox-dt-cal__month" key={`panel-${index}`}>
+      <div className="zb-dt-cal__month" key={`panel-${index}`}>
         {renderHead(ref, index)}
 
         {!paneOpen ? (
@@ -1107,20 +1107,20 @@ export function CalendarGrid(props: CalendarGridProps) {
             role="grid"
             aria-label={title}
             aria-multiselectable={mode === "multiple" || undefined}
-            className="ox-dt-cal__grid"
+            className="zb-dt-cal__grid"
           >
             {/* A real row. `role="grid"` requires row children and
                 `columnheader` requires a row parent — axe is right about both,
                 and a flat seven-column grid satisfies neither. Each row is its
                 own CSS grid rather than using `display: contents`, which avoids
                 the accessibility-tree caveats that technique still carries. */}
-            <div role="row" className="ox-dt-cal__row">
+            <div role="row" className="zb-dt-cal__row">
               {order.map((weekday, position) => (
                 <div
                   key={`wd-${position}`}
                   role="columnheader"
                   aria-label={weekdayNames[weekday]}
-                  className="ox-dt-cal__weekday"
+                  className="zb-dt-cal__weekday"
                 >
                   {/*
                     Two letters, not one. Tuesday and Thursday are both "T" and
@@ -1138,7 +1138,7 @@ export function CalendarGrid(props: CalendarGridProps) {
             </div>
 
             {weeks.map((week, weekIndex) => (
-              <div role="row" className="ox-dt-cal__row" key={`week-${weekIndex}`}>
+              <div role="row" className="zb-dt-cal__row" key={`week-${weekIndex}`}>
                 {week.map((cell, position) =>
                   showOutside || cell.inMonth ? (
                     renderCell(cell, position)
@@ -1149,7 +1149,7 @@ export function CalendarGrid(props: CalendarGridProps) {
                     <div
                       key={formatPlainDate(cell.date, "iso")}
                       role="gridcell"
-                      className="ox-dt-cal__blank"
+                      className="zb-dt-cal__blank"
                     />
                   ),
                 )}
@@ -1157,7 +1157,7 @@ export function CalendarGrid(props: CalendarGridProps) {
             ))}
           </div>
         ) : pane === "months" ? (
-          <div className="ox-dt-cal__pane" role="group" aria-label="Month">
+          <div className="zb-dt-cal__pane" role="group" aria-label="Month">
             {MONTH_ABBREVIATIONS.map((name, position) => (
               <button
                 key={name}
@@ -1174,7 +1174,7 @@ export function CalendarGrid(props: CalendarGridProps) {
             ))}
           </div>
         ) : (
-          <div className="ox-dt-cal__pane ox-dt-cal__pane--years" role="group" aria-label="Year">
+          <div className="zb-dt-cal__pane zb-dt-cal__pane--years" role="group" aria-label="Year">
             {Array.from({ length: 25 }, (_, i) => ref.y + 4 - i).map((year) => (
               <button
                 key={year}
@@ -1197,24 +1197,24 @@ export function CalendarGrid(props: CalendarGridProps) {
   return (
     <div
       className={cn(
-        "ox-dt-cal",
-        fluid && "ox-dt-cal--fluid",
-        monthCount > 1 && "ox-dt-cal--multi",
-        aside && "ox-dt-cal--railed",
+        "zb-dt-cal",
+        fluid && "zb-dt-cal--fluid",
+        monthCount > 1 && "zb-dt-cal--multi",
+        aside && "zb-dt-cal--railed",
         className,
       )}
     >
-      {aside ? <div className="ox-dt-cal__aside">{aside}</div> : null}
+      {aside ? <div className="zb-dt-cal__aside">{aside}</div> : null}
 
-      <div className="ox-dt-cal__body">
+      <div className="zb-dt-cal__body">
         {/* One keyboard handler for the whole window: arrowing off the end of
             June has to land in July, and a handler per grid would stop at the
             boundary the reader is trying to cross. */}
-        <div ref={gridRef} className="ox-dt-cal__months" onKeyDown={onGridKeyDown}>
+        <div ref={gridRef} className="zb-dt-cal__months" onKeyDown={onGridKeyDown}>
           {shown.map((ref, index) => renderMonth(ref, index))}
         </div>
 
-        {footer ? <div className="ox-dt-cal__foot">{footer}</div> : null}
+        {footer ? <div className="zb-dt-cal__foot">{footer}</div> : null}
       </div>
     </div>
   );
@@ -1310,7 +1310,7 @@ export function TemporalPopover(props: TemporalPopoverProps) {
 
   // The anchor is a zero-size marker that stays in the tree, so the panel can
   // find the field it belongs to after being portalled away from it.
-  const marker = <span ref={anchorRef} className="ox-dt-anchor__mark" aria-hidden="true" />;
+  const marker = <span ref={anchorRef} className="zb-dt-anchor__mark" aria-hidden="true" />;
 
   if (!open || !mounted) return marker;
 
@@ -1322,7 +1322,7 @@ export function TemporalPopover(props: TemporalPopoverProps) {
           ref={panelRef}
           role="dialog"
           aria-label={label}
-          className={cn("ox-dt-pop", box?.above && "ox-dt-pop--above")}
+          className={cn("zb-dt-pop", box?.above && "zb-dt-pop--above")}
           style={box ? { top: box.top, left: box.left } : { visibility: "hidden" }}
           {...scopeOf(anchorRef.current)}
         >
@@ -1351,7 +1351,7 @@ function scopeOf(marker: HTMLElement | null): Record<string, string> {
   const anchor = marker?.parentElement;
   if (!anchor || typeof anchor.closest !== "function") return {};
   const scope: Record<string, string> = {};
-  for (const attribute of ["data-ox-theme", "data-ox-density", "data-ox-brand", "dir"]) {
+  for (const attribute of ["data-zb-theme", "data-zb-density", "data-zb-brand", "dir"]) {
     const owner = anchor.closest(`[${attribute}]`);
     const value = owner?.getAttribute(attribute);
     if (value) scope[attribute] = value;
@@ -1368,15 +1368,15 @@ export type FieldMessageTone = "hint" | "error" | "warning" | "success";
 /**
  * A literal map, not an interpolation.
  *
- * `ox-dt-msg--${tone}` produces no CSS under a scanner that resolves classes
+ * `zb-dt-msg--${tone}` produces no CSS under a scanner that resolves classes
  * by reading source text, and the element renders unstyled — which for a
  * message tier means an error that looks like a hint.
  */
 const MESSAGE_TONE_CLASS: Record<FieldMessageTone, string> = {
   hint: "",
-  error: "ox-dt-msg--error",
-  warning: "ox-dt-msg--warning",
-  success: "ox-dt-msg--success",
+  error: "zb-dt-msg--error",
+  warning: "zb-dt-msg--warning",
+  success: "zb-dt-msg--success",
 };
 
 /**
@@ -1400,7 +1400,7 @@ export function FieldMessage(props: {
       id={id}
       role={assertive ? "alert" : "status"}
       aria-live={assertive ? "assertive" : "polite"}
-      className={cn("ox-dt-msg", MESSAGE_TONE_CLASS[tone])}
+      className={cn("zb-dt-msg", MESSAGE_TONE_CLASS[tone])}
     >
       <svg
         viewBox="0 0 24 24"
@@ -1410,7 +1410,7 @@ export function FieldMessage(props: {
         strokeLinecap="round"
         strokeLinejoin="round"
         aria-hidden="true"
-        className="ox-dt-msg__glyph"
+        className="zb-dt-msg__glyph"
       >
         {tone === "error" ? (
           <>

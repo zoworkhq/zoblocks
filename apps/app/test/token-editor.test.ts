@@ -8,9 +8,9 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { TOKEN_SURFACE } from "@oxygenui-design/tokens/surface";
+import { TOKEN_SURFACE } from "@zoblocks/tokens/surface";
 import { loadTokenSource } from "../../../scripts/gen/tokens/load";
-import type { TokenSource } from "@oxygenui-design/tokens/validate";
+import type { TokenSource } from "@zoblocks/tokens/validate";
 import { buildEditorModel, componentIsEditable } from "@/lib/token-editor";
 
 let base: TokenSource;
@@ -51,8 +51,8 @@ describe("buildEditorModel", () => {
     const light = buildEditorModel(await source(), "nw", RAMP, "light");
     const dark = buildEditorModel(await source(), "nw", RAMP, "dark");
 
-    expect(light.resolved["--ox-accent"]).not.toBe(dark.resolved["--ox-accent"]);
-    expect(light.resolved["--ox-bg"]).not.toBe(dark.resolved["--ox-bg"]);
+    expect(light.resolved["--zb-accent"]).not.toBe(dark.resolved["--zb-accent"]);
+    expect(light.resolved["--zb-bg"]).not.toBe(dark.resolved["--zb-bg"]);
   });
 
   it("applies the customer's ramp, so the model is their palette not ours", async () => {
@@ -64,7 +64,7 @@ describe("buildEditorModel", () => {
       "light",
     );
 
-    expect(mine.resolved["--ox-accent"]).not.toBe(theirs.resolved["--ox-accent"]);
+    expect(mine.resolved["--zb-accent"]).not.toBe(theirs.resolved["--zb-accent"]);
   });
 
   it("shows an override as the resolved value and keeps the base for revert", async () => {
@@ -125,12 +125,12 @@ describe("buildEditorModel", () => {
   it("lists every component token under the semantic token it inherits", async () => {
     const model = buildEditorModel(await source(), "nw", RAMP, "light");
 
-    expect(model.dependents["--ox-accent"]).toContain("--ox-switch-track-on-bg");
+    expect(model.dependents["--zb-accent"]).toContain("--zb-switch-track-on-bg");
     // Clinical, and present: the preview has to draw it correctly. The parent
     // is the `-bg` variant, not `status.critical` itself — a background token
     // inherits a background token.
-    expect(model.dependents["--ox-status-critical-bg"]).toContain("--ox-badge-critical-bg");
-    expect(model.dependents["--ox-status-critical"]).toContain("--ox-badge-critical-fg");
+    expect(model.dependents["--zb-status-critical-bg"]).toContain("--zb-badge-critical-bg");
+    expect(model.dependents["--zb-status-critical"]).toContain("--zb-badge-critical-fg");
 
     const listed = Object.values(model.dependents).flat().length;
     expect(listed).toBe(TOKEN_SURFACE.filter((entry) => entry.semantic).length);
@@ -165,11 +165,11 @@ describe("buildEditorModel", () => {
 
 describe("componentIsEditable", () => {
   it("is true for a bridgeable token and false for a clinical one", () => {
-    expect(componentIsEditable("--ox-accordion-header-bg")).toBe(true);
-    expect(componentIsEditable("--ox-badge-critical-bg")).toBe(false);
+    expect(componentIsEditable("--zb-accordion-header-bg")).toBe(true);
+    expect(componentIsEditable("--zb-badge-critical-bg")).toBe(false);
   });
 
   it("is false for a property the manifest does not declare", () => {
-    expect(componentIsEditable("--ox-not-a-token")).toBe(false);
+    expect(componentIsEditable("--zb-not-a-token")).toBe(false);
   });
 });

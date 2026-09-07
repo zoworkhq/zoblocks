@@ -25,7 +25,7 @@ export default async function LoginPage({
       {bootstrapped && (
         <p
           role="status"
-          className="mb-5 rounded-lg border border-[var(--ox-accent-border)] bg-[var(--ox-accent-subtle)] px-3 py-2.5 text-[0.8125rem] leading-snug text-ink"
+          className="mb-5 rounded-lg border border-[var(--zb-accent-border)] bg-[var(--zb-accent-subtle)] px-3 py-2.5 text-[0.8125rem] leading-snug text-ink"
         >
           Admin account created. Sign in — every later signup waits for your approval.
         </p>

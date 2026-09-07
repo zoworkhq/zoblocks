@@ -2,7 +2,7 @@
  * Tailwind resolves classes by scanning source text. A class name assembled at
  * runtime therefore produces no CSS at all.
  *
- *   text-[var(--ox-status-${tone})]     ← compiles to nothing
+ *   text-[var(--zb-status-${tone})]     ← compiles to nothing
  *
  * On a severity chip that does not fail loudly; it renders the element unstyled,
  * which silently deletes the severity signal from a clinical display. This is
@@ -32,7 +32,7 @@ export default {
     ],
     messages: {
       dynamic:
-        "Class name built from an interpolated value. Tailwind resolves classes by scanning source text, so this produces no CSS and the element renders unstyled. Use a literal lookup map: const TONE_CLASS = {{ '{' }} critical: \"text-[var(--ox-status-critical)]\" {{ '}' }}.",
+        "Class name built from an interpolated value. Tailwind resolves classes by scanning source text, so this produces no CSS and the element renders unstyled. Use a literal lookup map: const TONE_CLASS = {{ '{' }} critical: \"text-[var(--zb-status-critical)]\" {{ '}' }}.",
     },
   },
 

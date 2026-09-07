@@ -29,7 +29,7 @@ const PAGE = "/components/care-timeline";
 async function openTimeline(page: Page) {
   await page.goto(PAGE);
   await page.waitForLoadState("networkidle");
-  const timeline = page.locator("[data-ox-care-timeline]").first();
+  const timeline = page.locator("[data-zb-care-timeline]").first();
   await expect(timeline).toBeVisible();
   return timeline;
 }
@@ -48,7 +48,7 @@ async function selectScenario(page: Page, label: RegExp) {
   await page.goto(PAGE);
   await page.waitForLoadState("networkidle");
   await page.getByRole("tab", { name: label }).click();
-  const timeline = page.locator("[data-ox-care-timeline]").first();
+  const timeline = page.locator("[data-zb-care-timeline]").first();
   await expect(timeline).toBeVisible();
   return timeline;
 }
@@ -56,7 +56,7 @@ async function selectScenario(page: Page, label: RegExp) {
 test.describe("@a11y care timeline", () => {
   test("the coverage sentence is rendered, not implied", async ({ page }) => {
     const timeline = await openTimeline(page);
-    const coverage = timeline.locator(".ox-care-timeline__coverage").first();
+    const coverage = timeline.locator(".zb-care-timeline__coverage").first();
     await expect(coverage).toBeVisible();
     await expect(coverage).toContainText(/Showing/);
     await expect(coverage).toContainText(/newest first|oldest first/);
@@ -66,13 +66,13 @@ test.describe("@a11y care timeline", () => {
     // The repeat-CT case. If this ever becomes a quiet footnote, the component
     // has stopped doing the one thing it was built for.
     await selectScenario(page, /source that could not be reached/);
-    const timeline = page.locator("[data-ox-care-timeline][data-ox-degraded]").first();
+    const timeline = page.locator("[data-zb-care-timeline][data-zb-degraded]").first();
     await expect(timeline.getByRole("alert")).toBeVisible();
   });
 
   test("every list on the page is named", async ({ page }) => {
     const timeline = await openTimeline(page);
-    const lists = timeline.locator("ol.ox-timeline");
+    const lists = timeline.locator("ol.zb-timeline");
     const count = await lists.count();
     expect(count).toBeGreaterThan(0);
     for (let index = 0; index < count; index += 1) {
@@ -85,7 +85,7 @@ test.describe("@a11y care timeline", () => {
     // Spoken aloud it doubles the length of every item and adds nothing the
     // absolute date has not said — but it is never the only time on the row.
     const timeline = await openTimeline(page);
-    const ago = timeline.locator(".ox-care-timeline__ago").first();
+    const ago = timeline.locator(".zb-care-timeline__ago").first();
     await expect(ago).toHaveAttribute("aria-hidden", "true");
     await expect(timeline.locator("time").first()).toBeVisible();
   });
@@ -100,7 +100,7 @@ test.describe("@a11y forced colours", () => {
     // proof: a dashed node without the word "Planned" beside it would be a
     // signal only some readers receive.
     await expect(timeline).toContainText(/Showing/);
-    const chips = timeline.locator(".ox-care-timeline__chip");
+    const chips = timeline.locator(".zb-care-timeline__chip");
     if ((await chips.count()) > 0) {
       await expect(chips.first()).toBeVisible();
       expect((await chips.first().innerText()).trim().length).toBeGreaterThan(0);
@@ -114,7 +114,7 @@ test.describe("@a11y register layout", () => {
     // browser can assert the layout. Both matter: two columns rendered on top
     // of each other is the bug this breakpoint exists to prevent.
     await selectScenario(page, /Clinical on one side/);
-    const columns = page.locator(".ox-care-timeline__columns").first();
+    const columns = page.locator(".zb-care-timeline__columns").first();
     await expect(columns).toBeVisible();
 
     await page.setViewportSize({ width: 1280, height: 900 });
@@ -131,7 +131,7 @@ test.describe("@a11y register layout", () => {
 test.describe("@a11y jump control", () => {
   test("moves focus to the period it jumped to", async ({ page }) => {
     await selectScenario(page, /Clinical on one side/);
-    const jump = page.locator("select.ox-care-timeline__jump").first();
+    const jump = page.locator("select.zb-care-timeline__jump").first();
     await expect(jump).toBeVisible();
 
     const values = await jump
@@ -142,7 +142,7 @@ test.describe("@a11y jump control", () => {
     await jump.selectOption(values[values.length - 1] as string);
     // Scrolling without moving focus leaves a keyboard user where they were.
     const focused = await page.evaluate(() => document.activeElement?.className ?? "");
-    expect(focused).toContain("ox-care-timeline__group");
+    expect(focused).toContain("zb-care-timeline__group");
   });
 });
 
@@ -157,13 +157,13 @@ test.describe("@reflow care timeline", () => {
     });
     // WCAG 1.4.10's floor. The rail is a grid column precisely so this holds.
     expect(overflows).toBeLessThanOrEqual(1);
-    await expect(timeline.locator(".ox-care-timeline__coverage").first()).toBeVisible();
+    await expect(timeline.locator(".zb-care-timeline__coverage").first()).toBeVisible();
   });
 
   test("keeps the coverage sentence at 200% zoom", async ({ page }) => {
     await page.setViewportSize({ width: 640, height: 512 });
     const timeline = await openTimeline(page);
-    await expect(timeline.locator(".ox-care-timeline__coverage").first()).toBeVisible();
+    await expect(timeline.locator(".zb-care-timeline__coverage").first()).toBeVisible();
   });
 });
 
@@ -174,7 +174,7 @@ test.describe("@a11y print", () => {
     // list, which is the artefact a medico-legal review is built from.
     const timeline = await openTimeline(page);
     await page.emulateMedia({ media: "print" });
-    const coverage = timeline.locator(".ox-care-timeline__coverage").first();
+    const coverage = timeline.locator(".zb-care-timeline__coverage").first();
     await expect(coverage).toBeVisible();
     const display = await coverage.evaluate((el) => getComputedStyle(el).display);
     expect(display).not.toBe("none");

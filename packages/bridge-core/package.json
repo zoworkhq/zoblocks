@@ -1,12 +1,12 @@
 {
-  "name": "@oxygenui-design/bridge-core",
+  "name": "@zoblocks/bridge-core",
   "version": "0.1.0",
-  "description": "The theme-bridge contract: how a UI framework's resolved theme becomes Oxygen's component token surface. No framework, no React, no DOM.",
+  "description": "The theme-bridge contract: how a UI framework's resolved theme becomes Zoblocks's component token surface. No framework, no React, no DOM.",
   "license": "MIT",
-  "homepage": "https://oxygenui.design",
+  "homepage": "https://zoblocks.design",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zoworkhq/oxygenui.git",
+    "url": "git+https://github.com/zoworkhq/zoblocks.git",
     "directory": "packages/bridge-core"
   },
   "keywords": [
@@ -52,10 +52,10 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@oxygenui-design/tokens": "workspace:*"
+    "@zoblocks/tokens": "workspace:*"
   },
   "devDependencies": {
-    "@oxygenui-design/tsconfig": "workspace:*",
+    "@zoblocks/tsconfig": "workspace:*",
     "@testing-library/react": "^16",
     "@types/react": "^19.0.2",
     "@vitest/coverage-v8": "^4.1.10",

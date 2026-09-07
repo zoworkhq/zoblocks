@@ -30,7 +30,7 @@ import {
   type CopilotEvent,
   type Source,
 } from "../src/index.js";
-import { EMPTY_ANSWER } from "@oxygenui-design/copilot-core";
+import { EMPTY_ANSWER } from "@zoblocks/copilot-core";
 
 const disclosure = minimalDisclosure("test-model@1");
 
@@ -82,7 +82,7 @@ describe("AnswerBody", () => {
         onCite={vi.fn()}
       />,
     );
-    const uncited = container.querySelector(".ox-copilot-uncited");
+    const uncited = container.querySelector(".zb-copilot-uncited");
     expect(uncited).toHaveTextContent("Invented part.");
     expect(uncited).toHaveAttribute("title", DEFAULT_LOCALE.unsupportedHint);
   });
@@ -469,7 +469,7 @@ describe("non-happy states", () => {
 
   it("renders inline when asked, rather than fixed to the viewport", () => {
     const { container } = renderCopilot({ anchor: "inline" });
-    expect(container.querySelector(".ox-copilot--inline")).toBeInTheDocument();
+    expect(container.querySelector(".zb-copilot--inline")).toBeInTheDocument();
   });
 
   it("wires the crisis escalation hooks through from props", async () => {

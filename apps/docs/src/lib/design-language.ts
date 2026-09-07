@@ -18,18 +18,18 @@
  */
 
 import * as React from "react";
-import type { HostId } from "@oxygenui-design/host-react";
+import type { HostId } from "@zoblocks/host-react";
 
 export type DesignLanguage = HostId;
 
-export const LANGUAGE_COOKIE = "oxygen-language";
-export const LANGUAGE_STORAGE_KEY = "oxygen-language";
+export const LANGUAGE_COOKIE = "zoblocks-language";
+export const LANGUAGE_STORAGE_KEY = "zoblocks-language";
 export const LANGUAGE_PARAM = "lang";
 
 /** A year, matching the theme cookie. */
 const MAX_AGE = 60 * 60 * 24 * 365;
 
-const VALID: readonly string[] = ["oxygen", "antd", "mui"];
+const VALID: readonly string[] = ["zoblocks", "antd", "mui"];
 
 function isLanguage(value: string | null | undefined): value is DesignLanguage {
   return typeof value === "string" && VALID.includes(value);
@@ -37,13 +37,13 @@ function isLanguage(value: string | null | undefined): value is DesignLanguage {
 
 function cookieDomain(): string {
   const host = location.hostname;
-  return host === "oxygenui.design" || host.endsWith(".oxygenui.design")
-    ? "; domain=.oxygenui.design"
+  return host === "zoblocks.design" || host.endsWith(".zoblocks.design")
+    ? "; domain=.zoblocks.design"
     : "";
 }
 
 /**
- * Precedence: the URL, then the cookie, then storage, then Oxygen.
+ * Precedence: the URL, then the cookie, then storage, then Zoblocks.
  *
  * The query parameter wins so a link can pin a language — a support reply
  * showing a customer their own framework is the case this exists for, and it
@@ -54,23 +54,23 @@ export function readStoredLanguage(): DesignLanguage {
     const fromUrl = new URLSearchParams(location.search).get(LANGUAGE_PARAM);
     if (isLanguage(fromUrl)) return fromUrl;
 
-    const match = document.cookie.match(/(?:^|;\s*)oxygen-language=([^;]*)/);
+    const match = document.cookie.match(/(?:^|;\s*)zoblocks-language=([^;]*)/);
     const fromCookie = match?.[1] === undefined ? null : decodeURIComponent(match[1]);
     if (isLanguage(fromCookie)) return fromCookie;
 
     const fromStorage = localStorage.getItem(LANGUAGE_STORAGE_KEY);
     if (isLanguage(fromStorage)) return fromStorage;
   } catch {
-    /* Private mode, or a browser refusing storage. Oxygen is a safe default. */
+    /* Private mode, or a browser refusing storage. Zoblocks is a safe default. */
   }
-  return "oxygen";
+  return "zoblocks";
 }
 
 /* ------------------------------------------------------------------ */
 /* The store                                                           */
 /* ------------------------------------------------------------------ */
 
-let current: DesignLanguage = "oxygen";
+let current: DesignLanguage = "zoblocks";
 let hydrated = false;
 const listeners = new Set<() => void>();
 
@@ -94,7 +94,7 @@ function subscribe(listener: () => void) {
      * broken rather than deliberate. Writing it here means the URL is a way of
      * *setting* the preference, not a one-page override.
      */
-    if (current !== "oxygen") persist(current);
+    if (current !== "zoblocks") persist(current);
     // Nothing is subscribed yet on this tick, so tell React on the next one.
     queueMicrotask(emit);
   }
@@ -105,13 +105,13 @@ function subscribe(listener: () => void) {
 const getSnapshot = () => current;
 
 /**
- * `"oxygen"` on the server and on the first client render.
+ * `"zoblocks"` on the server and on the first client render.
  *
  * The stored value is applied in the subscription instead, because reading it
  * during render would disagree with the server-rendered HTML — the same
  * hydration rule `useSiteTheme` follows for the colour mode.
  */
-const getServerSnapshot = (): DesignLanguage => "oxygen";
+const getServerSnapshot = (): DesignLanguage => "zoblocks";
 
 /** Write the choice where the next page load will find it. */
 function persist(value: DesignLanguage): void {
@@ -134,7 +134,7 @@ export function setDesignLanguage(next: DesignLanguage): void {
   // selection, and pushing it through Next would re-render the whole route.
   try {
     const url = new URL(location.href);
-    if (next === "oxygen") url.searchParams.delete(LANGUAGE_PARAM);
+    if (next === "zoblocks") url.searchParams.delete(LANGUAGE_PARAM);
     else url.searchParams.set(LANGUAGE_PARAM, next);
     history.replaceState(null, "", url);
   } catch {
@@ -150,7 +150,7 @@ export function useDesignLanguage(): DesignLanguage {
 
 /** Test seam: drop the store back to its initial state. */
 export function resetDesignLanguageForTests(): void {
-  current = "oxygen";
+  current = "zoblocks";
   hydrated = false;
   listeners.clear();
 }

@@ -16,7 +16,7 @@ import { applyTheme, readStoredTheme, resolveTheme, writeTheme, type Theme } fro
  * The choice is shared with the marketing site through a cookie rather than
  * `localStorage`, because the two run on different origins and a reader who
  * picks dark there should not be handed a white login screen here. The old
- * `oxygen-app-theme` and `oxygen-console-theme` keys are still read once so
+ * `zoblocks-app-theme` and `zoblocks-console-theme` keys are still read once so
  * nobody's saved preference is silently reset. See `lib/theme.ts`.
  *
  * The class is applied before first paint by the inline script in

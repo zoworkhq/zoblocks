@@ -12,7 +12,7 @@ plugin_. The value is shown once. The database holds its SHA-256 and nothing
 else, so there is no screen that can show it again.
 
 ```
-Authorization: Bearer oxy_live_…
+Authorization: Bearer zb_live_…
 ```
 
 A key is labelled, expires after 90 days, is revocable from the same screen, and
@@ -59,7 +59,7 @@ is maintaining.
 
 The brand ramp, the semantic tier resolved for all three themes, the clinical
 tokens with the reason they are fixed, and the validation record of the version
-being described. This is the shape `@oxygenui-design/figma-core`'s
+being described. This is the shape `@zoblocks/figma-core`'s
 `toVariablePlan` consumes.
 
 Without `version` it serves the live one, falling back to the draft when nothing

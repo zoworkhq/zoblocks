@@ -37,7 +37,7 @@ describe('overflow="none"', () => {
     });
 
     // "You have measured and they always fit" — so the component adds nothing.
-    expect(document.querySelector(".ox-tabs__nudge")).toBeNull();
+    expect(document.querySelector(".zb-tabs__nudge")).toBeNull();
     expect(screen.queryByRole("button", { name: /More/ })).not.toBeInTheDocument();
     expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
     expect(screen.getAllByRole("tab")).toHaveLength(2);
@@ -145,7 +145,7 @@ describe("ref forwarding", () => {
   it("forwards a ref to the root element", () => {
     const ref = React.createRef<HTMLDivElement>();
     render(<Tabs as="tabs" aria-label="Docs" defaultValue="a" items={items} ref={ref} />);
-    expect(ref.current).toHaveClass("ox-tabs");
+    expect(ref.current).toHaveClass("zb-tabs");
   });
 });
 
@@ -277,8 +277,8 @@ describe("the antd bridge falls back sensibly", () => {
     const tokens = JSON.parse(screen.getByTestId("tokens").textContent ?? "{}");
     // antd derives borderRadiusLG from borderRadius, so the point of the chain
     // is that a theme setting only the base value still gets a coherent pair.
-    const inner = Number.parseFloat(String(tokens["--ox-tabs-thumb-radius"]));
-    const outer = Number.parseFloat(String(tokens["--ox-tabs-track-radius"]));
+    const inner = Number.parseFloat(String(tokens["--zb-tabs-thumb-radius"]));
+    const outer = Number.parseFloat(String(tokens["--zb-tabs-track-radius"]));
     expect(Number.isFinite(inner)).toBe(true);
     expect(outer).toBeGreaterThan(inner);
   });

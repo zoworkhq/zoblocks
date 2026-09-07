@@ -21,7 +21,7 @@ import {
   TOKEN_SURFACE,
   surfaceEntry,
   surfaceFor,
-} from "@oxygenui-design/tokens/surface";
+} from "@zoblocks/tokens/surface";
 
 describe("shape", () => {
   it("covers every component that has an override surface", () => {
@@ -32,7 +32,7 @@ describe("shape", () => {
   });
 
   it("names no component after a fragment of a longer name", () => {
-    // `--ox-care-timeline-divider` grouped as "care" and `--ox-av-size` as "av"
+    // `--zb-care-timeline-divider` grouped as "care" and `--zb-av-size` as "av"
     // when the component was derived from the token name rather than the
     // selector it is declared in. Both are real tokens; neither is a component.
     for (const bad of ["care", "av", "sw", "patient"]) {
@@ -42,7 +42,7 @@ describe("shape", () => {
 
   it("gives every entry a component, a source and a kind", () => {
     for (const e of TOKEN_SURFACE) {
-      expect(e.name, e.name).toMatch(/^--ox-[a-z0-9-]+$/);
+      expect(e.name, e.name).toMatch(/^--zb-[a-z0-9-]+$/);
       expect(e.component, e.name).toBeTruthy();
       expect(e.source, e.name).toBeTruthy();
       expect(e.kind, e.name).toBeTruthy();
@@ -63,13 +63,13 @@ describe("shape", () => {
 describe("clinical tokens are not bridgeable", () => {
   it("marks every token resolving to status or a flag", () => {
     const leaked = TOKEN_SURFACE.filter(
-      (e) => e.bridgeable && e.semantic && /^--ox-(status|flag)-/.test(e.semantic),
+      (e) => e.bridgeable && e.semantic && /^--zb-(status|flag)-/.test(e.semantic),
     );
     expect(leaked.map((e) => `${e.name} → ${e.semantic}`)).toEqual([]);
   });
 
   it("finds the ones that matter by name", () => {
-    for (const name of ["--ox-badge-critical-bg", "--ox-tabs-critical", "--ox-alert-critical-fg"]) {
+    for (const name of ["--zb-badge-critical-bg", "--zb-tabs-critical", "--zb-alert-critical-fg"]) {
       const entry = surfaceEntry(name);
       expect(entry, name).toBeDefined();
       expect(entry?.bridgeable, name).toBe(false);
@@ -77,7 +77,7 @@ describe("clinical tokens are not bridgeable", () => {
   });
 
   it("does not over-reach — brand chrome stays bridgeable", () => {
-    for (const name of ["--ox-tabs-accent", "--ox-tabs-surface", "--ox-copilot-accent"]) {
+    for (const name of ["--zb-tabs-accent", "--zb-tabs-surface", "--zb-copilot-accent"]) {
       const entry = surfaceEntry(name);
       expect(entry, name).toBeDefined();
       expect(entry?.bridgeable, name).toBe(true);
@@ -95,8 +95,8 @@ describe("clinical tokens are not bridgeable", () => {
 describe("declarations terminate in a literal", () => {
   /**
    * `fallback` means the strongest thing it can mean: the chain reaches a
-   * literal without the Oxygen stylesheet being loaded at all. Resolution is
-   * transitive, so `--ox-tabs-indicator: var(--ox-tabs-accent)` counts — the
+   * literal without the Zoblocks stylesheet being loaded at all. Resolution is
+   * transitive, so `--zb-tabs-indicator: var(--zb-tabs-accent)` counts — the
    * accent it points at ends in `#059478`.
    *
    * Seven timeline tokens failed this when the check was introduced. Each
@@ -113,14 +113,14 @@ describe("declarations terminate in a literal", () => {
 
 describe("framework fallbacks", () => {
   it("records the host variables already present in a chain", () => {
-    const accent = surfaceEntry("--ox-tabs-accent");
+    const accent = surfaceEntry("--zb-tabs-accent");
     expect(accent?.frameworks).toContain("--ant-color-primary");
   });
 
   /**
    * A standing question rather than a failure. These tokens are unbridgeable —
    * a JavaScript bridge may not write them — yet their CSS chain already falls
-   * through to antd's semantic colours when no Oxygen token is present.
+   * through to antd's semantic colours when no Zoblocks token is present.
    *
    * That is defensible for a tab badge and wrong as a general rule, and it is
    * the open decision in §3.5 of the architecture report. The test pins the
@@ -135,13 +135,13 @@ describe("framework fallbacks", () => {
 
 describe("lookup helpers", () => {
   it("finds an entry by name", () => {
-    expect(surfaceEntry("--ox-tabs-accent")?.component).toBe("tabs");
-    expect(surfaceEntry("--ox-nope")).toBeUndefined();
+    expect(surfaceEntry("--zb-tabs-accent")?.component).toBe("tabs");
+    expect(surfaceEntry("--zb-nope")).toBeUndefined();
   });
 
   it("returns every token for one component", () => {
     const tabs = surfaceFor("tabs");
     expect(tabs.length).toBeGreaterThan(30);
-    expect(tabs.every((e) => e.name.startsWith("--ox-tabs-"))).toBe(true);
+    expect(tabs.every((e) => e.name.startsWith("--zb-tabs-"))).toBe(true);
   });
 });

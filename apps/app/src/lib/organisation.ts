@@ -8,7 +8,7 @@
  */
 
 import { ObjectId } from "mongodb";
-import { slugSchema } from "@oxygenui-design/theme";
+import { slugSchema } from "@zoblocks/theme";
 import type { FrameworkId } from "@/db/collections";
 import type { Authorized } from "./authorize";
 import { FRAMEWORKS } from "./frameworks";
@@ -78,7 +78,7 @@ export async function setFrameworks(auth: Authorized, next: readonly string[]): 
     (framework) => framework.name,
   );
   return names.length === 0
-    ? "No framework selected. Oxygen components will use their own tokens."
+    ? "No framework selected. Zoblocks components will use their own tokens."
     : `Saved. This app now offers ${names.join(" and ")}.`;
 }
 

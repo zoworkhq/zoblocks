@@ -21,7 +21,7 @@ describe("PatientBanner — the basics", () => {
   it("publishes which patient it is showing", () => {
     F.renderWithPolicy(<PatientBanner patient={F.amaraA} context="navigation" />);
     // E2E tests and audit tooling assert on this at the moment of an order.
-    expect(screen.getByRole("region")).toHaveAttribute("data-ox-patient-id", "pat-4471");
+    expect(screen.getByRole("region")).toHaveAttribute("data-zb-patient-id", "pat-4471");
   });
 
   it("renders the date of birth unambiguously", () => {
@@ -64,14 +64,14 @@ describe("PatientBanner — Patient.gender", () => {
       <PatientBanner patient={F.withSpcu} context="navigation" />,
     );
     expect(container.textContent).not.toMatch(/\bmale\b/);
-    expect(container.querySelector('[data-ox-field="gender"]')).toBeNull();
+    expect(container.querySelector('[data-zb-field="gender"]')).toBeNull();
   });
 });
 
 describe("PatientBanner — identity is atomic", () => {
   it("renders a skeleton, never a half-identity", () => {
     const { container } = F.renderWithPolicy(<PatientBanner loading context="navigation" />);
-    expect(container.querySelector(".ox-banner--loading")).toBeInTheDocument();
+    expect(container.querySelector(".zb-banner--loading")).toBeInTheDocument();
     expect(screen.getByText("Loading patient")).toBeInTheDocument();
     // A name with a placeholder identifier reads as a complete record.
     expect(container.textContent).not.toContain("Okonkwo");
@@ -118,7 +118,7 @@ describe("PatientBanner — four states, not one pill", () => {
       <PatientBanner patient={F.testPatient} context="navigation" />,
     );
     expect(screen.getByText(/TEST PATIENT — not a person/)).toBeInTheDocument();
-    expect(container.querySelector(".ox-banner--test")).toBeInTheDocument();
+    expect(container.querySelector(".zb-banner--test")).toBeInTheDocument();
   });
 
   it("gives every state a word and an icon, never colour alone", () => {
@@ -126,7 +126,7 @@ describe("PatientBanner — four states, not one pill", () => {
       const { container, unmount } = F.renderWithPolicy(
         <PatientBanner patient={p} context="navigation" />,
       );
-      const tag = container.querySelector("[data-ox-state]");
+      const tag = container.querySelector("[data-zb-state]");
       expect(tag).toBeTruthy();
       // A word survives forced-colors, monochrome printing, and the roughly
       // one in twelve men who cannot separate red from green.
@@ -199,7 +199,7 @@ describe("PatientBanner — fields", () => {
         fields={["name", "dob", "identifier"]}
       />,
     );
-    expect(screen.getByRole("region")).toHaveAttribute("data-ox-fields", "name,dob,identifier");
+    expect(screen.getByRole("region")).toHaveAttribute("data-zb-fields", "name,dob,identifier");
   });
 
   it("omits a field the caller did not ask for", () => {
@@ -214,9 +214,9 @@ describe("PatientBanner — fields", () => {
       <PatientBanner patient={F.withNhs} context="navigation" ward="4B / bay 2" />,
     );
     // The ward is the first thing to go; the identifier is the last.
-    expect(container.querySelector('[data-ox-field="ward"]')?.className).toContain("ox-drop-4");
-    expect(container.querySelector('[data-ox-field="identifier"]')?.className).toContain(
-      "ox-drop-1",
+    expect(container.querySelector('[data-zb-field="ward"]')?.className).toContain("zb-drop-4");
+    expect(container.querySelector('[data-zb-field="identifier"]')?.className).toContain(
+      "zb-drop-1",
     );
   });
 
@@ -225,7 +225,7 @@ describe("PatientBanner — fields", () => {
     const { container } = F.renderWithPolicy(
       <PatientBanner patient={F.amaraA} context="navigation" />,
     );
-    for (const sel of [".ox-banner__name", '[data-ox-field="identifier"]']) {
+    for (const sel of [".zb-banner__name", '[data-zb-field="identifier"]']) {
       const el = container.querySelector(sel) as HTMLElement | null;
       expect(el?.className ?? "").not.toMatch(/truncate|ellipsis/);
     }

@@ -7,7 +7,7 @@
  * a renderer can walk without knowing any FHIR.
  */
 
-import type { Reference } from "@oxygenui-design/fhir";
+import type { Reference } from "@zoblocks/fhir";
 
 // ---------------------------------------------------------------------------
 // Dates

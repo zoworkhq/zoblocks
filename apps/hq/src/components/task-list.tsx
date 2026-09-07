@@ -114,7 +114,7 @@ function Row({
           className="num inline-flex items-center gap-1 whitespace-nowrap text-[0.6875rem]"
           style={{
             color: due.overdue
-              ? "var(--ox-status-critical)"
+              ? "var(--zb-status-critical)"
               : due.soon
                 ? "var(--color-ink-soft)"
                 : "var(--color-muted)",

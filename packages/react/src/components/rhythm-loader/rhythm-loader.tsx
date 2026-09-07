@@ -7,7 +7,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/rhythm-loader/rhythm-loader.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/rhythm-loader/rhythm-loader.tsx. Edit that file, not this one.
 /**
  * RhythmLoader — one PQRST complex on a baseline, swept like a monitor.
  *
@@ -52,21 +52,21 @@ export function RhythmLoader({ bpm, speed = 1, size, ...props }: RhythmLoaderPro
       {...props}
       variant="rhythm"
       vars={{
-        "--ox-loader-size": `${px}px`,
-        "--ox-loader-beat": `${beat}ms`,
-        "--ox-loader-cycle": `${cycleMs(4000, clamp(speed, 0.5, 2))}ms`,
-        "--ox-loader-stroke": `${strokePx(px)}px`,
+        "--zb-loader-size": `${px}px`,
+        "--zb-loader-beat": `${beat}ms`,
+        "--zb-loader-cycle": `${cycleMs(4000, clamp(speed, 0.5, 2))}ms`,
+        "--zb-loader-stroke": `${strokePx(px)}px`,
       }}
       art={
         <svg viewBox={LOADER_VIEWBOX.rhythm} focusable="false">
-          <path className="ox-loader__stroke ox-loader__track" d={LOADER_ART.strip} />
+          <path className="zb-loader__stroke zb-loader__track" d={LOADER_ART.strip} />
           <path
-            className="ox-loader__stroke ox-loader__tail"
+            className="zb-loader__stroke zb-loader__tail"
             pathLength={100}
             d={LOADER_ART.strip}
           />
           <path
-            className="ox-loader__stroke ox-loader__head"
+            className="zb-loader__stroke zb-loader__head"
             pathLength={100}
             d={LOADER_ART.strip}
           />

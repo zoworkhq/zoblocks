@@ -11,7 +11,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { RAMP_STEPS, withTierDefaults, type ThemeTokensInput } from "@oxygenui-design/theme";
+import { RAMP_STEPS, withTierDefaults, type ThemeTokensInput } from "@zoblocks/theme";
 import { THEME_SCREENS, themeScreenHref, themeScreens } from "@/lib/theme-screens";
 import type { ThemeFacts } from "@/lib/theme-screens";
 

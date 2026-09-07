@@ -1,5 +1,5 @@
 ---
-"@oxygenui-design/react": patch
+"@zoblocks/react": patch
 ---
 
 DatePicker — the docs demo now explains the component instead of operating it,

@@ -12,13 +12,13 @@ import { cssVar, flattenDtcg, referenceTarget, toCssValue } from "../src/validat
 
 describe("cssVar", () => {
   it("uses one rule for every tier", () => {
-    expect(cssVar("status.critical")).toBe("--ox-status-critical");
-    expect(cssVar("ref.brand.600")).toBe("--ox-ref-brand-600");
-    expect(cssVar("badge.critical-bg")).toBe("--ox-badge-critical-bg");
+    expect(cssVar("status.critical")).toBe("--zb-status-critical");
+    expect(cssVar("ref.brand.600")).toBe("--zb-ref-brand-600");
+    expect(cssVar("badge.critical-bg")).toBe("--zb-badge-critical-bg");
   });
 
   it("leaves a single-segment path alone beyond the prefix", () => {
-    expect(cssVar("accent")).toBe("--ox-accent");
+    expect(cssVar("accent")).toBe("--zb-accent");
   });
 });
 
@@ -45,12 +45,12 @@ describe("referenceTarget", () => {
 
 describe("toCssValue", () => {
   it("rewrites a reference to var(), which is what lets a brand override it", () => {
-    expect(toCssValue("{status.critical}")).toBe("var(--ox-status-critical)");
+    expect(toCssValue("{status.critical}")).toBe("var(--zb-status-critical)");
   });
 
   it("rewrites every reference inside a composite value", () => {
-    expect(toCssValue("1px solid {border}")).toBe("1px solid var(--ox-border)");
-    expect(toCssValue("{a} {b}")).toBe("var(--ox-a) var(--ox-b)");
+    expect(toCssValue("1px solid {border}")).toBe("1px solid var(--zb-border)");
+    expect(toCssValue("{a} {b}")).toBe("var(--zb-a) var(--zb-b)");
   });
 
   it("leaves a literal untouched", () => {

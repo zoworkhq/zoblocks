@@ -10,7 +10,7 @@
  */
 
 import * as React from "react";
-import { DEFAULT_LOCALE, resolveLocale, type TabsLocale } from "@oxygenui-design/tabs-core";
+import { DEFAULT_LOCALE, resolveLocale, type TabsLocale } from "@zoblocks/tabs-core";
 
 const LocaleContext = React.createContext<TabsLocale>(DEFAULT_LOCALE);
 

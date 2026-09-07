@@ -1,12 +1,12 @@
 {
-  "name": "@oxygenui-design/signature-core",
+  "name": "@zoblocks/signature-core",
   "version": "0.1.0",
-  "description": "The capture engine behind Oxygen's signature component. Stroke model, smoothing, export, and the outcome union — no React, no DOM required, no dependencies.",
+  "description": "The capture engine behind Zoblocks's signature component. Stroke model, smoothing, export, and the outcome union — no React, no DOM required, no dependencies.",
   "license": "MIT",
-  "homepage": "https://oxygenui.design/components/signature",
+  "homepage": "https://zoblocks.design/components/signature",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zoworkhq/oxygenui.git",
+    "url": "git+https://github.com/zoworkhq/zoblocks.git",
     "directory": "packages/signature-core"
   },
   "keywords": [
@@ -54,7 +54,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
-    "@oxygenui-design/tsconfig": "workspace:*",
+    "@zoblocks/tsconfig": "workspace:*",
     "@vitest/coverage-v8": "^4.1.10",
     "typescript": "^5.7.2",
     "vitest": "^4.1.10"

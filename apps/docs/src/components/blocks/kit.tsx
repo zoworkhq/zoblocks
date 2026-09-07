@@ -78,10 +78,10 @@ function Ic({ name }: { name: string }) {
   );
 }
 
-export function OxMark() {
+export function ZbMark() {
   return (
     <svg viewBox="0 0 28 16" className="h-4 w-7" aria-hidden="true">
-      <line x1="8" y1="8" x2="20" y2="8" stroke="var(--site-oxygen)" strokeWidth="2.5" />
+      <line x1="8" y1="8" x2="20" y2="8" stroke="var(--site-brand)" strokeWidth="2.5" />
       <circle cx="8" cy="8" r="5.5" fill="none" stroke="currentColor" strokeWidth="2" />
       <circle cx="20" cy="8" r="5.5" fill="none" stroke="currentColor" strokeWidth="2" />
     </svg>
@@ -95,7 +95,7 @@ export function Rail({ active }: { active: string }) {
   return (
     <nav className="rail" aria-label="Application">
       <div className="railBrand">
-        <OxMark />
+        <ZbMark />
         Northwind Health
       </div>
       {NAV.map((t) => (

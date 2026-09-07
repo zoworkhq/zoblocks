@@ -7,7 +7,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/timeline/timeline.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/timeline/timeline.tsx. Edit that file, not this one.
 /**
  * Timeline — Ant Design v6's Timeline, with the accessibility it does not have.
  *
@@ -40,7 +40,7 @@
  *      the list nor its item count. The redundant role is the accepted fix;
  *      the HTML validator's complaint about it is wrong here.
  *
- * Styling lives in `styles/oxygen-timeline.css`, installed alongside.
+ * Styling lives in `styles/zoblocks-timeline.css`, installed alongside.
  */
 
 import * as React from "react";
@@ -168,7 +168,7 @@ export type TimelineProps = TimelineOwnProps &
  * The class names this component renders, spelled out.
  *
  * A literal table rather than interpolation at the call site, for the reason
- * `@oxygenui/no-dynamic-class-name` exists: a class assembled from a variable
+ * `@zoblocks/no-dynamic-class-name` exists: a class assembled from a variable
  * is invisible to anything that resolves classes by scanning source text, and
  * an unstyled element is a defect that renders perfectly.
  *
@@ -178,28 +178,28 @@ export type TimelineProps = TimelineOwnProps &
  * names below are the ones `timeline.css` defines, and they are static there.
  */
 const PARTS = {
-  root: "ox-timeline",
-  item: "ox-timeline__item",
-  rail: "ox-timeline__rail",
-  node: "ox-timeline__node",
-  line: "ox-timeline__line",
-  body: "ox-timeline__body",
-  section: "ox-timeline__section",
-  header: "ox-timeline__header",
-  title: "ox-timeline__title",
-  content: "ox-timeline__content",
-  itemStart: "ox-timeline__item--start",
-  itemEnd: "ox-timeline__item--end",
-  modeStart: "ox-timeline--start",
-  modeEnd: "ox-timeline--end",
-  modeAlternate: "ox-timeline--alternate",
-  vertical: "ox-timeline--vertical",
-  horizontal: "ox-timeline--horizontal",
-  outlined: "ox-timeline--outlined",
-  filled: "ox-timeline--filled",
+  root: "zb-timeline",
+  item: "zb-timeline__item",
+  rail: "zb-timeline__rail",
+  node: "zb-timeline__node",
+  line: "zb-timeline__line",
+  body: "zb-timeline__body",
+  section: "zb-timeline__section",
+  header: "zb-timeline__header",
+  title: "zb-timeline__title",
+  content: "zb-timeline__content",
+  itemStart: "zb-timeline__item--start",
+  itemEnd: "zb-timeline__item--end",
+  modeStart: "zb-timeline--start",
+  modeEnd: "zb-timeline--end",
+  modeAlternate: "zb-timeline--alternate",
+  vertical: "zb-timeline--vertical",
+  horizontal: "zb-timeline--horizontal",
+  outlined: "zb-timeline--outlined",
+  filled: "zb-timeline--filled",
 } as const;
 
-const DEFAULT_PREFIX = "ox-timeline";
+const DEFAULT_PREFIX = "zb-timeline";
 
 type Parts = typeof PARTS;
 
@@ -212,10 +212,10 @@ function partsFor(prefixCls: string): Parts {
 }
 
 const PRESET_COLOR: Readonly<Record<string, string>> = {
-  blue: "var(--ox-accent)",
-  red: "var(--ox-status-critical)",
-  green: "var(--ox-status-normal)",
-  gray: "var(--ox-text-subtle)",
+  blue: "var(--zb-accent)",
+  red: "var(--zb-status-critical)",
+  green: "var(--zb-status-normal)",
+  gray: "var(--zb-text-subtle)",
 };
 
 /** antd v5's physical sides mean the same thing as v6's logical ones. */
@@ -260,7 +260,7 @@ function DefaultIcon() {
       style={{
         inlineSize: "0.4375rem",
         blockSize: "0.4375rem",
-        borderRadius: "var(--ox-radius-full)",
+        borderRadius: "var(--zb-radius-full)",
         background: "currentColor",
         display: "block",
       }}
@@ -290,7 +290,7 @@ function TimelineRoot({
     variant = "outlined",
     titleSpan,
     reverse = false,
-    prefixCls = "ox-timeline",
+    prefixCls = "zb-timeline",
     rootClassName,
     className,
     style,
@@ -319,7 +319,7 @@ function TimelineRoot({
 
   const rootStyle: React.CSSProperties = { ...slotStyles?.root, ...style };
   if (titleSpan !== undefined) {
-    (rootStyle as Record<string, string | number>)["--ox-timeline-title-span"] =
+    (rootStyle as Record<string, string | number>)["--zb-timeline-title-span"] =
       typeof titleSpan === "number" ? `${titleSpan}` : titleSpan;
   }
 
@@ -328,10 +328,10 @@ function TimelineRoot({
       {...rest}
       ref={ref}
       role="list"
-      data-ox-timeline=""
-      data-ox-mode={resolvedMode}
-      data-ox-orientation={orientation}
-      data-ox-variant={variant}
+      data-zb-timeline=""
+      data-zb-mode={resolvedMode}
+      data-zb-orientation={orientation}
+      data-zb-variant={variant}
       className={cn(
         parts.root,
         resolvedMode === "alternate"

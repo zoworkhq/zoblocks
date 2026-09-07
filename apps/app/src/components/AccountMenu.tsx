@@ -124,7 +124,7 @@ export function AccountMenu({
           <div className="border-b border-rule bg-paper-sunk px-3.5 py-3">
             <p className="truncate text-[0.8125rem] font-semibold">{name}</p>
             <p className="truncate text-[0.6875rem] text-graphite">{email}</p>
-            <p className="eyebrow mt-1.5 text-[0.5625rem] text-oxygen-deep">{role}</p>
+            <p className="eyebrow mt-1.5 text-[0.5625rem] text-brand-deep">{role}</p>
           </div>
 
           <div className="p-1.5">

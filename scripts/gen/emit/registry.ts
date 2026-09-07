@@ -1,6 +1,6 @@
 /**
- * Emits the Oxygen registry: registry.json and one document per item under
- * apps/docs/public/r/, in the format @oxygenui-design/cli installs from.
+ * Emits the Zoblocks registry: registry.json and one document per item under
+ * apps/docs/public/r/, in the format @zoblocks/cli installs from.
  *
  * Two guarantees this build makes that a hand-written registry cannot:
  *
@@ -16,7 +16,7 @@
 import { readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
-import { ITEM_SCHEMA_URL, REGISTRY_SCHEMA_URL } from "@oxygenui-design/cli";
+import { ITEM_SCHEMA_URL, REGISTRY_SCHEMA_URL } from "@zoblocks/cli";
 import { HOMEPAGE, REGISTRY_NAME, ROOT, SUPPORT_ITEM_NAMES, paths } from "../config";
 import type { LoadedComponent } from "../load";
 import type { Emitter } from "../write";
@@ -33,58 +33,60 @@ import type { Emitter } from "../write";
 const SUPPORT_ITEMS: BuildableItem[] = [
   {
     name: "utils",
-    type: "oxygen:lib",
+    type: "zoblocks:lib",
     title: "Utils",
-    description: "Class-name merge helper shared by every Oxygen component.",
+    description: "Class-name merge helper shared by every Zoblocks component.",
     dependencies: ["clsx", "tailwind-merge"],
     registryDependencies: [] as string[],
-    files: [{ path: "registry/oxygen/lib/utils.ts", type: "oxygen:lib", target: "lib/utils.ts" }],
+    files: [
+      { path: "registry/zoblocks/lib/utils.ts", type: "zoblocks:lib", target: "lib/utils.ts" },
+    ],
   },
   {
     name: "recorder-core",
-    type: "oxygen:lib",
+    type: "zoblocks:lib",
     title: "Recorder core",
     description:
       "Signal path, peak buffer, capture machine and the thirteen fault detectors behind Recorder. Installed automatically with the recorder.",
-    dependencies: ["clsx", "tailwind-merge", "@oxygenui-design/recorder-core"],
+    dependencies: ["clsx", "tailwind-merge", "@zoblocks/recorder-core"],
     registryDependencies: ["utils"],
     files: [
       {
-        path: "registry/oxygen/lib/recorder.tsx",
-        type: "oxygen:lib",
-        target: "lib/oxygen-recorder.tsx",
+        path: "registry/zoblocks/lib/recorder.tsx",
+        type: "zoblocks:lib",
+        target: "lib/zoblocks-recorder.tsx",
       },
       {
-        path: "registry/oxygen/lib/recorder.css",
-        type: "oxygen:file",
-        target: "styles/oxygen-recorder.css",
+        path: "registry/zoblocks/lib/recorder.css",
+        type: "zoblocks:file",
+        target: "styles/zoblocks-recorder.css",
       },
     ],
   },
   {
     name: "loader-core",
-    type: "oxygen:lib",
+    type: "zoblocks:lib",
     title: "Loader core",
     description:
-      "Shared frame, timing gate, and stylesheet behind every Oxygen loader. Installed automatically with any loader.",
+      "Shared frame, timing gate, and stylesheet behind every Zoblocks loader. Installed automatically with any loader.",
     dependencies: ["clsx", "tailwind-merge"],
     registryDependencies: ["utils"],
     files: [
       {
-        path: "registry/oxygen/lib/loader.tsx",
-        type: "oxygen:lib",
-        target: "lib/oxygen-loader.tsx",
+        path: "registry/zoblocks/lib/loader.tsx",
+        type: "zoblocks:lib",
+        target: "lib/zoblocks-loader.tsx",
       },
       {
-        path: "registry/oxygen/lib/loader.css",
-        type: "oxygen:file",
-        target: "styles/oxygen-loader.css",
+        path: "registry/zoblocks/lib/loader.css",
+        type: "zoblocks:file",
+        target: "styles/zoblocks-loader.css",
       },
     ],
   },
   {
     name: "accordion-core",
-    type: "oxygen:lib",
+    type: "zoblocks:lib",
     title: "Accordion core",
     description:
       "Headless disclosure behaviour and stylesheet behind Accordion and Disclosure: the open-set policies, the ARIA wiring, the access model, and find-in-page support. Installed automatically with either.",
@@ -92,20 +94,20 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     registryDependencies: ["utils"],
     files: [
       {
-        path: "registry/oxygen/lib/accordion-core.tsx",
-        type: "oxygen:hook",
-        target: "lib/oxygen-accordion.tsx",
+        path: "registry/zoblocks/lib/accordion-core.tsx",
+        type: "zoblocks:hook",
+        target: "lib/zoblocks-accordion.tsx",
       },
       {
-        path: "registry/oxygen/lib/accordion.css",
-        type: "oxygen:file",
-        target: "styles/oxygen-accordion.css",
+        path: "registry/zoblocks/lib/accordion.css",
+        type: "zoblocks:file",
+        target: "styles/zoblocks-accordion.css",
       },
     ],
   },
   {
     name: "clinical-status-core",
-    type: "oxygen:lib",
+    type: "zoblocks:lib",
     title: "Clinical status core",
     description:
       "The closed status vocabulary: nine scales, forty steps, each carrying a tone, a CSS glyph and a word in both a clinician and a patient register — plus the FHIR adapters that map Observation, AllergyIntolerance, Encounter, Task, Consent and DetectedIssue onto them. Installed automatically with ClinicalStatus.",
@@ -113,20 +115,20 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     registryDependencies: [] as string[],
     files: [
       {
-        path: "registry/oxygen/lib/clinical-status.ts",
-        type: "oxygen:lib",
-        target: "lib/oxygen-clinical-status.ts",
+        path: "registry/zoblocks/lib/clinical-status.ts",
+        type: "zoblocks:lib",
+        target: "lib/zoblocks-clinical-status.ts",
       },
       {
-        path: "registry/oxygen/lib/clinical-status.css",
-        type: "oxygen:style",
-        target: "styles/oxygen-clinical-status.css",
+        path: "registry/zoblocks/lib/clinical-status.css",
+        type: "zoblocks:style",
+        target: "styles/zoblocks-clinical-status.css",
       },
     ],
   },
   {
     name: "result-value-core",
-    type: "oxygen:lib",
+    type: "zoblocks:lib",
     title: "Result value core",
     description:
       "The seven absence reasons, the interpretation precedence rule, the delta suppression rule, and the sentence composer that turns an observation into one spoken clinical statement. Includes the FHIR Observation adapter. Installed automatically with ResultValue.",
@@ -134,20 +136,20 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     registryDependencies: ["clinical-status-core"],
     files: [
       {
-        path: "registry/oxygen/lib/result-value.ts",
-        type: "oxygen:lib",
-        target: "lib/oxygen-result-value.ts",
+        path: "registry/zoblocks/lib/result-value.ts",
+        type: "zoblocks:lib",
+        target: "lib/zoblocks-result-value.ts",
       },
       {
-        path: "registry/oxygen/lib/result-value.css",
-        type: "oxygen:style",
-        target: "styles/oxygen-result-value.css",
+        path: "registry/zoblocks/lib/result-value.css",
+        type: "zoblocks:style",
+        target: "styles/zoblocks-result-value.css",
       },
     ],
   },
   {
     name: "allergy-core",
-    type: "oxygen:lib",
+    type: "zoblocks:lib",
     title: "Allergy core",
     description:
       "The distinction between criticality (risk of a future reaction) and reaction severity (how bad a past one was), six verification states, four kinds, and the rule that a no-known-allergies assertion without an asserter and a date is not an assertion. Includes the FHIR AllergyIntolerance adapter. Installed automatically with AllergyChip.",
@@ -155,37 +157,41 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     registryDependencies: [] as string[],
     files: [
       {
-        path: "registry/oxygen/lib/allergy.ts",
-        type: "oxygen:lib",
-        target: "lib/oxygen-allergy.ts",
+        path: "registry/zoblocks/lib/allergy.ts",
+        type: "zoblocks:lib",
+        target: "lib/zoblocks-allergy.ts",
       },
       {
-        path: "registry/oxygen/lib/allergy.css",
-        type: "oxygen:style",
-        target: "styles/oxygen-allergy.css",
+        path: "registry/zoblocks/lib/allergy.css",
+        type: "zoblocks:style",
+        target: "styles/zoblocks-allergy.css",
       },
     ],
   },
   {
     name: "risk-core",
-    type: "oxygen:lib",
+    type: "zoblocks:lib",
     title: "Risk core",
     description:
       "Five bands including one for a patient the model could not score, driver attribution with its concentration, and a validity window that turns an old score into an expired one. Includes the FHIR RiskAssessment adapter. Installed automatically with RiskIndicator.",
     dependencies: [] as string[],
     registryDependencies: [] as string[],
     files: [
-      { path: "registry/oxygen/lib/risk.ts", type: "oxygen:lib", target: "lib/oxygen-risk.ts" },
       {
-        path: "registry/oxygen/lib/risk.css",
-        type: "oxygen:style",
-        target: "styles/oxygen-risk.css",
+        path: "registry/zoblocks/lib/risk.ts",
+        type: "zoblocks:lib",
+        target: "lib/zoblocks-risk.ts",
+      },
+      {
+        path: "registry/zoblocks/lib/risk.css",
+        type: "zoblocks:style",
+        target: "styles/zoblocks-risk.css",
       },
     ],
   },
   {
     name: "provenance-core",
-    type: "oxygen:lib",
+    type: "zoblocks:lib",
     title: "Provenance core",
     description:
       "Six source classes with CSS glyphs rather than colours, observed-at kept separate from recorded-at, per-datum staleness policies, and the confirmation state of an AI-extracted value. Includes a ledger keyed by resource and version, and the FHIR Provenance adapter. Installed automatically with ProvenanceChip.",
@@ -193,37 +199,41 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     registryDependencies: [] as string[],
     files: [
       {
-        path: "registry/oxygen/lib/provenance.ts",
-        type: "oxygen:lib",
-        target: "lib/oxygen-provenance.ts",
+        path: "registry/zoblocks/lib/provenance.ts",
+        type: "zoblocks:lib",
+        target: "lib/zoblocks-provenance.ts",
       },
       {
-        path: "registry/oxygen/lib/provenance.css",
-        type: "oxygen:style",
-        target: "styles/oxygen-provenance.css",
+        path: "registry/zoblocks/lib/provenance.css",
+        type: "zoblocks:style",
+        target: "styles/zoblocks-provenance.css",
       },
     ],
   },
   {
     name: "trend-core",
-    type: "oxygen:lib",
+    type: "zoblocks:lib",
     title: "Trend core",
     description:
       "Comparability segmentation across assay, method and unit changes, a minimum-points floor, the reliable-change threshold that renders noise as flat, and a required valence because half of clinical measures improve by falling. One SVG path per segment, no chart library. Installed automatically with TrendIndicator.",
     dependencies: [] as string[],
     registryDependencies: [] as string[],
     files: [
-      { path: "registry/oxygen/lib/trend.ts", type: "oxygen:lib", target: "lib/oxygen-trend.ts" },
       {
-        path: "registry/oxygen/lib/trend.css",
-        type: "oxygen:style",
-        target: "styles/oxygen-trend.css",
+        path: "registry/zoblocks/lib/trend.ts",
+        type: "zoblocks:lib",
+        target: "lib/zoblocks-trend.ts",
+      },
+      {
+        path: "registry/zoblocks/lib/trend.css",
+        type: "zoblocks:style",
+        target: "styles/zoblocks-trend.css",
       },
     ],
   },
   {
     name: "datetime-core",
-    type: "oxygen:lib",
+    type: "zoblocks:lib",
     title: "Date & time core",
     description:
       "The temporal engine and the behaviour every date, time and session control shares. Plain serialisable value types that carry their own precision — a birth date has no time member and cannot become midnight UTC — integer calendar arithmetic, a keyboard-first segmented field, an accessible month grid, and the session algebra whose driver is explicit state rather than an inference. Reads IANA zone data through Intl rather than shipping an offset table, and never reads the wall clock. Installed automatically with DateField, Calendar, DatePicker, BirthDateField, TimeField, SessionTimeField and ClinicalDateTime.",
@@ -231,40 +241,40 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     registryDependencies: ["utils"] as string[],
     files: [
       {
-        path: "registry/oxygen/lib/datetime.ts",
-        type: "oxygen:lib",
-        target: "lib/oxygen-datetime.ts",
+        path: "registry/zoblocks/lib/datetime.ts",
+        type: "zoblocks:lib",
+        target: "lib/zoblocks-datetime.ts",
       },
       {
-        path: "registry/oxygen/lib/datetime-field.tsx",
-        type: "oxygen:lib",
-        target: "lib/oxygen-datetime-field.tsx",
+        path: "registry/zoblocks/lib/datetime-field.tsx",
+        type: "zoblocks:lib",
+        target: "lib/zoblocks-datetime-field.tsx",
       },
       {
-        path: "registry/oxygen/lib/availability.ts",
-        type: "oxygen:lib",
-        target: "lib/oxygen-availability.ts",
+        path: "registry/zoblocks/lib/availability.ts",
+        type: "zoblocks:lib",
+        target: "lib/zoblocks-availability.ts",
       },
       {
-        path: "registry/oxygen/lib/recurrence.ts",
-        type: "oxygen:lib",
-        target: "lib/oxygen-recurrence.ts",
+        path: "registry/zoblocks/lib/recurrence.ts",
+        type: "zoblocks:lib",
+        target: "lib/zoblocks-recurrence.ts",
       },
       {
-        path: "registry/oxygen/lib/datetime-parts.tsx",
-        type: "oxygen:lib",
-        target: "lib/oxygen-datetime-parts.tsx",
+        path: "registry/zoblocks/lib/datetime-parts.tsx",
+        type: "zoblocks:lib",
+        target: "lib/zoblocks-datetime-parts.tsx",
       },
       {
-        path: "registry/oxygen/lib/datetime.css",
-        type: "oxygen:style",
-        target: "styles/oxygen-datetime.css",
+        path: "registry/zoblocks/lib/datetime.css",
+        type: "zoblocks:style",
+        target: "styles/zoblocks-datetime.css",
       },
     ],
   },
   {
     name: "clock-core",
-    type: "oxygen:lib",
+    type: "zoblocks:lib",
     title: "Clock",
     description:
       'One date format shared by the components that have to say "until when": an ISO timestamp read as the wall-clock time it was written in, rather than re-zoned through the reader\'s browser. Its own item rather than part of `utils`, because inside an application `@/lib/utils` is a name the application usually already owns.',
@@ -272,15 +282,15 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     registryDependencies: [] as string[],
     files: [
       {
-        path: "registry/oxygen/lib/clock.ts",
-        type: "oxygen:lib",
-        target: "lib/oxygen-clock.ts",
+        path: "registry/zoblocks/lib/clock.ts",
+        type: "zoblocks:lib",
+        target: "lib/zoblocks-clock.ts",
       },
     ],
   },
   {
     name: "presence-core",
-    type: "oxygen:lib",
+    type: "zoblocks:lib",
     title: "Presence core",
     description:
       "Nine clinical presence states rather than a green dot, ring geometry that survives a colour deficiency, rota resolution that returns a gap instead of the nearest plausible name, chart co-presence conflict detection, and escalation routing that offers the covering clinician before it offers an override. Installed automatically with CareTeamPresence.",
@@ -288,20 +298,20 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     registryDependencies: ["clock-core"],
     files: [
       {
-        path: "registry/oxygen/lib/presence.ts",
-        type: "oxygen:lib",
-        target: "lib/oxygen-presence.ts",
+        path: "registry/zoblocks/lib/presence.ts",
+        type: "zoblocks:lib",
+        target: "lib/zoblocks-presence.ts",
       },
       {
-        path: "registry/oxygen/lib/presence.css",
-        type: "oxygen:style",
-        target: "styles/oxygen-presence.css",
+        path: "registry/zoblocks/lib/presence.css",
+        type: "zoblocks:style",
+        target: "styles/zoblocks-presence.css",
       },
     ],
   },
   {
     name: "chart-header-core",
-    type: "oxygen:lib",
+    type: "zoblocks:lib",
     title: "Chart header core",
     description:
       'The Sex Parameter for Clinical Use resolved against what is on screen rather than read as a demographic, a safety strip whose absences are named rather than omitted, encounter context that will sit in "none selected" rather than pick one for you, and EpisodeOfCare into a program and a week. Installed automatically with ChartHeader.',
@@ -309,20 +319,20 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     registryDependencies: ["clock-core"],
     files: [
       {
-        path: "registry/oxygen/lib/chart-header.ts",
-        type: "oxygen:lib",
-        target: "lib/oxygen-chart-header.ts",
+        path: "registry/zoblocks/lib/chart-header.ts",
+        type: "zoblocks:lib",
+        target: "lib/zoblocks-chart-header.ts",
       },
       {
-        path: "registry/oxygen/lib/chart-header.css",
-        type: "oxygen:style",
-        target: "styles/oxygen-chart-header.css",
+        path: "registry/zoblocks/lib/chart-header.css",
+        type: "zoblocks:style",
+        target: "styles/zoblocks-chart-header.css",
       },
     ],
   },
   {
     name: "workspace-core",
-    type: "oxygen:lib",
+    type: "zoblocks:lib",
     title: "Workspace core",
     description:
       "The multi-chart workspace rules: a per-chart accent derived from the chart id so it is the same hue in every session, automatic disambiguation when two open charts look alike, a graded close verdict that asks about an unsigned note and refuses a draft order, and the fifteen-minute rule for re-asserting identity on return. Installed automatically with RecentPatientStack.",
@@ -330,20 +340,20 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     registryDependencies: [] as string[],
     files: [
       {
-        path: "registry/oxygen/lib/workspace.ts",
-        type: "oxygen:lib",
-        target: "lib/oxygen-workspace.ts",
+        path: "registry/zoblocks/lib/workspace.ts",
+        type: "zoblocks:lib",
+        target: "lib/zoblocks-workspace.ts",
       },
       {
-        path: "registry/oxygen/lib/workspace.css",
-        type: "oxygen:style",
-        target: "styles/oxygen-workspace.css",
+        path: "registry/zoblocks/lib/workspace.css",
+        type: "zoblocks:style",
+        target: "styles/zoblocks-workspace.css",
       },
     ],
   },
   {
     name: "palette-core",
-    type: "oxygen:lib",
+    type: "zoblocks:lib",
     title: "Command palette core",
     description:
       "Verb-first ranking with a sixty-line fuzzy matcher, treatment-relationship scoping that counts out-of-scope patients rather than naming them, an audit record for every patient search including the empty ones, and the second-Enter rule for a clinically significant action. Installed automatically with ChartCommandPalette.",
@@ -351,20 +361,20 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     registryDependencies: [] as string[],
     files: [
       {
-        path: "registry/oxygen/lib/palette.ts",
-        type: "oxygen:lib",
-        target: "lib/oxygen-palette.ts",
+        path: "registry/zoblocks/lib/palette.ts",
+        type: "zoblocks:lib",
+        target: "lib/zoblocks-palette.ts",
       },
       {
-        path: "registry/oxygen/lib/palette.css",
-        type: "oxygen:style",
-        target: "styles/oxygen-palette.css",
+        path: "registry/zoblocks/lib/palette.css",
+        type: "zoblocks:style",
+        target: "styles/zoblocks-palette.css",
       },
     ],
   },
   {
     name: "menu-core",
-    type: "oxygen:lib",
+    type: "zoblocks:lib",
     title: "Context menu core",
     description:
       "The resolver behind ChartContextMenu: the subject line a masked row may not exceed, four consequence tiers with the field each one makes mandatory, availability that distinguishes pending from refused from withheld, the withheld count, the bulk demotion, and the disclosure record produced on every path including the abandoned one. Installed automatically with ChartContextMenu.",
@@ -372,20 +382,20 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     registryDependencies: [] as string[],
     files: [
       {
-        path: "registry/oxygen/lib/menu.ts",
-        type: "oxygen:lib",
-        target: "lib/oxygen-menu.ts",
+        path: "registry/zoblocks/lib/menu.ts",
+        type: "zoblocks:lib",
+        target: "lib/zoblocks-menu.ts",
       },
       {
-        path: "registry/oxygen/lib/menu.css",
-        type: "oxygen:style",
-        target: "styles/oxygen-menu.css",
+        path: "registry/zoblocks/lib/menu.css",
+        type: "zoblocks:style",
+        target: "styles/zoblocks-menu.css",
       },
     ],
   },
   {
     name: "grid-core",
-    type: "oxygen:lib",
+    type: "zoblocks:lib",
     title: "Data grid core",
     description:
       'The engine behind DataGrid: a cell value type with no null member so an absence has to say which kind it is, coverage that admits a total of "unknown" because a FHIR server often will not say, comparison that keeps absent values at the bottom in both directions, two-dimensional cursor arithmetic for role="grid", a measured row ceiling the grid refuses past rather than degrading, and a CSV writer that neutralises formula injection with no way to switch it off. Installed automatically with DataGrid.',
@@ -393,41 +403,41 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     registryDependencies: [] as string[],
     files: [
       {
-        path: "registry/oxygen/lib/grid.ts",
-        type: "oxygen:lib",
-        target: "lib/oxygen-grid.ts",
+        path: "registry/zoblocks/lib/grid.ts",
+        type: "zoblocks:lib",
+        target: "lib/zoblocks-grid.ts",
       },
       {
-        path: "registry/oxygen/lib/grid.css",
-        type: "oxygen:style",
-        target: "styles/oxygen-grid.css",
+        path: "registry/zoblocks/lib/grid.css",
+        type: "zoblocks:style",
+        target: "styles/zoblocks-grid.css",
       },
     ],
   },
   {
     name: "switch-core",
-    type: "oxygen:lib",
+    type: "zoblocks:lib",
     title: "Switch core",
     description:
-      "The three-axis state model behind Oxygen's Switch: the commit phase machine, the state-label presets, and the absence vocabulary. Installed automatically with Switch.",
+      "The three-axis state model behind Zoblocks's Switch: the commit phase machine, the state-label presets, and the absence vocabulary. Installed automatically with Switch.",
     dependencies: ["clsx", "tailwind-merge"],
     registryDependencies: ["utils"],
     files: [
       {
-        path: "registry/oxygen/lib/switch.tsx",
-        type: "oxygen:lib",
-        target: "lib/oxygen-switch.tsx",
+        path: "registry/zoblocks/lib/switch.tsx",
+        type: "zoblocks:lib",
+        target: "lib/zoblocks-switch.tsx",
       },
       {
-        path: "registry/oxygen/lib/switch.css",
-        type: "oxygen:file",
-        target: "styles/oxygen-switch.css",
+        path: "registry/zoblocks/lib/switch.css",
+        type: "zoblocks:file",
+        target: "styles/zoblocks-switch.css",
       },
     ],
   },
   {
     name: "timeline-core",
-    type: "oxygen:lib",
+    type: "zoblocks:lib",
     title: "Timeline core",
     description:
       "The chronology engine behind Timeline and CareTimeline: precision-preserving time, the stable comparator, grouping, clustering with critical promotion, the coverage claim and its sentence. Installed automatically with either.",
@@ -435,41 +445,41 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     registryDependencies: ["utils", "accordion-core"],
     files: [
       {
-        path: "registry/oxygen/lib/timeline-core.ts",
-        type: "oxygen:lib",
+        path: "registry/zoblocks/lib/timeline-core.ts",
+        type: "zoblocks:lib",
         target: "lib/timeline-core.ts",
       },
       {
-        path: "registry/oxygen/lib/timeline.css",
-        type: "oxygen:file",
-        target: "styles/oxygen-timeline.css",
+        path: "registry/zoblocks/lib/timeline.css",
+        type: "zoblocks:file",
+        target: "styles/zoblocks-timeline.css",
       },
     ],
   },
   {
     name: "timeline-fhir",
-    type: "oxygen:lib",
+    type: "zoblocks:lib",
     title: "Timeline FHIR adapters",
     description:
       "Thirteen FHIR R4 resource types read into timeline events, plus an honest report of everything that could not be mapped. Pure functions — no fetching. Installed automatically with CareTimeline.",
-    dependencies: ["@oxygenui-design/fhir"],
+    dependencies: ["@zoblocks/fhir"],
     registryDependencies: ["utils", "timeline-core"],
     files: [
       {
-        path: "registry/oxygen/lib/timeline-fhir.ts",
-        type: "oxygen:lib",
+        path: "registry/zoblocks/lib/timeline-fhir.ts",
+        type: "zoblocks:lib",
         target: "lib/timeline-fhir.ts",
       },
     ],
   },
   {
     name: "clinical-note-core",
-    type: "oxygen:lib",
+    type: "zoblocks:lib",
     title: "Clinical note core",
     description:
       "The ProseMirror binding behind Clinical Note: the editor view, the provenance decorations, the toolbar commands, and the document builders. The clinical engine itself is the npm package; this is the part that needs a DOM. Installed automatically with Clinical Note.",
     dependencies: [
-      "@oxygenui-design/clinical-note-core",
+      "@zoblocks/clinical-note-core",
       "prosemirror-view",
       "prosemirror-state",
       "prosemirror-model",
@@ -480,30 +490,30 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     registryDependencies: ["utils"],
     files: [
       {
-        path: "registry/oxygen/lib/clinical-note.tsx",
-        type: "oxygen:hook",
-        target: "lib/oxygen-clinical-note.tsx",
+        path: "registry/zoblocks/lib/clinical-note.tsx",
+        type: "zoblocks:hook",
+        target: "lib/zoblocks-clinical-note.tsx",
       },
       {
-        path: "registry/oxygen/lib/clinical-note.css",
-        type: "oxygen:file",
-        target: "styles/oxygen-clinical-note.css",
+        path: "registry/zoblocks/lib/clinical-note.css",
+        type: "zoblocks:file",
+        target: "styles/zoblocks-clinical-note.css",
       },
     ],
   },
   {
     name: "tokens",
-    type: "oxygen:style",
-    title: "Oxygen tokens",
+    type: "zoblocks:style",
+    title: "Zoblocks tokens",
     description:
-      "Semantic clinical status tokens, three density modes, and light/dark themes. Required by every Oxygen component.",
+      "Semantic clinical status tokens, three density modes, and light/dark themes. Required by every Zoblocks component.",
     dependencies: [] as string[],
     registryDependencies: [] as string[],
     files: [
       {
-        path: "packages/tokens/src/oxygen-tokens.css",
-        type: "oxygen:file",
-        target: "styles/oxygen-tokens.css",
+        path: "packages/tokens/src/zoblocks-tokens.css",
+        type: "zoblocks:file",
+        target: "styles/zoblocks-tokens.css",
       },
     ],
   },
@@ -536,12 +546,12 @@ function toBuildable(component: LoadedComponent): BuildableItem {
   const { meta } = component;
   return {
     name: meta.name,
-    // Deliberately not derived from `layer`. `oxygen:block` means a
+    // Deliberately not derived from `layer`. `zoblocks:block` means a
     // multi-file composition installed as a unit; `layer` is our
     // dependency-direction concept. They are different axes that happen to
     // share a word, and conflating them would change install behaviour as a
     // side effect of an architectural label.
-    type: "oxygen:component",
+    type: "zoblocks:component",
     title: meta.title,
     // The install-time blurb. The long form lives in `rationale`, on the docs
     // page, which is the only surface with room for it.
@@ -550,7 +560,7 @@ function toBuildable(component: LoadedComponent): BuildableItem {
     dependencies: meta.dependencies,
     registryDependencies: meta.registryDependencies,
     files: meta.files ?? [
-      { path: component.sourcePath, type: "oxygen:component", target: component.consumerTarget },
+      { path: component.sourcePath, type: "zoblocks:component", target: component.consumerTarget },
     ],
   };
 }
@@ -575,14 +585,14 @@ const FORBIDDEN: Array<{ pattern: RegExp; why: string }> = [
  * Every `@/…` specifier in a published file must be installable.
  *
  * Registry source imports itself by the path it lands on in the consumer's
- * project — `@/lib/utils`, `@/components/oxygen/timeline`. Those specifiers
+ * project — `@/lib/utils`, `@/components/zoblocks/timeline`. Those specifiers
  * resolve inside this repository because tsconfig.generated.json maps them, so
  * nothing here fails when an item forgets to declare the dependency that
  * supplies one. The consumer is where it fails: the CLI writes exactly the
  * files the item asked for, the import resolves to nothing, and their build
  * breaks on source we told them was self-contained.
  *
- * `clinical-note` shipped in that state. It imports `@/lib/oxygen-clinical-note`
+ * `clinical-note` shipped in that state. It imports `@/lib/zoblocks-clinical-note`
  * and declared only `utils` and `tokens`, so the file supplying it — the
  * `clinical-note-core` support item — was never installed. Typechecking passed
  * here on every run, because here the path is mapped.
@@ -647,14 +657,14 @@ function unresolvedImports(
        * Relative imports, which this check used to ignore entirely.
        *
        * The registry renames files as it installs them — `lib/result-value.ts`
-       * lands as `lib/oxygen-result-value.ts` — so a relative specifier that
+       * lands as `lib/zoblocks-result-value.ts` — so a relative specifier that
        * resolves in this monorepo can resolve to nothing in a consumer's
        * project. That is exactly what shipped: `result-value` imported
-       * `./clinical-status`, whose file installs as `oxygen-clinical-status`,
-       * and `oxygen add result-value` produced a tree that did not compile.
+       * `./clinical-status`, whose file installs as `zoblocks-clinical-status`,
+       * and `zoblocks add result-value` produced a tree that did not compile.
        *
-       * Every sibling in `registry/oxygen/lib` is already imported by its
-       * installed name through `@/lib/oxygen-*`. One file was not, the check
+       * Every sibling in `registry/zoblocks/lib` is already imported by its
+       * installed name through `@/lib/zoblocks-*`. One file was not, the check
        * only looked at `@/` specifiers, and nothing caught it. This closes
        * that: inside the registry, a relative import across files is refused
        * outright, because the installed layout is flat and renamed and there
@@ -667,7 +677,7 @@ function unresolvedImports(
         problems.push(
           `${name}: ${file.target} imports "${specifier}" relatively. ` +
             `Files are renamed on install, so a relative path resolves here and not in a ` +
-            `consumer's project — import it by its installed name instead, as "@/lib/oxygen-…".`,
+            `consumer's project — import it by its installed name instead, as "@/lib/zoblocks-…".`,
         );
       }
     }
@@ -763,7 +773,7 @@ export async function emitRegistry(
             /*
              * Bare names are emitted as bare names.
              *
-             * They used to be expanded to absolute `oxygenui.design` URLs. That
+             * They used to be expanded to absolute `zoblocks.design` URLs. That
              * baked this registry's own domain into every document it serves,
              * which meant a copy of the registry — a mirror, an air-gapped
              * enterprise cache, a local build under test — resolved its

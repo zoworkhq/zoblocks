@@ -1,4 +1,4 @@
-import { defineComponentMeta } from "@oxygenui-design/component-meta";
+import { defineComponentMeta } from "@zoblocks/component-meta";
 
 /**
  * Identity is the third `package` component, and the reason is different again.
@@ -33,7 +33,7 @@ export default defineComponentMeta({
   },
 
   distribution: "package",
-  packageName: "@oxygenui-design/identity",
+  packageName: "@zoblocks/identity",
   /*
    * The banner is the component a consumer configures — the avatar and the chip
    * take an identity and little else, and the provider is policy. There is no
@@ -148,8 +148,8 @@ export default defineComponentMeta({
   IdentityProvider,
   PatientBanner,
   PatientGuard,
-} from "@oxygenui-design/identity";
-import "@oxygenui-design/identity/styles.css";
+} from "@zoblocks/identity";
+import "@zoblocks/identity/styles.css";
 
 <IdentityProvider disclosure="clinical" photos="allow" onSensitiveReveal={audit.write}>
   {/* context="action" takes a two-or-more tuple: NPSG.01.01.01 as a compile error. */}
@@ -165,6 +165,6 @@ import "@oxygenui-design/identity/styles.css";
   </PatientBanner>
 </IdentityProvider>;`,
 
-  dependencies: ["@oxygenui-design/identity-core"],
+  dependencies: ["@zoblocks/identity-core"],
   registryDependencies: [],
 });

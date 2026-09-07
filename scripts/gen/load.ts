@@ -11,7 +11,7 @@ import { existsSync } from "node:fs";
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { componentMetaSchema, type ComponentMeta } from "@oxygenui-design/component-meta";
+import { componentMetaSchema, type ComponentMeta } from "@zoblocks/component-meta";
 import {
   COMPONENTS_DIR,
   CONSUMER_COMPONENT_DIR,
@@ -53,9 +53,9 @@ export interface LoadedComponent {
    * every variant — which is a handful of props and no help at all.
    */
   extraPropsFiles: string[];
-  /** Import specifier a consumer uses after installing, e.g. "@/components/oxygen/vitals-panel". */
+  /** Import specifier a consumer uses after installing, e.g. "@/components/zoblocks/vitals-panel". */
   consumerSpecifier: string;
-  /** Where the Oxygen CLI writes it, e.g. "components/oxygen/vitals-panel.tsx". */
+  /** Where the Zoblocks CLI writes it, e.g. "components/zoblocks/vitals-panel.tsx". */
   consumerTarget: string;
   hasStory: boolean;
   hasTest: boolean;
@@ -90,9 +90,9 @@ async function listComponentDirs(): Promise<string[]> {
  * Package components, discovered by their metadata file.
  *
  * A package keeps its own `component.meta.ts` beside its source rather than
- * putting a stub in `registry/oxygen`. The metadata belongs with the thing it
+ * putting a stub in `registry/zoblocks`. The metadata belongs with the thing it
  * describes, and a registry directory containing no source would be a
- * standing invitation to `oxygen add` something that ships on npm.
+ * standing invitation to `zoblocks add` something that ships on npm.
  */
 async function listPackageMetaFiles(): Promise<string[]> {
   const packagesDir = path.join(ROOT, "packages");
@@ -213,10 +213,10 @@ export async function loadComponents(): Promise<LoadedComponent[]> {
 
     // The file is only read because it sits in a package, so declaring
     // `registry` here would produce a component the registry cannot build and
-    // the docs would offer a `oxygen add` command for something on npm.
+    // the docs would offer a `zoblocks add` command for something on npm.
     if (parsed.data.distribution !== "package") {
       problems.push(
-        `${rel(metaFile)}: a component.meta.ts inside packages/ must set distribution: "package". Registry components live in registry/oxygen.`,
+        `${rel(metaFile)}: a component.meta.ts inside packages/ must set distribution: "package". Registry components live in registry/zoblocks.`,
       );
       continue;
     }
@@ -352,7 +352,7 @@ export async function loadComponents(): Promise<LoadedComponent[]> {
     for (const fixture of component.meta.fixtures) {
       if (fixtureExports.size && !fixtureExports.has(fixture)) {
         problems.push(
-          `${component.meta.name}: fixture "${fixture}" is not exported by @oxygenui-design/fixtures`,
+          `${component.meta.name}: fixture "${fixture}" is not exported by @zoblocks/fixtures`,
         );
       }
     }

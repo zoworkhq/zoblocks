@@ -1,5 +1,5 @@
 /**
- * @oxygenui-design/copilot-react — headless React for Oxygen Copilot.
+ * @zoblocks/copilot-react — headless React for Zoblocks Copilot.
  *
  * Hooks and unstyled primitives. No design system, no CSS, no markup opinions
  * beyond the ones that are accessibility requirements.
@@ -61,7 +61,7 @@ export {
 } from "./primitives.js";
 
 // Re-exported so a consumer never reaches past this package for the engine's
-// types. The same courtesy `@oxygenui-design/signature` extends for its core.
+// types. The same courtesy `@zoblocks/signature` extends for its core.
 export type {
   ActionProposal,
   Actor,
@@ -84,7 +84,7 @@ export type {
   Source,
   TelemetryEvent,
   Withheld,
-} from "@oxygenui-design/copilot-core";
+} from "@zoblocks/copilot-core";
 
 export {
   behavioralModes,
@@ -103,4 +103,4 @@ export {
   minimalDisclosure,
   prepare,
   workUp,
-} from "@oxygenui-design/copilot-core";
+} from "@zoblocks/copilot-core";

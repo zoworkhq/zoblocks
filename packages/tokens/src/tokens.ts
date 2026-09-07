@@ -116,9 +116,9 @@ export const TOKEN_NAMES = [
 
 export type TokenName = (typeof TOKEN_NAMES)[number];
 
-/** `cssVar("status.critical")` → `"var(--ox-status-critical)"`. */
+/** `cssVar("status.critical")` → `"var(--zb-status-critical)"`. */
 export function cssVar(name: TokenName): string {
-  return `var(--ox-${name.split(".").join("-")})`;
+  return `var(--zb-${name.split(".").join("-")})`;
 }
 
 export const THEMES = [

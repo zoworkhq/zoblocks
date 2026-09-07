@@ -1,13 +1,13 @@
 /**
- * The inverse bridge: an Oxygen brand, pushed into Ant Design.
+ * The inverse bridge: a Zoblocks brand, pushed into Ant Design.
  *
- * `AntdBridge` answers "make Oxygen's components look like our antd app".
+ * `AntdBridge` answers "make Zoblocks's components look like our antd app".
  * This answers the question customers actually ask second, and care about
  * more: *"we configured our brand in your app — why do our **own** buttons
  * still look like Ant Design's default blue?"*
  *
  * Same correspondence as `map.ts`, read the other way. That is deliberate and
- * it is what keeps the two honest: if `colorPrimary ↔ --ox-accent` is ever
+ * it is what keeps the two honest: if `colorPrimary ↔ --zb-accent` is ever
  * wrong, it is wrong in both directions and one test catches it.
  *
  * **What is not pushed.** Clinical status, again, and for the mirror-image
@@ -18,7 +18,7 @@
  * form field is wrong*. The token is safe; the meaning does not survive.
  */
 
-import { toPx, type OxygenTokens } from "@oxygenui-design/bridge-core";
+import { toPx, type ZoblocksTokens } from "@zoblocks/bridge-core";
 
 /** The shape `ConfigProvider` takes. Structural, so antd stays a peer. */
 export interface AntdThemeConfig {
@@ -26,48 +26,48 @@ export interface AntdThemeConfig {
 }
 
 /**
- * An Oxygen brand as antd's token object.
+ * A Zoblocks brand as antd's token object.
  *
  * Only the tokens with an honest counterpart, the same rule the forward bridge
  * follows: antd has around a hundred seed tokens and filling them from a
  * palette we have no equivalents for would produce a theme that is uniformly
  * slightly wrong.
  */
-export function toAntdTheme(tokens: OxygenTokens): AntdThemeConfig {
+export function toAntdTheme(tokens: ZoblocksTokens): AntdThemeConfig {
   const token: Record<string, string | number> = {};
 
   const set = (key: string, value: string | number | undefined) => {
     if (value !== undefined && value !== "") token[key] = value;
   };
 
-  set("colorPrimary", tokens["--ox-accent"]);
-  set("colorPrimaryHover", tokens["--ox-accent-hover"]);
-  set("colorPrimaryBg", tokens["--ox-accent-subtle"]);
-  set("colorPrimaryBorder", tokens["--ox-accent-border"]);
+  set("colorPrimary", tokens["--zb-accent"]);
+  set("colorPrimaryHover", tokens["--zb-accent-hover"]);
+  set("colorPrimaryBg", tokens["--zb-accent-subtle"]);
+  set("colorPrimaryBorder", tokens["--zb-accent-border"]);
 
-  set("colorText", tokens["--ox-text"]);
-  set("colorTextSecondary", tokens["--ox-text-muted"]);
-  set("colorTextTertiary", tokens["--ox-text-subtle"]);
+  set("colorText", tokens["--zb-text"]);
+  set("colorTextSecondary", tokens["--zb-text-muted"]);
+  set("colorTextTertiary", tokens["--zb-text-subtle"]);
 
-  set("colorBgLayout", tokens["--ox-bg"]);
-  set("colorBgContainer", tokens["--ox-surface"]);
-  set("colorBgElevated", tokens["--ox-surface-raised"]);
-  set("colorFillQuaternary", tokens["--ox-bg-subtle"]);
-  set("colorFillTertiary", tokens["--ox-bg-muted"]);
+  set("colorBgLayout", tokens["--zb-bg"]);
+  set("colorBgContainer", tokens["--zb-surface"]);
+  set("colorBgElevated", tokens["--zb-surface-raised"]);
+  set("colorFillQuaternary", tokens["--zb-bg-subtle"]);
+  set("colorFillTertiary", tokens["--zb-bg-muted"]);
 
-  set("colorBorder", tokens["--ox-border"]);
+  set("colorBorder", tokens["--zb-border"]);
 
-  // antd states radii as numbers of pixels; Oxygen states them in rem.
-  set("borderRadiusSM", toPx(tokens["--ox-radius-sm"]));
-  set("borderRadius", toPx(tokens["--ox-radius"]));
-  set("borderRadiusLG", toPx(tokens["--ox-radius-lg"]));
+  // antd states radii as numbers of pixels; Zoblocks states them in rem.
+  set("borderRadiusSM", toPx(tokens["--zb-radius-sm"]));
+  set("borderRadius", toPx(tokens["--zb-radius"]));
+  set("borderRadiusLG", toPx(tokens["--zb-radius-lg"]));
 
-  set("fontFamily", tokens["--ox-font-sans"]);
-  set("fontFamilyCode", tokens["--ox-font-mono"]);
-  set("fontSize", toPx(tokens["--ox-text-base"]));
+  set("fontFamily", tokens["--zb-font-sans"]);
+  set("fontFamilyCode", tokens["--zb-font-mono"]);
+  set("fontSize", toPx(tokens["--zb-text-base"]));
 
-  set("motionDurationMid", tokens["--ox-duration"]);
-  set("motionEaseInOut", tokens["--ox-ease"]);
+  set("motionDurationMid", tokens["--zb-duration"]);
+  set("motionEaseInOut", tokens["--zb-ease"]);
 
   return { token };
 }

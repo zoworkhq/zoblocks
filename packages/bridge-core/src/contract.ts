@@ -1,7 +1,7 @@
 /**
  * The theme-bridge contract.
  *
- * A bridge translates one UI framework's resolved theme into Oxygen's
+ * A bridge translates one UI framework's resolved theme into Zoblocks's
  * component token surface. It renders nothing, owns no state, and imports no
  * component — which is what keeps a UI framework out of the module graph of
  * every consumer who did not ask for one.
@@ -20,7 +20,7 @@
  * A set of custom-property declarations, ready to spread onto an element's
  * `style`.
  *
- * Keyed by the full property name (`--ox-accent`) rather than a token path, so
+ * Keyed by the full property name (`--zb-accent`) rather than a token path, so
  * a bridge's output is inspectable as exactly what will land in the DOM.
  */
 export type TokenPatch = Record<`--${string}`, string | number | undefined>;
@@ -34,7 +34,7 @@ export type TokenPatch = Record<`--${string}`, string | number | undefined>;
  * mapping stays a pure function that a test can call with a literal.
  */
 export interface BridgeDefinition<HostTheme> {
-  /** Stable id. Becomes the `data-ox-bridge` attribute and the npm suffix. */
+  /** Stable id. Becomes the `data-zb-bridge` attribute and the npm suffix. */
   readonly id: string;
 
   /** Human name for docs and error messages. */
@@ -46,7 +46,7 @@ export interface BridgeDefinition<HostTheme> {
    * Deliberately not a `>=5 || >=6` range. A bridge written against v6 token
    * names reads `undefined` on v5, and `undefined` in a custom property means
    * "fall through to the next stop in the chain" — so the failure is a
-   * component quietly wearing Oxygen's defaults instead of the customer's
+   * component quietly wearing Zoblocks's defaults instead of the customer's
    * brand. No error, no warning, no failing test. One major per bridge is what
    * makes that a resolution error instead.
    */
@@ -67,7 +67,7 @@ export interface BridgeDefinition<HostTheme> {
    * Per-component geometry the semantic tier cannot carry.
    *
    * The documented exception, kept small on purpose. Almost everything a
-   * bridge does belongs in `map`, because writing `--ox-accent` once reaches
+   * bridge does belongs in `map`, because writing `--zb-accent` once reaches
    * every component while writing each component's accent is forty
    * declarations that drift apart.
    *
@@ -106,7 +106,7 @@ export function resolvePatch<HostTheme>(
 }
 
 /**
- * The minimum hit target Oxygen guarantees, in pixels.
+ * The minimum hit target Zoblocks guarantees, in pixels.
  *
  * WCAG 2.5.5. A host asking for 24px controls does not get to shrink a
  * clinical control below it, so density mappings clamp rather than copy.

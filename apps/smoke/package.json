@@ -1,5 +1,5 @@
 {
-  "name": "@oxygenui-design/smoke",
+  "name": "@zoblocks/smoke",
   "version": "0.0.0",
   "private": true,
   "description": "Proves the cross-framework claim by building and running the elements under each framework's real compiler.",
@@ -11,8 +11,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@oxygenui-design/loaders": "workspace:*",
-    "@oxygenui-design/tokens": "workspace:*"
+    "@zoblocks/loaders": "workspace:*",
+    "@zoblocks/tokens": "workspace:*"
   },
   "devDependencies": {
     "@angular/common": "^22.1.2",

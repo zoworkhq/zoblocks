@@ -1,12 +1,12 @@
 {
-  "name": "@oxygenui-design/clinical-note-core",
+  "name": "@zoblocks/clinical-note-core",
   "version": "0.1.0",
-  "description": "The engine behind Oxygen's ClinicalNote. Coded sections, per-range provenance, a composable sign gate, and deterministic FHIR/text serialization — no React, no DOM.",
+  "description": "The engine behind Zoblocks's ClinicalNote. Coded sections, per-range provenance, a composable sign gate, and deterministic FHIR/text serialization — no React, no DOM.",
   "license": "MIT",
-  "homepage": "https://oxygenui.design/components/clinical-note",
+  "homepage": "https://zoblocks.design/components/clinical-note",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zoworkhq/oxygenui.git",
+    "url": "git+https://github.com/zoworkhq/zoblocks.git",
     "directory": "packages/clinical-note-core"
   },
   "keywords": [
@@ -59,7 +59,7 @@
     "prosemirror-transform": "^1.10.4"
   },
   "devDependencies": {
-    "@oxygenui-design/tsconfig": "workspace:*",
+    "@zoblocks/tsconfig": "workspace:*",
     "@vitest/coverage-v8": "^4.1.10",
     "typescript": "^5.7.2",
     "vitest": "^4.1.10"

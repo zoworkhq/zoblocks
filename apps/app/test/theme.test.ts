@@ -10,7 +10,7 @@
  * the source next to a passing suite:
  *
  *   The cookie beats `localStorage`, because the cookie is the half that
- *   crosses from `oxygenui.design` to `app.oxygenui.design`. Reading storage
+ *   crosses from `zoblocks.design` to `app.zoblocks.design`. Reading storage
  *   first would make a reader who chose dark on the docs site land on a white
  *   login screen.
  *
@@ -45,7 +45,7 @@ let written: string[] = [];
 /** What `document.cookie` reads back. Set per test. */
 let cookieJar = "";
 
-const LEGACY_KEYS = ["oxygen-app-theme", "oxygen-console-theme"];
+const LEGACY_KEYS = ["zoblocks-app-theme", "zoblocks-console-theme"];
 
 function stubMatchMedia(prefersDark: boolean) {
   vi.stubGlobal("matchMedia", (query: string) => ({
@@ -75,7 +75,7 @@ beforeEach(() => {
 
   localStorage.clear();
   document.documentElement.className = "";
-  document.documentElement.removeAttribute("data-ox-theme");
+  document.documentElement.removeAttribute("data-zb-theme");
   stubMatchMedia(false);
   vi.stubGlobal("location", { hostname: "localhost" });
 });
@@ -131,7 +131,7 @@ describe("readStoredTheme", () => {
 
   it("prefers the current key over a legacy one", () => {
     localStorage.setItem(THEME_STORAGE_KEY, "light");
-    localStorage.setItem("oxygen-app-theme", "dark");
+    localStorage.setItem("zoblocks-app-theme", "dark");
     expect(readStoredTheme()).toBe("light");
   });
 
@@ -141,7 +141,7 @@ describe("readStoredTheme", () => {
   });
 
   it("returns null when an empty cookie value shadows storage", () => {
-    // `oxygen-theme=` is present-but-empty, which is not "unset": the module
+    // `zoblocks-theme=` is present-but-empty, which is not "unset": the module
     // treats it as a value and rejects it rather than reaching past it.
     cookieJar = `${THEME_COOKIE}=`;
     localStorage.setItem(THEME_STORAGE_KEY, "dark");
@@ -207,7 +207,7 @@ describe("applyTheme", () => {
     applyTheme("high-contrast");
 
     // Both at once would give a reader two half-applied token sets.
-    expect(root().getAttribute("data-ox-theme")).toBe("high-contrast");
+    expect(root().getAttribute("data-zb-theme")).toBe("high-contrast");
     expect(root().classList.contains("dark")).toBe(false);
   });
 
@@ -215,7 +215,7 @@ describe("applyTheme", () => {
     applyTheme("high-contrast");
     applyTheme("dark");
 
-    expect(root().hasAttribute("data-ox-theme")).toBe(false);
+    expect(root().hasAttribute("data-zb-theme")).toBe(false);
     expect(root().classList.contains("dark")).toBe(true);
   });
 
@@ -251,7 +251,7 @@ describe("writeTheme", () => {
   });
 
   it("sets no domain on a preview origin it does not own", () => {
-    vi.stubGlobal("location", { hostname: "oxygen-git-abc123.vercel.app" });
+    vi.stubGlobal("location", { hostname: "zoblocks-git-abc123.vercel.app" });
     writeTheme("dark");
     // Writing a cookie for a domain you do not own is a cookie the browser
     // drops; the empty branch is the honest one.
@@ -259,21 +259,21 @@ describe("writeTheme", () => {
   });
 
   it("scopes to the registrable domain on the apex", () => {
-    vi.stubGlobal("location", { hostname: "oxygenui.design" });
+    vi.stubGlobal("location", { hostname: "zoblocks.design" });
     writeTheme("dark");
-    expect(written[0]).toContain("domain=.oxygenui.design");
+    expect(written[0]).toContain("domain=.zoblocks.design");
   });
 
   it("scopes to the registrable domain on the app subdomain", () => {
-    vi.stubGlobal("location", { hostname: "app.oxygenui.design" });
+    vi.stubGlobal("location", { hostname: "app.zoblocks.design" });
     writeTheme("light");
     // This is the whole reason it is a cookie: the choice has to reach the
     // other origin.
-    expect(written[0]).toContain("domain=.oxygenui.design");
+    expect(written[0]).toContain("domain=.zoblocks.design");
   });
 
   it("does not scope to a domain that merely ends in the same letters", () => {
-    vi.stubGlobal("location", { hostname: "notoxygenui.design" });
+    vi.stubGlobal("location", { hostname: "notzoblocks.design" });
     writeTheme("dark");
     expect(written[0]).not.toContain("domain=");
   });
@@ -330,7 +330,7 @@ describe("THEME_BOOT_SCRIPT", () => {
   });
 
   it("reads the legacy storage keys, exactly as the module does", () => {
-    localStorage.setItem("oxygen-console-theme", "dark");
+    localStorage.setItem("zoblocks-console-theme", "dark");
     boot();
     expect(document.documentElement.classList.contains("dark")).toBe(true);
   });
@@ -338,7 +338,7 @@ describe("THEME_BOOT_SCRIPT", () => {
   it("sets the high-contrast attribute and stops", () => {
     cookieJar = `${THEME_COOKIE}=high-contrast`;
     boot();
-    expect(document.documentElement.getAttribute("data-ox-theme")).toBe("high-contrast");
+    expect(document.documentElement.getAttribute("data-zb-theme")).toBe("high-contrast");
     expect(document.documentElement.classList.contains("dark")).toBe(false);
   });
 
@@ -365,19 +365,19 @@ describe("THEME_BOOT_SCRIPT", () => {
     for (const stored of ["dark", "light", "high-contrast"] as const) {
       cookieJar = `${THEME_COOKIE}=${stored}`;
       document.documentElement.className = "";
-      document.documentElement.removeAttribute("data-ox-theme");
+      document.documentElement.removeAttribute("data-zb-theme");
       boot();
       const fromScript = {
         dark: document.documentElement.classList.contains("dark"),
-        attr: document.documentElement.getAttribute("data-ox-theme"),
+        attr: document.documentElement.getAttribute("data-zb-theme"),
       };
 
       document.documentElement.className = "";
-      document.documentElement.removeAttribute("data-ox-theme");
+      document.documentElement.removeAttribute("data-zb-theme");
       applyTheme(resolveTheme(readStoredTheme()));
       expect({
         dark: document.documentElement.classList.contains("dark"),
-        attr: document.documentElement.getAttribute("data-ox-theme"),
+        attr: document.documentElement.getAttribute("data-zb-theme"),
       }).toEqual(fromScript);
     }
   });

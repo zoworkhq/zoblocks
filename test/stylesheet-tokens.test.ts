@@ -5,9 +5,9 @@
  * only. Every component's colour actually lives in a `.css` file beside it, so
  * the check covered the smaller half of the surface and the CSS went unread.
  *
- * CareTeamPresence shipped `var(--ox-surface-sunken, #f1f5f9)` and
- * `var(--ox-radius-md, 6px)`. Neither name has ever existed: the real ones are
- * `--ox-bg-muted` and `--ox-radius`. Both had a plausible fallback, so nothing
+ * CareTeamPresence shipped `var(--zb-surface-sunken, #f1f5f9)` and
+ * `var(--zb-radius-md, 6px)`. Neither name has ever existed: the real ones are
+ * `--zb-bg-muted` and `--zb-radius`. Both had a plausible fallback, so nothing
  * failed — the fallback simply won in every theme, and the avatar chip stayed
  * light grey in dark mode with light-grey initials on it, at roughly 1.9:1.
  * Every unit test passed, axe passed, the contrast gate passed (it reads
@@ -24,7 +24,7 @@ import { describe, expect, it } from "vitest";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { ICON_SLOTS } from "@oxygenui-design/theme";
+import { ICON_SLOTS } from "@zoblocks/theme";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -47,16 +47,16 @@ const STYLESHEETS = SEARCHED.flatMap((dir) => filesUnder(path.join(ROOT, dir), [
 const SOURCES = SEARCHED.flatMap((dir) => filesUnder(path.join(ROOT, dir), [".ts", ".tsx"]));
 
 /**
- * Every `--ox-*` a stylesheet may legitimately name.
+ * Every `--zb-*` a stylesheet may legitimately name.
  *
  * Three origins, all of them real:
  *
  *  - the token build, which is what a consumer gets from
- *    `@oxygenui-design/tokens` without opting into anything;
+ *    `@zoblocks/tokens` without opting into anything;
  *  - a declaration in any shipped stylesheet, which is where component-scoped
- *    tokens like `--ox-switch-track-w` live;
- *  - a property set at runtime from TypeScript. `--ox-loader-phase`,
- *    `--ox-tabs-ind-x` and `--ox-signature-bleed` are written as inline styles
+ *    tokens like `--zb-switch-track-w` live;
+ *  - a property set at runtime from TypeScript. `--zb-loader-phase`,
+ *    `--zb-tabs-ind-x` and `--zb-signature-bleed` are written as inline styles
  *    by the component that reads them, and they are as real as the other two.
  */
 const tokens = JSON.parse(
@@ -76,16 +76,16 @@ for (const group of ["themes", "density", "component"] as const) {
 }
 
 for (const file of STYLESHEETS) {
-  for (const match of readFileSync(file, "utf8").matchAll(/^\s*(--ox-[a-z0-9-]+)\s*:/gm)) {
+  for (const match of readFileSync(file, "utf8").matchAll(/^\s*(--zb-[a-z0-9-]+)\s*:/gm)) {
     DEFINED.add(match[1] as string);
   }
 }
 
 for (const file of SOURCES) {
-  // `"--ox-loader-phase"` as an object key or a setProperty argument. Blunt on
+  // `"--zb-loader-phase"` as an object key or a setProperty argument. Blunt on
   // purpose: over-collecting here costs a token that was going to be fine, and
   // under-collecting costs a false failure on a component that works.
-  for (const match of readFileSync(file, "utf8").matchAll(/["'`](--ox-[a-z0-9-]+)["'`]/g)) {
+  for (const match of readFileSync(file, "utf8").matchAll(/["'`](--zb-[a-z0-9-]+)["'`]/g)) {
     DEFINED.add(match[1] as string);
   }
 }
@@ -94,7 +94,7 @@ for (const file of SOURCES) {
  * Override slots: named on purpose, defined nowhere on purpose.
  *
  * These are the opposite of the bug above. The whole contract is that the
- * property is *unset* until a deployment sets it — `var(--ox-icon-send,
+ * property is *unset* until a deployment sets it — `var(--zb-icon-send,
  * <the built-in>)` draws the shipped glyph and takes the customer's when
  * they provide one. Defining them would break the mechanism, so the check
  * cannot ask for a definition; it asks for the name to be listed here, which
@@ -103,18 +103,18 @@ for (const file of SOURCES) {
  * The icon family is read from the theme package rather than retyped, so a new
  * replaceable slot does not need an edit in two places.
  */
-for (const { slot } of ICON_SLOTS) DEFINED.add(`--ox-icon-${slot}`);
+for (const { slot } of ICON_SLOTS) DEFINED.add(`--zb-icon-${slot}`);
 
 const OVERRIDE_SLOTS: ReadonlyArray<[name: string, why: string]> = [
-  // `mask-image: var(--ox-icon-{slot}, …)` is assembled from a data attribute,
+  // `mask-image: var(--zb-icon-{slot}, …)` is assembled from a data attribute,
   // so the bare prefix appears in the source as a composition rather than a name.
-  ["--ox-icon-", "the prefix the icon rules compose a slot name onto"],
+  ["--zb-icon-", "the prefix the icon rules compose a slot name onto"],
   [
-    "--ox-accordion-intrinsic",
+    "--zb-accordion-intrinsic",
     "content-visibility guess for a collapsed section; a host that knows its own row height sets it",
   ],
-  ["--ox-signature-bleed", "print bleed for the signature block, set per deployment"],
-  ["--ox-tabs-font-numeric", "numeric face for tab counts, after --ox-font-numeric"],
+  ["--zb-signature-bleed", "print bleed for the signature block, set per deployment"],
+  ["--zb-tabs-font-numeric", "numeric face for tab counts, after --zb-font-numeric"],
 ];
 
 for (const [name] of OVERRIDE_SLOTS) DEFINED.add(name);
@@ -128,8 +128,8 @@ describe("stylesheets reference tokens that exist", () => {
   it("finds stylesheets to check, so a path change cannot quietly empty this suite", () => {
     expect(SHEETS.length).toBeGreaterThan(10);
     // And the token build was actually read, rather than silently parsed to {}.
-    expect(DEFINED.has("--ox-text-muted")).toBe(true);
-    expect(DEFINED.has("--ox-bg-muted")).toBe(true);
+    expect(DEFINED.has("--zb-text-muted")).toBe(true);
+    expect(DEFINED.has("--zb-bg-muted")).toBe(true);
   });
 
   it("keeps the override-slot list honest, so it cannot become a dumping ground", () => {
@@ -137,7 +137,7 @@ describe("stylesheets reference tokens that exist", () => {
     // uses any more is a suppression waiting to hide the next real one.
     const referenced = new Set(
       SHEETS.flatMap(({ text }) =>
-        [...text.matchAll(/var\(\s*(--ox-[a-z0-9-]+)/g)].map((m) => m[1] as string),
+        [...text.matchAll(/var\(\s*(--zb-[a-z0-9-]+)/g)].map((m) => m[1] as string),
       ),
     );
     const stale = OVERRIDE_SLOTS.map(([name]) => name).filter((name) => !referenced.has(name));
@@ -148,7 +148,7 @@ describe("stylesheets reference tokens that exist", () => {
     const unknown = new Set<string>();
     // Matches with or without a fallback. The fallback is precisely what makes
     // the bug silent, so it cannot also be what excuses the reference.
-    for (const match of text.matchAll(/var\(\s*(--ox-[a-z0-9-]+)/g)) {
+    for (const match of text.matchAll(/var\(\s*(--zb-[a-z0-9-]+)/g)) {
       const name = match[1] as string;
       if (!DEFINED.has(name)) unknown.add(name);
     }

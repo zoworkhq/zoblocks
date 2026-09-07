@@ -2,8 +2,8 @@
  * Generates `packages/react/src` from the registry source.
  *
  * The invariant this exists to protect: **no component's logic is written
- * twice.** Oxygen ships React two ways — copied into a customer's repository by
- * the Oxygen CLI, and installed from npm — and the moment those are two
+ * twice.** Zoblocks ships React two ways — copied into a customer's repository by
+ * the Zoblocks CLI, and installed from npm — and the moment those are two
  * hand-written trees they drift. The parity test between the registry and the
  * custom elements already caught two divergences in its first week; a third
  * copy would make that the project's main source of bugs.
@@ -15,8 +15,8 @@
  * mechanically produced.
  *
  * The only transformation is import specifiers. A registry component imports
- * the way the Oxygen CLI lays files out in a consumer's project
- * (`@/components/oxygen/rhythm-loader`); inside a package those become ordinary
+ * the way the Zoblocks CLI lays files out in a consumer's project
+ * (`@/components/zoblocks/rhythm-loader`); inside a package those become ordinary
  * relative paths. Nothing else is rewritten — if this file ever needs to change
  * logic, the abstraction is wrong.
  */
@@ -44,43 +44,43 @@ function rewriteImports(source: string, fromDepth: number): string {
       // The shared utility module.
       .replace(/(["'])@\/lib\/utils\1/g, `"${up}lib/utils"`)
       // The loader core.
-      .replace(/(["'])@\/lib\/oxygen-loader\1/g, `"${up}lib/loader"`)
-      // The recorder core: the React binding over @oxygenui-design/recorder-core.
-      .replace(/(["'])@\/lib\/oxygen-recorder\1/g, `"${up}lib/recorder"`)
+      .replace(/(["'])@\/lib\/zoblocks-loader\1/g, `"${up}lib/loader"`)
+      // The recorder core: the React binding over @zoblocks/recorder-core.
+      .replace(/(["'])@\/lib\/zoblocks-recorder\1/g, `"${up}lib/recorder"`)
       // The accordion core.
-      .replace(/(["'])@\/lib\/oxygen-accordion\1/g, `"${up}lib/accordion-core"`)
+      .replace(/(["'])@\/lib\/zoblocks-accordion\1/g, `"${up}lib/accordion-core"`)
       // The switch core.
-      .replace(/(["'])@\/lib\/oxygen-switch\1/g, `"${up}lib/switch"`)
+      .replace(/(["'])@\/lib\/zoblocks-switch\1/g, `"${up}lib/switch"`)
       // The clinical-note core: the ProseMirror binding.
-      .replace(/(["'])@\/lib\/oxygen-clinical-note\1/g, `"${up}lib/clinical-note"`)
-      .replace(/(["'])@\/lib\/oxygen-clinical-status\1/g, `"${up}lib/clinical-status"`)
-      .replace(/(["'])@\/lib\/oxygen-result-value\1/g, `"${up}lib/result-value"`)
-      .replace(/(["'])@\/lib\/oxygen-allergy\1/g, `"${up}lib/allergy"`)
-      .replace(/(["'])@\/lib\/oxygen-risk\1/g, `"${up}lib/risk"`)
-      .replace(/(["'])@\/lib\/oxygen-provenance\1/g, `"${up}lib/provenance"`)
-      .replace(/(["'])@\/lib\/oxygen-trend\1/g, `"${up}lib/trend"`)
-      .replace(/(["'])@\/lib\/oxygen-clock\1/g, `"${up}lib/clock"`)
-      .replace(/(["'])@\/lib\/oxygen-presence\1/g, `"${up}lib/presence"`)
-      .replace(/(["'])@\/lib\/oxygen-chart-header\1/g, `"${up}lib/chart-header"`)
-      .replace(/(["'])@\/lib\/oxygen-workspace\1/g, `"${up}lib/workspace"`)
-      .replace(/(["'])@\/lib\/oxygen-palette\1/g, `"${up}lib/palette"`)
-      .replace(/(["'])@\/lib\/oxygen-menu\1/g, `"${up}lib/menu"`)
-      .replace(/(["'])@\/lib\/oxygen-grid\1/g, `"${up}lib/grid"`)
+      .replace(/(["'])@\/lib\/zoblocks-clinical-note\1/g, `"${up}lib/clinical-note"`)
+      .replace(/(["'])@\/lib\/zoblocks-clinical-status\1/g, `"${up}lib/clinical-status"`)
+      .replace(/(["'])@\/lib\/zoblocks-result-value\1/g, `"${up}lib/result-value"`)
+      .replace(/(["'])@\/lib\/zoblocks-allergy\1/g, `"${up}lib/allergy"`)
+      .replace(/(["'])@\/lib\/zoblocks-risk\1/g, `"${up}lib/risk"`)
+      .replace(/(["'])@\/lib\/zoblocks-provenance\1/g, `"${up}lib/provenance"`)
+      .replace(/(["'])@\/lib\/zoblocks-trend\1/g, `"${up}lib/trend"`)
+      .replace(/(["'])@\/lib\/zoblocks-clock\1/g, `"${up}lib/clock"`)
+      .replace(/(["'])@\/lib\/zoblocks-presence\1/g, `"${up}lib/presence"`)
+      .replace(/(["'])@\/lib\/zoblocks-chart-header\1/g, `"${up}lib/chart-header"`)
+      .replace(/(["'])@\/lib\/zoblocks-workspace\1/g, `"${up}lib/workspace"`)
+      .replace(/(["'])@\/lib\/zoblocks-palette\1/g, `"${up}lib/palette"`)
+      .replace(/(["'])@\/lib\/zoblocks-menu\1/g, `"${up}lib/menu"`)
+      .replace(/(["'])@\/lib\/zoblocks-grid\1/g, `"${up}lib/grid"`)
       // The temporal engine and its React core. The longer specifier is
-      // rewritten first: `@/lib/oxygen-datetime` is a prefix of
-      // `@/lib/oxygen-datetime-field`, and the other order silently
+      // rewritten first: `@/lib/zoblocks-datetime` is a prefix of
+      // `@/lib/zoblocks-datetime-field`, and the other order silently
       // produces `"../lib/datetime-field"` from the wrong rule.
-      .replace(/(["'])@\/lib\/oxygen-datetime-parts\1/g, `"${up}lib/datetime-parts"`)
-      .replace(/(["'])@\/lib\/oxygen-datetime-field\1/g, `"${up}lib/datetime-field"`)
-      .replace(/(["'])@\/lib\/oxygen-availability\1/g, `"${up}lib/availability"`)
-      .replace(/(["'])@\/lib\/oxygen-recurrence\1/g, `"${up}lib/recurrence"`)
-      .replace(/(["'])@\/lib\/oxygen-datetime\1/g, `"${up}lib/datetime"`)
+      .replace(/(["'])@\/lib\/zoblocks-datetime-parts\1/g, `"${up}lib/datetime-parts"`)
+      .replace(/(["'])@\/lib\/zoblocks-datetime-field\1/g, `"${up}lib/datetime-field"`)
+      .replace(/(["'])@\/lib\/zoblocks-availability\1/g, `"${up}lib/availability"`)
+      .replace(/(["'])@\/lib\/zoblocks-recurrence\1/g, `"${up}lib/recurrence"`)
+      .replace(/(["'])@\/lib\/zoblocks-datetime\1/g, `"${up}lib/datetime"`)
       // The chronology engine and its FHIR adapters.
       .replace(/(["'])@\/lib\/timeline-core\1/g, `"${up}lib/timeline-core"`)
       .replace(/(["'])@\/lib\/timeline-fhir\1/g, `"${up}lib/timeline-fhir"`)
       // A sibling component, by the path the CLI writes in a consumer's project.
       .replace(
-        /(["'])@\/components\/oxygen\/([a-z0-9-]+)\1/g,
+        /(["'])@\/components\/zoblocks\/([a-z0-9-]+)\1/g,
         (_match, _quote, name: string) => `"${up}components/${name}/${name}"`,
       )
   );
@@ -147,7 +147,7 @@ export async function emitReactPackage(
     const source = await readFile(path.join(COMPONENTS_DIR, file), "utf8");
     await emitter.emit(
       path.join(PACKAGE_SRC, target),
-      withHeader(rewriteImports(source, depth), `registry/oxygen/${file}`),
+      withHeader(rewriteImports(source, depth), `registry/zoblocks/${file}`),
     );
   }
 
@@ -157,7 +157,7 @@ export async function emitReactPackage(
   // a fix cannot land in one channel and not the other.
   //
   // Both a per-concern file and a combined bundle are emitted. The bundle is
-  // the documented entry point and stays `@oxygenui-design/react/styles.css`;
+  // the documented entry point and stays `@zoblocks/react/styles.css`;
   // the individual files exist so an application that installs only loaders
   // does not ship accordion CSS it never renders. Concatenated rather than
   // `@import`-ed, because a bare `@import "./styles/…"` inside a published
@@ -187,7 +187,7 @@ export async function emitReactPackage(
   ] as const) {
     const css = await readFile(path.join(COMPONENTS_DIR, file), "utf8");
     await emitter.emit(path.join(PACKAGE_SRC, target), css);
-    sheets.push([`registry/oxygen/${file}`, css]);
+    sheets.push([`registry/zoblocks/${file}`, css]);
   }
 
   await emitter.emit(

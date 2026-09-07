@@ -1,12 +1,12 @@
 /**
- * @oxygenui-design/identity-core — the engine behind Oxygen's patient identity
+ * @zoblocks/identity-core — the engine behind Zoblocks's patient identity
  * components.
  *
  * No React, no Ant Design, no DOM. It accepts a FHIR `Patient` and returns a
  * value a renderer can walk without knowing any FHIR — which is what lets the
  * same logic serve a React banner, a print stylesheet, a PDF, and a server.
  *
- *     import { resolveIdentity, policy, disambiguate } from "@oxygenui-design/identity-core";
+ *     import { resolveIdentity, policy, disambiguate } from "@zoblocks/identity-core";
  *
  *     const p = policy({ locale: "en-GB", disclosure: "clinical" });
  *     const me = resolveIdentity(patient, p);

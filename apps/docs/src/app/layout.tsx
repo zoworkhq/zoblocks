@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Instrument_Sans, JetBrains_Mono } from "next/font/google";
 
 // Component tokens first, so the site layer can override deliberately.
-import "@oxygenui-design/tokens/oxygen-tokens.css";
+import "@zoblocks/tokens/zoblocks-tokens.css";
 import "./globals.css";
 import { THEME_BOOT_SCRIPT } from "@/lib/theme";
 import { CATALOG } from "@/lib/catalog";
@@ -41,10 +41,10 @@ const description =
   `${CATALOG.length} components installed as source you own. MIT core, no runtime dependencies.`;
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://oxygenui.design"),
+  metadataBase: new URL("https://zoblocks.design"),
   title: {
-    default: "Oxygen UI — healthcare components typed to FHIR",
-    template: "%s · Oxygen UI",
+    default: "Zoblocks — healthcare components typed to FHIR",
+    template: "%s · Zoblocks",
   },
   description,
   keywords: [
@@ -59,14 +59,14 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     type: "website",
-    url: "https://oxygenui.design",
-    siteName: "Oxygen UI",
-    title: "Oxygen UI — healthcare components typed to FHIR",
+    url: "https://zoblocks.design",
+    siteName: "Zoblocks",
+    title: "Zoblocks — healthcare components typed to FHIR",
     description,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Oxygen UI — healthcare components typed to FHIR",
+    title: "Zoblocks — healthcare components typed to FHIR",
     description,
   },
   robots: { index: true, follow: true },
@@ -98,7 +98,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Who this is, in machine-readable form.
 
           The domain emitted exactly one schema type — SoftwareSourceCode, on
-          component pages — and nothing that said what Oxygen UI *is*. An answer
+          component pages — and nothing that said what Zoblocks *is*. An answer
           engine resolves an entity before it will cite it, and there was no
           statement of the entity anywhere. `SoftwareApplication` rather than a
           bare Organization: the thing being described is the library, and the
@@ -116,29 +116,29 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               "@graph": [
                 {
                   "@type": "Organization",
-                  "@id": "https://oxygenui.design/#organization",
+                  "@id": "https://zoblocks.design/#organization",
                   name: "Zowork",
-                  url: "https://oxygenui.design",
+                  url: "https://zoblocks.design",
                   description:
-                    "Builds Oxygen UI, an open-source React component library for clinical and behavioral health software.",
+                    "Builds Zoblocks, an open-source React component library for clinical and behavioral health software.",
                 },
                 {
                   "@type": "WebSite",
-                  "@id": "https://oxygenui.design/#website",
-                  url: "https://oxygenui.design",
-                  name: "Oxygen UI",
+                  "@id": "https://zoblocks.design/#website",
+                  url: "https://zoblocks.design",
+                  name: "Zoblocks",
                   description,
-                  publisher: { "@id": "https://oxygenui.design/#organization" },
+                  publisher: { "@id": "https://zoblocks.design/#organization" },
                   inLanguage: "en",
                 },
                 {
                   "@type": "SoftwareApplication",
-                  "@id": "https://oxygenui.design/#software",
-                  name: "Oxygen UI",
+                  "@id": "https://zoblocks.design/#software",
+                  name: "Zoblocks",
                   applicationCategory: "DeveloperApplication",
                   operatingSystem: "Any",
                   description,
-                  url: "https://oxygenui.design",
+                  url: "https://zoblocks.design",
                   license: "https://opensource.org/licenses/MIT",
                   programmingLanguage: "TypeScript",
                   softwareRequirements: "React 19, Tailwind CSS",

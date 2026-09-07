@@ -49,8 +49,8 @@ export function renderConnect(root: HTMLElement, options: ConnectOptions): void 
 
   const form = el("form", "connect");
   form.append(
-    field("origin", "App address", "https://app.oxygenui.design", "url"),
-    field("token", "Figma key", "oxy_live_…", "password"),
+    field("origin", "App address", "https://app.zoblocks.design", "url"),
+    field("token", "Figma key", "zb_live_…", "password"),
   );
 
   /*

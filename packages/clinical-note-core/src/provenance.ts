@@ -165,21 +165,21 @@ export const provenanceMarkSpec: MarkSpec = {
   },
   parseDOM: [
     {
-      tag: "span[data-ox-origin]",
+      tag: "span[data-zb-origin]",
       getAttrs(dom: unknown) {
         // Typed loosely because the DOM type is only present when a view is
         // attached, and this package must import without one.
         const el = dom as { getAttribute(name: string): string | null };
-        const raw = el.getAttribute("data-ox-origin");
+        const raw = el.getAttribute("data-zb-origin");
         if (!isOrigin(raw)) return false;
-        const confidence = el.getAttribute("data-ox-confidence");
+        const confidence = el.getAttribute("data-zb-confidence");
         const parsed = confidence === null ? null : Number.parseFloat(confidence);
         return provenance({
           origin: raw,
-          source: el.getAttribute("data-ox-source"),
-          at: el.getAttribute("data-ox-at"),
+          source: el.getAttribute("data-zb-source"),
+          at: el.getAttribute("data-zb-at"),
           confidence: parsed === null || Number.isNaN(parsed) ? null : parsed,
-          reviewed: el.getAttribute("data-ox-reviewed") === "true",
+          reviewed: el.getAttribute("data-zb-reviewed") === "true",
         });
       },
     },
@@ -189,11 +189,11 @@ export const provenanceMarkSpec: MarkSpec = {
     // Attribute order is fixed rather than object-literal-incidental, because
     // `canonical.ts` hashes the serialized form and a reordering would change
     // the digest of an unchanged note.
-    const attrs: Record<string, string> = { "data-ox-origin": a.origin };
-    if (a.source !== null) attrs["data-ox-source"] = a.source;
-    if (a.at !== null) attrs["data-ox-at"] = a.at;
-    if (a.confidence !== null) attrs["data-ox-confidence"] = String(a.confidence);
-    if (a.origin === "ai") attrs["data-ox-reviewed"] = String(a.reviewed);
+    const attrs: Record<string, string> = { "data-zb-origin": a.origin };
+    if (a.source !== null) attrs["data-zb-source"] = a.source;
+    if (a.at !== null) attrs["data-zb-at"] = a.at;
+    if (a.confidence !== null) attrs["data-zb-confidence"] = String(a.confidence);
+    if (a.origin === "ai") attrs["data-zb-reviewed"] = String(a.reviewed);
     return ["span", attrs, 0];
   },
 };

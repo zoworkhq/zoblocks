@@ -5,7 +5,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/lib/clinical-status.ts. Edit that file, not this one.
+// Generated from registry/zoblocks/lib/clinical-status.ts. Edit that file, not this one.
 /**
  * The clinical status vocabulary — nine scales, closed.
  *
@@ -82,7 +82,7 @@ export type StatusGlyph =
   /** Clock face. True once, and old enough that it may not be now. */
   | "stale";
 
-/** Which register a word is written in. See `@oxygenui-design/intl`. */
+/** Which register a word is written in. See `@zoblocks/intl`. */
 export type StatusAudience = "clinician" | "patient";
 
 /** One step of one scale: the three channels, plus what to show when narrow. */

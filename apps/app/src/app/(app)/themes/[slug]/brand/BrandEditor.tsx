@@ -10,8 +10,8 @@ import {
   generateRamp,
   simulateVision,
   type VisionKind,
-} from "@oxygenui-design/theme";
-import { contrastBetween, hue, hueDistance, parseHex } from "@oxygenui-design/tokens/validate";
+} from "@zoblocks/theme";
+import { contrastBetween, hue, hueDistance, parseHex } from "@zoblocks/tokens/validate";
 import { saveBrandAction } from "@/lib/actions";
 import { ActionForm } from "@/components/action-form";
 import {
@@ -209,7 +209,7 @@ function StatusUnderVision({
    *
    * The first version of this reported the contrast ratio alone and claimed
    * that "when hue stops being reliable, lightness still carries the
-   * direction". Running it proved that wrong: under deuteranopia Oxygen's
+   * direction". Running it proved that wrong: under deuteranopia Zoblocks's
    * `high` becomes an olive and `low` a blue — clearly different — while their
    * *luminance* ratio is 1.27:1, which is nothing. The pair survives red-green
    * deficiency by hue, not by lightness, because 60° of separation puts them on
@@ -218,7 +218,7 @@ function StatusUnderVision({
    *
    * Both numbers are shown. Hue distance is what the 60° rule is about; the
    * contrast ratio is what is left when hue goes entirely, and it is honestly
-   * small — which is why no Oxygen component has ever used colour alone.
+   * small — which is why no Zoblocks component has ever used colour alone.
    */
   const high = status["status.high"];
   const low = status["status.low"];
@@ -290,7 +290,7 @@ function StatusUnderVision({
             The 60° floor is what makes this pair survive red-green deficiency: it puts{" "}
             <em>high</em> and <em>low</em> on the blue-yellow axis, which protanopia and
             deuteranopia leave intact. Their <em>luminance</em> difference is small and always was —
-            which is why no Oxygen component signals severity with colour alone. Every status also
+            which is why no Zoblocks component signals severity with colour alone. Every status also
             carries a word.
           </p>
         </div>

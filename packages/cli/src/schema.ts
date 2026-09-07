@@ -1,5 +1,5 @@
 /**
- * The Oxygen registry wire format.
+ * The Zoblocks registry wire format.
  *
  * Two documents are served:
  *
@@ -7,7 +7,7 @@
  *   - a **registry item** at `/r/<name>.json`, carrying the source itself.
  *
  * Both are versioned by `$schema`, published at
- * https://oxygenui.design/schema/. The URL is not decoration: it is the
+ * https://zoblocks.design/schema/. The URL is not decoration: it is the
  * contract a customer's tooling can pin, and the thing that lets us add a
  * field without guessing whether an older client will choke on it.
  *
@@ -24,26 +24,26 @@
  */
 
 /** Schema URLs. Emitted into every document we publish and checked on read. */
-export const ITEM_SCHEMA_URL = "https://oxygenui.design/schema/registry-item.json";
-export const REGISTRY_SCHEMA_URL = "https://oxygenui.design/schema/registry.json";
+export const ITEM_SCHEMA_URL = "https://zoblocks.design/schema/registry-item.json";
+export const REGISTRY_SCHEMA_URL = "https://zoblocks.design/schema/registry.json";
 
 /**
  * What a file is, which decides where it lands.
  *
  * Our own vocabulary rather than an inherited one. The values map to alias
- * roots in `oxygen.json`, so adding a kind means deciding where it goes — the
+ * roots in `zoblocks.json`, so adding a kind means deciding where it goes — the
  * enum and the alias table are two halves of one statement and live within a
  * few lines of each other in this package.
  */
 export const FILE_KINDS = [
-  "oxygen:component",
-  "oxygen:lib",
-  "oxygen:hook",
-  "oxygen:ui",
-  "oxygen:block",
-  "oxygen:page",
-  "oxygen:file",
-  "oxygen:style",
+  "zoblocks:component",
+  "zoblocks:lib",
+  "zoblocks:hook",
+  "zoblocks:ui",
+  "zoblocks:block",
+  "zoblocks:page",
+  "zoblocks:file",
+  "zoblocks:style",
 ] as const;
 
 export type FileKind = (typeof FILE_KINDS)[number];
@@ -53,7 +53,7 @@ export const ITEM_KINDS = FILE_KINDS;
 export type ItemKind = FileKind;
 
 export interface RegistryFile {
-  /** Path in the Oxygen repository. Provenance, not a destination. */
+  /** Path in the Zoblocks repository. Provenance, not a destination. */
   path: string;
   type: FileKind;
   /**
@@ -136,7 +136,7 @@ function requireKind(value: unknown, field: string, source: string): FileKind {
   if (!(FILE_KINDS as readonly string[]).includes(kind)) {
     throw new RegistryFormatError(
       `${source}: "${field}" is "${kind}", which this CLI does not understand. ` +
-        `Known kinds: ${FILE_KINDS.join(", ")}. Upgrade @oxygenui-design/cli if the registry is newer than you are.`,
+        `Known kinds: ${FILE_KINDS.join(", ")}. Upgrade @zoblocks/cli if the registry is newer than you are.`,
       source,
     );
   }
@@ -244,9 +244,9 @@ export function parseRegistryItem(raw: unknown, source: string): RegistryItem {
  * do not fully understand is the conservative choice. The index is a listing
  * nobody installs from: `type` is printed and otherwise unused, and failing the
  * whole catalog because one entry has a kind this version has not heard of
- * would mean every future kind breaks `oxygen list` for every older CLI.
+ * would mean every future kind breaks `zoblocks list` for every older CLI.
  *
- * This was found by running `oxygen list` against the live registry mid-migration
+ * This was found by running `zoblocks list` against the live registry mid-migration
  * — it served the older `registry:*` kinds and the command reported nothing at
  * all, rather than the catalog it could plainly read.
  */

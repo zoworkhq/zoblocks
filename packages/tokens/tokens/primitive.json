@@ -1,5 +1,5 @@
 {
-  "$description": "Primitive tier — the reference palette and raw scales. W3C DTCG format.\n\nNothing outside the token build references these. They are emitted as --ox-ref-* custom properties so a brand can replace the whole palette in one place, and @oxygenui/no-primitive-token makes a component reaching for one a lint error. A primitive is a colour; it does not mean anything. Meaning lives in the semantic tier.\n\nSee content/decisions/0005-three-tier-token-pipeline.md.",
+  "$description": "Primitive tier — the reference palette and raw scales. W3C DTCG format.\n\nNothing outside the token build references these. They are emitted as --zb-ref-* custom properties so a brand can replace the whole palette in one place, and @zoblocks/no-primitive-token makes a component reaching for one a lint error. A primitive is a colour; it does not mean anything. Meaning lives in the semantic tier.\n\nSee content/decisions/0005-three-tier-token-pipeline.md.",
   "ref": {
     "$description": "Reference palette. Replaceable wholesale by a brand.",
     "brand": {

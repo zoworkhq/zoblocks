@@ -54,8 +54,8 @@
    * these are alpha washes, and the alpha that reads as depth on near-black
    * reads as haze on paper. So they are tuned per ground rather than derived.
    */
-  --s-bloom: color-mix(in oklab, var(--site-oxygen) 9%, transparent);
-  --s-sweep: color-mix(in oklab, var(--site-oxygen) 5%, transparent);
+  --s-bloom: color-mix(in oklab, var(--site-brand) 9%, transparent);
+  --s-sweep: color-mix(in oklab, var(--site-brand) 5%, transparent);
   --s-card: color-mix(in oklab, var(--site-paper) 62%, transparent);
   --s-ramp-opacity: 0.26;
 }
@@ -74,12 +74,12 @@
  * away: three soft washes exist to make a surface gentler, which is the
  * opposite of what this reader asked for.
  */
-[data-ox-theme="high-contrast"] .soon .soonGlow,
-[data-ox-theme="high-contrast"] .soon .soonRamp,
-[data-ox-theme="high-contrast"] .soon .soonSweep {
+[data-zb-theme="high-contrast"] .soon .soonGlow,
+[data-zb-theme="high-contrast"] .soon .soonRamp,
+[data-zb-theme="high-contrast"] .soon .soonSweep {
   display: none;
 }
-[data-ox-theme="high-contrast"] .soon .soonGate {
+[data-zb-theme="high-contrast"] .soon .soonGate {
   background: none;
   border-color: var(--site-ink);
 }

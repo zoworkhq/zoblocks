@@ -10,7 +10,7 @@
  * absorbs the change and the pages do not.
  */
 
-import type { ComponentDoc } from "@oxygenui-design/component-meta";
+import type { ComponentDoc } from "@zoblocks/component-meta";
 import { BY_NAME, CATALOG } from "./generated/catalog";
 
 export type {
@@ -19,8 +19,8 @@ export type {
   PropDoc,
   Stability,
   Tier,
-} from "@oxygenui-design/component-meta";
-export { STATUS_LABEL, STATUS_CONTRACT } from "@oxygenui-design/component-meta";
+} from "@zoblocks/component-meta";
+export { STATUS_LABEL, STATUS_CONTRACT } from "@zoblocks/component-meta";
 export { CATALOG, ALL_CATEGORIES } from "./generated/catalog";
 
 export function getComponent(name: string): ComponentDoc | undefined {

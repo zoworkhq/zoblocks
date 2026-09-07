@@ -1,7 +1,7 @@
 /**
  * The shipped component, held to the published contract.
  *
- * `@oxygenui-design/tabs-testing` exists so a customer can hold *their* tab
+ * `@zoblocks/tabs-testing` exists so a customer can hold *their* tab
  * strip to this standard. Running it against ours is the part that keeps it
  * honest — an assertion package whose own component does not pass is a
  * recommendation nobody should take.
@@ -16,7 +16,7 @@ import * as React from "react";
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describeTabs, expectTabsContract } from "@oxygenui-design/tabs-testing";
+import { describeTabs, expectTabsContract } from "@zoblocks/tabs-testing";
 import { Tabs, type TabVariant } from "../src/index.js";
 
 const VARIANTS: TabVariant[] = [

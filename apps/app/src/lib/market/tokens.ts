@@ -1,5 +1,5 @@
 /**
- * Credentials for the Oxygen CLI.
+ * Credentials for the Zoblocks CLI.
  *
  * The shape is `sessions` and `password_resets`, deliberately: **only the
  * SHA-256 is stored.** The token is shown once, at mint time, and never again,
@@ -101,13 +101,13 @@ export async function mintToken(
   }
 
   /*
-   * `oxy_live_` rather than a bare string.
+   * `zb_live_` rather than a bare string.
    *
    * Prefixed secrets are what secret scanners match on, so a token pasted into
    * a public repository is caught by GitHub's push protection instead of by us
    * noticing traffic six weeks later.
    */
-  const token = `oxy_live_${randomBytes(TOKEN_BYTES).toString("base64url")}`;
+  const token = `zb_live_${randomBytes(TOKEN_BYTES).toString("base64url")}`;
   const expiresAt = new Date(Date.now() + TOKEN_LIFETIME_DAYS * 24 * 60 * 60 * 1000);
 
   await auth.data.registryTokens.insertOne({

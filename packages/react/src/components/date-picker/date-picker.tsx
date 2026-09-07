@@ -7,7 +7,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/date-picker/date-picker.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/date-picker/date-picker.tsx. Edit that file, not this one.
 /**
  * DatePicker — one temporal control, sixteen variants.
  *
@@ -29,20 +29,20 @@
  * call for the same reason.
  *
  * The variants are not a switch statement standing in for design. Each is a
- * real component in `@/lib/oxygen-datetime-parts`, separately testable and
+ * real component in `@/lib/zoblocks-datetime-parts`, separately testable and
  * separately rendered; `variant` is the front door.
  *
  * **Ant Design parity holds for the default.** `variant="picker"` matches
  * antd's `DatePicker` — `picker`, `disabledDate`, `allowClear`, `status` — so
  * a migration is one changed import line. The one divergence is the value
- * type: ours is a plain `OxDate`, not a `Dayjs`, because putting a date
+ * type: ours is a plain `ZbDate`, not a `Dayjs`, because putting a date
  * library in the graph of every form component is exactly what ADR 0010 exists
  * to prevent, and because a `Dayjs` birth date is representable as midnight
  * UTC, which is the single most common temporal defect in healthcare software.
  */
 
 import * as React from "react";
-import type { OxDate } from "../../lib/datetime";
+import type { ZbDate } from "../../lib/datetime";
 import {
   AppointmentScheduler,
   BirthDateField,
@@ -119,7 +119,7 @@ export interface DatePickerCommonProps {
    */
   variant?: DatePickerVariant;
   /** Today, supplied by the host. ENGINEERING.md §9 — never read here. */
-  now?: OxDate;
+  now?: ZbDate;
 }
 
 /**

@@ -1,19 +1,19 @@
 /**
- * `<ox-pulse-loader>` — an open heart with a rhythm line running through it.
+ * `<zb-pulse-loader>` — an open heart with a rhythm line running through it.
  *
  * Importing this module defines the element. That is a side effect on purpose,
  * and it is why `sideEffects` in package.json lists these files: a bundler that
  * tree-shook this import away would leave a page full of undefined elements.
  *
- *   import "@oxygenui-design/loaders/pulse";
- *   <ox-pulse-loader label="Loading your records"></ox-pulse-loader>
+ *   import "@zoblocks/loaders/pulse";
+ *   <zb-pulse-loader label="Loading your records"></zb-pulse-loader>
  */
 
 import { LOADER_ART, LOADER_VIEWBOX, PULSE_MIN_SIZE_PX } from "./art.js";
-import { OxLoaderElement, beatMs, cycleMs, define, strokePx } from "./base.js";
+import { ZbLoaderElement, beatMs, cycleMs, define, strokePx } from "./base.js";
 import { rhythmArt } from "./rhythm.js";
 
-export class OxPulseLoader extends OxLoaderElement {
+export class ZbPulseLoader extends ZbLoaderElement {
   static override get observedAttributes(): string[] {
     return [...super.observedAttributes, "bpm"];
   }
@@ -35,10 +35,10 @@ export class OxPulseLoader extends OxLoaderElement {
 
   protected override vars(sizePx: number): Array<[string, string]> {
     return [
-      ["--ox-loader-size", `${sizePx}px`],
-      ["--ox-loader-beat", `${beatMs(this.bpm, this.speed)}ms`],
-      ["--ox-loader-cycle", `${cycleMs(4000, this.speed)}ms`],
-      ["--ox-loader-stroke", `${strokePx(sizePx)}px`],
+      ["--zb-loader-size", `${sizePx}px`],
+      ["--zb-loader-beat", `${beatMs(this.bpm, this.speed)}ms`],
+      ["--zb-loader-cycle", `${cycleMs(4000, this.speed)}ms`],
+      ["--zb-loader-stroke", `${strokePx(sizePx)}px`],
     ];
   }
 
@@ -56,10 +56,10 @@ export class OxPulseLoader extends OxLoaderElement {
   }
 }
 
-define("ox-pulse-loader", OxPulseLoader);
+define("zb-pulse-loader", ZbPulseLoader);
 
 declare global {
   interface HTMLElementTagNameMap {
-    "ox-pulse-loader": OxPulseLoader;
+    "zb-pulse-loader": ZbPulseLoader;
   }
 }

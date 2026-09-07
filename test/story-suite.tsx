@@ -17,7 +17,7 @@ import { render, cleanup, act } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import axe from "axe-core";
 import { createElement, type ReactElement } from "react";
-import type { Meta, StoryObj } from "@oxygenui-design/component-meta";
+import type { Meta, StoryObj } from "@zoblocks/component-meta";
 
 export type StoryModule = { default: Meta } & Record<string, StoryObj | Meta>;
 
@@ -126,11 +126,11 @@ export function describeStories({ component, states, categories, entries }: Stor
       // A story that renders nothing is either a broken fixture or a state that
       // deliberately shows nothing — and the second must say so.
       const rooted = Array.from(view.container.querySelectorAll<HTMLElement>("*")).some((el) =>
-        Array.from(el.attributes).some((attr) => attr.name.startsWith("data-ox-")),
+        Array.from(el.attributes).some((attr) => attr.name.startsWith("data-zb-")),
       );
       expect(
         rooted,
-        `${component} › ${entry.exportName} rendered no element carrying a data-ox-* root marker`,
+        `${component} › ${entry.exportName} rendered no element carrying a data-zb-* root marker`,
       ).toBe(true);
     });
   });

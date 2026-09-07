@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { requireMember } from "@/lib/auth";
 import { scoped } from "@/db/scope";
 import { baseTokens } from "@/lib/base-tokens";
-import { RAMP_STEPS, themeHref, validateTheme, withTierDefaults } from "@oxygenui-design/theme";
+import { RAMP_STEPS, themeHref, validateTheme, withTierDefaults } from "@zoblocks/theme";
 import { whyNot } from "@/lib/roles";
 import { publishThemeAction } from "@/lib/actions";
 import { ActionForm } from "@/components/action-form";

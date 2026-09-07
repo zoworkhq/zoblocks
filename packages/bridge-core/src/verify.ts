@@ -17,8 +17,8 @@
  * deprecation warnings are.
  */
 
-import { NOT_BRIDGEABLE, surfaceEntry } from "@oxygenui-design/tokens/surface";
-import { contrastBetween } from "@oxygenui-design/tokens/validate";
+import { NOT_BRIDGEABLE, surfaceEntry } from "@zoblocks/tokens/surface";
+import { contrastBetween } from "@zoblocks/tokens/validate";
 import type { TokenPatch } from "./contract";
 
 export interface BridgeViolation {
@@ -48,7 +48,7 @@ export function clinicalViolations(patch: TokenPatch): BridgeViolation[] {
 /** Tokens the patch writes that are not part of the published surface at all. */
 export function unknownTokens(patch: TokenPatch): BridgeViolation[] {
   return Object.keys(patch)
-    .filter((token) => token.startsWith("--ox-") && !surfaceEntry(token))
+    .filter((token) => token.startsWith("--zb-") && !surfaceEntry(token))
     .filter((token) => !SEMANTIC_WRITABLE.test(token))
     .map((token) => ({
       token,
@@ -58,29 +58,29 @@ export function unknownTokens(patch: TokenPatch): BridgeViolation[] {
 
 /**
  * A bridge writes the *semantic* tier as well as the component tier — mapping
- * `colorPrimary` once onto `--ox-accent` reaches every component, where
+ * `colorPrimary` once onto `--zb-accent` reaches every component, where
  * mapping it onto each component's accent would be forty declarations that
  * drift. Those names are not in the component surface manifest by
  * construction, so they are matched by shape.
  */
 const SEMANTIC_WRITABLE =
-  /^--ox-(accent|bg|surface|border|text|focus-ring|font|radius|shadow|duration|ease|density)(-[a-z0-9-]+)?$/;
+  /^--zb-(accent|bg|surface|border|text|focus-ring|font|radius|shadow|duration|ease|density)(-[a-z0-9-]+)?$/;
 
 /** Foreground/background pairs a bridge is expected to keep readable. */
 const CHECKED_PAIRS: { fg: string; bg: string; floor: number; rule: string }[] = [
-  { fg: "--ox-text", bg: "--ox-surface", floor: 4.5, rule: "SC 1.4.3 (text)" },
-  { fg: "--ox-text", bg: "--ox-bg", floor: 4.5, rule: "SC 1.4.3 (text)" },
-  { fg: "--ox-text-muted", bg: "--ox-surface", floor: 4.5, rule: "SC 1.4.3 (text)" },
-  { fg: "--ox-text-on-accent", bg: "--ox-accent", floor: 4.5, rule: "SC 1.4.3 (text)" },
-  { fg: "--ox-focus-ring", bg: "--ox-bg", floor: 3, rule: "SC 1.4.11 (interface component)" },
-  { fg: "--ox-accent", bg: "--ox-surface", floor: 3, rule: "SC 1.4.11 (interface component)" },
+  { fg: "--zb-text", bg: "--zb-surface", floor: 4.5, rule: "SC 1.4.3 (text)" },
+  { fg: "--zb-text", bg: "--zb-bg", floor: 4.5, rule: "SC 1.4.3 (text)" },
+  { fg: "--zb-text-muted", bg: "--zb-surface", floor: 4.5, rule: "SC 1.4.3 (text)" },
+  { fg: "--zb-text-on-accent", bg: "--zb-accent", floor: 4.5, rule: "SC 1.4.3 (text)" },
+  { fg: "--zb-focus-ring", bg: "--zb-bg", floor: 3, rule: "SC 1.4.11 (interface component)" },
+  { fg: "--zb-accent", bg: "--zb-surface", floor: 3, rule: "SC 1.4.11 (interface component)" },
 ];
 
 /**
  * Contrast failures the host's theme introduces.
  *
  * Only pairs where the bridge supplies *both* sides are checked. If it maps a
- * foreground and leaves the background to Oxygen's own token, the ratio
+ * foreground and leaves the background to Zoblocks's own token, the ratio
  * depends on a value we cannot see from here, and a guess would be worse than
  * silence.
  */
@@ -153,7 +153,7 @@ export function assertBridgeOutput(bridgeId: string, patch: TokenPatch): void {
   if (violations.length === 0) return;
 
   throw new Error(
-    `[oxygen:bridge-${bridgeId}] the bridge wrote ${violations.length} token(s) it must not:\n` +
+    `[zoblocks:bridge-${bridgeId}] the bridge wrote ${violations.length} token(s) it must not:\n` +
       violations.map((v) => `  ${v.reason}`).join("\n"),
   );
 }

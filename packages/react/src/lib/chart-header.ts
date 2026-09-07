@@ -5,7 +5,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/lib/chart-header.ts. Edit that file, not this one.
+// Generated from registry/zoblocks/lib/chart-header.ts. Edit that file, not this one.
 /**
  * The rules behind the most-read 80 pixels in healthcare software.
  *
@@ -19,7 +19,7 @@
  * what may never appear beside a dose, and what "no encounter selected" means.
  * The rendering, the sticky behaviour and the collapse live in the component.
  *
- * Identity itself is not re-implemented here. `@oxygenui-design/identity-core`
+ * Identity itself is not re-implemented here. `@zoblocks/identity-core`
  * already resolves the name a person uses, their pronouns, their identifiers,
  * their photo state and the deceased/merged/test flags, and deliberately never
  * resolves `Patient.gender`. What is added here is the context-specific reading

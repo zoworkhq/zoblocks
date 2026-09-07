@@ -215,7 +215,7 @@ describe("editable tabs", () => {
   it("renders a close affordance that is not interactive to assistive technology", () => {
     render(<Editable />);
     const tab = screen.getByRole("tab", { name: "Note A" });
-    const close = tab.querySelector(".ox-tabs__close");
+    const close = tab.querySelector(".zb-tabs__close");
     // Any interactive control inside role="tab" is invalid ARIA — axe calls it
     // `nested-interactive`, and screen readers resolve it by flattening the tab
     // or skipping the control. The pointer keeps a target; the keyboard uses
@@ -230,7 +230,7 @@ describe("editable tabs", () => {
     const onClose = vi.fn();
     render(<Editable onClose={onClose} />);
     const tab = screen.getByRole("tab", { name: "Note B" });
-    await userEvent.setup().click(tab.querySelector(".ox-tabs__close") as HTMLElement);
+    await userEvent.setup().click(tab.querySelector(".zb-tabs__close") as HTMLElement);
     expect(onClose).toHaveBeenCalledWith("b");
     expect(screen.queryByRole("tab", { name: "Note B" })).not.toBeInTheDocument();
   });
@@ -273,7 +273,7 @@ describe("editable tabs", () => {
     );
     const user = userEvent.setup();
     await user.click(
-      screen.getByRole("tab", { name: "A" }).querySelector(".ox-tabs__close") as HTMLElement,
+      screen.getByRole("tab", { name: "A" }).querySelector(".zb-tabs__close") as HTMLElement,
     );
     expect(onAuditEvent).toHaveBeenCalledWith(
       expect.objectContaining({ type: "tabs.close", value: "a" }),
@@ -305,7 +305,7 @@ describe("editable tabs", () => {
         editable={{ onClose: () => {} }}
       />,
     );
-    expect(screen.getByRole("tab").querySelector(".ox-tabs__close")).toBeNull();
+    expect(screen.getByRole("tab").querySelector(".zb-tabs__close")).toBeNull();
   });
 
   it("reorders with Ctrl+Shift+Arrow, so reordering is not pointer-only", async () => {
@@ -340,7 +340,7 @@ describe("availability", () => {
       />,
     );
     const tab = screen.getByRole("tab");
-    expect(tab).toHaveAttribute("data-ox-availability", "stale");
+    expect(tab).toHaveAttribute("data-zb-availability", "stale");
     expect(tab).not.toHaveAttribute("aria-disabled");
     expect(tab).toHaveAccessibleName("Vitals, showing cached data");
   });

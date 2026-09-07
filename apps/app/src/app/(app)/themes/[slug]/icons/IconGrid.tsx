@@ -1,7 +1,7 @@
 "use client";
 
 import { Lock, RotateCcw, Upload } from "lucide-react";
-import { ICON_SLOTS, type IconOverride, type IconSlot } from "@oxygenui-design/theme";
+import { ICON_SLOTS, type IconOverride, type IconSlot } from "@zoblocks/theme";
 import { removeIconAction, uploadIconsAction } from "@/lib/actions";
 import { ActionForm } from "@/components/action-form";
 import { Callout, Field, Panel, SubmitButton } from "@/components/ui";
@@ -51,7 +51,7 @@ function Slot({
         style={
           override
             ? ({
-                ["--ox-icon-" + spec.slot]: `url("${override.src}")`,
+                ["--zb-icon-" + spec.slot]: `url("${override.src}")`,
                 fontSize: "24px",
               } as React.CSSProperties)
             : { fontSize: "24px" }
@@ -60,7 +60,7 @@ function Slot({
         {locked ? (
           <Lock aria-hidden="true" strokeWidth={2} className="size-4 text-graphite-soft" />
         ) : (
-          <span className="ox-icon" data-icon={spec.slot} aria-hidden="true" />
+          <span className="zb-icon" data-icon={spec.slot} aria-hidden="true" />
         )}
       </span>
 

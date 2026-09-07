@@ -21,7 +21,7 @@ import {
   useRegisterLabel,
   useSummonShortcut,
 } from "../src/primitives.js";
-import { EMPTY_ANSWER, type Answer, type Source } from "@oxygenui-design/copilot-core";
+import { EMPTY_ANSWER, type Answer, type Source } from "@zoblocks/copilot-core";
 import type { CopilotApi } from "../src/use-copilot.js";
 
 const source: Source = {

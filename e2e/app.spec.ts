@@ -16,7 +16,7 @@
 
 import { test, expect, type Page } from "@playwright/test";
 
-const BASE = process.env.OXYGEN_APP_URL ?? "http://localhost:6003";
+const BASE = process.env.ZOBLOCKS_APP_URL ?? "http://localhost:6003";
 
 /** The seed's worked customer. Obviously fake, in a database that evaporates. */
 const ADMIN = { email: "admin@northwind.example", password: "correct-horse-battery-staple" };
@@ -110,10 +110,10 @@ test.describe("@app the theme lifecycle", () => {
     expect(css.headers()["content-type"]).toContain("text/css");
 
     const body = await css.text();
-    expect(body).toContain("--ox-text:");
+    expect(body).toContain("--zb-text:");
     // The rule that survives every tier and every screen.
-    expect(body).not.toContain("--ox-status-");
-    expect(body).not.toContain("--ox-flag-");
+    expect(body).not.toContain("--zb-status-");
+    expect(body).not.toContain("--zb-flag-");
 
     /*
      * The brand manifest, at the version just published.
@@ -236,7 +236,7 @@ test.describe("@app the glyphs", () => {
     const send = panel.locator('[data-icon="send"]').first();
     await expect(send).toBeVisible();
     const applied = await send.evaluate((el) =>
-      getComputedStyle(el.parentElement!).getPropertyValue("--ox-icon-send").trim(),
+      getComputedStyle(el.parentElement!).getPropertyValue("--zb-icon-send").trim(),
     );
     expect(applied).toMatch(/^url\(/);
 
@@ -377,7 +377,7 @@ test.describe.serial("@app the frameworks setting", () => {
    * A theme file is a claim that a brand survived translation into somebody
    * else's vocabulary, and the only way to settle it is to look at *their*
    * Button. So this reads the painted colour off a real antd primary button and
-   * checks it against the accent Oxygen resolves — if the mapping table drifts,
+   * checks it against the accent Zoblocks resolves — if the mapping table drifts,
    * or the specimen quietly renders unthemed, the pixel disagrees.
    */
   test("draws the export in the framework's own components", async ({ page }) => {
@@ -397,7 +397,7 @@ test.describe.serial("@app the frameworks setting", () => {
 
     const painted = await admit.evaluate((el) => getComputedStyle(el).backgroundColor);
 
-    // #1851a5 — the ramp's 700, which is what `--ox-accent` resolves to. The
+    // #1851a5 — the ramp's 700, which is what `--zb-accent` resolves to. The
     // 600 the customer picked would be rgb(29, 99, 201).
     expect(painted).toBe("rgb(24, 81, 165)");
   });

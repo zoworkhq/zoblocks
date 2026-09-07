@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { requireMember } from "@/lib/auth";
 import { scoped } from "@/db/scope";
 import { baseTokens } from "@/lib/base-tokens";
-import { validateTheme } from "@oxygenui-design/theme";
+import { validateTheme } from "@zoblocks/theme";
 import { DataTable, EmptyState, PageHeader, Panel, StatusChip, type Column } from "@/components/ui";
 import { ComparePicker } from "./ComparePicker";
 

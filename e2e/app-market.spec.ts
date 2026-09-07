@@ -15,7 +15,7 @@
 
 import { expect, test, type Page } from "@playwright/test";
 
-const BASE = process.env.OXYGEN_APP_URL ?? "http://localhost:6003";
+const BASE = process.env.ZOBLOCKS_APP_URL ?? "http://localhost:6003";
 const ADMIN = { email: "admin@northwind.example", password: "correct-horse-battery-staple" };
 
 /** Seeded by `scripts/seed-market.mjs`, which the e2e server runs. */
@@ -192,12 +192,12 @@ test.describe("@app access tokens", () => {
     // The only moment the value exists outside the customer's machine.
     /*
      * Long enough to be a token, because the same screen documents the header
-     * with a literal `oxy_live_…` and a looser pattern matches the example
+     * with a literal `zb_live_…` and a looser pattern matches the example
      * instead of the thing that was just minted.
      */
-    const shown = page.getByText(/oxy_live_[\w-]{30,}/).first();
+    const shown = page.getByText(/zb_live_[\w-]{30,}/).first();
     await expect(shown).toBeVisible();
-    const token = (await shown.textContent())?.match(/oxy_live_[\w-]{30,}/)?.[0];
+    const token = (await shown.textContent())?.match(/zb_live_[\w-]{30,}/)?.[0];
     expect(token).toBeTruthy();
 
     // It installs nothing yet — this organisation owns no component.
@@ -217,8 +217,8 @@ test.describe("@app access tokens", () => {
     // Back to the token screen — `grant` left us on the item page it opened.
     await page.goto(`${BASE}/market/tokens`);
     await expect(page.getByText("E2E machine")).toBeVisible();
-    // The documented `oxy_live_…` example survives; a real token does not.
-    await expect(page.getByText(/oxy_live_[\w-]{30,}/)).toHaveCount(0);
+    // The documented `zb_live_…` example survives; a real token does not.
+    await expect(page.getByText(/zb_live_[\w-]{30,}/)).toHaveCount(0);
 
     await page.getByRole("button", { name: "Revoke" }).first().click();
     await expect(page.getByText("Revoked", { exact: true })).toBeVisible();

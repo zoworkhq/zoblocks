@@ -38,7 +38,7 @@
  */
 
 import * as React from "react";
-import type { SignatureValue, Signer } from "@oxygenui-design/signature-core";
+import type { SignatureValue, Signer } from "@zoblocks/signature-core";
 import { SignatureInk } from "./SignatureInk";
 import { useLocale, type SignatureLocale } from "./locale";
 
@@ -90,15 +90,15 @@ function SignerLines({ signer }: { signer: Signer }) {
   const registration = [signer.register, signer.identifier].filter(Boolean).join(" ");
 
   return (
-    <div className="ox-signature-block__signer">
-      <p className="ox-signature-block__name">
+    <div className="zb-signature-block__signer">
+      <p className="zb-signature-block__name">
         {signer.name}
         {signer.credential ? (
-          <span className="ox-signature-block__credential"> {signer.credential}</span>
+          <span className="zb-signature-block__credential"> {signer.credential}</span>
         ) : null}
       </p>
-      {signer.role ? <p className="ox-signature-block__role">{signer.role}</p> : null}
-      {registration ? <p className="ox-signature-block__registration">{registration}</p> : null}
+      {signer.role ? <p className="zb-signature-block__role">{signer.role}</p> : null}
+      {registration ? <p className="zb-signature-block__registration">{registration}</p> : null}
     </div>
   );
 }
@@ -133,18 +133,18 @@ export function SignatureBlock({
 
     return (
       <section
-        className={["ox-signature-block", "ox-signature-block--unsigned", className]
+        className={["zb-signature-block", "zb-signature-block--unsigned", className]
           .filter(Boolean)
           .join(" ")}
         aria-label={t.notSigned}
       >
-        <p className="ox-signature-block__notice">
+        <p className="zb-signature-block__notice">
           <strong>{t.notSigned}</strong>
           {" — "}
           {status[value.outcome] ?? value.outcome}
         </p>
         {"reason" in value && value.reason ? (
-          <p className="ox-signature-block__detail">{String(value.reason)}</p>
+          <p className="zb-signature-block__detail">{String(value.reason)}</p>
         ) : null}
       </section>
     );
@@ -161,10 +161,10 @@ export function SignatureBlock({
 
   return (
     <section
-      className={["ox-signature-block", className].filter(Boolean).join(" ")}
+      className={["zb-signature-block", className].filter(Boolean).join(" ")}
       aria-label={`${t.signedOn} ${signedAt}`}
     >
-      {caption ? <p className="ox-signature-block__caption">{caption}</p> : null}
+      {caption ? <p className="zb-signature-block__caption">{caption}</p> : null}
 
       {/*
         The alt text is whose signature it is and when — the equivalent purpose
@@ -173,18 +173,18 @@ export function SignatureBlock({
       <SignatureInk
         ink={value.ink}
         label={`${value.signer.name}, ${signedAt}`}
-        className="ox-signature-block__ink"
+        className="zb-signature-block__ink"
         height={56}
         preserveAspectRatio="xMinYMax meet"
       />
 
-      <hr className="ox-signature-block__rule" />
+      <hr className="zb-signature-block__rule" />
 
       <SignerLines signer={value.signer} />
 
-      {organisation ? <p className="ox-signature-block__org">{organisation}</p> : null}
+      {organisation ? <p className="zb-signature-block__org">{organisation}</p> : null}
 
-      <p className="ox-signature-block__when">
+      <p className="zb-signature-block__when">
         {t.signedOn} {signedAt}
       </p>
 
@@ -192,14 +192,14 @@ export function SignatureBlock({
         The meaning is not decoration: §11.50(a)(3) requires the manifestation
         to state what the signature meant, and "signed" alone does not.
       */}
-      <p className="ox-signature-block__meaning">{t.meaning[value.meaning] ?? value.meaning}</p>
+      <p className="zb-signature-block__meaning">{t.meaning[value.meaning] ?? value.meaning}</p>
 
       {verified !== undefined ? (
         <p
           className={
             verified
-              ? "ox-signature-block__integrity"
-              : "ox-signature-block__integrity ox-signature-block__integrity--failed"
+              ? "zb-signature-block__integrity"
+              : "zb-signature-block__integrity zb-signature-block__integrity--failed"
           }
         >
           {/* Named in words as well as marked, so monochrome print still says it. */}

@@ -33,7 +33,7 @@ import {
   type CopilotMode,
   type CopilotProvider,
   type Source,
-} from "@oxygenui-design/copilot-core";
+} from "@zoblocks/copilot-core";
 
 /* ------------------------------------------------------------------ */
 /* Results                                                             */

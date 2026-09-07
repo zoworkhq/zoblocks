@@ -77,7 +77,7 @@ for (const [name, email, role, status] of team) {
 const admin = ids["ada@example.com"];
 
 const tasks = [
-  ["Publish @oxygenui-design/fhir 0.1.1", "in_progress", "urgent", ids["ada@example.com"], -1],
+  ["Publish @zoblocks/fhir 0.1.1", "in_progress", "urgent", ids["ada@example.com"], -1],
   ["Deprecate the broken 0.1.0 release", "todo", "high", ids["ada@example.com"], 1],
   ["Wire trusted publishing for npm", "todo", "normal", ids["ravi@example.com"], 5],
   ["Add format:check to CI", "todo", "low", ids["ravi@example.com"], null],

@@ -9,17 +9,17 @@
 import * as React from "react";
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { OxygenTheme } from "../src/react";
+import { ZoblocksTheme } from "../src/react";
 
-describe("<OxygenTheme>", () => {
+describe("<ZoblocksTheme>", () => {
   it("applies tokens to one element", () => {
     const { container } = render(
-      <OxygenTheme tokens={{ "--ox-accent": "#1d63c9" }}>
+      <ZoblocksTheme tokens={{ "--zb-accent": "#1d63c9" }}>
         <button type="button">Sign</button>
-      </OxygenTheme>,
+      </ZoblocksTheme>,
     );
     const wrapper = container.firstElementChild as HTMLElement;
-    expect(wrapper.style.getPropertyValue("--ox-accent")).toBe("#1d63c9");
+    expect(wrapper.style.getPropertyValue("--zb-accent")).toBe("#1d63c9");
   });
 
   /**
@@ -29,18 +29,18 @@ describe("<OxygenTheme>", () => {
    */
   it("drops undefined and empty values rather than blanking the property", () => {
     const { container } = render(
-      <OxygenTheme tokens={{ "--ox-accent": undefined, "--ox-text": "", "--ox-bg": "#fff" }}>
+      <ZoblocksTheme tokens={{ "--zb-accent": undefined, "--zb-text": "", "--zb-bg": "#fff" }}>
         x
-      </OxygenTheme>,
+      </ZoblocksTheme>,
     );
     const wrapper = container.firstElementChild as HTMLElement;
-    expect(wrapper.style.getPropertyValue("--ox-accent")).toBe("");
-    expect(wrapper.style.getPropertyValue("--ox-bg")).toBe("#fff");
+    expect(wrapper.style.getPropertyValue("--zb-accent")).toBe("");
+    expect(wrapper.style.getPropertyValue("--zb-bg")).toBe("#fff");
   });
 
   it("ignores keys that are not custom properties", () => {
     const { container } = render(
-      <OxygenTheme tokens={{ color: "red", "--ox-bg": "#fff" }}>x</OxygenTheme>,
+      <ZoblocksTheme tokens={{ color: "red", "--zb-bg": "#fff" }}>x</ZoblocksTheme>,
     );
     const wrapper = container.firstElementChild as HTMLElement;
     expect(wrapper.style.color).toBe("");
@@ -48,28 +48,28 @@ describe("<OxygenTheme>", () => {
 
   it("sets the three axis attributes when asked", () => {
     const { container } = render(
-      <OxygenTheme tokens={{}} brand="northwind" theme="high-contrast" density="clinical">
+      <ZoblocksTheme tokens={{}} brand="northwind" theme="high-contrast" density="clinical">
         x
-      </OxygenTheme>,
+      </ZoblocksTheme>,
     );
     const wrapper = container.firstElementChild as HTMLElement;
-    expect(wrapper.getAttribute("data-ox-brand")).toBe("northwind");
-    expect(wrapper.getAttribute("data-ox-theme")).toBe("high-contrast");
-    expect(wrapper.getAttribute("data-ox-density")).toBe("clinical");
+    expect(wrapper.getAttribute("data-zb-brand")).toBe("northwind");
+    expect(wrapper.getAttribute("data-zb-theme")).toBe("high-contrast");
+    expect(wrapper.getAttribute("data-zb-density")).toBe("clinical");
   });
 
   it("omits an axis that was not asked for, rather than writing a default", () => {
-    const { container } = render(<OxygenTheme tokens={{}}>x</OxygenTheme>);
+    const { container } = render(<ZoblocksTheme tokens={{}}>x</ZoblocksTheme>);
     const wrapper = container.firstElementChild as HTMLElement;
-    expect(wrapper.hasAttribute("data-ox-brand")).toBe(false);
-    expect(wrapper.hasAttribute("data-ox-theme")).toBe(false);
+    expect(wrapper.hasAttribute("data-zb-brand")).toBe(false);
+    expect(wrapper.hasAttribute("data-zb-theme")).toBe(false);
   });
 
   it("adds nothing to the accessibility tree", () => {
     render(
-      <OxygenTheme tokens={{ "--ox-accent": "#1d63c9" }}>
+      <ZoblocksTheme tokens={{ "--zb-accent": "#1d63c9" }}>
         <button type="button">Sign</button>
-      </OxygenTheme>,
+      </ZoblocksTheme>,
     );
     const wrapper = screen.getByRole("button", { name: "Sign" }).parentElement as HTMLElement;
     expect(wrapper.getAttribute("role")).toBeNull();
@@ -78,9 +78,9 @@ describe("<OxygenTheme>", () => {
 
   it("renders as a span where a block element would break the layout", () => {
     const { container } = render(
-      <OxygenTheme tokens={{}} as="span">
+      <ZoblocksTheme tokens={{}} as="span">
         x
-      </OxygenTheme>,
+      </ZoblocksTheme>,
     );
     expect(container.firstElementChild?.tagName).toBe("SPAN");
   });
@@ -92,16 +92,16 @@ describe("<OxygenTheme>", () => {
   it("scopes independently, so one page can render two customers' branding", () => {
     const { container } = render(
       <div>
-        <OxygenTheme tokens={{ "--ox-accent": "#1d63c9" }} brand="northwind">
+        <ZoblocksTheme tokens={{ "--zb-accent": "#1d63c9" }} brand="northwind">
           <span>a</span>
-        </OxygenTheme>
-        <OxygenTheme tokens={{ "--ox-accent": "#b91c1c" }} brand="southmere">
+        </ZoblocksTheme>
+        <ZoblocksTheme tokens={{ "--zb-accent": "#b91c1c" }} brand="southmere">
           <span>b</span>
-        </OxygenTheme>
+        </ZoblocksTheme>
       </div>,
     );
-    const [first, second] = [...container.querySelectorAll("[data-ox-brand]")] as HTMLElement[];
-    expect(first!.style.getPropertyValue("--ox-accent")).toBe("#1d63c9");
-    expect(second!.style.getPropertyValue("--ox-accent")).toBe("#b91c1c");
+    const [first, second] = [...container.querySelectorAll("[data-zb-brand]")] as HTMLElement[];
+    expect(first!.style.getPropertyValue("--zb-accent")).toBe("#1d63c9");
+    expect(second!.style.getPropertyValue("--zb-accent")).toBe("#b91c1c");
   });
 });

@@ -15,7 +15,7 @@
  * silently ages is a screenshot that changes on its own.
  */
 
-import type { Meta, StoryObj } from "@oxygenui-design/component-meta";
+import type { Meta, StoryObj } from "@zoblocks/component-meta";
 import { expect, userEvent, within } from "../../../test/story-kit";
 import * as F from "../test/fixtures.js";
 import { IdentityProvider, type IdentityProviderProps } from "./IdentityProvider.js";
@@ -24,7 +24,7 @@ import { IdentitySet } from "./IdentitySet.js";
 import { PatientBanner } from "./PatientBanner.js";
 import { PatientChip } from "./PatientChip.js";
 import { PatientGuard } from "./PatientGuard.js";
-import { policy, resolveIdentity } from "@oxygenui-design/identity-core";
+import { policy, resolveIdentity } from "@zoblocks/identity-core";
 
 const TWO = [{ kind: "mrn" }, { kind: "nhs" }] as const;
 
@@ -187,7 +187,7 @@ export const PhotoOnFile: Story = {
       photos: "allow",
     }),
   play: async ({ canvasElement }) => {
-    expect(canvasElement.querySelector("[data-ox-photo]")).toBeTruthy();
+    expect(canvasElement.querySelector("[data-zb-photo]")).toBeTruthy();
   },
 };
 
@@ -199,7 +199,7 @@ export const NoPhoto: Story = {
   play: async ({ canvasElement }) => {
     // Initials on a deterministic swatch. Not a silhouette: a generic body
     // outline reads as "unknown person" rather than "no photograph".
-    const avatar = canvasElement.querySelector("[data-ox-photo]");
+    const avatar = canvasElement.querySelector("[data-zb-photo]");
     expect(avatar?.textContent).toMatch(/A/);
   },
 };
@@ -221,7 +221,7 @@ export const PhotoFailed: Story = {
   play: async ({ canvasElement }) => {
     // A broken image and a patient with no photograph are different facts, and
     // only one of them means somebody should look at the integration.
-    expect(canvasElement.querySelector("[data-ox-photo='unavailable']")).toBeTruthy();
+    expect(canvasElement.querySelector("[data-zb-photo='unavailable']")).toBeTruthy();
   },
 };
 
@@ -234,7 +234,7 @@ export const PhotoWithheld: Story = {
     // The default is deny. A cached portrait is PHI at rest in a browser the
     // site may not control, and an intake photograph taken during an
     // involuntary admission was not meaningfully consented to.
-    expect(canvasElement.querySelector("[data-ox-photo='withheld']")).toBeTruthy();
+    expect(canvasElement.querySelector("[data-zb-photo='withheld']")).toBeTruthy();
   },
 };
 
@@ -249,7 +249,7 @@ export const Loading: Story = {
   play: async ({ canvasElement }) => {
     // Never a half-identity: a banner with a name and no identifiers invites
     // somebody to act on the half that arrived.
-    expect(canvasElement.querySelector(".ox-banner--loading")).toBeTruthy();
+    expect(canvasElement.querySelector(".zb-banner--loading")).toBeTruthy();
     expect(canvasElement.querySelector("[aria-busy='true']")).toBeTruthy();
   },
 };
@@ -282,7 +282,7 @@ export const Escalated: Story = {
       <IdentitySet>
         <ul style={{ display: "grid", gap: 8, listStyle: "none", margin: 0, padding: 0 }}>
           {[F.amaraA, F.amaraB, F.ada].map((patient, index) => (
-            <li key={patient.id} style={{ "--ox-row": index } as React.CSSProperties}>
+            <li key={patient.id} style={{ "--zb-row": index } as React.CSSProperties}>
               <PatientChip patient={patient} block />
             </li>
           ))}
@@ -293,8 +293,8 @@ export const Escalated: Story = {
     // Two Amara Okonkwos on one list. The set escalates what distinguishes
     // them rather than leaving the reader to spot it — wrong-patient
     // documentation survives every amount of staff education.
-    expect(canvasElement.querySelectorAll("[data-ox-patient-chip]").length || 3).toBeGreaterThan(0);
-    expect(canvasElement.querySelector("[data-ox-escalated]")).toBeTruthy();
+    expect(canvasElement.querySelectorAll("[data-zb-patient-chip]").length || 3).toBeGreaterThan(0);
+    expect(canvasElement.querySelector("[data-zb-escalated]")).toBeTruthy();
   },
 };
 
@@ -326,7 +326,7 @@ export const BadCheckDigit: Story = {
     // An NHS number that fails its own modulus-11 check is a transcription
     // error, and rendering it as a valid identifier is how it gets matched
     // against the wrong record downstream.
-    expect(canvasElement.querySelector(".ox-banner__invalid")).toBeTruthy();
+    expect(canvasElement.querySelector(".zb-banner__invalid")).toBeTruthy();
   },
 };
 

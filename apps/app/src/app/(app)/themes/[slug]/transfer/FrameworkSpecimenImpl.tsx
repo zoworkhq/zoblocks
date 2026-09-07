@@ -7,23 +7,23 @@ import MuiButton from "@mui/material/Button";
 import MuiTextField from "@mui/material/TextField";
 import MuiChip from "@mui/material/Chip";
 import MuiSwitch from "@mui/material/Switch";
-import { toAntdTheme } from "@oxygenui-design/bridge-antd/inverse";
-import { toMuiTheme } from "@oxygenui-design/bridge-mui/inverse";
+import { toAntdTheme } from "@zoblocks/bridge-antd/inverse";
+import { toMuiTheme } from "@zoblocks/bridge-mui/inverse";
 
 /**
  * The export file, rendered.
  *
- * These are Ant Design's and Material UI's own components — not Oxygen's —
+ * These are Ant Design's and Material UI's own components — not Zoblocks's —
  * drawn under exactly the theme object the download beside them contains. That
  * is the point: the outbound bridge's claim is "your brand, in your framework's
  * vocabulary", and the only way to settle whether that survived the translation
  * is to look at the framework's own Button.
  *
  * It is deliberately the *outbound* direction. The inbound bridge maps a host's
- * resolved theme onto Oxygen's tokens, and the app does not have a
+ * resolved theme onto Zoblocks's tokens, and the app does not have a
  * customer's `ConfigProvider` config — so an inbound preview here could only
  * show a sample theme dressed up as theirs, which is worse than showing
- * nothing. What the app does have is their Oxygen theme, and this is what
+ * nothing. What the app does have is their Zoblocks theme, and this is what
  * their own components will look like wearing it.
  *
  * Loaded on the client only, and the wrapper beside this file is what makes

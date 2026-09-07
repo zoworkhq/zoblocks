@@ -7,11 +7,11 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/lib/loader.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/lib/loader.tsx. Edit that file, not this one.
 /**
- * loader-core — everything the Oxygen loaders share.
+ * loader-core — everything the Zoblocks loaders share.
  *
- * Each loader is installed on its own (`oxygen add pulse-loader`), and the
+ * Each loader is installed on its own (`zoblocks add pulse-loader`), and the
  * CLI pulls this file in as a dependency. Two things live here because
  * duplicating them per loader would mean five copies of the same clinical
  * judgement:
@@ -24,9 +24,9 @@
  *      accessibility contract. The five loaders differ only in their art.
  *
  * The art constants are here too, so that a loader and its custom-element
- * twin in @oxygenui-design/loaders cannot drift. A parity test asserts it.
+ * twin in @zoblocks/loaders cannot drift. A parity test asserts it.
  *
- * Styling lives in `styles/oxygen-loader.css`, installed alongside this file.
+ * Styling lives in `styles/zoblocks-loader.css`, installed alongside this file.
  * The loaders deliberately use no Tailwind utilities of their own: keyframes
  * cannot be expressed as tokens, and a component whose motion depends on the
  * host's Tailwind config is a component that renders unstyled in a Vue app.
@@ -42,7 +42,7 @@ import { cn } from "../lib/utils";
 /**
  * A style object that may also carry CSS custom properties.
  *
- * React's CSSProperties has no room for `--ox-loader-beat`, and the usual
+ * React's CSSProperties has no room for `--zb-loader-beat`, and the usual
  * workaround is an `as React.CSSProperties` cast at every call site — which
  * also silences real typos in the properties beside it. A template-literal key
  * widens the type exactly as far as it needs to go and no further.
@@ -132,7 +132,7 @@ export interface LoadingGateState {
  * The three timing rules, as one hook.
  *
  * Exported on its own because an application often needs the same decision for
- * something that is not an Oxygen loader — a skeleton, a disabled button, a
+ * something that is not a Zoblocks loader — a skeleton, a disabled button, a
  * progress line in a table.
  */
 export function useLoadingGate({
@@ -247,7 +247,7 @@ export function strokePx(sizePx: number): number {
  * the rhythm line passes through, and closing it would turn a clinical mark
  * into a valentine.
  *
- * Shared with @oxygenui-design/loaders so the React component and the custom
+ * Shared with @zoblocks/loaders so the React component and the custom
  * element cannot drift. `test/loader-parity.test.ts` asserts they match.
  */
 export const LOADER_ART = {
@@ -278,9 +278,9 @@ export const LOADER_VIEWBOX = {
 
 /** Static lookup — Tailwind and CSS both need to see the whole set as text. */
 const MODE_CLASS: Record<LoaderMode, string> = {
-  inline: "ox-loader--inline",
-  overlay: "ox-loader--overlay",
-  page: "ox-loader--page",
+  inline: "zb-loader--inline",
+  overlay: "zb-loader--overlay",
+  page: "zb-loader--page",
 };
 
 /**
@@ -303,7 +303,7 @@ export interface LoaderFrameProps extends Omit<LoaderCommonProps, "size" | "spee
 }
 
 /**
- * The shell every Oxygen loader renders inside.
+ * The shell every Zoblocks loader renders inside.
  *
  * The accessibility contract in one place:
  *
@@ -353,11 +353,11 @@ export function LoaderFrame({
   return (
     <div
       {...rest}
-      className={cn("ox-loader", MODE_CLASS[mode], className)}
-      data-ox-loader={variant}
-      data-ox-motion={motion}
-      data-ox-determinate={String(determinate)}
-      data-ox-scrim={mode === "inline" ? undefined : String(scrim)}
+      className={cn("zb-loader", MODE_CLASS[mode], className)}
+      data-zb-loader={variant}
+      data-zb-motion={motion}
+      data-zb-determinate={String(determinate)}
+      data-zb-scrim={mode === "inline" ? undefined : String(scrim)}
       style={{ ...vars, ...style }}
       role={determinate ? "progressbar" : "status"}
       aria-live={determinate || announce === "off" ? undefined : announce}
@@ -367,21 +367,21 @@ export function LoaderFrame({
       aria-valuenow={determinate ? Math.round(value ?? 0) : undefined}
       aria-valuetext={determinate ? `${Math.round(value ?? 0)} percent` : undefined}
     >
-      <div className="ox-loader__art" aria-hidden="true">
+      <div className="zb-loader__art" aria-hidden="true">
         {art}
-        {mark ? <span className="ox-loader__mark">{mark}</span> : null}
+        {mark ? <span className="zb-loader__mark">{mark}</span> : null}
       </div>
 
-      <span id={labelId} className={withLabel ? "ox-loader__label" : "ox-loader__sr"}>
+      <span id={labelId} className={withLabel ? "zb-loader__label" : "zb-loader__sr"}>
         {label}
       </span>
 
       {determinate && withLabel ? (
-        <span className="ox-loader__value">{Math.round(value ?? 0)}%</span>
+        <span className="zb-loader__value">{Math.round(value ?? 0)}%</span>
       ) : null}
 
-      {message && withLabel ? <span className="ox-loader__hint">{message}</span> : null}
-      {actions ? <div className="ox-loader__actions">{actions}</div> : null}
+      {message && withLabel ? <span className="zb-loader__hint">{message}</span> : null}
+      {actions ? <div className="zb-loader__actions">{actions}</div> : null}
     </div>
   );
 }

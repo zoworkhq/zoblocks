@@ -5,7 +5,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/lib/palette.ts. Edit that file, not this one.
+// Generated from registry/zoblocks/lib/palette.ts. Edit that file, not this one.
 /**
  * A command palette for a place where search is a regulated act.
  *

@@ -77,6 +77,6 @@ describe("its dependencies stay pure too", () => {
       dependencies?: Record<string, string>;
     };
 
-    expect(Object.keys(manifest.dependencies ?? {})).toEqual(["@oxygenui-design/tokens"]);
+    expect(Object.keys(manifest.dependencies ?? {})).toEqual(["@zoblocks/tokens"]);
   });
 });

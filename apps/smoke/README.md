@@ -1,6 +1,6 @@
 # Framework smoke apps
 
-`@oxygenui-design/loaders` claims to work "in React, Vue, Angular, Svelte, or
+`@zoblocks/loaders` claims to work "in React, Vue, Angular, Svelte, or
 plain HTML". Until this package existed that was a sentence in a README, not a
 tested property — and the interesting failures all live in the framework's
 template layer, which unit tests in jsdom never touch:
@@ -21,11 +21,11 @@ contract every page implements:
 | Selector       | Requirement                                                                      |
 | -------------- | -------------------------------------------------------------------------------- |
 | `#framework`   | Names the framework, so a mis-wired route fails loudly instead of passing twice. |
-| `#loader`      | `<ox-pulse-loader>` with `label`, `mode="inline"`, `min-duration="0"`.           |
+| `#loader`      | `<zb-pulse-loader>` with `label`, `mode="inline"`, `min-duration="0"`.           |
 | `#toggle`      | Flips framework state that drives the loader's `open` attribute.                 |
-| `#determinate` | `<ox-rhythm-loader>` whose `progress` is bound to a framework **number**.        |
+| `#determinate` | `<zb-rhythm-loader>` whose `progress` is bound to a framework **number**.        |
 | `#step`        | Advances that number by 25.                                                      |
-| `#events`      | Text count of `ox-loader-show` / `ox-loader-hide` events observed by the host.   |
+| `#events`      | Text count of `zb-loader-show` / `zb-loader-hide` events observed by the host.   |
 
 `min-duration="0"` is deliberate. The default 400 ms floor is right for humans
 and wrong for a test that would otherwise assert on a loader still serving out
@@ -35,7 +35,7 @@ boundary.
 ## Running
 
 ```bash
-pnpm --filter @oxygenui-design/smoke build   # every framework's real compiler runs here
+pnpm --filter @zoblocks/smoke build   # every framework's real compiler runs here
 pnpm e2e --grep @framework                   # drives the built output in three browsers
 ```
 

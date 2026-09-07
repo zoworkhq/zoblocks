@@ -18,11 +18,11 @@
  */
 
 import * as React from "react";
-import type { Control } from "@oxygenui-design/component-meta";
-import { allergyList, medicationList, observationPanel } from "@oxygenui-design/fixtures";
-import { Tabs, type TabsItemProps, type TabsProps } from "@oxygenui-design/tabs";
+import type { Control } from "@zoblocks/component-meta";
+import { allergyList, medicationList, observationPanel } from "@zoblocks/fixtures";
+import { Tabs, type TabsItemProps, type TabsProps } from "@zoblocks/tabs";
 import { ConfigProvider, Form, theme } from "antd";
-import { Signature, signatureRequired, type SignatureProps } from "@oxygenui-design/signature";
+import { Signature, signatureRequired, type SignatureProps } from "@zoblocks/signature";
 import { PLAYGROUND_COMPONENTS } from "./playground-registry";
 import { useSiteTheme } from "./use-site-theme";
 import { useAntdBrandTokens } from "./language-antd-theme";
@@ -221,7 +221,7 @@ class PlaygroundBoundary extends React.Component<
 
 const FIELD =
   "min-h-6 w-full rounded-lg border border-rule bg-paper px-2 py-1 text-sm text-ink " +
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-oxygen";
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand";
 
 function Knob({
   control,
@@ -241,7 +241,7 @@ function Knob({
         <input
           id={id}
           type="checkbox"
-          className="size-4 accent-[var(--color-oxygen)]"
+          className="size-4 accent-[var(--color-brand)]"
           checked={Boolean(value)}
           onChange={(event) => onChange(event.target.checked)}
         />
@@ -262,12 +262,12 @@ function Knob({
           {(control.options ?? []).map((option) => (
             <label
               key={option}
-              className="flex min-h-6 cursor-pointer items-center gap-1.5 rounded-lg border border-rule px-2 py-0.5 text-xs text-graphite has-[:checked]:border-oxygen/50 has-[:checked]:text-ink"
+              className="flex min-h-6 cursor-pointer items-center gap-1.5 rounded-lg border border-rule px-2 py-0.5 text-xs text-graphite has-[:checked]:border-brand/50 has-[:checked]:text-ink"
             >
               <input
                 type="radio"
                 name={id}
-                className="size-3 accent-[var(--color-oxygen)]"
+                className="size-3 accent-[var(--color-brand)]"
                 checked={value === option}
                 onChange={() => onChange(option)}
               />
@@ -317,7 +317,7 @@ function Knob({
         <input
           id={id}
           type="range"
-          className="mt-1 w-full accent-[var(--color-oxygen)]"
+          className="mt-1 w-full accent-[var(--color-brand)]"
           min={control.min ?? 0}
           max={control.max ?? 100}
           step={control.step ?? 1}
@@ -412,7 +412,7 @@ export function Playground({ name, controls }: { name: string; controls: readonl
         {/*
           The accent follows the design language.
 
-          It was pinned to Oxygen's, for a good reason at the time: with only
+          It was pinned to Zoblocks's, for a good reason at the time: with only
           the algorithm set this rendered antd's #1677ff with white on it —
           4.10:1, an AA failure. Under "Ant Design" that failure is now shown
           rather than corrected, because a reader comparing frameworks should

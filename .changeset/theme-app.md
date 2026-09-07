@@ -1,5 +1,5 @@
 ---
-"@oxygenui-design/theme": minor
+"@zoblocks/theme": minor
 ---
 
 Customer themes at runtime: the document model, the ramp generator, the
@@ -26,7 +26,7 @@ system" from meaning two things to support.
 - **`isServable()`** refuses a theme validated by an older validator, so
   tightening a rule cannot leave an older palette live and restoring an old
   version re-checks it.
-- **`<OxygenTheme>`** applies tokens inline, for multi-tenant pages where a
+- **`<ZoblocksTheme>`** applies tokens inline, for multi-tenant pages where a
   root-scoped stylesheet would let the last one loaded win.
 
 Only the primitive ramp is ever emitted. Semantic tokens are not, and cannot be

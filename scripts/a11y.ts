@@ -73,7 +73,7 @@ async function main() {
     const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
     await page.addInitScript((t) => {
       try {
-        localStorage.setItem("oxygen-theme", t);
+        localStorage.setItem("zoblocks-theme", t);
       } catch {}
     }, theme);
 

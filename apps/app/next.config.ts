@@ -2,10 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  // Oxygen components live at the repo root, outside this app's tree. Same
+  // Zoblocks components live at the repo root, outside this app's tree. Same
   // arrangement as apps/docs: transpile them from source rather than expecting
   // a built package. This app is the dogfood consumer of that registry.
-  transpilePackages: ["@oxygenui-design/tokens"],
+  transpilePackages: ["@zoblocks/tokens"],
   /*
    * The CLI is aliased to `dist` rather than transpiled from source.
    *
@@ -21,7 +21,7 @@ const nextConfig: NextConfig = {
    */
   turbopack: {
     resolveAlias: {
-      "@oxygenui-design/cli": "../../packages/cli/dist/index.js",
+      "@zoblocks/cli": "../../packages/cli/dist/index.js",
     },
   },
   // Internal tool on a public hostname. These are cheap and there is no reason

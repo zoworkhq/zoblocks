@@ -20,7 +20,7 @@ import {
   type CopilotEvent,
   type Source,
   type TelemetryEvent,
-} from "@oxygenui-design/copilot-core";
+} from "@zoblocks/copilot-core";
 
 const disclosure = minimalDisclosure("test-model@1");
 

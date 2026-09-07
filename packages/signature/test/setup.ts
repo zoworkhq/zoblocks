@@ -42,7 +42,7 @@ if (!HTMLElement.prototype.getBoundingClientRect.toString().includes("native")) 
   const original = HTMLElement.prototype.getBoundingClientRect;
   HTMLElement.prototype.getBoundingClientRect = function getBoundingClientRect() {
     const rect = original.call(this);
-    if (rect.width === 0 && rect.height === 0 && this.dataset.oxSignaturePad !== undefined) {
+    if (rect.width === 0 && rect.height === 0 && this.dataset.zbSignaturePad !== undefined) {
       return {
         ...rect,
         x: 0,
@@ -127,6 +127,6 @@ if (typeof globalThis.IntersectionObserver === "undefined") {
  */
 if (typeof URL.createObjectURL !== "function") {
   let n = 0;
-  URL.createObjectURL = () => `blob:oxygen/${++n}`;
+  URL.createObjectURL = () => `blob:zoblocks/${++n}`;
   URL.revokeObjectURL = () => {};
 }

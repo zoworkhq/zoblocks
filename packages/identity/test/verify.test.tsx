@@ -1,4 +1,4 @@
-import { policy, resolveIdentity } from "@oxygenui-design/identity-core";
+import { policy, resolveIdentity } from "@zoblocks/identity-core";
 import { renderHook, act } from "@testing-library/react";
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";

@@ -1,5 +1,5 @@
 /**
- * @oxygenui-design/tabs-core — the selection engine behind Oxygen Tabs.
+ * @zoblocks/tabs-core — the selection engine behind Zoblocks Tabs.
  *
  * No React, no DOM, no dependencies. Everything here is a pure function or a
  * small state machine over plain data, which is what lets the same keyboard

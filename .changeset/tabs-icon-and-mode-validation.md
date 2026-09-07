@@ -1,6 +1,6 @@
 ---
-"@oxygenui-design/tabs": patch
-"@oxygenui-design/tabs-core": patch
+"@zoblocks/tabs": patch
+"@zoblocks/tabs-core": patch
 ---
 
 Two fixes to the shapes a caller actually reaches for first.

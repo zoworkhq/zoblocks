@@ -18,7 +18,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import path from "node:path";
 import { CATALOG } from "../apps/docs/src/lib/generated/catalog";
-import type { ComponentDoc } from "@oxygenui-design/component-meta";
+import type { ComponentDoc } from "@zoblocks/component-meta";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const read = (p: string) =>

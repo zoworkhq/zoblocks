@@ -6,8 +6,8 @@ import { defineConfig } from "vitest/config";
  * Component tests for the registry — the exact source customers receive.
  *
  * The aliases are read from `tsconfig.generated.json` rather than restated
- * here. Registry components import each other by the path the Oxygen CLI
- * writes into a consumer's project (`@/components/oxygen/status-badge`), and
+ * here. Registry components import each other by the path the Zoblocks CLI
+ * writes into a consumer's project (`@/components/zoblocks/status-badge`), and
  * that map is generated from component metadata. Duplicating it would mean a
  * new component typechecks, renders in the docs, and then fails only under
  * test — with a module-resolution error that looks like a broken test rather
@@ -61,7 +61,7 @@ export default defineConfig({
     passWithNoTests: false,
     coverage: {
       provider: "v8",
-      include: ["registry/oxygen/**/*.tsx"],
+      include: ["registry/zoblocks/**/*.tsx"],
       // Shipped source only. Stories join tests on this list because they are
       // fixtures rather than product: they are excluded from the npm tarball
       // and absent from every registry item, so a customer never runs a line of

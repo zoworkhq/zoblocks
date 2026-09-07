@@ -233,13 +233,13 @@ test.describe("the catalog @a11y", () => {
     await page.goto(CATALOG);
     await settle(page);
 
-    const cards = page.locator("[data-ox-component-card]");
+    const cards = page.locator("[data-zb-component-card]");
     const count = await cards.count();
     expect(count).toBeGreaterThanOrEqual(12);
 
     for (let i = 0; i < count; i += 1) {
       const card = cards.nth(i);
-      const name = (await card.getAttribute("data-ox-component-card"))!;
+      const name = (await card.getAttribute("data-zb-component-card"))!;
       await expect(
         card.locator(".component-preview-frame"),
         `${name} has no preview frame — it fell back to the state chips`,
@@ -252,13 +252,13 @@ test.describe("the catalog @a11y", () => {
     await settle(page);
 
     const overflowing = await page.evaluate(() =>
-      [...document.querySelectorAll<HTMLElement>("[data-ox-component-card]")]
+      [...document.querySelectorAll<HTMLElement>("[data-zb-component-card]")]
         .map((card) => {
           const frame = card.querySelector<HTMLElement>(".component-preview-frame");
           const art = frame?.firstElementChild as HTMLElement | undefined;
           if (!frame || !art) return null;
           return {
-            name: card.getAttribute("data-ox-component-card")!,
+            name: card.getAttribute("data-zb-component-card")!,
             over: Math.round(art.scrollWidth - frame.clientWidth),
           };
         })
@@ -288,7 +288,7 @@ test.describe("the catalog @a11y", () => {
     await settle(page);
 
     const slack = await page.evaluate(() =>
-      [...document.querySelectorAll<HTMLElement>("[data-ox-component-card]")]
+      [...document.querySelectorAll<HTMLElement>("[data-zb-component-card]")]
         .map((card) => {
           const frame = card.querySelector<HTMLElement>(".component-preview-frame");
           const band = frame?.firstElementChild as HTMLElement | undefined;
@@ -308,7 +308,7 @@ test.describe("the catalog @a11y", () => {
 
           const reserved = band.getBoundingClientRect();
           return {
-            name: card.getAttribute("data-ox-component-card")!,
+            name: card.getAttribute("data-zb-component-card")!,
             // Positive: the band holds more height than the art needs.
             unused: Math.round(reserved.height - (bottom - top)),
             // Positive: the art paints outside the band it was given.
@@ -365,7 +365,7 @@ test.describe("the catalog @a11y", () => {
     const rows = await page.evaluate(() => {
       // Derived from a card rather than by class: `main div.grid` is the hero's
       // two-column header, which is also a grid and also matches.
-      const card = document.querySelector<HTMLElement>("[data-ox-component-card]");
+      const card = document.querySelector<HTMLElement>("[data-zb-component-card]");
       const grid = card?.parentElement;
       if (!grid || getComputedStyle(grid).display !== "grid") return null;
       return getComputedStyle(grid)
@@ -394,7 +394,7 @@ test.describe("the catalog @a11y", () => {
     await page.goto(CATALOG);
     await settle(page);
 
-    const tabsCard = page.locator("[data-ox-component-card='tabs']");
+    const tabsCard = page.locator("[data-zb-component-card='tabs']");
     const selected = () =>
       tabsCard.locator("[role='radio'][aria-checked='true']").first().textContent();
 
@@ -434,7 +434,7 @@ test.describe("the catalog @a11y", () => {
 test.describe("the tab gallery @a11y", () => {
   async function openGallery(page: Page) {
     await page.goto(TABS);
-    const gallery = page.locator(".ox-gallery");
+    const gallery = page.locator(".zb-gallery");
     await gallery.scrollIntoViewIfNeeded();
     await expect(gallery).toBeVisible();
     await settle(page);
@@ -474,7 +474,7 @@ test.describe("the tab gallery @a11y", () => {
 
   test("the strip stays a normal height with icon-only triggers", async ({ page }) => {
     await openGallery(page);
-    const strip = page.locator("#v08 .ox-tabs__list").first();
+    const strip = page.locator("#v08 .zb-tabs__list").first();
     const box = (await strip.boundingBox())!;
     // It was ~140px tall when the glyphs were unconstrained.
     expect(box.height).toBeLessThan(72);
@@ -490,9 +490,9 @@ test.describe("the tab gallery @a11y", () => {
     await openGallery(page);
 
     const overflowing = await page.evaluate(() =>
-      [...document.querySelectorAll(".ox-gallery__grid .ox-demo")]
+      [...document.querySelectorAll(".zb-gallery__grid .zb-demo")]
         .map((demo) => {
-          const list = demo.querySelector(".ox-tabs__list");
+          const list = demo.querySelector(".zb-tabs__list");
           if (!list) return null;
           return {
             id: demo.id,
@@ -513,16 +513,16 @@ test.describe("the tab gallery @a11y", () => {
   test("the overflow chapter still overflows", async ({ page }) => {
     await openGallery(page);
     await page
-      .locator(".ox-gallery__chapters")
+      .locator(".zb-gallery__chapters")
       .getByRole("radio", { name: "Overflow" })
       .click({ force: true });
     await settle(page);
 
     const scroll = page.locator("#o1");
-    await expect(scroll.locator(".ox-tabs__bar")).toHaveAttribute("data-ox-end", "false");
+    await expect(scroll.locator(".zb-tabs__bar")).toHaveAttribute("data-zb-end", "false");
 
     const over = await scroll
-      .locator(".ox-tabs__list")
+      .locator(".zb-tabs__list")
       .evaluate((list) => list.scrollWidth - list.clientWidth);
     expect(over).toBeGreaterThan(50);
   });
@@ -536,14 +536,14 @@ test.describe("the tab gallery @a11y", () => {
     // A page-wide dark theme with eleven light-mode panels inside it argues
     // against the thing the gallery exists to demonstrate.
     //
-    // The attribute is the product's own `data-ox-theme`, not a docs-only
-    // stand-in. The galleries used to carry `data-ox-demo-theme` with three
+    // The attribute is the product's own `data-zb-theme`, not a docs-only
+    // stand-in. The galleries used to carry `data-zb-demo-theme` with three
     // hand-written palettes behind it, which themed the stage and nothing
     // inside it: component tokens are substituted where they are declared, so
     // every field and popover kept the root's light values. Setting the real
     // attribute means the demos are themed by the shipped mechanism, and a
     // token that stops following a theme breaks here rather than quietly.
-    await expect(page.locator(".ox-gallery__stage")).toHaveAttribute("data-ox-theme", "dark");
+    await expect(page.locator(".zb-gallery__stage")).toHaveAttribute("data-zb-theme", "dark");
   });
 });
 
@@ -785,7 +785,7 @@ test.describe("the public marketplace @a11y", () => {
   test("lists the packs, priced, whether or not the console answers", async ({ page }) => {
     await page.goto("/marketplace");
 
-    const cards = page.locator("[data-ox-pack]");
+    const cards = page.locator("[data-zb-pack]");
     // A floor, not a maybe. The console has never been deployed and the shelf
     // still has to work.
     await expect(cards.first()).toBeVisible();
@@ -814,7 +814,7 @@ test.describe("the public marketplace @a11y", () => {
      */
     await expect(page.getByRole("heading", { name: "Announced" })).toBeVisible();
 
-    const cards = page.locator("[data-ox-pack]");
+    const cards = page.locator("[data-zb-pack]");
     expect(await cards.count()).toBeGreaterThan(1);
     await expect(cards.getByRole("link", { name: /Buy in the app/ })).toHaveCount(0);
 
@@ -844,11 +844,11 @@ test.describe("the public marketplace @a11y", () => {
   test("shows what is in a pack rather than only describing it", async ({ page }) => {
     await page.goto("/marketplace");
 
-    const cards = page.locator("[data-ox-pack]");
+    const cards = page.locator("[data-zb-pack]");
     const total = await cards.count();
     expect(total).toBeGreaterThan(1);
 
-    await expect(page.locator("[data-ox-pack-preview]")).toHaveCount(total);
+    await expect(page.locator("[data-zb-pack-preview]")).toHaveCount(total);
   });
 
   test("never publishes a clinical review nobody performed", async ({ page }) => {
@@ -880,7 +880,7 @@ test.describe("the public marketplace @a11y", () => {
 
     // By address, not by clicking a card: cards do not link while selling
     // is closed. The page is still built and still reachable.
-    const slug = await page.locator("[data-ox-pack]").first().getAttribute("data-ox-pack");
+    const slug = await page.locator("[data-zb-pack]").first().getAttribute("data-zb-pack");
     await page.goto(`/marketplace/${slug}`);
 
     await expect(page.getByRole("heading", { name: "What was checked" })).toBeVisible();

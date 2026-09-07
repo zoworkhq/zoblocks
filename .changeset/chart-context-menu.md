@@ -1,6 +1,6 @@
 ---
-"@oxygenui-design/react": minor
-"@oxygenui-design/tokens": minor
+"@zoblocks/react": minor
+"@zoblocks/tokens": minor
 ---
 
 ChartContextMenu — a context menu that names what it is about before it offers

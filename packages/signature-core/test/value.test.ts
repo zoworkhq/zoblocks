@@ -314,7 +314,7 @@ describe("FHIR Provenance", () => {
     // A plausible-looking fake OID would be trusted and mismapped. A local
     // system is visibly ours, so a consumer knows to map it.
     const system = toFhirProvenance(declined).activity?.coding[0]!.system;
-    expect(system).toContain("oxygenui.design");
+    expect(system).toContain("zoblocks.design");
   });
 
   it("records the witness as an agent, not just as prose", () => {

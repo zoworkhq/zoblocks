@@ -7,7 +7,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/care-timeline/care-timeline.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/care-timeline/care-timeline.tsx. Edit that file, not this one.
 /**
  * CareTimeline — a chronology that states what it is a view of.
  *
@@ -272,47 +272,47 @@ function markFor(resolved: ResolvedEvent): React.ReactNode {
 /**
  * Class names spelled out rather than assembled.
  *
- * `@oxygenui/no-dynamic-class-name` is right about this even where Tailwind is
+ * `@zoblocks/no-dynamic-class-name` is right about this even where Tailwind is
  * not involved: a class built from a variable cannot be grepped, so the set of
  * things a stylesheet has to cover stops being visible from the code that uses
  * them. Each table is also the exhaustive list of a closed vocabulary, so a
  * value added to the union without a class here is a build error.
  */
 const LAYOUT_CLASS: Readonly<Record<CareTimelineLayout, string>> = {
-  default: "ox-care-timeline--default",
-  card: "ox-care-timeline--card",
-  compact: "ox-care-timeline--compact",
-  register: "ox-care-timeline--register",
+  default: "zb-care-timeline--default",
+  card: "zb-care-timeline--card",
+  compact: "zb-care-timeline--compact",
+  register: "zb-care-timeline--register",
 };
 
 const REGISTER_CLASS: Readonly<Record<TimelineRegister, string>> = {
-  clinical: "ox-care-timeline__item--clinical",
-  administrative: "ox-care-timeline__item--administrative",
-  communication: "ox-care-timeline__item--communication",
-  "patient-reported": "ox-care-timeline__item--patient-reported",
-  system: "ox-care-timeline__item--system",
+  clinical: "zb-care-timeline__item--clinical",
+  administrative: "zb-care-timeline__item--administrative",
+  communication: "zb-care-timeline__item--communication",
+  "patient-reported": "zb-care-timeline__item--patient-reported",
+  system: "zb-care-timeline__item--system",
 };
 
 const SOURCE_CLASS: Readonly<Record<SourceStatus, string>> = {
-  ok: "ox-care-timeline__source--ok",
-  partial: "ox-care-timeline__source--partial",
-  unavailable: "ox-care-timeline__source--unavailable",
-  excluded: "ox-care-timeline__source--excluded",
+  ok: "zb-care-timeline__source--ok",
+  partial: "zb-care-timeline__source--partial",
+  unavailable: "zb-care-timeline__source--unavailable",
+  excluded: "zb-care-timeline__source--excluded",
 };
 
 const STEP_CLASS: Readonly<Record<TimelineStep["state"], string>> = {
-  done: "ox-care-timeline__step--done",
-  open: "ox-care-timeline__step--open",
-  "not-done": "ox-care-timeline__step--not-done",
+  done: "zb-care-timeline__step--done",
+  open: "zb-care-timeline__step--open",
+  "not-done": "zb-care-timeline__step--not-done",
 };
 
 type ChipTone = "plain" | "caution" | "critical" | "info";
 
 const CHIP_CLASS: Readonly<Record<ChipTone, string>> = {
-  plain: "ox-care-timeline__chip ox-care-timeline__chip--plain",
-  caution: "ox-care-timeline__chip ox-care-timeline__chip--caution",
-  critical: "ox-care-timeline__chip ox-care-timeline__chip--critical",
-  info: "ox-care-timeline__chip ox-care-timeline__chip--info",
+  plain: "zb-care-timeline__chip zb-care-timeline__chip--plain",
+  caution: "zb-care-timeline__chip zb-care-timeline__chip--caution",
+  critical: "zb-care-timeline__chip zb-care-timeline__chip--critical",
+  info: "zb-care-timeline__chip zb-care-timeline__chip--info",
 };
 
 function partyText(party: { name: string; role?: string; organization?: string }): string {
@@ -494,22 +494,22 @@ export function CareTimeline({
     <section
       {...rest}
       ref={ref}
-      data-ox-care-timeline=""
-      data-ox-layout={layout}
-      data-ox-order={coverage.order}
-      data-ox-degraded={sentence.degraded ? "" : undefined}
-      className={cn("ox-care-timeline", LAYOUT_CLASS[layout], className)}
+      data-zb-care-timeline=""
+      data-zb-layout={layout}
+      data-zb-order={coverage.order}
+      data-zb-degraded={sentence.degraded ? "" : undefined}
+      className={cn("zb-care-timeline", LAYOUT_CLASS[layout], className)}
       style={style}
     >
       {filters ? (
-        <div className="ox-care-timeline__toolbar">
+        <div className="zb-care-timeline__toolbar">
           {TIMELINE_REGISTERS.map((register) => {
             const on = shown.includes(register);
             return (
               <button
                 key={register}
                 type="button"
-                className="ox-care-timeline__filter"
+                className="zb-care-timeline__filter"
                 aria-pressed={on}
                 onClick={() =>
                   setRegisters(
@@ -525,13 +525,13 @@ export function CareTimeline({
       ) : null}
 
       {jump && model.sections.length > 1 ? (
-        <div className="ox-care-timeline__toolbar">
-          <label className="ox-care-timeline__jump-label" htmlFor={`${baseId}-jump`}>
+        <div className="zb-care-timeline__toolbar">
+          <label className="zb-care-timeline__jump-label" htmlFor={`${baseId}-jump`}>
             {locale.jumpToDate}
           </label>
           <select
             id={`${baseId}-jump`}
-            className="ox-care-timeline__jump"
+            className="zb-care-timeline__jump"
             aria-describedby={`${baseId}-jump-hint`}
             defaultValue=""
             onChange={(event) => {
@@ -556,7 +556,7 @@ export function CareTimeline({
               </option>
             ))}
           </select>
-          <span className="ox-care-timeline__hint" id={`${baseId}-jump-hint`}>
+          <span className="zb-care-timeline__hint" id={`${baseId}-jump-hint`}>
             {locale.jumpToDateHint}
           </span>
         </div>
@@ -565,13 +565,13 @@ export function CareTimeline({
       {/* Announced as content, not as a count. Empty until something arrives —
           an empty live region announces nothing, which is what makes this safe
           to render unconditionally. */}
-      <div role="status" aria-live="polite" className="ox-care-timeline__announce">
+      <div role="status" aria-live="polite" className="zb-care-timeline__announce">
         {announcement}
       </div>
 
       {sentence.degraded || problems.length > 0 ? (
-        <div className="ox-care-timeline__banner" role="alert">
-          <span className="ox-care-timeline__banner-mark">
+        <div className="zb-care-timeline__banner" role="alert">
+          <span className="zb-care-timeline__banner-mark">
             <Glyph d={MARKS.gap} />
           </span>
           <div>
@@ -586,7 +586,7 @@ export function CareTimeline({
               .join(" ")}{" "}
             {locale.sourceNotAClaim}
             {problems.length > 0 ? (
-              <ul className="ox-care-timeline__problems">
+              <ul className="zb-care-timeline__problems">
                 {problems.map((problem) => (
                   <li key={problem}>{problem}</li>
                 ))}
@@ -616,7 +616,7 @@ export function CareTimeline({
       ))}
 
       {empty === "none" ? null : (
-        <p className="ox-care-timeline__empty">
+        <p className="zb-care-timeline__empty">
           {empty === "no-record"
             ? locale.emptyNoRecord
             : empty === "none-in-window"
@@ -625,17 +625,17 @@ export function CareTimeline({
         </p>
       )}
 
-      <footer className="ox-care-timeline__coverage">
+      <footer className="zb-care-timeline__coverage">
         <div>
-          <span className="ox-care-timeline__coverage-lead">{sentence.headline}</span>
+          <span className="zb-care-timeline__coverage-lead">{sentence.headline}</span>
           {sentence.detail ? <> — {sentence.detail}</> : null}
-          <ul className="ox-care-timeline__sources" aria-label={locale.sourcesLabel}>
+          <ul className="zb-care-timeline__sources" aria-label={locale.sourcesLabel}>
             {declaredCoverage.sources.map((source) => (
               <li
                 key={source.id}
-                className={cn("ox-care-timeline__source", SOURCE_CLASS[source.status])}
+                className={cn("zb-care-timeline__source", SOURCE_CLASS[source.status])}
               >
-                <span className="ox-care-timeline__source-dot" aria-hidden="true" />
+                <span className="zb-care-timeline__source-dot" aria-hidden="true" />
                 {source.status === "ok"
                   ? source.label
                   : `${source.label} — ${source.detail ?? source.status}`}
@@ -644,7 +644,7 @@ export function CareTimeline({
           </ul>
         </div>
         {onLoadOlder ? (
-          <button type="button" className="ox-care-timeline__action" onClick={onLoadOlder}>
+          <button type="button" className="zb-care-timeline__action" onClick={onLoadOlder}>
             {locale.loadOlder}
           </button>
         ) : null}
@@ -737,21 +737,21 @@ function Section({
   return (
     <>
       {previous?.type === "planned" ? (
-        <p className="ox-care-timeline__divider ox-care-timeline__divider--now">
+        <p className="zb-care-timeline__divider zb-care-timeline__divider--now">
           {locale.now} — {formatFhirDateTime(now, { locale: localeTag }) ?? now}
-          <span className="ox-care-timeline__divider-rule" aria-hidden="true" />
+          <span className="zb-care-timeline__divider-rule" aria-hidden="true" />
         </p>
       ) : null}
 
       {section.titled ? (
         <Heading
-          className="ox-care-timeline__group"
+          className="zb-care-timeline__group"
           tabIndex={-1}
           ref={(element: HTMLElement | null) => registerHeading(section.key, element)}
         >
           {heading}
-          <span className="ox-care-timeline__group-rule" aria-hidden="true" />
-          <span className="ox-care-timeline__group-count">{section.count}</span>
+          <span className="zb-care-timeline__group-rule" aria-hidden="true" />
+          <span className="zb-care-timeline__group-count">{section.count}</span>
         </Heading>
       ) : null}
 
@@ -759,9 +759,9 @@ function Section({
 
       {split ? (
         <>
-          <p className="ox-care-timeline__divider">
+          <p className="zb-care-timeline__divider">
             {locale.newSince(seenLabel)}
-            <span className="ox-care-timeline__divider-rule" aria-hidden="true" />
+            <span className="zb-care-timeline__divider-rule" aria-hidden="true" />
           </p>
           <Rows rows={tail} label={`${listLabel} — ${heading}, earlier`} {...shared} />
         </>
@@ -788,17 +788,17 @@ function Rows({ rows, label, layout, ...context }: RowListProps & { layout: Care
 
   const { clinical, other } = splitByRegister(rows);
   return (
-    <div className="ox-care-timeline__columns">
-      <div className="ox-care-timeline__column">
-        <p className="ox-care-timeline__column-head">{context.locale.registerColumnClinical}</p>
+    <div className="zb-care-timeline__columns">
+      <div className="zb-care-timeline__column">
+        <p className="zb-care-timeline__column-head">{context.locale.registerColumnClinical}</p>
         <RowList
           rows={clinical}
           label={`${label} — ${context.locale.registerColumnClinical}`}
           {...context}
         />
       </div>
-      <div className="ox-care-timeline__column">
-        <p className="ox-care-timeline__column-head">{context.locale.registerColumnOther}</p>
+      <div className="zb-care-timeline__column">
+        <p className="zb-care-timeline__column-head">{context.locale.registerColumnOther}</p>
         <RowList
           rows={other}
           label={`${label} — ${context.locale.registerColumnOther}`}
@@ -839,10 +839,10 @@ function toItem(row: TimelineRow, context: RenderContext): TimelineItemType {
   if (row.type === "gap") {
     return {
       key: row.key,
-      className: "ox-care-timeline__item--gap",
+      className: "zb-care-timeline__item--gap",
       icon: <Glyph d={MARKS.gap} />,
       content: (
-        <p className="ox-care-timeline__gap-notice">{context.locale.gapNotice(row.gap.reason)}</p>
+        <p className="zb-care-timeline__gap-notice">{context.locale.gapNotice(row.gap.reason)}</p>
       ),
     };
   }
@@ -850,7 +850,7 @@ function toItem(row: TimelineRow, context: RenderContext): TimelineItemType {
   if (row.type === "cluster") {
     return {
       key: row.key,
-      className: "ox-care-timeline__item--cluster",
+      className: "zb-care-timeline__item--cluster",
       icon: <Glyph d={MARKS[row.register]} />,
       content: <Cluster row={row} context={context} />,
     };
@@ -874,14 +874,14 @@ function Cluster({
     <>
       <button
         type="button"
-        className="ox-care-timeline__cluster"
+        className="zb-care-timeline__cluster"
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
       >
-        <span className="ox-care-timeline__cluster-count">
+        <span className="zb-care-timeline__cluster-count">
           {locale.clusterSummary(row.members.length, kindWord)}
         </span>
-        <span className="ox-care-timeline__cluster-note">{locale.clusterNoneCritical}</span>
+        <span className="zb-care-timeline__cluster-note">{locale.clusterNoneCritical}</span>
       </button>
       {open ? (
         <Timeline
@@ -915,22 +915,22 @@ function eventItem(resolved: ResolvedEvent, context: RenderContext): TimelineIte
   return {
     key: event.id,
     className: cn(
-      "ox-care-timeline__item",
+      "zb-care-timeline__item",
       REGISTER_CLASS[resolved.register],
-      status === "in-error" ? "ox-care-timeline__item--in-error" : undefined,
-      status === "planned" ? "ox-care-timeline__item--planned" : undefined,
-      event.severity === "critical" ? "ox-care-timeline__item--critical" : undefined,
+      status === "in-error" ? "zb-care-timeline__item--in-error" : undefined,
+      status === "planned" ? "zb-care-timeline__item--planned" : undefined,
+      event.severity === "critical" ? "zb-care-timeline__item--critical" : undefined,
     ),
     icon: icons?.[event.kind] ?? markFor(resolved),
     title: (
       <>
-        <span className="ox-care-timeline__kind">
+        <span className="zb-care-timeline__kind">
           {kindWord}
           {/* Shown for the two registers that change how a reader weighs the
               fact. "Patient reported" beside a symptom onset is not a hedge,
               it is the correct attribution. */}
           {resolved.register === "patient-reported" || resolved.register === "system" ? (
-            <span className="ox-care-timeline__provenance">
+            <span className="zb-care-timeline__provenance">
               · {locale.register[resolved.register]}
             </span>
           ) : null}
@@ -947,15 +947,15 @@ function eventItem(resolved: ResolvedEvent, context: RenderContext): TimelineIte
             </Chip>
           ) : null}
         </span>
-        <span className="ox-timeline__title-text">
+        <span className="zb-timeline__title-text">
           {event.href ? (
-            <a className="ox-care-timeline__link" href={event.href}>
+            <a className="zb-care-timeline__link" href={event.href}>
               {title}
             </a>
           ) : onSelect ? (
             <button
               type="button"
-              className="ox-care-timeline__link"
+              className="zb-care-timeline__link"
               onClick={() => onSelect(event)}
             >
               {title}
@@ -969,22 +969,22 @@ function eventItem(resolved: ResolvedEvent, context: RenderContext): TimelineIte
     content: (
       <>
         {event.detail && !withheld ? (
-          <p className="ox-care-timeline__detail">{event.detail}</p>
+          <p className="zb-care-timeline__detail">{event.detail}</p>
         ) : null}
         {withheld && event.access?.kind === "withheld" ? (
-          <p className="ox-care-timeline__detail">{event.access.reason}</p>
+          <p className="zb-care-timeline__detail">{event.access.reason}</p>
         ) : null}
 
         {event.steps && event.steps.length > 0 ? (
           <ol
-            className="ox-care-timeline__steps"
+            className="zb-care-timeline__steps"
             aria-label={locale.stepsLabel(String(event.title))}
           >
             {event.steps.map((step) => (
-              <li key={step.label} className={cn("ox-care-timeline__step", STEP_CLASS[step.state])}>
-                <span className="ox-care-timeline__step-dot" aria-hidden="true" />
+              <li key={step.label} className={cn("zb-care-timeline__step", STEP_CLASS[step.state])}>
+                <span className="zb-care-timeline__step-dot" aria-hidden="true" />
                 <span>{step.label}</span>
-                <span className="ox-care-timeline__step-time">
+                <span className="zb-care-timeline__step-time">
                   {step.at ? (formatFhirDateTime(step.at, { locale: localeTag }) ?? step.at) : ""}
                 </span>
               </li>
@@ -993,16 +993,16 @@ function eventItem(resolved: ResolvedEvent, context: RenderContext): TimelineIte
         ) : null}
 
         {event.actor || event.recipient ? (
-          <p className="ox-care-timeline__who">
+          <p className="zb-care-timeline__who">
             {event.actor ? partyText(event.actor) : null}
             {event.recipient ? ` → ${partyText(event.recipient)}` : null}
           </p>
         ) : null}
 
-        <p className="ox-care-timeline__when">
+        <p className="zb-care-timeline__when">
           <time dateTime={event.occurred}>{absolute ?? event.occurred}</time>
           {relative ? (
-            <span aria-hidden="true" className="ox-care-timeline__ago">
+            <span aria-hidden="true" className="zb-care-timeline__ago">
               {relative}
             </span>
           ) : null}
@@ -1010,7 +1010,7 @@ function eventItem(resolved: ResolvedEvent, context: RenderContext): TimelineIte
         </p>
 
         {status === "lapsed" ? (
-          <p className="ox-care-timeline__note ox-care-timeline__note--caution">
+          <p className="zb-care-timeline__note zb-care-timeline__note--caution">
             {locale.lapsedDetail}
           </p>
         ) : null}
@@ -1018,8 +1018,8 @@ function eventItem(resolved: ResolvedEvent, context: RenderContext): TimelineIte
         {event.revision ? (
           <p
             className={cn(
-              "ox-care-timeline__note",
-              status === "in-error" ? "ox-care-timeline__note--critical" : undefined,
+              "zb-care-timeline__note",
+              status === "in-error" ? "zb-care-timeline__note--critical" : undefined,
             )}
           >
             <strong>
@@ -1032,7 +1032,7 @@ function eventItem(resolved: ResolvedEvent, context: RenderContext): TimelineIte
           </p>
         ) : null}
 
-        {gated ? <p className="ox-care-timeline__note">{locale.gatedAction}</p> : null}
+        {gated ? <p className="zb-care-timeline__note">{locale.gatedAction}</p> : null}
       </>
     ),
   };

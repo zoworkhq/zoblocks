@@ -7,7 +7,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/data-grid/data-grid.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/data-grid/data-grid.tsx. Edit that file, not this one.
 /**
  * DataGrid — a worklist that states what it is showing, out of what.
  *
@@ -32,7 +32,7 @@
  * colour, hover, or an animation running.
  *
  * Four behaviours are the component rather than decoration on it. All four
- * live in `@/lib/oxygen-grid` so they can be proved without a DOM.
+ * live in `@/lib/zoblocks-grid` so they can be proved without a DOM.
  *
  *   **Coverage is in the masthead, above the data.** Not a footer note: the
  *   reader has to meet the claim before they meet the rows it is about. A
@@ -58,7 +58,7 @@
  * attribute in its entire build and zero keyboard handlers; none of this is
  * inherited, because there was nothing to inherit.
  *
- * Styling lives in `styles/oxygen-grid.css`, installed alongside.
+ * Styling lives in `styles/zoblocks-grid.css`, installed alongside.
  */
 
 import * as React from "react";
@@ -319,17 +319,17 @@ const HEADER_ROW = -1;
  * rule is really protecting.
  */
 const ALIGN_CLASS = {
-  start: { th: "ox-grid__th--start", td: "ox-grid__td--start" },
-  end: { th: "ox-grid__th--end", td: "ox-grid__td--end" },
+  start: { th: "zb-grid__th--start", td: "zb-grid__td--start" },
+  end: { th: "zb-grid__th--end", td: "zb-grid__td--end" },
 } as const;
 
 const KIND_CLASS: Record<NonNullable<DataGridColumn<never>["kind"]>, string> = {
-  text: "ox-grid__td--text",
-  number: "ox-grid__td--number",
-  measure: "ox-grid__td--measure",
-  identifier: "ox-grid__td--identifier",
-  instant: "ox-grid__td--instant",
-  status: "ox-grid__td--status",
+  text: "zb-grid__td--text",
+  number: "zb-grid__td--number",
+  measure: "zb-grid__td--measure",
+  identifier: "zb-grid__td--identifier",
+  instant: "zb-grid__td--instant",
+  status: "zb-grid__td--status",
 };
 
 function defaultAlign<Row>(column: DataGridColumn<Row>): "start" | "end" {
@@ -420,7 +420,7 @@ export function DataGrid<Row>({
   id,
 }: DataGridProps<Row>) {
   const reactId = React.useId();
-  const gridId = id ?? `ox-grid-${reactId}`;
+  const gridId = id ?? `zb-grid-${reactId}`;
   const titleId = `${gridId}-title`;
 
   const [uncontrolledSort, setUncontrolledSort] = React.useState<GridSort | null>(defaultSort);
@@ -558,8 +558,8 @@ export function DataGrid<Row>({
     scope
       ?.querySelector<HTMLElement>(
         cursor.row === HEADER_ROW
-          ? `[data-ox-cell][data-ox-col="${cursor.column}"]`
-          : `[data-ox-row="${cursor.row}"] [data-ox-cell][data-ox-col="${cursor.column}"]`,
+          ? `[data-zb-cell][data-zb-col="${cursor.column}"]`
+          : `[data-zb-row="${cursor.row}"] [data-zb-cell][data-zb-col="${cursor.column}"]`,
       )
       ?.focus();
   }, [cursor]);
@@ -645,18 +645,18 @@ export function DataGrid<Row>({
   if (refusal) {
     return (
       <section
-        className={cn("ox-grid ox-grid--refused", className)}
-        data-ox-grid=""
-        data-ox-density={density}
+        className={cn("zb-grid zb-grid--refused", className)}
+        data-zb-grid=""
+        data-zb-density={density}
         {...labelling}
         id={gridId}
       >
-        <div className="ox-grid__masthead">
-          <p className="ox-grid__title" id={titleId}>
+        <div className="zb-grid__masthead">
+          <p className="zb-grid__title" id={titleId}>
             {title ?? caption}
           </p>
         </div>
-        <p className="ox-grid__refusal" role="status">
+        <p className="zb-grid__refusal" role="status">
           {refusal}
         </p>
       </section>
@@ -680,9 +680,9 @@ export function DataGrid<Row>({
 
   return (
     <section
-      className={cn("ox-grid", className)}
-      data-ox-grid=""
-      data-ox-density={density}
+      className={cn("zb-grid", className)}
+      data-zb-grid=""
+      data-zb-density={density}
       {...labelling}
       id={gridId}
     >
@@ -694,12 +694,12 @@ export function DataGrid<Row>({
         disclaimer; above it, it is the heading of the thing they are reading.
       */}
       {masthead ? (
-        <header className="ox-grid__masthead">
-          <div className="ox-grid__mastline">
-            <p className="ox-grid__title" id={titleId}>
+        <header className="zb-grid__masthead">
+          <div className="zb-grid__mastline">
+            <p className="zb-grid__title" id={titleId}>
               {title ?? caption}
             </p>
-            {note ? <p className="ox-grid__note">{note}</p> : null}
+            {note ? <p className="zb-grid__note">{note}</p> : null}
           </div>
           {/*
           Three sentences, three elements, in descending order of consequence.
@@ -711,9 +711,9 @@ export function DataGrid<Row>({
           is its qualification; that is a structural difference, so it is
           structure rather than a typographic trick.
         */}
-          <p className="ox-grid__coverage">{describeGridCoverage(coverage)}</p>
+          <p className="zb-grid__coverage">{describeGridCoverage(coverage)}</p>
           {coverage.predicate || coverage.asOf ? (
-            <p className="ox-grid__predicate">
+            <p className="zb-grid__predicate">
               {coverage.predicate}
               {coverage.asOf ? <> As of {coverage.asOf}.</> : null}
             </p>
@@ -740,16 +740,16 @@ export function DataGrid<Row>({
         than on every click.
       */}
       {stripVisible ? (
-        <div className="ox-grid__strip">
+        <div className="zb-grid__strip">
           {arrivals ? (
-            <div className="ox-grid__held" data-ox-on={bulkVisible ? "false" : "true"}>
-              <p className="ox-grid__heldline" aria-live="polite">
+            <div className="zb-grid__held" data-zb-on={bulkVisible ? "false" : "true"}>
+              <p className="zb-grid__heldline" aria-live="polite">
                 {heldLine}
               </p>
               {onAdmitArrivals ? (
                 <button
                   type="button"
-                  className="ox-grid__admit"
+                  className="zb-grid__admit"
                   onClick={() => onAdmitArrivals(arrivals)}
                 >
                   Let them in
@@ -766,35 +766,35 @@ export function DataGrid<Row>({
           */}
           {selectable && bulkActions ? (
             <div
-              className="ox-grid__bulk"
+              className="zb-grid__bulk"
               role="region"
               aria-label="Selection actions"
-              data-ox-on={bulkVisible ? "true" : "false"}
+              data-zb-on={bulkVisible ? "true" : "false"}
               inert={!bulkVisible}
             >
-              <p className="ox-grid__bulkcount" aria-live="polite">
+              <p className="zb-grid__bulkcount" aria-live="polite">
                 {describeGridSelection(selectedRows.length)}
               </p>
               <button
                 type="button"
-                className="ox-grid__bulkclear"
+                className="zb-grid__bulkclear"
                 onClick={() => onSelectionChange?.([])}
               >
                 Clear
               </button>
-              <div className="ox-grid__bulkactions">{bulkActions(selectedRows)}</div>
+              <div className="zb-grid__bulkactions">{bulkActions(selectedRows)}</div>
             </div>
           ) : null}
         </div>
       ) : null}
 
       <div
-        className="ox-grid__scroll"
+        className="zb-grid__scroll"
         ref={scrollRef}
         style={maxHeight ? { maxBlockSize: maxHeight } : undefined}
       >
         <table
-          className="ox-grid__table"
+          className="zb-grid__table"
           role="grid"
           {...labelling}
           /* Against the cohort, not the page. A reader on row 3 of 24 in a
@@ -806,10 +806,10 @@ export function DataGrid<Row>({
           aria-multiselectable={selectable ? true : undefined}
           onKeyDown={onKeyDown}
         >
-          <caption className="ox-grid__caption">{caption}</caption>
+          <caption className="zb-grid__caption">{caption}</caption>
 
           <thead role="rowgroup">
-            <tr role="row" aria-rowindex={1} ref={headRef} className="ox-grid__headrow">
+            <tr role="row" aria-rowindex={1} ref={headRef} className="zb-grid__headrow">
               {/*
                 Select-all covers the page, not the cohort.
                 
@@ -821,12 +821,12 @@ export function DataGrid<Row>({
               {selectable ? (
                 <th
                   scope="col"
-                  className={cn("ox-grid__th ox-grid__th--select", pinnedCount && "ox-grid__pin")}
+                  className={cn("zb-grid__th zb-grid__th--select", pinnedCount && "zb-grid__pin")}
                   style={pinStyle(0)}
                 >
                   <input
                     type="checkbox"
-                    className="ox-grid__check"
+                    className="zb-grid__check"
                     checked={selectState === "all"}
                     ref={(node) => {
                       if (node) node.indeterminate = selectState === "some";
@@ -852,10 +852,10 @@ export function DataGrid<Row>({
                       active ? (sort?.direction ?? undefined) : sortable ? "none" : undefined
                     }
                     className={cn(
-                      "ox-grid__th",
+                      "zb-grid__th",
                       ALIGN_CLASS[defaultAlign(column)].th,
-                      active && "ox-grid__th--sorted",
-                      index < pinnedColumns && "ox-grid__pin",
+                      active && "zb-grid__th--sorted",
+                      index < pinnedColumns && "zb-grid__pin",
                     )}
                     style={{
                       ...(column.width ? { width: column.width } : null),
@@ -865,33 +865,33 @@ export function DataGrid<Row>({
                     {sortable ? (
                       <button
                         type="button"
-                        data-ox-cell=""
-                        data-ox-col={index}
+                        data-zb-cell=""
+                        data-zb-col={index}
                         tabIndex={tab}
-                        className="ox-grid__sort"
+                        className="zb-grid__sort"
                         onClick={() => {
                           place({ row: HEADER_ROW, column: index });
                           applySort(column);
                         }}
                       >
-                        <span className="ox-grid__label">{column.header}</span>
-                        {mark ? <sup className="ox-grid__mark">{mark}</sup> : null}
+                        <span className="zb-grid__label">{column.header}</span>
+                        {mark ? <sup className="zb-grid__mark">{mark}</sup> : null}
                         {/* A glyph, not a colour, and it is absent rather than
                             dimmed when the column is not the sorted one — an
                             arrow on every header teaches nothing. */}
-                        <span aria-hidden="true" className="ox-grid__arrow">
+                        <span aria-hidden="true" className="zb-grid__arrow">
                           {active ? (sort?.direction === "ascending" ? "↑" : "↓") : ""}
                         </span>
                       </button>
                     ) : (
                       <span
-                        data-ox-cell=""
-                        data-ox-col={index}
+                        data-zb-cell=""
+                        data-zb-col={index}
                         tabIndex={tab}
-                        className="ox-grid__static"
+                        className="zb-grid__static"
                       >
-                        <span className="ox-grid__label">{column.header}</span>
-                        {mark ? <sup className="ox-grid__mark">{mark}</sup> : null}
+                        <span className="zb-grid__label">{column.header}</span>
+                        {mark ? <sup className="zb-grid__mark">{mark}</sup> : null}
                       </span>
                     )}
                   </th>
@@ -912,8 +912,8 @@ export function DataGrid<Row>({
             */}
             {ordered.length === 0 ? (
               <tr role="row" aria-rowindex={2}>
-                <td className="ox-grid__emptycell" colSpan={columns.length + (selectable ? 1 : 0)}>
-                  <p className="ox-grid__empty" role="status">
+                <td className="zb-grid__emptycell" colSpan={columns.length + (selectable ? 1 : 0)}>
+                  <p className="zb-grid__empty" role="status">
                     {empty ?? `No ${coverage.noun ?? "rows"} match.`}
                   </p>
                 </td>
@@ -930,23 +930,23 @@ export function DataGrid<Row>({
                      reader is on "row 4 of 1,439" in the grid's terms, which
                      is what a screen reader reads out. */
                   aria-rowindex={rowIndex + 2}
-                  data-ox-row={rowIndex}
+                  data-zb-row={rowIndex}
                   aria-selected={selectable ? selected.includes(key) : undefined}
                   className={cn(
-                    "ox-grid__tr",
-                    current && "ox-grid__tr--current",
-                    selectable && selected.includes(key) && "ox-grid__tr--selected",
+                    "zb-grid__tr",
+                    current && "zb-grid__tr--current",
+                    selectable && selected.includes(key) && "zb-grid__tr--selected",
                   )}
                 >
                   {selectable ? (
                     <td
                       role="gridcell"
-                      className={cn("ox-grid__td ox-grid__td--select", "ox-grid__pin")}
+                      className={cn("zb-grid__td zb-grid__td--select", "zb-grid__pin")}
                       style={pinStyle(0)}
                     >
                       <input
                         type="checkbox"
-                        className="ox-grid__check"
+                        className="zb-grid__check"
                         checked={selected.includes(key)}
                         aria-label={
                           identify
@@ -965,16 +965,16 @@ export function DataGrid<Row>({
                         key={column.key}
                         role="gridcell"
                         aria-colindex={index + 1}
-                        data-ox-cell=""
-                        data-ox-col={index}
+                        data-zb-cell=""
+                        data-zb-col={index}
                         tabIndex={tab}
                         onFocus={() => setCursorKey({ row: key, column: column.key })}
                         onClick={() => place({ row: rowIndex, column: index })}
                         className={cn(
-                          "ox-grid__td",
+                          "zb-grid__td",
                           ALIGN_CLASS[defaultAlign(column)].td,
                           column.kind && KIND_CLASS[column.kind],
-                          index < pinnedColumns && "ox-grid__pin",
+                          index < pinnedColumns && "zb-grid__pin",
                         )}
                         style={pinStyle(index + (selectable ? 1 : 0))}
                       >
@@ -1002,8 +1002,8 @@ export function DataGrid<Row>({
           the one live region this table should have.
         */}
         {onReachEnd && ordered.length > 0 ? (
-          <div className="ox-grid__more" ref={sentinelRef}>
-            <p className="ox-grid__moreline" role="status">
+          <div className="zb-grid__more" ref={sentinelRef}>
+            <p className="zb-grid__moreline" role="status">
               {describeGridLoaded(
                 coverage,
                 loadingMore ? "loading" : exhausted ? "exhausted" : "idle",
@@ -1029,7 +1029,7 @@ export function DataGrid<Row>({
         `identify` genuinely has no foot.
       */}
       {footVisible ? (
-        <footer className="ox-grid__foot">
+        <footer className="zb-grid__foot">
           {/*
           Rendered whenever `identify` is supplied, selected or not.
 
@@ -1039,9 +1039,9 @@ export function DataGrid<Row>({
           layout has to be the same before and after the reader arrives.
         */}
           {identity ? (
-            <p className="ox-grid__reading">
-              <span className="ox-grid__readinglabel">Reading</span>
-              <span className="ox-grid__readingline">
+            <p className="zb-grid__reading">
+              <span className="zb-grid__readinglabel">Reading</span>
+              <span className="zb-grid__readingline">
                 {describeGridIdentity(identity, { row: cursor.row + 1, of: coverage.total })}
               </span>
             </p>
@@ -1058,16 +1058,16 @@ export function DataGrid<Row>({
           cites its own note; so does this.
         */}
           {sortColumn?.derived ? (
-            <p className="ox-grid__sorted">
+            <p className="zb-grid__sorted">
               Sorted by a prediction — see note {marks.get(sortColumn.key) ?? 1}.
             </p>
           ) : null}
 
           {notes.length ? (
-            <ol className="ox-grid__notes">
+            <ol className="zb-grid__notes">
               {notes.map((text, index) => (
-                <li key={text} className="ox-grid__noteitem">
-                  <span className="ox-grid__notemark" aria-hidden="true">
+                <li key={text} className="zb-grid__noteitem">
+                  <span className="zb-grid__notemark" aria-hidden="true">
                     {index + 1}
                   </span>
                   <span>{text}</span>
@@ -1101,9 +1101,9 @@ function Cell({
     const label = gridAbsenceLabel(value);
     const mark = marks.get(`absence:“${label}” — ${gridAbsenceDetail(value)}`);
     return (
-      <span className="ox-grid__absent" data-ox-absence={value.absent}>
+      <span className="zb-grid__absent" data-zb-absence={value.absent}>
         {label}
-        {mark ? <sup className="ox-grid__mark">{mark}</sup> : null}
+        {mark ? <sup className="zb-grid__mark">{mark}</sup> : null}
       </span>
     );
   }

@@ -1,4 +1,4 @@
-# @oxygenui-design/fhir
+# @zoblocks/fhir
 
 ## 0.1.1
 

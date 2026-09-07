@@ -11,7 +11,7 @@
  */
 
 import { beforeEach, describe, expect, it } from "vitest";
-import { hexToFigmaRgb } from "@oxygenui-design/figma-core";
+import { hexToFigmaRgb } from "@zoblocks/figma-core";
 
 import { applyPull, readPin } from "../src/sandbox/apply";
 import { readFile } from "../src/sandbox/read";
@@ -28,17 +28,17 @@ const payload: ResolvedPayload = {
   status: "published",
   ramp: { "600": "#1d63c9", "700": "#1851a5" },
   semantic: {
-    // `--ox-accent` is exactly the 700 step, so the plan aliases it rather than
+    // `--zb-accent` is exactly the 700 step, so the plan aliases it rather than
     // flattening — which is what makes the ordering test below meaningful.
-    light: { "--ox-accent": "#1851a5", "--ox-text": "#16181d", "--ox-status-critical": "#b4232b" },
-    dark: { "--ox-accent": "#5a94e7", "--ox-text": "#e8ecf1", "--ox-status-critical": "#f08b96" },
+    light: { "--zb-accent": "#1851a5", "--zb-text": "#16181d", "--zb-status-critical": "#b4232b" },
+    dark: { "--zb-accent": "#5a94e7", "--zb-text": "#e8ecf1", "--zb-status-critical": "#f08b96" },
     "high-contrast": {
-      "--ox-accent": "#0f3568",
-      "--ox-text": "#000000",
-      "--ox-status-critical": "#8c0d16",
+      "--zb-accent": "#0f3568",
+      "--zb-text": "#000000",
+      "--zb-status-critical": "#8c0d16",
     },
   },
-  locked: { "--ox-status-critical": CLINICAL },
+  locked: { "--zb-status-critical": CLINICAL },
 };
 
 let figma: FakeFigma;
@@ -61,7 +61,10 @@ async function pull(next: ResolvedPayload = payload) {
 describe("the first pull", () => {
   it("creates the collections the plan needs and nothing else", async () => {
     await pull();
-    expect(figma.writes.createdCollections.sort()).toEqual(["Oxygen / Brand", "Oxygen / Semantic"]);
+    expect(figma.writes.createdCollections.sort()).toEqual([
+      "Zoblocks / Brand",
+      "Zoblocks / Semantic",
+    ]);
   });
 
   it("renames the mode Figma gave it rather than leaving a spare", async () => {
@@ -69,25 +72,25 @@ describe("the first pull", () => {
     // A new collection arrives with one mode already named by Figma. Adding
     // three beside it leaves a "Mode 1" nobody uses next to three that are.
     expect(figma.writes.addedModes).toEqual([
-      "Oxygen / Semantic/dark",
-      "Oxygen / Semantic/high-contrast",
+      "Zoblocks / Semantic/dark",
+      "Zoblocks / Semantic/high-contrast",
     ]);
     expect(figma.writes.renamedModes).toEqual([
-      "Oxygen / Brand/Default",
-      "Oxygen / Semantic/light",
+      "Zoblocks / Brand/Default",
+      "Zoblocks / Semantic/light",
     ]);
   });
 
-  it("stamps the Oxygen token on every variable it creates", async () => {
+  it("stamps the Zoblocks token on every variable it creates", async () => {
     await pull();
-    expect(figma.variable("--ox-accent")).toBeDefined();
-    expect(figma.variable("--ox-ref-brand-700")).toBeDefined();
+    expect(figma.variable("--zb-accent")).toBeDefined();
+    expect(figma.variable("--zb-ref-brand-700")).toBeDefined();
   });
 
   it("writes an alias to the brand variable, not a flattened colour", async () => {
     await pull();
-    const accent = figma.variable("--ox-accent")!;
-    const brand = figma.variable("--ox-ref-brand-700")!;
+    const accent = figma.variable("--zb-accent")!;
+    const brand = figma.variable("--zb-ref-brand-700")!;
     const light = Object.values(accent.valuesByMode)[0];
 
     // Flattened it renders identically and severs the link, so moving the brand
@@ -99,12 +102,12 @@ describe("the first pull", () => {
   it("puts the reason a clinical variable is fixed in Figma's own field", async () => {
     await pull();
     // Where a designer is actually looking when they wonder why it changed back.
-    expect(figma.variable("--ox-status-critical")!.description).toBe(CLINICAL);
+    expect(figma.variable("--zb-status-critical")!.description).toBe(CLINICAL);
   });
 
   it("pins the theme and version to every collection", async () => {
     await pull();
-    const brand = figma.collection("Oxygen / Brand")!;
+    const brand = figma.collection("Zoblocks / Brand")!;
     expect(brand.getPluginData(PIN.theme)).toBe("clinical");
     expect(brand.getPluginData(PIN.version)).toBe("3");
     expect(await readPin(figma.api())).toEqual({ slug: "clinical", version: 3 });
@@ -129,7 +132,7 @@ describe("pulling the same version twice", () => {
 describe("a designer who edited the file", () => {
   it("updates a renamed variable rather than creating a duplicate", async () => {
     await pull();
-    const accent = figma.variable("--ox-accent")!;
+    const accent = figma.variable("--zb-accent")!;
     accent.name = "Brand blue";
     figma.settle();
 
@@ -139,13 +142,13 @@ describe("a designer who edited the file", () => {
     expect(applied.updated).toBe(1);
     // The identity came from plugin data; the label is restored because it is
     // what keeps a collection navigable.
-    expect(figma.variable("--ox-accent")!.name).toBe("accent");
+    expect(figma.variable("--zb-accent")!.name).toBe("accent");
   });
 
   it("restores a clinical value they changed, and names it", async () => {
     await pull();
-    const critical = figma.variable("--ox-status-critical")!;
-    const light = figma.collection("Oxygen / Semantic")!.modes.find((m) => m.name === "light")!;
+    const critical = figma.variable("--zb-status-critical")!;
+    const light = figma.collection("Zoblocks / Semantic")!.modes.find((m) => m.name === "light")!;
     critical.setValueForMode(light.modeId, hexToFigmaRgb("#ff00ff")!);
     figma.settle();
 
@@ -158,24 +161,24 @@ describe("a designer who edited the file", () => {
 
   it("never deletes a variable that has left the theme", async () => {
     await pull();
-    const before = figma.variable("--ox-accent")!;
+    const before = figma.variable("--zb-accent")!;
     figma.settle();
 
     const shrunk: ResolvedPayload = {
       ...payload,
       semantic: {
-        light: { "--ox-text": "#16181d" },
-        dark: { "--ox-text": "#e8ecf1" },
-        "high-contrast": { "--ox-text": "#000000" },
+        light: { "--zb-text": "#16181d" },
+        dark: { "--zb-text": "#e8ecf1" },
+        "high-contrast": { "--zb-text": "#000000" },
       },
       locked: {},
     };
     const { preview } = await pull(shrunk);
 
-    expect(preview.diff.orphan.map((o) => o.token)).toContain("--ox-accent");
+    expect(preview.diff.orphan.map((o) => o.token)).toContain("--zb-accent");
     // Listed in the preview and left exactly as it was. `api.ts` declares no
     // removal call, so this is structural rather than a decision made here.
-    expect(figma.variable("--ox-accent")).toBe(before);
+    expect(figma.variable("--zb-accent")).toBe(before);
   });
 
   it("puts back a collection somebody deleted", async () => {
@@ -186,7 +189,7 @@ describe("a designer who edited the file", () => {
     // the state after somebody tidies. The next pull should heal it rather than
     // fail at alias resolution with half a write applied.
     const fresh = new FakeFigma();
-    fresh.seedCollection("Oxygen / Semantic", ["light", "dark", "high-contrast"]);
+    fresh.seedCollection("Zoblocks / Semantic", ["light", "dark", "high-contrast"]);
     const { snapshot } = await readFile(fresh.api());
     const preview = previewPull(payload, snapshot);
     await applyPull(fresh.api(), {
@@ -194,8 +197,8 @@ describe("a designer who edited the file", () => {
       pin: { slug: "clinical", version: 3 },
     });
 
-    expect(fresh.writes.createdCollections).toEqual(["Oxygen / Brand"]);
-    expect(fresh.variable("--ox-ref-brand-700")).toBeDefined();
+    expect(fresh.writes.createdCollections).toEqual(["Zoblocks / Brand"]);
+    expect(fresh.variable("--zb-ref-brand-700")).toBeDefined();
   });
 });
 
@@ -209,7 +212,7 @@ describe("moving between versions", () => {
       version: 4,
       semantic: {
         ...payload.semantic,
-        light: { ...payload.semantic.light, "--ox-text": "#0b0d11" },
+        light: { ...payload.semantic.light, "--zb-text": "#0b0d11" },
       },
     };
     const { applied } = await pull(next);
@@ -235,14 +238,14 @@ describe("the file in states nobody planned for", () => {
     await applyPull(fresh.api(), {
       write: [
         {
-          token: "--ox-accent",
+          token: "--zb-accent",
           name: "accent",
           tier: "semantic",
-          collection: "Oxygen / Semantic",
+          collection: "Zoblocks / Semantic",
           values: {
             // Points at a brand variable that is neither in this write list nor
             // already in the file — the state after somebody deletes one.
-            light: { kind: "alias", token: "--ox-ref-brand-700" },
+            light: { kind: "alias", token: "--zb-ref-brand-700" },
             dark: { kind: "color", hex: "#5a94e7", rgb: hexToFigmaRgb("#5a94e7")! },
           },
         },
@@ -250,8 +253,8 @@ describe("the file in states nobody planned for", () => {
       pin: { slug: "clinical", version: 1 },
     });
 
-    const accent = fresh.variable("--ox-accent")!;
-    const modes = fresh.collection("Oxygen / Semantic")!.modes;
+    const accent = fresh.variable("--zb-accent")!;
+    const modes = fresh.collection("Zoblocks / Semantic")!.modes;
     const light = modes.find((m) => m.name === "light")!.modeId;
     const dark = modes.find((m) => m.name === "dark")!.modeId;
 
@@ -272,25 +275,25 @@ describe("the file in states nobody planned for", () => {
     await applyPull(figma.api(), {
       write: [
         {
-          token: "--ox-font-family",
+          token: "--zb-font-family",
           name: "font/family",
           tier: "semantic",
-          collection: "Oxygen / Semantic",
+          collection: "Zoblocks / Semantic",
           values: { light: { kind: "string", value: "Inter" } },
         },
         {
-          token: "--ox-radius-md",
+          token: "--zb-radius-md",
           name: "radius/md",
           tier: "semantic",
-          collection: "Oxygen / Semantic",
+          collection: "Zoblocks / Semantic",
           values: { light: { kind: "number", value: 8 } },
         },
       ],
       pin: { slug: "clinical", version: 1 },
     });
 
-    const family = figma.variable("--ox-font-family")!;
-    const radius = figma.variable("--ox-radius-md")!;
+    const family = figma.variable("--zb-font-family")!;
+    const radius = figma.variable("--zb-radius-md")!;
     expect(Object.values(family.valuesByMode)).toEqual(["Inter"]);
     expect(Object.values(radius.valuesByMode)).toEqual([8]);
   });
@@ -298,15 +301,15 @@ describe("the file in states nobody planned for", () => {
   it("leaves a mode the collection does not have rather than inventing one", async () => {
     const fresh = new FakeFigma();
     // A collection somebody made by hand, with only one mode.
-    fresh.seedCollection("Oxygen / Semantic", ["light"]);
+    fresh.seedCollection("Zoblocks / Semantic", ["light"]);
 
     await applyPull(fresh.api(), {
       write: [
         {
-          token: "--ox-text",
+          token: "--zb-text",
           name: "text",
           tier: "semantic",
-          collection: "Oxygen / Semantic",
+          collection: "Zoblocks / Semantic",
           values: {
             light: { kind: "color", hex: "#16181d", rgb: hexToFigmaRgb("#16181d")! },
             dark: { kind: "color", hex: "#e8ecf1", rgb: hexToFigmaRgb("#e8ecf1")! },
@@ -318,10 +321,10 @@ describe("the file in states nobody planned for", () => {
 
     // `ensureCollection` adds the missing modes, so both land. What must not
     // happen is a value written against a mode id that does not exist.
-    const text = fresh.variable("--ox-text")!;
+    const text = fresh.variable("--zb-text")!;
     for (const modeId of Object.keys(text.valuesByMode)) {
       expect(
-        fresh.collection("Oxygen / Semantic")!.modes.some((m) => m.modeId === modeId),
+        fresh.collection("Zoblocks / Semantic")!.modes.some((m) => m.modeId === modeId),
         modeId,
       ).toBe(true);
     }
@@ -341,7 +344,7 @@ describe("reading the pin back", () => {
 
   it("ignores a collection carrying a version that is not one", async () => {
     const fresh = new FakeFigma();
-    const collection = fresh.seedCollection("Oxygen / Brand", ["Default"]);
+    const collection = fresh.seedCollection("Zoblocks / Brand", ["Default"]);
     collection.setPluginData(PIN.theme, "clinical");
     collection.setPluginData(PIN.version, "not-a-number");
 
@@ -352,7 +355,7 @@ describe("reading the pin back", () => {
 
   it("ignores a version with no theme beside it", async () => {
     const fresh = new FakeFigma();
-    fresh.seedCollection("Oxygen / Brand", ["Default"]).setPluginData(PIN.version, "3");
+    fresh.seedCollection("Zoblocks / Brand", ["Default"]).setPluginData(PIN.version, "3");
     expect(await readPin(fresh.api())).toBeUndefined();
   });
 });

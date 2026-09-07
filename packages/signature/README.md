@@ -1,17 +1,17 @@
-# @oxygenui-design/signature
+# @zoblocks/signature
 
 **Healthcare signature capture for Ant Design.** Draw, type or upload — and
 record the times nobody signed, which is most of what makes this different from
 a signature pad.
 
 ```bash
-npm install @oxygenui-design/signature
+npm install @zoblocks/signature
 ```
 
 ```tsx
 import { Form } from "antd";
-import { Signature, signatureRequired } from "@oxygenui-design/signature";
-import "@oxygenui-design/signature/styles.css";
+import { Signature, signatureRequired } from "@zoblocks/signature";
+import "@zoblocks/signature/styles.css";
 
 <Form.Item name="consent" label="Patient signature" rules={[signatureRequired()]}>
   <Signature
@@ -25,7 +25,7 @@ import "@oxygenui-design/signature/styles.css";
 ```
 
 antd is a **peer dependency** (v5.20+ or v6). The engine underneath —
-[`@oxygenui-design/signature-core`](../signature-core) — has no dependency on
+[`@zoblocks/signature-core`](../signature-core) — has no dependency on
 React or antd at all.
 
 ---
@@ -47,7 +47,7 @@ signatureAffirmative(); // isAffirmative — a decline does not. For consent gat
 Then branch on the outcome to decide whether to proceed:
 
 ```ts
-import { isAffirmative } from "@oxygenui-design/signature";
+import { isAffirmative } from "@zoblocks/signature";
 if (!isAffirmative(value)) return escalateToClinician(value);
 ```
 
@@ -59,7 +59,7 @@ Note 1 refuses that excuse using handwriting as its worked example: the
 technique needs a path, the underlying function does not. The function here is
 recording assent, and typing a name achieves it.
 
-`@oxygenui/signature-requires-typed-path` makes `methods={["draw"]}` a lint
+`@zoblocks/signature-requires-typed-path` makes `methods={["draw"]}` a lint
 error rather than a runtime warning, because the mistake renders perfectly and
 passes every other test.
 
@@ -169,7 +169,7 @@ of vanishing against a forced background.
 
 ## Not a medical device
 
-Oxygen UI provides user-interface components. Signature capture does not by
+Zoblocks provides user-interface components. Signature capture does not by
 itself establish the legal validity of any record; that depends on the
 deployment, the jurisdiction, and the procedures around it. This component does
 not authenticate anyone — 21 CFR 11.200(a)'s two-component rule lives in your

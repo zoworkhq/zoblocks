@@ -1,7 +1,7 @@
 /**
  * Token emitters. One DTCG source, five outputs.
  *
- *   packages/tokens/src/oxygen-tokens.css   what the registry copies into a customer's project
+ *   packages/tokens/src/zoblocks-tokens.css   what the registry copies into a customer's project
  *   packages/tokens/src/tailwind.css        a Tailwind v4 @theme block
  *   packages/tokens/src/tokens.ts           typed constants, for JS that computes with a value
  *   packages/tokens/src/tokens.json         flat map, for Figma and other tooling
@@ -29,7 +29,7 @@ import {
 import { measureContrast, resolveFlat, resolveTheme } from "./validate";
 
 export const tokenPaths = {
-  css: path.join(ROOT, "packages", "tokens", "src", "oxygen-tokens.css"),
+  css: path.join(ROOT, "packages", "tokens", "src", "zoblocks-tokens.css"),
   tailwind: path.join(ROOT, "packages", "tokens", "src", "tailwind.css"),
   ts: path.join(ROOT, "packages", "tokens", "src", "tokens.ts"),
   json: path.join(ROOT, "packages", "tokens", "src", "tokens.json"),
@@ -45,9 +45,9 @@ export const tokenPaths = {
  * inside a dark shell has no way to ask for the tokens it needs.
  */
 const THEME_SELECTOR: Record<Theme, string | undefined> = {
-  light: '.light,\n[data-theme="light"],\n[data-ox-theme="light"]',
-  dark: '.dark,\n[data-theme="dark"],\n[data-ox-theme="dark"]',
-  "high-contrast": '[data-ox-theme="high-contrast"]',
+  light: '.light,\n[data-theme="light"],\n[data-zb-theme="light"]',
+  dark: '.dark,\n[data-theme="dark"],\n[data-zb-theme="dark"]',
+  "high-contrast": '[data-zb-theme="high-contrast"]',
 };
 
 function section(title: string, note?: string): string {
@@ -70,7 +70,7 @@ function declarations(map: TokenMap, rename?: (path: string) => string): string[
 }
 
 // ---------------------------------------------------------------------------
-// oxygen-tokens.css
+// zoblocks-tokens.css
 // ---------------------------------------------------------------------------
 
 function buildCss(source: TokenSource): string {
@@ -79,16 +79,16 @@ function buildCss(source: TokenSource): string {
   out.push(banner("/*"));
   out.push("");
   out.push("/**");
-  out.push(" * Oxygen UI — design tokens");
+  out.push(" * Zoblocks — design tokens");
   out.push(" *");
   out.push(" * Plain CSS custom properties, so the same file works in a Tailwind v4");
   out.push(" * project, a CSS-modules project, or plain CSS.");
   out.push(" *");
   out.push(" * Three tiers, with a strict reference rule:");
   out.push(" *");
-  out.push(" *   --ox-ref-*        primitive   referenced by semantic tokens only");
-  out.push(" *   --ox-status-*     semantic    referenced by components");
-  out.push(" *   --ox-badge-*      component   referenced by one component; your override point");
+  out.push(" *   --zb-ref-*        primitive   referenced by semantic tokens only");
+  out.push(" *   --zb-status-*     semantic    referenced by components");
+  out.push(" *   --zb-badge-*      component   referenced by one component; your override point");
   out.push(" *");
   out.push(" * Three axes: brand × theme (light, dark, high-contrast) × density");
   out.push(" * (patient, standard, clinical).");
@@ -105,7 +105,7 @@ function buildCss(source: TokenSource): string {
   out.push(
     section(
       "Primitive — the reference palette",
-      "Do not reference these from a component. A brand replaces this block\nwholesale; a component that reaches past the semantic tier to a colour\nhere silently ignores the brand. Enforced by @oxygenui/no-primitive-token.",
+      "Do not reference these from a component. A brand replaces this block\nwholesale; a component that reaches past the semantic tier to a colour\nhere silently ignores the brand. Enforced by @zoblocks/no-primitive-token.",
     ),
   );
   out.push(...declarations(source.primitive));
@@ -127,10 +127,10 @@ function buildCss(source: TokenSource): string {
   out.push(
     section(
       `Density — default profile (${DEFAULT_DENSITY})`,
-      "So a page that never sets data-ox-density is still usable rather than\nunstyled.",
+      "So a page that never sets data-zb-density is still usable rather than\nunstyled.",
     ),
   );
-  out.push(...declarations(source.density[DEFAULT_DENSITY], (key) => `--ox-density-${key}`));
+  out.push(...declarations(source.density[DEFAULT_DENSITY], (key) => `--zb-density-${key}`));
   out.push(...declarations(source.densityRoot));
   out.push("");
 
@@ -163,7 +163,7 @@ function buildCss(source: TokenSource): string {
         brand.description ?? "Customer palette. Overrides primitives only.",
       ),
     );
-    out.push(`[data-ox-brand="${brand.name}"] {`);
+    out.push(`[data-zb-brand="${brand.name}"] {`);
     out.push(...declarations(brand.primitive));
     out.push("}");
     out.push("");
@@ -177,13 +177,13 @@ function buildCss(source: TokenSource): string {
    *
    * `var()` inside a custom-property *declaration* is substituted using the
    * referenced value as computed on the element the declaration applies to. So
-   * `--ox-switch-target-min: var(--ox-density-target)` written once on `:root`
+   * `--zb-switch-target-min: var(--zb-density-target)` written once on `:root`
    * captures the root profile's 2.75rem and inherits that literal everywhere —
-   * and `data-ox-density="clinical"` on a container changes
-   * `--ox-density-target` beneath it while the component token stays frozen at
+   * and `data-zb-density="clinical"` on a container changes
+   * `--zb-density-target` beneath it while the component token stays frozen at
    * whatever the root said.
    *
-   * That is not a cosmetic drift. `--ox-switch-target-min` is the hit area, and
+   * That is not a cosmetic drift. `--zb-switch-target-min` is the hit area, and
    * the accessibility note for that component claims it follows the density
    * profile. It did not: every switch on every page presented the root
    * profile's target no matter what scope it sat in.
@@ -198,8 +198,8 @@ function buildCss(source: TokenSource): string {
   );
 
   for (const profile of DENSITIES) {
-    out.push(`[data-ox-density="${profile}"] {`);
-    out.push(...declarations(source.density[profile], (key) => `--ox-density-${key}`));
+    out.push(`[data-zb-density="${profile}"] {`);
+    out.push(...declarations(source.density[profile], (key) => `--zb-density-${key}`));
     if (densityLinked.length) {
       out.push("");
       out.push("  /* Component tokens that track density — see the note above. */");
@@ -222,7 +222,7 @@ function buildCss(source: TokenSource): string {
    * docs galleries are exactly that case — each demo stage carries its own
    * theme so three can be shown at once — and every date field in a dark or
    * high-contrast stage rendered on a white background, because
-   * `--ox-field-bg` still held the root's `--ox-surface`.
+   * `--zb-field-bg` still held the root's `--zb-surface`.
    *
    * It is not only ours: a customer putting a dark sidebar or a preview panel
    * inside a light app hits it the same way, and the tier discipline is what
@@ -257,9 +257,9 @@ function buildCss(source: TokenSource): string {
   out.push("/* Reduced motion. Clinical surfaces must remain fully usable without it. */");
   out.push("@media (prefers-reduced-motion: reduce) {");
   out.push("  :root {");
-  out.push("    --ox-duration-fast: 0ms;");
-  out.push("    --ox-duration: 0ms;");
-  out.push("    --ox-duration-slow: 0ms;");
+  out.push("    --zb-duration-fast: 0ms;");
+  out.push("    --zb-duration: 0ms;");
+  out.push("    --zb-duration-slow: 0ms;");
   out.push("  }");
   out.push("}");
   out.push("");
@@ -269,9 +269,9 @@ function buildCss(source: TokenSource): string {
   out.push("   label and icon are mandatory rather than decorative. */");
   out.push("@media (forced-colors: active) {");
   out.push("  :root {");
-  out.push("    --ox-border: CanvasText;");
-  out.push("    --ox-border-strong: CanvasText;");
-  out.push("    --ox-focus-ring: Highlight;");
+  out.push("    --zb-border: CanvasText;");
+  out.push("    --zb-border-strong: CanvasText;");
+  out.push("    --zb-focus-ring: Highlight;");
   out.push("  }");
   out.push("}");
 
@@ -304,8 +304,8 @@ function buildTailwind(source: TokenSource): string {
   out.push("/**");
   out.push(" * Tailwind v4 theme block.");
   out.push(" *");
-  out.push(" * Import after oxygen-tokens.css to get `bg-ox-status-critical-bg`,");
-  out.push(" * `text-ox-status-critical` and friends as real utilities rather than");
+  out.push(" * Import after zoblocks-tokens.css to get `bg-zb-status-critical-bg`,");
+  out.push(" * `text-zb-status-critical` and friends as real utilities rather than");
   out.push(" * arbitrary values. Every entry points at the custom property rather than a");
   out.push(" * literal, so theme and density switching still happens in CSS at runtime.");
   out.push(" */");
@@ -319,7 +319,7 @@ function buildTailwind(source: TokenSource): string {
       if (!namespace) continue;
 
       const flat = token.path.split(".").join("-");
-      const name = `--${namespace}-ox-${flat}`;
+      const name = `--${namespace}-zb-${flat}`;
       if (seen.has(name)) continue;
       seen.add(name);
 
@@ -359,9 +359,9 @@ function buildTs(source: TokenSource): string {
   out.push("");
   out.push("export type TokenName = (typeof TOKEN_NAMES)[number];");
   out.push("");
-  out.push('/** `cssVar("status.critical")` → `"var(--ox-status-critical)"`. */');
+  out.push('/** `cssVar("status.critical")` → `"var(--zb-status-critical)"`. */');
   out.push("export function cssVar(name: TokenName): string {");
-  out.push('  return `var(--ox-${name.split(".").join("-")})`;');
+  out.push('  return `var(--zb-${name.split(".").join("-")})`;');
   out.push("}");
   out.push("");
   out.push("export const THEMES = [");
@@ -404,7 +404,7 @@ function buildJson(source: TokenSource): string {
   for (const profile of DENSITIES) {
     density[profile] = Object.fromEntries(
       [...resolveFlat(source, source.density[profile])].map(([key, value]) => [
-        `--ox-density-${key}`,
+        `--zb-density-${key}`,
         value,
       ]),
     );
@@ -415,7 +415,7 @@ function buildJson(source: TokenSource): string {
   );
 
   // Brands are published as fully resolved theme maps rather than as their
-  // overrides, because a consumer asking "what colour is --ox-accent for
+  // overrides, because a consumer asking "what colour is --zb-accent for
   // Northwind in dark?" should not have to re-implement the resolver.
   const brands: Record<string, Record<string, Record<string, string>>> = {};
   for (const brand of source.brands) {

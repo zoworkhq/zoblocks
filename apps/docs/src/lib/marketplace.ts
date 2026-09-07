@@ -227,7 +227,7 @@ function withoutClinicalReview(provenance: Provenance): Provenance {
  * The console owns what is for sale and still wins outright: one item from it
  * replaces the whole local list rather than merging, because a half-live
  * catalogue is a catalogue nobody can reason about. What the fallback buys is
- * a page that works — `app.oxygenui.design` has no DNS record today, so every
+ * a page that works — `app.zoblocks.design` has no DNS record today, so every
  * fetch has failed and the storefront has rendered its empty state since the
  * day it shipped.
  */
@@ -235,7 +235,7 @@ function withoutClinicalReview(provenance: Provenance): Provenance {
  * Nothing on the shelf is for sale yet.
  *
  * Checkout, entitlement and delivery all live in the console, and none of it
- * is open: `app.oxygenui.design` has no DNS record, so every buy control on
+ * is open: `app.zoblocks.design` has no DNS record, so every buy control on
  * this site has been a link to a door that does not open. Until it does, the
  * storefront announces rather than sells.
  *

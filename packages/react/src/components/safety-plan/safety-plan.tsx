@@ -7,7 +7,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/safety-plan/safety-plan.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/safety-plan/safety-plan.tsx. Edit that file, not this one.
 /**
  * SafetyPlan — the six steps, with the fifth one open.
  *
@@ -160,13 +160,13 @@ function StepBody({
 
   if (!entries.length && !contacts.length) {
     // Absence with a reason, never a blank — CONTENT.md §1.
-    return <p className="ox-safety-plan__empty">{emptyLabel}</p>;
+    return <p className="zb-safety-plan__empty">{emptyLabel}</p>;
   }
 
   return (
     <>
       {entries.length ? (
-        <ul className="ox-safety-plan__entries">
+        <ul className="zb-safety-plan__entries">
           {entries.map((entry) => (
             <li key={entry}>{entry}</li>
           ))}
@@ -174,16 +174,16 @@ function StepBody({
       ) : null}
 
       {contacts.length ? (
-        <dl className="ox-safety-plan__contacts">
+        <dl className="zb-safety-plan__contacts">
           {contacts.map((contact) => (
             <React.Fragment key={contact.name}>
               <dt>{contact.name}</dt>
               <dd>
                 {contact.detail ? (
-                  <span className="ox-safety-plan__detail">{contact.detail}</span>
+                  <span className="zb-safety-plan__detail">{contact.detail}</span>
                 ) : null}
                 {contact.availability ? (
-                  <span className="ox-safety-plan__availability">{contact.availability}</span>
+                  <span className="zb-safety-plan__availability">{contact.availability}</span>
                 ) : null}
               </dd>
             </React.Fragment>
@@ -191,7 +191,7 @@ function StepBody({
         </dl>
       ) : null}
 
-      {explanation ? <p className="ox-safety-plan__explanation">{explanation}</p> : null}
+      {explanation ? <p className="zb-safety-plan__explanation">{explanation}</p> : null}
     </>
   );
 }
@@ -246,9 +246,9 @@ export function SafetyPlan({
   );
 
   return (
-    <div className={cn("ox-safety-plan", className)} {...rest}>
+    <div className={cn("zb-safety-plan", className)} {...rest}>
       {revisedAt ? (
-        <p className="ox-safety-plan__revised">
+        <p className="zb-safety-plan__revised">
           <time dateTime={revisedAt}>{labels.revised(revisedAt)}</time>
         </p>
       ) : null}

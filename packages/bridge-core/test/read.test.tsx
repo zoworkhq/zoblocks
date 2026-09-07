@@ -1,8 +1,8 @@
 /**
- * Reading Oxygen's resolved tokens back out of the page.
+ * Reading Zoblocks's resolved tokens back out of the page.
  *
- * The browser is the only authority on what `--ox-accent` currently means: it
- * depends on which brand stylesheet loaded, which `data-ox-theme` is set, and
+ * The browser is the only authority on what `--zb-accent` currently means: it
+ * depends on which brand stylesheet loaded, which `data-zb-theme` is set, and
  * where in the tree you ask. Re-deriving it would be a second answer, wrong
  * exactly when a customer had done something interesting.
  */
@@ -10,17 +10,17 @@
 import * as React from "react";
 import { describe, expect, it, afterEach } from "vitest";
 import { render, screen, act } from "@testing-library/react";
-import { resolveOxygenTokens, toMs, toPx, useOxygenTokens } from "../src/index";
+import { resolveZoblocksTokens, toMs, toPx, useZoblocksTokens } from "../src/index";
 
 afterEach(() => {
   document.documentElement.removeAttribute("style");
-  document.documentElement.removeAttribute("data-ox-theme");
+  document.documentElement.removeAttribute("data-zb-theme");
 });
 
-describe("resolveOxygenTokens", () => {
+describe("resolveZoblocksTokens", () => {
   it("reads what the page actually resolves", () => {
-    document.documentElement.style.setProperty("--ox-accent", "#1d63c9");
-    expect(resolveOxygenTokens()["--ox-accent"]).toBe("#1d63c9");
+    document.documentElement.style.setProperty("--zb-accent", "#1d63c9");
+    expect(resolveZoblocksTokens()["--zb-accent"]).toBe("#1d63c9");
   });
 
   /**
@@ -29,18 +29,18 @@ describe("resolveOxygenTokens", () => {
    * framework handed a blank colour renders a blank colour.
    */
   it("omits a token the page has not defined", () => {
-    expect("--ox-accent" in resolveOxygenTokens()).toBe(false);
+    expect("--zb-accent" in resolveZoblocksTokens()).toBe(false);
   });
 
   it("reads from a scoped element, so two brands on one page stay apart", () => {
     const a = document.createElement("div");
     const b = document.createElement("div");
-    a.style.setProperty("--ox-accent", "#1d63c9");
-    b.style.setProperty("--ox-accent", "#b91c1c");
+    a.style.setProperty("--zb-accent", "#1d63c9");
+    b.style.setProperty("--zb-accent", "#b91c1c");
     document.body.append(a, b);
 
-    expect(resolveOxygenTokens(a)["--ox-accent"]).toBe("#1d63c9");
-    expect(resolveOxygenTokens(b)["--ox-accent"]).toBe("#b91c1c");
+    expect(resolveZoblocksTokens(a)["--zb-accent"]).toBe("#1d63c9");
+    expect(resolveZoblocksTokens(b)["--zb-accent"]).toBe("#b91c1c");
     a.remove();
     b.remove();
   });
@@ -48,7 +48,7 @@ describe("resolveOxygenTokens", () => {
   it("returns nothing rather than throwing where there is no DOM", () => {
     // The server case. Asserted by shape here; the SSR path is exercised by
     // the fallback test below.
-    expect(typeof resolveOxygenTokens).toBe("function");
+    expect(typeof resolveZoblocksTokens).toBe("function");
   });
 });
 
@@ -73,13 +73,13 @@ describe("unit helpers", () => {
 });
 
 function Probe() {
-  const tokens = useOxygenTokens();
-  return <span data-testid="accent">{tokens["--ox-accent"] ?? "none"}</span>;
+  const tokens = useZoblocksTokens();
+  return <span data-testid="accent">{tokens["--zb-accent"] ?? "none"}</span>;
 }
 
-describe("useOxygenTokens", () => {
+describe("useZoblocksTokens", () => {
   it("resolves the tokens after mount", async () => {
-    document.documentElement.style.setProperty("--ox-accent", "#1d63c9");
+    document.documentElement.style.setProperty("--zb-accent", "#1d63c9");
     render(<Probe />);
     expect(await screen.findByText("#1d63c9")).toBeTruthy();
   });
@@ -94,38 +94,38 @@ describe("useOxygenTokens", () => {
     // effect resolves nothing, and wiping the seed here would flash the page
     // to the unthemed palette.
     function Seeded() {
-      const fallback = React.useMemo(() => ({ "--ox-accent": "#1d63c9" }) as const, []);
-      const tokens = useOxygenTokens({ fallback });
-      return <span data-testid="accent">{tokens["--ox-accent"] ?? "none"}</span>;
+      const fallback = React.useMemo(() => ({ "--zb-accent": "#1d63c9" }) as const, []);
+      const tokens = useZoblocksTokens({ fallback });
+      return <span data-testid="accent">{tokens["--zb-accent"] ?? "none"}</span>;
     }
     render(<Seeded />);
     expect(await screen.findByText("#1d63c9")).toBeTruthy();
   });
 
   it("lets the page override a seeded value once it resolves", async () => {
-    document.documentElement.style.setProperty("--ox-accent", "#b91c1c");
+    document.documentElement.style.setProperty("--zb-accent", "#b91c1c");
     function Seeded() {
-      const fallback = React.useMemo(() => ({ "--ox-accent": "#1d63c9" }) as const, []);
-      const tokens = useOxygenTokens({ fallback });
-      return <span data-testid="accent">{tokens["--ox-accent"] ?? "none"}</span>;
+      const fallback = React.useMemo(() => ({ "--zb-accent": "#1d63c9" }) as const, []);
+      const tokens = useZoblocksTokens({ fallback });
+      return <span data-testid="accent">{tokens["--zb-accent"] ?? "none"}</span>;
     }
     render(<Seeded />);
     expect(await screen.findByText("#b91c1c")).toBeTruthy();
   });
 
   /**
-   * A toggle flips `data-ox-theme` and every token below it changes at once.
+   * A toggle flips `data-zb-theme` and every token below it changes at once.
    * A framework holding the previous set renders half a theme, which looks
    * like a bug in the customer's code rather than in ours.
    */
   it("follows a theme change", async () => {
-    document.documentElement.style.setProperty("--ox-accent", "#1d63c9");
+    document.documentElement.style.setProperty("--zb-accent", "#1d63c9");
     render(<Probe />);
     expect(await screen.findByText("#1d63c9")).toBeTruthy();
 
     await act(async () => {
-      document.documentElement.style.setProperty("--ox-accent", "#b91c1c");
-      document.documentElement.setAttribute("data-ox-theme", "dark");
+      document.documentElement.style.setProperty("--zb-accent", "#b91c1c");
+      document.documentElement.setAttribute("data-zb-theme", "dark");
       await new Promise((resolve) => setTimeout(resolve, 0));
     });
 

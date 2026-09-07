@@ -24,7 +24,7 @@
  *
  * **Each glyph is a masked span rather than an inline `<svg>`, so a customer
  * can replace it.** The geometry moved to `icons.css`, where every slot reads
- * `mask-image: var(--ox-icon-{slot}, <built-in>)` — an unset property draws
+ * `mask-image: var(--zb-icon-{slot}, <built-in>)` — an unset property draws
  * what shipped, a set one draws theirs. CSS rather than a React prop because
  * the Tailwind skin is a file copied into the customer's tree and a framework
  * bridge writes CSS; neither imports anything from here, and both get this for
@@ -56,7 +56,7 @@ function icon(slot: string) {
         {...props}
         aria-hidden="true"
         data-icon={slot}
-        className={className ? "ox-icon " + className : "ox-icon"}
+        className={className ? "zb-icon " + className : "zb-icon"}
       />
     );
   };

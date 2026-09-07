@@ -7,9 +7,9 @@
  * with a substance use disorder" find different recommended interventions. The
  * word does work; it changes how the next clinician reads the patient.
  *
- * This rule covers Oxygen's own strings — message catalogues, labels, defaults.
+ * This rule covers Zoblocks's own strings — message catalogues, labels, defaults.
  * The matching model output is checked at runtime by `runChecks` in
- * `@oxygenui-design/copilot-core`, because the model was trained on decades of
+ * `@zoblocks/copilot-core`, because the model was trained on decades of
  * clinical text that used these terms freely and will reproduce them.
  *
  * Two deliberate limits:

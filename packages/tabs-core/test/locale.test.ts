@@ -1,7 +1,7 @@
 /**
  * The announced strings.
  *
- * A red badge is a colour signal, and colour is never the signal in Oxygen —
+ * A red badge is a colour signal, and colour is never the signal in Zoblocks —
  * so the tone has to reach the accessible name as a word. These tests are the
  * enforcement of that rule.
  */

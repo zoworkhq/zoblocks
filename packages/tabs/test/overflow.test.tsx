@@ -38,7 +38,7 @@ async function settle() {
 describe('overflow="scroll"', () => {
   it("renders nudge buttons outside the tab order", () => {
     render(<Tabs as="tabs" aria-label="Chart" defaultValue="t0" items={many} overflow="scroll" />);
-    const nudges = document.querySelectorAll(".ox-tabs__nudge");
+    const nudges = document.querySelectorAll(".zb-tabs__nudge");
     expect(nudges).toHaveLength(2);
     // They duplicate what arrow keys already do; two extra tab stops that do
     // nothing for a keyboard user is a cost with no benefit.
@@ -55,9 +55,9 @@ describe('overflow="scroll"', () => {
     stubScroll(list, 0);
     await settle();
 
-    const scroller = document.querySelector(".ox-tabs__bar");
-    expect(scroller).toHaveAttribute("data-ox-start", "true");
-    expect(scroller).toHaveAttribute("data-ox-end", "true");
+    const scroller = document.querySelector(".zb-tabs__bar");
+    expect(scroller).toHaveAttribute("data-zb-start", "true");
+    expect(scroller).toHaveAttribute("data-zb-end", "true");
   });
 
   it("drops the start fade once the strip is scrolled", async () => {
@@ -67,9 +67,9 @@ describe('overflow="scroll"', () => {
     stubScroll(list, 250);
     await settle();
 
-    const scroller = document.querySelector(".ox-tabs__bar");
-    expect(scroller).toHaveAttribute("data-ox-start", "false");
-    expect(scroller).toHaveAttribute("data-ox-end", "false");
+    const scroller = document.querySelector(".zb-tabs__bar");
+    expect(scroller).toHaveAttribute("data-zb-start", "false");
+    expect(scroller).toHaveAttribute("data-zb-end", "false");
   });
 
   it("treats RTL's negative scrollLeft as a distance from the start", async () => {
@@ -78,7 +78,7 @@ describe('overflow="scroll"', () => {
     restore = stubGeometry(list, { clientWidth: 300, scrollWidth: 800, tabWidth: 100 });
     stubScroll(list, -500);
     await settle();
-    expect(document.querySelector(".ox-tabs__bar")).toHaveAttribute("data-ox-end", "true");
+    expect(document.querySelector(".zb-tabs__bar")).toHaveAttribute("data-zb-end", "true");
   });
 
   it("scrolls the strip when a nudge is pressed", async () => {
@@ -90,7 +90,7 @@ describe('overflow="scroll"', () => {
 
     const scrollBy = vi.fn();
     list.scrollBy = scrollBy;
-    const forward = document.querySelectorAll(".ox-tabs__nudge")[1] as HTMLElement;
+    const forward = document.querySelectorAll(".zb-tabs__nudge")[1] as HTMLElement;
     await userEvent.setup().click(forward);
     // 70% of a page: the edge tab stays visible as an anchor.
     expect(scrollBy).toHaveBeenCalledWith({ left: 210, behavior: "smooth" });

@@ -13,7 +13,7 @@ set -uo pipefail
 
 cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-PORT="${OXYGEN_A11Y_PORT:-6001}"
+PORT="${ZOBLOCKS_A11Y_PORT:-6001}"
 BASE="http://localhost:${PORT}"
 
 # The filter is checked before starting, because `pnpm --filter` on a name that
@@ -23,8 +23,8 @@ BASE="http://localhost:${PORT}"
 #
 # `pnpm --filter <unmatched> exec` still exits 0, so the exit code cannot be
 # used. `ls --json` prints nothing at all when no package matches, which can.
-if [ -z "$(pnpm --filter @oxygenui-design/docs ls --depth -1 --json 2>/dev/null)" ]; then
-  echo "::error::No package matched @oxygenui-design/docs — check the name in apps/docs/package.json."
+if [ -z "$(pnpm --filter @zoblocks/docs ls --depth -1 --json 2>/dev/null)" ]; then
+  echo "::error::No package matched @zoblocks/docs — check the name in apps/docs/package.json."
   exit 1
 fi
 
@@ -54,13 +54,13 @@ cleanup() {
 trap cleanup EXIT INT TERM
 
 set -m
-pnpm --filter @oxygenui-design/docs start >/tmp/oxygen-a11y-server.log 2>&1 &
+pnpm --filter @zoblocks/docs start >/tmp/zoblocks-a11y-server.log 2>&1 &
 server=$!
 set +m
 
 if ! npx --yes wait-on "$BASE" -t 60000; then
   echo "::error::The docs server did not come up on $BASE within 60s."
-  tail -20 /tmp/oxygen-a11y-server.log
+  tail -20 /tmp/zoblocks-a11y-server.log
   exit 1
 fi
 

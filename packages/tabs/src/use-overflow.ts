@@ -9,12 +9,7 @@
  */
 
 import * as React from "react";
-import {
-  fitTabs,
-  scrollEdges,
-  shouldCollapse,
-  type OverflowStrategy,
-} from "@oxygenui-design/tabs-core";
+import { fitTabs, scrollEdges, shouldCollapse, type OverflowStrategy } from "@zoblocks/tabs-core";
 import { useIsoLayoutEffect } from "./internal.js";
 
 export interface UseOverflowOptions {
@@ -61,7 +56,7 @@ export function useOverflow({
   const measureWidths = React.useCallback(() => {
     const list = listRef.current;
     if (!list) return null;
-    const tabs = Array.from(list.querySelectorAll<HTMLElement>("[data-ox-tab]"));
+    const tabs = Array.from(list.querySelectorAll<HTMLElement>("[data-zb-tab]"));
     // Everything visible for the duration of the read.
     const restore = tabs.map((tab) => tab.style.display);
     for (const tab of tabs) tab.style.display = "";

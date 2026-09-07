@@ -41,7 +41,7 @@ export function stubGeometry(list: HTMLElement, sizes: StubSizes): () => void {
 
   define(list, { clientWidth, scrollWidth, offsetWidth: clientWidth, offsetHeight: tabHeight });
 
-  const tabs = Array.from(list.querySelectorAll<HTMLElement>("[data-ox-tab]"));
+  const tabs = Array.from(list.querySelectorAll<HTMLElement>("[data-zb-tab]"));
   tabs.forEach((tab, index) => {
     const left = index * (tabWidth + gap);
     define(tab, {

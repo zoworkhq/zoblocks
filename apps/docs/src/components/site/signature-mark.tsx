@@ -7,7 +7,7 @@
  * 92-pixel cell is the wrong trade.
  *
  * So the geometry below is not hand-drawn — it is the output of
- * `toInkPaths()` from `@oxygenui-design/signature-core`, the exact function the
+ * `toInkPaths()` from `@zoblocks/signature-core`, the exact function the
  * live pad calls on every pointer move, run over the stroke model in
  * `SIGNATURE_STROKES`. Smoothing, decimation and the velocity-driven width
  * curve are all the component's own.

@@ -1,7 +1,7 @@
 /**
  * The cross-framework claim, executed.
  *
- * `@oxygenui-design/loaders` says it "works in React, Vue, Angular, Svelte, or
+ * `@zoblocks/loaders` says it "works in React, Vue, Angular, Svelte, or
  * plain HTML". That sentence sits on the npm page and in the docs, and until
  * this file existed nothing tested it — the unit suite runs in jsdom against
  * elements constructed by hand, which is precisely the layer where none of the
@@ -17,8 +17,8 @@
 
 import { test, expect, type ConsoleMessage, type Page } from "@playwright/test";
 
-const SMOKE = process.env.OXYGEN_SMOKE_URL ?? "http://localhost:6010";
-const SMOKE_18 = process.env.OXYGEN_SMOKE_18_URL ?? "http://localhost:6011";
+const SMOKE = process.env.ZOBLOCKS_SMOKE_URL ?? "http://localhost:6010";
+const SMOKE_18 = process.env.ZOBLOCKS_SMOKE_18_URL ?? "http://localhost:6011";
 
 const PAGES = [
   { id: "html", url: `${SMOKE}/html/` },
@@ -69,12 +69,12 @@ for (const { id, url } of PAGES) {
       const upgraded = await page.evaluate(() => {
         const element = document.querySelector("#loader");
         return {
-          defined: Boolean(customElements.get("ox-pulse-loader")),
+          defined: Boolean(customElements.get("zb-pulse-loader")),
           hasShadow: Boolean(element?.shadowRoot),
-          constructedByUs: element?.constructor.name.startsWith("Ox") ?? false,
+          constructedByUs: element?.constructor.name.startsWith("Zb") ?? false,
         };
       });
-      expect(upgraded, `${id}: <ox-pulse-loader> must upgrade`).toEqual({
+      expect(upgraded, `${id}: <zb-pulse-loader> must upgrade`).toEqual({
         defined: true,
         hasShadow: true,
         constructedByUs: true,
@@ -84,7 +84,7 @@ for (const { id, url } of PAGES) {
       const loader = page.locator("#loader");
       await expect(loader).toHaveAttribute("role", "status");
       await expect(loader).toHaveAttribute("aria-live", "polite");
-      await expect(loader).toHaveAttribute("data-ox-loader", "pulse");
+      await expect(loader).toHaveAttribute("data-zb-loader", "pulse");
 
       // The art is inside a shadow root, so a plain locator cannot see it.
       const artNodes = await page.evaluate(

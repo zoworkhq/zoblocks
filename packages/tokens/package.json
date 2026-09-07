@@ -1,12 +1,12 @@
 {
-  "name": "@oxygenui-design/tokens",
+  "name": "@zoblocks/tokens",
   "version": "0.1.0",
-  "description": "Oxygen UI design tokens: semantic clinical status, density modes, light/dark themes.",
+  "description": "Zoblocks design tokens: semantic clinical status, density modes, light/dark themes.",
   "license": "MIT",
-  "homepage": "https://oxygenui.design",
+  "homepage": "https://zoblocks.design",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zoworkhq/oxygenui.git",
+    "url": "git+https://github.com/zoworkhq/zoblocks.git",
     "directory": "packages/tokens"
   },
   "keywords": [
@@ -19,7 +19,7 @@
     "*.css"
   ],
   "exports": {
-    "./oxygen-tokens.css": "./src/oxygen-tokens.css",
+    "./zoblocks-tokens.css": "./src/zoblocks-tokens.css",
     "./tailwind.css": "./src/tailwind.css",
     "./tokens.json": "./src/tokens.json",
     "./contrast.json": "./src/contrast.json",
@@ -52,7 +52,7 @@
         "types": "./dist/surface.d.ts",
         "default": "./dist/surface.js"
       },
-      "./oxygen-tokens.css": "./src/oxygen-tokens.css",
+      "./zoblocks-tokens.css": "./src/zoblocks-tokens.css",
       "./tailwind.css": "./src/tailwind.css",
       "./tokens.json": "./src/tokens.json",
       "./contrast.json": "./src/contrast.json",
@@ -72,7 +72,7 @@
   "types": "./src/tokens.ts",
   "//publishConfig": "main/types/exports are rewritten to ./dist at publish time. That rewrite is a pnpm feature — publishing with npm ships raw TypeScript, which is exactly what 0.1.0 did.",
   "devDependencies": {
-    "@oxygenui-design/tsconfig": "workspace:*",
+    "@zoblocks/tsconfig": "workspace:*",
     "@vitest/coverage-v8": "^4.1.10",
     "typescript": "^5.7.2",
     "vitest": "^4.1.10"

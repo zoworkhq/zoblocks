@@ -186,7 +186,7 @@ describe('transition="view"', () => {
 describe("virtualise", () => {
   it("marks the root so the stylesheet can skip off-screen layout", () => {
     render(<Tabs as="tabs" aria-label="Docs" defaultValue="t0" items={items} virtualise />);
-    expect(document.querySelector(".ox-tabs")).toHaveAttribute("data-ox-virtualised");
+    expect(document.querySelector(".zb-tabs")).toHaveAttribute("data-zb-virtualised");
   });
 
   it("keeps every trigger in the accessibility tree", () => {
@@ -198,6 +198,6 @@ describe("virtualise", () => {
 
   it("is off by default", () => {
     render(<Tabs as="tabs" aria-label="Docs" defaultValue="t0" items={items} />);
-    expect(document.querySelector(".ox-tabs")).not.toHaveAttribute("data-ox-virtualised");
+    expect(document.querySelector(".zb-tabs")).not.toHaveAttribute("data-zb-virtualised");
   });
 });

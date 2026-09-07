@@ -1,9 +1,9 @@
 {
-  "name": "@oxygenui-design/figma-core",
+  "name": "@zoblocks/figma-core",
   "version": "0.1.0",
   "type": "module",
   "private": false,
-  "description": "Oxygen themes as Figma variable plans. Pure — no figma.*, no DOM, no network.",
+  "description": "Zoblocks themes as Figma variable plans. Pure — no figma.*, no DOM, no network.",
   "exports": {
     ".": "./src/index.ts",
     "./package.json": "./package.json"
@@ -21,10 +21,10 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@oxygenui-design/tokens": "workspace:*"
+    "@zoblocks/tokens": "workspace:*"
   },
   "devDependencies": {
-    "@oxygenui-design/tsconfig": "workspace:*",
+    "@zoblocks/tsconfig": "workspace:*",
     "@vitest/coverage-v8": "^4.1.10",
     "typescript": "^5.7.2",
     "vitest": "^4.1.10"

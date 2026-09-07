@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import type { PropDoc } from "@oxygenui-design/component-meta";
+import type { PropDoc } from "@zoblocks/component-meta";
 import { cn } from "@/lib/utils";
 
 const PAGE_SIZE = 10;
@@ -53,7 +53,7 @@ export function PropsTable({ props, label }: { props: readonly PropDoc[]; label:
     ? filtered.slice(current * PAGE_SIZE, current * PAGE_SIZE + PAGE_SIZE)
     : filtered;
 
-  const searchId = `ox-props-search-${label.replace(/[^a-zA-Z0-9]/g, "-")}`;
+  const searchId = `zb-props-search-${label.replace(/[^a-zA-Z0-9]/g, "-")}`;
 
   return (
     <div>
@@ -76,7 +76,7 @@ export function PropsTable({ props, label }: { props: readonly PropDoc[]; label:
                 "w-full rounded-lg border border-rule bg-paper-sunk px-3 py-1.5",
                 "text-xs text-ink placeholder:text-graphite-soft",
                 "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
-                "focus-visible:outline-oxygen",
+                "focus-visible:outline-brand",
               )}
             />
           </div>
@@ -118,7 +118,7 @@ export function PropsTable({ props, label }: { props: readonly PropDoc[]; label:
             </dt>
 
             <dd className="min-w-0">
-              <p className="numeric break-words text-xs leading-relaxed text-oxygen-deep">
+              <p className="numeric break-words text-xs leading-relaxed text-brand-deep">
                 {prop.type}
               </p>
               {/*
@@ -193,7 +193,7 @@ function PageButton({
         "transition-colors duration-200",
         disabled
           ? "cursor-not-allowed border-rule text-graphite-soft/50"
-          : "border-rule text-graphite hover:border-oxygen/40 hover:text-ink",
+          : "border-rule text-graphite hover:border-brand/40 hover:text-ink",
       )}
     >
       {children}

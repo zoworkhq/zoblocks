@@ -6,7 +6,7 @@
  * "could not load" path is a real state this suite has to exercise.
  */
 
-import type { Patient } from "@oxygenui-design/fhir";
+import type { Patient } from "@zoblocks/fhir";
 import { render, type RenderOptions, type RenderResult } from "@testing-library/react";
 import type { ReactElement, ReactNode } from "react";
 import { IdentityProvider, type IdentityProviderProps } from "../src/IdentityProvider.js";

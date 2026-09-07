@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Oxygen loaders — plain HTML</title>
+    <title>Zoblocks loaders — plain HTML</title>
     <link rel="stylesheet" href="../shared.css" />
   </head>
   <body>
@@ -15,23 +15,23 @@
       can pass, so it is the first thing to look at when the suite goes red.
     -->
     <div class="row">
-      <ox-pulse-loader
+      <zb-pulse-loader
         id="loader"
         label="Loading patient record"
         mode="inline"
         min-duration="0"
-      ></ox-pulse-loader>
+      ></zb-pulse-loader>
       <button id="toggle" type="button">Toggle</button>
     </div>
 
     <div class="row">
-      <ox-rhythm-loader
+      <zb-rhythm-loader
         id="determinate"
         label="Uploading study"
         mode="inline"
         min-duration="0"
         progress="0"
-      ></ox-rhythm-loader>
+      ></zb-rhythm-loader>
       <button id="step" type="button">Step</button>
     </div>
 

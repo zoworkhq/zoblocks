@@ -17,7 +17,7 @@ import {
   defaultConfig,
   readConfig,
   writeConfig,
-  type OxygenConfig,
+  type ZoblocksConfig,
 } from "./config.js";
 import { collectItems, type FetchOptions } from "./registry.js";
 import { PUBLIC_REGISTRY_INDEX } from "./constants.js";
@@ -41,7 +41,7 @@ export interface AddOptions {
   yes: boolean;
 }
 
-/** `oxygen init` — write oxygen.json. */
+/** `zoblocks init` — write zoblocks.json. */
 export async function init(
   context: CommandContext,
   options: { force: boolean } = { force: false },
@@ -62,12 +62,12 @@ export async function init(
   out("");
   out(`  Components land under it at the paths they import each other by —`);
   out(
-    `  ${path.join(config.root, "components/oxygen")}, ${path.join(config.root, "lib")}, ${path.join(config.root, "styles")}.`,
+    `  ${path.join(config.root, "components/zoblocks")}, ${path.join(config.root, "lib")}, ${path.join(config.root, "styles")}.`,
   );
   out(`  If "@/" points somewhere else in your tsconfig, change "root" in ${CONFIG_FILE}.`);
   out("");
   out("  Then:");
-  out("    oxygen add vitals-panel");
+  out("    zoblocks add vitals-panel");
   out("");
   out("  Paid components need a registry namespace and a token — the console");
   out("  prints the exact block under Marketplace → Access tokens.");
@@ -75,7 +75,7 @@ export async function init(
   return 0;
 }
 
-/** `oxygen list` — what the public catalog holds. */
+/** `zoblocks list` — what the public catalog holds. */
 export async function list(context: CommandContext): Promise<number> {
   const doFetch = context.fetchImpl ?? fetch;
   const response = await doFetch(PUBLIC_REGISTRY_INDEX, {
@@ -96,12 +96,12 @@ export async function list(context: CommandContext): Promise<number> {
     context.out(`  ${item.name.padEnd(width)}  ${item.description}`);
   }
   context.out("");
-  context.out("  oxygen add <name>");
+  context.out("  zoblocks add <name>");
 
   return 0;
 }
 
-/** `oxygen add <specifier...>` — the reason this binary exists. */
+/** `zoblocks add <specifier...>` — the reason this binary exists. */
 export async function add(
   context: CommandContext,
   specifiers: string[],
@@ -110,11 +110,11 @@ export async function add(
   const { cwd, env, out, err } = context;
 
   if (specifiers.length === 0) {
-    err("Nothing to add. Name a component: oxygen add vitals-panel");
+    err("Nothing to add. Name a component: zoblocks add vitals-panel");
     return 1;
   }
 
-  let config: OxygenConfig;
+  let config: ZoblocksConfig;
   try {
     config = await readConfig(cwd);
   } catch (error) {

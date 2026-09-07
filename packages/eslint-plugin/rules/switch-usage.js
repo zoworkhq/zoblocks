@@ -6,7 +6,7 @@
  * splitting them into four rules would mean four passes over every JSX opening
  * element for checks that are each a dozen lines.
  *
- * See oxygen-switch-brief.html §17 and
+ * See zoblocks-switch-brief.html §17 and
  * content/decisions/0010-antd-compatible-primitives.md.
  */
 

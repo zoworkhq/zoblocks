@@ -17,11 +17,11 @@ export const RAMP: Record<string, string> = {
 
 /** The clinical tokens, which must arrive locked and never come back. */
 export const CLINICAL = [
-  "--ox-status-critical",
-  "--ox-status-high",
-  "--ox-status-low",
-  "--ox-status-normal",
-  "--ox-status-unknown",
+  "--zb-status-critical",
+  "--zb-status-high",
+  "--zb-status-low",
+  "--zb-status-normal",
+  "--zb-status-unknown",
 ];
 
 export function theme(over: Partial<ResolvedTheme> = {}): ResolvedTheme {
@@ -30,22 +30,22 @@ export function theme(over: Partial<ResolvedTheme> = {}): ResolvedTheme {
     semantic: {
       light: {
         // Exactly the 700 step: this must become an alias, not a literal.
-        "--ox-accent": "#1851a5",
-        "--ox-text": "#16181d",
-        "--ox-bg": "#ffffff",
-        "--ox-status-critical": "#b4232b",
+        "--zb-accent": "#1851a5",
+        "--zb-text": "#16181d",
+        "--zb-bg": "#ffffff",
+        "--zb-status-critical": "#b4232b",
       },
       dark: {
-        "--ox-accent": "#5a94e7",
-        "--ox-text": "#e8ecf1",
-        "--ox-bg": "#0e1116",
-        "--ox-status-critical": "#f08b96",
+        "--zb-accent": "#5a94e7",
+        "--zb-text": "#e8ecf1",
+        "--zb-bg": "#0e1116",
+        "--zb-status-critical": "#f08b96",
       },
       "high-contrast": {
-        "--ox-accent": "#0f3568",
-        "--ox-text": "#000000",
-        "--ox-bg": "#ffffff",
-        "--ox-status-critical": "#8c0d16",
+        "--zb-accent": "#0f3568",
+        "--zb-text": "#000000",
+        "--zb-bg": "#ffffff",
+        "--zb-status-critical": "#8c0d16",
       },
     },
     locked: Object.fromEntries(

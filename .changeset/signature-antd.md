@@ -1,9 +1,9 @@
 ---
-"@oxygenui-design/signature": minor
-"@oxygenui-design/signature-core": minor
+"@zoblocks/signature": minor
+"@zoblocks/signature-core": minor
 ---
 
-New package: `@oxygenui-design/signature`, healthcare signature capture for Ant
+New package: `@zoblocks/signature`, healthcare signature capture for Ant
 Design v6, built on the framework-free engine in `signature-core`.
 
 `<Signature>` is an antd `Form.Item` control offering draw, type and upload —
@@ -17,7 +17,7 @@ Three things worth knowing:
   `outcome === "signed"` makes refusal impossible to submit, which defeats the
   component. `signatureAffirmative()` is the stricter variant for consent gates.
 - **The typed path is required for WCAG 2.1.1 (Level A).** The new
-  `@oxygenui/signature-requires-typed-path` lint rule makes `methods={["draw"]}`
+  `@zoblocks/signature-requires-typed-path` lint rule makes `methods={["draw"]}`
   an error, because the mistake renders perfectly and passes every other test.
 - **No `dangerouslySetInnerHTML` anywhere.** `Ink` now carries structured render
   data (path strings, positioned text) alongside the SVG string, and

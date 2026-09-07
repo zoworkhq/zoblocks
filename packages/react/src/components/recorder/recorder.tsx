@@ -5,7 +5,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/oxygen/recorder/recorder.tsx. Edit that file, not this one.
+// Generated from registry/zoblocks/recorder/recorder.tsx. Edit that file, not this one.
 /**
  * Recorder — one control, five arts, one engine.
  *
@@ -45,7 +45,7 @@ import {
   type SignalFrame,
   type TimeDomainSource,
   type TrackObservation,
-} from "@oxygenui-design/recorder-core";
+} from "@zoblocks/recorder-core";
 
 import {
   RecorderBars,
@@ -370,12 +370,12 @@ export function Recorder({
       {/* role="timer" is an aria-live="off" region by default. Making it polite
           is the commonest audio-UI accessibility defect: it announces a number
           every second for twenty minutes. */}
-      <span className="ox-rec-sr" role="timer" aria-label={`${label} elapsed`}>
+      <span className="zb-rec-sr" role="timer" aria-label={`${label} elapsed`}>
         {recorderClock(elapsed)}
       </span>
 
       {blockedByConsent(phase, consent) ? (
-        <div className="ox-rec-fault" data-severity="critical" role="alert">
+        <div className="zb-rec-fault" data-severity="critical" role="alert">
           <span>
             <b>Consent not recorded.</b> Recording cannot start. Capture the basis, or start an
             unrecorded encounter.
@@ -447,14 +447,14 @@ function PulseArt({
   const capturing = phase === "recording";
   return (
     <>
-      <div className="ox-rec-stage">
-        <div className="ox-rec-sonar" />
-        <div className="ox-rec-ring" data-ring="glow" />
-        <div className="ox-rec-ring" data-ring="hold" />
-        <div className="ox-rec-ring" data-ring="level" />
+      <div className="zb-rec-stage">
+        <div className="zb-rec-sonar" />
+        <div className="zb-rec-ring" data-ring="glow" />
+        <div className="zb-rec-ring" data-ring="hold" />
+        <div className="zb-rec-ring" data-ring="level" />
         <button
           type="button"
-          className="ox-rec-btn"
+          className="zb-rec-btn"
           data-mode={capturing ? "stop" : "record"}
           aria-label={capturing ? "Stop recording and attach" : "Start recording"}
           onClick={onStop}
@@ -462,15 +462,15 @@ function PulseArt({
           <span />
         </button>
       </div>
-      <div className="ox-rec-row" style={{ justifyContent: "center" }}>
+      <div className="zb-rec-row" style={{ justifyContent: "center" }}>
         {capturing ? <RecorderTell label="Rec" /> : null}
         {/* A timecode, not a clock. With one control and no lane, the frames
             field is the only thing on screen still moving — it is the evidence
             that the machine is advancing. */}
-        <span className="ox-rec-clock" data-size="lg">
+        <span className="zb-rec-clock" data-size="lg">
           {recorderTimecode(elapsed)}
         </span>
-        <span className="ox-rec-meta">{describeLevel(frame)}</span>
+        <span className="zb-rec-meta">{describeLevel(frame)}</span>
       </div>
     </>
   );
@@ -505,28 +505,28 @@ function BarsArt({
 }): React.JSX.Element {
   return (
     <>
-      <div className="ox-rec-row">
+      <div className="zb-rec-row">
         {phase === "recording" ? <RecorderTell /> : null}
-        <span className="ox-rec-clock" data-size="lg">
+        <span className="zb-rec-clock" data-size="lg">
           {recorderClock(elapsed)}
         </span>
       </div>
-      <div className="ox-rec-pane">
-        <div className="ox-rec-lane" ref={laneRef}>
+      <div className="zb-rec-pane">
+        <div className="zb-rec-lane" ref={laneRef}>
           <RecorderBars count={bars} />
         </div>
       </div>
-      <div className="ox-rec-row">
+      <div className="zb-rec-row">
         {/* The device name is permanent, never behind a hover or a settings
             panel: §11 row 7 has no signal-level defence and this is the only
             one there is. The context sits beside it rather than replacing it. */}
-        <span className="ox-rec-meta">
+        <span className="zb-rec-meta">
           {context !== undefined ? `${context} · ` : ""}
           {device?.label ?? "No input device"}
           {" · "}
           {describeLevel(frame)}
         </span>
-        <span className="ox-rec-transport">
+        <span className="zb-rec-transport">
           {onPause !== undefined ? (
             <RecorderButton icon="pause" onClick={onPause}>
               Pause
@@ -568,20 +568,20 @@ function StripArt({
 }): React.JSX.Element {
   return (
     <>
-      <div className="ox-rec-bar">
+      <div className="zb-rec-bar">
         {/* A real glyph rather than a dot: at 40px the microphone is the only
             thing telling a reader what this strip is before it moves. */}
-        <span className="ox-rec-mic">
+        <span className="zb-rec-mic">
           <RecorderIcon name="mic" size={18} />
         </span>
-        <div className="ox-rec-lane" ref={laneRef}>
+        <div className="zb-rec-lane" ref={laneRef}>
           <RecorderBars count={bars} />
         </div>
-        <span className="ox-rec-clock">{recorderClockShort(elapsed)}</span>
+        <span className="zb-rec-clock">{recorderClockShort(elapsed)}</span>
         {onSend !== undefined ? (
           <button
             type="button"
-            className="ox-rec-send"
+            className="zb-rec-send"
             aria-label="Stop and insert"
             onClick={onSend}
           >
@@ -590,7 +590,7 @@ function StripArt({
         ) : null}
       </div>
       {context !== undefined ? (
-        <p className="ox-rec-meta ox-rec-context">
+        <p className="zb-rec-meta zb-rec-context">
           Dictating into <strong>{context}</strong> · Esc discards
         </p>
       ) : null}
@@ -684,22 +684,22 @@ function DuetArt({
 
   return (
     <>
-      <div className="ox-rec-row">
+      <div className="zb-rec-row">
         {/* The take's own name, not the speakers — they are already on the
             axis, and printing them twice spends the one line a reviewer reads
             first on something the picture already says. */}
-        <b className="ox-rec-title">{title ?? "Recording"}</b>
-        <span className="ox-rec-clock">
+        <b className="zb-rec-title">{title ?? "Recording"}</b>
+        <span className="zb-rec-clock">
           {takeClock(played * durationMs)} / {takeClock(durationMs)}
         </span>
       </div>
-      {!split ? <span className="ox-rec-meta">Single rail — no diarisation</span> : null}
+      {!split ? <span className="zb-rec-meta">Single rail — no diarisation</span> : null}
       {markers.length > 0 ? (
-        <div className="ox-rec-markbar">
+        <div className="zb-rec-markbar">
           {markers.map((marker) => (
             <span
               key={marker.id}
-              className="ox-rec-mark"
+              className="zb-rec-mark"
               data-struck={marker.struck === true ? "true" : "false"}
               style={{ left: `${Math.max(0, Math.min(1, marker.at)) * 100}%` }}
             >
@@ -709,35 +709,35 @@ function DuetArt({
           ))}
         </div>
       ) : null}
-      <div className="ox-rec-pane">
-        <div className="ox-rec-played" style={{ width: `${played * 100}%` }} />
-        <div className="ox-rec-rails">
-          <div className="ox-rec-rail" data-rail="a">
+      <div className="zb-rec-pane">
+        <div className="zb-rec-played" style={{ width: `${played * 100}%` }} />
+        <div className="zb-rec-rails">
+          <div className="zb-rec-rail" data-rail="a">
             {rail(0)}
           </div>
           {split ? (
-            <div className="ox-rec-rail" data-rail="b">
+            <div className="zb-rec-rail" data-rail="b">
               {rail(1)}
             </div>
           ) : null}
-          <div className="ox-rec-axis" />
-          <span className="ox-rec-who" data-rail="a">
+          <div className="zb-rec-axis" />
+          <span className="zb-rec-who" data-rail="a">
             {labels[0]}
           </span>
           {split ? (
-            <span className="ox-rec-who" data-rail="b">
+            <span className="zb-rec-who" data-rail="b">
               {labels[1]}
             </span>
           ) : null}
         </div>
-        <div className="ox-rec-head" style={{ left: `${played * 100}%` }} />
+        <div className="zb-rec-head" style={{ left: `${played * 100}%` }} />
       </div>
       {balance !== null ? (
-        <div className="ox-rec-balance">
-          <div className="ox-rec-balance-track">
-            <div className="ox-rec-balance-fill" style={{ width: `${balance}%` }} />
+        <div className="zb-rec-balance">
+          <div className="zb-rec-balance-track">
+            <div className="zb-rec-balance-fill" style={{ width: `${balance}%` }} />
           </div>
-          <span className="ox-rec-meta">
+          <span className="zb-rec-meta">
             {balance}% / {100 - balance}%
           </span>
         </div>
@@ -764,21 +764,21 @@ function StreamArt({
   const stalled = fault?.code === "recogniser-stalled";
   return (
     <div data-stalled={stalled ? "true" : "false"}>
-      <div className="ox-rec-log">
+      <div className="zb-rec-log">
         {turns.map((turn) => (
-          <div className="ox-rec-turn" key={turn.id}>
+          <div className="zb-rec-turn" key={turn.id}>
             <b>{turn.speaker}</b>
-            <p className="ox-rec-words">
+            <p className="zb-rec-words">
               {turn.words}
               {turn.interim !== undefined ? (
-                <span className="ox-rec-interim"> {turn.interim}</span>
+                <span className="zb-rec-interim"> {turn.interim}</span>
               ) : null}
             </p>
           </div>
         ))}
       </div>
       {stalled ? (
-        <div className="ox-rec-fault" data-severity="warn" role="status">
+        <div className="zb-rec-fault" data-severity="warn" role="status">
           <RecorderIcon name="alert" />
           <span>
             <b>Transcript stalled.</b> The audio is still being written to disk — the recogniser is
@@ -786,7 +786,7 @@ function StreamArt({
           </span>
         </div>
       ) : null}
-      <p className="ox-rec-meta ox-rec-context">
+      <p className="zb-rec-meta zb-rec-context">
         Interim tokens are drawn as guesses. Nothing is committed until the recogniser stops
         revising it.
       </p>
@@ -922,37 +922,37 @@ export function RecorderDispositionStrip({
 
   return (
     <div
-      className={cn("ox-rec", "ox-rec-stack", className)}
-      data-ox-recorder="disposition"
+      className={cn("zb-rec", "zb-rec-stack", className)}
+      data-zb-recorder="disposition"
       data-state={state}
       {...rest}
     >
-      <ol className="ox-rec-steps">
+      <ol className="zb-rec-steps">
         {DISPOSITION_STEPS.map((step, index) => (
           <li
             key={step}
-            className="ox-rec-step"
+            className="zb-rec-step"
             data-done={index < active ? "true" : "false"}
             data-live={index === active ? "true" : "false"}
             data-failed={index === active && state === "failed" ? "true" : "false"}
           >
-            <span className="ox-rec-step-name">{step}</span>
-            <span className="ox-rec-step-value">{values[index]}</span>
+            <span className="zb-rec-step-name">{step}</span>
+            <span className="zb-rec-step-value">{values[index]}</span>
           </li>
         ))}
       </ol>
 
       {/* Hatched while held: there is no progress to report, because nothing
           is moving. A bar creeping forward would be inventing one. */}
-      <div className="ox-rec-track" data-indeterminate={state === "held" ? "true" : "false"}>
+      <div className="zb-rec-track" data-indeterminate={state === "held" ? "true" : "false"}>
         <div
-          className="ox-rec-track-fill"
+          className="zb-rec-track-fill"
           style={{ width: `${state === "ready" ? 100 : percent}%` }}
         />
       </div>
 
-      <div className="ox-rec-row">
-        <span className="ox-rec-meta" role={state === "failed" ? "alert" : undefined}>
+      <div className="zb-rec-row">
+        <span className="zb-rec-meta" role={state === "failed" ? "alert" : undefined}>
           {note}
         </span>
         {state === "failed" && onRetry !== undefined ? (
@@ -960,7 +960,7 @@ export function RecorderDispositionStrip({
             Retry from {percent}%
           </RecorderButton>
         ) : (
-          <span className="ox-rec-meta">{state === "ready" ? "done" : `${percent}%`}</span>
+          <span className="zb-rec-meta">{state === "ready" ? "done" : `${percent}%`}</span>
         )}
       </div>
     </div>

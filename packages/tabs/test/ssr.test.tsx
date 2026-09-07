@@ -47,9 +47,9 @@ describe("server-rendered markup", () => {
     const html = serverHtml(
       <Tabs as="tabs" aria-label="Docs" defaultValue="shared" items={items} />,
     );
-    // `data-ox-selected` is what the stylesheet paints against while
-    // `:not([data-ox-measured])` holds the animated indicator back.
-    expect(html).toMatch(/data-ox-value="shared"[^>]*data-ox-selected="true"/);
+    // `data-zb-selected` is what the stylesheet paints against while
+    // `:not([data-zb-measured])` holds the animated indicator back.
+    expect(html).toMatch(/data-zb-value="shared"[^>]*data-zb-selected="true"/);
   });
 
   it("emits exactly one tab stop in the strip", () => {
@@ -74,7 +74,7 @@ describe("server-rendered markup", () => {
         items={items}
       />,
     );
-    expect(html).not.toContain("data-ox-measured");
+    expect(html).not.toContain("data-zb-measured");
   });
 
   it("carries the announced count into the server HTML", () => {

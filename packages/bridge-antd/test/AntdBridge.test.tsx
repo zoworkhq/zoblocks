@@ -31,7 +31,7 @@ describe("useAntdTokens", () => {
         <Probe />
       </ConfigProvider>,
     );
-    expect(tokens["--ox-accent"]).toBe("#7c3aed");
+    expect(tokens["--zb-accent"]).toBe("#7c3aed");
   });
 
   it("follows the dark algorithm without the bridge knowing about it", () => {
@@ -47,8 +47,8 @@ describe("useAntdTokens", () => {
     );
     // The bridge reads resolved values, so a dark algorithm needs no
     // special-casing — it simply arrives already resolved.
-    expect(dark["--ox-surface"]).not.toBe(light["--ox-surface"]);
-    expect(dark["--ox-text"]).not.toBe(light["--ox-text"]);
+    expect(dark["--zb-surface"]).not.toBe(light["--zb-surface"]);
+    expect(dark["--zb-text"]).not.toBe(light["--zb-text"]);
   });
 
   it("keeps the concentric radius relationship from a real theme", () => {
@@ -57,8 +57,8 @@ describe("useAntdTokens", () => {
         <Probe />
       </ConfigProvider>,
     );
-    expect(tokens["--ox-tabs-thumb-radius"]).toBe("12px");
-    expect(tokens["--ox-tabs-track-radius"]).toBe("16px");
+    expect(tokens["--zb-tabs-thumb-radius"]).toBe("12px");
+    expect(tokens["--zb-tabs-track-radius"]).toBe("16px");
   });
 
   it("writes no clinical token even though a real antd theme defines colorError", () => {
@@ -67,8 +67,8 @@ describe("useAntdTokens", () => {
         <Probe />
       </ConfigProvider>,
     );
-    expect(Object.keys(tokens).some((k) => k.startsWith("--ox-status-"))).toBe(false);
-    expect(Object.keys(tokens).some((k) => k.startsWith("--ox-flag-"))).toBe(false);
+    expect(Object.keys(tokens).some((k) => k.startsWith("--zb-status-"))).toBe(false);
+    expect(Object.keys(tokens).some((k) => k.startsWith("--zb-flag-"))).toBe(false);
   });
 });
 
@@ -82,9 +82,9 @@ describe("<AntdBridge>", () => {
       </ConfigProvider>,
     );
 
-    const wrapper = container.querySelector("[data-ox-bridge='antd']") as HTMLElement;
+    const wrapper = container.querySelector("[data-zb-bridge='antd']") as HTMLElement;
     expect(wrapper).toBeTruthy();
-    expect(wrapper.style.getPropertyValue("--ox-accent")).toBe("#7c3aed");
+    expect(wrapper.style.getPropertyValue("--zb-accent")).toBe("#7c3aed");
     expect(wrapper.tagName).toBe("DIV");
   });
 
@@ -116,7 +116,7 @@ describe("<AntdBridge>", () => {
         <AntdBridge as="span">text</AntdBridge>
       </ConfigProvider>,
     );
-    expect(container.querySelector("[data-ox-bridge]")?.tagName).toBe("SPAN");
+    expect(container.querySelector("[data-zb-bridge]")?.tagName).toBe("SPAN");
   });
 
   it("passes a className through, so a host can position it", () => {
@@ -125,6 +125,6 @@ describe("<AntdBridge>", () => {
         <AntdBridge className="fill">x</AntdBridge>
       </ConfigProvider>,
     );
-    expect(container.querySelector("[data-ox-bridge]")?.className).toBe("fill");
+    expect(container.querySelector("[data-zb-bridge]")?.className).toBe("fill");
   });
 });

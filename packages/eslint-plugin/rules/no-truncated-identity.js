@@ -24,11 +24,11 @@
  */
 
 /** CSS class names that clip text. */
-const CLIPPING_CLASS = /(^|\s)(truncate|text-ellipsis|line-clamp-\d+|ox-truncate)(\s|$)/;
+const CLIPPING_CLASS = /(^|\s)(truncate|text-ellipsis|line-clamp-\d+|zb-truncate)(\s|$)/;
 
 /** Identity-bearing markers in a class name, data attribute or prop. */
 const IDENTITY_HINT =
-  /(patient|person|identity|human)?-?(name|mrn|identifier|nhs|abha|medicare|ssn)|ox-banner__name|ox-chip__name/i;
+  /(patient|person|identity|human)?-?(name|mrn|identifier|nhs|abha|medicare|ssn)|zb-banner__name|zb-chip__name/i;
 
 /** @type {import("eslint").Rule.RuleModule} */
 export default {
@@ -52,7 +52,7 @@ export default {
         if (attr.type !== "JSXAttribute" || !attr.name) return false;
         const name = attr.name.name;
         if (typeof name !== "string") return false;
-        if (name === "data-ox-field" || name === "data-ox-patient-id") return true;
+        if (name === "data-zb-field" || name === "data-zb-patient-id") return true;
         if (name !== "className" && name !== "class") return false;
         const value = attr.value;
         if (value?.type === "Literal" && typeof value.value === "string") {

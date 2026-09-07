@@ -17,10 +17,10 @@ describe("indicatorGeometry", () => {
 
   it("emits the four custom properties the stylesheet consumes", () => {
     expect(indicatorStyle({ x: 12, y: 4, width: 120, height: 36 })).toEqual({
-      "--ox-tabs-ind-x": "12px",
-      "--ox-tabs-ind-y": "4px",
-      "--ox-tabs-ind-w": "120px",
-      "--ox-tabs-ind-h": "36px",
+      "--zb-tabs-ind-x": "12px",
+      "--zb-tabs-ind-y": "4px",
+      "--zb-tabs-ind-w": "120px",
+      "--zb-tabs-ind-h": "36px",
     });
   });
 });

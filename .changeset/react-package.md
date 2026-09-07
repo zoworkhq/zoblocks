@@ -1,10 +1,10 @@
 ---
-"@oxygenui-design/react": minor
+"@zoblocks/react": minor
 ---
 
 First release: the loaders as an installable React package.
 
-Until now the only React channel was copy-source through the Oxygen registry,
+Until now the only React channel was copy-source through the Zoblocks registry,
 which has no versioning and no upgrade path. This package covers teams who want
 semver instead.
 
