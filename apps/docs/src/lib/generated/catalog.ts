@@ -4436,7 +4436,7 @@ export const CATALOG: ComponentDoc[] = [
     ],
     "limitations": [
       "No phrase library, terminology or attestation wording ships here. Those are jurisdictional, organisational and licensing decisions; the component provides the seams.",
-      "Per-range provenance is not standardised anywhere in FHIR. It travels as a custom Zoblocks extension that a conforming server may legitimately ignore or strip.",
+      "Per-range provenance is not standardised anywhere in FHIR. It travels as a custom ZoBlocks extension that a conforming server may legitimately ignore or strip.",
       "There is no clock. `now` is a required prop, because a browser clock on a ward workstation is not evidence.",
       "No speech recognizer, no collaboration server, no crypto. The component defines the channel, the integration and the seam; the implementations are the deployment's.",
       "The LOINC section codes match published display names but must be confirmed — with their C-CDA cardinality — against the implementation guide a deployment conforms to.",
@@ -5889,7 +5889,7 @@ export const CATALOG: ComponentDoc[] = [
       "One sort column. Multi-column sort is a real requirement in a worklist and is not here yet.",
       "No column resize, reorder, pinning or grouping. Columns are typed objects precisely so a saved view can carry those later; today the caller sets width and order.",
       "No selection model and no row expansion. A grid that owns selection also owns the bulk-action confirmation, which is ChartContextMenu's job.",
-      "Filtering is the caller's. The grid renders the predicate as a sentence and never composes one — a component that owned the filter would also own the query, and no Zoblocks package makes a network call.",
+      "Filtering is the caller's. The grid renders the predicate as a sentence and never composes one — a component that owned the filter would also own the query, and no ZoBlocks package makes a network call.",
       "The export helper produces delimited text, not XLSX. Typed cells are the stronger answer to formula injection; the quote prefix is what is available without a writer dependency.",
       "`status` columns sort by a declared order that the caller supplies. There is no terminology binding, so a mis-declared order sorts wrongly and nothing catches it.",
       "Strings are English and not routed through @zoblocks/intl — true of every registry component today."
@@ -12059,7 +12059,7 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "checked",
         "type": "SwitchValue",
-        "description": "`\"unknown\"` is Zoblocks's widening. antd's `boolean` shape is unchanged.",
+        "description": "`\"unknown\"` is ZoBlocks's widening. antd's `boolean` shape is unchanged.",
         "required": false
       },
       {
@@ -12341,7 +12341,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "checked",
             "type": "SwitchValue",
-            "description": "`\"unknown\"` is Zoblocks's widening. antd's `boolean` shape is unchanged.",
+            "description": "`\"unknown\"` is ZoBlocks's widening. antd's `boolean` shape is unchanged.",
             "required": false
           },
           {
@@ -12622,7 +12622,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "checked",
             "type": "SwitchValue",
-            "description": "`\"unknown\"` is Zoblocks's widening. antd's `boolean` shape is unchanged.",
+            "description": "`\"unknown\"` is ZoBlocks's widening. antd's `boolean` shape is unchanged.",
             "required": false
           },
           {
@@ -14290,7 +14290,7 @@ export const CATALOG: ComponentDoc[] = [
       }
     ],
     "limitations": [
-      "Ant Design is a peer dependency. This is the only Zoblocks component that is not distributed as copy-as-source, because copying antd's Modal and Form into a consumer's repository would be a fork rather than a component.",
+      "Ant Design is a peer dependency. This is the only ZoBlocks component that is not distributed as copy-as-source, because copying antd's Modal and Form into a consumer's repository would be a fork rather than a component.",
       "Signature.data is a graphical signature only — an image of a mark. Deployments needing non-repudiation add a second Signature entry carrying a JWS.",
       "The timestamp is a required prop, not read from the clock. A browser clock is not evidence, and 42 CFR 482.24(c)(1) wants entries dated by whoever is accountable.",
       "Stroke biometrics are captured into the model but never emitted unless explicitly opted in, because whether stroke dynamics are a 'writing sample' is unsettled under BIPA and CUBI.",

@@ -378,7 +378,7 @@ await upsertItem(
 );
 
 /* --------------------------------------------------------------------------
- * 4 · A paid component, installed by the Zoblocks CLI.
+ * 4 · A paid component, installed by the ZoBlocks CLI.
  * ----------------------------------------------------------------------- */
 await upsertItem(
   {

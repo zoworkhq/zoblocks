@@ -1,8 +1,8 @@
 /**
  * The two delivery channels must draw the same loader.
  *
- * Zoblocks ships each loader twice: as React source copied into a customer's repo
- * by the Zoblocks CLI, and as a custom element on npm for every other framework.
+ * ZoBlocks ships each loader twice: as React source copied into a customer's repo
+ * by the ZoBlocks CLI, and as a custom element on npm for every other framework.
  * The React file has to be self-contained — it is copied verbatim, so it cannot
  * import from a workspace package — which means the geometry genuinely exists
  * in two places.

@@ -286,6 +286,6 @@ describe("auditExchange", () => {
     expect(event.resourceType).toBe("AuditEvent");
     expect(event.type.system).toContain("dicom");
     expect(event.recorded).toBeTruthy();
-    expect(event.source.observer.display).toBe("Zoblocks Copilot");
+    expect(event.source.observer.display).toBe("ZoBlocks Copilot");
   });
 });

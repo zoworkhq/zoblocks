@@ -330,7 +330,7 @@ export async function buildSurface(source: TokenSource): Promise<SurfaceEntry[]>
  * This is the silent failure the manifest exists to catch. A declaration
  * reading `var(--zb-fg-muted, var(--ant-color-text-secondary, #475569))` looks
  * correct and renders correctly — against antd's colour or the literal. What it
- * never does is follow a Zoblocks brand, because `--zb-fg-muted` is not a token
+ * never does is follow a ZoBlocks brand, because `--zb-fg-muted` is not a token
  * the pipeline emits. The component silently opts out of the theming system it
  * appears to participate in, and no test notices because the pixels are fine.
  */
@@ -355,7 +355,7 @@ export function danglingReferences(
  * Component tokens whose chain does not reach a literal.
  *
  * A declaration reading `var(--zb-border)` and nothing else is correct in an
- * Zoblocks application and renders as *nothing* on a page that has not loaded
+ * ZoBlocks application and renders as *nothing* on a page that has not loaded
  * the token stylesheet — the component does not degrade, its rails and borders
  * disappear. That is a weaker failure than a dangling reference and still a
  * real one.

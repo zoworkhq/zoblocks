@@ -8,7 +8,7 @@ import { floorFor, floorForPair } from "@zoblocks/tokens/validate";
 import { gateModeFor, runGate, themeFromModeName, type PairReading } from "../src/gate";
 import { colour, zoblocksFile, snapshot, PASSING } from "./fixture";
 
-const ZOBLOCKS = "Zoblocks / Semantic";
+const ZOBLOCKS = "ZoBlocks / Semantic";
 
 const find = (readings: PairReading[], fg: string, bg: string) =>
   readings.find((r) => r.fg === fg && r.bg === bg);
@@ -18,7 +18,7 @@ describe("gateModeFor", () => {
     expect(gateModeFor(zoblocksFile(), ZOBLOCKS)).toBe("zoblocks");
   });
 
-  it("falls back to a palette reading when nothing carries a Zoblocks token", () => {
+  it("falls back to a palette reading when nothing carries a ZoBlocks token", () => {
     const file = snapshot([
       colour("Ink", "#101010", { collection: "Swatches" }),
       colour("Paper", "#fefefe", { collection: "Swatches" }),
@@ -36,7 +36,7 @@ describe("gateModeFor", () => {
   });
 });
 
-describe("the Zoblocks reading", () => {
+describe("the ZoBlocks reading", () => {
   it("passes a palette that passes", () => {
     const report = runGate(zoblocksFile(), { collection: ZOBLOCKS, figmaMode: "light" });
     expect(report.mode).toBe("zoblocks");
@@ -245,7 +245,7 @@ describe("what a reading skips", () => {
 
     const report = runGate(file, { collection: ZOBLOCKS, figmaMode: "light" });
     expect(report.unstamped).toEqual(["Scratch pink"]);
-    // Listed, not measured: a swatch with no Zoblocks identity is somebody's own.
+    // Listed, not measured: a swatch with no ZoBlocks identity is somebody's own.
     expect(report.readings.some((r) => r.fg === "Scratch pink")).toBe(false);
   });
 

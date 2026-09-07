@@ -37,7 +37,7 @@ Three consequences worth stating explicitly:
   and severs the link, so moving the brand stops moving the accent — which is
   the problem a token system exists to prevent, rebuilt inside a design file.
 - **Identity is stamped, not named.** Every variable this plugin creates carries
-  its Zoblocks token name in `setPluginData`. A designer will rename things; the
+  its ZoBlocks token name in `setPluginData`. A designer will rename things; the
   label is theirs and the plugin data is the key.
 
 ## Distribution, and the plan the REST API needs

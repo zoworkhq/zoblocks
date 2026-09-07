@@ -4,7 +4,7 @@
  *
  *     pnpm add @zoblocks/host-react
  *
- * The root entry carries the contract, the context and the Zoblocks
+ * The root entry carries the contract, the context and the ZoBlocks
  * implementation, and imports no UI framework. The two framework hosts are
  * behind subpath exports:
  *
@@ -17,7 +17,7 @@
  * the split is structural rather than an optimisation.
  *
  * **This package must never be imported by a component.** ADR 0010 keeps
- * Zoblocks's primitives free of any framework dependency, and that survives only
+ * ZoBlocks's primitives free of any framework dependency, and that survives only
  * while `host-react` stays at the composition layer. A dependency-cruiser rule
  * enforces it; see `.dependency-cruiser.cjs`.
  */
@@ -40,4 +40,4 @@ export {
 } from "./contract";
 
 export { HostPrimitivesProvider, useHost, useHostId } from "./context";
-export { ZoblocksHost, zoblocksPrimitives } from "./zoblocks";
+export { ZoBlocksHost, zoblocksPrimitives } from "./zoblocks";

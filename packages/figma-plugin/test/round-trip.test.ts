@@ -3,7 +3,7 @@
  *
  * The plan names round-trip identity as its first correctness property, and
  * `figma-core` tests the two conversion functions in isolation. This tests the
- * *journey*: a Zoblocks hex becomes a plan, becomes floats written into a file,
+ * *journey*: a ZoBlocks hex becomes a plan, becomes floats written into a file,
  * is read back out by the adapter, and has to be the same byte.
  *
  * Colour conversion drifts at the edges — 0 and 255, the values that round

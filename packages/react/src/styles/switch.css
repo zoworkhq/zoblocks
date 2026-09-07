@@ -1,5 +1,5 @@
 /**
- * Zoblocks Switch — the stylesheet.
+ * ZoBlocks Switch — the stylesheet.
  *
  * Every colour resolves through a `--zb-switch-*` component token, so a brand
  * restyles the control by overriding tokens rather than editing this file.

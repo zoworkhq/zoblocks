@@ -30,7 +30,7 @@ import {
 import { runGate } from "../src/gate";
 import { zoblocksFile, PASSING } from "./fixture";
 
-const ZOBLOCKS = "Zoblocks / Semantic";
+const ZOBLOCKS = "ZoBlocks / Semantic";
 
 function map(entries: Record<string, string>): TokenMap {
   const out: TokenMap = new Map();

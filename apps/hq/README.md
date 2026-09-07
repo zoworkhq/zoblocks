@@ -9,8 +9,8 @@ the core is ever open-sourced — nothing outside this directory refers to it.
 
 ## Why it lives here
 
-It is the dogfood consumer of the registry. Screens import Zoblocks components by
-the exact specifier the Zoblocks CLI writes into a customer's project
+It is the dogfood consumer of the registry. Screens import ZoBlocks components by
+the exact specifier the ZoBlocks CLI writes into a customer's project
 (`@/components/zoblocks/app-shell`). A component that breaks breaks our own daily
 tool first.
 

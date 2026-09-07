@@ -28,7 +28,7 @@
 "@zoblocks/tokens": major
 ---
 
-Oxygen UI is now Zoblocks.
+Oxygen UI is now ZoBlocks.
 
 The name was carrying a known conflict rather than a resolved one: Soflyy holds
 the Oxygen trademark with a stated policy against "oxygen" in product names, and
@@ -55,7 +55,7 @@ pnpm dlx @zoblocks/codemod oxygen-to-zoblocks "src/**/*.{ts,tsx,css}" --write
 | `.ox-*` class names                                                                                                                                                  | `.zb-*`                                     |
 | `data-ox-*` attributes                                                                                                                                               | `data-zb-*`                                 |
 | `<ox-pulse-loader>` and the other four loaders                                                                                                                       | `<zb-pulse-loader>`                         |
-| `OxygenAntdProvider`, `OxygenMuiProvider`, `OxygenTheme`, `OxygenHost`, `useOxygenTokens`, `resolveOxygenTokens`, `oxygenPrimitives`, `OxygenTokens`, `OxygenConfig` | the same names with `Zoblocks`              |
+| `OxygenAntdProvider`, `OxygenMuiProvider`, `OxygenTheme`, `OxygenHost`, `useOxygenTokens`, `resolveOxygenTokens`, `oxygenPrimitives`, `OxygenTokens`, `OxygenConfig` | the same names with `ZoBlocks`              |
 | `OxLoaderElement`, `OxSwitchElement`, `OxPulseLoader` and siblings                                                                                                   | `Zb…`                                       |
 | `OXYGEN_TOKEN`, `oxy_live_…`                                                                                                                                         | `ZOBLOCKS_TOKEN`, `zb_live_…`               |
 | `oxygenui.design`, `app.`, `hq.`                                                                                                                                     | `zoblocks.design`, `app.`, `hq.`            |

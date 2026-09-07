@@ -1,5 +1,5 @@
 /**
- * Material UI's resolved theme, mapped onto Zoblocks's token surface.
+ * Material UI's resolved theme, mapped onto ZoBlocks's token surface.
  *
  * This is the bridge that tested the contract. Writing it against a surface
  * derived from Ant Design was the point of building it before any customer
@@ -12,9 +12,9 @@
  *
  * **A background scale.** antd distinguishes `colorFillQuaternary` and
  * `colorFillTertiary` from the container background; MUI has
- * `background.default` and `background.paper` and nothing between. Zoblocks's
+ * `background.default` and `background.paper` and nothing between. ZoBlocks's
  * `bg-subtle` and `bg-muted` — the washes behind a selected row and a table
- * header — have no counterpart, so they keep Zoblocks's values and the two
+ * header — have no counterpart, so they keep ZoBlocks's values and the two
  * systems differ visibly there. That is the honest outcome.
  *
  * **A radius scale.** `shape.borderRadius` is one number. Deriving `sm` and
@@ -23,11 +23,11 @@
  * through.
  *
  * **A hit-target token.** MUI sizes controls per component (`size="small"`)
- * rather than through a global. `--zb-density-target` therefore keeps Zoblocks's
+ * rather than through a global. `--zb-density-target` therefore keeps ZoBlocks's
  * floor, which is the safe direction to be wrong in.
  *
  * What MUI has and antd does not is a 25-step elevation scale. Importing it
- * whole would give Zoblocks twenty-five shadow tokens it has no use for, so it
+ * whole would give ZoBlocks twenty-five shadow tokens it has no use for, so it
  * is sampled at 1 / 4 / 8 onto sm / md / lg.
  */
 

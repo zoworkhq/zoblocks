@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * The default host — Zoblocks's own chrome.
+ * The default host — ZoBlocks's own chrome.
  *
  * These are **reference primitives, not registry components.** Nothing here
  * ships through `zoblocks add`, nothing here appears in the catalog, and no
@@ -9,7 +9,7 @@
  * third state that is genuinely ours rather than "antd with the colours
  * changed", and so a page with no framework mounted still has a button.
  *
- * That distinction matters more than it looks. ADR 0010 says Zoblocks's
+ * That distinction matters more than it looks. ADR 0010 says ZoBlocks's
  * primitives match Ant Design's API and take no dependency on it; the day
  * these become registry components is the day that ADR needs revisiting, and
  * the docs need to stop calling them chrome. Until then they live here, at the
@@ -18,10 +18,10 @@
  *
  * Structure only. Every colour, radius and duration comes from `--zb-*`, so
  * these restyle under a bridge exactly as a clinical component does — which
- * is the whole reason the Zoblocks state is worth having in the switcher.
+ * is the whole reason the ZoBlocks state is worth having in the switcher.
  * Styles are in `host.css`, imported by the consumer.
  *
- * Kept apart from `ZoblocksHost` so this module imports nothing but the
+ * Kept apart from `ZoBlocksHost` so this module imports nothing but the
  * contract. `context.tsx` seeds its default from `zoblocksPrimitives`, and if
  * that value lived beside the provider the two would import each other — a
  * cycle whose only symptom is `Cannot access 'zoblocksPrimitives' before

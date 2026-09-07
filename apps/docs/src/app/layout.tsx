@@ -43,8 +43,8 @@ const description =
 export const metadata: Metadata = {
   metadataBase: new URL("https://zoblocks.design"),
   title: {
-    default: "Zoblocks — healthcare components typed to FHIR",
-    template: "%s · Zoblocks",
+    default: "ZoBlocks — healthcare components typed to FHIR",
+    template: "%s · ZoBlocks",
   },
   description,
   keywords: [
@@ -60,13 +60,13 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: "https://zoblocks.design",
-    siteName: "Zoblocks",
-    title: "Zoblocks — healthcare components typed to FHIR",
+    siteName: "ZoBlocks",
+    title: "ZoBlocks — healthcare components typed to FHIR",
     description,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Zoblocks — healthcare components typed to FHIR",
+    title: "ZoBlocks — healthcare components typed to FHIR",
     description,
   },
   robots: { index: true, follow: true },
@@ -98,7 +98,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Who this is, in machine-readable form.
 
           The domain emitted exactly one schema type — SoftwareSourceCode, on
-          component pages — and nothing that said what Zoblocks *is*. An answer
+          component pages — and nothing that said what ZoBlocks *is*. An answer
           engine resolves an entity before it will cite it, and there was no
           statement of the entity anywhere. `SoftwareApplication` rather than a
           bare Organization: the thing being described is the library, and the
@@ -120,13 +120,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   name: "Zowork",
                   url: "https://zoblocks.design",
                   description:
-                    "Builds Zoblocks, an open-source React component library for clinical and behavioral health software.",
+                    "Builds ZoBlocks, an open-source React component library for clinical and behavioral health software.",
                 },
                 {
                   "@type": "WebSite",
                   "@id": "https://zoblocks.design/#website",
                   url: "https://zoblocks.design",
-                  name: "Zoblocks",
+                  name: "ZoBlocks",
                   description,
                   publisher: { "@id": "https://zoblocks.design/#organization" },
                   inLanguage: "en",
@@ -134,7 +134,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 {
                   "@type": "SoftwareApplication",
                   "@id": "https://zoblocks.design/#software",
-                  name: "Zoblocks",
+                  name: "ZoBlocks",
                   applicationCategory: "DeveloperApplication",
                   operatingSystem: "Any",
                   description,

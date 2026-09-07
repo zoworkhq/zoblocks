@@ -1,6 +1,6 @@
 # @zoblocks/cli
 
-Installs Zoblocks components into your repository. It writes the source, pulls
+Installs ZoBlocks components into your repository. It writes the source, pulls
 in anything those files import, and tells you what it touched.
 
 ```bash
@@ -71,7 +71,7 @@ derived from it.
 
 ### Why there is one path setting and not four
 
-Zoblocks source is copied verbatim, and it imports itself through `@/` —
+ZoBlocks source is copied verbatim, and it imports itself through `@/` —
 `@/lib/utils`, `@/components/zoblocks/timeline`. Those specifiers are **inside the
 files**, so a component's location is fixed by the source rather than by
 configuration. A setting that moved `utils.ts` to `src/shared/` while

@@ -197,7 +197,7 @@ export interface CopilotApi {
    *
    * The switcher is real; persistence is not this component's job. A host that
    * wants threads to survive a reload writes them wherever its data already
-   * lives — Zoblocks never picks the database, for the same reason it never
+   * lives — ZoBlocks never picks the database, for the same reason it never
    * becomes a processor of clinical interaction data.
    */
   readonly threads: readonly CopilotThreadSummary[];

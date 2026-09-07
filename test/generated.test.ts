@@ -107,7 +107,7 @@ describe("the published registry", () => {
   const registryDir = path.join(ROOT, "apps/docs/public/r");
 
   it("serves no file containing an absolute path", () => {
-    // These are fetched by the Zoblocks CLI and written into a customer's repo,
+    // These are fetched by the ZoBlocks CLI and written into a customer's repo,
     // so anything machine-specific here ends up in their source tree.
     const offenders: string[] = [];
     for (const name of readdirSync(registryDir).filter((f) => f.endsWith(".json"))) {

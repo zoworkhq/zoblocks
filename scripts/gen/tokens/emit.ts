@@ -79,7 +79,7 @@ function buildCss(source: TokenSource): string {
   out.push(banner("/*"));
   out.push("");
   out.push("/**");
-  out.push(" * Zoblocks — design tokens");
+  out.push(" * ZoBlocks — design tokens");
   out.push(" *");
   out.push(" * Plain CSS custom properties, so the same file works in a Tailwind v4");
   out.push(" * project, a CSS-modules project, or plain CSS.");

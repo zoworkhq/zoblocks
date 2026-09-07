@@ -138,7 +138,7 @@ user must be able to discover which one they are looking at.
 ## Theming
 
 Every value resolves through `--zb-tabs-*` → `--zb-*` → `--ant-*` → a literal.
-That chain means the same stylesheet is correct in a Zoblocks app, in a plain antd
+That chain means the same stylesheet is correct in a ZoBlocks app, in a plain antd
 app driven by `ConfigProvider` (no JavaScript required), and on a bare page.
 Rebranding is four lines:
 
@@ -165,6 +165,6 @@ For a host on antd's non-`cssVar` theme, `@zoblocks/tabs/antd` exports
 - Enforce your permissions. `disabled` and `availability` are presentation; a
   hidden panel is not a security control.
 
-Zoblocks is not a compliance boundary. It does not make an application HIPAA,
+ZoBlocks is not a compliance boundary. It does not make an application HIPAA,
 GDPR or DPDP compliant, and it is not a medical device or clinical decision
 support.

@@ -1,7 +1,7 @@
 /**
  * The theme-bridge contract.
  *
- * A bridge translates one UI framework's resolved theme into Zoblocks's
+ * A bridge translates one UI framework's resolved theme into ZoBlocks's
  * component token surface. It renders nothing, owns no state, and imports no
  * component — which is what keeps a UI framework out of the module graph of
  * every consumer who did not ask for one.
@@ -46,7 +46,7 @@ export interface BridgeDefinition<HostTheme> {
    * Deliberately not a `>=5 || >=6` range. A bridge written against v6 token
    * names reads `undefined` on v5, and `undefined` in a custom property means
    * "fall through to the next stop in the chain" — so the failure is a
-   * component quietly wearing Zoblocks's defaults instead of the customer's
+   * component quietly wearing ZoBlocks's defaults instead of the customer's
    * brand. No error, no warning, no failing test. One major per bridge is what
    * makes that a resolution error instead.
    */
@@ -106,7 +106,7 @@ export function resolvePatch<HostTheme>(
 }
 
 /**
- * The minimum hit target Zoblocks guarantees, in pixels.
+ * The minimum hit target ZoBlocks guarantees, in pixels.
  *
  * WCAG 2.5.5. A host asking for 24px controls does not get to shrink a
  * clinical control below it, so density mappings clamp rather than copy.

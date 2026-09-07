@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "Zoblocks React library",
+  "display": "ZoBlocks React library",
   "extends": "./base.json",
   "compilerOptions": {
     "outDir": "dist",

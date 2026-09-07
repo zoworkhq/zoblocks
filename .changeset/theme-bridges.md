@@ -6,7 +6,7 @@
 "@zoblocks/react": patch
 ---
 
-Theme bridges: Zoblocks components now take a host framework's design language
+Theme bridges: ZoBlocks components now take a host framework's design language
 without importing that framework.
 
 Three new packages. `@zoblocks/bridge-core` is the contract — a bridge

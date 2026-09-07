@@ -1,7 +1,7 @@
 /**
  * Deep-linking, through an adapter.
  *
- * Zoblocks does not depend on a router, and it must not: a component library
+ * ZoBlocks does not depend on a router, and it must not: a component library
  * that picks a router picks its customers. `syncTo` therefore takes an object
  * with three methods, and the two built-in adapters use nothing but the
  * platform. A Next.js or React Router host writes ten lines and keeps its own

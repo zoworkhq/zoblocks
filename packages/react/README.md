@@ -2,7 +2,7 @@
 
 **Healthcare React components built for the states a demo would skip.**
 
-Part of [Zoblocks](https://zoblocks.design). Zero runtime dependencies beyond
+Part of [ZoBlocks](https://zoblocks.design). Zero runtime dependencies beyond
 `clsx` and `tailwind-merge`. React 18 and 19.
 
 ```bash
@@ -19,7 +19,7 @@ import "@zoblocks/tokens/zoblocks-tokens.css";
 
 ## Two ways to install
 
-|           | npm package             | Zoblocks registry                    |
+|           | npm package             | ZoBlocks registry                    |
 | --------- | ----------------------- | ------------------------------------ |
 | Install   | `npm i @zoblocks/react` | `npx @zoblocks/cli add pulse-loader` |
 | Upgrades  | semver                  | you own the source                   |
@@ -46,7 +46,7 @@ designed still state rather than a paused animation.
 
 ## What this is not
 
-Zoblocks is not a compliance boundary. It does not make an application HIPAA,
+ZoBlocks is not a compliance boundary. It does not make an application HIPAA,
 GDPR, or DPDP compliant, and it is not a medical device or clinical decision
 support.
 

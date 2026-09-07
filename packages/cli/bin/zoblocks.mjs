@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * zoblocks — the Zoblocks installer.
+ * zoblocks — the ZoBlocks installer.
  *
  * A thin shell: read the version off package.json, hand argv to run(), exit
  * with what it returns. Everything testable lives in src/.

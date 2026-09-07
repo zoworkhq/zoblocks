@@ -4,7 +4,7 @@
 modes, light and dark themes.**
 
 Published as CSS custom properties, not as a JavaScript object. This is the
-token layer behind [Zoblocks](https://zoblocks.design).
+token layer behind [ZoBlocks](https://zoblocks.design).
 
 ```bash
 npm install @zoblocks/tokens

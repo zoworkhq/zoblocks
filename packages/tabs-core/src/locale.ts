@@ -2,7 +2,7 @@
  * Every string the component can utter.
  *
  * Counts and status tones are the reason this file is not optional. A red "2"
- * on a Labs tab is a colour signal, and Zoblocks's rule is that colour is
+ * on a Labs tab is a colour signal, and ZoBlocks's rule is that colour is
  * reinforcement and never the signal itself — so the tone travels into the
  * accessible name as a word. "Labs, 2 critical results" is the announcement;
  * "Labs 2" is the bug.

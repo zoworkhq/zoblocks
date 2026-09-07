@@ -2,7 +2,7 @@
   "name": "@zoblocks/fixtures",
   "version": "0.1.0",
   "private": true,
-  "description": "Synthetic, non-PHI FHIR fixtures for Zoblocks docs, demos, and tests.",
+  "description": "Synthetic, non-PHI FHIR fixtures for ZoBlocks docs, demos, and tests.",
   "license": "MIT",
   "type": "module",
   "sideEffects": false,

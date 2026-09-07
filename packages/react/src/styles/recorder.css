@@ -756,7 +756,7 @@
 /* ------------------------------------------------------- reduced motion */
 
 /**
- * Every other Zoblocks component can simply stop. This one cannot: the movement
+ * Every other ZoBlocks component can simply stop. This one cannot: the movement
  * is carrying the only evidence that the microphone is open. So the scroll
  * stops, the meter does not, and what the scroll was carrying comes back as a
  * number — a substitution, not a removal.

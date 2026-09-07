@@ -2,7 +2,7 @@
   "name": "@zoblocks/eslint-plugin",
   "version": "0.1.0",
   "private": true,
-  "description": "Lint rules that enforce Zoblocks's architectural invariants — the ones previously kept by comment.",
+  "description": "Lint rules that enforce ZoBlocks's architectural invariants — the ones previously kept by comment.",
   "license": "MIT",
   "type": "module",
   "main": "./index.js",

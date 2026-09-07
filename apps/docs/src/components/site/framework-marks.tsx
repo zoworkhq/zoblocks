@@ -7,7 +7,7 @@
  *
  * **Provenance, because these are other projects' trademarks.**
  *
- * - Zoblocks's mark is ours: the same two blocks and tenon as `ZoblocksMark`
+ * - ZoBlocks's mark is ours: the same two blocks and tenon as `ZoBlocksMark`
  *   in `chrome.tsx`, at the size this control needs.
  * - Ant Design's is the project's own `AntDesignOutlined` glyph, copied from
  *   `@ant-design/icons-svg` (MIT). The path is unmodified. It is inlined
@@ -21,14 +21,14 @@
  *   published clear space, before this ships publicly.
  *
  * All three are used only to name their own framework, and none is recoloured
- * to Zoblocks's palette. Zoblocks is not affiliated with either project.
+ * to ZoBlocks's palette. ZoBlocks is not affiliated with either project.
  */
 
 import type { DesignLanguage } from "@/lib/design-language";
 
 const SIZE = "size-4";
 
-export function ZoblocksLanguageMark({ className = SIZE }: { className?: string }) {
+export function ZoBlocksLanguageMark({ className = SIZE }: { className?: string }) {
   return (
     <svg viewBox="0 0 28 16" className={className} aria-hidden="true">
       <rect x="11.5" y="5.5" width="5" height="5" rx="1.25" fill="var(--color-brand)" />
@@ -80,7 +80,7 @@ export const LANGUAGE_MARK: Record<
   DesignLanguage,
   (props: { className?: string }) => React.JSX.Element
 > = {
-  zoblocks: ZoblocksLanguageMark,
+  zoblocks: ZoBlocksLanguageMark,
   antd: AntDesignMark,
   mui: MaterialUiMark,
 };

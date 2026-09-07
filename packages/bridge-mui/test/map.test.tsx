@@ -48,7 +48,7 @@ describe("identity of the mapping", () => {
     expect(out["--zb-duration-slow"]).toBe("375ms");
   });
 
-  /** MUI has 25 elevation steps and Zoblocks has three. Sampled, not imported. */
+  /** MUI has 25 elevation steps and ZoBlocks has three. Sampled, not imported. */
   it("samples three steps from the elevation scale", () => {
     const shadows = Array.from({ length: 25 }, (_, i) => `shadow-${i}`);
     const out = patch({ shadows });
@@ -88,7 +88,7 @@ describe("what MUI cannot express", () => {
     expect(out["--zb-radius-lg"]).toBeUndefined();
   });
 
-  it("leaves the hit target to Zoblocks, since MUI sizes controls per component", () => {
+  it("leaves the hit target to ZoBlocks, since MUI sizes controls per component", () => {
     expect(muiBridge.unmapped).toContain("--zb-density-target");
     expect(patch({ shape: { borderRadius: 8 } })["--zb-density-target"]).toBeUndefined();
   });
@@ -103,7 +103,7 @@ describe("what MUI cannot express", () => {
    * primary is too pale for it.
    *
    * This assertion used to say antd had no equivalent at all. That was wrong,
-   * and the error had a visible cost: with the token unmapped, Zoblocks's own
+   * and the error had a visible cost: with the token unmapped, ZoBlocks's own
    * near-black dark label landed on antd's dark primary at 3.70:1, a button
    * antd would never render. Left here as a comparison rather than deleted,
    * because the difference between a derived value and a fixed one is the

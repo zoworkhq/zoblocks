@@ -11,7 +11,7 @@
  * a host running three of them mounted three wrappers that each called
  * `theme.useToken()` and each decided separately what `colorTextSecondary`
  * meant. The bridge is now one package writing the *semantic* tier, so mapping
- * `colorPrimary` once reaches every Zoblocks component rather than only tabs.
+ * `colorPrimary` once reaches every ZoBlocks component rather than only tabs.
  *
  * **This file is frozen.** It is a compatibility shim, deliberately holding
  * its original behaviour rather than delegating to the new bridge: the two
@@ -99,7 +99,7 @@ export interface AntdTabsBridgeProps {
 }
 
 /**
- * Wrap a subtree to give every Zoblocks tab strip inside it the host's antd
+ * Wrap a subtree to give every ZoBlocks tab strip inside it the host's antd
  * theme. One element, no context, no re-render beyond the token change itself.
  */
 /** @deprecated Use `AntdBridge` from `@zoblocks/bridge-antd`. */

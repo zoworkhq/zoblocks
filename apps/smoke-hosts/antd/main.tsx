@@ -22,7 +22,7 @@ createRoot(document.getElementById("root")!).render(
         borderRadius: 10,
         fontFamily: "Georgia, serif",
         // Deliberately present. The bridge must not carry it onto a clinical
-        // token, and the test asserts the badge keeps Zoblocks's validated red.
+        // token, and the test asserts the badge keeps ZoBlocks's validated red.
         colorError: "#ff00ff",
       },
     }}

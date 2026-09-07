@@ -1,7 +1,7 @@
 {
   "name": "@zoblocks/bridge-core",
   "version": "0.1.0",
-  "description": "The theme-bridge contract: how a UI framework's resolved theme becomes Zoblocks's component token surface. No framework, no React, no DOM.",
+  "description": "The theme-bridge contract: how a UI framework's resolved theme becomes ZoBlocks's component token surface. No framework, no React, no DOM.",
   "license": "MIT",
   "homepage": "https://zoblocks.design",
   "repository": {

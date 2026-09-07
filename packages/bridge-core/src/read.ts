@@ -1,7 +1,7 @@
 /**
- * Reading Zoblocks's resolved tokens back out of the page.
+ * Reading ZoBlocks's resolved tokens back out of the page.
  *
- * The bridges so far run one way: a host framework's theme in, Zoblocks's tokens
+ * The bridges so far run one way: a host framework's theme in, ZoBlocks's tokens
  * out. This is the other direction, and it is the one a customer actually asks
  * for — *"we configured our brand in your app; why do our own buttons still
  * look like Ant Design's default blue?"*
@@ -13,7 +13,7 @@
  * derivation would be a second answer, and it would be wrong exactly when a
  * customer had done something interesting.
  *
- * Nothing here runs on a server. `resolveZoblocksTokens` returns `{}` without a
+ * Nothing here runs on a server. `resolveZoBlocksTokens` returns `{}` without a
  * DOM, and the React hook seeds from a caller-supplied fallback so the first
  * server render and the first client render agree.
  */
@@ -46,22 +46,22 @@ export const READABLE_TOKENS = [
 ] as const;
 
 export type ReadableToken = (typeof READABLE_TOKENS)[number];
-export type ZoblocksTokens = Partial<Record<ReadableToken, string>>;
+export type ZoBlocksTokens = Partial<Record<ReadableToken, string>>;
 
 /**
  * Resolve the tokens as they apply at `element`.
  *
  * Scoped to an element rather than the document because a brand can be applied
- * to a subtree — `<ZoblocksTheme brand="northwind">` writes onto a wrapper, and a
+ * to a subtree — `<ZoBlocksTheme brand="northwind">` writes onto a wrapper, and a
  * multi-tenant page has two of them. Reading from `documentElement` would give
  * one customer's brand to both.
  */
-export function resolveZoblocksTokens(element?: Element | null): ZoblocksTokens {
+export function resolveZoBlocksTokens(element?: Element | null): ZoBlocksTokens {
   if (typeof window === "undefined" || typeof getComputedStyle !== "function") return {};
 
   const target = element ?? document.documentElement;
   const style = getComputedStyle(target);
-  const out: ZoblocksTokens = {};
+  const out: ZoBlocksTokens = {};
 
   for (const token of READABLE_TOKENS) {
     const value = style.getPropertyValue(token).trim();

@@ -47,18 +47,18 @@ describe("export", () => {
   });
 
   /**
-   * `colorPrimary` is the accent Zoblocks *renders*, not the swatch the customer
+   * `colorPrimary` is the accent ZoBlocks *renders*, not the swatch the customer
    * typed.
    *
    * This assertion used to expect the ramp's 600 — the brand colour as picked —
-   * because the export read `ref.brand` directly. Zoblocks's `--zb-accent`
+   * because the export read `ref.brand` directly. ZoBlocks's `--zb-accent`
    * resolves to step 700, so an antd application themed from that file sat a
-   * shade away from the Zoblocks components beside it, and the two looked subtly
+   * shade away from the ZoBlocks components beside it, and the two looked subtly
    * unrelated. The export now goes through `bridge-antd`'s own table, which is
    * the same one the runtime bridge uses, so the file and the bridge cannot
    * disagree.
    */
-  it("writes the accent Zoblocks renders, in antd's vocabulary", async () => {
+  it("writes the accent ZoBlocks renders, in antd's vocabulary", async () => {
     const auth = await actingAs(await seedOrg("Northwind", "northwind"));
     const { id } = await createTheme(auth, { name: "Clinical", brandColour: "#1d63c9" });
     const result = await exportThemeAs(auth, id, "antd");

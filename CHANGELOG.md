@@ -55,7 +55,7 @@ stability tiers and breaking-change rules in
   against what the commit actually built.
 - **Releases ran fewer gates than merges** — no lint, typecheck, format,
   generator drift check, or audit, and no dependency on CI passing.
-- **Shipped npm source received none of Zoblocks's own lint rules.** The ESLint
+- **Shipped npm source received none of ZoBlocks's own lint rules.** The ESLint
   globs named `packages/react/**` and `packages/pro-*/**`, neither of which
   exists.
 - Command-injection sinks in two workflows, where free-form input was

@@ -102,7 +102,7 @@ describe("contrast is checked where both sides are known", () => {
   });
 
   it("stays silent when only one side is mapped", () => {
-    // The other side comes from Zoblocks's own token, which is not visible here.
+    // The other side comes from ZoBlocks's own token, which is not visible here.
     // A guess would be worse than silence.
     expect(contrastViolations({ "--zb-text": "#bbbbbb" })).toEqual([]);
   });

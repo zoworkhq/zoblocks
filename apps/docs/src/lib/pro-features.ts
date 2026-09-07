@@ -84,8 +84,8 @@ export const PRO_FEATURES: readonly ProFeature[] = [
   {
     id: "bridge",
     tab: "Frameworks",
-    title: "Zoblocks speaks your host’s language",
-    body: "A token bridge lets a Zoblocks component take the design language of the framework around it — Ant Design, MUI, or neither — without the library ever importing one.",
+    title: "ZoBlocks speaks your host’s language",
+    body: "A token bridge lets a ZoBlocks component take the design language of the framework around it — Ant Design, MUI, or neither — without the library ever importing one.",
     why: "The app never resolves a UI framework. That is the architectural claim the whole bridge design rests on.",
     where: "apps/app/src/app/(app)/frameworks",
   },

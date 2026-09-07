@@ -1,7 +1,7 @@
 {
   "name": "@zoblocks/identity-core",
   "version": "0.1.0",
-  "description": "The identity engine behind Zoblocks's patient avatar, chip and banner. Name resolution, deterministic swatches, script-aware initials, and the disambiguation pass that keeps two patients with one name apart — no React, no DOM.",
+  "description": "The identity engine behind ZoBlocks's patient avatar, chip and banner. Name resolution, deterministic swatches, script-aware initials, and the disambiguation pass that keeps two patients with one name apart — no React, no DOM.",
   "license": "MIT",
   "homepage": "https://zoblocks.design/components/patient-banner",
   "repository": {

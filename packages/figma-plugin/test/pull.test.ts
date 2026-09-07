@@ -54,7 +54,7 @@ function payload(over: Partial<ResolvedPayload> = {}): ResolvedPayload {
 const rgb = (hex: string) => hexToFigmaRgb(hex)!;
 
 /** A variable as the sandbox would have read it back out of a file. */
-function inFile(token: string, name: string, light: string, collection = "Zoblocks / Semantic") {
+function inFile(token: string, name: string, light: string, collection = "ZoBlocks / Semantic") {
   return {
     token,
     name,
@@ -202,8 +202,8 @@ describe("the order things are written in", () => {
   });
 
   it("gives brand one mode and the themed tiers three", () => {
-    expect(modesFor("Zoblocks / Brand")).toEqual(["Default"]);
-    expect(modesFor("Zoblocks / Semantic")).toEqual(["light", "dark", "high-contrast"]);
+    expect(modesFor("ZoBlocks / Brand")).toEqual(["Default"]);
+    expect(modesFor("ZoBlocks / Semantic")).toEqual(["light", "dark", "high-contrast"]);
   });
 });
 

@@ -1,5 +1,5 @@
 /**
- * Oxygen UI → Zoblocks.
+ * Oxygen UI → ZoBlocks.
  *
  * The project was renamed in September 2026. Everything a consumer's tree can
  * hold moved at once: the npm scope, the directory the CLI writes into, the
@@ -124,7 +124,7 @@ function collectNotes(source: string, notes: CodemodNote[]): void {
   }
 }
 
-export function transformOxygenToZoblocks(source: string): CodemodResult {
+export function transformOxygenToZoBlocks(source: string): CodemodResult {
   let code = source;
   for (const [pattern, replacement] of RULES) {
     code = code.replace(pattern, replacement);

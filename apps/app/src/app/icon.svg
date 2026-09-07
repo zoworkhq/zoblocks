@@ -5,7 +5,7 @@
     Picked up by Next's `icon` file convention (app/icon.svg), so no <link> tag
     is written by hand.
 
-    Three deliberate differences from `ZoblocksMark` in chrome.tsx, all forced
+    Three deliberate differences from `ZoBlocksMark` in chrome.tsx, all forced
     by the size this renders at:
 
       1. It carries its own dark ground rather than sitting transparent. A tab

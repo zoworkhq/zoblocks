@@ -1,5 +1,5 @@
 /**
- * @zoblocks/signature-core — the engine behind Zoblocks's Signature.
+ * @zoblocks/signature-core — the engine behind ZoBlocks's Signature.
  *
  * No React, no Ant Design, no DOM. It accepts plain samples and returns a
  * stroke model, SVG, and a value that says what actually happened — including

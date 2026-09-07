@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "type": "module",
   "private": true,
-  "description": "Zoblocks's accessibility gate, inside Figma. Reads the open file's variables; no network, no account, no sync.",
+  "description": "ZoBlocks's accessibility gate, inside Figma. Reads the open file's variables; no network, no account, no sync.",
   "exports": {
     ".": "./src/gate.ts",
     "./package.json": "./package.json"

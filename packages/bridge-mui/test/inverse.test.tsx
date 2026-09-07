@@ -1,5 +1,5 @@
 /**
- * A Zoblocks brand pushed into Material UI.
+ * A ZoBlocks brand pushed into Material UI.
  *
  * Deliberately the mirror of the antd inverse, down to the prop names: a
  * customer moving between frameworks should change a provider and nothing
@@ -10,11 +10,11 @@ import * as React from "react";
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { ThemeProvider, createTheme, useTheme } from "@mui/material/styles";
-import { resolvePatch, type ZoblocksTokens } from "@zoblocks/bridge-core";
-import { ZoblocksAntdProvider } from "@zoblocks/bridge-antd";
-import { NOT_PUSHED_TO_MUI, ZoblocksMuiProvider, muiBridge, toMuiTheme } from "../src/index";
+import { resolvePatch, type ZoBlocksTokens } from "@zoblocks/bridge-core";
+import { ZoBlocksAntdProvider } from "@zoblocks/bridge-antd";
+import { NOT_PUSHED_TO_MUI, ZoBlocksMuiProvider, muiBridge, toMuiTheme } from "../src/index";
 
-const BRAND: ZoblocksTokens = {
+const BRAND: ZoBlocksTokens = {
   "--zb-accent": "#1d63c9",
   "--zb-accent-hover": "#1a53a8",
   "--zb-text": "#0f172a",
@@ -51,7 +51,7 @@ describe("toMuiTheme", () => {
     expect(options.palette?.background?.default).toBe("#ffffff");
   });
 
-  it("puts the Zoblocks accent on MUI's primary", () => {
+  it("puts the ZoBlocks accent on MUI's primary", () => {
     const options = toMuiTheme(BRAND);
     expect(options.palette?.primary?.main).toBe("#1d63c9");
     expect(options.palette?.primary?.dark).toBe("#1a53a8");
@@ -112,7 +112,7 @@ describe("the two directions agree", () => {
   });
 });
 
-describe("<ZoblocksMuiProvider>", () => {
+describe("<ZoBlocksMuiProvider>", () => {
   function Probe() {
     const theme = useTheme();
     return <span data-testid="primary">{theme.palette.primary.main}</span>;
@@ -122,9 +122,9 @@ describe("<ZoblocksMuiProvider>", () => {
     document.documentElement.style.setProperty("--zb-accent", "#7c3aed");
     render(
       <ThemeProvider theme={createTheme()}>
-        <ZoblocksMuiProvider>
+        <ZoBlocksMuiProvider>
           <Probe />
-        </ZoblocksMuiProvider>
+        </ZoBlocksMuiProvider>
       </ThemeProvider>,
     );
     expect(await screen.findByText("#7c3aed")).toBeTruthy();
@@ -144,9 +144,9 @@ describe("<ZoblocksMuiProvider>", () => {
 
     render(
       <ThemeProvider theme={createTheme({ spacing: 10 })}>
-        <ZoblocksMuiProvider>
+        <ZoBlocksMuiProvider>
           <SpacingProbe />
-        </ZoblocksMuiProvider>
+        </ZoBlocksMuiProvider>
       </ThemeProvider>,
     );
 
@@ -158,9 +158,9 @@ describe("<ZoblocksMuiProvider>", () => {
     document.documentElement.style.setProperty("--zb-accent", "#7c3aed");
     render(
       <ThemeProvider theme={createTheme()}>
-        <ZoblocksMuiProvider override={{ palette: { primary: { main: "#b91c1c" } } }}>
+        <ZoBlocksMuiProvider override={{ palette: { primary: { main: "#b91c1c" } } }}>
           <Probe />
-        </ZoblocksMuiProvider>
+        </ZoBlocksMuiProvider>
       </ThemeProvider>,
     );
     expect(await screen.findByText("#b91c1c")).toBeTruthy();
@@ -175,8 +175,8 @@ describe("the two inverse bridges are the same shape", () => {
    * quietly make that false.
    */
   it("take the same props", () => {
-    const antdProps = ZoblocksAntdProvider.length;
-    const muiProps = ZoblocksMuiProvider.length;
+    const antdProps = ZoBlocksAntdProvider.length;
+    const muiProps = ZoBlocksMuiProvider.length;
     expect(antdProps).toBe(muiProps);
   });
 });

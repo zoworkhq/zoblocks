@@ -423,7 +423,7 @@ export function SwitchGallery() {
               name="The matrix"
               api="size × checked × availability"
               tags={["16 live controls"]}
-              note="The specimen sheet this component started from, rebuilt with Zoblocks's real token values. Read-only is a dashed border and a filled thumb — a different object, not a weaker one, because dimming reads as “inactive”, which is a value rather than an availability."
+              note="The specimen sheet this component started from, rebuilt with ZoBlocks's real token values. Read-only is a dashed border and a filled thumb — a different object, not a weaker one, because dimming reads as “inactive”, which is a value rather than an availability."
               wide
             >
               <AnatomyMatrix />

@@ -1,7 +1,7 @@
 /**
- * The inverse bridge: a Zoblocks brand, pushed into Ant Design.
+ * The inverse bridge: a ZoBlocks brand, pushed into Ant Design.
  *
- * `AntdBridge` answers "make Zoblocks's components look like our antd app".
+ * `AntdBridge` answers "make ZoBlocks's components look like our antd app".
  * This answers the question customers actually ask second, and care about
  * more: *"we configured our brand in your app — why do our **own** buttons
  * still look like Ant Design's default blue?"*
@@ -18,7 +18,7 @@
  * form field is wrong*. The token is safe; the meaning does not survive.
  */
 
-import { toPx, type ZoblocksTokens } from "@zoblocks/bridge-core";
+import { toPx, type ZoBlocksTokens } from "@zoblocks/bridge-core";
 
 /** The shape `ConfigProvider` takes. Structural, so antd stays a peer. */
 export interface AntdThemeConfig {
@@ -26,14 +26,14 @@ export interface AntdThemeConfig {
 }
 
 /**
- * A Zoblocks brand as antd's token object.
+ * A ZoBlocks brand as antd's token object.
  *
  * Only the tokens with an honest counterpart, the same rule the forward bridge
  * follows: antd has around a hundred seed tokens and filling them from a
  * palette we have no equivalents for would produce a theme that is uniformly
  * slightly wrong.
  */
-export function toAntdTheme(tokens: ZoblocksTokens): AntdThemeConfig {
+export function toAntdTheme(tokens: ZoBlocksTokens): AntdThemeConfig {
   const token: Record<string, string | number> = {};
 
   const set = (key: string, value: string | number | undefined) => {
@@ -57,7 +57,7 @@ export function toAntdTheme(tokens: ZoblocksTokens): AntdThemeConfig {
 
   set("colorBorder", tokens["--zb-border"]);
 
-  // antd states radii as numbers of pixels; Zoblocks states them in rem.
+  // antd states radii as numbers of pixels; ZoBlocks states them in rem.
   set("borderRadiusSM", toPx(tokens["--zb-radius-sm"]));
   set("borderRadius", toPx(tokens["--zb-radius"]));
   set("borderRadiusLG", toPx(tokens["--zb-radius-lg"]));

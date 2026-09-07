@@ -17,7 +17,7 @@ platform. No Tailwind-native, copy-and-own, platform-agnostic equivalent exists.
 
 ## Decision
 
-Zoblocks components take FHIR R4 resources directly as props. `PatientBanner`
+ZoBlocks components take FHIR R4 resources directly as props. `PatientBanner`
 takes a `Patient`. `ObservationPanel` takes `Observation[]`.
 
 Supporting decisions:

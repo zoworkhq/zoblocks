@@ -17,7 +17,7 @@ export default function SignUpPage() {
     <>
       <h1 className="display-sm">Request access</h1>
       <p className="body-sm mt-1.5 text-graphite">
-        Join an organisation that already uses the Zoblocks console.
+        Join an organisation that already uses the ZoBlocks console.
       </p>
 
       <div className="mt-7">
@@ -41,7 +41,7 @@ export default function SignUpPage() {
       */}
       <p className="body-sm mt-5 text-graphite">
         Starting a new organisation?{" "}
-        <a href="mailto:hello@zowork.com?subject=New%20Zoblocks%20workspace" className="link">
+        <a href="mailto:hello@zowork.com?subject=New%20ZoBlocks%20workspace" className="link">
           Ask us to set one up
         </a>
         . We create the organisation and make you its first administrator.

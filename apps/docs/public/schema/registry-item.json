@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://zoblocks.design/schema/registry-item.json",
-  "title": "Zoblocks registry item",
+  "title": "ZoBlocks registry item",
   "description": "One installable item: a component, a shared module, or a stylesheet, with its source inlined. Installed by @zoblocks/cli.",
   "type": "object",
   "required": [
@@ -68,7 +68,7 @@
         "properties": {
           "path": {
             "type": "string",
-            "description": "Path in the Zoblocks repository. Provenance, not a destination."
+            "description": "Path in the ZoBlocks repository. Provenance, not a destination."
           },
           "type": {
             "enum": [

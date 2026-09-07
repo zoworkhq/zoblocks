@@ -6,9 +6,9 @@
  * Two things happen here and they are separate. The host **provider** supplies
  * the chrome primitives a demo asks for through `useHost()`; the host
  * **bridge** writes that framework's resolved theme onto `--zb-*`, so the
- * Zoblocks components inside restyle without importing anything. A reader who
+ * ZoBlocks components inside restyle without importing anything. A reader who
  * switches to Material UI gets MUI's real Button — ripple and all — beside an
- * Zoblocks ResultValue wearing MUI's palette, which is what a customer's screen
+ * ZoBlocks ResultValue wearing MUI's palette, which is what a customer's screen
  * actually looks like.
  *
  * **Lazily, and that is structural rather than an optimisation.** Measured
@@ -20,7 +20,7 @@
  * `React.lazy` rather than `next/dynamic`, for one reason that decides it:
  * `next/dynamic`'s `loading` renders *instead of* the subtree and receives no
  * children, so the preview would blank for the length of the download. A
- * Suspense fallback can render the same children under the Zoblocks host, so the
+ * Suspense fallback can render the same children under the ZoBlocks host, so the
  * component stays on screen and only its chrome changes when the chunk lands.
  *
  * Neither framework is ever imported on the server. The language store reports
@@ -31,7 +31,7 @@
  */
 
 import * as React from "react";
-import { ZoblocksHost } from "@zoblocks/host-react";
+import { ZoBlocksHost } from "@zoblocks/host-react";
 import { useDesignLanguage } from "@/lib/design-language";
 import { useSiteTheme } from "./use-site-theme";
 
@@ -58,16 +58,16 @@ export function HostStage({
   const mode = useSiteTheme() ? "dark" : "light";
 
   /*
-   * The fallback is the Zoblocks host, not a spinner.
+   * The fallback is the ZoBlocks host, not a spinner.
    *
    * A preview that empties while 142 KB downloads is worse than one that
    * shows the same component in our own chrome for a moment: the component is
    * what is being demonstrated either way, and it never disappears.
    */
   const fallback = (
-    <ZoblocksHost mode={mode} className={className}>
+    <ZoBlocksHost mode={mode} className={className}>
       {children}
-    </ZoblocksHost>
+    </ZoBlocksHost>
   );
 
   if (language === "antd") {

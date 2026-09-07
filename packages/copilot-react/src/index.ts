@@ -1,5 +1,5 @@
 /**
- * @zoblocks/copilot-react — headless React for Zoblocks Copilot.
+ * @zoblocks/copilot-react — headless React for ZoBlocks Copilot.
  *
  * Hooks and unstyled primitives. No design system, no CSS, no markup opinions
  * beyond the ones that are accessibility requirements.

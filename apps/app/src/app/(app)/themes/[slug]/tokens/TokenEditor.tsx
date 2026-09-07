@@ -101,7 +101,7 @@ export function TokenEditor({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="body-sm text-graphite">
             {overrideCount === 0
-              ? "No overrides — this theme is your brand ramp and Zoblocks's defaults."
+              ? "No overrides — this theme is your brand ramp and ZoBlocks's defaults."
               : `${overrideCount} override${overrideCount === 1 ? "" : "s"} across three themes.`}
           </p>
           <SubmitButton reason={reason} pendingLabel="Checking…">

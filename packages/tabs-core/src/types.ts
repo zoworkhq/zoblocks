@@ -51,7 +51,7 @@ export type FillMode = "none" | "equal" | "stretch";
 export type MountStrategy = "eager" | "lazy" | "lazy-once";
 
 /**
- * Colour is never the signal in Zoblocks, so a tone always travels with a word
+ * Colour is never the signal in ZoBlocks, so a tone always travels with a word
  * in the accessible name. See {@link describeCount}.
  */
 export type Tone = "neutral" | "critical" | "high" | "normal";

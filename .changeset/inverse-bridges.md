@@ -4,16 +4,16 @@
 "@zoblocks/bridge-mui": minor
 ---
 
-The inverse bridge: a Zoblocks brand, pushed into the host's own framework.
+The inverse bridge: a ZoBlocks brand, pushed into the host's own framework.
 
 ```diff
-  <ZoblocksAntdProvider>
+  <ZoBlocksAntdProvider>
 -   <YourAntdApp />   // antd's default blue
 +   <YourAntdApp />   // your brand
-  </ZoblocksAntdProvider>
+  </ZoBlocksAntdProvider>
 ```
 
-The forward bridge answers "make Zoblocks's components look like our antd app".
+The forward bridge answers "make ZoBlocks's components look like our antd app".
 This answers the question customers ask second and care about more: _we
 configured our brand in your app — why do our **own** buttons still look
 like Ant Design's default blue?_ A customer configures once and their whole
@@ -22,11 +22,11 @@ theming and a design system.
 
 It is the same correspondence read backwards, which is what keeps both
 directions honest: if `colorPrimary ↔ --zb-accent` is ever wrong, it is wrong
-both ways and one round-trip test catches it. `ZoblocksAntdProvider` and
-`ZoblocksMuiProvider` take the same props, so switching framework stays one
+both ways and one round-trip test catches it. `ZoBlocksAntdProvider` and
+`ZoBlocksMuiProvider` take the same props, so switching framework stays one
 import.
 
-`useZoblocksTokens()` in `bridge-core` resolves the live `--zb-*` values from
+`useZoBlocksTokens()` in `bridge-core` resolves the live `--zb-*` values from
 computed style — the browser is the only authority on what a token currently
 means, since it depends on which brand loaded and which `data-zb-theme` is set.
 It is SSR-safe, scopeable to a subtree so two customers can render on one page,

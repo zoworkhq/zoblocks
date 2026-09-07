@@ -14,11 +14,11 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { argv, exit, stdout } from "node:process";
 import { transformAntdCollapse } from "../src/antd-collapse.ts";
-import { transformOxygenToZoblocks } from "../src/oxygen-to-zoblocks.ts"; // rename-sweep-exempt: names the migration
+import { transformOxygenToZoBlocks } from "../src/oxygen-to-zoblocks.ts"; // rename-sweep-exempt: names the migration
 
 const TRANSFORMS = {
   "antd-collapse": transformAntdCollapse,
-  "oxygen-to-zoblocks": transformOxygenToZoblocks, // rename-sweep-exempt: names the migration
+  "oxygen-to-zoblocks": transformOxygenToZoBlocks, // rename-sweep-exempt: names the migration
 };
 
 const args = argv.slice(2);

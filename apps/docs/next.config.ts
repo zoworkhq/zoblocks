@@ -57,7 +57,7 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        // Registry JSON is fetched by the Zoblocks CLI from any origin.
+        // Registry JSON is fetched by the ZoBlocks CLI from any origin.
         source: "/r/:path*",
         headers: [
           { key: "Access-Control-Allow-Origin", value: "*" },

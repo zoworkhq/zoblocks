@@ -1,7 +1,7 @@
 {
   "name": "@zoblocks/copilot-evals",
   "version": "0.1.0",
-  "description": "The eval harness behind Zoblocks Copilot. Five suites and one release gate — because below roughly 70% reliability, automation makes clinicians worse than no automation.",
+  "description": "The eval harness behind ZoBlocks Copilot. Five suites and one release gate — because below roughly 70% reliability, automation makes clinicians worse than no automation.",
   "license": "MIT",
   "homepage": "https://zoblocks.design/components/copilot",
   "repository": {

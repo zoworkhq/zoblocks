@@ -4622,9 +4622,9 @@ export function ComponentPreview({
               `HostStage` mounts the selected framework's provider and its
               token bridge on one wrapper, so the component below is drawn from
               that framework's tokens while the panel around it — rail, chrome,
-              code, notes — stays Zoblocks's. A docs site that rebranded itself
+              code, notes — stays ZoBlocks's. A docs site that rebranded itself
               into Ant Design when a reader clicked "Ant Design" would have
-              stopped being able to show what Zoblocks looks like, which is the
+              stopped being able to show what ZoBlocks looks like, which is the
               thing it exists to do.
             */}
             <HostStage className="my-auto flex w-full min-w-0 flex-col gap-6">

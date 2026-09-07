@@ -2,7 +2,7 @@
 "@zoblocks/signature-core": minor
 ---
 
-New package: the capture engine behind Zoblocks's Signature component.
+New package: the capture engine behind ZoBlocks's Signature component.
 
 Stroke model, pointer capture with palm rejection, velocity-based smoothing,
 vector export, a minimum-ink gate, and the `SignatureValue` union with its FHIR

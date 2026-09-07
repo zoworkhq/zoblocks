@@ -12,7 +12,7 @@
  * should be readable source rather than a string.
  *
  * Colours resolve through the same `--zb-switch-*` component tokens as the
- * React side, and fall back to sensible literals when the Zoblocks token
+ * React side, and fall back to sensible literals when the ZoBlocks token
  * stylesheet is not present — so the element is themed by a host that has
  * tokens, and legible in one that does not.
  *

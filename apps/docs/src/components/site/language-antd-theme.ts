@@ -7,7 +7,7 @@
  * `host-react`: the Signature demo, because `@zoblocks/signature`
  * genuinely wraps antd and cannot be rendered any other way, and the
  * Playground, because several of its renderers do. Both used to hardcode
- * Zoblocks's accent, which was right when Zoblocks was the only design language
+ * ZoBlocks's accent, which was right when ZoBlocks was the only design language
  * and became wrong the moment the switcher existed — the framework changed
  * everywhere on the page except inside those two panels.
  *
@@ -38,7 +38,7 @@ export interface AntdBrandTokens {
  */
 const BRAND: Record<DesignLanguage, { light: AntdBrandTokens; dark: AntdBrandTokens }> = {
   zoblocks: {
-    // `colorTextLightSolid` moves with the accent because Zoblocks's dark accent
+    // `colorTextLightSolid` moves with the accent because ZoBlocks's dark accent
     // is a light teal, and white on it is worse than the blue it replaced.
     light: { colorPrimary: "#067662", colorTextLightSolid: "#ffffff" },
     dark: { colorPrimary: "#6ce7cb", colorTextLightSolid: "#071014" },

@@ -1,5 +1,5 @@
 /**
- * Figma variables read back as Zoblocks overrides.
+ * Figma variables read back as ZoBlocks overrides.
  *
  * The failure this guards is quiet and total: a theme that has lost a clinical
  * signal renders correctly, passes every other check, and ships. Severity in
@@ -28,13 +28,13 @@ const snapshot: VariableSnapshot = {
     {
       token: "--zb-accent",
       name: "accent",
-      collection: "Zoblocks / Semantic",
+      collection: "ZoBlocks / Semantic",
       values: { light: colour("#1851a5") },
     },
     ...CLINICAL.map((token) => ({
       token,
       name: token.replace("--zb-", ""),
-      collection: "Zoblocks / Semantic",
+      collection: "ZoBlocks / Semantic",
       values: { light: colour("#b4232b") },
     })),
     {
@@ -60,7 +60,7 @@ describe("the report a designer gets back", () => {
   });
 
   /**
-   * A variable with no plugin data is not a Zoblocks token.
+   * A variable with no plugin data is not a ZoBlocks token.
    *
    * Reported by the label a designer sees rather than dropped, because "we
    * ignored four of your variables" is a thing they need to be able to check
@@ -91,7 +91,7 @@ describe("what it will not turn into a value", () => {
           {
             token: "--zb-accent",
             name: "accent",
-            collection: "Zoblocks / Semantic",
+            collection: "ZoBlocks / Semantic",
             values: { light: { kind: "alias", token: "--zb-ref-brand-700" } },
           },
         ],
@@ -112,7 +112,7 @@ describe("what it will not turn into a value", () => {
           {
             token: "--zb-accent",
             name: "accent",
-            collection: "Zoblocks / Semantic",
+            collection: "ZoBlocks / Semantic",
             values: { dark: colour("#5a94e7") },
           },
         ],
@@ -129,7 +129,7 @@ describe("what it will not turn into a value", () => {
           {
             token: "--zb-accent",
             name: "accent",
-            collection: "Zoblocks / Semantic",
+            collection: "ZoBlocks / Semantic",
             values: { dark: colour("#5a94e7") },
           },
         ],

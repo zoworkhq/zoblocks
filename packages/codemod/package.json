@@ -1,7 +1,7 @@
 {
   "name": "@zoblocks/codemod",
   "version": "0.1.0",
-  "description": "Migration codemods for Zoblocks. Rewrites what it can prove and reports what it cannot, rather than guessing.",
+  "description": "Migration codemods for ZoBlocks. Rewrites what it can prove and reports what it cannot, rather than guessing.",
   "license": "MIT",
   "homepage": "https://zoblocks.design",
   "repository": {

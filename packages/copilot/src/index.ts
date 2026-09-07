@@ -17,7 +17,7 @@
  * (`@zoblocks/copilot-core`) has no dependency on React or antd at all,
  * and the behaviour (`@zoblocks/copilot-react`) has no dependency on
  * antd. An application with a different design system can use either directly,
- * and the Zoblocks registry item is a second skin over the same two packages.
+ * and the ZoBlocks registry item is a second skin over the same two packages.
  */
 
 export { Copilot, type CopilotProps } from "./Copilot.js";

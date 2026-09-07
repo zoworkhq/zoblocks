@@ -2,7 +2,7 @@
 
 **Everything under this directory says Oxygen UI, and that is deliberate.**
 
-The project was renamed from Oxygen UI to Zoblocks on 7 September 2026. The
+The project was renamed from Oxygen UI to ZoBlocks on 7 September 2026. The
 rename swept the whole repository — the npm scope, the registry, the CLI
 contract, the token prefix, the mark, every user-facing sentence. It stopped at
 this directory.

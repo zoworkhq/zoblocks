@@ -110,7 +110,7 @@ test.describe("@bridge the same application under three hosts", () => {
 
 test.describe("@bridge clinical colour is never a host's to set", () => {
   /**
-   * Both hosts set their error colour to magenta. Zoblocks's critical red must
+   * Both hosts set their error colour to magenta. ZoBlocks's critical red must
    * be unmoved in both — it holds a validated 4.5:1 floor against its own
    * background and 60° of hue separation from `status.low`, and a brand colour
    * carries neither.
@@ -140,9 +140,9 @@ test.describe("@bridge clinical colour is never a host's to set", () => {
       ["antd", antd],
       ["mui", mui],
     ] as const) {
-      expect(host.critical, `${id}: critical must be Zoblocks's`).toBe(none.critical);
-      expect(host.high, `${id}: high must be Zoblocks's`).toBe(none.high);
-      expect(host.low, `${id}: low must be Zoblocks's`).toBe(none.low);
+      expect(host.critical, `${id}: critical must be ZoBlocks's`).toBe(none.critical);
+      expect(host.high, `${id}: high must be ZoBlocks's`).toBe(none.high);
+      expect(host.low, `${id}: low must be ZoBlocks's`).toBe(none.low);
       expect(
         host.critical.toLowerCase(),
         `${id}: the host's magenta must not appear`,

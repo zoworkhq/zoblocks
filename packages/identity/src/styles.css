@@ -1,5 +1,5 @@
 /**
- * Zoblocks Identity — styles.
+ * ZoBlocks Identity — styles.
  *
  * Two rules govern this file:
  *
@@ -20,7 +20,7 @@
    * Every value below is an `--zb-identity-*` token; each resolves to a
    * semantic `--zb-*` token, then to an Ant Design `--ant-*` variable, then to
    * a literal. That chain is what makes one stylesheet correct in three places:
-   * a Zoblocks app where the brand and theme flow through, a plain antd app
+   * a ZoBlocks app where the brand and theme flow through, a plain antd app
    * where ConfigProvider drives it with no JavaScript, and a bare page where
    * the literals keep it legible.
    *

@@ -33,7 +33,7 @@ export interface PlaygroundTheme {
  * is the thing a reviewer most needs to check and cannot check by reading hex
  * values.
  *
- * What this screen deliberately does *not* do is render Zoblocks components
+ * What this screen deliberately does *not* do is render ZoBlocks components
  * inside Ant Design or Material UI. It could only do that by importing them,
  * and the app never resolves a UI framework — that is the architectural
  * claim the whole bridge design rests on, and an app that quietly broke it

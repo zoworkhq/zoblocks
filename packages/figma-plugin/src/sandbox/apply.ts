@@ -11,7 +11,7 @@
  *   - **Order.** A semantic variable aliasing `--zb-ref-brand-700` cannot be
  *     written before that variable exists, so the brand tier goes first and the
  *     alias resolves a name to an id at the moment of writing.
- *   - **Identity.** Every variable is stamped with its Zoblocks token, and an
+ *   - **Identity.** Every variable is stamped with its ZoBlocks token, and an
  *     existing one is found by that stamp. Matching on the label would create a
  *     duplicate the first time somebody tidies a collection.
  *   - **Nothing is deleted.** Orphans were listed in the preview and are left
@@ -142,7 +142,7 @@ async function collectionIndex(
 }
 
 /**
- * Keyed by the Zoblocks token, and only for variables that carry one.
+ * Keyed by the ZoBlocks token, and only for variables that carry one.
  *
  * A file with a hand-made variable called `accent` is not a file where somebody
  * already pulled; treating it as one would silently take ownership of a swatch

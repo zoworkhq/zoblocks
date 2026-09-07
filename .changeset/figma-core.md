@@ -2,7 +2,7 @@
 "@zoblocks/figma-core": minor
 ---
 
-Zoblocks themes as Figma variable plans
+ZoBlocks themes as Figma variable plans
 
 A new pure package: it turns a resolved theme into a plan a Figma plugin can
 apply, reads variables back as an import report, and diffs the two. No
@@ -27,7 +27,7 @@ Three properties carry the value, and each degrades silently:
   the ability to see what actually changed. Values compare as hex, because the
   same colour returns from Figma with rounding applied and float equality would
   report every variable as different.
-- **Durable identity.** The Zoblocks token name is stamped in plugin data; the
+- **Durable identity.** The ZoBlocks token name is stamped in plugin data; the
   label belongs to the designer. Matching on the label would create a duplicate
   the first time somebody tidies a collection, and claim a variable that was
   never ours.

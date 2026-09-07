@@ -29,7 +29,7 @@ export default async function FrameworksPage() {
       <PageHeader
         eyebrow={org?.name}
         title="Frameworks"
-        lede="Zoblocks components take your host framework's design language through a token bridge."
+        lede="ZoBlocks components take your host framework's design language through a token bridge."
       />
 
       <div className="space-y-6">
@@ -62,7 +62,7 @@ export default async function FrameworksPage() {
           description={`${CLINICAL_TOTAL} of the ${SURFACE_TOTAL} component tokens are refused to every bridge, in both directions.`}
         >
           <p className="body-sm text-graphite">
-            A framework has <code className="font-mono text-[0.75rem]">colorError</code>. Zoblocks
+            A framework has <code className="font-mono text-[0.75rem]">colorError</code>. ZoBlocks
             has five status tokens carrying a validated contrast floor and 60° of hue separation, so
             the direction of an abnormal result survives colour-vision deficiency. No framework
             token carries direction, so there is nothing honest to map onto.

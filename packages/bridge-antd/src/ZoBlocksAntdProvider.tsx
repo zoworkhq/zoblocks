@@ -1,16 +1,16 @@
 "use client";
 
 /**
- * Your antd application, in your Zoblocks brand.
+ * Your antd application, in your ZoBlocks brand.
  *
- *     import { ZoblocksAntdProvider } from "@zoblocks/bridge-antd";
+ *     import { ZoBlocksAntdProvider } from "@zoblocks/bridge-antd";
  *
- *     <ZoblocksAntdProvider>
+ *     <ZoBlocksAntdProvider>
  *       <YourAntdApp />       // your Button, your Table, your Modal
- *     </ZoblocksAntdProvider>
+ *     </ZoBlocksAntdProvider>
  *
  * A customer configures their brand once in the app and their whole
- * application follows — not only the Zoblocks components in it. That is the
+ * application follows — not only the ZoBlocks components in it. That is the
  * difference between a component library with theming and a design system.
  *
  * It composes with an existing `ConfigProvider`: antd merges nested providers,
@@ -22,10 +22,10 @@
 
 import * as React from "react";
 import { ConfigProvider } from "antd";
-import { useZoblocksTokens, type ZoblocksTokens } from "@zoblocks/bridge-core";
+import { useZoBlocksTokens, type ZoBlocksTokens } from "@zoblocks/bridge-core";
 import { toAntdTheme } from "./inverse";
 
-export interface ZoblocksAntdProviderProps {
+export interface ZoBlocksAntdProviderProps {
   children: React.ReactNode;
   /**
    * Values for the server render and the first client render.
@@ -34,13 +34,13 @@ export interface ZoblocksAntdProviderProps {
    * the same values the browser is about to resolve is what avoids a flash of
    * the default palette.
    */
-  fallback?: ZoblocksTokens;
+  fallback?: ZoBlocksTokens;
   /** Merged over the derived tokens, so a host can keep a deliberate exception. */
   override?: Record<string, string | number>;
 }
 
-export function ZoblocksAntdProvider({ children, fallback, override }: ZoblocksAntdProviderProps) {
-  const tokens = useZoblocksTokens({ fallback });
+export function ZoBlocksAntdProvider({ children, fallback, override }: ZoBlocksAntdProviderProps) {
+  const tokens = useZoBlocksTokens({ fallback });
 
   const theme = React.useMemo(() => {
     const derived = toAntdTheme(tokens);

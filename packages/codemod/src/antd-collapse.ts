@@ -1,11 +1,11 @@
 /**
- * antd `Collapse` → Zoblocks `Accordion`.
+ * antd `Collapse` → ZoBlocks `Accordion`.
  *
  * The two APIs are deliberately the same shape, so most of this is an import
  * rewrite and three v6 renames. What makes the codemod worth shipping is the
  * part it *refuses* to do automatically.
  *
- * `headingLevel` is the case. Zoblocks wraps every trigger in a real heading, and
+ * `headingLevel` is the case. ZoBlocks wraps every trigger in a real heading, and
  * the correct level depends on the surrounding document outline — which a
  * transform cannot see. Guessing produces a page whose heading list is wrong in
  * a way nothing at runtime reports: the markup is valid, axe is quiet, and the
@@ -100,7 +100,7 @@ function collectNotes(source: string, notes: CodemodNote[]): void {
       line: lineOf(source, match.index),
       severity: "action",
       message:
-        "Collapse.Panel has no Zoblocks equivalent and is deprecated in antd too. Move these panels into the `items` array; the panel's `header` becomes `label` and its children become `children`.",
+        "Collapse.Panel has no ZoBlocks equivalent and is deprecated in antd too. Move these panels into the `items` array; the panel's `header` becomes `label` and its children become `children`.",
     });
   }
 
@@ -116,7 +116,7 @@ function collectNotes(source: string, notes: CodemodNote[]): void {
         line: lineOf(source, index),
         severity: "action",
         message:
-          "Set headingLevel to match the surrounding outline. Zoblocks wraps every trigger in a real heading and defaults to 3; nested accordions and pages whose main heading is not an h2 need a different level, and nothing at runtime reports a wrong one.",
+          "Set headingLevel to match the surrounding outline. ZoBlocks wraps every trigger in a real heading and defaults to 3; nested accordions and pages whose main heading is not an h2 need a different level, and nothing at runtime reports a wrong one.",
       });
     }
 
@@ -125,7 +125,7 @@ function collectNotes(source: string, notes: CodemodNote[]): void {
         line: lineOf(source, index),
         severity: "info",
         message:
-          "`accordion` keeps antd's meaning — one section open at a time — but no longer changes the emitted roles. antd switched to role=tablist/tab/tabpanel here; Zoblocks stays a disclosure widget in every configuration. No code change needed.",
+          "`accordion` keeps antd's meaning — one section open at a time — but no longer changes the emitted roles. antd switched to role=tablist/tab/tabpanel here; ZoBlocks stays a disclosure widget in every configuration. No code change needed.",
       });
     }
   }

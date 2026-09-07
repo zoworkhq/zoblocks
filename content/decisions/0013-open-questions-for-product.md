@@ -150,7 +150,7 @@ inherits Modal focus management and Input's composition handling for dictation.
 Both are genuinely expensive to rebuild well, and rebuilding them badly would
 undermine components whose argument is accessibility.
 
-If the count ever needs to grow, that is the moment to build Zoblocks's own
+If the count ever needs to grow, that is the moment to build ZoBlocks's own
 overlay primitives instead — a real project, and one that should be scheduled
 rather than arrived at.
 

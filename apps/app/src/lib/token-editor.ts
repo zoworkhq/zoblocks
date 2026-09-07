@@ -76,7 +76,7 @@ export interface EditorModel {
    *
    * The preview needs the *whole* set, not only the overridden ones. A theme
    * carries a brand ramp, and the app's own page resolves `--zb-accent`
-   * from Zoblocks's palette rather than the customer's — so a preview that
+   * from ZoBlocks's palette rather than the customer's — so a preview that
    * applied only the overrides would show a customer their edits against our
    * colours.
    */
@@ -89,7 +89,7 @@ export interface EditorModel {
    * a `var()` resolves at the element that *declares* it. So setting
    * `--zb-accent` on a subtree changes `--zb-accent` there and leaves every
    * component token still holding the value it computed at the root. The
-   * switch stays Zoblocks's teal while the swatch beside it goes red.
+   * switch stays ZoBlocks's teal while the swatch beside it goes red.
    *
    * Publishing is unaffected: `emitThemeCss` writes to `:root`, where the
    * component declarations are, so the chain resolves normally. This is
@@ -221,7 +221,7 @@ export function buildEditorModel(
    *
    * Propagating them changes nothing a customer controls: `resolved` takes
    * clinical values from the base palette, and the schema refuses a clinical
-   * override, so what is copied here is always Zoblocks's own value for the
+   * override, so what is copied here is always ZoBlocks's own value for the
    * theme being previewed.
    */
   const dependents: Record<string, string[]> = {};

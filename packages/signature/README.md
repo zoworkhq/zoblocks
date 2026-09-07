@@ -169,7 +169,7 @@ of vanishing against a forced background.
 
 ## Not a medical device
 
-Zoblocks provides user-interface components. Signature capture does not by
+ZoBlocks provides user-interface components. Signature capture does not by
 itself establish the legal validity of any record; that depends on the
 deployment, the jurisdiction, and the procedures around it. This component does
 not authenticate anyone — 21 CFR 11.200(a)'s two-component rule lives in your

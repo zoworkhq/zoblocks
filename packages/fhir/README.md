@@ -3,8 +3,8 @@
 **FHIR R4 type contracts and pure read helpers for healthcare UI.**
 
 Zero runtime dependencies. This package is the data layer behind
-[Zoblocks](https://zoblocks.design) — the components are installed as source
-through the Zoblocks CLI, and they import their types and read helpers from here.
+[ZoBlocks](https://zoblocks.design) — the components are installed as source
+through the ZoBlocks CLI, and they import their types and read helpers from here.
 
 ```bash
 npm install @zoblocks/fhir

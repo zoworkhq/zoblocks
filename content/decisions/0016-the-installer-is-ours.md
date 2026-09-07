@@ -45,7 +45,7 @@ dependencies silently pointed somewhere they could not reach.
 
 ## Decision
 
-**Zoblocks ships its own installer: `@zoblocks/cli`, binary `zoblocks`.**
+**ZoBlocks ships its own installer: `@zoblocks/cli`, binary `zoblocks`.**
 
 1. **Our own registry format**, published at `https://zoblocks.design/schema/`
    and generated from the same metadata as the registry itself. File kinds are
@@ -81,7 +81,7 @@ The CLI does **not** let a project place components, lib, hooks, and styles
 independently, and this is the decision most likely to be revisited by someone
 who has not hit the failure.
 
-Zoblocks source is copied verbatim and imports itself through `@/` —
+ZoBlocks source is copied verbatim and imports itself through `@/` —
 `@/lib/utils`, `@/components/zoblocks/timeline`. Those specifiers are inside the
 files. A component's location is therefore fixed by the source, not by
 configuration: honouring a setting that moved `utils.ts` to `src/shared/` would
@@ -128,7 +128,7 @@ sentences we write while leaving it in every command we tell people to run,
 which is the half of the surface that matters. It also leaves the format,
 the resolution rules, and the mirror problem exactly where they were.
 
-**Rejected: a Zoblocks CLI that wraps shadcn.** Cheaper, and it would have made
+**Rejected: a ZoBlocks CLI that wraps shadcn.** Cheaper, and it would have made
 the visible surface entirely ours. But the dependency stays in the tree that a
 vendor security review reads, the format is still not ours to change, and the
 mirror bug is not fixable from a wrapper. It buys the presentation without any

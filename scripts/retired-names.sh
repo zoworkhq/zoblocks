@@ -4,7 +4,7 @@
 #
 # A repository this size regrows a name within a week of hand-written commits —
 # a copied import, a pasted URL, a comment written from memory. The September
-# 2026 sweep from Oxygen UI to Zoblocks is only true today unless something
+# 2026 sweep from Oxygen UI to ZoBlocks is only true today unless something
 # keeps it true, and this is that something.
 #
 # Five exemptions, each narrow and each deliberate:

@@ -138,7 +138,7 @@ export async function install(
     case "component":
       return {
         message:
-          "Components install with the Zoblocks CLI. Mint an access token and add the @zoblocks-pro registry to zoblocks.json.",
+          "Components install with the ZoBlocks CLI. Mint an access token and add the @zoblocks-pro registry to zoblocks.json.",
         href: "/market/tokens",
       };
 

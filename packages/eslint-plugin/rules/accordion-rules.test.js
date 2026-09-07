@@ -177,7 +177,7 @@ ruleTester.run("no-heading-level-drift", noHeadingLevelDrift, {
     {
       code: `const a = (
         <Accordion headingLevel={2} items={[{ key: "p", label: "P", children: (
-          <Zoblocks.Accordion items={inner} />
+          <ZoBlocks.Accordion items={inner} />
         ) }]} />
       );`,
       errors: [{ messageId: "drift" }],

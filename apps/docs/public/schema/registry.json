@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://zoblocks.design/schema/registry.json",
-  "title": "Zoblocks registry",
+  "title": "ZoBlocks registry",
   "description": "The manifest of every item a registry serves.",
   "type": "object",
   "required": [
@@ -87,7 +87,7 @@
               "properties": {
                 "path": {
                   "type": "string",
-                  "description": "Path in the Zoblocks repository. Provenance, not a destination."
+                  "description": "Path in the ZoBlocks repository. Provenance, not a destination."
                 },
                 "type": {
                   "enum": [

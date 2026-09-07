@@ -1,7 +1,7 @@
 /**
  * `@/lib/utils` means two different files, and both must satisfy the registry.
  *
- * Registry components import `@/lib/utils` because that is where the Zoblocks
+ * Registry components import `@/lib/utils` because that is where the ZoBlocks
  * CLI writes it in a consumer's project. Inside the docs app the same specifier
  * resolves to `apps/docs/src/lib/utils.ts` — the app's own utils, mapped ahead
  * of `@/*` in its tsconfig — and the two files happen to agree on `cn`, so

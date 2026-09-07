@@ -24,7 +24,7 @@ const registryFile = {
   properties: {
     path: {
       type: "string",
-      description: "Path in the Zoblocks repository. Provenance, not a destination.",
+      description: "Path in the ZoBlocks repository. Provenance, not a destination.",
     },
     type: { enum: [...FILE_KINDS] },
     target: {
@@ -64,7 +64,7 @@ export async function emitSchemas(emitter: Emitter): Promise<void> {
   const item = {
     $schema: DRAFT,
     $id: `${HOMEPAGE}/schema/registry-item.json`,
-    title: "Zoblocks registry item",
+    title: "ZoBlocks registry item",
     description:
       "One installable item: a component, a shared module, or a stylesheet, with its source inlined. Installed by @zoblocks/cli.",
     type: "object",
@@ -82,7 +82,7 @@ export async function emitSchemas(emitter: Emitter): Promise<void> {
   const registry = {
     $schema: DRAFT,
     $id: `${HOMEPAGE}/schema/registry.json`,
-    title: "Zoblocks registry",
+    title: "ZoBlocks registry",
     description: "The manifest of every item a registry serves.",
     type: "object",
     required: ["name", "homepage", "items"],

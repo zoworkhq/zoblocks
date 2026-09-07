@@ -377,7 +377,7 @@ test.describe.serial("@app the frameworks setting", () => {
    * A theme file is a claim that a brand survived translation into somebody
    * else's vocabulary, and the only way to settle it is to look at *their*
    * Button. So this reads the painted colour off a real antd primary button and
-   * checks it against the accent Zoblocks resolves — if the mapping table drifts,
+   * checks it against the accent ZoBlocks resolves — if the mapping table drifts,
    * or the specimen quietly renders unthemed, the pixel disagrees.
    */
   test("draws the export in the framework's own components", async ({ page }) => {

@@ -35,7 +35,7 @@ const FORMATS = [
   {
     id: "antd" as const,
     name: "antd ConfigProvider",
-    body: "Theme your own antd components with this brand — not only Zoblocks's.",
+    body: "Theme your own antd components with this brand — not only ZoBlocks's.",
     /*
       Offered only to an organisation that runs it.
       

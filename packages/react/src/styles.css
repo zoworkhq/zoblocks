@@ -9,7 +9,7 @@
 
 /* ---- registry/zoblocks/lib/loader.css ---- */
 /**
- * Zoblocks loaders — structure and motion.
+ * ZoBlocks loaders — structure and motion.
  *
  * Install target: styles/zoblocks-loader.css. Import it once, next to the token
  * stylesheet:
@@ -1246,7 +1246,7 @@
 /* ------------------------------------------------------- reduced motion */
 
 /**
- * Every other Zoblocks component can simply stop. This one cannot: the movement
+ * Every other ZoBlocks component can simply stop. This one cannot: the movement
  * is carrying the only evidence that the microphone is open. So the scroll
  * stops, the meter does not, and what the scroll was carrying comes back as a
  * number — a substitution, not a removal.
@@ -1306,7 +1306,7 @@
 
 /* ---- registry/zoblocks/lib/accordion.css ---- */
 /**
- * Zoblocks accordion — structure, motion, and the three states that are not decoration.
+ * ZoBlocks accordion — structure, motion, and the three states that are not decoration.
  *
  * Install target: styles/zoblocks-accordion.css. Import it once, next to the
  * token stylesheet:
@@ -1966,7 +1966,7 @@
 
 /* ---- registry/zoblocks/lib/switch.css ---- */
 /**
- * Zoblocks Switch — the stylesheet.
+ * ZoBlocks Switch — the stylesheet.
  *
  * Every colour resolves through a `--zb-switch-*` component token, so a brand
  * restyles the control by overriding tokens rather than editing this file.
@@ -9955,7 +9955,7 @@ button.zb-prov:focus-visible,
 
 /* ---- registry/zoblocks/lib/timeline.css ---- */
 /**
- * Zoblocks timeline — the rail, the nodes, and the states that are not decoration.
+ * ZoBlocks timeline — the rail, the nodes, and the states that are not decoration.
  *
  * Install target: styles/zoblocks-timeline.css. Import it once, next to the
  * token stylesheet:

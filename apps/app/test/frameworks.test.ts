@@ -86,7 +86,7 @@ describe("the facts each card shows", () => {
       const clinical = framework.unmapped.filter((t) => t.kind === "clinical");
       const gaps = framework.unmapped.filter((t) => t.kind === "no-counterpart");
 
-      // Both bridges decline the same eight, because the refusal is Zoblocks's
+      // Both bridges decline the same eight, because the refusal is ZoBlocks's
       // rule rather than a limitation of either framework.
       expect(clinical.map((t) => t.token).sort()).toEqual([
         "--zb-flag-deceased",
@@ -139,7 +139,7 @@ describe("the app never resolves a UI framework", () => {
    * The rule this replaces, and why it changed.
    *
    * It used to be "the app declares neither antd nor MUI anywhere in its
-   * manifest". That was a proxy for the claim that matters — Zoblocks's
+   * manifest". That was a proxy for the claim that matters — ZoBlocks's
    * components do not need a UI framework — and it held until the app had a
    * legitimate reason to render one: showing a customer the antd theme they are
    * about to download, in antd's own components, because a theme file is a

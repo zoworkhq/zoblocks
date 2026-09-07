@@ -12,12 +12,12 @@
 /* Loader keyframes and structure. Shipped to customers as
    styles/zoblocks-loader.css by the `loader-core` registry item; imported here
    so the docs render the same file a customer installs, not a copy of it. */
-/* Zoblocks's reference host chrome — the Button, field, Switch, Checkbox and
+/* ZoBlocks's reference host chrome — the Button, field, Switch, Checkbox and
    Tabs that surround a clinical component when no framework is mounted.
    Shipped by `@zoblocks/host-react`; imported here so the previews
    render the package's own sheet rather than a copy of it. Structure only:
    every colour and radius in it comes from `--zb-*`, which is what lets the
-   Zoblocks state in the language switcher restyle under a bridge. */
+   ZoBlocks state in the language switcher restyle under a bridge. */
 @import "../../../../packages/host-react/src/host.css";
 
 @import "../../../../registry/zoblocks/lib/loader.css";

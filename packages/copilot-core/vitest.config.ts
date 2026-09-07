@@ -6,7 +6,7 @@ import { defineConfig } from "vitest/config";
  * Coverage globs are anchored to this package.
  *
  * Vitest 4 resolves a relative `coverage.include` against the workspace root
- * rather than the config file, and every Zoblocks package resolves its workspace
+ * rather than the config file, and every ZoBlocks package resolves its workspace
  * siblings to their TypeScript source. The combination silently pulled
  * copilot-core's files into this package's report and tanked the branch figure
  * with code another suite already covers. Anchoring says what was always meant.

@@ -140,7 +140,7 @@ function breadcrumbData(component: ComponentDoc) {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Zoblocks", item: "https://zoblocks.design" },
+      { "@type": "ListItem", position: 1, name: "ZoBlocks", item: "https://zoblocks.design" },
       {
         "@type": "ListItem",
         position: 2,

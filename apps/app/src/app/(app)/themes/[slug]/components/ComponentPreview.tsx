@@ -18,7 +18,7 @@ import type { ComponentToken } from "./ComponentEditor";
  * out to its dependents: the customer is setting the component tokens directly,
  * so what they typed is what the component reads. The semantic layer is still
  * applied underneath, because a preview that resolved `--zb-accent` from
- * Zoblocks's palette would show a customer their edits sitting on our colours.
+ * ZoBlocks's palette would show a customer their edits sitting on our colours.
  */
 
 /**

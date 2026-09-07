@@ -55,7 +55,7 @@ export const SUPPORT_ITEM_NAMES: ReadonlySet<string> = new Set([
   "recorder-core",
 ]);
 
-/** Prefix the Zoblocks CLI writes component files under, inside the consumer's project. */
+/** Prefix the ZoBlocks CLI writes component files under, inside the consumer's project. */
 export const CONSUMER_COMPONENT_DIR = "components/zoblocks";
 
 export const paths = {

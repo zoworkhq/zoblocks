@@ -55,7 +55,7 @@ export interface LoadedComponent {
   extraPropsFiles: string[];
   /** Import specifier a consumer uses after installing, e.g. "@/components/zoblocks/vitals-panel". */
   consumerSpecifier: string;
-  /** Where the Zoblocks CLI writes it, e.g. "components/zoblocks/vitals-panel.tsx". */
+  /** Where the ZoBlocks CLI writes it, e.g. "components/zoblocks/vitals-panel.tsx". */
   consumerTarget: string;
   hasStory: boolean;
   hasTest: boolean;

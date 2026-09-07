@@ -1,7 +1,7 @@
 {
   "name": "@zoblocks/tabs-core",
   "version": "0.1.0",
-  "description": "The selection engine behind Zoblocks's tab system. Semantic modes, the WAI-ARIA keyboard model, priority-plus overflow and indicator geometry — no React, no DOM, no dependencies.",
+  "description": "The selection engine behind ZoBlocks's tab system. Semantic modes, the WAI-ARIA keyboard model, priority-plus overflow and indicator geometry — no React, no DOM, no dependencies.",
   "license": "MIT",
   "homepage": "https://zoblocks.design/components/tabs",
   "repository": {

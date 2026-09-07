@@ -1,6 +1,6 @@
 <div align="center">
 
-<h1>Zoblocks</h1>
+<h1>ZoBlocks</h1>
 
 **Healthcare components that already know what the data means.**
 
@@ -36,7 +36,7 @@ false.** A blank cell is indistinguishable from a rendering bug. An empty
 signature field is indistinguishable from a patient who refused. A severity
 carried by colour alone disappears in forced-colors mode.
 
-Zoblocks is built around those states rather than around the happy path, and
+ZoBlocks is built around those states rather than around the happy path, and
 the invariants are enforced by lint rules and failing builds rather than by code
 review.
 
@@ -208,27 +208,27 @@ instead. Both channels are generated from the same source.
 | `@zoblocks/tokens`         | Semantic clinical tokens: 3 themes × 3 densities × a brand axis.          |
 | `@zoblocks/theme`          | Customer themes: the document model, ramp generator, validation and CSS.  |
 | `@zoblocks/bridge-core`    | The theme-bridge contract. No framework, no React, no DOM.                |
-| `@zoblocks/bridge-antd`    | Ant Design ↔ Zoblocks, both directions. antd is an optional peer.         |
-| `@zoblocks/bridge-mui`     | Material UI ↔ Zoblocks, both directions. MUI is an optional peer.         |
+| `@zoblocks/bridge-antd`    | Ant Design ↔ ZoBlocks, both directions. antd is an optional peer.         |
+| `@zoblocks/bridge-mui`     | Material UI ↔ ZoBlocks, both directions. MUI is an optional peer.         |
 | `@zoblocks/intl`           | Terminology that requires both a clinician and a patient phrasing.        |
 | `@zoblocks/eslint-plugin`  | Eighteen rules enforcing the invariants above.                            |
 | `@zoblocks/fixtures`       | Synthetic, non-PHI FHIR fixtures that over-represent the hard states.     |
 
 ### Theme bridges
 
-A bridge is the only sanctioned way a UI framework reaches a Zoblocks component.
-It reads that framework's resolved theme and writes Zoblocks's token surface —
+A bridge is the only sanctioned way a UI framework reaches a ZoBlocks component.
+It reads that framework's resolved theme and writes ZoBlocks's token surface —
 nothing else crosses the boundary, so no component is swapped and no capability
 is reduced to what two frameworks happen to share.
 
 ```tsx
-// Zoblocks components in your antd app's design language
+// ZoBlocks components in your antd app's design language
 <ConfigProvider theme={brand}>
   <AntdBridge>{app}</AntdBridge>
 </ConfigProvider>
 
-// ...and the inverse: your own antd components in your Zoblocks brand
-<ZoblocksAntdProvider>{app}</ZoblocksAntdProvider>
+// ...and the inverse: your own antd components in your ZoBlocks brand
+<ZoBlocksAntdProvider>{app}</ZoBlocksAntdProvider>
 ```
 
 Switching framework changes the wrapper and nothing inside it —
@@ -375,7 +375,7 @@ Progress against the enterprise-readiness audit is tracked in
 
 ## What this is not
 
-Zoblocks is **not a compliance boundary**. Installing it does not make an
+ZoBlocks is **not a compliance boundary**. Installing it does not make an
 application HIPAA, GDPR, or DPDP compliant, and it is not a medical device or
 clinical decision support. Access control, audit, data residency, and clinical
 validation remain yours.

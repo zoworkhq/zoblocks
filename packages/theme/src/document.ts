@@ -140,7 +140,7 @@ export const themeTokensSchema = z
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["component", theme, name],
-            message: `${name} is not a Zoblocks custom property. Component overrides are keyed by the property exactly as the surface manifest declares it.`,
+            message: `${name} is not a ZoBlocks custom property. Component overrides are keyed by the property exactly as the surface manifest declares it.`,
           });
           continue;
         }

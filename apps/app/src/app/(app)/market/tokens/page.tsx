@@ -36,7 +36,7 @@ export default async function TokensPage() {
       <PageHeader
         eyebrow="Marketplace"
         title="Access tokens"
-        lede="A key for the Zoblocks CLI or for the Figma plugin — one scope each, chosen when it is minted. Tokens belong to the organisation and are visible to every admin and developer in it."
+        lede="A key for the ZoBlocks CLI or for the Figma plugin — one scope each, chosen when it is minted. Tokens belong to the organisation and are visible to every admin and developer in it."
       />
 
       <Panel className="mt-6" title="Mint a token">
@@ -112,7 +112,7 @@ export default async function TokensPage() {
       */}
       <details className="mt-4 rounded-xl border border-rule bg-paper-sunk px-4 py-3">
         <summary className="flex min-h-6 cursor-pointer items-center text-[0.8125rem] font-medium text-ink">
-          Wiring a registry token into the Zoblocks CLI
+          Wiring a registry token into the ZoBlocks CLI
         </summary>
         <pre className="mt-3 overflow-x-auto rounded-lg bg-panel p-3 font-mono text-[0.6875rem] text-panel-fg">
           {`// zoblocks.json — the token stays in the environment, never in the repo

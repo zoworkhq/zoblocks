@@ -1,6 +1,6 @@
 # @zoblocks/clinical-note-core
 
-The engine behind Zoblocks's `ClinicalNote`. Coded sections, per-range
+The engine behind ZoBlocks's `ClinicalNote`. Coded sections, per-range
 provenance, a composable sign gate, and deterministic serialization to FHIR,
 XHTML and plain text.
 
@@ -161,13 +161,13 @@ R5.
 
 ## Boundaries
 
-Zoblocks provides user-interface components. This package does not make an
+ZoBlocks provides user-interface components. This package does not make an
 application HIPAA, GDPR or DPDP compliant, is not a medical device, is not
 clinical decision support, and does not by itself establish the legal validity
 or admissibility of any record.
 
 Per-range provenance is **not standardised anywhere in FHIR**. It travels as a
-custom Zoblocks extension that a conforming server may legitimately ignore or
+custom ZoBlocks extension that a conforming server may legitimately ignore or
 strip. It is the most valuable thing this package produces and it is
 non-standard; that trade is acceptable only because it is stated here.
 

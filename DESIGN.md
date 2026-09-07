@@ -1,6 +1,6 @@
-# Zoblocks — Product Design Contract
+# ZoBlocks — Product Design Contract
 
-Copy this file into any product built with Zoblocks and fill it in. It is the
+Copy this file into any product built with ZoBlocks and fill it in. It is the
 handoff artifact between design, engineering, clinical review, and any AI
 coding agent working in the repository. Keep it versioned next to the code.
 
@@ -67,6 +67,6 @@ implementing team's responsibility:
 - **Clinical validation and sign-off:**
 - **Regulatory obligations:**
 
-> Zoblocks is not a compliance boundary. It does not make an application
+> ZoBlocks is not a compliance boundary. It does not make an application
 > HIPAA, GDPR, or DPDP compliant, and it is not a medical device or clinical
 > decision support.

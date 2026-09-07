@@ -41,7 +41,7 @@ was first generated:
   `--zb-fg-muted`, `--zb-fg-subtle`, `--zb-rule` and `--zb-status-accent` are
   plausible, consistent with their neighbours, and defined nowhere. The
   affected components render correctly — against antd's colour or the literal —
-  and silently never follow a Zoblocks brand. The docs site masked it by
+  and silently never follow a ZoBlocks brand. The docs site masked it by
   defining the invented names in `tabs-gallery.css`.
 - **Nothing distinguished a chrome token from a clinical one.** A bridge
   mapping a host's `colorError` onto `--zb-status-critical` would replace a

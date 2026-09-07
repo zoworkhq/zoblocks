@@ -1,5 +1,5 @@
 /**
- * The private registry the Zoblocks CLI installs paid components from.
+ * The private registry the ZoBlocks CLI installs paid components from.
  *
  *     GET /r/pro/vitals-flowsheet.json
  *     Authorization: Bearer zb_live_…

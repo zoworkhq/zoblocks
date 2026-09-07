@@ -15,7 +15,7 @@ import { renderReport } from "../src/ui/render";
 import { wireCopy } from "../src/ui/copy";
 import { colour, zoblocksFile, snapshot } from "./fixture";
 
-const ZOBLOCKS = "Zoblocks / Semantic";
+const ZOBLOCKS = "ZoBlocks / Semantic";
 
 let root: HTMLElement;
 
@@ -60,7 +60,7 @@ describe("the summary", () => {
     // A passing palette measurement is not the same claim as a passing theme,
     // and a designer who does not know which they got will read it as the
     // stronger one.
-    expect(text()).toContain("No Zoblocks tokens here");
+    expect(text()).toContain("No ZoBlocks tokens here");
   });
 
   it("names the mode and the floors applied", () => {
@@ -221,7 +221,7 @@ describe("the rows with nothing to offer", () => {
     // suggest. Saying nothing would read as "no fix needed".
     const report: GateReport = {
       mode: "zoblocks",
-      collection: "Zoblocks / Semantic",
+      collection: "ZoBlocks / Semantic",
       figmaMode: "light",
       theme: "light",
       findings: [],
@@ -258,7 +258,7 @@ describe("the rows with nothing to offer", () => {
         { collection: ZOBLOCKS, figmaMode: "light" },
       ),
     );
-    expect(text()).toContain("Not Zoblocks tokens (1)");
+    expect(text()).toContain("Not ZoBlocks tokens (1)");
     expect(text()).toContain("They are left alone");
   });
 
@@ -275,7 +275,7 @@ describe("the rows with nothing to offer", () => {
         { collection: "Swatches", figmaMode: "light" },
       ),
     );
-    expect(text()).not.toContain("Not Zoblocks tokens");
+    expect(text()).not.toContain("Not ZoBlocks tokens");
   });
 });
 

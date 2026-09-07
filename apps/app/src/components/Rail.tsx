@@ -42,11 +42,11 @@ import { cn } from "@/lib/utils";
  * lie. Playground, Brand and Members join their groups when they are built.
  */
 
-export function ZoblocksMark({ className = "h-4 w-7" }: { className?: string }) {
+export function ZoBlocksMark({ className = "h-4 w-7" }: { className?: string }) {
   // Two blocks and the tenon that joins them. The docs site's mark, verbatim:
   // a customer arrives here from zoblocks.design in one click, and a different
   // mark at the boundary is the fastest way to make one product feel like two.
-  // Keep this in step with `ZoblocksMark` in the docs app's chrome.tsx.
+  // Keep this in step with `ZoBlocksMark` in the docs app's chrome.tsx.
   return (
     <svg viewBox="0 0 28 16" className={className} aria-hidden="true">
       <rect x="11.5" y="5.5" width="5" height="5" rx="1.25" fill="var(--color-brand)" />
@@ -262,12 +262,12 @@ export function Rail({
       <div className="flex items-center justify-between gap-3">
         <Link
           href="/themes"
-          aria-label="Zoblocks app home"
+          aria-label="ZoBlocks app home"
           className="group flex items-center gap-2.5 text-ink"
         >
-          <ZoblocksMark className="h-4 w-7 transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:rotate-180" />
+          <ZoBlocksMark className="h-4 w-7 transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:rotate-180" />
           <span className="font-display text-[0.9375rem] font-semibold tracking-[-0.02em]">
-            Zoblocks
+            ZoBlocks
           </span>
           <span className="eyebrow text-[0.5625rem] text-graphite-soft">App</span>
         </Link>

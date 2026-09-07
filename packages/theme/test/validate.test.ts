@@ -171,7 +171,7 @@ describe("semantic overrides", () => {
    * reported against their brand, so `validateTheme` filtered on that prefix. An
    * override changes the *base* palette instead, and the gate reports those with
    * no prefix at all — so the first version of this let a customer make body
-   * text unreadable and publish it, with the failure attributed to Zoblocks and
+   * text unreadable and publish it, with the failure attributed to ZoBlocks and
    * shown to nobody.
    */
   it("fails an override that makes body text unreadable", async () => {

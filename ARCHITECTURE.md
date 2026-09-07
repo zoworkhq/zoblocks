@@ -1,4 +1,4 @@
-# Zoblocks — Platform Architecture
+# ZoBlocks — Platform Architecture
 
 **Status:** proposed · 6 August 2026
 **Horizon:** the structure below is intended to hold from 24 components to 500+
@@ -16,7 +16,7 @@ arguments.
 
 ## 1. The scaling problem, stated concretely
 
-The repository today ships 24 components through the Zoblocks registry and works
+The repository today ships 24 components through the ZoBlocks registry and works
 well at that size. Three properties of it do not survive multiplication.
 
 ### 1.1 Adding one component edits five shared files
@@ -55,7 +55,7 @@ This is the load-bearing one, and it is in direct tension with four of the
 brief's requirements: versioning, backward compatibility, migration paths, and
 deprecation strategy.
 
-Once the Zoblocks CLI writes a file into a customer's repository, that file is
+Once the ZoBlocks CLI writes a file into a customer's repository, that file is
 theirs. There is no channel to reach it. A bug in `ClinicalValue` that
 misrenders a comparator ships to every customer who installed it and can never
 be recalled — not by a patch release, not by a security advisory, not by a
@@ -94,7 +94,7 @@ that.
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
-│  L4  Distribution   npm channels · Zoblocks registry · CDN · Figma │
+│  L4  Distribution   npm channels · ZoBlocks registry · CDN · Figma │
 ├──────────────────────────────────────────────────────────────────┤
 │  L3  Composition    blocks · patterns · app shells · templates   │
 ├──────────────────────────────────────────────────────────────────┤
@@ -278,7 +278,7 @@ a test, rather than a growing hand-maintained map.
 
 ### 5.1 Two channels, one source
 
-|                                | npm                       | Registry (Zoblocks CLI)         |
+|                                | npm                       | Registry (ZoBlocks CLI)         |
 | ------------------------------ | ------------------------- | ------------------------------- |
 | Upgrade path                   | semver, patches, codemods | none — the customer has forked  |
 | Security fixes reach customers | yes                       | no                              |
@@ -304,7 +304,7 @@ notices.
 
 The npm scope is `@zoblocks`, unhyphenated. The project shipped its first two
 packages under `@zoblocks-design`, a scope forced on it by an unrelated
-`zoblocks-ui` already on npm; the rename to Zoblocks retired that constraint along
+`zoblocks-ui` already on npm; the rename to ZoBlocks retired that constraint along
 with the name, and the shorter scope was free. Registry installs name a
 component directly (`zoblocks add pulse-loader`) and need no namespace at all;
 the namespaces that do appear — `@zoblocks-pro` — are registry aliases declared
@@ -480,7 +480,7 @@ the right instinct and should be preserved.
 CSS custom properties and class names, so no `unsafe-inline` is required; the
 docs state a nonce strategy for the one place a style tag is unavoidable.
 
-**The boundary statement stays.** Zoblocks is not a compliance boundary and not
+**The boundary statement stays.** ZoBlocks is not a compliance boundary and not
 a medical device. That claim is in the README, and it belongs in the
 architecture too, because it constrains what components are allowed to do:
 nothing in this library may present itself as clinical decision support.

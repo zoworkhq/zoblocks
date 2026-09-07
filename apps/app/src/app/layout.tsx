@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Instrument_Sans, JetBrains_Mono } from "next/font/google";
 
 // Component tokens first, so the app layer overrides deliberately rather
-// than by accident. The app renders real Zoblocks components in its preview
+// than by accident. The app renders real ZoBlocks components in its preview
 // surfaces, and they resolve against these.
 import "@zoblocks/tokens/zoblocks-tokens.css";
 // The components' own stylesheets. Without these the live preview renders real
@@ -44,7 +44,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: { default: "Theme app — Zoblocks", template: "%s · Zoblocks app" },
+  title: { default: "Theme app — ZoBlocks", template: "%s · ZoBlocks app" },
   description:
     "Author a design language, validate it against the same gate the build uses, publish it.",
   // A customer's unreleased branding is on these pages.

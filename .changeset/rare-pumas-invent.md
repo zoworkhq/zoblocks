@@ -2,7 +2,7 @@
 "@zoblocks/elements": minor
 ---
 
-New package: Zoblocks controls as dependency-free custom elements, starting with
+New package: ZoBlocks controls as dependency-free custom elements, starting with
 `<zb-switch>`.
 
 The framework-agnostic channel for the Switch. Same three axes and the same

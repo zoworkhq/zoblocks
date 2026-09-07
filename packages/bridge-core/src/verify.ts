@@ -80,7 +80,7 @@ const CHECKED_PAIRS: { fg: string; bg: string; floor: number; rule: string }[] =
  * Contrast failures the host's theme introduces.
  *
  * Only pairs where the bridge supplies *both* sides are checked. If it maps a
- * foreground and leaves the background to Zoblocks's own token, the ratio
+ * foreground and leaves the background to ZoBlocks's own token, the ratio
  * depends on a value we cannot see from here, and a guess would be worse than
  * silence.
  */

@@ -21,7 +21,7 @@ import { TelemetryTrace } from "@/components/site/telemetry-trace";
  */
 export const metadata: Metadata = {
   title: {
-    absolute: "Zoblocks — React healthcare components typed to FHIR",
+    absolute: "ZoBlocks — React healthcare components typed to FHIR",
   },
   alternates: { canonical: "/" },
 };
@@ -476,7 +476,7 @@ const QUALITY = [
   },
   {
     title: "What this is not",
-    body: "Zoblocks is not a compliance boundary. It does not make an application HIPAA, GDPR, or DPDP compliant, and it is not a medical device. It is well-built UI; the clinical and regulatory obligations remain yours.",
+    body: "ZoBlocks is not a compliance boundary. It does not make an application HIPAA, GDPR, or DPDP compliant, and it is not a medical device. It is well-built UI; the clinical and regulatory obligations remain yours.",
   },
 ];
 

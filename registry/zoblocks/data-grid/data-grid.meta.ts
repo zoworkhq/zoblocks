@@ -117,7 +117,7 @@ export default defineComponentMeta({
     "One sort column. Multi-column sort is a real requirement in a worklist and is not here yet.",
     "No column resize, reorder, pinning or grouping. Columns are typed objects precisely so a saved view can carry those later; today the caller sets width and order.",
     "No selection model and no row expansion. A grid that owns selection also owns the bulk-action confirmation, which is ChartContextMenu's job.",
-    "Filtering is the caller's. The grid renders the predicate as a sentence and never composes one — a component that owned the filter would also own the query, and no Zoblocks package makes a network call.",
+    "Filtering is the caller's. The grid renders the predicate as a sentence and never composes one — a component that owned the filter would also own the query, and no ZoBlocks package makes a network call.",
     "The export helper produces delimited text, not XLSX. Typed cells are the stronger answer to formula injection; the quote prefix is what is available without a writer dependency.",
     "`status` columns sort by a declared order that the caller supplies. There is no terminology binding, so a mis-declared order sorts wrongly and nothing catches it.",
     "Strings are English and not routed through @zoblocks/intl — true of every registry component today.",

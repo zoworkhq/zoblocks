@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ZoblocksMark } from "@/components/Rail";
+import { ZoBlocksMark } from "@/components/Rail";
 import { ToastProvider } from "@/components/ui";
 
 /**
@@ -41,12 +41,12 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <header className="relative mx-auto w-full max-w-[26rem]">
           <Link
             href="/"
-            aria-label="Zoblocks app home"
+            aria-label="ZoBlocks app home"
             className="group inline-flex items-center gap-2.5 text-ink"
           >
-            <ZoblocksMark className="h-4 w-7 transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:rotate-180" />
+            <ZoBlocksMark className="h-4 w-7 transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:rotate-180" />
             <span className="font-display text-[0.9375rem] font-semibold tracking-[-0.02em]">
-              Zoblocks
+              ZoBlocks
             </span>
             <span className="eyebrow text-[0.5625rem] text-graphite-soft">App</span>
           </Link>

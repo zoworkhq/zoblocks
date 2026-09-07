@@ -1,7 +1,7 @@
 {
   "name": "@zoblocks/copilot-core",
   "version": "0.1.0",
-  "description": "The engine behind Zoblocks's clinical copilot. Session state machine, provider contract, mode scope contracts, safety pipeline and FHIR audit mapping — no React, no DOM, no dependencies.",
+  "description": "The engine behind ZoBlocks's clinical copilot. Session state machine, provider contract, mode scope contracts, safety pipeline and FHIR audit mapping — no React, no DOM, no dependencies.",
   "license": "MIT",
   "homepage": "https://zoblocks.design/components/copilot",
   "repository": {

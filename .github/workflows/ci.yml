@@ -357,7 +357,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      # The project was renamed to Zoblocks in September 2026, retiring the
+      # The project was renamed to ZoBlocks in September 2026, retiring the
       # previous name entirely.
       # A sweep makes that true once; this keeps it true. A repository this size
       # regrows a name within a week of hand-written commits — a copied import,

@@ -380,7 +380,7 @@ export interface CatalogVersionDoc {
   files: CatalogFile[];
   /** For `kind: "theme"`, the token document imported on install. */
   tokens?: ThemeTokensInput;
-  /** For `kind: "component"`, the registry item served to the Zoblocks CLI. */
+  /** For `kind: "component"`, the registry item served to the ZoBlocks CLI. */
   registry?: Record<string, unknown>;
   notes: string;
   publishedAt: Date;
@@ -463,7 +463,7 @@ export interface EntitlementDoc {
 }
 
 /**
- * A credential the Zoblocks CLI sends to install a paid component.
+ * A credential the ZoBlocks CLI sends to install a paid component.
  *
  * Only the SHA-256 is stored — the token itself is shown once at mint time and
  * never again — so a dump of this collection yields nothing usable. Exactly
@@ -473,7 +473,7 @@ export interface EntitlementDoc {
 /**
  * What a token may reach.
  *
- * `registry` installs purchased components through the Zoblocks CLI; `figma`
+ * `registry` installs purchased components through the ZoBlocks CLI; `figma`
  * reads themes and proposes drafts through the plugin API. They are separate
  * because the people are separate: handing a designer a Figma key that also
  * pulls down paid component source would grant a privilege nobody asked for,

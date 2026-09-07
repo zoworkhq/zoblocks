@@ -10,7 +10,7 @@ rings at a resting breath), `<zb-helix-loader>` (for laboratory surfaces), and
 `<zb-infusion-loader>` (the only one that can show real progress).
 
 Each is importable on its own subpath, works in React, Vue, Angular, Svelte or
-plain HTML, themes through Zoblocks's semantic tokens, and ships a designed
+plain HTML, themes through ZoBlocks's semantic tokens, and ships a designed
 reduced-motion state rather than a paused one. Waits are announced in words:
 `role="status"` while indeterminate, `role="progressbar"` with a spoken value
 when a percentage is genuinely known.

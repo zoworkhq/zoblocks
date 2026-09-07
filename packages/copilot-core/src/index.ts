@@ -1,5 +1,5 @@
 /**
- * @zoblocks/copilot-core — the engine behind Zoblocks's clinical copilot.
+ * @zoblocks/copilot-core — the engine behind ZoBlocks's clinical copilot.
  *
  * No React, no DOM, no dependencies. The whole package is importable in a Node
  * handler, an edge worker, or a test runner with no environment, which is the

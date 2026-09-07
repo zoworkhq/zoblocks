@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * switch-core — the state model behind Zoblocks's Switch.
+ * switch-core — the state model behind ZoBlocks's Switch.
  *
  * A switch in a consumer application is one axis: `checked`. In a shared
  * clinical record it is three, and they are genuinely independent — a control
@@ -17,7 +17,7 @@
  *
  * `useCommitPhase` is exported on its own for the same reason `useLoadingGate`
  * is: an application will need this decision for something that is not an
- * Zoblocks Switch — a checkbox, a segmented control, an inline dropdown — and a
+ * ZoBlocks Switch — a checkbox, a segmented control, an inline dropdown — and a
  * second hand-rolled copy of it is a second set of bugs.
  *
  * Styling lives in `styles/zoblocks-switch.css`, installed alongside this file.

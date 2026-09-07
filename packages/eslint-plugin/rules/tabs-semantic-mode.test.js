@@ -58,7 +58,7 @@ ruleTester.run("tabs-semantic-mode", tabsSemanticMode, {
     { code: 'import Tabs from "rc-tabs";\nconst a = <Tabs items={items} />;' },
     { code: 'import { Tabs as Foo } from "antd";\nconst a = <Tabs items={items} as="tabs" />;' },
 
-    // Zoblocks's own Tabs is still required to declare itself, however it is
+    // ZoBlocks's own Tabs is still required to declare itself, however it is
     // imported — otherwise the fix above would disable the rule everywhere.
     {
       code: 'import { Tabs } from "@zoblocks/react";\nconst a = <Tabs as="tabs" items={items} />;',
@@ -130,7 +130,7 @@ ruleTester.run("tabs-semantic-mode", tabsSemanticMode, {
       errors: [{ messageId: "missingMode" }],
     },
     {
-      // Ours, by the specifier the Zoblocks CLI writes into a consumer project.
+      // Ours, by the specifier the ZoBlocks CLI writes into a consumer project.
       code: 'import { Tabs } from "@/components/zoblocks/tabs";\nconst a = <Tabs items={items} />;',
       errors: [{ messageId: "missingMode" }],
     },

@@ -186,7 +186,7 @@ export default function ComponentsPage() {
               <p className="mt-4 text-xs text-graphite-soft" data-reveal>
                 Team and Enterprise add starter kits, shared design assets and support.{" "}
                 <a
-                  href="mailto:hello@zowork.com?subject=Zoblocks%20Team%20and%20Enterprise"
+                  href="mailto:hello@zowork.com?subject=ZoBlocks%20Team%20and%20Enterprise"
                   className="underline underline-offset-2 hover:text-ink"
                 >
                   Ask us for the current terms

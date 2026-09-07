@@ -9,7 +9,7 @@
 //
 // Generated from registry/zoblocks/lib/accordion-core.tsx. Edit that file, not this one.
 /**
- * accordion-core — the behaviour behind every Zoblocks disclosure surface.
+ * accordion-core — the behaviour behind every ZoBlocks disclosure surface.
  *
  * Nothing here renders. It is the part a customer must not rewrite when they
  * replace our visual language, because it is where the accessibility contract

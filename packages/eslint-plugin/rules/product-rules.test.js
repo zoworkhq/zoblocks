@@ -77,7 +77,7 @@ ruleTester.run("no-hardcoded-count", noHardcodedCount, {
       errors: [{ messageId: "hardcoded" }],
     },
     {
-      code: 'const d = "Zoblocks ships 27 components carrying 300-plus documented states.";',
+      code: 'const d = "ZoBlocks ships 27 components carrying 300-plus documented states.";',
       errors: [{ messageId: "hardcoded" }],
     },
     {

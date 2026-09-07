@@ -78,7 +78,7 @@ export async function setFrameworks(auth: Authorized, next: readonly string[]): 
     (framework) => framework.name,
   );
   return names.length === 0
-    ? "No framework selected. Zoblocks components will use their own tokens."
+    ? "No framework selected. ZoBlocks components will use their own tokens."
     : `Saved. This app now offers ${names.join(" and ")}.`;
 }
 

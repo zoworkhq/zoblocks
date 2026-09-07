@@ -90,7 +90,7 @@ export interface AccordionProps extends Omit<
   /** Per-slot inline styles, matching Ant Design v6's semantic DOM. */
   styles?: Partial<Record<AccordionSlot, React.CSSProperties>>;
 
-  /* -- Zoblocks additions ---------------------------------------------- */
+  /* -- ZoBlocks additions ---------------------------------------------- */
 
   /**
    * Heading level for every trigger.
@@ -415,7 +415,7 @@ export function Accordion({
       ref={rootRef}
       className={cn("zb-accordion", classNames?.root, className)}
       style={rootStyle}
-      // The root marker every Zoblocks component carries, matching the loaders'
+      // The root marker every ZoBlocks component carries, matching the loaders'
       // `data-zb-loader`. It is what a test, a VRT fixture or a host stylesheet
       // uses to find the component without depending on a class name that
       // customisation is explicitly allowed to replace.

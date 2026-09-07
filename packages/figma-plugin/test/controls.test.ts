@@ -16,7 +16,7 @@ import type { CollectionSummary } from "../src/protocol";
 
 const ZOBLOCKS: CollectionSummary = {
   id: "c1",
-  name: "Zoblocks / Semantic",
+  name: "ZoBlocks / Semantic",
   modes: ["light", "dark", "high-contrast"],
   stamped: 26,
   colours: 26,
@@ -65,8 +65,8 @@ describe("the collection picker", () => {
   it("states the counts that decide which reading a collection can get", () => {
     draw([ZOBLOCKS, SWATCHES], zoblocksChoice);
     const options = [...root.querySelectorAll("#collection option")].map((o) => o.textContent);
-    expect(options[0]).toContain("26 colours, 26 Zoblocks");
-    expect(options[1]).toContain("3 colours, 0 Zoblocks");
+    expect(options[0]).toContain("26 colours, 26 ZoBlocks");
+    expect(options[1]).toContain("3 colours, 0 ZoBlocks");
   });
 
   it("offers the modes the chosen collection actually has", () => {
@@ -84,7 +84,7 @@ describe("the collection picker", () => {
   });
 });
 
-describe("what a palette reading needs and a Zoblocks reading does not", () => {
+describe("what a palette reading needs and a ZoBlocks reading does not", () => {
   it("asks for a ground only when the pairs are unknown", () => {
     draw([ZOBLOCKS], zoblocksChoice);
     expect(root.querySelector("#ground")).toBeNull();
@@ -142,7 +142,7 @@ describe("nothing to measure", () => {
 describe("the ground picker with nothing to pick from", () => {
   it("renders empty rather than throwing when the report has not arrived", () => {
     // The first paint after choosing a palette collection: the panel knows the
-    // collection has no Zoblocks stamps but has not been told its colour names
+    // collection has no ZoBlocks stamps but has not been told its colour names
     // yet, so the list is briefly empty.
     draw([SWATCHES], paletteChoice, []);
     const ground = root.querySelector<HTMLSelectElement>("#ground")!;

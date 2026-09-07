@@ -47,13 +47,13 @@ function fakeFigma(collections: FigmaVariableCollection[], specs: Spec[]): Figma
 
 const BRAND: FigmaVariableCollection = {
   id: "c1",
-  name: "Zoblocks / Brand",
+  name: "ZoBlocks / Brand",
   modes: [{ modeId: "m1", name: "Default" }],
 };
 
 const SEMANTIC: FigmaVariableCollection = {
   id: "c2",
-  name: "Zoblocks / Semantic",
+  name: "ZoBlocks / Semantic",
   modes: [
     { modeId: "m2", name: "light" },
     { modeId: "m3", name: "dark" },
@@ -218,8 +218,8 @@ describe("readFile", () => {
 
     const { collections } = await readFile(figma);
     expect(collections).toEqual([
-      { id: "c1", name: "Zoblocks / Brand", modes: ["Default"], stamped: 1, colours: 1 },
-      { id: "c2", name: "Zoblocks / Semantic", modes: ["light", "dark"], stamped: 1, colours: 2 },
+      { id: "c1", name: "ZoBlocks / Brand", modes: ["Default"], stamped: 1, colours: 1 },
+      { id: "c2", name: "ZoBlocks / Semantic", modes: ["light", "dark"], stamped: 1, colours: 2 },
     ]);
   });
 
@@ -228,7 +228,7 @@ describe("readFile", () => {
     // A designer who selected an empty collection should be told it is empty,
     // not shown a picker that silently lacks the thing they clicked.
     expect(collections).toEqual([
-      { id: "c1", name: "Zoblocks / Brand", modes: ["Default"], stamped: 0, colours: 0 },
+      { id: "c1", name: "ZoBlocks / Brand", modes: ["Default"], stamped: 0, colours: 0 },
     ]);
   });
 });

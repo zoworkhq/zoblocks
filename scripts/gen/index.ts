@@ -5,7 +5,7 @@
  * every shared artifact the platform derives from them:
  *
  *   tsconfig.generated.json                     path mappings
- *   registry.json + apps/docs/public/r/*.json   the Zoblocks registry
+ *   registry.json + apps/docs/public/r/*.json   the ZoBlocks registry
  *   apps/docs/public/schema/*.json              the formats those declare
  *   apps/docs/src/lib/generated/catalog.ts      the docs catalog
  *   apps/docs/src/app/generated-sources.css     Tailwind source globs

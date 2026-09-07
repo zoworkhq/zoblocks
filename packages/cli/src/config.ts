@@ -23,7 +23,7 @@
  * ## Why there is one path setting and not four
  *
  * An earlier version of this file let you place components, lib, hooks, and
- * styles independently. That is a promise this CLI cannot keep. Zoblocks source
+ * styles independently. That is a promise this CLI cannot keep. ZoBlocks source
  * is copied verbatim, and it imports itself through the `@/` alias —
  * `@/lib/utils`, `@/components/zoblocks/timeline`. Those specifiers are inside
  * the files, so a component's location is fixed by the source, not by
@@ -55,7 +55,7 @@ export interface RegistryConfig {
   headers?: Record<string, string>;
 }
 
-export interface ZoblocksConfig {
+export interface ZoBlocksConfig {
   $schema?: string;
   /**
    * Directory the project's `@/` alias resolves to, relative to the project
@@ -68,7 +68,7 @@ export interface ZoblocksConfig {
 /**
  * Where `@/` points when nothing says otherwise.
  *
- * A `src` directory is the near-universal convention in the frameworks Zoblocks
+ * A `src` directory is the near-universal convention in the frameworks ZoBlocks
  * targets, and getting this wrong costs one edit to a file the CLI just told
  * you it wrote. Guessing is cheaper than prompting every developer for an
  * answer that is right by default.
@@ -83,8 +83,8 @@ export class ConfigError extends Error {
 }
 
 /**
- * The name this file carried before the project was renamed from Zoblocks to
- * Zoblocks. A consumer who installed anything under the old name has one of
+ * The name this file carried before the project was renamed from ZoBlocks to
+ * ZoBlocks. A consumer who installed anything under the old name has one of
  * these committed, and it parses identically — only the filename moved.
  *
  * It is read, never written. `resolveConfigPath` prefers the current name, so
@@ -127,7 +127,7 @@ export function guessRoot(cwd: string): string {
   return existsSync(path.join(cwd, "src")) ? "src" : ".";
 }
 
-export function defaultConfig(cwd: string): ZoblocksConfig {
+export function defaultConfig(cwd: string): ZoBlocksConfig {
   return {
     $schema: CONFIG_SCHEMA_URL,
     root: guessRoot(cwd),
@@ -135,7 +135,7 @@ export function defaultConfig(cwd: string): ZoblocksConfig {
   };
 }
 
-export async function readConfig(cwd: string): Promise<ZoblocksConfig> {
+export async function readConfig(cwd: string): Promise<ZoBlocksConfig> {
   const { file, legacy } = resolveConfigPath(cwd);
   if (!existsSync(file)) {
     throw new ConfigError(`No ${CONFIG_FILE} in ${cwd}.\n\nRun "zoblocks init" to create one.`);
@@ -192,7 +192,7 @@ export async function readConfig(cwd: string): Promise<ZoblocksConfig> {
   };
 }
 
-export async function writeConfig(cwd: string, config: ZoblocksConfig): Promise<void> {
+export async function writeConfig(cwd: string, config: ZoBlocksConfig): Promise<void> {
   await writeFile(configPath(cwd), `${JSON.stringify(config, null, 2)}\n`, "utf8");
 }
 
@@ -210,7 +210,7 @@ export async function writeConfig(cwd: string, config: ZoblocksConfig): Promise<
  * not, and it puts the file somewhere obvious rather than failing.
  */
 export function resolveTarget(
-  config: ZoblocksConfig,
+  config: ZoBlocksConfig,
   file: { path: string; target?: string },
 ): string {
   return path.join(config.root, file.target ?? path.basename(file.path));

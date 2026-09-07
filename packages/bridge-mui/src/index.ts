@@ -1,5 +1,5 @@
 /**
- * @zoblocks/bridge-mui — Zoblocks components in a Material UI host's
+ * @zoblocks/bridge-mui — ZoBlocks components in a Material UI host's
  * design language.
  *
  *     pnpm add @zoblocks/bridge-mui
@@ -14,5 +14,5 @@
 export { MuiBridge, useMuiTokens, type MuiBridgeProps } from "./MuiBridge";
 export { muiBridge, type MuiTheme } from "./map";
 
-export { ZoblocksMuiProvider, type ZoblocksMuiProviderProps } from "./ZoblocksMuiProvider";
+export { ZoBlocksMuiProvider, type ZoBlocksMuiProviderProps } from "./ZoBlocksMuiProvider";
 export { NOT_PUSHED_TO_MUI, toMuiTheme, type MuiThemeOptions } from "./inverse";

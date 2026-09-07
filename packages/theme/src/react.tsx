@@ -3,7 +3,7 @@
 /**
  * A theme applied inline, without a stylesheet.
  *
- *     <ZoblocksTheme tokens={{ "--zb-accent": "#1d63c9" }}>{app}</ZoblocksTheme>
+ *     <ZoBlocksTheme tokens={{ "--zb-accent": "#1d63c9" }}>{app}</ZoBlocksTheme>
  *
  * The third delivery mode. Most applications should link the published
  * stylesheet — version-pinned, CDN-cacheable, no JavaScript, and it survives
@@ -19,7 +19,7 @@
 
 import * as React from "react";
 
-export interface ZoblocksThemeProps {
+export interface ZoBlocksThemeProps {
   children: React.ReactNode;
   /** Custom properties to apply. Keys must be `--` prefixed. */
   tokens: Record<string, string | number | undefined>;
@@ -31,7 +31,7 @@ export interface ZoblocksThemeProps {
   as?: "div" | "span";
 }
 
-export function ZoblocksTheme({
+export function ZoBlocksTheme({
   children,
   tokens,
   brand,
@@ -39,7 +39,7 @@ export function ZoblocksTheme({
   density,
   className,
   as = "div",
-}: ZoblocksThemeProps) {
+}: ZoBlocksThemeProps) {
   const style = React.useMemo(() => {
     const out: Record<string, string | number> = {};
     for (const [key, value] of Object.entries(tokens)) {

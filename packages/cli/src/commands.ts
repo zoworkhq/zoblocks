@@ -17,7 +17,7 @@ import {
   defaultConfig,
   readConfig,
   writeConfig,
-  type ZoblocksConfig,
+  type ZoBlocksConfig,
 } from "./config.js";
 import { collectItems, type FetchOptions } from "./registry.js";
 import { PUBLIC_REGISTRY_INDEX } from "./constants.js";
@@ -114,7 +114,7 @@ export async function add(
     return 1;
   }
 
-  let config: ZoblocksConfig;
+  let config: ZoBlocksConfig;
   try {
     config = await readConfig(cwd);
   } catch (error) {

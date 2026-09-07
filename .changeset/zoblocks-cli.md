@@ -2,7 +2,7 @@
 "@zoblocks/cli": minor
 ---
 
-First release: Zoblocks installs its own components.
+First release: ZoBlocks installs its own components.
 
 `npx @zoblocks/cli add pulse-loader` replaces the third-party CLI the
 registry channel used to depend on. The public catalog now needs no

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ZoblocksMark } from "@/components/Rail";
+import { ZoBlocksMark } from "@/components/Rail";
 import { buttonClasses } from "@/components/ui";
 
 /**
@@ -15,7 +15,7 @@ export default function NotFound() {
   return (
     <main className="grid min-h-screen place-items-center px-6">
       <div className="w-full max-w-[26rem]">
-        <ZoblocksMark className="h-4 w-7 text-ink" />
+        <ZoBlocksMark className="h-4 w-7 text-ink" />
         <h1 className="display-sm mt-5">There is nothing at this address</h1>
         <p className="mt-2 text-[0.875rem] leading-relaxed text-graphite">
           Check the link, or sign in and start from there.

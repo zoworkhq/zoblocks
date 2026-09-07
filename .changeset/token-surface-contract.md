@@ -24,7 +24,7 @@ theming system it appears to be part of:
 
 - **Seven component tokens referenced tokens that do not exist.** `--zb-fg`,
   `--zb-fg-muted`, `--zb-fg-subtle` in `tabs`; `--zb-rule` and
-  `--zb-status-accent` in `copilot`. Those colours never followed a Zoblocks or
+  `--zb-status-accent` in `copilot`. Those colours never followed a ZoBlocks or
   customer brand — they fell through to antd's value or a literal. The docs
   site masked it by defining the invented names in its own stylesheet. Now
   corrected to `--zb-text*`, `--zb-border` and `--zb-accent`, and a dangling

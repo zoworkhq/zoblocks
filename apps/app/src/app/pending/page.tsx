@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ZoblocksMark } from "@/components/Rail";
+import { ZoBlocksMark } from "@/components/Rail";
 import { Callout, buttonClasses } from "@/components/ui";
 
 export const metadata = { title: "Awaiting approval" };
@@ -20,9 +20,9 @@ export default function PendingPage() {
   return (
     <div className="mx-auto flex min-h-screen max-w-[30rem] flex-col justify-center px-6 py-16">
       <span className="mb-7 inline-flex items-center gap-2.5 text-ink">
-        <ZoblocksMark className="h-4 w-7" />
+        <ZoBlocksMark className="h-4 w-7" />
         <span className="font-display text-[0.9375rem] font-semibold tracking-[-0.02em]">
-          Zoblocks
+          ZoBlocks
         </span>
         <span className="eyebrow text-[0.5625rem] text-graphite-soft">App</span>
       </span>

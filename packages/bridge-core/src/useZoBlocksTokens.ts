@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * The resolved Zoblocks tokens, kept current.
+ * The resolved ZoBlocks tokens, kept current.
  *
  * Two things make this more than a `getComputedStyle` call.
  *
@@ -19,9 +19,9 @@
  */
 
 import * as React from "react";
-import { THEME_ATTRIBUTES, resolveZoblocksTokens, type ZoblocksTokens } from "./read";
+import { THEME_ATTRIBUTES, resolveZoBlocksTokens, type ZoBlocksTokens } from "./read";
 
-export interface UseZoblocksTokensOptions {
+export interface UseZoBlocksTokensOptions {
   /**
    * Values for the server render and the first client render.
    *
@@ -29,14 +29,14 @@ export interface UseZoblocksTokensOptions {
    * already knows the brand it is serving, so it can seed the same values the
    * browser is about to resolve.
    */
-  fallback?: ZoblocksTokens;
+  fallback?: ZoBlocksTokens;
   /** Read from here rather than `documentElement`. Scopes to one brand subtree. */
   scope?: React.RefObject<Element | null>;
 }
 
-export function useZoblocksTokens(options: UseZoblocksTokensOptions = {}): ZoblocksTokens {
+export function useZoBlocksTokens(options: UseZoBlocksTokensOptions = {}): ZoBlocksTokens {
   const { fallback, scope } = options;
-  const [tokens, setTokens] = React.useState<ZoblocksTokens>(fallback ?? {});
+  const [tokens, setTokens] = React.useState<ZoBlocksTokens>(fallback ?? {});
 
   React.useEffect(() => {
     const element = scope?.current ?? null;
@@ -52,7 +52,7 @@ export function useZoblocksTokens(options: UseZoblocksTokensOptions = {}): Zoblo
        * A token the page has not defined keeps whatever the caller seeded, and
        * one it has defined wins.
        */
-      const next = { ...fallback, ...resolveZoblocksTokens(element) };
+      const next = { ...fallback, ...resolveZoBlocksTokens(element) };
 
       // Compared before setting: a MutationObserver fires for attribute writes
       // that change nothing, and re-rendering a whole application's theme
@@ -81,8 +81,8 @@ export function useZoblocksTokens(options: UseZoblocksTokensOptions = {}): Zoblo
   return tokens;
 }
 
-function shallowEqual(a: ZoblocksTokens, b: ZoblocksTokens): boolean {
+function shallowEqual(a: ZoBlocksTokens, b: ZoBlocksTokens): boolean {
   const keys = Object.keys(a);
   if (keys.length !== Object.keys(b).length) return false;
-  return keys.every((key) => a[key as keyof ZoblocksTokens] === b[key as keyof ZoblocksTokens]);
+  return keys.every((key) => a[key as keyof ZoBlocksTokens] === b[key as keyof ZoBlocksTokens]);
 }

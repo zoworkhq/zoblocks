@@ -6,7 +6,7 @@
 component, resolved from whichever UI framework the host runs, so one demo
 source renders under Ant Design, Material UI, or neither.
 
-Zoblocks ships 28 components and none of them is a Button. That is ADR 0010
+ZoBlocks ships 28 components and none of them is a Button. That is ADR 0010
 working as intended — primitives match Ant Design's public API and take no
 dependency on it, which is what keeps copy-as-source distribution open for the
 whole form family — but it leaves a real gap when the question is "does this

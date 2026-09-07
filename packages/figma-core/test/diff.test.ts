@@ -109,7 +109,7 @@ describe("a renamed variable is updated, not duplicated", () => {
   it("never claims a variable it did not create", () => {
     const plan = toVariablePlan(theme());
     const diff = diffPlan(plan, {
-      variables: [{ name: "accent", collection: "Zoblocks / Semantic", values: {} }],
+      variables: [{ name: "accent", collection: "ZoBlocks / Semantic", values: {} }],
     });
 
     expect(diff.orphan).toEqual([]);
@@ -131,7 +131,7 @@ describe("what is no longer in the theme", () => {
     snapshot.variables.push({
       token: "--zb-accent-retired",
       name: "accent/retired",
-      collection: "Zoblocks / Semantic",
+      collection: "ZoBlocks / Semantic",
       values: {},
     });
 
@@ -184,12 +184,12 @@ describe("values that are not colours", () => {
     token,
     name: token.replace("--zb-", ""),
     tier: "semantic",
-    collection: "Zoblocks / Semantic",
+    collection: "ZoBlocks / Semantic",
     values: { light: value },
   });
 
   const planOf = (variables: PlannedVariable[]): VariablePlan => ({
-    collections: [{ name: "Zoblocks / Semantic", modes: ["light"] }],
+    collections: [{ name: "ZoBlocks / Semantic", modes: ["light"] }],
     variables,
   });
 
@@ -198,7 +198,7 @@ describe("values that are not colours", () => {
       {
         token,
         name: token.replace("--zb-", ""),
-        collection: "Zoblocks / Semantic",
+        collection: "ZoBlocks / Semantic",
         values: { light: value },
       },
     ],

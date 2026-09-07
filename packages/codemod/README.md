@@ -1,6 +1,6 @@
 # @zoblocks/codemod
 
-Migration codemods for Zoblocks. They rewrite what they can prove and report
+Migration codemods for ZoBlocks. They rewrite what they can prove and report
 what they cannot, rather than guessing.
 
 ```bash
@@ -16,7 +16,7 @@ Exits non-zero while any note still needs a human, so it composes into CI as a
 
 ## `oxygen-to-zoblocks`
 
-Oxygen UI → Zoblocks. The project was renamed in September 2026, and everything
+Oxygen UI → ZoBlocks. The project was renamed in September 2026, and everything
 a consumer's tree can hold moved with it.
 
 ```bash
@@ -52,7 +52,7 @@ for exactly that.
 
 ## `antd-collapse`
 
-Ant Design `Collapse` → Zoblocks `Accordion`. The two APIs are deliberately the
+Ant Design `Collapse` → ZoBlocks `Accordion`. The two APIs are deliberately the
 same shape, so most of this is an import rewrite and three v6 renames.
 
 **Rewritten automatically**
@@ -71,12 +71,12 @@ build somewhere that looks unrelated.
 
 **Reported, not rewritten**
 
-- **`headingLevel`.** Zoblocks wraps every trigger in a real heading, and the
+- **`headingLevel`.** ZoBlocks wraps every trigger in a real heading, and the
   correct level depends on the surrounding document outline — which a transform
   cannot see. A wrong level produces valid markup, a quiet axe run, and a
   heading list that misrepresents the page to the one reader who navigates by
   it. So the codemod asks, once per call site.
-- **`Collapse.Panel`.** Deprecated in antd too, and it has no Zoblocks equivalent.
+- **`Collapse.Panel`.** Deprecated in antd too, and it has no ZoBlocks equivalent.
   The panels move into the `items` array: `header` becomes `label`, children
   become `children`.
 - **An aliased import** (`Collapse as Foldy`). The import is rewritten; the
@@ -87,7 +87,7 @@ build somewhere that looks unrelated.
 `accordion` keeps antd's meaning — one section open at a time. It no longer
 changes the emitted roles: antd switches to `role="tablist"/"tab"/"tabpanel"`
 when that prop is set, which swaps a disclosure pattern for a tab pattern as a
-side effect of a state option. Zoblocks stays a disclosure widget in every
+side effect of a state option. ZoBlocks stays a disclosure widget in every
 configuration.
 
 ## Why there is no parser here

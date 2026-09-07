@@ -8,7 +8,7 @@
  * **Durable identity**: a designer will rename a variable, and matching on the
  * label would create a duplicate the first time somebody tidies a collection.
  *
- * So the key is the Zoblocks token name stamped in plugin data, and the label is
+ * So the key is the ZoBlocks token name stamped in plugin data, and the label is
  * treated as something the designer owns.
  */
 

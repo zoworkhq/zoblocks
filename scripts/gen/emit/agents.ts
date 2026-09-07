@@ -72,14 +72,14 @@ export async function emitAgentManifest(
       return `## ${layer[0]!.toUpperCase()}${layer.slice(1)}\n\n${items}`;
     });
 
-  const content = `# Zoblocks
+  const content = `# ZoBlocks
 
 > React components for healthcare interfaces, typed to FHIR R4 and delivered as
-> source through the Zoblocks registry. Components take FHIR resources as props
+> source through the ZoBlocks registry. Components take FHIR resources as props
 > directly and render absence, preliminary status, restricted records, and
 > critical results as explicit states rather than as blanks.
 
-Zoblocks is not a compliance boundary, not a medical device, and not clinical
+ZoBlocks is not a compliance boundary, not a medical device, and not clinical
 decision support. Access control, audit, data residency, and clinical validation
 remain the implementing team's responsibility.
 

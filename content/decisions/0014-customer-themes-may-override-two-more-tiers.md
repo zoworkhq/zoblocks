@@ -9,7 +9,7 @@ for a brand: one palette file, compiled at build time, reaching every component
 through the semantic tier without any component knowing a brand exists.
 
 It is not a sufficient rule for a **customer theme**. The app exists so an
-enterprise customer can put Zoblocks's components into their own design language,
+enterprise customer can put ZoBlocks's components into their own design language,
 and two things they reliably want are outside a ramp:
 
 - **A semantic value that is not a shade of their brand.** `text-muted` against

@@ -2,8 +2,8 @@
  * Generates `packages/react/src` from the registry source.
  *
  * The invariant this exists to protect: **no component's logic is written
- * twice.** Zoblocks ships React two ways — copied into a customer's repository by
- * the Zoblocks CLI, and installed from npm — and the moment those are two
+ * twice.** ZoBlocks ships React two ways — copied into a customer's repository by
+ * the ZoBlocks CLI, and installed from npm — and the moment those are two
  * hand-written trees they drift. The parity test between the registry and the
  * custom elements already caught two divergences in its first week; a third
  * copy would make that the project's main source of bugs.
@@ -15,7 +15,7 @@
  * mechanically produced.
  *
  * The only transformation is import specifiers. A registry component imports
- * the way the Zoblocks CLI lays files out in a consumer's project
+ * the way the ZoBlocks CLI lays files out in a consumer's project
  * (`@/components/zoblocks/rhythm-loader`); inside a package those become ordinary
  * relative paths. Nothing else is rewritten — if this file ever needs to change
  * logic, the abstraction is wrong.

@@ -51,7 +51,7 @@ export function renderControls(root: HTMLElement, options: ControlsOptions): voi
         value: c.name,
         // The counts are the reason a designer can tell why one collection gets
         // the real pair list and another gets a single ground.
-        label: `${c.name} — ${c.colours} colours, ${c.stamped} Zoblocks`,
+        label: `${c.name} — ${c.colours} colours, ${c.stamped} ZoBlocks`,
       })),
       onChange: (value) => options.onChange({ ...options.value, collection: value }),
     }),
@@ -67,7 +67,7 @@ export function renderControls(root: HTMLElement, options: ControlsOptions): voi
     }),
   );
 
-  // Only the palette reading needs a ground and a floor: with Zoblocks stamps,
+  // Only the palette reading needs a ground and a floor: with ZoBlocks stamps,
   // the pair list already knows which colour is text and which rule applies.
   if (chosen.stamped === 0) {
     root.append(

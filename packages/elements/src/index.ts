@@ -1,5 +1,5 @@
 /**
- * @zoblocks/elements — Zoblocks controls as custom elements.
+ * @zoblocks/elements — ZoBlocks controls as custom elements.
  *
  * Dependency-free, framework-agnostic, and side-effectful by design: importing
  * an entry point DEFINES the element. Marking this package side-effect-free

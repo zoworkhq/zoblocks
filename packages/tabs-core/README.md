@@ -1,13 +1,13 @@
 # @zoblocks/tabs-core
 
-**The selection engine behind Zoblocks Tabs.** No React, no DOM, no dependencies —
+**The selection engine behind ZoBlocks Tabs.** No React, no DOM, no dependencies —
 every export is a pure function or a small state machine over plain data.
 
 ```bash
 npm install @zoblocks/tabs-core
 ```
 
-It exists so a host on a different design system can take Zoblocks's keyboard
+It exists so a host on a different design system can take ZoBlocks's keyboard
 model and accessibility contract without the skin, and so that contract can be
 tested exhaustively without rendering anything.
 

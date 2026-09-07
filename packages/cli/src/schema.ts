@@ -1,5 +1,5 @@
 /**
- * The Zoblocks registry wire format.
+ * The ZoBlocks registry wire format.
  *
  * Two documents are served:
  *
@@ -53,7 +53,7 @@ export const ITEM_KINDS = FILE_KINDS;
 export type ItemKind = FileKind;
 
 export interface RegistryFile {
-  /** Path in the Zoblocks repository. Provenance, not a destination. */
+  /** Path in the ZoBlocks repository. Provenance, not a destination. */
   path: string;
   type: FileKind;
   /**

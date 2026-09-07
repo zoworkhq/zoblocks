@@ -9,14 +9,14 @@
 import * as React from "react";
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { ZoblocksTheme } from "../src/react";
+import { ZoBlocksTheme } from "../src/react";
 
-describe("<ZoblocksTheme>", () => {
+describe("<ZoBlocksTheme>", () => {
   it("applies tokens to one element", () => {
     const { container } = render(
-      <ZoblocksTheme tokens={{ "--zb-accent": "#1d63c9" }}>
+      <ZoBlocksTheme tokens={{ "--zb-accent": "#1d63c9" }}>
         <button type="button">Sign</button>
-      </ZoblocksTheme>,
+      </ZoBlocksTheme>,
     );
     const wrapper = container.firstElementChild as HTMLElement;
     expect(wrapper.style.getPropertyValue("--zb-accent")).toBe("#1d63c9");
@@ -29,9 +29,9 @@ describe("<ZoblocksTheme>", () => {
    */
   it("drops undefined and empty values rather than blanking the property", () => {
     const { container } = render(
-      <ZoblocksTheme tokens={{ "--zb-accent": undefined, "--zb-text": "", "--zb-bg": "#fff" }}>
+      <ZoBlocksTheme tokens={{ "--zb-accent": undefined, "--zb-text": "", "--zb-bg": "#fff" }}>
         x
-      </ZoblocksTheme>,
+      </ZoBlocksTheme>,
     );
     const wrapper = container.firstElementChild as HTMLElement;
     expect(wrapper.style.getPropertyValue("--zb-accent")).toBe("");
@@ -40,7 +40,7 @@ describe("<ZoblocksTheme>", () => {
 
   it("ignores keys that are not custom properties", () => {
     const { container } = render(
-      <ZoblocksTheme tokens={{ color: "red", "--zb-bg": "#fff" }}>x</ZoblocksTheme>,
+      <ZoBlocksTheme tokens={{ color: "red", "--zb-bg": "#fff" }}>x</ZoBlocksTheme>,
     );
     const wrapper = container.firstElementChild as HTMLElement;
     expect(wrapper.style.color).toBe("");
@@ -48,9 +48,9 @@ describe("<ZoblocksTheme>", () => {
 
   it("sets the three axis attributes when asked", () => {
     const { container } = render(
-      <ZoblocksTheme tokens={{}} brand="northwind" theme="high-contrast" density="clinical">
+      <ZoBlocksTheme tokens={{}} brand="northwind" theme="high-contrast" density="clinical">
         x
-      </ZoblocksTheme>,
+      </ZoBlocksTheme>,
     );
     const wrapper = container.firstElementChild as HTMLElement;
     expect(wrapper.getAttribute("data-zb-brand")).toBe("northwind");
@@ -59,7 +59,7 @@ describe("<ZoblocksTheme>", () => {
   });
 
   it("omits an axis that was not asked for, rather than writing a default", () => {
-    const { container } = render(<ZoblocksTheme tokens={{}}>x</ZoblocksTheme>);
+    const { container } = render(<ZoBlocksTheme tokens={{}}>x</ZoBlocksTheme>);
     const wrapper = container.firstElementChild as HTMLElement;
     expect(wrapper.hasAttribute("data-zb-brand")).toBe(false);
     expect(wrapper.hasAttribute("data-zb-theme")).toBe(false);
@@ -67,9 +67,9 @@ describe("<ZoblocksTheme>", () => {
 
   it("adds nothing to the accessibility tree", () => {
     render(
-      <ZoblocksTheme tokens={{ "--zb-accent": "#1d63c9" }}>
+      <ZoBlocksTheme tokens={{ "--zb-accent": "#1d63c9" }}>
         <button type="button">Sign</button>
-      </ZoblocksTheme>,
+      </ZoBlocksTheme>,
     );
     const wrapper = screen.getByRole("button", { name: "Sign" }).parentElement as HTMLElement;
     expect(wrapper.getAttribute("role")).toBeNull();
@@ -78,9 +78,9 @@ describe("<ZoblocksTheme>", () => {
 
   it("renders as a span where a block element would break the layout", () => {
     const { container } = render(
-      <ZoblocksTheme tokens={{}} as="span">
+      <ZoBlocksTheme tokens={{}} as="span">
         x
-      </ZoblocksTheme>,
+      </ZoBlocksTheme>,
     );
     expect(container.firstElementChild?.tagName).toBe("SPAN");
   });
@@ -92,12 +92,12 @@ describe("<ZoblocksTheme>", () => {
   it("scopes independently, so one page can render two customers' branding", () => {
     const { container } = render(
       <div>
-        <ZoblocksTheme tokens={{ "--zb-accent": "#1d63c9" }} brand="northwind">
+        <ZoBlocksTheme tokens={{ "--zb-accent": "#1d63c9" }} brand="northwind">
           <span>a</span>
-        </ZoblocksTheme>
-        <ZoblocksTheme tokens={{ "--zb-accent": "#b91c1c" }} brand="southmere">
+        </ZoBlocksTheme>
+        <ZoBlocksTheme tokens={{ "--zb-accent": "#b91c1c" }} brand="southmere">
           <span>b</span>
-        </ZoblocksTheme>
+        </ZoBlocksTheme>
       </div>,
     );
     const [first, second] = [...container.querySelectorAll("[data-zb-brand]")] as HTMLElement[];

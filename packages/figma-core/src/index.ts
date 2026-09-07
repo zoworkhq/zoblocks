@@ -1,5 +1,5 @@
 /**
- * @zoblocks/figma-core — Zoblocks themes as Figma variable plans.
+ * @zoblocks/figma-core — ZoBlocks themes as Figma variable plans.
  *
  * Pure by construction: no `figma.*`, no DOM, no network, no `node:*`. A Figma
  * plugin runs across two isolated contexts — a sandbox with the Figma API and

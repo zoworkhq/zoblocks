@@ -12,8 +12,8 @@
  * should be readable source rather than a string.
  *
  * Colours resolve through the same `--zb-*` semantic tokens as everything else
- * in Zoblocks, and fall back to `currentColor` when the token stylesheet is not
- * present — so the element is themed by a host that has Zoblocks tokens, and
+ * in ZoBlocks, and fall back to `currentColor` when the token stylesheet is not
+ * present — so the element is themed by a host that has ZoBlocks tokens, and
  * still legible in one that does not.
  */
 

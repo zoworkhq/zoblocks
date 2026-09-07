@@ -19,7 +19,7 @@ export default function LoginPage() {
       {/*
         No eyebrow above this, unlike `PageHeader` inside the app.
 
-        It had one — "Zoblocks app", matching the rest of the product. That
+        It had one — "ZoBlocks app", matching the rest of the product. That
         earned its place when the wordmark sat in the far corner of a wide
         split. In a single centred column the wordmark is the line directly
         above, so the eyebrow said the same words twice in the space of an inch,

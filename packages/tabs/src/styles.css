@@ -1,12 +1,12 @@
 /*
- * Zoblocks Tabs.
+ * ZoBlocks Tabs.
  *
  * Three-tier tokens with a strict reference rule. Every value a component
  * reads is an `--zb-tabs-*` token; every one of those resolves to a semantic
  * `--zb-*` token, then to an Ant Design `--ant-*` variable, then to a literal.
  * That chain is what makes the same stylesheet correct in three places:
  *
- *   - a Zoblocks app, where `--zb-*` are defined and the brand flows through;
+ *   - a ZoBlocks app, where `--zb-*` are defined and the brand flows through;
  *   - a plain antd app, where `ConfigProvider` drives `--ant-*` and the strip
  *     matches the host theme with no JavaScript at all;
  *   - a bare page, where the literals keep it legible.

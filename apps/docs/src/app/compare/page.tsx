@@ -21,9 +21,9 @@ import { RevealRoot } from "@/components/site/interactions";
  * not a humblebrag. A comparison without one is an advert.
  */
 export const metadata: Metadata = {
-  title: "Compare — Zoblocks, antd, or build it",
+  title: "Compare — ZoBlocks, antd, or build it",
   description:
-    "How Zoblocks compares to general-purpose React libraries, headless table libraries, and building clinical components in-house. Measured, with sources.",
+    "How ZoBlocks compares to general-purpose React libraries, headless table libraries, and building clinical components in-house. Measured, with sources.",
   alternates: { canonical: "/compare" },
 };
 
@@ -39,21 +39,21 @@ const STATE_COUNT = CATALOG.reduce((total, component) => total + component.state
 
 /** The grid's own numbers, so the table below cannot describe a version it is not. */
 const GRID = getComponent("data-grid");
-const GRID_COLUMN = `Zoblocks DataGrid ${GRID?.since ?? ""}`.trim();
+const GRID_COLUMN = `ZoBlocks DataGrid ${GRID?.since ?? ""}`.trim();
 
 const OPTIONS = [
   {
     name: "Build it in-house",
     when: "You have a design system, an accessibility practice, and a team that can carry both.",
     cost: "The components are the small part. The states are the work.",
-    detail: `A lab result is an afternoon. A lab result that renders a corrected value without hiding the number a clinician saw an hour ago, distinguishes “no reference range published” from “within range”, and says “restricted” rather than showing an em dash — that is the part that takes a quarter and gets cut when the quarter runs out. Zoblocks ships ${COMPONENT_COUNT} components carrying ${STATE_COUNT} documented states because those states are the reason the library exists.`,
+    detail: `A lab result is an afternoon. A lab result that renders a corrected value without hiding the number a clinician saw an hour ago, distinguishes “no reference range published” from “within range”, and says “restricted” rather than showing an em dash — that is the part that takes a quarter and gets cut when the quarter runs out. ZoBlocks ships ${COMPONENT_COUNT} components carrying ${STATE_COUNT} documented states because those states are the reason the library exists.`,
   },
   {
     name: "A general-purpose React library",
     when: "Your product is not clinical, or clinical display is a small part of it.",
     cost: "Excellent engineering, aimed at a different problem.",
     detail:
-      "Ant Design, MUI and their peers are better than anything we would write for the 80% of an application that is forms, layout and navigation — and Zoblocks is deliberately API-compatible with antd v6 rather than competing with it. What they do not have is a vocabulary for absence: no component in a general-purpose library knows the difference between a result that is missing and a result you are not permitted to see, because no general-purpose product needs one.",
+      "Ant Design, MUI and their peers are better than anything we would write for the 80% of an application that is forms, layout and navigation — and ZoBlocks is deliberately API-compatible with antd v6 rather than competing with it. What they do not have is a vocabulary for absence: no component in a general-purpose library knows the difference between a result that is missing and a result you are not permitted to see, because no general-purpose product needs one.",
   },
   {
     name: "A headless table library",
@@ -118,9 +118,9 @@ const RC_TABLE = [
 
 const NOT_FOR_YOU = [
   "You want components you can upgrade with a version bump. Source is copied into your repo, so fixes arrive as a diff you take deliberately — that is the trade, and for some teams it is the wrong one.",
-  "You need a component library for a general product. Most of Zoblocks is clinical, and the parts that are not are better served by antd or MUI.",
+  "You need a component library for a general product. Most of ZoBlocks is clinical, and the parts that are not are better served by antd or MUI.",
   "You need a general-purpose table. Ours is built for clinical worklists — a required coverage claim, five kinds of absence, model provenance on a derived column — and it does not generalise into a reporting grid.",
-  "You are looking for a compliance shortcut. Zoblocks is not a compliance boundary and not a medical device, and using it changes nothing about your regulatory position.",
+  "You are looking for a compliance shortcut. ZoBlocks is not a compliance boundary and not a medical device, and using it changes nothing about your regulatory position.",
 ];
 
 export default function ComparePage() {
@@ -141,7 +141,7 @@ export default function ComparePage() {
               className="mt-5 max-w-2xl text-lg font-medium tracking-tight text-graphite"
               data-reveal
             >
-              Zoblocks compared to antd, TanStack, and building it yourself.
+              ZoBlocks compared to antd, TanStack, and building it yourself.
             </h2>
             <p className="body-lg mt-5 max-w-2xl text-pretty text-graphite" data-reveal>
               Every claim about another project below is a measurement against a named version, and
@@ -245,7 +245,7 @@ export default function ComparePage() {
         <section className="border-b border-rule bg-paper-sunk/40">
           <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
             <h2 className="display-sm text-balance" data-reveal>
-              When not to choose Zoblocks.
+              When not to choose ZoBlocks.
             </h2>
             <ul className="mt-8 max-w-3xl" data-reveal>
               {NOT_FOR_YOU.map((reason) => (

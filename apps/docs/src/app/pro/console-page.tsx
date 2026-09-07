@@ -54,7 +54,7 @@ export function ConsolePage() {
           <div className="mx-auto grid max-w-6xl section-major gap-10 px-5 sm:px-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] lg:items-center lg:gap-16">
             <div>
               <p className="eyebrow eyebrow-rule text-brand-deep" data-reveal>
-                Zoblocks Pro
+                ZoBlocks Pro
               </p>
               <h1 className="display-lg mt-5 text-balance" data-reveal>
                 Your brand, through a gate that will not let it fail.

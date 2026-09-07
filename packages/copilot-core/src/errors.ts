@@ -1,7 +1,7 @@
 /**
  * Errors, as a closed union rather than thrown strings.
  *
- * Every one of these has a designed UI state behind it — Zoblocks's DESIGN.md
+ * Every one of these has a designed UI state behind it — ZoBlocks's DESIGN.md
  * requires loading, empty, error, offline, permission-denied and restricted to
  * each be a decision rather than a default. A union is what lets the skin prove
  * it handled all of them: add a member here and every `switch` that renders one

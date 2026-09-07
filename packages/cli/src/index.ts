@@ -1,5 +1,5 @@
 /**
- * @zoblocks/cli — the installer for Zoblocks components.
+ * @zoblocks/cli — the installer for ZoBlocks components.
  *
  * The binary is `zoblocks`. This entry point exists so the same machinery is
  * usable from a script: a build step that materialises components into a
@@ -20,7 +20,7 @@ export {
   readConfig,
   resolveTarget,
   writeConfig,
-  type ZoblocksConfig,
+  type ZoBlocksConfig,
   type RegistryConfig,
 } from "./config.js";
 export {

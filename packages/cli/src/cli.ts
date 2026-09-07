@@ -12,7 +12,7 @@ import { ConfigError } from "./config.js";
 import { RegistryError } from "./registry.js";
 import { RegistryFormatError } from "./schema.js";
 
-const HELP = `zoblocks — install Zoblocks components into your project
+const HELP = `zoblocks — install ZoBlocks components into your project
 
 Usage
   zoblocks init                      Create zoblocks.json

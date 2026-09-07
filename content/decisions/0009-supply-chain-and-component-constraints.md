@@ -27,7 +27,7 @@ to a customer.
 
 ### Component source constraints, enforced by lint
 
-A component in any Zoblocks package may not:
+A component in any ZoBlocks package may not:
 
 - read `process.env`
 - make network calls — no `fetch`, no `XMLHttpRequest`, no `WebSocket`
@@ -69,7 +69,7 @@ for the one case where a style element is unavoidable.
 
 ### The boundary claim is architectural
 
-Zoblocks is not a compliance boundary and not a medical device. This constrains
+ZoBlocks is not a compliance boundary and not a medical device. This constrains
 what components are permitted to do: nothing in this library may present itself
 as clinical decision support, and no component may derive a clinical
 recommendation. It is a rule about the code, not only a disclaimer in the

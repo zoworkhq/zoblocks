@@ -1,5 +1,5 @@
 /**
- * The inverse bridge: a Zoblocks brand, pushed into Material UI.
+ * The inverse bridge: a ZoBlocks brand, pushed into Material UI.
  *
  * The mirror of `map.ts`, and deliberately the same shape as the antd inverse
  * so a customer moving between the two frameworks changes a provider and
@@ -11,7 +11,7 @@
  * is wrong*. The hex would survive; the meaning would not.
  */
 
-import { toPx, type ZoblocksTokens } from "@zoblocks/bridge-core";
+import { toPx, type ZoBlocksTokens } from "@zoblocks/bridge-core";
 
 /** The shape `createTheme` takes. Structural, so MUI stays a peer. */
 export interface MuiThemeOptions {
@@ -34,7 +34,7 @@ export interface MuiThemeOptions {
   typography?: { fontFamily?: string; fontSize?: number };
 }
 
-export function toMuiTheme(tokens: ZoblocksTokens): MuiThemeOptions {
+export function toMuiTheme(tokens: ZoBlocksTokens): MuiThemeOptions {
   const options: MuiThemeOptions = {};
 
   /*
@@ -70,7 +70,7 @@ export function toMuiTheme(tokens: ZoblocksTokens): MuiThemeOptions {
   });
   if (palette) options.palette = palette as MuiThemeOptions["palette"];
 
-  // MUI has one radius, a number of pixels. Handing it Zoblocks's base is the
+  // MUI has one radius, a number of pixels. Handing it ZoBlocks's base is the
   // honest choice — there is nowhere to put the other two steps.
   const radius = toPx(tokens["--zb-radius"]);
   if (radius !== undefined) options.shape = { borderRadius: radius };

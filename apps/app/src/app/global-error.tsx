@@ -31,7 +31,7 @@ export default function GlobalError({
   return (
     <html lang="en-GB">
       <head>
-        <title>Something went wrong · Zoblocks app</title>
+        <title>Something went wrong · ZoBlocks app</title>
       </head>
       <body
         style={{

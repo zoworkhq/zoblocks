@@ -196,7 +196,7 @@ describe("the pull screen", () => {
       {
         token: "--zb-status-critical",
         name: "status/critical",
-        collection: "Zoblocks / Semantic",
+        collection: "ZoBlocks / Semantic",
         values: { light: { kind: "color", hex: "#ff00ff", rgb: { r: 1, g: 0, b: 1 } } },
       },
     ]);
@@ -214,7 +214,7 @@ describe("the pull screen", () => {
 
   it("promises not to delete an orphan, in the place it lists them", () => {
     const stale = snapshot([
-      { token: "--zb-legacy", name: "legacy", collection: "Zoblocks / Semantic", values: {} },
+      { token: "--zb-legacy", name: "legacy", collection: "ZoBlocks / Semantic", values: {} },
     ]);
     renderPull(root, {
       themes: THEMES,

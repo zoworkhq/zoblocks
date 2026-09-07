@@ -1,4 +1,4 @@
-# Zoblocks — Engineering Standard
+# ZoBlocks — Engineering Standard
 
 **This is the document every component, feature, bug fix, release, and
 contribution is evaluated against.** If a review and this document disagree,
@@ -54,7 +54,7 @@ Enforced by `pnpm gen --strict` in CI. **Nothing starts at `stable`.**
 
 ## 1. Purpose and scope
 
-Zoblocks is a component library for healthcare interfaces. It is used by teams
+ZoBlocks is a component library for healthcare interfaces. It is used by teams
 building software that clinicians and patients depend on. Two consequences run
 through everything below:
 
@@ -65,7 +65,7 @@ through everything below:
    _something_ wrong outranks a component that throws, because nobody
    investigates a screen that looks fine.
 
-Zoblocks is **not a compliance boundary**, not a medical device, and not clinical
+ZoBlocks is **not a compliance boundary**, not a medical device, and not clinical
 decision support. Say so on every surface that could be mistaken for a claim.
 
 ## 2. Architecture invariants

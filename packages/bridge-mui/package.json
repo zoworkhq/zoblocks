@@ -1,7 +1,7 @@
 {
   "name": "@zoblocks/bridge-mui",
   "version": "0.1.0",
-  "description": "Theme bridge for Material UI: reads a host's resolved MUI theme and writes Zoblocks's component token surface, so Zoblocks components take the host's design language without importing MUI.",
+  "description": "Theme bridge for Material UI: reads a host's resolved MUI theme and writes ZoBlocks's component token surface, so ZoBlocks components take the host's design language without importing MUI.",
   "license": "MIT",
   "homepage": "https://zoblocks.design",
   "repository": {

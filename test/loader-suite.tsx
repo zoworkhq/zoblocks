@@ -1,5 +1,5 @@
 /**
- * The behaviour every Zoblocks loader shares, as one reusable suite.
+ * The behaviour every ZoBlocks loader shares, as one reusable suite.
  *
  * Five loaders differ only in their art. Everything a reader hears, everything
  * a timing decision does, and every rule about motion is in the frame they all

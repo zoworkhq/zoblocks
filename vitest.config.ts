@@ -6,7 +6,7 @@ import { defineConfig } from "vitest/config";
  * Component tests for the registry — the exact source customers receive.
  *
  * The aliases are read from `tsconfig.generated.json` rather than restated
- * here. Registry components import each other by the path the Zoblocks CLI
+ * here. Registry components import each other by the path the ZoBlocks CLI
  * writes into a consumer's project (`@/components/zoblocks/status-badge`), and
  * that map is generated from component metadata. Duplicating it would mean a
  * new component typechecks, renders in the docs, and then fails only under

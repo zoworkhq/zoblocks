@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * loader-core — everything the Zoblocks loaders share.
+ * loader-core — everything the ZoBlocks loaders share.
  *
  * Each loader is installed on its own (`zoblocks add pulse-loader`), and the
  * CLI pulls this file in as a dependency. Two things live here because
@@ -124,7 +124,7 @@ export interface LoadingGateState {
  * The three timing rules, as one hook.
  *
  * Exported on its own because an application often needs the same decision for
- * something that is not a Zoblocks loader — a skeleton, a disabled button, a
+ * something that is not a ZoBlocks loader — a skeleton, a disabled button, a
  * progress line in a table.
  */
 export function useLoadingGate({
@@ -295,7 +295,7 @@ export interface LoaderFrameProps extends Omit<LoaderCommonProps, "size" | "spee
 }
 
 /**
- * The shell every Zoblocks loader renders inside.
+ * The shell every ZoBlocks loader renders inside.
  *
  * The accessibility contract in one place:
  *

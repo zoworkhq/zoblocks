@@ -1,6 +1,6 @@
 # @zoblocks/elements
 
-Zoblocks controls as dependency-free custom elements. No framework, no build
+ZoBlocks controls as dependency-free custom elements. No framework, no build
 step, no runtime dependencies — a `<script type="module">` tag is enough.
 
 ```bash
@@ -109,7 +109,7 @@ something the user just did.
 ### Styling
 
 Every colour and dimension resolves through an `--zb-switch-*` custom property,
-with a literal fallback so the element is legible without the Zoblocks token
+with a literal fallback so the element is legible without the ZoBlocks token
 stylesheet. Load `@zoblocks/tokens` and it follows your theme, your
 brand, and your density automatically.
 

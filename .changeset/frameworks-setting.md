@@ -17,11 +17,11 @@ new `/inverse` subpath, which depends only on `bridge-core` — so this pulls in
 mapping table, not React or a component library.
 
 **One behaviour change worth knowing about.** `colorPrimary` used to be the ramp
-step the customer picked; it is now the accent Zoblocks actually renders.
+step the customer picked; it is now the accent ZoBlocks actually renders.
 `--zb-accent` resolves to the ramp's 700, so a theme built from the 600 sat one
-shade away from the Zoblocks components beside it and the two looked subtly
+shade away from the ZoBlocks components beside it and the two looked subtly
 unrelated. Consequently `exportTheme` takes the theme's resolved tokens as a
-third argument: "resolved" means Zoblocks's defaults, with this customer's ramp
+third argument: "resolved" means ZoBlocks's defaults, with this customer's ramp
 applied, with their overrides on top, and the first of those lives in the token
 package rather than in a theme document.
 

@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Zoblocks components live at the repo root, outside this app's tree, so
+/* ZoBlocks components live at the repo root, outside this app's tree, so
    Tailwind's automatic content detection never sees them. */
 @source "../../../../registry";
 

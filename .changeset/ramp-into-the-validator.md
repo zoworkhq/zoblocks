@@ -12,7 +12,7 @@ every one of them, so no caller changes.
 
 The move has a cause, and it is the same one that made the validator a package
 in the first place. A new fourth caller — a Figma plugin sandbox, running
-Zoblocks's accessibility gate inside a design file — offers a nearest passing
+ZoBlocks's accessibility gate inside a design file — offers a nearest passing
 colour per failing pair, exactly as the app's token editor does. Reaching
 `nearestPassing` through `theme` would have made that sandbox depend on the
 theme document schema, zod and both framework bridges to make one suggestion.

@@ -12,7 +12,7 @@
     "plugins": [{ "name": "next" }],
     "baseUrl": ".",
     "paths": {
-      // Zoblocks components are consumed by the same specifier the Zoblocks CLI
+      // ZoBlocks components are consumed by the same specifier the ZoBlocks CLI
       // writes into a customer's project (`@/components/zoblocks/app-shell`).
       // While the registry is being rebuilt those files live under
       // src/components/zoblocks/ — exactly a customer's install layout — and

@@ -9,7 +9,7 @@ import { ThemeToggle } from "@/components/site/theme-toggle";
 import { SIGN_UP_LABEL, signInHref, signUpHref } from "@/lib/app";
 import { cn } from "@/lib/utils";
 
-export function ZoblocksMark({ className = "h-4 w-7" }: { className?: string }) {
+export function ZoBlocksMark({ className = "h-4 w-7" }: { className?: string }) {
   /*
    * Two blocks and the tenon that joins them.
    *
@@ -131,11 +131,11 @@ export function SiteHeader() {
           // target, not a link inside a sentence, so the Inline exception does
           // not cover it. It sits in a taller header row, so nothing moves.
           className="group flex min-h-6 items-center gap-2.5 text-ink"
-          aria-label="Zoblocks home"
+          aria-label="ZoBlocks home"
         >
-          <ZoblocksMark className="h-4 w-7 transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:rotate-180" />
+          <ZoBlocksMark className="h-4 w-7 transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:rotate-180" />
           <span className="font-display text-[0.9375rem] font-semibold tracking-tight">
-            Zoblocks
+            ZoBlocks
           </span>
           <span className="numeric hidden rounded border border-rule px-1.5 py-0.5 text-[0.625rem] text-graphite-soft sm:inline">
             v0.1.0
@@ -288,8 +288,8 @@ export function SiteFooter() {
         <div className="flex flex-col gap-10 md:flex-row md:justify-between">
           <div className="max-w-xs">
             <div className="flex items-center gap-2.5 text-ink">
-              <ZoblocksMark />
-              <span className="font-display text-sm font-semibold tracking-tight">Zoblocks</span>
+              <ZoBlocksMark />
+              <span className="font-display text-sm font-semibold tracking-tight">ZoBlocks</span>
             </div>
             <p className="body-sm mt-3 text-graphite">
               Healthcare components typed to FHIR R4. Source you own, states you can trust.
@@ -347,7 +347,7 @@ export function SiteFooter() {
 
         <div className="mt-10 border-t border-rule pt-6">
           <p className="body-sm max-w-2xl text-graphite-soft">
-            Zoblocks is not a compliance boundary and is not a medical device. All demo data on this
+            ZoBlocks is not a compliance boundary and is not a medical device. All demo data on this
             site is synthetic.
           </p>
         </div>

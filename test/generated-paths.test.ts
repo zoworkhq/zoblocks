@@ -1,7 +1,7 @@
 /**
  * The path mappings, checked in both places they have to exist.
  *
- * Registry components import each other by the path the Zoblocks CLI writes into
+ * Registry components import each other by the path the ZoBlocks CLI writes into
  * a consumer's project — `@/components/zoblocks/accordion`, `@/lib/zoblocks-switch`
  * — so those specifiers have to resolve in this repository too, and separately
  * in the docs app, which resolves from its own directory and cannot extend the
@@ -123,7 +123,7 @@ describe("every component is importable from the docs app", () => {
 
 describe("the support modules registry components share", () => {
   /*
-   * These are installed into a consumer's project under `lib/` by the Zoblocks
+   * These are installed into a consumer's project under `lib/` by the ZoBlocks
    * CLI and imported by that path. A missing one does not fail loudly — the
    * component simply cannot be resolved by whichever project is missing it,
    * which is how the accordion family stayed out of the docs app.

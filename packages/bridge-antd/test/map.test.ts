@@ -79,7 +79,7 @@ describe("the partial-mapping rule", () => {
   /**
    * `--zb-text-on-accent` used to be in `unmapped`, on the belief that antd
    * exposed no such token. It exposes `colorTextLightSolid`, and the belief
-   * cost a rendering: Zoblocks's dark label on antd's dark primary at 3.70:1,
+   * cost a rendering: ZoBlocks's dark label on antd's dark primary at 3.70:1,
    * which antd never produces.
    *
    * The pairing is what matters. bridge-core only measures a contrast pair

@@ -1,5 +1,5 @@
 /**
- * @zoblocks/identity-core — the engine behind Zoblocks's patient identity
+ * @zoblocks/identity-core — the engine behind ZoBlocks's patient identity
  * components.
  *
  * No React, no Ant Design, no DOM. It accepts a FHIR `Patient` and returns a

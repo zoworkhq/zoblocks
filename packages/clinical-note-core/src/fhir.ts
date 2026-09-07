@@ -150,7 +150,7 @@ export const COAUTHORS_SIGNATURE: FhirCoding = {
 };
 
 /**
- * The Zoblocks extension carrying composition ratios.
+ * The ZoBlocks extension carrying composition ratios.
  *
  * **Not standard, and this file says so in the URL rather than hoping nobody
  * notices.** There is no FHIR element for per-range authorship or for "what

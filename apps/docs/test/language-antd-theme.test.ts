@@ -10,7 +10,7 @@
  * That leaves a copy of two colours per language, and a copy is a thing that
  * drifts. These assertions are the guard: the Material UI values are exactly
  * what `muiBridge.map()` writes for `--zb-accent` and `--zb-text-on-accent`
- * from an untouched `createTheme()`, and the Zoblocks values are the resolved
+ * from an untouched `createTheme()`, and the ZoBlocks values are the resolved
  * `--zb-accent` and `--zb-text-on-accent` from `packages/tokens`. If either
  * moves, this fails rather than the demo quietly showing last year's blue.
  */
@@ -19,7 +19,7 @@ import { describe, expect, it } from "vitest";
 import { antdBrandTokens } from "@/components/site/language-antd-theme";
 
 describe("the antd brand table", () => {
-  it("gives Zoblocks its own accent, in both modes", () => {
+  it("gives ZoBlocks its own accent, in both modes", () => {
     // `--zb-accent` / `--zb-text-on-accent`, light and dark, from
     // packages/tokens/src/zoblocks-tokens.css.
     expect(antdBrandTokens("zoblocks", false)).toEqual({

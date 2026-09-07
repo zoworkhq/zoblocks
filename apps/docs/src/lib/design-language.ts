@@ -43,7 +43,7 @@ function cookieDomain(): string {
 }
 
 /**
- * Precedence: the URL, then the cookie, then storage, then Zoblocks.
+ * Precedence: the URL, then the cookie, then storage, then ZoBlocks.
  *
  * The query parameter wins so a link can pin a language — a support reply
  * showing a customer their own framework is the case this exists for, and it
@@ -61,7 +61,7 @@ export function readStoredLanguage(): DesignLanguage {
     const fromStorage = localStorage.getItem(LANGUAGE_STORAGE_KEY);
     if (isLanguage(fromStorage)) return fromStorage;
   } catch {
-    /* Private mode, or a browser refusing storage. Zoblocks is a safe default. */
+    /* Private mode, or a browser refusing storage. ZoBlocks is a safe default. */
   }
   return "zoblocks";
 }

@@ -1,7 +1,7 @@
 /**
- * A Zoblocks brand pushed into Ant Design.
+ * A ZoBlocks brand pushed into Ant Design.
  *
- * The forward bridge answers "make Zoblocks look like our antd app". This
+ * The forward bridge answers "make ZoBlocks look like our antd app". This
  * answers the one customers care about more: "we configured our brand — why do
  * our *own* buttons still look like antd's default blue?"
  *
@@ -14,10 +14,10 @@ import * as React from "react";
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { theme as antdTheme, ConfigProvider } from "antd";
-import { resolvePatch, type ZoblocksTokens } from "@zoblocks/bridge-core";
-import { NOT_PUSHED_TO_ANTD, ZoblocksAntdProvider, antdBridge, toAntdTheme } from "../src/index";
+import { resolvePatch, type ZoBlocksTokens } from "@zoblocks/bridge-core";
+import { NOT_PUSHED_TO_ANTD, ZoBlocksAntdProvider, antdBridge, toAntdTheme } from "../src/index";
 
-const BRAND: ZoblocksTokens = {
+const BRAND: ZoBlocksTokens = {
   "--zb-accent": "#1d63c9",
   "--zb-accent-hover": "#1a53a8",
   "--zb-text": "#0f172a",
@@ -31,7 +31,7 @@ const BRAND: ZoblocksTokens = {
 };
 
 describe("toAntdTheme", () => {
-  it("puts the Zoblocks accent on antd's primary", () => {
+  it("puts the ZoBlocks accent on antd's primary", () => {
     const { token } = toAntdTheme(BRAND);
     expect(token?.colorPrimary).toBe("#1d63c9");
     expect(token?.colorPrimaryHover).toBe("#1a53a8");
@@ -45,7 +45,7 @@ describe("toAntdTheme", () => {
     expect(token?.colorBgLayout).toBe("#f8fafc");
   });
 
-  /** antd states radii and sizes as numbers of pixels; Zoblocks uses rem. */
+  /** antd states radii and sizes as numbers of pixels; ZoBlocks uses rem. */
   it("converts rem to the pixel numbers antd expects", () => {
     const { token } = toAntdTheme(BRAND);
     expect(token?.borderRadius).toBe(8);
@@ -71,7 +71,7 @@ describe("toAntdTheme", () => {
     const { token } = toAntdTheme({
       ...BRAND,
       "--zb-accent": "#1d63c9",
-    } as ZoblocksTokens);
+    } as ZoBlocksTokens);
 
     for (const forbidden of NOT_PUSHED_TO_ANTD) {
       expect(forbidden in (token ?? {}), forbidden).toBe(false);
@@ -111,7 +111,7 @@ describe("the two directions agree", () => {
   });
 });
 
-describe("<ZoblocksAntdProvider>", () => {
+describe("<ZoBlocksAntdProvider>", () => {
   function Probe() {
     const { token } = antdTheme.useToken();
     return <span data-testid="primary">{token.colorPrimary}</span>;
@@ -121,9 +121,9 @@ describe("<ZoblocksAntdProvider>", () => {
     document.documentElement.style.setProperty("--zb-accent", "#7c3aed");
 
     render(
-      <ZoblocksAntdProvider>
+      <ZoBlocksAntdProvider>
         <Probe />
-      </ZoblocksAntdProvider>,
+      </ZoBlocksAntdProvider>,
     );
 
     expect(await screen.findByText("#7c3aed")).toBeTruthy();
@@ -134,9 +134,9 @@ describe("<ZoblocksAntdProvider>", () => {
     document.documentElement.style.setProperty("--zb-accent", "#7c3aed");
 
     render(
-      <ZoblocksAntdProvider override={{ colorPrimary: "#b91c1c" }}>
+      <ZoBlocksAntdProvider override={{ colorPrimary: "#b91c1c" }}>
         <Probe />
-      </ZoblocksAntdProvider>,
+      </ZoBlocksAntdProvider>,
     );
 
     expect(await screen.findByText("#b91c1c")).toBeTruthy();
@@ -152,14 +152,14 @@ describe("<ZoblocksAntdProvider>", () => {
 
     render(
       <ConfigProvider theme={{ token: { borderRadius: 16 } }}>
-        <ZoblocksAntdProvider>
+        <ZoBlocksAntdProvider>
           <SizeProbe />
-        </ZoblocksAntdProvider>
+        </ZoBlocksAntdProvider>
       </ConfigProvider>,
     );
 
     // The outer radius survives because this bridge does not supply one when
-    // Zoblocks has not defined it.
+    // ZoBlocks has not defined it.
     expect(await screen.findByText(/#7c3aed\|16/)).toBeTruthy();
     document.documentElement.removeAttribute("style");
   });

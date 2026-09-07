@@ -1,5 +1,5 @@
 /**
- * @zoblocks/bridge-antd — Zoblocks components in an Ant Design host's
+ * @zoblocks/bridge-antd — ZoBlocks components in an Ant Design host's
  * design language.
  *
  *     pnpm add @zoblocks/bridge-antd
@@ -15,5 +15,5 @@
 export { AntdBridge, useAntdTokens, type AntdBridgeProps } from "./AntdBridge";
 export { antdBridge, type AntdTokens } from "./map";
 
-export { ZoblocksAntdProvider, type ZoblocksAntdProviderProps } from "./ZoblocksAntdProvider";
+export { ZoBlocksAntdProvider, type ZoBlocksAntdProviderProps } from "./ZoBlocksAntdProvider";
 export { NOT_PUSHED_TO_ANTD, toAntdTheme, type AntdThemeConfig } from "./inverse";

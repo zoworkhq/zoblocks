@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "type": "module",
   "private": false,
-  "description": "Zoblocks themes as Figma variable plans. Pure — no figma.*, no DOM, no network.",
+  "description": "ZoBlocks themes as Figma variable plans. Pure — no figma.*, no DOM, no network.",
   "exports": {
     ".": "./src/index.ts",
     "./package.json": "./package.json"

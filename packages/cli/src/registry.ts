@@ -14,7 +14,7 @@
  * config is also one that a compromised `zoblocks.json` cannot redirect.
  */
 
-import { PUBLIC_REGISTRY_URL, expandHeaders, type ZoblocksConfig } from "./config.js";
+import { PUBLIC_REGISTRY_URL, expandHeaders, type ZoBlocksConfig } from "./config.js";
 import { ITEM_SCHEMA_URL, parseRegistryItem, type RegistryItem } from "./schema.js";
 
 export class RegistryError extends Error {
@@ -37,7 +37,7 @@ export interface ResolvedSpecifier {
 
 export function resolveSpecifier(
   specifier: string,
-  config: ZoblocksConfig,
+  config: ZoBlocksConfig,
   env: NodeJS.ProcessEnv,
 ): ResolvedSpecifier {
   if (/^https?:\/\//.test(specifier)) {
@@ -150,7 +150,7 @@ export async function fetchItem(
         ? `"${resolved.raw}" is not available to your organisation.\n\n` +
             `Either the component does not exist, or nobody has purchased it yet. ` +
             `The console lists what you own under Marketplace.`
-        : `"${resolved.raw}" is not in the Zoblocks catalog.\n\n` +
+        : `"${resolved.raw}" is not in the ZoBlocks catalog.\n\n` +
             `Browse the catalog at https://zoblocks.design/components`,
     );
   }
@@ -207,7 +207,7 @@ export async function fetchItem(
  */
 export async function collectItems(
   specifiers: string[],
-  config: ZoblocksConfig,
+  config: ZoBlocksConfig,
   options: FetchOptions = {},
 ): Promise<RegistryItem[]> {
   const env = options.env ?? process.env;

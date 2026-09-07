@@ -95,7 +95,7 @@ describe("clinical tokens are not bridgeable", () => {
 describe("declarations terminate in a literal", () => {
   /**
    * `fallback` means the strongest thing it can mean: the chain reaches a
-   * literal without the Zoblocks stylesheet being loaded at all. Resolution is
+   * literal without the ZoBlocks stylesheet being loaded at all. Resolution is
    * transitive, so `--zb-tabs-indicator: var(--zb-tabs-accent)` counts — the
    * accent it points at ends in `#059478`.
    *
@@ -120,7 +120,7 @@ describe("framework fallbacks", () => {
   /**
    * A standing question rather than a failure. These tokens are unbridgeable —
    * a JavaScript bridge may not write them — yet their CSS chain already falls
-   * through to antd's semantic colours when no Zoblocks token is present.
+   * through to antd's semantic colours when no ZoBlocks token is present.
    *
    * That is defensible for a tab badge and wrong as a general rule, and it is
    * the open decision in §3.5 of the architecture report. The test pins the

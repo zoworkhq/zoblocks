@@ -1,6 +1,6 @@
 # @zoblocks/identity-core
 
-The engine behind Zoblocks's patient avatar, chip and banner. No React, no Ant
+The engine behind ZoBlocks's patient avatar, chip and banner. No React, no Ant
 Design, no DOM — it takes a FHIR `Patient` and returns a value a renderer can
 walk without knowing any FHIR.
 
@@ -79,5 +79,5 @@ assertion that fails if per-pair work creeps back into the O(n²) loop.
 
 ---
 
-Zoblocks is not a compliance boundary and is not a medical device. See the
+ZoBlocks is not a compliance boundary and is not a medical device. See the
 repository README.

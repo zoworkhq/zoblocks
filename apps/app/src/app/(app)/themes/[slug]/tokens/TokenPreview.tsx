@@ -37,7 +37,7 @@ export function TokenPreview({
   /*
    * Every semantic token, not only the edited ones.
    *
-   * The app's own page resolves `--zb-accent` from Zoblocks's palette, not
+   * The app's own page resolves `--zb-accent` from ZoBlocks's palette, not
    * from this customer's brand — so a preview applying only the overrides would
    * show a customer their edits sitting on our colours.
    */
@@ -52,7 +52,7 @@ export function TokenPreview({
    * Required, not belt-and-braces. The component tier is declared at `:root` —
    * `--zb-switch-track-on-bg: var(--zb-accent)` — and a `var()` resolves at the
    * element that declares it, so setting `--zb-accent` on this subtree changes
-   * nothing a component actually reads. Without this the switch stayed Zoblocks's
+   * nothing a component actually reads. Without this the switch stayed ZoBlocks's
    * teal while the swatch beside it went red, which is a preview that lies.
    */
   for (const [semantic, names] of Object.entries(model.dependents)) {

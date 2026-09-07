@@ -4,7 +4,7 @@
  * `useTabs` — the headless layer.
  *
  * Returns prop getters, so a team whose design bears no resemblance to any of
- * the eleven skins can still have Zoblocks's keyboard model and accessibility
+ * the eleven skins can still have ZoBlocks's keyboard model and accessibility
  * tree rather than reinventing both badly. This is the escape hatch that stops
  * a customer forking the package.
  *

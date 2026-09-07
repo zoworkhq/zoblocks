@@ -175,7 +175,7 @@ export async function importThemeAction(form: FormData): Promise<ActionResult> {
     const notes = [`Imported ${steps} palette step(s) into the draft.`];
     if (report.discardedClinical.length) {
       notes.push(
-        `Discarded ${report.discardedClinical.length} clinical token(s): they keep Zoblocks's validated values.`,
+        `Discarded ${report.discardedClinical.length} clinical token(s): they keep ZoBlocks's validated values.`,
       );
     }
     if (report.unmatched.length) {
@@ -548,7 +548,7 @@ export async function signUpAction(form: FormData): Promise<ActionResult> {
       ok: false,
       message: "No organisation is registered at that address.",
       problems: [
-        "If your team already uses Zoblocks, ask an administrator for the short name in your app URLs.",
+        "If your team already uses ZoBlocks, ask an administrator for the short name in your app URLs.",
         "If you are starting a new organisation, email hello@zowork.com and we will set one up.",
         "If you already have an account, sign in instead.",
       ],

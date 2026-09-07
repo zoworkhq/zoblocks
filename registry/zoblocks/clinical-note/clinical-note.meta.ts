@@ -98,7 +98,7 @@ export default defineComponentMeta({
 
   limitations: [
     "No phrase library, terminology or attestation wording ships here. Those are jurisdictional, organisational and licensing decisions; the component provides the seams.",
-    "Per-range provenance is not standardised anywhere in FHIR. It travels as a custom Zoblocks extension that a conforming server may legitimately ignore or strip.",
+    "Per-range provenance is not standardised anywhere in FHIR. It travels as a custom ZoBlocks extension that a conforming server may legitimately ignore or strip.",
     "There is no clock. `now` is a required prop, because a browser clock on a ward workstation is not evidence.",
     "No speech recognizer, no collaboration server, no crypto. The component defines the channel, the integration and the seam; the implementations are the deployment's.",
     "The LOINC section codes match published display names but must be confirmed — with their C-CDA cardinality — against the implementation guide a deployment conforms to.",

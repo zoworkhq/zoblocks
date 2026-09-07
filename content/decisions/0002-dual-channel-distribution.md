@@ -8,7 +8,7 @@
 
 ## Context
 
-Zoblocks ships today through a shadcn registry: the CLI copies component source
+ZoBlocks ships today through a shadcn registry: the CLI copies component source
 into the customer's repository. The README sells this deliberately — "yours to
 read, audit, and change" — and for a healthcare buyer who must review what
 renders a potassium result, that auditability is a genuine feature.

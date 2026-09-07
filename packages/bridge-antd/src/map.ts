@@ -1,5 +1,5 @@
 /**
- * Ant Design's resolved theme, mapped onto Zoblocks's token surface.
+ * Ant Design's resolved theme, mapped onto ZoBlocks's token surface.
  *
  * The mapping rule, inherited from the bridge this generalises: **map a token
  * only where the meaning genuinely matches.** Where it does not, write nothing
@@ -11,7 +11,7 @@
  * Two categories are deliberately absent and both are load-bearing:
  *
  * **Clinical status.** antd has `colorError`, `colorWarning` and
- * `colorSuccess`. Zoblocks has `status.critical`, `status.high`, `status.low`,
+ * `colorSuccess`. ZoBlocks has `status.critical`, `status.high`, `status.low`,
  * `status.normal` and `status.unknown`, and the difference is not vocabulary.
  * Ours carry a validated contrast floor in three themes and a 60° hue
  * separation between `high` and `low`, so the *direction* of an abnormal
@@ -21,7 +21,7 @@
  * refuses these at runtime; this file simply never offers them.
  *
  * **Locale and motion preferences.** `ConfigProvider locale` is not bridged:
- * `@zoblocks/intl` owns Zoblocks's strings because clinical copy is
+ * `@zoblocks/intl` owns ZoBlocks's strings because clinical copy is
  * reviewed content, not a framework's message catalog.
  */
 
@@ -53,7 +53,7 @@ export interface AntdTokens {
    * in `unmapped`: it was listed there on the belief that antd computed the
    * label per component and exposed nothing to read. It does expose this, the
    * docs site's playground was already using it, and the cost of the mistake
-   * was visible — with the token unmapped, Zoblocks's *dark* label (#071014,
+   * was visible — with the token unmapped, ZoBlocks's *dark* label (#071014,
    * near-black) landed on antd's dark primary at 3.70:1, which is not a
    * rendering antd would ever produce. Mapped, it is antd's own #fff at
    * 5.19:1.
@@ -121,7 +121,7 @@ function semantic(token: AntdTokens): TokenPatch {
      * `contrastViolations` in bridge-core only checks a pair when the bridge
      * supplies *both* sides — anything else would be guessing at a value it
      * cannot see. So a half-mapped pair is invisible to the gate by
-     * construction: with the fill mapped and the label left to Zoblocks, the
+     * construction: with the fill mapped and the label left to ZoBlocks, the
      * ratio was never measured by anything. Now it is, and antd's own default
      * duly reports 4.10:1 against its primary — a real AA failure in antd's
      * palette, which is antd's to own and ours to surface rather than hide.
@@ -208,7 +208,7 @@ export const antdBridge: BridgeDefinition<AntdTokens> = {
    * v6 renamed a substantial part of the token surface. A bridge written
    * against v6 names reads `undefined` on a v5 host, and `undefined` in a
    * custom property means "fall through" — so the failure is a component
-   * quietly wearing Zoblocks's defaults instead of the customer's brand. No
+   * quietly wearing ZoBlocks's defaults instead of the customer's brand. No
    * error, no warning, nothing to notice. A single major turns that into a
    * peer-resolution error at install time.
    */

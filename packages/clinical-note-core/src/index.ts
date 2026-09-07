@@ -1,5 +1,5 @@
 /**
- * @zoblocks/clinical-note-core — the engine behind Zoblocks's ClinicalNote.
+ * @zoblocks/clinical-note-core — the engine behind ZoBlocks's ClinicalNote.
  *
  * No React, no Ant Design, no DOM. Coded sections, per-range provenance, a
  * composable sign gate, and deterministic serialization to FHIR, XHTML and

@@ -61,7 +61,7 @@ test.describe("@bridge design language switch", () => {
     await page.goto(PAGE);
     await expect(control(page)).toBeVisible();
 
-    // Zoblocks is the default and must cost nothing: neither framework has been
+    // ZoBlocks is the default and must cost nothing: neither framework has been
     // fetched yet, so neither framework's classes exist.
     await expect(hosted(page)).toHaveAttribute("data-zb-host", "zoblocks");
     await expect(page.locator(".ant-btn")).toHaveCount(0);
@@ -157,7 +157,7 @@ test.describe("@bridge design language switch", () => {
   test("is one tab stop, with arrows moving inside it", async ({ page }) => {
     await page.goto(PAGE);
     const group = control(page);
-    const selected = group.getByRole("radio", { name: "Zoblocks" });
+    const selected = group.getByRole("radio", { name: "ZoBlocks" });
     await selected.focus();
 
     // Roving tabindex, per the APG radiogroup pattern: the two unselected

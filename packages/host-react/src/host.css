@@ -1,9 +1,9 @@
 /**
- * Zoblocks's reference host chrome.
+ * ZoBlocks's reference host chrome.
  *
  * Structure and geometry only — every colour, radius, duration and easing is
  * read from `--zb-*`, so these controls restyle under a bridge exactly as a
- * clinical component does. That is what makes the Zoblocks state in the
+ * clinical component does. That is what makes the ZoBlocks state in the
  * framework switcher worth having: it is not "antd with our palette", it is
  * our own geometry wearing whatever tokens are in scope.
  *

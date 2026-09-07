@@ -2,7 +2,7 @@
  * The component metadata schema.
  *
  * One `<component>.meta.ts` per component is the single source of truth for
- * everything the platform generates: the Zoblocks registry, the docs catalog,
+ * everything the platform generates: the ZoBlocks registry, the docs catalog,
  * TypeScript path mappings, Tailwind source globs, package barrels, the agent
  * manifest, and the CI coverage gate.
  *
@@ -45,7 +45,7 @@ export const layerSchema = z.enum(["primitive", "clinical", "pattern", "block"])
  * How a consumer gets this component.
  *
  * `registry` is the default and the house style: the source is copied into the
- * customer's repository by the Zoblocks CLI, so it must be self-contained and
+ * customer's repository by the ZoBlocks CLI, so it must be self-contained and
  * readable on its own.
  *
  * `package` is for components that cannot satisfy that constraint. Signature is
@@ -149,7 +149,7 @@ export const registryFileSchema = z.object({
   path: nonEmpty("file path"),
   /**
    * What the file is, which decides where the CLI puts it. The vocabulary is
-   * Zoblocks's own — `@zoblocks/cli` maps each kind to an alias root in
+   * ZoBlocks's own — `@zoblocks/cli` maps each kind to an alias root in
    * the consumer's `zoblocks.json`, so adding a kind here means deciding where
    * it lands there.
    */

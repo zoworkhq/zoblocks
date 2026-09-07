@@ -2,7 +2,7 @@
   "name": "zoblocks",
   "version": "0.0.0",
   "private": true,
-  "description": "Healthcare UI components with FHIR-shaped data contracts, delivered as source through the Zoblocks registry.",
+  "description": "Healthcare UI components with FHIR-shaped data contracts, delivered as source through the ZoBlocks registry.",
   "homepage": "https://zoblocks.design",
   "repository": {
     "type": "git",

@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { transformOxygenToZoblocks } from "../src/oxygen-to-zoblocks";
+import { transformOxygenToZoBlocks } from "../src/oxygen-to-zoblocks";
 
-const run = (source: string) => transformOxygenToZoblocks(source);
+const run = (source: string) => transformOxygenToZoBlocks(source);
 const messages = (source: string) => run(source).notes.map((n) => n.message);
 
 describe("imports", () => {

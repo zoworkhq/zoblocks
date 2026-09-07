@@ -14,14 +14,14 @@ import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AntdHost } from "./antd";
 import { MuiHost } from "./mui";
-import { ZoblocksHost } from "./zoblocks";
+import { ZoBlocksHost } from "./zoblocks";
 import { useHost } from "./context";
 import type { HostProviderProps } from "./contract";
 
 afterEach(cleanup);
 
 const HOSTS: Array<[string, React.ComponentType<HostProviderProps>]> = [
-  ["zoblocks", ZoblocksHost],
+  ["zoblocks", ZoBlocksHost],
   ["antd", AntdHost],
   ["mui", MuiHost],
 ];
@@ -110,7 +110,7 @@ describe("the antd host", () => {
     expect(container.querySelector(".ant-switch-checked")).not.toBeNull();
   });
 
-  it("writes antd's tokens onto Zoblocks's surface but not its clinical ones", () => {
+  it("writes antd's tokens onto ZoBlocks's surface but not its clinical ones", () => {
     const { container } = render(
       <AntdHost mode="light">
         <Demo />
@@ -178,12 +178,12 @@ describe("the MUI host", () => {
   });
 });
 
-describe("the Zoblocks host", () => {
+describe("the ZoBlocks host", () => {
   it("renders reference chrome drawn from tokens", () => {
     const { container } = render(
-      <ZoblocksHost mode="light">
+      <ZoBlocksHost mode="light">
         <Demo />
-      </ZoblocksHost>,
+      </ZoBlocksHost>,
     );
     expect(container.querySelector(".zb-host-btn")).not.toBeNull();
     // No framework class anywhere: this host must stay dependency-free.

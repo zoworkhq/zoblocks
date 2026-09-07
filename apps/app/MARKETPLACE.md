@@ -108,7 +108,7 @@ items  = <comma-separated catalogue slugs>
 | Icons                   | Written into a theme's **draft** icon slots. Publishing stays separate. |
 | Illustrations, fixtures | `GET /m/{item}/pack.zip` — a deterministic store-only archive.          |
 | Themes                  | A **draft** theme. Nothing is live until an admin publishes it.         |
-| Components              | The Zoblocks CLI, through a private namespace.                          |
+| Components              | The ZoBlocks CLI, through a private namespace.                          |
 
 ```jsonc
 // the customer's zoblocks.json

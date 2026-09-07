@@ -62,8 +62,8 @@ describe("the first pull", () => {
   it("creates the collections the plan needs and nothing else", async () => {
     await pull();
     expect(figma.writes.createdCollections.sort()).toEqual([
-      "Zoblocks / Brand",
-      "Zoblocks / Semantic",
+      "ZoBlocks / Brand",
+      "ZoBlocks / Semantic",
     ]);
   });
 
@@ -72,16 +72,16 @@ describe("the first pull", () => {
     // A new collection arrives with one mode already named by Figma. Adding
     // three beside it leaves a "Mode 1" nobody uses next to three that are.
     expect(figma.writes.addedModes).toEqual([
-      "Zoblocks / Semantic/dark",
-      "Zoblocks / Semantic/high-contrast",
+      "ZoBlocks / Semantic/dark",
+      "ZoBlocks / Semantic/high-contrast",
     ]);
     expect(figma.writes.renamedModes).toEqual([
-      "Zoblocks / Brand/Default",
-      "Zoblocks / Semantic/light",
+      "ZoBlocks / Brand/Default",
+      "ZoBlocks / Semantic/light",
     ]);
   });
 
-  it("stamps the Zoblocks token on every variable it creates", async () => {
+  it("stamps the ZoBlocks token on every variable it creates", async () => {
     await pull();
     expect(figma.variable("--zb-accent")).toBeDefined();
     expect(figma.variable("--zb-ref-brand-700")).toBeDefined();
@@ -107,7 +107,7 @@ describe("the first pull", () => {
 
   it("pins the theme and version to every collection", async () => {
     await pull();
-    const brand = figma.collection("Zoblocks / Brand")!;
+    const brand = figma.collection("ZoBlocks / Brand")!;
     expect(brand.getPluginData(PIN.theme)).toBe("clinical");
     expect(brand.getPluginData(PIN.version)).toBe("3");
     expect(await readPin(figma.api())).toEqual({ slug: "clinical", version: 3 });
@@ -148,7 +148,7 @@ describe("a designer who edited the file", () => {
   it("restores a clinical value they changed, and names it", async () => {
     await pull();
     const critical = figma.variable("--zb-status-critical")!;
-    const light = figma.collection("Zoblocks / Semantic")!.modes.find((m) => m.name === "light")!;
+    const light = figma.collection("ZoBlocks / Semantic")!.modes.find((m) => m.name === "light")!;
     critical.setValueForMode(light.modeId, hexToFigmaRgb("#ff00ff")!);
     figma.settle();
 
@@ -189,7 +189,7 @@ describe("a designer who edited the file", () => {
     // the state after somebody tidies. The next pull should heal it rather than
     // fail at alias resolution with half a write applied.
     const fresh = new FakeFigma();
-    fresh.seedCollection("Zoblocks / Semantic", ["light", "dark", "high-contrast"]);
+    fresh.seedCollection("ZoBlocks / Semantic", ["light", "dark", "high-contrast"]);
     const { snapshot } = await readFile(fresh.api());
     const preview = previewPull(payload, snapshot);
     await applyPull(fresh.api(), {
@@ -197,7 +197,7 @@ describe("a designer who edited the file", () => {
       pin: { slug: "clinical", version: 3 },
     });
 
-    expect(fresh.writes.createdCollections).toEqual(["Zoblocks / Brand"]);
+    expect(fresh.writes.createdCollections).toEqual(["ZoBlocks / Brand"]);
     expect(fresh.variable("--zb-ref-brand-700")).toBeDefined();
   });
 });
@@ -241,7 +241,7 @@ describe("the file in states nobody planned for", () => {
           token: "--zb-accent",
           name: "accent",
           tier: "semantic",
-          collection: "Zoblocks / Semantic",
+          collection: "ZoBlocks / Semantic",
           values: {
             // Points at a brand variable that is neither in this write list nor
             // already in the file — the state after somebody deletes one.
@@ -254,7 +254,7 @@ describe("the file in states nobody planned for", () => {
     });
 
     const accent = fresh.variable("--zb-accent")!;
-    const modes = fresh.collection("Zoblocks / Semantic")!.modes;
+    const modes = fresh.collection("ZoBlocks / Semantic")!.modes;
     const light = modes.find((m) => m.name === "light")!.modeId;
     const dark = modes.find((m) => m.name === "dark")!.modeId;
 
@@ -278,14 +278,14 @@ describe("the file in states nobody planned for", () => {
           token: "--zb-font-family",
           name: "font/family",
           tier: "semantic",
-          collection: "Zoblocks / Semantic",
+          collection: "ZoBlocks / Semantic",
           values: { light: { kind: "string", value: "Inter" } },
         },
         {
           token: "--zb-radius-md",
           name: "radius/md",
           tier: "semantic",
-          collection: "Zoblocks / Semantic",
+          collection: "ZoBlocks / Semantic",
           values: { light: { kind: "number", value: 8 } },
         },
       ],
@@ -301,7 +301,7 @@ describe("the file in states nobody planned for", () => {
   it("leaves a mode the collection does not have rather than inventing one", async () => {
     const fresh = new FakeFigma();
     // A collection somebody made by hand, with only one mode.
-    fresh.seedCollection("Zoblocks / Semantic", ["light"]);
+    fresh.seedCollection("ZoBlocks / Semantic", ["light"]);
 
     await applyPull(fresh.api(), {
       write: [
@@ -309,7 +309,7 @@ describe("the file in states nobody planned for", () => {
           token: "--zb-text",
           name: "text",
           tier: "semantic",
-          collection: "Zoblocks / Semantic",
+          collection: "ZoBlocks / Semantic",
           values: {
             light: { kind: "color", hex: "#16181d", rgb: hexToFigmaRgb("#16181d")! },
             dark: { kind: "color", hex: "#e8ecf1", rgb: hexToFigmaRgb("#e8ecf1")! },
@@ -324,7 +324,7 @@ describe("the file in states nobody planned for", () => {
     const text = fresh.variable("--zb-text")!;
     for (const modeId of Object.keys(text.valuesByMode)) {
       expect(
-        fresh.collection("Zoblocks / Semantic")!.modes.some((m) => m.modeId === modeId),
+        fresh.collection("ZoBlocks / Semantic")!.modes.some((m) => m.modeId === modeId),
         modeId,
       ).toBe(true);
     }
@@ -344,7 +344,7 @@ describe("reading the pin back", () => {
 
   it("ignores a collection carrying a version that is not one", async () => {
     const fresh = new FakeFigma();
-    const collection = fresh.seedCollection("Zoblocks / Brand", ["Default"]);
+    const collection = fresh.seedCollection("ZoBlocks / Brand", ["Default"]);
     collection.setPluginData(PIN.theme, "clinical");
     collection.setPluginData(PIN.version, "not-a-number");
 
@@ -355,7 +355,7 @@ describe("reading the pin back", () => {
 
   it("ignores a version with no theme beside it", async () => {
     const fresh = new FakeFigma();
-    fresh.seedCollection("Zoblocks / Brand", ["Default"]).setPluginData(PIN.version, "3");
+    fresh.seedCollection("ZoBlocks / Brand", ["Default"]).setPluginData(PIN.version, "3");
     expect(await readPin(fresh.api())).toBeUndefined();
   });
 });

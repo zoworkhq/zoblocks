@@ -1,4 +1,4 @@
-# Zoblocks — Clinical Content Style Guide
+# ZoBlocks — Clinical Content Style Guide
 
 Every rule here came from a decision already made inside a component. The
 components enforce them for the surfaces they own; this document exists because

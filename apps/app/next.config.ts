@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  // Zoblocks components live at the repo root, outside this app's tree. Same
+  // ZoBlocks components live at the repo root, outside this app's tree. Same
   // arrangement as apps/docs: transpile them from source rather than expecting
   // a built package. This app is the dogfood consumer of that registry.
   transpilePackages: ["@zoblocks/tokens"],

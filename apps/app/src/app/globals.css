@@ -23,7 +23,7 @@
  *   that relationship flattens the whole thing into a generic admin grid.
  *
  * One rule this app adds: where a customer's own colours are on screen, the
- * surrounding chrome goes achromatic — a Zoblocks-teal control beside a
+ * surrounding chrome goes achromatic — a ZoBlocks-teal control beside a
  * customer's teal makes theirs look wrong. That is `.preview-region`, and it
  * applies there and nowhere else.
  * ======================================================================== */
@@ -316,7 +316,7 @@ body {
  *
  * The one thing this app adds to the docs vocabulary. Where a customer's own
  * colours are being displayed, the surrounding chrome drops its hue: an
- * Zoblocks-teal control sitting beside a customer's teal swatch makes the
+ * ZoBlocks-teal control sitting beside a customer's teal swatch makes the
  * customer's swatch look wrong, and they will change a colour that was fine.
  */
 /*

@@ -7,9 +7,9 @@ import { RevealRoot } from "@/components/site/interactions";
 import { BlockGallery } from "@/components/site/block-gallery";
 
 export const metadata: Metadata = {
-  title: "Blocks — clinical screens built from Zoblocks",
+  title: "Blocks — clinical screens built from ZoBlocks",
   description:
-    "Production-shaped clinical screens built from Zoblocks: caseload dashboard, progress note with provenance, patient view, sourced copilot. Live, synthetic data.",
+    "Production-shaped clinical screens built from ZoBlocks: caseload dashboard, progress note with provenance, patient view, sourced copilot. Live, synthetic data.",
   alternates: { canonical: "/showcase" },
 };
 
@@ -47,7 +47,7 @@ export default function ShowcasePage() {
                 <FlaskConical aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-graphite" />
                 <p className="body-sm text-graphite">
                   <strong className="text-ink">Reference implementations, not customers.</strong>{" "}
-                  Zoblocks is new and has none yet. Every block below is built by us on synthetic
+                  ZoBlocks is new and has none yet. Every block below is built by us on synthetic
                   data. When customers ship, their work appears here with their names on it.
                 </p>
               </div>
@@ -107,7 +107,7 @@ export default function ShowcasePage() {
           <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
             <div className="max-w-2xl">
               <h2 className="display-lg text-balance" data-reveal>
-                Built something with Zoblocks?
+                Built something with ZoBlocks?
               </h2>
               <p className="lede mt-5 text-pretty" data-reveal>
                 We would rather show your product than ours. Send a link and a sentence about the
@@ -116,7 +116,7 @@ export default function ShowcasePage() {
               </p>
               <div className="mt-8 flex flex-wrap gap-3" data-reveal>
                 <a
-                  href="mailto:hello@zowork.com?subject=Zoblocks%20showcase%20submission"
+                  href="mailto:hello@zowork.com?subject=ZoBlocks%20showcase%20submission"
                   className="group inline-flex items-center gap-2 rounded-xl bg-cta px-5 py-3.5 text-sm font-medium text-paper transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:bg-cta-hover"
                 >
                   Submit your build

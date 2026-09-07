@@ -241,7 +241,7 @@ export interface SwitchProps extends Omit<
 > {
   /* ---- antd-compatible core ------------------------------------- */
 
-  /** `"unknown"` is Zoblocks's widening. antd's `boolean` shape is unchanged. */
+  /** `"unknown"` is ZoBlocks's widening. antd's `boolean` shape is unchanged. */
   checked?: SwitchValue;
   /** Uncontrolled starting value. Ignored once `checked` is supplied. */
   defaultChecked?: SwitchValue;

@@ -5,7 +5,7 @@ from clinical instruments rather than from spinners — a heartbeat, a rhythm
 strip, a breath, a helix, and an infusion — themeable, accessible, and honest
 about how long a wait has taken.
 
-Part of [Zoblocks](https://zoblocks.design). Zero runtime dependencies. Works
+Part of [ZoBlocks](https://zoblocks.design). Zero runtime dependencies. Works
 in React, Vue, Angular, Svelte, Solid, Rails, Django, or a plain HTML file.
 
 ```bash
@@ -196,7 +196,7 @@ colon for global targets and cannot bind a name that contains one.
 
 ## Styling
 
-Every colour resolves through Zoblocks's semantic tokens, falling back to
+Every colour resolves through ZoBlocks's semantic tokens, falling back to
 `currentColor` when the token stylesheet is absent.
 
 ```css
@@ -230,7 +230,7 @@ Shadow parts: `::part(art)`, `::part(label)`, `::part(hint)`, `::part(progress)`
 
 ## What this is not
 
-Zoblocks is not a compliance boundary. It does not make an application HIPAA,
+ZoBlocks is not a compliance boundary. It does not make an application HIPAA,
 GDPR, or DPDP compliant, and it is not a medical device or clinical decision
 support. These loaders display no patient data and depict no real rhythm — a
 `bpm` value is a cadence for an animation, never a measurement of a person.

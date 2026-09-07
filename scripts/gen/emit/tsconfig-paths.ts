@@ -4,7 +4,7 @@
  *
  * Registry components import each other the way they will be laid out in a
  * consumer's project ("@/components/zoblocks/absent-value"), because that is what
- * the Zoblocks CLI writes. Those specifiers have to resolve here too.
+ * the ZoBlocks CLI writes. Those specifiers have to resolve here too.
  *
  * This file used to be maintained by hand in the root tsconfig, with a comment
  * asking authors to add a mapping per component. Four were missing when the
@@ -36,7 +36,7 @@ export const WORKSPACE_ALIASES: Record<string, string[]> = {
   "@zoblocks/component-meta": ["./packages/component-meta/src/index.ts"],
   "@/lib/utils": ["./registry/zoblocks/lib/utils.ts"],
   // Support modules under registry/zoblocks/lib are installed into a consumer's
-  // project by the Zoblocks CLI under lib/, and imported by that path. They
+  // project by the ZoBlocks CLI under lib/, and imported by that path. They
   // resolve here the same way component specifiers do.
   "@/lib/zoblocks-loader": ["./registry/zoblocks/lib/loader.tsx"],
   "@/lib/zoblocks-recorder": ["./registry/zoblocks/lib/recorder.tsx"],
@@ -83,7 +83,7 @@ export async function emitTsconfigPaths(
     `${JSON.stringify(
       {
         $schema: "https://json.schemastore.org/tsconfig",
-        display: "Zoblocks generated path mappings",
+        display: "ZoBlocks generated path mappings",
         _generated: banner("//")
           .split("\n")
           .map((l) => l.replace(/^\/\/ ?/, "")),

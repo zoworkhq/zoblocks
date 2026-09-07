@@ -16,7 +16,7 @@
       "@/lib/utils": ["./src/lib/utils.ts"],
       "@/registry/*": ["../../registry/*"],
       // Registry components import each other, and their shared library, by the
-      // paths the Zoblocks CLI writes in a consumer's project. Mapped back to the
+      // paths the ZoBlocks CLI writes in a consumer's project. Mapped back to the
       // registry source so the previews render the real files, unedited.
       //
       // The per-component entries are generated — see tsconfig.generated.json,

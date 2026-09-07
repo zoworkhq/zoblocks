@@ -1,5 +1,5 @@
 /**
- * @zoblocks/recorder-core — the engine behind Zoblocks's Recorder.
+ * @zoblocks/recorder-core — the engine behind ZoBlocks's Recorder.
  *
  * No React, no Ant Design, no DOM, no dependencies. It accepts an analyser
  * and a delta and returns a level, a bucket and a phase — including every
@@ -23,7 +23,7 @@
  * — because a perfectly flat waveform and a quiet room look identical, and
  * only one of them is a fault.
  *
- * The React surface, the five arts and the stylesheet live in the Zoblocks
+ * The React surface, the five arts and the stylesheet live in the ZoBlocks
  * registry. This package is what stays the same whichever way that goes.
  */
 

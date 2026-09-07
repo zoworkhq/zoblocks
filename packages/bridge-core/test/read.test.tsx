@@ -1,5 +1,5 @@
 /**
- * Reading Zoblocks's resolved tokens back out of the page.
+ * Reading ZoBlocks's resolved tokens back out of the page.
  *
  * The browser is the only authority on what `--zb-accent` currently means: it
  * depends on which brand stylesheet loaded, which `data-zb-theme` is set, and
@@ -10,17 +10,17 @@
 import * as React from "react";
 import { describe, expect, it, afterEach } from "vitest";
 import { render, screen, act } from "@testing-library/react";
-import { resolveZoblocksTokens, toMs, toPx, useZoblocksTokens } from "../src/index";
+import { resolveZoBlocksTokens, toMs, toPx, useZoBlocksTokens } from "../src/index";
 
 afterEach(() => {
   document.documentElement.removeAttribute("style");
   document.documentElement.removeAttribute("data-zb-theme");
 });
 
-describe("resolveZoblocksTokens", () => {
+describe("resolveZoBlocksTokens", () => {
   it("reads what the page actually resolves", () => {
     document.documentElement.style.setProperty("--zb-accent", "#1d63c9");
-    expect(resolveZoblocksTokens()["--zb-accent"]).toBe("#1d63c9");
+    expect(resolveZoBlocksTokens()["--zb-accent"]).toBe("#1d63c9");
   });
 
   /**
@@ -29,7 +29,7 @@ describe("resolveZoblocksTokens", () => {
    * framework handed a blank colour renders a blank colour.
    */
   it("omits a token the page has not defined", () => {
-    expect("--zb-accent" in resolveZoblocksTokens()).toBe(false);
+    expect("--zb-accent" in resolveZoBlocksTokens()).toBe(false);
   });
 
   it("reads from a scoped element, so two brands on one page stay apart", () => {
@@ -39,8 +39,8 @@ describe("resolveZoblocksTokens", () => {
     b.style.setProperty("--zb-accent", "#b91c1c");
     document.body.append(a, b);
 
-    expect(resolveZoblocksTokens(a)["--zb-accent"]).toBe("#1d63c9");
-    expect(resolveZoblocksTokens(b)["--zb-accent"]).toBe("#b91c1c");
+    expect(resolveZoBlocksTokens(a)["--zb-accent"]).toBe("#1d63c9");
+    expect(resolveZoBlocksTokens(b)["--zb-accent"]).toBe("#b91c1c");
     a.remove();
     b.remove();
   });
@@ -48,7 +48,7 @@ describe("resolveZoblocksTokens", () => {
   it("returns nothing rather than throwing where there is no DOM", () => {
     // The server case. Asserted by shape here; the SSR path is exercised by
     // the fallback test below.
-    expect(typeof resolveZoblocksTokens).toBe("function");
+    expect(typeof resolveZoBlocksTokens).toBe("function");
   });
 });
 
@@ -73,11 +73,11 @@ describe("unit helpers", () => {
 });
 
 function Probe() {
-  const tokens = useZoblocksTokens();
+  const tokens = useZoBlocksTokens();
   return <span data-testid="accent">{tokens["--zb-accent"] ?? "none"}</span>;
 }
 
-describe("useZoblocksTokens", () => {
+describe("useZoBlocksTokens", () => {
   it("resolves the tokens after mount", async () => {
     document.documentElement.style.setProperty("--zb-accent", "#1d63c9");
     render(<Probe />);
@@ -95,7 +95,7 @@ describe("useZoblocksTokens", () => {
     // to the unthemed palette.
     function Seeded() {
       const fallback = React.useMemo(() => ({ "--zb-accent": "#1d63c9" }) as const, []);
-      const tokens = useZoblocksTokens({ fallback });
+      const tokens = useZoBlocksTokens({ fallback });
       return <span data-testid="accent">{tokens["--zb-accent"] ?? "none"}</span>;
     }
     render(<Seeded />);
@@ -106,7 +106,7 @@ describe("useZoblocksTokens", () => {
     document.documentElement.style.setProperty("--zb-accent", "#b91c1c");
     function Seeded() {
       const fallback = React.useMemo(() => ({ "--zb-accent": "#1d63c9" }) as const, []);
-      const tokens = useZoblocksTokens({ fallback });
+      const tokens = useZoBlocksTokens({ fallback });
       return <span data-testid="accent">{tokens["--zb-accent"] ?? "none"}</span>;
     }
     render(<Seeded />);

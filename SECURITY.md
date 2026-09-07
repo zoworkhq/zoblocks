@@ -1,6 +1,6 @@
 # Security policy
 
-Zoblocks is used in software that clinicians and patients depend on. We treat
+ZoBlocks is used in software that clinicians and patients depend on. We treat
 security reports as the highest-priority work in the project.
 
 ## Reporting a vulnerability
@@ -47,16 +47,16 @@ repository's CI.
 compromised developer machine, and reports generated solely by a scanner with no
 demonstrated impact.
 
-## What Zoblocks does and does not protect
+## What ZoBlocks does and does not protect
 
-Zoblocks components are **structurally constrained** — a lint rule and a build
+ZoBlocks components are **structurally constrained** — a lint rule and a build
 check enforce that a component cannot read `process.env`, make a network call,
 open a WebSocket, call `eval`, use `dangerouslySetInnerHTML`, or write to the
 console. That last one matters more than it looks: a component that logs its
 props writes patient data to the browser console and onward to whatever
 error-reporting service the host application has installed.
 
-Zoblocks is **not a compliance boundary**. It does not make an application HIPAA,
+ZoBlocks is **not a compliance boundary**. It does not make an application HIPAA,
 GDPR, or DPDP compliant, and it is not a medical device or clinical decision
 support. Access control, audit, data residency, and clinical validation remain
 the implementing team's responsibility.

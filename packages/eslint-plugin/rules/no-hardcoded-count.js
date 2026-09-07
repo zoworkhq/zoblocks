@@ -6,7 +6,7 @@
  * re-reads:
  *
  *   "27 components installed as source you own"     the catalogue held 30
- *   "Zoblocks ships 27 components carrying 300-plus"  30, and 352
+ *   "ZoBlocks ships 27 components carrying 300-plus"  30, and 352
  *   "Twenty-two of the forty-four registry items"   26 of 50
  *   "All fourteen states"                           right, and hand-written
  *

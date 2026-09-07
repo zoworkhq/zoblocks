@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
  * The achromatic zone.
  *
  * The one addition this app makes to the docs vocabulary, and it exists
- * because of a real failure mode: a Zoblocks-teal control sitting beside a
+ * because of a real failure mode: a ZoBlocks-teal control sitting beside a
  * customer's teal swatch makes the customer's swatch look wrong, and they will
  * change a colour that was fine. So inside a preview the chrome drops its hue —
  * `.preview-region` redefines the accent tokens to neutrals — and the only
@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
  *
  * This is deliberately scoped. The instinct that produced it was right; applying
  * it to the whole product, which is what the first version of this app did,
- * produced a generic admin panel wearing none of Zoblocks's identity.
+ * produced a generic admin panel wearing none of ZoBlocks's identity.
  */
 export function Preview({
   label,

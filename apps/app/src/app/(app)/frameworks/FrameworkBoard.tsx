@@ -51,7 +51,7 @@ export function FrameworkBoard({
         <div className="flex flex-wrap items-center justify-between gap-3 pb-1">
           <p className="body-sm text-graphite">
             {selected.length === 0
-              ? "No framework selected — Zoblocks components use their own tokens."
+              ? "No framework selected — ZoBlocks components use their own tokens."
               : `${selected.length} of ${frameworks.length} enabled.`}
           </p>
           {/*
@@ -172,7 +172,7 @@ function FrameworkCard({
             icon={<Minus aria-hidden="true" className="size-3" />}
             tone="neutral"
             title={`${gaps.length} with no counterpart in ${framework.name}`}
-            body="Declared rather than approximated. Each falls through to Zoblocks's own value, which is a better answer than a guess — and a future major of the host may close some of these."
+            body="Declared rather than approximated. Each falls through to ZoBlocks's own value, which is a better answer than a guess — and a future major of the host may close some of these."
             tokens={gaps.map((token) => token.token)}
           />
         )}

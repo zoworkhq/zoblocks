@@ -1,5 +1,5 @@
 /**
- * A Zoblocks theme, as a plan a Figma plugin can apply.
+ * A ZoBlocks theme, as a plan a Figma plugin can apply.
  *
  * Plain data on both sides: this package never imports `figma.*`, so it can be
  * tested with vitest instead of inside a plugin sandbox — the same discipline
@@ -11,7 +11,7 @@
  * integrations resolve everything to a literal and dump it in, producing a file
  * where changing the brand means editing three hundred variables by hand —
  * which is the problem the token system exists to solve, rebuilt inside Figma.
- * Zoblocks already computes the reference chain to emit `var()` fallbacks in CSS;
+ * ZoBlocks already computes the reference chain to emit `var()` fallbacks in CSS;
  * emitting a Figma alias wherever that chain points at another token reproduces
  * the tiering in the design file, so a designer moves one swatch and watches
  * sixty tokens follow.
@@ -21,7 +21,7 @@ import { cssVar } from "@zoblocks/tokens/validate";
 
 import { hexToFigmaRgb, type FigmaRgb } from "./color";
 
-/** The three Zoblocks themes become the three modes of a collection. */
+/** The three ZoBlocks themes become the three modes of a collection. */
 export type ThemeName = "light" | "dark" | "high-contrast";
 
 export const THEMES: readonly ThemeName[] = ["light", "dark", "high-contrast"];
@@ -30,15 +30,15 @@ export type Tier = "brand" | "semantic" | "component";
 
 /** Names chosen to be legible in Figma's own picker, not to match our paths. */
 export const COLLECTION: Record<Tier, string> = {
-  brand: "Zoblocks / Brand",
-  semantic: "Zoblocks / Semantic",
-  component: "Zoblocks / Component",
+  brand: "ZoBlocks / Brand",
+  semantic: "ZoBlocks / Semantic",
+  component: "ZoBlocks / Component",
 };
 
 /**
  * What a variable's value is in one mode.
  *
- * An alias names another Zoblocks token rather than a Figma id, because ids do
+ * An alias names another ZoBlocks token rather than a Figma id, because ids do
  * not exist until the sandbox has created things. Resolving a name to an id is
  * the adapter's job and the only ordering constraint it has.
  */
@@ -49,7 +49,7 @@ export type PlannedValue =
   | { kind: "number"; value: number };
 
 export interface PlannedVariable {
-  /** The Zoblocks token name — `--zb-accent`. The durable identity. */
+  /** The ZoBlocks token name — `--zb-accent`. The durable identity. */
   token: string;
   /** What a designer sees. A label, never the key. */
   name: string;
@@ -90,7 +90,7 @@ export interface PlanOptions {
 export interface ResolvedTheme {
   /** `{ "600": "#1d63c9", … }` — the eleven steps. */
   ramp: Record<string, string>;
-  /** Per theme, keyed by Zoblocks token name: `--zb-accent` → `#1851a5`. */
+  /** Per theme, keyed by ZoBlocks token name: `--zb-accent` → `#1851a5`. */
   semantic: Record<ThemeName, Record<string, string>>;
   /** Per theme, same shape. Only the tokens that carry a value. */
   component?: Record<ThemeName, Record<string, string>>;
@@ -114,7 +114,7 @@ export interface ResolvedTheme {
 const rampToken = (step: string) => cssVar(`ref.brand.${step}`);
 
 /**
- * A human label from a Zoblocks token name.
+ * A human label from a ZoBlocks token name.
  *
  * `--zb-accent-hover` becomes `accent/hover`, because Figma groups variables on
  * the slash and a flat list of sixty is not navigable. The token name is still

@@ -2,7 +2,7 @@
  * The shapes, and the numbers that govern how they move.
  *
  * This is the single source of truth for both delivery channels: the custom
- * elements in this package and the React components in the Zoblocks registry.
+ * elements in this package and the React components in the ZoBlocks registry.
  * `test/loader-parity.test.ts` at the repository root asserts the two agree, so
  * a path edited here and not there fails the build rather than shipping two
  * loaders that are subtly different shapes.

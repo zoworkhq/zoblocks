@@ -36,7 +36,7 @@ export function colour(
   return {
     ...(options.token ? { token: options.token } : {}),
     name,
-    collection: options.collection ?? "Zoblocks / Semantic",
+    collection: options.collection ?? "ZoBlocks / Semantic",
     values: { [mode]: { kind: "color", hex, rgb: rgb(hex) } },
   };
 }
@@ -48,7 +48,7 @@ export function snapshot(variables: SnapshotVariable[]): VariableSnapshot {
 /**
  * A palette that passes everything the gate checks, in light.
  *
- * Values are the ones Zoblocks ships, so a test that asserts a ratio here is
+ * Values are the ones ZoBlocks ships, so a test that asserts a ratio here is
  * asserting something about the real design system rather than about a number
  * invented to make a test pass.
  */
@@ -103,7 +103,7 @@ export const PASSING: Record<string, string> = {
 export function zoblocksFile(
   over: Record<string, string> = {},
   mode = "light",
-  collection = "Zoblocks / Semantic",
+  collection = "ZoBlocks / Semantic",
 ): VariableSnapshot {
   const values = { ...PASSING, ...over };
   return snapshot(

@@ -7,7 +7,7 @@
  *   import "@zoblocks/loaders/pulse";     // ~1 kB
  *   import "@zoblocks/loaders";           // all five
  *
- * React users should prefer the Zoblocks registry components, which are copied
+ * React users should prefer the ZoBlocks registry components, which are copied
  * into the project as readable source:
  *
  *   npx @zoblocks/cli add pulse-loader

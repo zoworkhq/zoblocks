@@ -3,7 +3,7 @@
  *
  * A supported configuration rather than a degraded one, and the control the
  * other two are measured against: same application, same accessibility tree,
- * Zoblocks's own tokens for the styling.
+ * ZoBlocks's own tokens for the styling.
  */
 
 import { createRoot } from "react-dom/client";

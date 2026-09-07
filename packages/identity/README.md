@@ -83,6 +83,6 @@ zero rather than shortening it.
 
 ---
 
-Zoblocks is not a compliance boundary and is not a medical device. These
+ZoBlocks is not a compliance boundary and is not a medical device. These
 components reduce the chance of a _display_ error; they make no claim about
 care.

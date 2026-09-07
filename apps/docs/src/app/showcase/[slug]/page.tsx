@@ -29,7 +29,7 @@ export async function generateMetadata({
   const block = getBlock(slug);
   if (!block) return {};
   return {
-    title: `${block.title} — Zoblocks blocks`,
+    title: `${block.title} — ZoBlocks blocks`,
     description: block.blurb,
     alternates: { canonical: `/showcase/${block.slug}` },
   };

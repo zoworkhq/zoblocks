@@ -412,7 +412,7 @@ export function Playground({ name, controls }: { name: string; controls: readonl
         {/*
           The accent follows the design language.
 
-          It was pinned to Zoblocks's, for a good reason at the time: with only
+          It was pinned to ZoBlocks's, for a good reason at the time: with only
           the algorithm set this rendered antd's #1677ff with white on it —
           4.10:1, an AA failure. Under "Ant Design" that failure is now shown
           rather than corrected, because a reader comparing frameworks should

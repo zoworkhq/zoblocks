@@ -1,4 +1,4 @@
-# Contributing to Zoblocks
+# Contributing to ZoBlocks
 
 Thank you for helping. This document covers the mechanics. The _standard_ your
 change is judged against is [ENGINEERING.md](ENGINEERING.md) — read its

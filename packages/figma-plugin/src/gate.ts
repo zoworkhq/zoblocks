@@ -43,7 +43,7 @@ export interface PairReading {
   /** What a designer sees in the variables panel. */
   fg: string;
   bg: string;
-  /** The Zoblocks token, when this pair came from the token list. */
+  /** The ZoBlocks token, when this pair came from the token list. */
   fgToken?: string;
   bgToken?: string;
   fgValue: string;
@@ -77,13 +77,13 @@ export interface GateReport {
   collection: string;
   /** The Figma mode read, by its name in the file. */
   figmaMode: string;
-  /** The Zoblocks theme whose floors were applied. */
+  /** The ZoBlocks theme whose floors were applied. */
   theme: Theme;
   readings: PairReading[];
   findings: GateFinding[];
   /** Pairs the token list names that this collection does not carry. */
   missing: string[];
-  /** Colour variables with no Zoblocks stamp, by label. */
+  /** Colour variables with no ZoBlocks stamp, by label. */
   unstamped: string[];
 }
 
@@ -108,7 +108,7 @@ const round = (ratio: number) => Math.round(ratio * 100) / 100;
 /**
  * Which reading this collection can support.
  *
- * A file carrying Zoblocks stamps can be measured against the real pair list,
+ * A file carrying ZoBlocks stamps can be measured against the real pair list,
  * because we know which colour is text and which is the ground it sits on. A
  * file of somebody's own swatches cannot: pairing them by guesswork would
  * report failures nobody can act on, and worse, would report passes.
@@ -123,7 +123,7 @@ export function runGate(snapshot: VariableSnapshot, options: GateOptions): GateR
 }
 
 /**
- * The real pair list, over a file this plugin (or a Zoblocks theme) put there.
+ * The real pair list, over a file this plugin (or a ZoBlocks theme) put there.
  *
  * `CONTRAST_PAIRS` and `STATUS_PAIRS` are imported rather than restated. A
  * hand-picked subset is how `flag.restricted` was once measured, printed, and
@@ -352,7 +352,7 @@ function darkestOrLightest(colours: Map<string, string>): string | undefined {
 }
 
 /**
- * A Figma mode name read as a Zoblocks theme.
+ * A Figma mode name read as a ZoBlocks theme.
  *
  * Modes this plugin creates are named for the themes, so the common case is
  * exact. Anything else falls back to light, because guessing high-contrast

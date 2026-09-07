@@ -173,7 +173,7 @@ export function validateTheme(
    * changes the *base* palette the gate walks, and the gate reports those
    * without a brand prefix — so filtering on the prefix alone would have let a
    * customer move `text-muted` to something unreadable and publish it, with the
-   * failure attributed to Zoblocks and shown to nobody.
+   * failure attributed to ZoBlocks and shown to nobody.
    *
    * Base problems are therefore included whenever the theme overrides anything
    * semantic, and only then: with no overrides the base palette is ours, it

@@ -7,9 +7,9 @@
 @import "@zoblocks/copilot-react/icons.css";
 
 /**
- * Zoblocks Copilot — antd skin.
+ * ZoBlocks Copilot — antd skin.
  *
- * Reads Zoblocks's semantic tokens where they exist and falls back to antd's own
+ * Reads ZoBlocks's semantic tokens where they exist and falls back to antd's own
  * CSS variables where they do not, so the component looks native inside a
  * customer's existing antd theme rather than importing a second design
  * language. Every fallback is a real antd v6 token, not a guess.

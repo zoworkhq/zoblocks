@@ -179,7 +179,7 @@ export const TIERS: Tier[] = [
       "Will be perpetual — it will not expire",
       "Every item states what was checked",
       "Installs into a theme draft",
-      "Components install with the Zoblocks CLI",
+      "Components install with the ZoBlocks CLI",
     ],
     cta: "See what is coming",
     href: "/marketplace",
@@ -215,7 +215,7 @@ export const TIERS: Tier[] = [
       "Design-system setup and migration",
     ],
     cta: "Talk to us",
-    href: "mailto:hello@zowork.com?subject=Zoblocks%20Enterprise",
+    href: "mailto:hello@zowork.com?subject=ZoBlocks%20Enterprise",
   },
 ];
 
@@ -226,11 +226,11 @@ export const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: "Is any of this a compliance boundary?",
-    a: "No. Installing Zoblocks does not make an application HIPAA, GDPR, or DPDP compliant, and nothing here is a medical device or clinical decision support. Access control, audit, data residency, and clinical validation remain yours. We would rather lose a sale than imply otherwise.",
+    a: "No. Installing ZoBlocks does not make an application HIPAA, GDPR, or DPDP compliant, and nothing here is a medical device or clinical decision support. Access control, audit, data residency, and clinical validation remain yours. We would rather lose a sale than imply otherwise.",
   },
   {
     q: "What exactly do I own?",
-    a: "The source. Components are copied into your repository by the Zoblocks CLI — there is no runtime package between you and the render, and you can read, audit, fork, and change every line. Core is MIT, and every component in the public catalogue is Core. Marketplace packs will carry a commercial licence that does not restrict what you build with them.",
+    a: "The source. Components are copied into your repository by the ZoBlocks CLI — there is no runtime package between you and the render, and you can read, audit, fork, and change every line. Core is MIT, and every component in the public catalogue is Core. Marketplace packs will carry a commercial licence that does not restrict what you build with them.",
   },
   {
     q: "Can I use it for client work?",
@@ -274,7 +274,7 @@ export interface ShowcaseEntry {
  *
  * There are no customers yet, and a showcase padded with invented logos is the
  * fastest way to lose a healthcare buyer — they check. Every entry here is an
- * Zoblocks-built composition on synthetic data, labelled as such on the page.
+ * ZoBlocks-built composition on synthetic data, labelled as such on the page.
  */
 export const SHOWCASE: ShowcaseEntry[] = [
   {

@@ -337,7 +337,7 @@ describe("config", () => {
   });
 
   it("still refuses a literal token minted before the rename", () => {
-    // The `oxy_` prefix was retired with the Zoblocks name, but tokens issued
+    // The `oxy_` prefix was retired with the ZoBlocks name, but tokens issued
     // under it are live credentials. A guard that only knows the new prefix
     // waves through exactly the ones most likely to be sitting in an old file.
     expect(() =>
@@ -628,7 +628,7 @@ describe("registry errors are translated for the reader", () => {
   it("tells a public 404 apart from an entitlement 404", async () => {
     await expect(
       collectItems(["x"], config, { env: {}, fetchImpl: failing(404) }),
-    ).rejects.toThrowError(/not in the Zoblocks catalog/);
+    ).rejects.toThrowError(/not in the ZoBlocks catalog/);
 
     const withRegistry = {
       root: ".",

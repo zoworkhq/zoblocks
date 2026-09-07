@@ -27,7 +27,7 @@ import { InstallCommand, RevealRoot } from "@/components/site/interactions";
 export const metadata: Metadata = {
   title: "Install — Next.js, Vite and Tailwind setup",
   description:
-    "Install Zoblocks components into a React project. Verified setup for Next.js App Router and Vite, with Tailwind v4 config and client boundary rules.",
+    "Install ZoBlocks components into a React project. Verified setup for Next.js App Router and Vite, with Tailwind v4 config and client boundary rules.",
   alternates: { canonical: "/install" },
 };
 
@@ -96,7 +96,7 @@ export default function InstallPage() {
               className="mt-5 max-w-2xl text-lg font-medium tracking-tight text-graphite"
               data-reveal
             >
-              Setting up Zoblocks in a Next.js or Vite project with Tailwind v4.
+              Setting up ZoBlocks in a Next.js or Vite project with Tailwind v4.
             </h2>
             <div className="mt-8 max-w-2xl" data-reveal>
               <InstallCommand command="npx @zoblocks/cli init" />

@@ -1,5 +1,5 @@
 /**
- * Emits the Zoblocks registry: registry.json and one document per item under
+ * Emits the ZoBlocks registry: registry.json and one document per item under
  * apps/docs/public/r/, in the format @zoblocks/cli installs from.
  *
  * Two guarantees this build makes that a hand-written registry cannot:
@@ -35,7 +35,7 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     name: "utils",
     type: "zoblocks:lib",
     title: "Utils",
-    description: "Class-name merge helper shared by every Zoblocks component.",
+    description: "Class-name merge helper shared by every ZoBlocks component.",
     dependencies: ["clsx", "tailwind-merge"],
     registryDependencies: [] as string[],
     files: [
@@ -68,7 +68,7 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     type: "zoblocks:lib",
     title: "Loader core",
     description:
-      "Shared frame, timing gate, and stylesheet behind every Zoblocks loader. Installed automatically with any loader.",
+      "Shared frame, timing gate, and stylesheet behind every ZoBlocks loader. Installed automatically with any loader.",
     dependencies: ["clsx", "tailwind-merge"],
     registryDependencies: ["utils"],
     files: [
@@ -419,7 +419,7 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     type: "zoblocks:lib",
     title: "Switch core",
     description:
-      "The three-axis state model behind Zoblocks's Switch: the commit phase machine, the state-label presets, and the absence vocabulary. Installed automatically with Switch.",
+      "The three-axis state model behind ZoBlocks's Switch: the commit phase machine, the state-label presets, and the absence vocabulary. Installed automatically with Switch.",
     dependencies: ["clsx", "tailwind-merge"],
     registryDependencies: ["utils"],
     files: [
@@ -504,9 +504,9 @@ const SUPPORT_ITEMS: BuildableItem[] = [
   {
     name: "tokens",
     type: "zoblocks:style",
-    title: "Zoblocks tokens",
+    title: "ZoBlocks tokens",
     description:
-      "Semantic clinical status tokens, three density modes, and light/dark themes. Required by every Zoblocks component.",
+      "Semantic clinical status tokens, three density modes, and light/dark themes. Required by every ZoBlocks component.",
     dependencies: [] as string[],
     registryDependencies: [] as string[],
     files: [

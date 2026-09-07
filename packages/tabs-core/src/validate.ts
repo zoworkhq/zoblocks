@@ -182,5 +182,5 @@ export function validateTabsConfig(input: ValidateInput): Problem[] {
 export function formatProblems(problems: readonly Problem[]): string {
   if (problems.length === 0) return "";
   const lines = problems.map((p) => `  • [${p.code}] ${p.message}`);
-  return `Zoblocks Tabs found ${problems.length} configuration problem(s):\n${lines.join("\n")}`;
+  return `ZoBlocks Tabs found ${problems.length} configuration problem(s):\n${lines.join("\n")}`;
 }

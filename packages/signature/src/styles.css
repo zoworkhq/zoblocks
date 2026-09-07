@@ -440,7 +440,7 @@
    Sized in ems against the document it sits in rather than in fixed pixels,
    because this block is dropped into a letter template whose type scale is
    not ours to decide. Every colour goes through a token with a literal
-   fallback, so the block still renders in a host that has not loaded Zoblocks's
+   fallback, so the block still renders in a host that has not loaded ZoBlocks's
    stylesheet — which is the common case for a print or email template.
    ------------------------------------------------------------------------- */
 
