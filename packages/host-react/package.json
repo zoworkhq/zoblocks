@@ -93,12 +93,12 @@
     "@testing-library/user-event": "^14",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
-    "@vitest/coverage-v8": "^4.1.10",
+    "@vitest/coverage-v8": "^5.0.0",
     "antd": "^6.6.0",
     "jsdom": "^30",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "typescript": "^5.7.2",
-    "vitest": "^4.1.10"
+    "vitest": "^5.0.0"
   }
 }
