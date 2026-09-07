@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { CATALOG } from "@/lib/catalog";
 import { SiteFooter, SiteHeader } from "@/components/site/chrome";
+import { ZoworkDesk } from "@/components/site/zowork-desk";
 
 /**
  * Pro — the holding page.
@@ -32,6 +33,13 @@ import { SiteFooter, SiteHeader } from "@/components/site/chrome";
  * console's own output out of focus along the bottom. Nothing to go lopsided.
  *
  * The page it replaces is still here, whole, in `console-page.tsx`.
+ *
+ * ## Why there is a second section
+ *
+ * A held promise with nothing after it is a dead end. `ZoworkDesk` is the
+ * way out: the team that wrote these components also builds the applications
+ * they sit inside, which is a real answer for the reader the console was
+ * going to serve.
  */
 
 export const metadata: Metadata = {
@@ -181,6 +189,14 @@ export default function ProPage() {
             </ol>
           </div>
         </section>
+
+        {/*
+          The second act. "Coming soon" leaves a reader who wants this now with
+          nowhere to go; this is where they go. It sits inside `main` and after
+          the stage deliberately — it is an answer to the page above it, not a
+          footer.
+        */}
+        <ZoworkDesk />
       </main>
 
       <SiteFooter />

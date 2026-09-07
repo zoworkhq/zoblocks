@@ -565,3 +565,351 @@
     }
   }
 }
+
+/* ===========================================================================
+ * Zowork, under the stage.
+ *
+ * A guest brand needs an edge. The plate is therefore dark in both themes,
+ * exactly as the stage above it is, and its colours are literal rather than
+ * tokens — a panel that follows the page theme stops reading as somebody
+ * else's plate and starts reading as more page.
+ *
+ * They are not, however, a second palette: every value below is the site's own
+ * `--site-panel` family in its dark values. This is the site's dark.
+ *
+ * ## One accent, and it is ours
+ *
+ * Zowork's brand colour is a coral, #ff667d, and it is deliberately absent.
+ * Two accent hues inside one panel read as a mistake rather than as two
+ * companies, and the coral fought the green at every edge they shared. Zowork
+ * publish a white mark for dark grounds; that is the one served here, and the
+ * accent stays ZoBlocks green throughout.
+ * ======================================================================== */
+
+.zwDesk {
+  --zw-bg: #08110f;
+  --zw-bg-2: #0c1614;
+  --zw-rule: #1d302d;
+  --zw-fg: #e8f4f1;
+  --zw-muted: #8b9c98;
+  --zw-accent: #2dd4b0;
+
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr);
+  background: var(--zw-bg);
+  color: var(--zw-fg);
+}
+
+/* The edge itself. One hairline, fading out, marking where the page stops. */
+.zwDesk::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--zw-accent) 0%, var(--zw-accent) 34%, transparent 100%);
+}
+
+.zwDesk .zwDeskSay {
+  display: flex;
+  flex-direction: column;
+  gap: 1.375rem;
+  padding: 3.25rem 3rem 3rem;
+}
+
+/*
+ * `align-self` is load-bearing. As a flex item in a column the default
+ * `align-items: stretch` overrides `width: auto` and paints the mark at the
+ * full column width with the height still pinned — a smeared elephant, not a
+ * subtle distortion. `aspect-ratio` and `object-fit` make it unrenderable even
+ * if something downstream sets a width.
+ */
+.zwDesk .zwDeskLogoImg {
+  display: block;
+  align-self: flex-start;
+  height: 1.625rem;
+  width: auto;
+  max-width: none;
+  aspect-ratio: 202 / 52;
+  object-fit: contain;
+}
+
+.zwDesk .zwDeskEyebrow {
+  color: var(--zw-muted);
+}
+
+.zwDesk .zwDeskHead {
+  max-width: 19ch;
+  font-family: var(--font-display);
+  font-size: clamp(1.42rem, 1.05rem + 1.4vw, 1.95rem);
+  font-weight: 600;
+  line-height: 1.14;
+  letter-spacing: -0.033em;
+  text-wrap: balance;
+}
+.zwDesk .zwDeskHead em {
+  font-style: normal;
+  color: var(--zw-accent);
+}
+
+.zwDesk .zwDeskLede {
+  max-width: 46ch;
+  color: var(--zw-muted);
+  font-size: 0.9375rem;
+  line-height: 1.62;
+}
+.zwDesk .zwDeskLede b {
+  color: var(--zw-fg);
+  font-weight: 600;
+}
+
+/* The proof. Mono numerals so four unrelated facts line up as data. */
+.zwDesk .zwDeskProof {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  border: 1px solid var(--zw-rule);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+.zwDesk .zwDeskProof > div {
+  display: flex;
+  flex: 1 1 7.5rem;
+  flex-direction: column;
+  gap: 0.125rem;
+  padding: 0.75rem 0.875rem;
+  border-right: 1px solid var(--zw-rule);
+}
+.zwDesk .zwDeskProof > div:last-child {
+  border-right: none;
+}
+.zwDesk .zwDeskProofV {
+  color: var(--zw-fg);
+  font-family: var(--font-mono);
+  font-size: 1.02rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.zwDesk .zwDeskProofL {
+  margin: 0;
+  color: var(--zw-muted);
+  font-size: 0.7rem;
+  line-height: 1.35;
+}
+
+.zwDesk .zwDeskActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.9375rem;
+}
+.zwDesk .zwDeskCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6875rem 1.1875rem;
+  border-radius: 0.4375rem;
+  background: var(--zw-accent);
+  color: var(--zw-bg);
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.zwDesk .zwDeskCta:hover {
+  filter: brightness(1.07);
+}
+.zwDesk .zwDeskGhost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4375rem;
+  color: var(--zw-fg);
+  font-size: 0.9rem;
+  font-weight: 500;
+  opacity: 0.85;
+}
+.zwDesk .zwDeskGhost:hover {
+  opacity: 1;
+}
+
+/* ---- the contact plate ---- */
+.zwDesk .zwDeskCard {
+  display: flex;
+  flex-direction: column;
+  padding: 2.625rem 2.5rem;
+  border-left: 1px solid var(--zw-rule);
+  background: var(--zw-bg-2);
+}
+
+.zwDesk .zwDeskLive {
+  display: flex;
+  align-items: center;
+  gap: 0.5625rem;
+  padding-bottom: 1.125rem;
+  color: var(--zw-muted);
+  font-size: 0.8rem;
+}
+.zwDesk .zwDeskDot {
+  position: relative;
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--zw-accent);
+}
+.zwDesk .zwDeskDot::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border: 1px solid var(--zw-accent);
+  border-radius: 50%;
+  opacity: 0.35;
+  animation: zw-ping 2.4s ease-out infinite;
+}
+@keyframes zw-ping {
+  0% {
+    opacity: 0.5;
+    transform: scale(0.7);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+.zwDesk .zwDeskField {
+  display: block;
+  padding: 0.875rem 0;
+  border-top: 1px solid var(--zw-rule);
+}
+.zwDesk .zwDeskK {
+  display: block;
+  margin-bottom: 0.375rem;
+  color: var(--zw-muted);
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+}
+.zwDesk .zwDeskV {
+  display: block;
+  font-size: 0.9375rem;
+}
+.zwDesk .zwDeskV a {
+  color: var(--zw-fg);
+  border-bottom: 1px solid var(--zw-rule);
+}
+.zwDesk .zwDeskV a:hover {
+  border-bottom-color: var(--zw-accent);
+}
+
+.zwDesk .zwDeskTri {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.375rem;
+}
+.zwDesk .zwDeskTri > span {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.zwDesk .zwDeskTriK {
+  color: var(--zw-muted);
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.zwDesk .zwDeskTri a {
+  border-bottom: none;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+}
+.zwDesk .zwDeskTri a:hover {
+  color: var(--zw-accent);
+}
+
+.zwDesk .zwDeskCities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.125rem;
+}
+.zwDesk .zwDeskCities > span {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.zwDesk .zwDeskCityCode {
+  color: var(--zw-fg);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+.zwDesk .zwDeskCityName {
+  color: var(--zw-muted);
+  font-size: 0.68rem;
+}
+
+.zwDesk .zwDeskSocial {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: auto 0 0;
+  padding: 1.375rem 0 0;
+  list-style: none;
+}
+.zwDesk .zwDeskSocial a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.125rem;
+  height: 2.125rem;
+  border: 1px solid var(--zw-rule);
+  border-radius: 0.4375rem;
+  color: var(--zw-muted);
+}
+.zwDesk .zwDeskSocial a:hover {
+  border-color: var(--zw-accent);
+  color: var(--zw-accent);
+}
+.zwDesk .zwDeskSocial svg {
+  display: block;
+  width: 0.9375rem;
+  height: 0.9375rem;
+  fill: currentColor;
+}
+
+@media (max-width: 56rem) {
+  .zwDesk {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .zwDesk .zwDeskSay {
+    padding: 2.25rem 1.5rem 2rem;
+  }
+  .zwDesk .zwDeskCard {
+    padding: 2rem 1.5rem;
+    border-top: 1px solid var(--zw-rule);
+    border-left: none;
+  }
+  .zwDesk .zwDeskProof > div {
+    flex-basis: 50%;
+  }
+}
+
+/* The sentence carries the meaning; the pulse is decoration. */
+@media (prefers-reduced-motion: reduce) {
+  .zwDesk .zwDeskDot::after {
+    animation: none;
+  }
+}
+
+/* Forced colours strips the accent, so the edge and the dot must not be the
+   only thing saying "different section". The border below is what survives. */
+@media (forced-colors: active) {
+  .zwDesk {
+    border-top: 2px solid CanvasText;
+  }
+  .zwDesk .zwDeskCta {
+    border: 1px solid ButtonText;
+  }
+}
