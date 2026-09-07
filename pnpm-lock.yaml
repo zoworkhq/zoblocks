@@ -52,6 +52,36 @@ importers:
       '@next/eslint-plugin-next':
         specifier: ^16.3.0
         version: 16.3.0(eslint@10.8.1(jiti@2.7.0))
+      '@playwright/test':
+        specifier: ^1.62.1
+        version: 1.62.1
+      '@size-limit/preset-small-lib':
+        specifier: ^13.0.3
+        version: 13.0.3(size-limit@13.0.3)
+      '@testing-library/dom':
+        specifier: ^10
+        version: 10.4.1
+      '@testing-library/jest-dom':
+        specifier: ^7
+        version: 7.0.1(@testing-library/dom@10.4.1)(vitest@4.1.10)
+      '@testing-library/react':
+        specifier: ^16
+        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@testing-library/user-event':
+        specifier: ^14
+        version: 14.6.3(@testing-library/dom@10.4.1)
+      '@types/node':
+        specifier: ^22.10.2
+        version: 22.20.1
+      '@types/react':
+        specifier: ^19.0.2
+        version: 19.2.18
+      '@types/react-dom':
+        specifier: ^19.0.2
+        version: 19.2.4(@types/react@19.2.18)
+      '@vitest/coverage-v8':
+        specifier: ^4.1.10
+        version: 4.1.10(vitest@4.1.10)
       '@zoblocks/cli':
         specifier: workspace:*
         version: link:packages/cli
@@ -88,36 +118,6 @@ importers:
       '@zoblocks/tokens':
         specifier: workspace:*
         version: link:packages/tokens
-      '@playwright/test':
-        specifier: ^1.62.1
-        version: 1.62.1
-      '@size-limit/preset-small-lib':
-        specifier: ^13.0.3
-        version: 13.0.3(size-limit@13.0.3)
-      '@testing-library/dom':
-        specifier: ^10
-        version: 10.4.1
-      '@testing-library/jest-dom':
-        specifier: ^7
-        version: 7.0.1(@testing-library/dom@10.4.1)(vitest@4.1.10)
-      '@testing-library/react':
-        specifier: ^16
-        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      '@testing-library/user-event':
-        specifier: ^14
-        version: 14.6.3(@testing-library/dom@10.4.1)
-      '@types/node':
-        specifier: ^22.10.2
-        version: 22.20.1
-      '@types/react':
-        specifier: ^19.0.2
-        version: 19.2.18
-      '@types/react-dom':
-        specifier: ^19.0.2
-        version: 19.2.4(@types/react@19.2.18)
-      '@vitest/coverage-v8':
-        specifier: ^4.1.10
-        version: 4.1.10(vitest@4.1.10)
       axe-core:
         specifier: ^4.13.0
         version: 4.13.0
@@ -194,8 +194,8 @@ importers:
         specifier: ^11.14.0
         version: 11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8)
       '@mui/material':
-        specifier: ^9.3.1
-        version: 9.3.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        specifier: ^9.4.0
+        version: 9.4.0(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@zoblocks/bridge-antd':
         specifier: workspace:*
         version: link:../../packages/bridge-antd
@@ -234,7 +234,7 @@ importers:
         version: 0.468.0(react@19.2.8)
       mongodb:
         specifier: ^7.4.0
-        version: 7.5.0(socks@2.8.9)
+        version: 7.5.0(socks@2.8.10)
       next:
         specifier: ^16.3.1
         version: 16.3.1(@babel/core@7.29.7)(@playwright/test@1.62.1)(@types/node@22.20.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -251,9 +251,6 @@ importers:
         specifier: ^3.24.1
         version: 3.25.76
     devDependencies:
-      '@zoblocks/tsconfig':
-        specifier: workspace:*
-        version: link:../../packages/tsconfig
       '@tailwindcss/postcss':
         specifier: ^4.0.0
         version: 4.3.3
@@ -278,9 +275,12 @@ importers:
       '@types/react-dom':
         specifier: ^19.0.2
         version: 19.2.4(@types/react@19.2.18)
+      '@zoblocks/tsconfig':
+        specifier: workspace:*
+        version: link:../../packages/tsconfig
       mongodb-memory-server:
         specifier: ^10
-        version: 10.4.3(socks@2.8.9)
+        version: 10.4.3(socks@2.8.10)
       tailwindcss:
         specifier: ^4.0.0
         version: 4.3.3
@@ -303,8 +303,8 @@ importers:
         specifier: ^11.14.0
         version: 11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8)
       '@mui/material':
-        specifier: ^9.3.1
-        version: 9.3.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        specifier: ^9.4.0
+        version: 9.4.0(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@zoblocks/clinical-note-core':
         specifier: workspace:*
         version: link:../../packages/clinical-note-core
@@ -363,9 +363,6 @@ importers:
         specifier: ^2.5.5
         version: 2.6.1
     devDependencies:
-      '@zoblocks/tsconfig':
-        specifier: workspace:*
-        version: link:../../packages/tsconfig
       '@tailwindcss/postcss':
         specifier: ^4.0.0
         version: 4.3.3
@@ -393,6 +390,9 @@ importers:
       '@vitejs/plugin-react':
         specifier: ^5
         version: 5.2.0(vite@8.2.1(@types/node@22.20.1)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
+      '@zoblocks/tsconfig':
+        specifier: workspace:*
+        version: link:../../packages/tsconfig
       jsdom:
         specifier: ^30
         version: 30.0.1
@@ -422,7 +422,7 @@ importers:
         version: 0.468.0(react@19.2.8)
       mongodb:
         specifier: ^7.4.0
-        version: 7.5.0(socks@2.8.9)
+        version: 7.5.0(socks@2.8.10)
       next:
         specifier: ^16.3.1
         version: 16.3.1(@babel/core@7.29.7)(@playwright/test@1.62.1)(@types/node@22.20.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -439,9 +439,6 @@ importers:
         specifier: ^3.24.1
         version: 3.25.76
     devDependencies:
-      '@zoblocks/tsconfig':
-        specifier: workspace:*
-        version: link:../../packages/tsconfig
       '@tailwindcss/postcss':
         specifier: ^4.0.0
         version: 4.3.3
@@ -457,9 +454,12 @@ importers:
       '@types/react-dom':
         specifier: ^19.0.2
         version: 19.2.4(@types/react@19.2.18)
+      '@zoblocks/tsconfig':
+        specifier: workspace:*
+        version: link:../../packages/tsconfig
       mongodb-memory-server:
         specifier: ^10
-        version: 10.4.3(socks@2.8.9)
+        version: 10.4.3(socks@2.8.10)
       tailwindcss:
         specifier: ^4.0.0
         version: 4.3.3
@@ -540,8 +540,8 @@ importers:
         specifier: ^11.14.0
         version: 11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8)
       '@mui/material':
-        specifier: ^9.3.1
-        version: 9.3.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        specifier: ^9.4.0
+        version: 9.4.0(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@zoblocks/bridge-antd':
         specifier: workspace:*
         version: link:../../packages/bridge-antd
@@ -617,9 +617,6 @@ importers:
         specifier: workspace:*
         version: link:../bridge-core
     devDependencies:
-      '@zoblocks/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
       '@testing-library/react':
         specifier: ^16
         version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -629,6 +626,9 @@ importers:
       '@vitest/coverage-v8':
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
+      '@zoblocks/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       antd:
         specifier: ^6.6.0
         version: 6.6.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -654,9 +654,6 @@ importers:
         specifier: workspace:*
         version: link:../tokens
     devDependencies:
-      '@zoblocks/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
       '@testing-library/react':
         specifier: ^16
         version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -666,6 +663,9 @@ importers:
       '@vitest/coverage-v8':
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
+      '@zoblocks/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       jsdom:
         specifier: ^30
         version: 30.0.1
@@ -695,14 +695,8 @@ importers:
         specifier: ^11.14.0
         version: 11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8)
       '@mui/material':
-        specifier: ^9.3.1
-        version: 9.3.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      '@zoblocks/bridge-antd':
-        specifier: workspace:*
-        version: link:../bridge-antd
-      '@zoblocks/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
+        specifier: ^9.4.0
+        version: 9.4.0(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@testing-library/react':
         specifier: ^16
         version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -712,6 +706,12 @@ importers:
       '@vitest/coverage-v8':
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
+      '@zoblocks/bridge-antd':
+        specifier: workspace:*
+        version: link:../bridge-antd
+      '@zoblocks/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       jsdom:
         specifier: ^30
         version: 30.0.1
@@ -730,15 +730,15 @@ importers:
 
   packages/cli:
     devDependencies:
-      '@zoblocks/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
       '@types/node':
         specifier: ^22.10.2
         version: 22.20.1
       '@vitest/coverage-v8':
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
+      '@zoblocks/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       typescript:
         specifier: ^5.7.2
         version: 5.9.3
@@ -755,12 +755,12 @@ importers:
         specifier: ^1.10.4
         version: 1.12.0
     devDependencies:
-      '@zoblocks/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
       '@vitest/coverage-v8':
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
+      '@zoblocks/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       typescript:
         specifier: ^5.7.2
         version: 5.9.3
@@ -770,12 +770,12 @@ importers:
 
   packages/codemod:
     devDependencies:
-      '@zoblocks/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
       '@vitest/coverage-v8':
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
+      '@zoblocks/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       typescript:
         specifier: ^5.7.2
         version: 5.9.3
@@ -808,9 +808,6 @@ importers:
         specifier: workspace:*
         version: link:../copilot-react
     devDependencies:
-      '@zoblocks/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
       '@testing-library/dom':
         specifier: ^10
         version: 10.4.1
@@ -832,6 +829,9 @@ importers:
       '@vitest/coverage-v8':
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
+      '@zoblocks/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       antd:
         specifier: ^6.6.0
         version: 6.6.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -856,12 +856,12 @@ importers:
 
   packages/copilot-core:
     devDependencies:
-      '@zoblocks/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
       '@vitest/coverage-v8':
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
+      '@zoblocks/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       typescript:
         specifier: ^5.7.2
         version: 5.9.3
@@ -875,12 +875,12 @@ importers:
         specifier: workspace:*
         version: link:../copilot-core
     devDependencies:
-      '@zoblocks/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
       '@vitest/coverage-v8':
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
+      '@zoblocks/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       typescript:
         specifier: ^5.7.2
         version: 5.9.3
@@ -894,9 +894,6 @@ importers:
         specifier: workspace:*
         version: link:../copilot-core
     devDependencies:
-      '@zoblocks/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
       '@testing-library/dom':
         specifier: ^10
         version: 10.4.1
@@ -918,6 +915,9 @@ importers:
       '@vitest/coverage-v8':
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
+      '@zoblocks/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       axe-core:
         specifier: ^4.13.0
         version: 4.13.0
@@ -976,12 +976,12 @@ importers:
         specifier: workspace:*
         version: link:../tokens
     devDependencies:
-      '@zoblocks/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
       '@vitest/coverage-v8':
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
+      '@zoblocks/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       typescript:
         specifier: ^5.7.2
         version: 5.9.3
@@ -998,12 +998,12 @@ importers:
         specifier: workspace:*
         version: link:../tokens
     devDependencies:
-      '@zoblocks/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
       '@vitest/coverage-v8':
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
+      '@zoblocks/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       esbuild:
         specifier: ^0.28.2
         version: 0.28.2
@@ -1049,11 +1049,8 @@ importers:
         specifier: ^11.14.0
         version: 11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8)
       '@mui/material':
-        specifier: ^9.3.1
-        version: 9.3.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      '@zoblocks/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
+        specifier: ^9.4.0
+        version: 9.4.0(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@testing-library/react':
         specifier: ^16
         version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -1069,6 +1066,9 @@ importers:
       '@vitest/coverage-v8':
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
+      '@zoblocks/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       antd:
         specifier: ^6.6.0
         version: 6.6.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -1094,12 +1094,6 @@ importers:
         specifier: workspace:*
         version: link:../identity-core
     devDependencies:
-      '@zoblocks/fhir':
-        specifier: workspace:*
-        version: link:../fhir
-      '@zoblocks/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
       '@testing-library/dom':
         specifier: ^10
         version: 10.4.1
@@ -1121,6 +1115,12 @@ importers:
       '@vitest/coverage-v8':
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
+      '@zoblocks/fhir':
+        specifier: workspace:*
+        version: link:../fhir
+      '@zoblocks/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       axe-core:
         specifier: ^4.13.0
         version: 4.13.0
@@ -1146,12 +1146,12 @@ importers:
         specifier: workspace:*
         version: link:../fhir
     devDependencies:
-      '@zoblocks/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
       '@vitest/coverage-v8':
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
+      '@zoblocks/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       typescript:
         specifier: ^5.7.2
         version: 5.9.3
@@ -1161,15 +1161,15 @@ importers:
 
   packages/intl:
     devDependencies:
-      '@zoblocks/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
       '@testing-library/react':
         specifier: ^16
         version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@types/react':
         specifier: ^19.0.2
         version: 19.2.18
+      '@zoblocks/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       jsdom:
         specifier: ^30
         version: 30.0.1
@@ -1210,9 +1210,6 @@ importers:
         specifier: ^2.5.5
         version: 2.6.1
     devDependencies:
-      '@zoblocks/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
       '@testing-library/jest-dom':
         specifier: ^7
         version: 7.0.1(@testing-library/dom@10.4.1)(vitest@4.1.10)
@@ -1222,6 +1219,9 @@ importers:
       '@types/react':
         specifier: ^19.0.2
         version: 19.2.18
+      '@zoblocks/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       jsdom:
         specifier: ^30
         version: 30.0.1
@@ -1240,12 +1240,12 @@ importers:
 
   packages/recorder-core:
     devDependencies:
-      '@zoblocks/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
       '@vitest/coverage-v8':
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
+      '@zoblocks/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       typescript:
         specifier: ^5.7.2
         version: 5.9.3
@@ -1259,15 +1259,6 @@ importers:
         specifier: workspace:*
         version: link:../signature-core
     devDependencies:
-      '@zoblocks/component-meta':
-        specifier: workspace:*
-        version: link:../component-meta
-      '@zoblocks/fixtures':
-        specifier: workspace:*
-        version: link:../fixtures
-      '@zoblocks/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
       '@testing-library/dom':
         specifier: ^10
         version: 10.4.1
@@ -1289,6 +1280,15 @@ importers:
       '@vitest/coverage-v8':
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
+      '@zoblocks/component-meta':
+        specifier: workspace:*
+        version: link:../component-meta
+      '@zoblocks/fixtures':
+        specifier: workspace:*
+        version: link:../fixtures
+      '@zoblocks/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       antd:
         specifier: ^6.6.0
         version: 6.6.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -1313,12 +1313,12 @@ importers:
 
   packages/signature-core:
     devDependencies:
-      '@zoblocks/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
       '@vitest/coverage-v8':
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
+      '@zoblocks/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       typescript:
         specifier: ^5.7.2
         version: 5.9.3
@@ -1332,18 +1332,6 @@ importers:
         specifier: workspace:*
         version: link:../tabs-core
     devDependencies:
-      '@zoblocks/component-meta':
-        specifier: workspace:*
-        version: link:../component-meta
-      '@zoblocks/fixtures':
-        specifier: workspace:*
-        version: link:../fixtures
-      '@zoblocks/tabs-testing':
-        specifier: workspace:*
-        version: link:../tabs-testing
-      '@zoblocks/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
       '@testing-library/dom':
         specifier: ^10
         version: 10.4.1
@@ -1365,6 +1353,18 @@ importers:
       '@vitest/coverage-v8':
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
+      '@zoblocks/component-meta':
+        specifier: workspace:*
+        version: link:../component-meta
+      '@zoblocks/fixtures':
+        specifier: workspace:*
+        version: link:../fixtures
+      '@zoblocks/tabs-testing':
+        specifier: workspace:*
+        version: link:../tabs-testing
+      '@zoblocks/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       antd:
         specifier: ^6.6.0
         version: 6.6.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -1389,12 +1389,12 @@ importers:
 
   packages/tabs-core:
     devDependencies:
-      '@zoblocks/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
       '@vitest/coverage-v8':
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
+      '@zoblocks/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       typescript:
         specifier: ^5.7.2
         version: 5.9.3
@@ -1404,12 +1404,12 @@ importers:
 
   packages/tabs-testing:
     devDependencies:
-      '@zoblocks/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
       '@vitest/coverage-v8':
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
+      '@zoblocks/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       jsdom:
         specifier: ^30
         version: 30.0.1
@@ -1438,9 +1438,6 @@ importers:
         specifier: ^3.24.1
         version: 3.25.76
     devDependencies:
-      '@zoblocks/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
       '@testing-library/react':
         specifier: ^16
         version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -1450,6 +1447,9 @@ importers:
       '@vitest/coverage-v8':
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
+      '@zoblocks/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       jsdom:
         specifier: ^30
         version: 30.0.1
@@ -1468,12 +1468,12 @@ importers:
 
   packages/tokens:
     devDependencies:
-      '@zoblocks/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
       '@vitest/coverage-v8':
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
+      '@zoblocks/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       typescript:
         specifier: ^5.7.2
         version: 5.9.3
@@ -1522,6 +1522,7 @@ packages:
   '@angular/platform-browser-dynamic@22.1.2':
     resolution: {integrity: sha512-nNARbs9zXfoJL72zsTso6GHt1VuIGXWEpyZtzxcC32qQFG1YbzVqGkQTwZ0mZ2/Ctv8dAZ6PPiDo8sbYvAvUDw==}
     engines: {node: ^22.22.3 || ^24.15.0 || >=26.0.0}
+    deprecated: '@angular/platform-browser-dynamic is deprecated. Use `@angular/platform-browser` instead.'
     peerDependencies:
       '@angular/common': 22.1.2
       '@angular/compiler': 22.1.2
@@ -2372,16 +2373,16 @@ packages:
   '@mongodb-js/saslprep@1.4.13':
     resolution: {integrity: sha512-E3Sv4eCYAlKYUTx8S3ioQcDUscOif+8zZ5OnW1IzJ+Tt+EO+ke8mn+Y3FX6N1H79picwbdOavVOb1jPi2EOyrg==}
 
-  '@mui/core-downloads-tracker@9.3.1':
-    resolution: {integrity: sha512-IAyAFNQbT7hysJ9HXphiOmWJF7G1OglzHanqCgvQgH9LA2ydxtmaTBDbcBqw6euZesyShiwvpvbnYO1GY1AyXQ==}
+  '@mui/core-downloads-tracker@9.4.0':
+    resolution: {integrity: sha512-d+gIYM1raJP87yrVQcVg+Q3vycVMArMkgu/TjJLi2vTvO9FHKWNRR1xs9nnN4eLpM9nGxxm02UMvc9BrmcUKvQ==}
 
-  '@mui/material@9.3.1':
-    resolution: {integrity: sha512-NahAEGIXqS1K0bA4th1jeFxBguS59NOcLbMA0vU+fSaPWKjtwGBGGHeTwlc9PSmzMjOZKceeFWESB8fVHr31hA==}
+  '@mui/material@9.4.0':
+    resolution: {integrity: sha512-6KKUIvkQ2r/s48s9VZV9JEZ1W2dRa7RndVsF+Ipx4CYxDOQeozeRsS5r9NiheFf8A5hpbqJJIGoX7hjg5X4XUw==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       '@emotion/react': ^11.5.0
       '@emotion/styled': ^11.3.0
-      '@mui/material-pigment-css': ^9.3.0
+      '@mui/material-pigment-css': ^9.4.0
       '@types/react': ^17.0.0 || ^18.0.0 || ^19.0.0
       react: ^17.0.0 || ^18.0.0 || ^19.0.0
       react-dom: ^17.0.0 || ^18.0.0 || ^19.0.0
@@ -2395,8 +2396,8 @@ packages:
       '@types/react':
         optional: true
 
-  '@mui/private-theming@9.3.0':
-    resolution: {integrity: sha512-ERvqk5pejf9aRnQcDILSWGtFmsEMiVxlQ4+xsVCjsEvmK0fV9BiVP/cQwAF5dwyDFbve4lTrlcgeFEecVzTNiA==}
+  '@mui/private-theming@9.4.0':
+    resolution: {integrity: sha512-qQpX/2XPGDz5F2OIWzo4kkorURlDeXGKytRQudXCdLS5TuwKsMKaZyx77LZEVSB73c7o3UrLWwQ/goRuHBdtjw==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       '@types/react': ^17.0.0 || ^18.0.0 || ^19.0.0
@@ -2405,8 +2406,8 @@ packages:
       '@types/react':
         optional: true
 
-  '@mui/styled-engine@9.3.0':
-    resolution: {integrity: sha512-x9+KYxhjoHYZ4nioxdKnvQWdw0RScbhoZfQ4tv3Db742683U3wlYSp6zV6Us78dMFnKnyTrPTkQKyutp14gnKA==}
+  '@mui/styled-engine@9.4.0':
+    resolution: {integrity: sha512-SlqVEYqnyEgXMFW4JuIDMelyhKzoWBJ85v2mNCQd0XtU0uk7U9E1zaJZ06XqodhA8oJrb+4Q+3E/JlwBe4jWkw==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       '@emotion/react': ^11.4.1
@@ -2418,8 +2419,8 @@ packages:
       '@emotion/styled':
         optional: true
 
-  '@mui/system@9.3.0':
-    resolution: {integrity: sha512-0l4LqHJxZj65xSrioniGsxm7VNoGXonPo203oZjhBUvIDPeBqRTb7Mqc45Qxs6sO6WGR7WE/9cJ6lb4lkvHkjg==}
+  '@mui/system@9.4.0':
+    resolution: {integrity: sha512-AZz9z13oGS1J0BYeAFHTbV7PegCtPiE/uMEIi7TJ1kTx3Vkt+jUpLyXF/2uV8B6Y79iTh98kVeOH9fX3x3zXXg==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       '@emotion/react': ^11.5.0
@@ -2434,16 +2435,16 @@ packages:
       '@types/react':
         optional: true
 
-  '@mui/types@9.3.0':
-    resolution: {integrity: sha512-2JSxyfpEFWNUB2vKs/T1BvkfyNisMHWph8bLMj8T0uHwmLl/0qfAwQkfwMT6kxLXN9uIum9AEbECXU8er3amIg==}
+  '@mui/types@9.4.0':
+    resolution: {integrity: sha512-13DH0Oniua4WmGqeYbQAZqmiN7r4nfd0zwIoGJ5QeJwyIHgEmf+LkRw/jV1HZb6AiUoHX8Oxf4xgalq3vYHcIw==}
     peerDependencies:
       '@types/react': ^17.0.0 || ^18.0.0 || ^19.0.0
     peerDependenciesMeta:
       '@types/react':
         optional: true
 
-  '@mui/utils@9.3.0':
-    resolution: {integrity: sha512-2HZdHwWJ6eB+7lVGSOHsByGw8jeRulT4g0NZ608Wb8Q57DE2jbNqrWPFuJsvkQQiBiTmlpvQL3i+/62zsiPrkw==}
+  '@mui/utils@9.4.0':
+    resolution: {integrity: sha512-WkzY8uYtqUDyGKPShrRQRBomfMQHddlsyKu/gRRESYO24tDPD2z0xRE8CBoUsWqpBa+YrFs9KixiS7kQRjsPAQ==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       '@types/react': ^17.0.0 || ^18.0.0 || ^19.0.0
@@ -3461,8 +3462,8 @@ packages:
     resolution: {integrity: sha512-UzGt8zg7Ny8djbYMhxl2zuEevVa7r2gJjYY5Lwr1xM7+XU2nd6CkIWFTVcCIbAP63vSz71NaVyyuSk9lHKcy0A==}
     engines: {node: '>=4'}
 
-  axios@1.19.0:
-    resolution: {integrity: sha512-ht/iuYZXEjFxLH/Hkezgd7m6JKlHHXEUSneaDz8uZe1Gj5QZtCnpyDsckvAiEnT89OEbCLmnte4R4sn7P0EKFw==}
+  axios@1.20.0:
+    resolution: {integrity: sha512-r8aOh8j9cGKpgQAqpzrUHnSIc6a59Y3Xf/cv8sy1DrHCkZHzQGEuoq1tARk6qSyDdtQGSDgpb9kFlruzPvrgwg==}
 
   axobject-query@4.1.0:
     resolution: {integrity: sha512-qIj0G9wZbMGNLjLmg1PT6v2mE9AH2zlnADJD/2tC6E00hgmhUOfEB6greHPAfLRSufHqROIUTkw6E+M3lH0PTQ==}
@@ -4220,8 +4221,8 @@ packages:
     resolution: {integrity: sha512-6xwYfHbajpoF0xLW+iwLkhwgvLoZDfjYfoFNu8ftMoXINzwuymNLd9u/KmwtdT2GbR+/Cz66otEGEVVUHX9QLQ==}
     engines: {node: '>=10.13.0'}
 
-  ip-address@10.5.0:
-    resolution: {integrity: sha512-R5SnVLJmgYYvf2F2ZgwSBnelz5G4q5AxIC277GDfUaNbrZKNANcBC7RHqYYePlszf4kBolVkJauG0ZjHHFh55g==}
+  ip-address@10.7.0:
+    resolution: {integrity: sha512-BGFsyJd5mpXp3rK6jIdADLNgpJUK1jnjzvYF8lK+VyDab9JAmqN0YOKDdP17HlgKb2+ehPgDc8EtnRLbGCAMhA==}
     engines: {node: '>= 12'}
 
   ip-regex@2.1.0:
@@ -5169,8 +5170,8 @@ packages:
     resolution: {integrity: sha512-WlMj/67cEJ6MDI1OcsnjuYKDNDoyPCCYZ249kuuXPiMDw9F8PXkVaQ7YWu3siTydfQ/4BEZcvGzu+aYvz7dDCQ==}
     engines: {node: '>= 20'}
 
-  socks@2.8.9:
-    resolution: {integrity: sha512-LJhUYUvItdQ0LkJTmPeaEObWXAqFyfmP85x0tch/ez9cahmhlBBLbIqDFnvBnUJGagb0JbIQrkBs1wJ+yRYpEw==}
+  socks@2.8.10:
+    resolution: {integrity: sha512-e0VyvkVTwVYViNovRkZ9aodhxVlyoMn7eJhVUPxZ+eK9P/7CBkxvvsBOHqFPEH416726W8tLXXXjKwqgTErrCQ==}
     engines: {node: '>= 10.0.0', npm: '>= 3.0.0'}
 
   source-map-js@1.2.1:
@@ -6561,15 +6562,15 @@ snapshots:
     dependencies:
       sparse-bitfield: 3.0.3
 
-  '@mui/core-downloads-tracker@9.3.1': {}
+  '@mui/core-downloads-tracker@9.4.0': {}
 
-  '@mui/material@9.3.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
+  '@mui/material@9.4.0(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
       '@babel/runtime': 7.29.7
-      '@mui/core-downloads-tracker': 9.3.1
-      '@mui/system': 9.3.0(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8)
-      '@mui/types': 9.3.0(@types/react@19.2.18)
-      '@mui/utils': 9.3.0(@types/react@19.2.18)(react@19.2.8)
+      '@mui/core-downloads-tracker': 9.4.0
+      '@mui/system': 9.4.0(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8)
+      '@mui/types': 9.4.0(@types/react@19.2.18)
+      '@mui/utils': 9.4.0(@types/react@19.2.18)(react@19.2.8)
       '@popperjs/core': 2.11.8
       '@types/react-transition-group': 4.4.12(@types/react@19.2.18)
       clsx: 2.1.1
@@ -6584,16 +6585,16 @@ snapshots:
       '@emotion/styled': 11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8)
       '@types/react': 19.2.18
 
-  '@mui/private-theming@9.3.0(@types/react@19.2.18)(react@19.2.8)':
+  '@mui/private-theming@9.4.0(@types/react@19.2.18)(react@19.2.8)':
     dependencies:
       '@babel/runtime': 7.29.7
-      '@mui/utils': 9.3.0(@types/react@19.2.18)(react@19.2.8)
+      '@mui/utils': 9.4.0(@types/react@19.2.18)(react@19.2.8)
       prop-types: 15.8.1
       react: 19.2.8
     optionalDependencies:
       '@types/react': 19.2.18
 
-  '@mui/styled-engine@9.3.0(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8))(react@19.2.8)':
+  '@mui/styled-engine@9.4.0(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8))(react@19.2.8)':
     dependencies:
       '@babel/runtime': 7.29.7
       '@emotion/cache': 11.14.0
@@ -6606,13 +6607,13 @@ snapshots:
       '@emotion/react': 11.14.0(@types/react@19.2.18)(react@19.2.8)
       '@emotion/styled': 11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8)
 
-  '@mui/system@9.3.0(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8)':
+  '@mui/system@9.4.0(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8)':
     dependencies:
       '@babel/runtime': 7.29.7
-      '@mui/private-theming': 9.3.0(@types/react@19.2.18)(react@19.2.8)
-      '@mui/styled-engine': 9.3.0(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8))(react@19.2.8)
-      '@mui/types': 9.3.0(@types/react@19.2.18)
-      '@mui/utils': 9.3.0(@types/react@19.2.18)(react@19.2.8)
+      '@mui/private-theming': 9.4.0(@types/react@19.2.18)(react@19.2.8)
+      '@mui/styled-engine': 9.4.0(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8))(react@19.2.8)
+      '@mui/types': 9.4.0(@types/react@19.2.18)
+      '@mui/utils': 9.4.0(@types/react@19.2.18)(react@19.2.8)
       clsx: 2.1.1
       csstype: 3.2.3
       prop-types: 15.8.1
@@ -6622,16 +6623,16 @@ snapshots:
       '@emotion/styled': 11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8)
       '@types/react': 19.2.18
 
-  '@mui/types@9.3.0(@types/react@19.2.18)':
+  '@mui/types@9.4.0(@types/react@19.2.18)':
     dependencies:
       '@babel/runtime': 7.29.7
     optionalDependencies:
       '@types/react': 19.2.18
 
-  '@mui/utils@9.3.0(@types/react@19.2.18)(react@19.2.8)':
+  '@mui/utils@9.4.0(@types/react@19.2.18)(react@19.2.8)':
     dependencies:
       '@babel/runtime': 7.29.7
-      '@mui/types': 9.3.0(@types/react@19.2.18)
+      '@mui/types': 9.4.0(@types/react@19.2.18)
       '@types/prop-types': 15.7.15
       clsx: 2.1.1
       prop-types: 15.8.1
@@ -7737,7 +7738,7 @@ snapshots:
 
   axe-core@4.13.0: {}
 
-  axios@1.19.0:
+  axios@1.20.0:
     dependencies:
       follow-redirects: 1.16.0(debug@4.4.3)
       form-data: 4.0.6
@@ -7848,7 +7849,7 @@ snapshots:
     dependencies:
       '@testim/chrome-version': 1.1.4
       adm-zip: 0.6.0
-      axios: 1.19.0
+      axios: 1.20.0
       compare-versions: 6.1.1
       proxy-agent: 8.0.2
       proxy-from-env: 2.1.0
@@ -8485,7 +8486,7 @@ snapshots:
 
   interpret@3.1.1: {}
 
-  ip-address@10.5.0: {}
+  ip-address@10.7.0: {}
 
   ip-regex@2.1.0: {}
 
@@ -8842,7 +8843,7 @@ snapshots:
       '@types/whatwg-url': 13.0.0
       whatwg-url: 14.2.0
 
-  mongodb-memory-server-core@10.4.3(socks@2.8.9):
+  mongodb-memory-server-core@10.4.3(socks@2.8.10):
     dependencies:
       async-mutex: 0.5.0
       camelcase: 6.3.0
@@ -8850,7 +8851,7 @@ snapshots:
       find-cache-dir: 3.3.2
       follow-redirects: 1.16.0(debug@4.4.3)
       https-proxy-agent: 7.0.6
-      mongodb: 6.21.0(socks@2.8.9)
+      mongodb: 6.21.0(socks@2.8.10)
       new-find-package-json: 2.0.0
       semver: 7.8.5
       tar-stream: 3.2.0
@@ -8869,9 +8870,9 @@ snapshots:
       - socks
       - supports-color
 
-  mongodb-memory-server@10.4.3(socks@2.8.9):
+  mongodb-memory-server@10.4.3(socks@2.8.10):
     dependencies:
-      mongodb-memory-server-core: 10.4.3(socks@2.8.9)
+      mongodb-memory-server-core: 10.4.3(socks@2.8.10)
       tslib: 2.8.1
     transitivePeerDependencies:
       - '@aws-sdk/credential-providers'
@@ -8886,21 +8887,21 @@ snapshots:
       - socks
       - supports-color
 
-  mongodb@6.21.0(socks@2.8.9):
+  mongodb@6.21.0(socks@2.8.10):
     dependencies:
       '@mongodb-js/saslprep': 1.4.13
       bson: 6.10.4
       mongodb-connection-string-url: 3.0.2
     optionalDependencies:
-      socks: 2.8.9
+      socks: 2.8.10
 
-  mongodb@7.5.0(socks@2.8.9):
+  mongodb@7.5.0(socks@2.8.10):
     dependencies:
       '@mongodb-js/saslprep': 1.4.13
       bson: 7.3.1
       mongodb-connection-string-url: 7.0.2
     optionalDependencies:
-      socks: 2.8.9
+      socks: 2.8.10
 
   motion-dom@11.18.1:
     dependencies:
@@ -9408,13 +9409,13 @@ snapshots:
     dependencies:
       agent-base: 9.0.0
       debug: 4.4.3
-      socks: 2.8.9
+      socks: 2.8.10
     transitivePeerDependencies:
       - supports-color
 
-  socks@2.8.9:
+  socks@2.8.10:
     dependencies:
-      ip-address: 10.5.0
+      ip-address: 10.7.0
       smart-buffer: 4.2.0
 
   source-map-js@1.2.1: {}
