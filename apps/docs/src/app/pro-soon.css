@@ -587,12 +587,28 @@
  * ======================================================================== */
 
 .zwDesk {
-  --zw-bg: #08110f;
-  --zw-bg-2: #0c1614;
-  --zw-rule: #1d302d;
-  --zw-fg: #e8f4f1;
-  --zw-muted: #8b9c98;
-  --zw-accent: #2dd4b0;
+  /*
+   * Every colour here comes through one of these, and every one is a site
+   * token — so light, dark and high contrast are all served by this block.
+   *
+   * The first build wrote them as literals because the plate was dark under
+   * both themes. That is the same mistake the stage above already made and
+   * already paid for: a light reader got a dark slab wedged between a light
+   * header and a light footer, and the high-contrast reader, who had asked for
+   * maximum contrast in the toggle, was the only one who did not get it.
+   *
+   * The edge a guest section needs is carried by the ground shift and the
+   * accent hairline instead, both of which survive every theme.
+   */
+  --zw-bg: var(--site-paper-sunk);
+  --zw-bg-2: var(--site-paper);
+  --zw-rule: var(--site-rule);
+  --zw-fg: var(--site-ink);
+  --zw-muted: var(--site-graphite);
+  --zw-accent: var(--site-brand);
+  --zw-accent-text: var(--site-accent-text);
+  --zw-cta-bg: var(--site-cta);
+  --zw-cta-fg: var(--site-paper);
 
   position: relative;
   display: grid;
@@ -630,8 +646,21 @@
   height: 1.625rem;
   width: auto;
   max-width: none;
-  aspect-ratio: 202 / 52;
   object-fit: contain;
+}
+
+/*
+ * The two marks are not the same shape — the coral original is 519x145 and the
+ * white one 202x52 — so the ratio is declared per mark. One shared value
+ * stretched the coral by 8.5%, which is small enough to look like bad kerning
+ * rather than like a bug. It is here at all to reserve the box before the file
+ * lands, so the row does not jump.
+ */
+.zwDesk .zwDeskLogoLight {
+  aspect-ratio: 519 / 145;
+}
+.zwDesk .zwDeskLogoDark {
+  aspect-ratio: 202 / 52;
 }
 
 .zwDesk .zwDeskEyebrow {
@@ -649,7 +678,10 @@
 }
 .zwDesk .zwDeskHead em {
   font-style: normal;
-  color: var(--zw-accent);
+  /* `--site-accent-text`, not `--site-brand`: the brand green is a fill that
+     fails as body-size text on paper. This token is the readable one in each
+     theme. */
+  color: var(--zw-accent-text);
 }
 
 .zwDesk .zwDeskLede {
@@ -709,8 +741,8 @@
   gap: 0.5rem;
   padding: 0.6875rem 1.1875rem;
   border-radius: 0.4375rem;
-  background: var(--zw-accent);
-  color: var(--zw-bg);
+  background: var(--zw-cta-bg);
+  color: var(--zw-cta-fg);
   font-size: 0.9rem;
   font-weight: 700;
   white-space: nowrap;
@@ -826,7 +858,7 @@
   font-size: 0.8125rem;
 }
 .zwDesk .zwDeskTri a:hover {
-  color: var(--zw-accent);
+  color: var(--zw-accent-text);
 }
 
 .zwDesk .zwDeskCities {
@@ -870,13 +902,40 @@
 }
 .zwDesk .zwDeskSocial a:hover {
   border-color: var(--zw-accent);
-  color: var(--zw-accent);
+  color: var(--zw-accent-text);
 }
 .zwDesk .zwDeskSocial svg {
   display: block;
   width: 0.9375rem;
   height: 0.9375rem;
   fill: currentColor;
+}
+
+/*
+ * The logo is the one thing a token cannot carry. Zowork publish exactly two
+ * marks — a white one for dark grounds and the coral original — and neither
+ * reads on both, so both ship and the theme chooses. This is also why the
+ * coral appears at all: it is Zowork's own mark in its own colour, not a
+ * second accent introduced into the UI.
+ *
+ * `.dark` is Tailwind's class strategy, which the whole site already uses, so
+ * this follows the toggle and the system default together.
+ */
+.zwDesk .zwDeskLogoDark {
+  display: none;
+}
+.dark .zwDesk .zwDeskLogoLight {
+  display: none;
+}
+.dark .zwDesk .zwDeskLogoDark {
+  display: block;
+}
+
+/* High contrast asks for maximum contrast, and the coral mark on pure white is
+   the weakest thing on the plate. The dark-ground mark is worse there, so the
+   coral stays and the surrounding rule does the separating. */
+[data-zb-theme="high-contrast"] .zwDesk {
+  border-top: 2px solid var(--site-ink);
 }
 
 @media (max-width: 56rem) {

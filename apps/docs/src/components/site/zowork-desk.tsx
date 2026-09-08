@@ -12,21 +12,22 @@ import { ArrowRight } from "lucide-react";
  * the five entries on Zowork's own platform list — ZoBlocks is one of the
  * things Zowork makes, and saying so is the whole argument of the section.
  *
- * ## Why the plate is dark in both themes
+ * ## The plate follows the theme
  *
- * Same reason the stage above it is: a guest brand needs an edge, and a panel
- * that follows the page theme reads as more page rather than as somebody
- * else's plate. The colours below are therefore literal rather than tokens.
- * They are the site's own `--site-panel` family in its dark values, so this is
- * the site's dark, not a second one.
+ * It was dark under both at first, on the argument that a guest brand needs an
+ * edge. That is the same mistake the stage above it already made and already
+ * paid for — a light reader gets a dark slab between a light header and a light
+ * footer, and the high-contrast reader, who asked for maximum contrast, is the
+ * only one who does not get it. Every colour now comes from a site token, and
+ * the edge is carried by the ground shift and the accent hairline instead.
  *
- * ## Why the accent is ours and the logo is white
+ * ## The accent is ours; the logo is Zowork's
  *
- * Zowork's brand colour is a coral, `#ff667d`. Dropped deliberately. Two
- * accent hues inside one panel read as a mistake rather than as two companies,
- * and the coral fought the green everywhere they met. Zowork publish a white
- * logo for dark grounds, which is the one used here, and the accent stays
- * ZoBlocks green throughout.
+ * Zowork's brand colour is a coral, `#ff667d`, and nothing in the UI uses it.
+ * Two accent hues inside one panel read as a mistake rather than as two
+ * companies. The mark is the exception, because a logo recoloured to suit its
+ * host is no longer the logo: their coral original shows on light grounds and
+ * their white one on dark.
  *
  * ## Facts
  *
@@ -99,21 +100,42 @@ export function ZoworkDesk() {
     <section className="zwDesk" aria-labelledby="zw-desk-head">
       <div className="zwDeskSay">
         {/*
-          Zowork's own white mark, served from this origin. `next/image` with a
-          fixed width and height rather than a bare `img`: the lint ceiling is
-          exact, so one `no-img-element` warning fails the build.
+          Both of Zowork's marks ship, and CSS picks one.
+
+          They publish exactly two — a white one for dark grounds and the coral
+          original — and neither reads on both. Recolouring either would be
+          inventing a variant of somebody else's logo, so the theme chooses
+          instead. The coral therefore appears in light mode as Zowork's own
+          mark in its own colour, which is a different thing from introducing a
+          second accent into the UI: nothing else on the plate is coral.
+
+          `alt` on one and `alt=""` on the other. Both are the same logo, and a
+          screen reader announcing "Zowork" twice for one mark is noise.
+
+          `next/image` rather than a bare `img`: `no-img-element` is a warning
+          and `pnpm lint` runs at exactly its ceiling, so one bare tag fails the
+          build. `unoptimized` because these are 2 KB PNGs already at their
+          display size — the optimiser would cost a round trip to save nothing.
 
           `zwDeskLogoImg` pins the box. As a flex item in a column the default
-          `align-items: stretch` overrides `width: auto` and renders the mark
-          full-width at a fixed height — which is not a subtle distortion, it
-          is a smeared elephant.
+          `align-items: stretch` overrides `width: auto` and renders the mark at
+          full column width with the height still fixed, which is not a subtle
+          distortion.
         */}
         <Image
-          src="/brand/zowork.png"
+          src="/brand/zowork-colour.png"
           alt="Zowork"
+          width={519}
+          height={145}
+          className="zwDeskLogoImg zwDeskLogoLight"
+          unoptimized
+        />
+        <Image
+          src="/brand/zowork.png"
+          alt=""
           width={202}
           height={52}
-          className="zwDeskLogoImg"
+          className="zwDeskLogoImg zwDeskLogoDark"
           unoptimized
         />
 
