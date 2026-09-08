@@ -1,568 +1,226 @@
 /* ===========================================================================
  * The Pro holding page.
  *
- * Scoped under `.soon`. Pro is out of the first release, and the design
- * problem is that "coming soon" usually says *nothing here yet* — which is the
- * one thing that is not true. The console is built and the gate works.
+ * Scoped under `.pro`. Pro is out of the first release, and the design problem
+ * is that "coming soon" usually says *nothing here yet* — which is the one
+ * thing that is not true. The console is built and the gate works.
  *
- * So the page keeps its own argument and holds it a step short: the gate's
- * four real steps, three settled and `Publish` left open on a dashed rail.
- * Two shapes rather than two colours carry that state, so it survives a
- * greyscale print and a red-green deficiency.
+ * ## What this replaced
  *
- * ## Full-bleed, and why
+ * A full-bleed animated stage: a blurred token ramp, a sweep, and the
+ * console's four-step pipeline with `Publish` held on a dashed rail. It made
+ * the point honestly and it carried 1,128 characters over two screens, of
+ * which the largest element said "soon". The console has ten capabilities and
+ * none of them were on the page.
  *
- * The first build was a dark card centred on the light page with a blurred
- * copy of the old hero behind it. It held together at 1280px and fell apart at
- * 1920: the blurred material sat on the left only — a left-aligned hero has
- * nothing on its right — so the card floated in white beside a smudge. An
- * overlay reads as an overlay only when something sits behind it everywhere.
+ * So this is the ordinary shape a component library uses for a paid tier —
+ * status, one sentence, then a grid of capabilities. It is deliberately plain.
+ * There is no decoration on this page at all, which is why there is no
+ * `prefers-reduced-motion` block below: nothing moves.
  *
- * The stage is the overlay now. Edge to edge at any width, textured with the
- * console's own output rather than with a copy of a page. Nothing to go
- * lopsided, and nothing that has to be re-balanced per breakpoint.
+ * ## Colours
  *
- * Every animation sits inside `prefers-reduced-motion: no-preference`, which
- * makes the *composed* picture the default rather than a frozen first frame.
- * =========================================================================== */
+ * Every one is a site token, so light, dark and high contrast are served by
+ * this single block. The stage before it wrote them as literals and cost twice
+ * for it: a light reader got a dark slab between a light header and a light
+ * footer, and the high-contrast reader, who had asked for maximum contrast in
+ * the toggle, was the only one who did not get it. `e2e/pro.spec.ts` fails if
+ * a literal creeps back in.
+ * ======================================================================== */
 
-.soon {
-  --s-ease: cubic-bezier(0.16, 1, 0.3, 1);
+.pro {
+  --p-ground: var(--site-paper);
+  --p-ground-2: var(--site-paper-sunk);
+  --p-fg: var(--site-ink);
+  --p-muted: var(--site-graphite);
+  --p-rule: var(--site-rule);
+  --p-mark: var(--site-accent-text);
+  --p-cta-bg: var(--site-cta);
+  --p-cta-fg: var(--site-paper);
 
-  /*
-   * Every colour on this page comes through one of these, and every semantic
-   * one is a site token — so light, dark and high contrast are all served by
-   * this single block.
-   *
-   * The first build wrote the stage's colours as literals, because it was dark
-   * under both themes. That cost twice: a light reader got a dark slab wedged
-   * between a light header and a light footer, and the high-contrast reader,
-   * who had asked for maximum contrast in the toggle, was the only one who did
-   * not get it. `e2e/pro.spec.ts` now fails if a literal creeps back in.
-   */
-  --s-ground: var(--site-paper);
-  --s-ground-2: var(--site-paper-sunk);
-  --s-fg: var(--site-ink);
-  --s-muted: var(--site-graphite);
-  --s-rule: var(--site-rule);
-  --s-mark: var(--site-accent-text);
-  --s-cta-bg: var(--site-cta);
-  --s-cta-fg: var(--site-paper);
-
-  /*
-   * Below here is decoration, and it is the one thing a token cannot carry:
-   * these are alpha washes, and the alpha that reads as depth on near-black
-   * reads as haze on paper. So they are tuned per ground rather than derived.
-   */
-  --s-bloom: color-mix(in oklab, var(--site-brand) 9%, transparent);
-  --s-sweep: color-mix(in oklab, var(--site-brand) 5%, transparent);
-  --s-card: color-mix(in oklab, var(--site-paper) 62%, transparent);
-  --s-ramp-opacity: 0.26;
+  background: var(--p-ground);
 }
 
-.dark .soon {
-  --s-bloom: rgb(45 212 176 / 0.09);
-  --s-sweep: rgb(45 212 176 / 0.07);
-  --s-card: rgb(255 255 255 / 0.018);
-  --s-ramp-opacity: 0.3;
+/* ---------- the hero ---------- */
+
+/*
+ * Centred, and narrow. The measure is what does the work here: four short
+ * blocks stacked on a 58ch column read as one statement, where the same text
+ * ranged left across a 1200px page reads as four unrelated lines.
+ */
+.pro .proHero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: clamp(3.5rem, 2rem + 6vw, 6rem) 1.5rem clamp(3rem, 2rem + 4vw, 4.5rem);
+  border-bottom: 1px solid var(--p-rule);
+  text-align: center;
+}
+
+.pro .proEyebrow {
+  color: var(--p-muted);
 }
 
 /*
- * High contrast is a theme somebody chooses from the toggle, not a fallback.
- * It redefines `--site-paper` and `--site-ink` to pure white and black, so the
- * tokens above already carry it. What is left to do is take the decoration
- * away: three soft washes exist to make a surface gentler, which is the
- * opposite of what this reader asked for.
+ * The status is the `h1`. That is unusual and it is the point: on a page about
+ * a product nobody can have yet, the release state is the only fact the reader
+ * does not already hold, so it takes the largest type and the document's one
+ * top-level heading.
  */
-[data-zb-theme="high-contrast"] .soon .soonGlow,
-[data-zb-theme="high-contrast"] .soon .soonRamp,
-[data-zb-theme="high-contrast"] .soon .soonSweep {
-  display: none;
-}
-[data-zb-theme="high-contrast"] .soon .soonGate {
-  background: none;
-  border-color: var(--site-ink);
-}
-
-/* ---------- the stage ---------- */
-.soon .soonStage {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  min-height: min(88svh, 52rem);
-  display: grid;
-  align-items: center;
-  padding: clamp(3.5rem, 9vh, 7rem) 1.25rem clamp(4.5rem, 11vh, 8rem);
-  /*
-   * The first band is the whole trick: the stage opens on exactly the colour
-   * the header sits on and only then drifts into its own ground, so the two
-   * meet as a dissolve rather than as an edge. It used to open on a tinted
-   * wash, which put a hard horizontal seam directly under the menu.
-   */
-  background: linear-gradient(
-    180deg,
-    var(--site-paper) 0%,
-    var(--s-ground) 18%,
-    var(--s-ground-2) 100%
-  );
-  color: var(--s-fg);
-  border-bottom: 1px solid var(--site-rule);
-}
-@media (min-width: 640px) {
-  .soon .soonStage {
-    padding-inline: 2rem;
-  }
-}
-
-.soon .soonGlow {
-  position: absolute;
-  z-index: -3;
-  left: 50%;
-  top: 44%;
-  width: min(70rem, 130vw);
-  height: 40rem;
-  translate: -50% -50%;
-  border-radius: 999px;
-  background: radial-gradient(ellipse, var(--s-bloom), transparent 62%);
-}
-
-/*
- * The console's output, out of focus along the bottom edge — eleven steps from
- * one hue. This is the "page behind": it spans the full width, so it cannot go
- * lopsided the way a blurred hero did.
- */
-.soon .soonRamp {
-  position: absolute;
-  z-index: -2;
-  inset: auto 0 0 0;
-  height: clamp(6rem, 13vh, 9rem);
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 1fr;
-  filter: blur(46px) saturate(1.1);
-  opacity: var(--s-ramp-opacity);
-  /* Fades upward *and* inward, so the band never meets a side edge with an
-     abrupt colour — the seam that made the first version look like a smear. */
-  mask-image:
-    linear-gradient(to top, #000 0%, transparent 100%),
-    linear-gradient(to right, transparent 0%, #000 22%, #000 78%, transparent 100%);
-  mask-composite: intersect;
-  pointer-events: none;
-}
-.soon .soonRamp span {
-  background: var(--c);
-}
-
-/* The sweep is motion and nothing else. Under reduced motion a parked band
-   would read as a rendering fault, so it is not drawn at all. */
-.soon .soonSweep {
-  display: none;
-}
-
-/* ---------- the composition ---------- */
-.soon .soonInner {
-  position: relative;
-  width: 100%;
-  max-width: 72rem;
-  margin-inline: auto;
-  display: grid;
-  gap: clamp(2.75rem, 5vw, 5rem);
-  align-items: center;
-  grid-template-columns: minmax(0, 1fr);
-}
-@media (min-width: 900px) {
-  .soon .soonInner {
-    grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
-  }
-}
-
-.soon .soonEyebrow {
-  margin: 0;
-  color: var(--s-mark);
-}
-
-.soon .soonHead {
-  margin: 1.5rem 0 0;
-  font-family: var(--font-display, ui-sans-serif, system-ui, sans-serif);
-  font-size: clamp(3rem, 7.5vw, 5.25rem);
-  line-height: 0.94;
-  letter-spacing: -0.045em;
+.pro .proHead {
+  margin: 0.25rem 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 1.5rem + 3.2vw, 3.5rem);
   font-weight: 600;
+  line-height: 1.02;
+  letter-spacing: -0.038em;
   text-wrap: balance;
 }
-.soon .soonCh {
-  display: inline-block;
+
+/* What the product is, directly under what its status is. */
+.pro .proSay {
+  font-size: clamp(1rem, 0.95rem + 0.3vw, 1.15rem);
+  font-weight: 500;
+  color: var(--p-fg);
 }
 
-.soon .soonLede {
-  margin: 1.75rem 0 0;
-  max-width: 40ch;
-  font-size: 1rem;
+.pro .proLede {
+  max-width: 58ch;
+  color: var(--p-muted);
+  font-size: 0.9375rem;
   line-height: 1.65;
-  color: var(--s-muted);
 }
 
-/* ---------- actions ---------- */
-.soon .soonActions {
-  margin-top: 2.25rem;
+.pro .proActions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.6rem;
-  align-items: center;
-}
-.soon .soonCta {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 12px;
-  padding: 0.85rem 1.2rem;
-  font-size: 0.9375rem;
-  font-weight: 500;
-  background: var(--s-cta-bg);
-  color: var(--s-cta-fg);
-  text-decoration: none;
-  transition:
-    transform 0.3s var(--s-ease),
-    filter 0.3s var(--s-ease);
-}
-.soon .soonCta:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.06);
-}
-.soon .soonGhost {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  border-radius: 12px;
-  border: 1px solid transparent;
-  padding: 0.85rem 1.1rem;
-  font-size: 0.9375rem;
-  color: var(--s-muted);
-  text-decoration: none;
-  transition:
-    color 0.25s var(--s-ease),
-    border-color 0.25s var(--s-ease);
-}
-.soon .soonGhost:hover {
-  color: var(--s-fg);
-  border-color: var(--s-rule);
-}
-.soon .soonGhost svg {
-  transition: transform 0.3s var(--s-ease);
-}
-.soon .soonGhost:hover svg {
-  transform: translateX(2px);
-}
-.soon .soonNote {
-  margin: 1.25rem 0 0;
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.6875rem;
-  letter-spacing: 0.06em;
-  color: var(--s-muted);
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 0.875rem;
 }
 
-/* ===========================================================================
- * The gate, read top to bottom.
- * ======================================================================== */
-.soon .soonGate {
+.pro .proCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6875rem 1.1875rem;
+  border-radius: 0.5rem;
+  background: var(--p-cta-bg);
+  color: var(--p-cta-fg);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.pro .proCta:hover {
+  background: var(--site-cta-hover, var(--p-cta-bg));
+}
+
+.pro .proGhost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4375rem;
+  padding: 0.6875rem 1.1875rem;
+  border: 1px solid var(--p-rule);
+  border-radius: 0.5rem;
+  color: var(--p-fg);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+.pro .proGhost:hover {
+  border-color: var(--site-rule-strong);
+}
+
+/* ---------- the capability grid ---------- */
+
+/*
+ * Three columns, and the count matters: six cells fill three columns exactly,
+ * and two columns exactly, and one. A seventh would leave a ragged row at two
+ * of the three breakpoints, which is the reason this page lists six of the
+ * console's ten capabilities rather than all of them.
+ *
+ * The 1px gap over a ruled ground draws every divider at once, so no cell
+ * needs a border and none of them double up at the seams.
+ */
+.pro .proGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
   margin: 0;
-  list-style: none;
-  display: grid;
-  gap: 0;
-  background: var(--s-card);
-  border: 1px solid var(--s-rule);
-  border-radius: 18px;
-  padding: clamp(1.25rem, 2.4vw, 1.9rem);
+  background: var(--p-rule);
+  border-bottom: 1px solid var(--p-rule);
 }
 
-.soon .soonStep {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1.25rem minmax(0, 1fr);
-  column-gap: 0.9rem;
-  padding-bottom: 1.6rem;
-}
-.soon .soonStep:last-child {
-  padding-bottom: 0;
+.pro .proCell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4375rem;
+  padding: 1.625rem 1.75rem 1.75rem;
+  background: var(--p-ground);
 }
 
-/* The rail between markers. Dashed into `Publish`, because that segment has
-   not been travelled — the single piece of state this page exists to show. */
-.soon .soonStep:not(:last-child)::before {
-  content: "";
-  position: absolute;
-  left: 0.625rem;
-  top: 1.5rem;
-  bottom: 0.25rem;
-  border-left: 1px solid var(--s-mark);
-  opacity: 0.45;
-}
-.soon .soonStep:has(+ [data-pending])::before {
-  border-left-style: dashed;
-  border-color: var(--s-muted);
-  opacity: 0.8;
+.pro .proCellName {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.012em;
 }
 
-/* Done is a filled disc, outstanding is an open ring — a difference in shape,
-   not only in colour. Resting state is the finished one: three done, one open. */
-.soon .soonDot {
-  grid-row: 1 / span 3;
-  width: 1.25rem;
-  height: 1.25rem;
-  margin-top: 0.2rem;
-  position: relative;
-  display: grid;
-  place-items: center;
-  color: var(--s-mark);
-}
-.soon .soonDot::before {
-  content: "";
-  width: 0.55rem;
-  height: 0.55rem;
-  border-radius: 999px;
-  background: currentColor;
-}
-.soon .soonStep[data-pending] .soonDot::before {
-  width: 1.05rem;
-  height: 1.05rem;
-  background: none;
-  border: 1.5px solid currentColor;
+.pro .proCellDetail {
+  margin: 0;
+  color: var(--p-muted);
+  font-size: 0.84rem;
+  line-height: 1.55;
 }
 
-.soon .soonStepK {
-  grid-column: 2;
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.625rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--s-muted);
-}
-.soon .soonStepV {
-  grid-column: 2;
-  margin-top: 0.3rem;
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--s-fg);
-}
-.soon .soonStep[data-pending] .soonStepV {
-  color: var(--s-mark);
-}
-.soon .soonStepN {
-  grid-column: 2;
-  margin-top: 0.15rem;
-  font-size: 0.8125rem;
-  line-height: 1.5;
-  color: var(--s-muted);
+/* ---------- what is not held ---------- */
+.pro .proNow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: 1.75rem 2.5rem;
+  background: var(--p-ground-2);
+  border-bottom: 1px solid var(--p-rule);
 }
 
-@media (max-width: 420px) {
-  .soon .soonCta,
-  .soon .soonGhost {
-    justify-content: center;
-    width: 100%;
+.pro .proNowHead {
+  font-size: 0.9875rem;
+  font-weight: 600;
+  letter-spacing: -0.016em;
+}
+
+.pro .proNowBody {
+  max-width: 60ch;
+  margin-top: 0.1875rem;
+  color: var(--p-muted);
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+.pro .proNowLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4375rem;
+  color: var(--p-mark);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+@media (max-width: 56rem) {
+  .pro .proGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .pro .proNow {
+    padding: 1.5rem 1.5rem;
+  }
+  .pro .proCell {
+    padding: 1.375rem 1.5rem 1.5rem;
   }
 }
 
-/* ===========================================================================
- * Motion. Everything below is additive — remove it and the picture above is
- * already the finished one.
- * ======================================================================== */
-@media (prefers-reduced-motion: no-preference) {
-  .soon .soonSay {
-    animation: soon-up 900ms var(--s-ease) both;
-  }
-  .soon .soonGate {
-    animation: soon-gate 1000ms var(--s-ease) 260ms both;
-  }
-  @keyframes soon-gate {
-    from {
-      opacity: 0;
-      transform: translateY(18px) scale(0.985);
-      filter: blur(6px);
-    }
-  }
-
-  .soon .soonCh {
-    animation: soon-ch 900ms var(--s-ease) both;
-    animation-delay: calc(var(--i) * 45ms + 260ms);
-  }
-  @keyframes soon-ch {
-    from {
-      opacity: 0;
-      transform: translateY(0.5em) rotate(3deg);
-      filter: blur(10px);
-    }
-  }
-
-  .soon .soonLede {
-    animation: soon-up 800ms var(--s-ease) 780ms both;
-  }
-  .soon .soonActions {
-    animation: soon-up 800ms var(--s-ease) 900ms both;
-  }
-  .soon .soonNote {
-    animation: soon-up 800ms var(--s-ease) 1020ms both;
-  }
-  @keyframes soon-up {
-    from {
-      opacity: 0;
-      transform: translateY(12px);
-    }
-  }
-
-  /*
-   * The pipeline runs, once per cycle.
-   *
-   * What was here before cycled each settled dot from muted to accent and back
-   * — which meant a step that is *done* rendered as *not done* for part of
-   * every loop, and a screenshot caught exactly that: `Eleven steps` grey
-   * between two green neighbours, saying the opposite of what it means. State
-   * is not a thing to animate. It is the one thing on this page that must hold
-   * still.
-   *
-   * So the motion is a signal travelling the rail instead. A pulse glides down
-   * each settled segment, each dot throws a ring as the pulse reaches it, and
-   * the run stops dead at the dashed gap — because that segment has not been
-   * travelled. Nothing dims, nothing changes state, and the stop is the point.
-   */
-  .soon .soonStep {
-    animation: soon-step-in 700ms var(--s-ease) both;
-    animation-delay: calc(320ms + var(--n, 0) * 80ms);
-  }
-  @keyframes soon-step-in {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-      filter: blur(4px);
-    }
-  }
-
-  /* The pulse. Only on segments the signal actually crosses — never the
-     dashed one, whose emptiness is carrying the meaning. */
-  .soon .soonStep:not(:last-child):not(:has(+ [data-pending]))::after {
-    content: "";
-    position: absolute;
-    left: 0.625rem;
-    top: 1.5rem;
-    bottom: 0.25rem;
-    width: 1px;
-    background-image: linear-gradient(to bottom, transparent, var(--s-mark), transparent);
-    background-size: 100% 46%;
-    background-repeat: no-repeat;
-    background-position-y: 0%;
-    opacity: 0;
-    animation: soon-signal 6s linear infinite;
-  }
-  .soon .soonStep:nth-child(1)::after {
-    animation-delay: 0.5s;
-  }
-  .soon .soonStep:nth-child(2)::after {
-    animation-delay: 1.2s;
-  }
-  @keyframes soon-signal {
-    0% {
-      background-position-y: 0%;
-      opacity: 0;
-    }
-    2% {
-      opacity: 1;
-    }
-    10% {
-      background-position-y: 100%;
-      opacity: 1;
-    }
-    13%,
-    100% {
-      background-position-y: 100%;
-      opacity: 0;
-    }
-  }
-
-  /* The ring each settled dot throws as the pulse arrives. */
-  .soon .soonStep:not([data-pending]) .soonDot::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0.55rem;
-    height: 0.55rem;
-    border-radius: 999px;
-    border: 1.5px solid var(--s-mark);
-    translate: -50% -50%;
-    opacity: 0;
-    animation: soon-ping 6s var(--s-ease) infinite;
-  }
-  .soon .soonStep:nth-child(1) .soonDot::after {
-    animation-delay: 0.45s;
-  }
-  .soon .soonStep:nth-child(2) .soonDot::after {
-    animation-delay: 1.15s;
-  }
-  .soon .soonStep:nth-child(3) .soonDot::after {
-    animation-delay: 1.85s;
-  }
-  @keyframes soon-ping {
-    0% {
-      opacity: 0.7;
-      scale: 0.7;
-    }
-    14%,
-    100% {
-      opacity: 0;
-      scale: 3;
-    }
-  }
-
-  .soon .soonStep[data-pending] .soonDot::before {
-    animation: soon-breathe 2.6s ease-in-out infinite;
-  }
-  @keyframes soon-breathe {
-    0%,
-    100% {
-      box-shadow: 0 0 0 0 color-mix(in oklab, var(--s-mark) 45%, transparent);
-    }
-    65% {
-      box-shadow: 0 0 0 8px transparent;
-    }
-  }
-
-  .soon .soonRamp {
-    animation: soon-ramp 9s ease-in-out infinite;
-  }
-  @keyframes soon-ramp {
-    0%,
-    100% {
-      opacity: calc(var(--s-ramp-opacity) * 0.8);
-    }
-    50% {
-      opacity: calc(var(--s-ramp-opacity) * 1.2);
-    }
-  }
-
-  .soon .soonSweep {
-    display: block;
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    overflow: hidden;
-  }
-  .soon .soonSweep i {
-    position: absolute;
-    left: -30%;
-    top: 0;
-    bottom: 0;
-    width: 42%;
-    background: linear-gradient(100deg, transparent, var(--s-sweep), transparent);
-    animation: soon-sweep 7s cubic-bezier(0.45, 0, 0.2, 1) infinite;
-  }
-  @keyframes soon-sweep {
-    0% {
-      transform: translateX(0);
-    }
-    55%,
-    100% {
-      transform: translateX(320%);
-    }
+@media (max-width: 34rem) {
+  .pro .proGrid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 

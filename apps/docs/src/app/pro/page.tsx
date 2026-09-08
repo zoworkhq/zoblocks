@@ -10,86 +10,83 @@ import { ZoworkDesk } from "@/components/site/zowork-desk";
  *
  * The console is built and the contrast gate works; it is simply not in the
  * first release. That distinction is the whole design. A blank "coming soon"
- * says *nothing here yet*, which is the one thing that is not true, and the
- * page it replaces — ten animated glances, a feature browser and a tier table
- * — sells a console nobody can reach and takes payment decisions with it.
+ * says *nothing here yet*, which is the one thing that is not true.
  *
- * So the page keeps its own argument and holds it one step short. The gate's
- * four steps are the console's real pipeline; three tick over in sequence and
- * `Publish` stays an open ring on a dashed rail. Done and pending are two
- * *shapes* rather than two colours, so the state survives a greyscale print
- * and a red-green deficiency — the same rule the components are held to.
+ * ## What this replaced, and why
  *
- * ## Why the stage is full-bleed
+ * The previous build made that point with a full-bleed animated stage: a
+ * blurred token ramp, a sweep, and the console's four-step pipeline with
+ * `Publish` held open on a dashed rail. It was honest and it was pretty, and
+ * it carried **1,128 characters over two full screens** — a page whose largest
+ * element said "soon" and whose only other content was a four-item list.
  *
- * The first build was a dark card centred on the light page with a blurred
- * copy of the old hero behind it. At 1280px that read as an overlay. At
- * 1920px it read as a bug: the blurred material sat on the left only, because
- * a left-aligned hero has nothing on its right, and the card floated in white
- * with a smudge beside it. An overlay only reads as one when something sits
- * behind it *everywhere*.
+ * The console has ten capabilities. None of them were on the page.
  *
- * So the stage is the overlay now — edge to edge, at any width, with the
- * console's own output out of focus along the bottom. Nothing to go lopsided.
+ * So the shape is now the ordinary one a component library uses for a paid
+ * tier: the status as the headline, one sentence saying what the thing is,
+ * then the capabilities as a grid a reader can scan. Nothing here is
+ * decorative. `console-page.tsx` still holds the full pitch, whole, for the
+ * release that puts the console back.
  *
- * The page it replaces is still here, whole, in `console-page.tsx`.
+ * ## Why the copy reads flat
  *
- * ## Why there is a second section
- *
- * A held promise with nothing after it is a dead end. `ZoworkDesk` is the
- * way out: the team that wrote these components also builds the applications
- * they sit inside, which is a real answer for the reader the console was
- * going to serve.
+ * Deliberately. An earlier draft of this page named the features things like
+ * "One colour, eleven steps" and "A failing theme cannot go live". That is a
+ * magazine voice, and on a component library it reads as marketing rather than
+ * as documentation. Every name below is what the feature would be called in a
+ * changelog: `Theme editor`, `Contrast validation`, `Versioned delivery`.
  */
 
 export const metadata: Metadata = {
   title: "Pro — coming soon",
-  // Derived. Both counts on this page said 27 against a catalogue of 30, which
-  // undersells the only half of the product a reader can actually have today.
   description:
-    `The ZoBlocks theming console is built and gated, and not in the first release. ` +
-    `The ${CATALOG.length} open-source components are.`,
+    `ZoBlocks Pro is a theming console: branded themes, automatic contrast validation and ` +
+    `versioned stylesheet delivery. Not in the current release. The ${CATALOG.length} ` +
+    `open-source components are available now.`,
   alternates: { canonical: "/pro" },
 };
 
-const HEADLINE = "Coming soon";
-
-/** The console's real pipeline. Only the last one is outstanding. */
-const STEPS: { step: string; label: string; note: string; pending?: boolean }[] = [
-  { step: "01", label: "Brand colour", note: "one hex, from you" },
-  { step: "02", label: "Eleven steps", note: "generated, not guessed" },
-  { step: "03", label: "Contrast gate", note: "every pair checked" },
-  { step: "04", label: "Publish", note: "held for the next release", pending: true },
-];
-
 /**
- * The eleven steps the console emits from one hue — its output, blurred along
- * the bottom of the stage.
+ * The console's capabilities, in the order a reader meets them when using it.
  *
- * Mirrored, and that is the whole point. Laid out in its natural order the
- * ramp runs light to dark across the viewport, and once blurred that is a
- * band bright on the left and black on the right — the exact lopsidedness the
- * full-bleed stage exists to avoid. Reflected about its darkest step it reads
- * as a centred bloom instead, symmetric at any width.
- *
- * Hard-coded rather than computed: a decorative band that changes between
- * renders is a visual-regression failure waiting to happen, and ADR 0007 is
- * explicit that VRT must be deterministic.
+ * Six rather than ten. The remaining four — the component playground,
+ * role-based access, Figma integration and organisation licensing — are real
+ * and are listed in `lib/pro-features.ts`, but a holding page for something
+ * nobody can buy does not need to enumerate them; six fills the grid without a
+ * ragged final row at any breakpoint.
  */
-const RAMP_STEPS = [
-  "#eafaf5",
-  "#c6f1e5",
-  "#9be7d4",
-  "#6cdcc1",
-  "#3fd0ad",
-  "#10b995",
-  "#0d9c7e",
-  "#0a7f67",
-  "#086651",
-  "#064e3e",
-  "#04372c",
+const FEATURES: { name: string; detail: string }[] = [
+  {
+    name: "Theme editor",
+    detail:
+      "Create and edit themes as drafts. Changes reach a running application only when someone publishes them.",
+  },
+  {
+    name: "Contrast validation",
+    detail:
+      "Every colour pair is checked against WCAG on the server. A theme below the threshold cannot be published.",
+  },
+  {
+    name: "Colour scale generation",
+    detail:
+      "Enter one brand colour. The console derives an eleven-step scale from 50 to 950, anchored so step 600 is the colour you gave it.",
+  },
+  {
+    name: "Versioned delivery",
+    detail:
+      "Each publish produces an immutable stylesheet URL with the version in the path, alongside a manifest for what CSS cannot carry.",
+  },
+  {
+    name: "Density modes",
+    detail:
+      "Three densities share one token set. Row spacing changes; the minimum touch target does not.",
+  },
+  {
+    name: "Framework bridges",
+    detail:
+      "Map a theme onto Ant Design or MUI tokens, so components match the application around them.",
+  },
 ];
-const RAMP = [...RAMP_STEPS].reverse().concat(RAMP_STEPS.slice(1));
 
 /*
  * No waitlist exists to post to, and a field that swallows an address is worse
@@ -104,98 +101,72 @@ export default function ProPage() {
     <>
       <SiteHeader />
 
-      <main id="main" className="soon">
-        <section className="soonStage">
-          {/* Texture, and none of it carries information. */}
-          <div className="soonGlow" aria-hidden="true" />
-          <div className="soonRamp" aria-hidden="true">
-            {RAMP.map((c, i) => (
-              <span key={`${c}${i}`} style={{ ["--c" as string]: c }} />
-            ))}
-          </div>
-          {/* The validation sweep, crossing the stage the way it crosses a theme. */}
-          <div className="soonSweep" aria-hidden="true">
-            <i />
-          </div>
+      <main id="main" className="pro">
+        <section className="proHero">
+          {/*
+            The eyebrow names the product and the `h1` states its status, which
+            is the wrong way round for a marketing page and the right way round
+            for this one: the status is the only thing on this page a reader
+            does not already know.
+          */}
+          <p className="eyebrow proEyebrow">ZoBlocks Pro</p>
+          <h1 className="proHead">Coming soon</h1>
+          <p className="proSay">Theme management for ZoBlocks</p>
+          <p className="proLede">
+            Create branded themes, validate colour contrast automatically, and deliver them to your
+            applications as versioned stylesheets. The console is built and running. It is not in
+            the current release.
+          </p>
 
-          <div className="soonInner">
-            <div className="soonSay">
-              <p className="eyebrow eyebrow-rule soonEyebrow">ZoBlocks Pro</p>
-              {/*
-                One span per letter is what staggers the entrance, and eleven
-                single-character nodes are not a heading — so the whole run is
-                hidden from the accessibility tree and `aria-label` supplies
-                the name.
-
-                The first attempt used a visually-hidden copy of the string
-                instead, which reads correctly but leaves `ComingsoonComing
-                soon` in `textContent` — what a reader gets when they select
-                the headline and copy it. The word space is a real text node
-                for the same reason: an empty spacer span would make the copy
-                read `Comingsoon`.
-              */}
-              <h1 className="soonHead" aria-label={HEADLINE}>
-                <span aria-hidden="true">
-                  {HEADLINE.split("").map((c, i) =>
-                    c === " " ? (
-                      " "
-                    ) : (
-                      <span key={`${c}${i}`} className="soonCh" style={{ ["--i" as string]: i }}>
-                        {c}
-                      </span>
-                    ),
-                  )}
-                </span>
-              </h1>
-              <p className="soonLede">
-                The theming console is built and the gate works. It is not in the first release —
-                the {CATALOG.length} open components are.
-              </p>
-
-              <div className="soonActions">
-                <a href={NOTIFY_HREF} className="soonCta">
-                  Email me when it ships
-                </a>
-                <Link href="/components" className="soonGhost">
-                  Browse the open components
-                  <ArrowRight aria-hidden="true" className="size-4" />
-                </Link>
-              </div>
-              <p className="soonNote">Free · no card · the components ship today</p>
-            </div>
-
-            {/*
-              The pipeline, read top to bottom. The rail into `Publish` is
-              dashed because that segment has not been travelled — the one
-              piece of state the page exists to communicate.
-            */}
-            <ol className="soonGate">
-              {STEPS.map(({ step, label, note, pending }, i) => (
-                <li
-                  key={step}
-                  className="soonStep"
-                  style={{ ["--n" as string]: i }}
-                  {...(pending ? { "data-pending": "" } : {})}
-                >
-                  <i className="soonDot" aria-hidden="true" />
-                  <span className="soonStepK">Step {step}</span>
-                  <span className="soonStepV">
-                    {label}
-                    <span className="sr-only">{pending ? " — not yet" : " — done"}</span>
-                  </span>
-                  <span className="soonStepN">{note}</span>
-                </li>
-              ))}
-            </ol>
+          <div className="proActions">
+            <a href={NOTIFY_HREF} className="proCta">
+              Notify me when it ships
+            </a>
+            <Link href="/components" className="proGhost">
+              View components
+              <ArrowRight aria-hidden="true" className="size-4" />
+            </Link>
           </div>
         </section>
 
         {/*
-          The second act. "Coming soon" leaves a reader who wants this now with
-          nowhere to go; this is where they go. It sits inside `main` and after
-          the stage deliberately — it is an answer to the page above it, not a
-          footer.
+          A description list rather than a grid of divs. Each cell is a term and
+          its definition, which is what this is, and it means a screen reader
+          announces the pairing rather than twelve unrelated fragments.
         */}
+        <section aria-labelledby="pro-features-head">
+          <h2 id="pro-features-head" className="sr-only">
+            What the console does
+          </h2>
+          <dl className="proGrid">
+            {FEATURES.map(({ name, detail }) => (
+              <div key={name} className="proCell">
+                <dt className="proCellName">{name}</dt>
+                <dd className="proCellDetail">{detail}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+
+        {/*
+          The one thing on this page that is not held. It closes the page on
+          something a reader can actually do, which a holding page otherwise
+          fails to offer.
+        */}
+        <section className="proNow">
+          <div>
+            <p className="proNowHead">The component library is available now</p>
+            <p className="proNowBody">
+              {CATALOG.length} components, MIT licensed, installed as source into your repository.
+              No account and no card.
+            </p>
+          </div>
+          <Link href="/components" className="proNowLink">
+            Browse components
+            <ArrowRight aria-hidden="true" className="size-4" />
+          </Link>
+        </section>
+
         <ZoworkDesk />
       </main>
 

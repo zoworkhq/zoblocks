@@ -1,14 +1,29 @@
 /**
  * The Pro holding page.
  *
- * Pro is out of the first release, so `/pro` no longer sells the console. The
- * things worth a browser here are the ones a later edit would quietly break:
- * that the gate still reads three-done-one-open rather than four of anything,
- * that the state is carried by something other than colour, that the two ways
- * off the page still lead somewhere, and that a reader who has asked for
- * reduced motion gets the composed picture instead of a frozen first frame.
+ * Pro is out of the first release, so `/pro` does not sell the console. It
+ * states the release status, says in one sentence what the product is, and
+ * lists six of the console's capabilities.
  *
- * The spec that tested the console page is in this file's history; it comes
+ * ## What this file used to test, and why it does not any more
+ *
+ * The page it replaced made its point with an animated stage and the console's
+ * four-step pipeline, `Publish` held open on a dashed rail. Six of the eleven
+ * tests here checked that gate — that it read three-done-one-open, that the
+ * state was carried by shape rather than colour, that the dashed segment was
+ * the last one, and that the letter-by-letter headline still copied as one
+ * word. None of that exists now, so none of those tests do either.
+ *
+ * Five rules survived the redesign, because they are about the page rather
+ * than about that design:
+ *
+ *   1. Every colour comes from a site token, never a literal.
+ *   2. Both ways off the page lead somewhere.
+ *   3. The status is stated in words, not only in styling.
+ *   4. Nothing scrolls sideways at 320px.
+ *   5. No WCAG 2.2 AA violations.
+ *
+ * The spec for the console page itself is in this file's history; it comes
  * back with `console-page.tsx`.
  */
 
@@ -33,140 +48,64 @@ async function audit(page: Page) {
   return result.violations;
 }
 
-/** The entrance is a staggered fade; auditing mid-fade measures a
-    half-transparent element and reports a phantom contrast failure. */
-async function settle(page: Page) {
-  await page.waitForTimeout(1600);
-}
-
 test.describe("the Pro holding page @a11y", () => {
-  test("holds the gate one step short", async ({ page }) => {
-    await page.goto("/pro");
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Coming soon");
-
-    // Four steps, exactly one of them outstanding. Both halves matter: four
-    // ticks would say the console shipped, and four rings would say none of it
-    // is built — the page exists to say neither.
-    await expect(page.locator(".soon .soonStep")).toHaveCount(4);
-    await expect(page.locator(".soon .soonStep[data-pending]")).toHaveCount(1);
-    await expect(page.locator(".soon .soonStep[data-pending]")).toContainText("Publish");
-  });
-
   /**
-   * The state is a difference in shape, not only in colour, so it survives a
-   * greyscale print and a red-green deficiency. Asserted on the rendered
-   * marker: settled steps paint a filled disc, the outstanding one a ring.
-   */
-  test("done and outstanding differ by more than colour", async ({ page }) => {
-    await page.goto("/pro");
-    const borders = await page.evaluate(() =>
-      [...document.querySelectorAll(".soon .soonStep")].map((step) => {
-        const marker = getComputedStyle(step.querySelector(".soonDot")!, "::before");
-        return {
-          pending: step.hasAttribute("data-pending"),
-          border: parseFloat(marker.borderTopWidth) || 0,
-          background: marker.backgroundColor,
-        };
-      }),
-    );
-    expect(borders).toHaveLength(4);
-    for (const { pending, border, background } of borders) {
-      if (pending) {
-        expect(border, "the outstanding step should be a ring").toBeGreaterThan(0);
-        expect(background).toMatch(/rgba\(0, 0, 0, 0\)|transparent/);
-      } else {
-        expect(border, "a settled step should be a filled disc").toBe(0);
-        expect(background).not.toMatch(/rgba\(0, 0, 0, 0\)|transparent/);
-      }
-    }
-  });
-
-  /**
-   * Per-letter spans are the animation's mechanism, and both the readings they
-   * can corrupt are asserted here. The first build hid the letters and added a
-   * visually-hidden copy for the name — correct to a screen reader, and it put
-   * `ComingsoonComing soon` on the clipboard.
-   */
-  /**
-   * State holds still.
+   * The status is the `h1`, which is deliberate and easy to lose.
    *
-   * The gate's first animation cycled each settled dot from muted to accent
-   * and back, so a step that is *done* rendered as *not done* for part of every
-   * loop — a screenshot caught `Eleven steps` sitting grey between two green
-   * neighbours, saying the opposite of what it means. Motion on this page may
-   * travel the rail; it may not touch the thing the rail is reporting.
-   *
-   * Sampled across a full cycle rather than asserted on the mechanism, so it
-   * still holds if the animation is rewritten again.
+   * A later edit that promotes "Theme management for ZoBlocks" to the heading
+   * would read better as marketing and would remove the only fact on the page
+   * a visitor does not already have. If that trade is ever made it should be
+   * made on purpose, which is what this test forces.
    */
-  test("no settled step ever renders as unsettled", async ({ page }) => {
-    await page.goto("/pro");
-    const read = () =>
-      page.evaluate(() =>
-        [...document.querySelectorAll(".soon .soonStep:not([data-pending]) .soonDot")].map(
-          (d) => getComputedStyle(d).color,
-        ),
-      );
-
-    const first = await read();
-    expect(first).toHaveLength(3);
-
-    // One full 6s loop, sampled well inside it.
-    for (let i = 0; i < 13; i += 1) {
-      await page.waitForTimeout(520);
-      expect(await read(), `a settled dot changed colour ${i * 520}ms into the cycle`).toEqual(
-        first,
-      );
-    }
-  });
-
-  /**
-   * The rail says the same thing as the markers, in a second channel: the
-   * segments between settled steps are solid, and the one running into
-   * `Publish` is dashed because it has not been travelled. It is drawn
-   * entirely in `::before`, so nothing in the DOM would reveal a regression.
-   */
-  test("the rail into Publish is dashed, the rest solid", async ({ page }) => {
-    await page.goto("/pro");
-    const rails = await page.evaluate(() =>
-      [...document.querySelectorAll(".soon .soonStep")].map((s) => {
-        const cs = getComputedStyle(s, "::before");
-        return { drawn: cs.content !== "none", style: cs.borderLeftStyle };
-      }),
-    );
-    expect(rails.map((r) => (r.drawn ? r.style : "none"))).toEqual([
-      "solid",
-      "solid",
-      "dashed",
-      "none",
-    ]);
-  });
-
-  test("the headline reads as one line, spoken and copied", async ({ page }) => {
+  test("the release status is the page's heading", async ({ page }) => {
     await page.goto("/pro");
     const h1 = page.getByRole("heading", { level: 1 });
-    await expect(h1).toHaveText("Coming soon");
-    expect(await h1.evaluate((h) => h.getAttribute("aria-label"))).toBe("Coming soon");
-    // Eleven letters, and not one of them offered to the accessibility tree.
-    expect(await page.locator(".soon .soonHead .soonCh").count()).toBe(10);
-    expect(
-      await h1.evaluate((h) =>
-        [...h.querySelectorAll(".soonCh")].every((n) => n.closest("[aria-hidden='true']") !== null),
-      ),
-      "a headline letter was left in the accessibility tree",
-    ).toBe(true);
+    await expect(h1).toHaveText(/coming soon/i);
+    await expect(page.locator("main h1")).toHaveCount(1);
   });
 
   /**
-   * Every colour on this page has to come from a site token.
+   * Status in words, not only in styling.
    *
-   * The stage was dark under both themes at first, so its colours were written
-   * as literals — which meant a light reader got a dark slab wedged between a
-   * light header and a light footer, and the high-contrast reader, who had
-   * asked for maximum contrast in the toggle, was the only one who did not get
-   * it. A literal is invisible to every theme; this is the test that sees it.
+   * The old page carried its state in the shape of a marker. This one carries
+   * it in a sentence, which has to survive a stylesheet failing to load — so
+   * the assertion is on text content rather than on anything computed.
    */
-  test("the stage follows the theme rather than a literal", async ({ page }) => {
+  test("says what is held and what is not, in text", async ({ page }) => {
+    await page.goto("/pro");
+    const main = page.locator("main");
+    await expect(main).toContainText(/not in the current release/i);
+    await expect(main).toContainText(/available now/i);
+  });
+
+  /** Six capabilities, each a term with its own definition. */
+  test("lists the console's capabilities as described terms", async ({ page }) => {
+    await page.goto("/pro");
+    const cells = page.locator(".pro .proCell");
+    await expect(cells).toHaveCount(6);
+
+    // Every cell is a dt/dd pair. A grid of bare divs would announce twelve
+    // unrelated fragments instead of six named things.
+    const pairs = await page.evaluate(() =>
+      [...document.querySelectorAll(".pro .proCell")].map((cell) => ({
+        term: cell.querySelector("dt")?.textContent?.trim() ?? "",
+        detail: (cell.querySelector("dd")?.textContent ?? "").trim().length,
+      })),
+    );
+    expect(pairs.every((p) => p.term.length > 0 && p.detail > 30)).toBe(true);
+    expect(pairs.map((p) => p.term)).toContain("Contrast validation");
+  });
+
+  /**
+   * Every colour comes from a site token.
+   *
+   * The stage this replaced wrote its colours as literals because it was dark
+   * under both themes, and that cost twice: a light reader got a dark slab
+   * wedged between a light header and a light footer, and the high-contrast
+   * reader, who had asked for maximum contrast in the toggle, was the only one
+   * who did not get it. A literal is invisible to every theme; this sees it.
+   */
+  test("the page follows the theme rather than a literal", async ({ page }) => {
     await page.goto("/pro");
 
     const read = () =>
@@ -176,7 +115,7 @@ test.describe("the Pro holding page @a11y", () => {
          * same colour comes back as `#000`, `#000000` or `rgb(0, 0, 0)`
          * depending on the engine and on whether the stylesheet was minified;
          * letting the browser resolve both sides removes all three from the
-         * comparison. The first version of this test failed on that alone.
+         * comparison.
          */
         const probe = document.createElement("span");
         probe.style.display = "none";
@@ -189,10 +128,10 @@ test.describe("the Pro holding page @a11y", () => {
         const root = getComputedStyle(document.documentElement);
         const out = {
           ink: rgb(root.getPropertyValue("--site-ink")),
-          head: rgb(getComputedStyle(document.querySelector(".soon .soonHead")!).color),
+          head: rgb(getComputedStyle(document.querySelector(".pro .proHead")!).color),
           ground: rgb(root.getPropertyValue("--site-paper")),
-          decorHidden: [".soonGlow", ".soonRamp"].every(
-            (sel) => getComputedStyle(document.querySelector(`.soon ${sel}`)!).display === "none",
+          cellGround: rgb(
+            getComputedStyle(document.querySelector(".pro .proCell")!).backgroundColor,
           ),
         };
         probe.remove();
@@ -221,75 +160,56 @@ test.describe("the Pro holding page @a11y", () => {
       ["high contrast", hc],
     ] as const) {
       expect(t.head, `${name}: the headline ignored --site-ink`).toBe(t.ink);
+      expect(t.cellGround, `${name}: a capability cell ignored --site-paper`).toBe(t.ground);
     }
 
     // And the three are genuinely different, so none of this passed by accident.
     expect(new Set([light.head, dark.head, hc.head]).size).toBe(3);
     expect(light.ground).not.toBe(dark.ground);
-
-    // Decoration exists to soften a surface. High contrast wants it hard.
-    expect(light.decorHidden).toBe(false);
-    expect(dark.decorHidden).toBe(false);
-    expect(hc.decorHidden, "a decorative wash survived into high contrast").toBe(true);
   });
 
-  test("both ways off the page lead somewhere", async ({ page }) => {
+  test("every way off the page leads somewhere", async ({ page }) => {
     await page.goto("/pro");
-    const notify = page.locator("main").getByRole("link", { name: /email me when it ships/i });
+    const main = page.locator("main");
+
+    const notify = main.getByRole("link", { name: /notify me when it ships/i });
     await expect(notify).toHaveAttribute("href", /^mailto:[^@]+@[^@]+\./);
 
-    const components = page.locator("main").getByRole("link", { name: /browse the open/i });
-    await expect(components).toHaveAttribute("href", "/components");
-    await components.click();
+    // Two routes to the catalogue: one in the hero, one closing the page.
+    const toComponents = main.getByRole("link", { name: /view components|browse components/i });
+    await expect(toComponents).toHaveCount(2);
+    for (const href of await toComponents.evaluateAll((els) =>
+      els.map((e) => e.getAttribute("href")),
+    )) {
+      expect(href).toBe("/components");
+    }
+
+    await toComponents.first().click();
     await expect(page).toHaveURL(/\/components$/);
   });
 
   /**
-   * Every animation is declared inside `prefers-reduced-motion: no-preference`,
-   * so opting out must leave the composed picture — a gate that still reads
-   * three-done-one-open, not a blank panel or a first frame.
+   * Nothing on this page moves, which is the point of checking.
+   *
+   * The stage it replaced was almost entirely animation, and every rule was
+   * declared inside `prefers-reduced-motion: no-preference` so that opting out
+   * left the composed picture. This page has no animation to opt out of, and a
+   * future edit that reintroduces one without that guard should fail here.
    */
-  test("reduced motion leaves the page composed, not blank", async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: "reduce" });
+  test("nothing animates, with or without a motion preference", async ({ page }) => {
     await page.goto("/pro");
-    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-
-    /*
-     * Pseudo-elements are checked explicitly. The gate's motion — the pulse
-     * travelling the rail and the ring each dot throws — lives entirely in
-     * `::before` and `::after`, which `querySelectorAll` cannot reach, so an
-     * element-only sweep would have passed while every one of them ran.
-     */
     const running = await page.evaluate(() =>
-      [...document.querySelectorAll(".soon, .soon *")].flatMap((n) =>
+      [...document.querySelectorAll(".pro, .pro *")].flatMap((n) =>
         [null, "::before", "::after"]
           .map((pseudo) => getComputedStyle(n, pseudo).animationName)
           .filter((name) => name !== "none")
           .map((name) => `${n.className || n.tagName} ${name}`),
       ),
     );
-    expect(running, `animations ran under reduced motion: ${running.join(", ")}`).toEqual([]);
-
-    // The stage is drawn, the headline is legible and the gate still reads.
-    const composed = await page.evaluate(() => {
-      const stage = document.querySelector(".soon .soonStage")!;
-      const head = document.querySelector(".soon .soonHead")!;
-      const gate = document.querySelector(".soon .soonGate")!;
-      return {
-        stageHeight: stage.getBoundingClientRect().height,
-        gateHeight: gate.getBoundingClientRect().height,
-        headOpacity: getComputedStyle(head).opacity,
-        gateOpacity: getComputedStyle(gate).opacity,
-        letters: [...document.querySelectorAll(".soon .soonCh")].every(
-          (n) => getComputedStyle(n).opacity === "1",
-        ),
-      };
-    });
-    expect(composed.stageHeight).toBeGreaterThan(400);
-    expect(composed.gateHeight).toBeGreaterThan(150);
-    expect(composed.headOpacity).toBe("1");
-    expect(composed.gateOpacity).toBe("1");
-    expect(composed.letters, "a headline letter stayed transparent").toBe(true);
+    // The Zowork plate's reply indicator is the one exception, and it is
+    // already guarded by its own reduced-motion rule.
+    const unguarded = running.filter((r) => !r.includes("zw-ping"));
+    expect(unguarded, `unguarded animations: ${unguarded.join(", ")}`).toEqual([]);
   });
 
   test("does not scroll sideways at 320px", async ({ page }) => {
@@ -305,7 +225,6 @@ test.describe("the Pro holding page @a11y", () => {
   test("has no WCAG 2.2 AA violations", async ({ page }) => {
     await page.goto("/pro");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-    await settle(page);
     const failures = (await audit(page)).map(
       (v) => `${v.id} (${v.impact ?? "unknown"}) — ${v.help}\n    ${v.nodes[0]?.target.join(" ")}`,
     );
