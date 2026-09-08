@@ -235,12 +235,20 @@ export function expandHeaders(
   const expanded: Record<string, string> = {};
 
   for (const [key, value] of Object.entries(headers ?? {})) {
-    // Both prefixes. `zb_` is what the console mints now; `oxy_` is what it
-    // minted before the rename, and a token from then is still a live
-    // credential that must not be committed. Dropping the old prefix here
-    // would turn this guard off for exactly the tokens most likely to be
-    // sitting in an old config.
-    if (/\b(zb|oxy)_(live|test)_[A-Za-z0-9]/.test(value)) {
+    /*
+     * Both prefixes, and the retired one is deliberate. `zb_` is what the
+     * console mints now; the other is what it minted before the rename, and a
+     * token from then is still a live credential that must not be committed.
+     * Dropping it here would turn this guard off for exactly the tokens most
+     * likely to be sitting in an old config file.
+     *
+     * Declared as a constant on its own line rather than inline: the marker
+     * has to sit on the same line as the pattern, and Prettier moves a
+     * trailing comment off a line this long.
+     */
+    const LITERAL_TOKEN = /\b(zb|oxy)_(live|test)_[A-Za-z0-9]/; // rename-sweep-exempt
+
+    if (LITERAL_TOKEN.test(value)) {
       throw new ConfigError(
         `${CONFIG_FILE}: registry "${registryName}" has a token written literally into "${key}".\n\n` +
           `Move it to your environment and reference it instead:\n` +

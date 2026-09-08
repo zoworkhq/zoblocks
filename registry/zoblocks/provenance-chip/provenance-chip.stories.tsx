@@ -137,7 +137,7 @@ export const Extracted: Story = {
         {...args}
         record={{
           source: "ai-extracted",
-          model: "oxy-extract-3",
+          model: "zb-extract-3",
           span: { document: "Scanned referral", page: 2, line: 14 },
           confirmed: false,
         }}
@@ -160,7 +160,7 @@ export const ExtractedConfirmed: Story = {
   parameters: { state: "AI-extracted, confirmed by a clinician" },
   render: story({
     source: "ai-extracted",
-    model: "oxy-extract-3",
+    model: "zb-extract-3",
     span: { document: "Scanned referral", page: 2, line: 14 },
     confirmed: true,
     confirmedBy: { display: "Dr Warren" },
@@ -246,7 +246,7 @@ export const GlyphOnly: Story = {
           { source: "clinic", observedAt: "2026-08-12T09:48:00Z" },
           { source: "device", observedAt: "2026-08-08T08:10:00Z" },
           { source: "patient-reported", observedAt: "2026-08-11T20:00:00Z" },
-          { source: "ai-extracted", model: "oxy-extract-3", confirmed: false },
+          { source: "ai-extracted", model: "zb-extract-3", confirmed: false },
         ] as ProvenanceRecord[]
       ).map((record, index) => (
         <Value key={index}>
@@ -300,7 +300,7 @@ export const SpanReachable: Story = {
         {...args}
         record={{
           source: "ai-extracted",
-          model: "oxy-extract-3",
+          model: "zb-extract-3",
           span: { document: "Scanned referral", page: 2, line: 14 },
           confirmed: false,
         }}

@@ -581,7 +581,7 @@ const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
         [
           { source: "clinic", observedAt: "2026-08-12T09:48:00Z" },
           { source: "device", observedAt: "2026-08-08T08:10:00Z", device: "Omron BP7450" },
-          { source: "ai-extracted", model: "oxy-extract-3", confirmed: false },
+          { source: "ai-extracted", model: "zb-extract-3", confirmed: false },
         ] as const
       ).map((record, index) => (
         <span key={index} style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>

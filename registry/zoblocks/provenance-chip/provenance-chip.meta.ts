@@ -249,7 +249,7 @@ const ledger = ledgerFrom(records);
 <ProvenanceChip record={{ source: "device", observedAt: t4days,
   device: "Omron BP7450", deviceNote: "unvalidated cuff size, median of 3" }} now={now} />
 
-<ProvenanceChip record={{ source: "ai-extracted", model: "oxy-extract-3",
+<ProvenanceChip record={{ source: "ai-extracted", model: "zb-extract-3",
   span: { document: "Scanned referral", page: 2, line: 14 }, confirmed: false }} />`,
     },
     {

@@ -215,7 +215,7 @@ describe("staleness", () => {
 describe("AI extraction", () => {
   const extracted: ProvenanceRecord = {
     source: "ai-extracted",
-    model: "oxy-extract-3",
+    model: "zb-extract-3",
     span: { document: "Scanned referral", page: 2, line: 14 },
     confirmed: false,
   };
@@ -248,7 +248,7 @@ describe("AI extraction", () => {
   it("names the model and the span", () => {
     render(<ProvenanceChip record={extracted} />);
     const name = screen.getByRole("img").getAttribute("aria-label")!;
-    expect(name).toContain("model oxy-extract-3");
+    expect(name).toContain("model zb-extract-3");
     expect(name).toContain("from Scanned referral, page 2, line 14");
   });
 

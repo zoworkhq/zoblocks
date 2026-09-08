@@ -48,7 +48,7 @@ export function ConsolePage() {
       <SiteHeader />
       <VisionFilters />
 
-      <main id="main" className="oxp">
+      <main id="main" className="zbp">
         {/* ---------------------------------------------------------- hero */}
         <section className="border-b border-rule">
           <div className="mx-auto grid max-w-6xl section-major gap-10 px-5 sm:px-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] lg:items-center lg:gap-16">

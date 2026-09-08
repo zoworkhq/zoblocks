@@ -29,6 +29,23 @@
 #     retired config file in order to read it. The marker has to be on the same
 #     line, so an exemption is visible in every diff that touches it.
 #
+# ## Abbreviations, not just the whole word
+#
+# The word itself is the easy half. The September 2026 sweep matched hyphenated
+# forms (`ox-`, `data-ox-`, `--ox-`) and PascalCase (`Ox[A-Z]`), and `.oxp` —
+# the Pro page's class prefix, short for Oxygen Pro — has neither a hyphen nor
+# a capital, so nothing caught it and 119 uses survived in code that is one
+# import away from production. The ABBREV block below is that gap closed.
+#
+# Every pattern there is anchored on its left edge. `box-shadow` appears 711
+# times in this repository, `checkbox` 124 more, and an unanchored `ox-` would
+# fail the build on all of them.
+#
+# `pnpm-lock.yaml` and the workflows are exempt from this block alone: both
+# carry opaque base64 — integrity hashes and a Vercel organisation id — and
+# `Ox` followed by a capital turns up in it by chance. They remain subject to
+# the whole-word check above.
+#
 # Run: pnpm check:names
 set -uo pipefail
 cd "$(git rev-parse --show-toplevel)"
@@ -62,7 +79,35 @@ NAMED=$({ git ls-files; git ls-files --others --exclude-standard; } \
   | grep -v '^content/archive/' \
   | grep -v 'oxygen-to-zoblocks' || true)
 
+# Brand-derived abbreviations. Each pattern is verified to match a real
+# positive before being added — a gate pattern that silently never fires is
+# worse than no gate, because it reports success.
+ABBREV=$(git grep -I -n -E \
+    '[[:<:]]oxp|[[:<:]]oxy|(^|[^A-Za-z0-9])--ox-|(^|[^A-Za-z0-9])data-ox-|(^|[^A-Za-z0-9])\.ox-|(["'"'"'`<( ])ox-|Ox[A-Z]' \
+    -- . \
+    ':!content/archive' \
+    ':!.changeset' \
+    ':!CHANGELOG.md' \
+    ':!scripts/retired-names.sh' \
+    ':!packages/codemod/src/oxygen-to-zoblocks.ts' \
+    ':!packages/codemod/test/oxygen-to-zoblocks.test.ts' \
+    ':!packages/codemod/README.md' \
+    ':!pnpm-lock.yaml' \
+    ':!.github/workflows' \
+  2>/dev/null | grep -v 'rename-sweep-exempt' || true)
+
 STATUS=0
+
+if [ -n "$ABBREV" ]; then
+  STATUS=1
+  echo "These carry an abbreviation of the retired name:"
+  echo
+  printf '%s\n' "$ABBREV" | sed 's/^/  /'
+  echo
+  echo "The prefixes are zb- and zbp. If a line genuinely must keep the old"
+  echo "one, put 'rename-sweep-exempt' in a comment on the same line and say why."
+  echo
+fi
 
 if [ -n "$NAMED" ]; then
   STATUS=1

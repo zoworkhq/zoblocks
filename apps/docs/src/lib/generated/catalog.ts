@@ -9204,7 +9204,7 @@ export const CATALOG: ComponentDoc[] = [
         "title": "One value, six provenances",
         "description": "The same 128/76, six times. Each supports a different decision, and only the affix says which — the clinic reading is actionable, the HIE row carries a document date rather than an observation date, and the extracted row states that nobody has looked at it.",
         "fixture": "observationPotassiumCritical",
-        "code": "<ProvenanceChip record={{ source: \"clinic\", observedAt: t12min,\n  performer: { display: \"M. Adeyemi\", role: \"MA\" }, device: \"Welch Allyn 6000\" }} now={now} />\n\n<ProvenanceChip record={{ source: \"device\", observedAt: t4days,\n  device: \"Omron BP7450\", deviceNote: \"unvalidated cuff size, median of 3\" }} now={now} />\n\n<ProvenanceChip record={{ source: \"ai-extracted\", model: \"oxy-extract-3\",\n  span: { document: \"Scanned referral\", page: 2, line: 14 }, confirmed: false }} />"
+        "code": "<ProvenanceChip record={{ source: \"clinic\", observedAt: t12min,\n  performer: { display: \"M. Adeyemi\", role: \"MA\" }, device: \"Welch Allyn 6000\" }} now={now} />\n\n<ProvenanceChip record={{ source: \"device\", observedAt: t4days,\n  device: \"Omron BP7450\", deviceNote: \"unvalidated cuff size, median of 3\" }} now={now} />\n\n<ProvenanceChip record={{ source: \"ai-extracted\", model: \"zb-extract-3\",\n  span: { document: \"Scanned referral\", page: 2, line: 14 }, confirmed: false }} />"
       },
       {
         "id": "document-vintage",

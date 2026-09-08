@@ -1037,7 +1037,7 @@ const PC_SOURCES: Array<{ record: ProvenanceRecord; means: string }> = [
   {
     record: {
       source: "ai-extracted",
-      model: "oxy-extract-3",
+      model: "zb-extract-3",
       span: { document: "Scanned referral", page: 2, line: 14 },
       confirmed: false,
     },

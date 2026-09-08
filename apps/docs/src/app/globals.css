@@ -137,7 +137,7 @@
 @import "./data-grid-demo.css";
 
 /* The Pro page: glance stages, the feature browser and the tier table.
-   Scoped under `.oxp`. */
+   Scoped under `.zbp`. */
 @import "./pro.css";
 
 /* The Pro holding page. Independent of pro.css, so restoring the console

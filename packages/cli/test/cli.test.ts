@@ -337,11 +337,12 @@ describe("config", () => {
   });
 
   it("still refuses a literal token minted before the rename", () => {
-    // The `oxy_` prefix was retired with the ZoBlocks name, but tokens issued
+    // rename-sweep-exempt: the retired prefix is the subject of this test.
+    // It went with the ZoBlocks rename, but tokens issued
     // under it are live credentials. A guard that only knows the new prefix
     // waves through exactly the ones most likely to be sitting in an old file.
-    expect(() =>
-      expandHeaders({ Authorization: "Bearer oxy_live_abc123" }, {}, "@zoblocks-pro"),
+    expect(
+      () => expandHeaders({ Authorization: "Bearer oxy_live_abc123" }, {}, "@zoblocks-pro"), // rename-sweep-exempt: the retired prefix is the point of this test
     ).toThrowError(ConfigError);
   });
 
