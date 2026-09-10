@@ -2,7 +2,7 @@
   "name": "@zoblocks/docs",
   "version": "0.1.0",
   "private": true,
-  "description": "zoblocks.design \u2014 marketing site, component catalog, and registry host.",
+  "description": "zoblocks.design — marketing site, component catalog, and registry host.",
   "scripts": {
     "build": "next build",
     "dev": "next dev --turbopack --port ${PORT:-6001}",
@@ -31,13 +31,12 @@
     "clsx": "^2.1.1",
     "lucide-react": "^0.468.0",
     "motion": "^11.15.0",
-    "next": "^16.3.1",
+    "next": "^16.3.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwind-merge": "^2.5.5"
   },
   "devDependencies": {
-    "@zoblocks/tsconfig": "workspace:*",
     "@tailwindcss/postcss": "^4.0.0",
     "@testing-library/dom": "^10",
     "@testing-library/jest-dom": "^7",
@@ -47,6 +46,7 @@
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
     "@vitejs/plugin-react": "^5",
+    "@zoblocks/tsconfig": "workspace:*",
     "jsdom": "^30",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.7.2",
