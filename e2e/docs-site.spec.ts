@@ -670,21 +670,47 @@ test.describe("site chrome @a11y", () => {
     await expect(link).toBeFocused();
   });
 
-  test("the tab icon is declared and served", async ({ page, request }) => {
+  /**
+   * Both tab icons are declared and both are served.
+   *
+   * This asserted a single icon link and read `.first()`, which was true when
+   * it was written and stopped being true on 2 Sep 2026 — `6b3d245` added a
+   * real `favicon.ico` so browsers that will not take an SVG get something,
+   * and Next emits it ahead of the SVG in the head. The test then read the
+   * `.ico` and asserted it was SVG. The page was right and the test was
+   * measuring the wrong one of two correct things.
+   *
+   * So it now checks each for what that format is *for*: the SVG for its own
+   * ground, the `.ico` for existing at all.
+   */
+  test("both tab icons are declared and served", async ({ page, request }) => {
     await page.goto(CATALOG);
 
-    const icon = page.locator("link[rel~='icon']").first();
-    await expect(icon).toHaveCount(1);
+    const svg = page.locator("link[rel~='icon'][type='image/svg+xml']");
+    const ico = page.locator("link[rel~='icon'][type='image/x-icon']");
+    await expect(svg).toHaveCount(1);
+    await expect(ico).toHaveCount(1);
 
-    const href = (await icon.getAttribute("href"))!;
-    const response = await request.get(new URL(href, page.url()).toString());
-
-    expect(response.status()).toBe(200);
-    expect(response.headers()["content-type"]).toContain("image/svg+xml");
+    const svgResponse = await request.get(
+      new URL((await svg.getAttribute("href"))!, page.url()).toString(),
+    );
+    expect(svgResponse.status()).toBe(200);
+    expect(svgResponse.headers()["content-type"]).toContain("image/svg+xml");
 
     // It carries its own ground: a transparent mark in ink disappears against a
     // dark browser chrome, which is where a large share of readers see it.
-    expect(await response.text()).toContain("<rect");
+    expect(await svgResponse.text()).toContain("<rect");
+
+    /*
+     * The fallback has to exist, which is the whole reason it was added — a
+     * declared icon that 404s is worse than no icon, because the browser stops
+     * looking rather than falling through to the next declaration.
+     */
+    const icoResponse = await request.get(
+      new URL((await ico.getAttribute("href"))!, page.url()).toString(),
+    );
+    expect(icoResponse.status()).toBe(200);
+    expect(icoResponse.headers()["content-type"]).toMatch(/icon|image/);
   });
 
   test("the composite previews follow the page theme in both directions", async ({ page }) => {
