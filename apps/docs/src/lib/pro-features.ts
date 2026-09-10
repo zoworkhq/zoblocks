@@ -101,7 +101,7 @@ export const PRO_FEATURES: readonly ProFeature[] = [
     id: "roles",
     tab: "Members",
     title: "Capabilities, not job titles",
-    body: "Twelve capabilities, granted per role, decided by an administrator. Accounts are disabled and never deleted, so an audit trail keeps pointing at a person who still exists.",
+    body: "Thirteen capabilities, granted per role, decided by an administrator. Accounts are disabled and never deleted, so an audit trail keeps pointing at a person who still exists.",
     why: "Publishing and rollback are separate capabilities from editing, because the person allowed to try something is not always the person allowed to ship it.",
     where: "apps/app/src/lib/roles.ts",
   },

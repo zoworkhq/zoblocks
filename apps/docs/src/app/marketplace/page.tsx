@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { RevealRoot } from "@/components/site/interactions";
-import { KIND_LABEL, buyHref, priceLabel, shelf, APP, type ShelfItem } from "@/lib/marketplace";
+import { KIND_LABEL, shelf, APP, type ShelfItem } from "@/lib/marketplace";
 import { PackPreview } from "@/components/site/pack-preview";
 
 export const metadata: Metadata = {
@@ -114,9 +114,8 @@ export default async function MarketplacePage() {
                 </div>
                 <p className="body-sm mt-2 max-w-2xl text-graphite" data-reveal>
                   Announced rather than hidden — a team deciding whether to build one of these
-                  themselves deserves to know it is coming. Selling is closed while the console is
-                  out of the first release, so every price here is what a pack will cost rather than
-                  an offer. Several are finished and measured; the shop is what is shut.
+                  themselves deserves to know it is coming. Several are finished and measured; the
+                  shop is what is shut, and it opens with the console.
                 </p>
 
                 <ul className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -189,19 +188,20 @@ function PackCard({ item, index }: { item: ShelfItem; index: number }) {
           "focus-within:border-brand/40 hover:-translate-y-0.5 hover:border-brand/40"
         }
       >
-        <div className="flex items-baseline justify-between gap-3">
-          <p className="eyebrow text-graphite-soft">{KIND_LABEL[item.kind]}</p>
-          {/*
-            "Coming soon" was wrong on a finished pack and duplicated by the
-            button below it. The badge answers whether the pack exists; the
-            button answers whether you can have it.
-          */}
-          {item.comingSoon ? (
-            <span className="rounded-full border border-rule px-2 py-0.5 font-mono text-[0.5625rem] uppercase tracking-wider text-graphite-soft">
-              Not built yet
-            </span>
-          ) : null}
-        </div>
+        {/*
+          The kind, and nothing else.
+
+          A `Not built yet` chip sat opposite it, and it was the last of four
+          places one card told a reader it could not sell them anything. The
+          section above says the shop opens with the console, once. A card that
+          repeats it in a badge, a price, a file count and a disabled button is
+          not being clearer, it is being repetitive — and it buries the pack
+          itself, which is the only thing on the card worth reading.
+
+          `item.comingSoon` still separates the two shelves on this page and
+          still drives the detail route, so nothing about the data changed.
+        */}
+        <p className="eyebrow text-graphite-soft">{KIND_LABEL[item.kind]}</p>
 
         {/*
           A card leads somewhere only when there is somewhere to go.
@@ -235,56 +235,23 @@ function PackCard({ item, index }: { item: ShelfItem; index: number }) {
           <PackPreview item={item} />
         </div>
 
-        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-rule pt-4">
-          <div className="flex items-baseline gap-2">
-            <span className="tabular font-mono text-sm font-semibold">
-              {priceLabel(item.price)}
-            </span>
-            {item.comingSoon ? null : (
-              <span className="body-xs text-graphite-soft">
-                {item.files} file{item.files === 1 ? "" : "s"} · v{item.version}
-              </span>
-            )}
-          </div>
+        {/*
+          No price, no file count, no disabled button.
 
-          {!item.purchasable ? (
-            /* A disabled button rather than a line of text: the slot holds a
-               control on a purchasable pack, and a label where a button was
-               reads as a missing button. `disabled` is what says the action
-               exists and is unavailable — to a screen reader as well as to the
-               eye. No `z-10` here, unlike the buy link: nothing to click means
-               the title's overlay should keep the whole card pointing at the
-               detail page. */
-            <button
-              type="button"
-              disabled
-              className={
-                "inline-flex cursor-not-allowed items-center gap-1.5 rounded-lg border border-rule " +
-                "bg-paper-sunk px-2.5 py-1.5 text-[0.6875rem] font-semibold text-graphite-soft"
-              }
-            >
-              {/* "Coming soon", in Rahul's words. The badge above still says
-                  "Not built yet" on the packs that do not exist, because that
-                  is a different fact from the shop being shut. */}
-              Coming soon
-            </button>
-          ) : (
-            <a
-              href={buyHref(item.slug)}
-              // Above the title's overlay, so the card opens the detail page and
-              // this one control goes to the console.
-              className={
-                "relative z-10 inline-flex items-center gap-1.5 rounded-lg border border-brand/40 " +
-                "bg-brand/8 px-2.5 py-1.5 text-[0.6875rem] font-semibold text-brand-deep " +
-                "transition-colors hover:bg-brand/15 focus-visible:outline focus-visible:outline-2 " +
-                "focus-visible:outline-offset-2 focus-visible:outline-brand"
-              }
-            >
-              Buy in the app
-              <ArrowUpRight aria-hidden="true" className="size-3" />
-            </a>
-          )}
-        </div>
+          The card footer carried a figure, a `4 files · v2` line and a
+          `Coming soon` control side by side. That is three ways of saying the
+          same thing about a shop that is shut, and the figure read as an offer
+          the page cannot honour. Rahul asked for all of it to go on
+          10 Sep 2026; the section heading says once that the shop opens with
+          the console, and the card is now the pack rather than a receipt for
+          one.
+
+          `priceLabel`, `buyHref`, `item.price`, `files` and `version` all stay
+          in `lib/marketplace.ts` — the detail pages and the console still use
+          them. They come back here together when there is something to sell,
+          which is one edit rather than four: nothing is purchasable today, so
+          the buy control this replaced never rendered anyway.
+        */}
       </article>
     </li>
   );

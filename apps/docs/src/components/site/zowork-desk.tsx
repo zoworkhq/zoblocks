@@ -100,21 +100,25 @@ export function ZoworkDesk() {
     <section className="zwDesk" aria-labelledby="zw-desk-head">
       <div className="zwDeskSay">
         {/*
-          Both of Zowork's marks ship, and CSS picks one.
+          One mark, black on light and white on dark.
 
-          They publish exactly two — a white one for dark grounds and the coral
-          original — and neither reads on both. Recolouring either would be
-          inventing a variant of somebody else's logo, so the theme chooses
-          instead. The coral therefore appears in light mode as Zowork's own
-          mark in its own colour, which is a different thing from introducing a
-          second accent into the UI: nothing else on the plate is coral.
+          Zowork publish two files, `zowork.png` and `zowork-colour.png`, and
+          this used to ship both: the coral original on light grounds and the
+          white one on dark. Rahul asked for black on 10 Sep 2026, and the
+          coral was the loudest thing on the plate — a second accent hue inside
+          a panel that is otherwise entirely ZoBlocks green.
 
-          `alt` on one and `alt=""` on the other. Both are the same logo, and a
-          screen reader announcing "Zowork" twice for one mark is noise.
+          Black comes from the file Zowork already publish rather than from a
+          new asset. `zowork.png` is a one-colour mark: every opaque pixel in
+          it is pure white, on transparency, which was measured rather than
+          assumed. `invert(1)` therefore turns it into pure black and leaves
+          the alpha alone. That is the other half of a monochrome mark, not a
+          recolour — there is no hue to lose. If Zowork ever publish a black
+          file, swap it in here and drop the filter.
 
           `next/image` rather than a bare `img`: `no-img-element` is a warning
           and `pnpm lint` runs at exactly its ceiling, so one bare tag fails the
-          build. `unoptimized` because these are 2 KB PNGs already at their
+          build. `unoptimized` because this is a 2 KB PNG already at its
           display size — the optimiser would cost a round trip to save nothing.
 
           `zwDeskLogoImg` pins the box. As a flex item in a column the default
@@ -123,19 +127,11 @@ export function ZoworkDesk() {
           distortion.
         */}
         <Image
-          src="/brand/zowork-colour.png"
-          alt="Zowork"
-          width={519}
-          height={145}
-          className="zwDeskLogoImg zwDeskLogoLight"
-          unoptimized
-        />
-        <Image
           src="/brand/zowork.png"
-          alt=""
+          alt="Zowork"
           width={202}
           height={52}
-          className="zwDeskLogoImg zwDeskLogoDark"
+          className="zwDeskLogoImg"
           unoptimized
         />
 

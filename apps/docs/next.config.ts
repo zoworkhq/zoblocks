@@ -28,6 +28,21 @@ const nextConfig: NextConfig = {
    */
   transpilePackages: [
     "@zoblocks/component-meta",
+    /*
+     * `@zoblocks/tokens` publishes `./validate` as TypeScript source, and the
+     * Pro page's demo imports `generateRamp` and `contrastBetween` from it so
+     * the numbers on that page are the console's own rather than a mock-up.
+     * Its relative imports carry no extensions, so it transpiles from source
+     * rather than needing an alias to `dist` like the NodeNext packages below.
+     */
+    "@zoblocks/tokens",
+    /*
+     * Only for `@zoblocks/theme/vision`, which the Pro demo uses to simulate
+     * colour-vision deficiency on the brand ramp. That module is deliberately
+     * exported on its own: `@zoblocks/theme` itself pulls a schema library and
+     * the whole theme document model, and `vision.ts` imports nothing at all.
+     */
+    "@zoblocks/theme",
     "@zoblocks/fhir",
     "@zoblocks/fixtures",
     // host-react resolves the two bridges from source as well, because all

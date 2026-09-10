@@ -1,0 +1,1027 @@
+/* ===========================================================================
+ * The Pro page: a dark hero, then a bento.
+ *
+ * See `components/site/pro-console.tsx` for the two designs this replaced and
+ * the measurements that condemned the second one — a 17,435px page with a
+ * 527px console floating in it.
+ *
+ * ## The grid is unequal on purpose
+ *
+ * Six tiles across six columns, sized to how much each capability deserves
+ * rather than to fit a pattern. The application wearing the theme takes four
+ * columns and both rows because it is the thing worth looking at; the ramp is
+ * a tall two-column strip because that is a ramp's shape; the four
+ * capabilities that are a sentence rather than a demonstration share one tile
+ * between them. Equal tiles was the first design's mistake, and the whole
+ * point of this layout is that unequal ones make an argument.
+ *
+ * ## Two grounds
+ *
+ * The hero uses `--site-panel` and its family — the tokens this design system
+ * reserves for hardware rather than document — so the page lands before it
+ * explains anything. The tiles stay on paper, which leaves the brand colour
+ * inside them the brightest thing on the screen.
+ *
+ * Both are tokens. `e2e/pro.spec.ts` fails if a literal reaches the chrome;
+ * the only literals here are the customer's brand, arriving inline from the
+ * component as `--tile`, `--stop` and the `--s-*` surface.
+ * ======================================================================== */
+
+.pro {
+  /* `max-w-6xl`, the same measure `SiteHeader` and `SiteFooter` hold. */
+  --p-measure: 72rem;
+  --p-gutter: 2rem;
+
+  --p-ground: var(--site-paper);
+  --p-ground-2: var(--site-paper-sunk);
+  --p-fg: var(--site-ink);
+  --p-muted: var(--site-graphite);
+  --p-rule: var(--site-rule);
+  --p-mark: var(--site-accent-text);
+  --p-cta-bg: var(--site-cta);
+  --p-cta-fg: var(--site-paper);
+
+  background: var(--p-ground);
+}
+
+.pro .proWrap {
+  max-width: var(--p-measure);
+  margin: 0 auto;
+  padding-inline: var(--p-gutter);
+}
+
+/* ---------------------------------------------------------------------------
+ * The hero
+ * ------------------------------------------------------------------------ */
+
+.pro .proHero {
+  padding-block: clamp(3.5rem, 2rem + 6vw, 6.5rem) clamp(3rem, 2rem + 4vw, 5rem);
+}
+
+/*
+ * The release state, as a chip.
+ *
+ * It names the product and states the status in one line, once. An earlier
+ * version put "Coming soon" here *and* in the `h1`, which is the same two
+ * words twice inside one screen.
+ */
+.pro .proStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3125rem 0.8125rem 0.3125rem 0.6875rem;
+  border: 1px solid var(--p-rule);
+  border-radius: 999px;
+  background: var(--p-ground-2);
+  color: var(--p-muted);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.pro .proStatusDot {
+  position: relative;
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--site-brand);
+}
+/* Drawn always, animated only under `no-preference`, so opting out of motion
+   keeps the halo rather than losing an element. */
+.pro .proStatusDot::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border: 1px solid var(--site-brand);
+  border-radius: 50%;
+  opacity: 0.35;
+}
+
+.pro .proHead {
+  max-width: 18ch;
+  margin: 1.25rem 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 1.2rem + 4.4vw, 4rem);
+  font-weight: 600;
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+.pro .proLede {
+  max-width: 48ch;
+  margin-top: 1.375rem;
+  color: var(--p-muted);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+}
+
+.pro .proActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.pro .proCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8125rem 1.375rem;
+  border-radius: 0.625rem;
+  background: var(--p-cta-bg);
+  color: var(--p-cta-fg);
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+.pro .proCta:hover {
+  background: var(--site-cta-hover, var(--p-cta-bg));
+}
+
+.pro .proGhost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4375rem;
+  padding: 0.8125rem 1.375rem;
+  border: 1px solid var(--p-rule);
+  border-radius: 0.625rem;
+  color: var(--p-fg);
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+.pro .proGhost:hover {
+  border-color: var(--site-rule-strong);
+}
+
+/* ---------------------------------------------------------------------------
+ * The hero's two actions
+ *
+ * Everything else in the hero is a site utility — `eyebrow eyebrow-rule`,
+ * `display-lg`, `body-lg`, `section-major` — so the page's opening matches
+ * `/showcase`, `/components` and `/marketplace` exactly. Only the buttons need
+ * rules of their own, because the site has no button utility.
+ *
+ * They briefly carried `--site-panel-fg` and `--site-trace`, which are the
+ * *panel's* colours and were right while the hero was a dark card. On paper
+ * that put near-white text on near-white ground; axe caught it. Document
+ * ground, document tokens.
+ * ------------------------------------------------------------------------ */
+
+.pro .proCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.625rem;
+  background: var(--p-cta-bg);
+  color: var(--p-cta-fg);
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+.pro .proCta:hover {
+  background: var(--site-cta-hover, var(--p-cta-bg));
+}
+
+.pro .proGhost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4375rem;
+  padding: 0.75rem 1.25rem;
+  border: 1px solid var(--p-rule);
+  border-radius: 0.625rem;
+  color: var(--p-fg);
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+.pro .proGhost:hover {
+  border-color: var(--site-rule-strong);
+}
+
+/* ---------------------------------------------------------------------------
+ * The bento
+ * ------------------------------------------------------------------------ */
+
+.pro .pbento {
+  padding-block: clamp(2.5rem, 2rem + 2vw, 4rem);
+}
+
+.pro .pbentoBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.875rem 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.pro .pbentoPicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/*
+ * The swatch is the button. No chip beside a label — the control *is* the
+ * colour, with its name on it, which is both smaller and more direct than a
+ * dot next to a word.
+ */
+.pro .pbentoSwatch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4375rem 0.75rem 0.4375rem 0.5rem;
+  border: 1px solid var(--p-rule);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--p-muted);
+  font-size: 0.8125rem;
+  line-height: 1.2;
+}
+.pro .pbentoSwatch::before {
+  content: "";
+  width: 0.875rem;
+  height: 0.875rem;
+  border-radius: 50%;
+  background: var(--tile);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--p-fg) 14%, transparent);
+}
+.pro .pbentoSwatch:hover {
+  border-color: var(--site-rule-strong);
+  color: var(--p-fg);
+}
+.pro .pbentoSwatch[aria-pressed="true"] {
+  border-color: var(--tile);
+  background: var(--p-ground-2);
+  color: var(--p-fg);
+  font-weight: 600;
+}
+
+/*
+ * Focus rings written here rather than as Tailwind `focus-visible:` utilities:
+ * those live in a cascade layer on this site and lose to plain rules, so a
+ * utility ring inside these tiles would be silently inert.
+ */
+.pro .pbentoSwatch:focus-visible,
+.pro .pbentoSeg button:focus-visible {
+  outline: 2px solid var(--site-brand);
+  outline-offset: 2px;
+}
+
+.pro .pbentoBarNote {
+  color: var(--p-muted);
+  font-size: 0.8125rem;
+}
+.pro .pbentoBarNote code {
+  color: var(--p-fg);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+}
+
+/*
+ * Six columns and two bands. Every tile names its own area, so the shape of
+ * the page is legible in one place rather than spread across six span rules.
+ */
+.pro .pbentoGrid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-areas:
+    "app app app app ramp ramp"
+    "app app app app ramp ramp"
+    "gate gate gate deliver deliver deliver"
+    "hosts hosts hosts also also also";
+  gap: 1rem;
+}
+
+.pro .pbentoTile--app {
+  grid-area: app;
+}
+.pro .pbentoTile--ramp {
+  grid-area: ramp;
+}
+.pro .pbentoTile--gate {
+  grid-area: gate;
+}
+.pro .pbentoTile--deliver {
+  grid-area: deliver;
+}
+.pro .pbentoTile--hosts {
+  grid-area: hosts;
+}
+.pro .pbentoTile--also {
+  grid-area: also;
+}
+
+.pro .pbentoTile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  padding: 1.125rem 1.25rem 1.25rem;
+  border: 1px solid var(--p-rule);
+  border-radius: 0.875rem;
+  background: var(--p-ground);
+}
+
+.pro .pbentoName {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.014em;
+}
+
+.pro .pbentoWhat {
+  margin-top: 0.3125rem;
+  color: var(--p-muted);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.pro .pbentoSay {
+  margin-top: auto;
+  color: var(--p-muted);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+.pro .pbentoSay[data-warn] {
+  color: var(--site-critical-text);
+}
+
+.pro .pbentoSpacer {
+  flex: 1;
+}
+
+/* ---- the application ---- */
+
+.pro .pbentoApp {
+  overflow: hidden;
+  border: 1px solid var(--p-rule);
+  border-radius: 0.625rem;
+  background: var(--s-ground);
+  color: var(--s-ink);
+}
+
+.pro .pbentoAppBar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6875rem 0.875rem;
+  border-bottom: 1px solid var(--s-rule);
+}
+.pro .pbentoAppMark {
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 0.3125rem;
+  background: var(--s-accent);
+}
+.pro .pbentoAppOrg {
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+.pro .pbentoAppGhost {
+  padding: 0.3125rem 0.625rem;
+  border: 1px solid var(--s-rule-strong);
+  border-radius: 0.375rem;
+  color: var(--s-muted);
+  font-size: 0.75rem;
+}
+/* The filled action, and the pair the whole gate exists to protect. */
+.pro .pbentoAppCta {
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  background: var(--s-accent);
+  color: var(--s-accent-ink);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.pro .pbentoAppTabs {
+  display: flex;
+  gap: 1.125rem;
+  padding: 0 0.875rem;
+  border-bottom: 1px solid var(--s-rule);
+}
+.pro .pbentoAppTabs > span {
+  padding: 0.5625rem 0;
+  border-bottom: 2px solid transparent;
+  color: var(--s-muted);
+  font-size: 0.78rem;
+}
+.pro .pbentoAppTabs > span[data-active] {
+  border-bottom-color: var(--s-accent);
+  color: var(--s-ink);
+  font-weight: 600;
+}
+
+.pro .pbentoAppRows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pro .pbentoAppRows > li {
+  position: relative;
+  display: flex;
+  height: var(--s-row);
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0 0.875rem;
+  border-bottom: 1px solid var(--s-rule);
+}
+.pro .pbentoAppRows > li:last-child {
+  border-bottom: 0;
+}
+.pro .pbentoAppRows > li[data-selected] {
+  background: var(--s-accent-soft);
+}
+
+.pro .pbentoAppRail {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 2px;
+  background: transparent;
+}
+.pro .pbentoAppRows > li[data-selected] .pbentoAppRail {
+  background: var(--s-accent);
+}
+
+.pro .pbentoAppAt {
+  color: var(--s-muted);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+}
+.pro .pbentoAppWho {
+  min-width: 7rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+.pro .pbentoAppWhy {
+  color: var(--s-muted);
+  font-size: 0.78rem;
+}
+/* Fixed height on purpose: the target floor is the one measurement the density
+   axis is not allowed to move. */
+.pro .pbentoAppFlag {
+  display: inline-flex;
+  height: 1.5rem;
+  align-items: center;
+  margin-left: auto;
+  padding: 0 0.625rem;
+  border: 1px solid var(--s-accent);
+  border-radius: 999px;
+  font-size: 0.6875rem;
+}
+
+.pro .pbentoAxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+}
+
+.pro .pbentoAxis {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.pro .pbentoAxisLabel {
+  color: var(--p-muted);
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.pro .pbentoSeg {
+  display: inline-flex;
+  overflow: hidden;
+  border: 1px solid var(--p-rule);
+  border-radius: 0.375rem;
+}
+.pro .pbentoSeg button {
+  padding: 0.25rem 0.5rem;
+  border: 0;
+  border-left: 1px solid var(--p-rule);
+  background: transparent;
+  color: var(--p-muted);
+  font-size: 0.6875rem;
+  line-height: 1.3;
+}
+.pro .pbentoSeg button:first-child {
+  border-left: 0;
+}
+.pro .pbentoSeg button[aria-pressed="true"] {
+  background: var(--p-ground-2);
+  color: var(--p-fg);
+  font-weight: 600;
+}
+
+/* ---- the ramp ---- */
+
+/*
+ * Stacked, because the tile is two columns wide and eleven across it would
+ * give each step forty pixels and no room for its number or its value.
+ */
+.pro .pbentoRamp {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pro .pbentoRamp > li {
+  display: grid;
+  flex: 1;
+  grid-template-columns: 2.25rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 1.375rem;
+}
+
+.pro .pbentoStop {
+  height: 100%;
+  min-height: 1.125rem;
+  border-radius: 3px;
+  background: var(--stop);
+}
+
+.pro .pbentoStopStep,
+.pro .pbentoStopHex {
+  color: var(--p-muted);
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-variant-numeric: tabular-nums;
+}
+.pro .pbentoRamp > li[data-anchor] .pbentoStopStep,
+.pro .pbentoRamp > li[data-anchor] .pbentoStopHex {
+  color: var(--p-fg);
+  font-weight: 600;
+}
+.pro .pbentoRamp > li[data-anchor] {
+  flex: 1.6;
+}
+
+/* ---- the gate ---- */
+
+.pro .pbentoChecks {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pro .pbentoChecks > li {
+  display: grid;
+  grid-template-columns: auto 8.5rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.625rem;
+  font-size: 0.78rem;
+}
+
+.pro .pbentoPair {
+  display: grid;
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 0.25rem;
+  place-items: center;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--p-fg) 14%, transparent);
+}
+.pro .pbentoPair > span {
+  width: 0.4375rem;
+  height: 0.4375rem;
+  border-radius: 1px;
+}
+
+.pro .pbentoCheckLabel {
+  color: var(--p-muted);
+}
+
+/* The measurement, drawn. Scaled to 9:1 so the 4.5 floor lands at the
+   midpoint — "past halfway" and "passes" become the same glance. */
+.pro .pbentoCheckBar {
+  position: relative;
+  height: 0.375rem;
+  border-radius: 999px;
+  background: var(--p-ground-2);
+  box-shadow: inset 0 0 0 1px var(--p-rule);
+}
+.pro .pbentoCheckBar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--site-critical-text);
+}
+.pro .pbentoChecks > li[data-ok] .pbentoCheckBar > span {
+  background: var(--p-mark);
+}
+.pro .pbentoCheckBar::after {
+  content: "";
+  position: absolute;
+  inset: -3px auto -3px 50%;
+  width: 1px;
+  background: var(--site-rule-strong);
+}
+
+.pro .pbentoRatio {
+  color: var(--site-critical-text);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+}
+.pro .pbentoChecks > li[data-ok] .pbentoRatio {
+  color: var(--p-fg);
+}
+
+.pro .pbentoVerdict {
+  margin-top: auto;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--site-critical-text);
+  color: var(--p-fg);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+.pro .pbentoVerdict[data-ok] {
+  border-left-color: var(--p-mark);
+}
+
+/* ---- delivery ---- */
+
+.pro .pbentoVersions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4375rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/*
+ * Three columns wide, not one.
+ *
+ * Delivery was a single column and its whole content is a path — which
+ * truncated to `/t/northwind/no…` on every row, so the one tile whose subject
+ * is an immutable URL was the one tile that could not show you one.
+ */
+.pro .pbentoVersions > li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--p-muted);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+}
+.pro .pbentoVersions > li[data-current] {
+  color: var(--p-fg);
+  font-weight: 600;
+}
+.pro .pbentoVersions code {
+  overflow: hidden;
+  font-family: inherit;
+  font-size: inherit;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pro .pbentoDot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--stop);
+}
+
+/* ---- frameworks ---- */
+
+.pro .pbentoHosts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/*
+ * Each host is a small card that lifts under the pointer.
+ *
+ * They were four bare columns, and four buttons differing only in radius is
+ * almost nothing to look at. A card gives each mark somewhere to sit and gives
+ * the hover somewhere to happen — and the hover is the point: the shadow that
+ * deepens is that framework's own elevation language, not a generic one.
+ */
+.pro .pbentoHosts > li {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5625rem;
+  padding: 0.75rem;
+  border: 1px solid var(--p-rule);
+  border-radius: 0.625rem;
+  background: var(--p-ground-2);
+}
+
+.pro .pbentoHostName {
+  display: flex;
+  align-items: center;
+  gap: 0.4375rem;
+  color: var(--p-muted);
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* The marks keep their own colours. A logo tinted to suit its host is no
+   longer the logo — see `framework-marks.tsx` for the provenance of each. */
+.pro .pbentoHostMark {
+  width: 0.875rem;
+  height: 0.875rem;
+  flex: none;
+}
+
+/* The shared shape; each host overrides only what makes it recognisable. */
+.pro .pbentoHostBtn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  background: var(--h-accent);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.2;
+  /* MUI's label is uppercase and tracked out, which made it the one button
+     wide enough to wrap inside its card — a two-line "NEW / NOTE" that reads
+     as a layout fault rather than as MUI's house style. */
+  white-space: nowrap;
+}
+/* Ant: a small tight shadow, regular weight. */
+.pro .pbentoHosts > li[data-host="antd"] .pbentoHostBtn {
+  box-shadow: 0 2px 0 color-mix(in srgb, var(--h-accent) 28%, transparent);
+  font-weight: 400;
+}
+/* MUI: uppercase, tracked out, on a two-layer elevation. */
+.pro .pbentoHosts > li[data-host="mui"] .pbentoHostBtn {
+  border-radius: 0.25rem;
+  box-shadow:
+    0 3px 1px -2px rgb(0 0 0 / 0.2),
+    0 2px 2px 0 rgb(0 0 0 / 0.14);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+/* Bootstrap: flatter, chunkier, no shadow. */
+.pro .pbentoHosts > li[data-host="bs"] .pbentoHostBtn {
+  padding: 0.4375rem 0.875rem;
+  font-weight: 400;
+}
+/* ZoBlocks: the quiet one. */
+.pro .pbentoHosts > li[data-host="zb"] .pbentoHostBtn {
+  border-radius: 0.4375rem;
+}
+
+.pro .pbentoHostToken {
+  overflow: hidden;
+  max-width: 100%;
+  color: var(--p-muted);
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---- the four that are a sentence ---- */
+
+/*
+ * Two columns, not four.
+ *
+ * Four across this tile gave each item about twelve characters a line and left
+ * four ragged paragraphs with nothing to tell them apart. Two columns give the
+ * sentences a measure, and the icon gives the eye somewhere to land.
+ */
+.pro .pbentoAlso {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.875rem 1.5rem;
+  margin: 0;
+}
+
+.pro .pbentoAlso dt {
+  display: flex;
+  align-items: center;
+  gap: 0.4375rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.pro .pbentoAlsoIcon {
+  flex: none;
+  color: var(--p-mark);
+}
+
+.pro .pbentoAlso dd {
+  /* Indented to the icon's text, so the two lines read as one entry. */
+  margin: 0.25rem 0 0 1.4375rem;
+  color: var(--p-muted);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+/* ---------------------------------------------------------------------------
+ * What is not held back
+ * ------------------------------------------------------------------------ */
+
+.pro .proNowBand {
+  border-top: 1px solid var(--p-rule);
+  background: var(--p-ground-2);
+}
+
+.pro .proNow {
+  display: flex;
+  max-width: var(--p-measure);
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  margin: 0 auto;
+  padding: 1.75rem var(--p-gutter);
+}
+
+.pro .proNowHead {
+  font-size: 0.9875rem;
+  font-weight: 600;
+  letter-spacing: -0.016em;
+}
+
+.pro .proNowBody {
+  max-width: 60ch;
+  margin-top: 0.1875rem;
+  color: var(--p-muted);
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+.pro .proNowLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4375rem;
+  color: var(--p-mark);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------------------------------
+ * Narrow
+ * ------------------------------------------------------------------------ */
+
+@media (max-width: 68rem) {
+  /*
+   * Three areas become one column each. The order is the order of the
+   * argument: what it looks like, what it derives, what it refuses.
+   */
+  .pro .pbentoGrid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "app"
+      "ramp"
+      "gate"
+      "deliver"
+      "hosts"
+      "also";
+  }
+  .pro .pbentoRamp > li {
+    min-height: 1.25rem;
+  }
+}
+
+@media (max-width: 48rem) {
+  .pro {
+    --p-gutter: 1.25rem;
+  }
+  .pro .pbentoHosts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 34rem) {
+  /*
+   * The worklist row drops its reason column.
+   *
+   * At 320px the row's four items — time, name, reason, flag — are wider than
+   * the viewport, and because the flag is pushed right with `margin-left:
+   * auto` it is the one that ends up outside it. Firefox showed it 31px past
+   * the edge; Chromium hid the same overflow by shrinking a text node, which
+   * is why this needed a sweep across engines to find at all.
+   *
+   * The reason is the column a real clinical table drops first, and the flag
+   * is the one it never drops — it is the thing the row exists to flag.
+   */
+  .pro .pbentoAppWho {
+    min-width: 0;
+  }
+  .pro .pbentoAppWhy {
+    display: none;
+  }
+
+  .pro .pbentoChecks > li {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+  .pro .pbentoCheckBar {
+    display: none;
+  }
+  .pro .pbentoHosts,
+  .pro .pbentoAlso {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Motion
+ *
+ * Declared inside `no-preference` rather than switched off inside `reduce`, so
+ * a reader who opts out gets the finished tiles rather than ones frozen
+ * mid-reveal at `opacity: 0`. Nothing plays by itself: every rule here is a
+ * response to a click.
+ * ------------------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes pbento-rise {
+    from {
+      opacity: 0;
+      transform: translateY(0.375rem);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* `--i` is the row index, set inline. The stagger is what makes eleven steps
+     read as one derivation rather than eleven swatches. */
+  .pro .pbentoRamp > li,
+  .pro .pbentoChecks > li,
+  .pro .pbentoVersions > li,
+  .pro .pbentoHosts > li {
+    animation: pbento-rise 360ms ease-out both;
+    animation-delay: calc(var(--i, 0) * 26ms);
+  }
+
+  /*
+   * The host cards, under the pointer.
+   *
+   * Each lifts and deepens the shadow its own framework would use: Ant's tight
+   * offset, MUI's two-layer elevation, and nothing at all for Bootstrap and
+   * ZoBlocks, which do not do elevation on a primary button. The effect is the
+   * difference being demonstrated rather than decoration on top of it.
+   */
+  .pro .pbentoHosts > li,
+  .pro .pbentoHostBtn {
+    transition:
+      transform 220ms var(--ease-out-expo, ease-out),
+      box-shadow 220ms var(--ease-out-expo, ease-out),
+      border-color 220ms var(--ease-out-expo, ease-out);
+  }
+  .pro .pbentoHosts > li:hover {
+    transform: translateY(-2px);
+    border-color: var(--site-rule-strong);
+  }
+  .pro .pbentoHosts > li[data-host="antd"]:hover .pbentoHostBtn {
+    box-shadow: 0 3px 0 color-mix(in srgb, var(--h-accent) 34%, transparent);
+  }
+  .pro .pbentoHosts > li[data-host="mui"]:hover .pbentoHostBtn {
+    box-shadow:
+      0 2px 4px -1px rgb(0 0 0 / 0.2),
+      0 4px 5px 0 rgb(0 0 0 / 0.14);
+  }
+  .pro .pbentoHosts > li[data-host="zb"]:hover .pbentoHostBtn,
+  .pro .pbentoHosts > li[data-host="bs"]:hover .pbentoHostBtn {
+    filter: brightness(1.06);
+  }
+
+  /* The application repainting. Every surface on it is a custom property, so
+     one transition carries the whole change of brand, mode or vision. */
+  .pro .pbentoApp,
+  .pro .pbentoApp * {
+    transition:
+      background-color 320ms var(--ease-out-expo, ease-out),
+      border-color 320ms var(--ease-out-expo, ease-out),
+      color 320ms var(--ease-out-expo, ease-out),
+      height 260ms var(--ease-out-expo, ease-out);
+  }
+}
+
+/* Forced colours drops every ground, and the grounds are most of the
+   information. Outlines keep the swatches as distinguishable objects. */
+@media (forced-colors: active) {
+  .pro .pbentoStop,
+  .pro .pbentoPair,
+  .pro .pbentoDot,
+  .pro .pbentoTile {
+    border: 1px solid CanvasText;
+  }
+}

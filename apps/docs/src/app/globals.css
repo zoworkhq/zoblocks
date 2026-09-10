@@ -142,6 +142,8 @@
 
 /* The Pro holding page. Independent of pro.css, so restoring the console
    page is a change in one file rather than an untangling in two. */
+@import "./pro-bento.css";
+
 @import "./pro-soon.css";
 
 /* ===========================================================================

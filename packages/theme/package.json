@@ -24,6 +24,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./react": "./src/react.tsx",
+    "./vision": "./src/vision.ts",
     "./logo": "./src/logo.ts",
     "./package.json": "./package.json"
   },

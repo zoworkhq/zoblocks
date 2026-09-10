@@ -5,7 +5,11 @@
  * this one is public and static, that one is authenticated and per-tenant.
  * Nothing here can link to a route — only to a URL — so the address has to be
  * configuration rather than a path, and it has to be `NEXT_PUBLIC_` because the
- * header that uses it is a client component.
+ * pages that use it are client components.
+ *
+ * As of 10 Sep 2026 the only reader is `pro/console-page.tsx`, which is the
+ * Pro pitch held for a later release. The header and footer used to carry both
+ * doors and no longer do.
  *
  * The default is the deployed app rather than localhost. A missing variable
  * in production would otherwise point every reader's Sign in at their own
@@ -42,5 +46,13 @@ export const signInHref = `${APP}/login`;
  */
 export const signUpHref = `${APP}/signup`;
 
-/** The label for `signUpHref`, so both places that render it agree. */
+/**
+ * The label for `signUpHref`.
+ *
+ * Nothing on the public site renders it as of 10 Sep 2026: the header and the
+ * footer both dropped their doors into the app, because the app is not in this
+ * release. It stays here, with `signInHref` and `signUpHref`, because
+ * `pro/console-page.tsx` holds the full Pro pitch whole for the release that
+ * puts the console back, and that page needs all three.
+ */
 export const SIGN_UP_LABEL = "Request access";

@@ -552,47 +552,41 @@ test.describe("the tab gallery @a11y", () => {
 /* ==================================================================== */
 
 /* ==================================================================== */
-/* The way into the app                                             */
+/* No way into the app                                              */
 /* ==================================================================== */
 
 test.describe("the app doors @a11y", () => {
   /**
-   * Sign in and Sign up leave for another application.
+   * There are no doors, and that is the assertion.
    *
-   * Asserted on the pathname and on *having* an origin rather than on the
-   * origin itself, because that address is configuration: `NEXT_PUBLIC_APP_URL`
-   * in a deployment, localhost on a laptop. Pinning the host here would make
-   * the test pass only on the machine it was written on.
+   * Sign in and Request access were the header's only cross-origin links and
+   * its only filled control. They came out on 10 Sep 2026 because the app is
+   * not in this release. This test is what stops them returning by accident —
+   * a stray import of `signInHref` into chrome would otherwise reinstate them
+   * silently, and nothing else on the site would notice.
+   *
+   * Scoped to the whole page rather than the header: the footer carried the
+   * same pair in an "App" column, and both went together.
    */
-  for (const [label, path] of [
-    ["Sign in", "/login"],
-    ["Request access", "/signup"],
-  ] as const) {
-    test(`${label} points at the app's ${path}`, async ({ page }) => {
+  for (const label of ["Sign in", "Request access"] as const) {
+    test(`the site offers no ${label} link`, async ({ page }) => {
       await page.goto("/");
-
-      const link = page.locator("header").getByRole("link", { name: label, exact: true });
-      await expect(link).toBeVisible();
-
-      const href = (await link.getAttribute("href"))!;
-      const url = new URL(href);
-      expect(url.pathname).toBe(path);
-      // Absolute, so it is a real cross-origin navigation rather than a route
-      // this site is pretending to own.
-      expect(href).toMatch(/^https?:\/\//);
+      await expect(page.getByRole("link", { name: label, exact: true })).toHaveCount(0);
     });
   }
 
   /**
-   * The header holds both doors at a phone width without clipping.
+   * The header still fits a phone.
    *
-   * This is the assertion the change actually needed. The bar was at exactly
-   * its width before the links were added — 375px of content in a 375px
-   * viewport — so adding two controls silently pushed `Sign up` off the edge
-   * and wrapped the wordmark onto a second line. Neither breaks a page-level
-   * overflow check, which is why one is written here against the header itself.
+   * Written when the two doors were added — the bar was at exactly its width
+   * beforehand, 375px of content in a 375px viewport, and two more controls
+   * pushed the sign-up button off the edge and wrapped the wordmark onto a
+   * second line. Removing them gives that room back, so this now has slack
+   * rather than none. It stays because a page-level overflow check never
+   * caught the original break, and the next control added here will have the
+   * same problem.
    */
-  test("neither door is clipped on a phone", async ({ page }) => {
+  test("the header is not clipped on a phone", async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto("/");
 
@@ -611,10 +605,6 @@ test.describe("the app doors @a11y", () => {
     expect(overflow.content, "header content is wider than the header").toBeLessThanOrEqual(
       overflow.box,
     );
-
-    for (const label of ["Sign in", "Request access"]) {
-      await expect(siteHeader.getByRole("link", { name: label, exact: true })).toBeVisible();
-    }
   });
 
   /**
@@ -782,7 +772,7 @@ test.describe("the public marketplace @a11y", () => {
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
 
-  test("lists the packs, priced, whether or not the console answers", async ({ page }) => {
+  test("lists the packs whether or not the console answers", async ({ page }) => {
     await page.goto("/marketplace");
 
     const cards = page.locator("[data-zb-pack]");
@@ -791,14 +781,37 @@ test.describe("the public marketplace @a11y", () => {
     await expect(cards.first()).toBeVisible();
     expect(await cards.count()).toBeGreaterThan(1);
 
-    // The title owns the card; the buy control is the second destination, which
-    // is why this names the link rather than taking the first one it finds.
     const first = cards.first();
     // No card links anywhere while nothing can be bought — the detail page
     // says nothing the card does not, and the shelf must not send a reader
     // through a door with nothing behind it.
     await expect(first.getByRole("link")).toHaveCount(0);
-    await expect(first).toContainText(/\$|Free|By arrangement/);
+    // The pack is named and described. That is the card.
+    await expect(first.getByRole("heading")).toBeVisible();
+  });
+
+  /**
+   * The shop being shut is said once, by the section, and nowhere else.
+   *
+   * Every card used to carry it four times over: a `Not built yet` chip, a
+   * price, a file count and a disabled `Coming soon` button. Rahul asked for
+   * all four to go on 10 Sep 2026, and the risk with a change like that is a
+   * later edit quietly putting one back — a price is the obvious candidate,
+   * because it is the field a shop is expected to have.
+   *
+   * The section heading is asserted too, so this cannot pass by the page
+   * having stopped saying it at all.
+   */
+  test("says the shop is shut once, not on every card", async ({ page }) => {
+    await page.goto("/marketplace");
+
+    await expect(page.getByText(/the shop is what is shut/i)).toBeVisible();
+
+    const cards = page.locator("[data-zb-pack]");
+    for (const card of await cards.all()) {
+      await expect(card).not.toContainText(/\$\d/);
+      await expect(card).not.toContainText(/coming soon|not built yet|not for sale/i);
+    }
   });
 
   test("refuses every purchase path, and still says what a built pack contains", async ({
@@ -821,14 +834,15 @@ test.describe("the public marketplace @a11y", () => {
     /*
      * A shut shop is not a claim about what a pack contains.
      *
-     * `comingSoon` and `purchasable` were briefly one field, and while they
-     * were, packs with files committed in this repository rendered as unbuilt:
-     * no `4 files · v2` line, and a placeholder motif where their manifest
-     * belongs. Source-agnostic, like the test below — the console sends a file
-     * count and the local fallback sends paths, and this line is drawn from
-     * either.
+     * This used to assert the `4 files · v2` line, which went with the price
+     * and the disabled control when the card footer came out. The claim it was
+     * really making survives in the preview: `comingSoon` and `purchasable`
+     * were briefly one field, and while they were, packs with files committed
+     * in this repository drew a placeholder motif where their manifest
+     * belongs. So this asks the preview, which is the part a reader actually
+     * looks at.
      */
-    await expect(cards.filter({ hasText: /[1-9]\d* files? · v[1-9]/ }).first()).toBeVisible();
+    await expect(cards.first().locator("[data-zb-pack-preview]")).toHaveCount(1);
   });
 
   /*

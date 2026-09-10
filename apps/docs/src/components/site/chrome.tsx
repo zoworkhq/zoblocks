@@ -1,12 +1,12 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowUpRight, Github } from "lucide-react";
 import { CommandMenu } from "@/components/site/command-menu";
 import { ThemeToggle } from "@/components/site/theme-toggle";
-import { SIGN_UP_LABEL, signInHref, signUpHref } from "@/lib/app";
 import { cn } from "@/lib/utils";
 
 export function ZoBlocksMark({ className = "h-4 w-7" }: { className?: string }) {
@@ -118,6 +118,21 @@ export function SiteHeader() {
       data-scrolled={scrolled || undefined}
       className={cn(
         "sticky top-0 z-40 backdrop-blur-xl transition-[height,background-color,border-color] duration-500 ease-[var(--ease-out-expo)]",
+        /*
+         * Translucent, and it stays that way.
+         *
+         * This was briefly fully opaque when scrolled: `/pro` grew a dark hero
+         * card, the card passed behind the bar, and 80% of paper over near
+         * black is a grey the version badge beside the wordmark could not hold
+         * 4.5:1 against. That hero is gone and the site has no other near-black
+         * full-width section, so the change is reverted rather than kept — a
+         * site-wide opacity change to serve one page that no longer exists is
+         * a change nobody would be able to explain later.
+         *
+         * It is worth knowing the hazard is real. If a dark band ever returns,
+         * this is where it will show up, and axe will find it before a reader
+         * does.
+         */
         scrolled
           ? "h-13 border-b border-rule bg-paper/80"
           : "h-16 border-b border-transparent bg-paper/40",
@@ -177,11 +192,13 @@ export function SiteHeader() {
 
           {/* GitHub and the theme picker stand down on a phone.
 
-              The header was at exactly its width before the app links were
-              added: 375px of content in a 375px viewport, with the wordmark
-              already wrapping to two lines. Two more controls do not fit, and
-              the ones to sacrifice are the ones that are reachable elsewhere —
-              GitHub is in the footer, and the picker moves there below `sm`.
+              The reason they were hidden has gone: the two app links that took
+              the room came out on 10 Sep 2026, so 375px now has slack. They
+              stay hidden anyway, because the condition for hiding a control was
+              never "no room" — it was that nothing is lost. GitHub is in the
+              footer and the picker moves there below `sm`, so a phone reader
+              reaches both, and a six-control bar at 375px is worse than a
+              four-control one even when it fits.
 
               Nothing is lost, which is the condition for hiding it. The picker
               is light/dark only now, and both are preferences — a reader on a
@@ -207,34 +224,16 @@ export function SiteHeader() {
             <ThemeToggle />
           </div>
 
-          {/* The way into the app.
+          {/* No Sign in and no Request access.
 
-              A rule rather than a gap separates these from the utilities to
-              their left. GitHub and the theme toggle are things you do *to*
-              this page; these two leave it for another application entirely,
-              and a plain gap reads as one more icon in the same row.
-
-              Plain `<a>`, not `<Link>`: the app is a different origin, and
-              a client-side navigation cannot cross one. `Link` would prefetch
-              an address it can never render. */}
-          <span aria-hidden="true" className="mx-2 hidden h-4 w-px bg-rule sm:block" />
-
-          <a
-            href={signInHref}
-            className="rounded-lg px-3 py-1.5 text-sm text-graphite transition-colors duration-200 hover:text-ink"
-          >
-            Sign in
-          </a>
-
-          {/* The only filled control in the header. It is the same `bg-cta` as
-              the hero's primary action because it is the same weight of
-              decision — everything else up here is navigation. */}
-          <a
-            href={signUpHref}
-            className="ml-1 inline-flex shrink-0 items-center rounded-lg bg-cta px-3 py-1.5 text-sm font-medium text-paper transition-colors duration-200 hover:bg-cta-hover"
-          >
-            {SIGN_UP_LABEL}
-          </a>
+              Both used to sit here, behind a rule, as the way into the app.
+              The app is not in this release, so the one filled control on the
+              site pointed at a form for a product a reader cannot have yet —
+              and it was the loudest thing in the header. Removed on
+              10 Sep 2026 rather than disabled: a greyed door still promises
+              a room. `lib/app.ts` keeps both addresses, and
+              `pro/console-page.tsx` still renders them, so putting them back
+              is two anchors and an import. */}
         </nav>
       </div>
     </header>
@@ -262,21 +261,14 @@ const FOOTER_LINKS = [
     ],
   },
   /*
-   * Both doors again, down here.
+   * There is no third "App" column.
    *
-   * Not redundancy for its own sake: the header hides Sign in below `sm` to
-   * keep six controls off a phone-width bar, and a returning reader on a phone
-   * needs somewhere to go that is not the sign-up form. `external` marks them
-   * because they leave for the app's origin, which is what the arrow on
-   * hover is telling the reader.
+   * It held Sign in and Request access, mirroring the header pair so a reader
+   * on a phone had somewhere to go that was not the sign-up form. Both doors
+   * came out on 10 Sep 2026 — see the header — and a footer column pointing
+   * into an application this release does not ship is the same promise in
+   * smaller type.
    */
-  {
-    title: "App",
-    links: [
-      { href: signInHref, label: "Sign in", external: true },
-      { href: signUpHref, label: SIGN_UP_LABEL, external: true },
-    ],
-  },
 ];
 
 export function SiteFooter() {
@@ -294,7 +286,45 @@ export function SiteFooter() {
             <p className="body-sm mt-3 text-graphite">
               Healthcare components typed to FHIR R4. Source you own, states you can trust.
             </p>
-            <p className="axis-label mt-4">MIT core · v0.1.0 · by Zowork</p>
+            <p className="axis-label mt-4">MIT core · v0.1.0</p>
+
+            {/* Who made it, at a size that says so.
+
+                This was the tail of the line above — "· by Zowork" in 10px
+                mono caps, the same weight as the licence and the version
+                number, which made the authorship read as one more piece of
+                metadata. It is the opposite: the licence is a fact about the
+                package and this is the reason to trust it.
+
+                The mark is Zowork's own one-colour file, inverted to black on
+                light grounds the same way the Pro plate does it — every opaque
+                pixel in `zowork.png` is pure white, so the inverse is pure
+                black and nothing else changes. `dark:invert-0` puts it back to
+                white where the ground is dark.
+
+                `unoptimized` because it is a 2 KB PNG already at its display
+                size, and `next/image` rather than a bare `img` because
+                `no-img-element` is a warning and `pnpm lint` runs at exactly
+                its ceiling. */}
+            <a
+              href="https://www.zowork.com/"
+              rel="noopener"
+              className="group mt-3 inline-flex items-center gap-2.5 text-sm text-graphite transition-colors duration-200 hover:text-ink"
+            >
+              Built by
+              <Image
+                src="/brand/zowork.png"
+                alt="Zowork"
+                width={202}
+                height={52}
+                className="h-5 w-auto max-w-none invert dark:invert-0"
+                unoptimized
+              />
+              <ArrowUpRight
+                aria-hidden="true"
+                className="size-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+              />
+            </a>
 
             {/* Where the theme picker goes when the header cannot hold it.
 
@@ -309,9 +339,10 @@ export function SiteFooter() {
             </div>
           </div>
 
-          {/* Three columns now, so two-up on a phone and three-up once there is
-              room — `grid-cols-2` alone left App stranded on its own row. */}
-          <div className="grid grid-cols-2 gap-10 sm:grid-cols-3 sm:gap-16">
+          {/* Two columns, so two-up at every width. It was `sm:grid-cols-3`
+              while App existed; with two children that reserved an empty
+              third and pulled both away from the footer's right edge. */}
+          <div className="grid grid-cols-2 gap-10 sm:gap-16">
             {FOOTER_LINKS.map((column) => (
               <div key={column.title}>
                 <p className="axis-label">{column.title}</p>

@@ -25,6 +25,7 @@
     "@zoblocks/identity": "workspace:*",
     "@zoblocks/signature": "workspace:*",
     "@zoblocks/tabs": "workspace:*",
+    "@zoblocks/theme": "workspace:*",
     "@zoblocks/tokens": "workspace:*",
     "antd": "^6.6.0",
     "clsx": "^2.1.1",

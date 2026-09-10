@@ -14,6 +14,8 @@
  *   rather than imported because that package is a transitive dependency of
  *   antd rather than one this app declares, and reaching into a hoisted
  *   transitive is how a build breaks on an unrelated upgrade.
+ * - Bootstrap's is the project's own rounded-square "B", redrawn from the
+ *   published mark (MIT) in Bootstrap's brand purple. Unrecoloured.
  * - Material UI's is **ours, not theirs** — a geometric stand-in in MUI's own
  *   brand blue. MUI ships no logo in any npm package we depend on, and
  *   guessing at a trademark is worse than obviously not being it. Replace it
@@ -72,6 +74,36 @@ export function MaterialUiMark({ className = SIZE }: { className?: string }) {
       <path d="M1.5 15.6V8.4l6.2 3.6v7.2Z" opacity="0.55" />
       <path d="M7.7 12 13.9 8.4v7.2L7.7 19.2Z" opacity="0.8" />
       <path d="M13.9 8.4 20.1 4.8V12l-6.2 3.6Z" />
+    </svg>
+  );
+}
+
+/**
+ * Bootstrap's rounded-square mark, in its own `#7952B3`.
+ *
+ * Drawn rather than fetched, so it costs no request and carries no tracking.
+ * Bootstrap is a *host* on the Pro page rather than a shipped bridge —
+ * `packages/` has `bridge-antd` and `bridge-mui` and no third — and it appears
+ * there because the bridge design is custom properties on a wrapper, which any
+ * host that can set them can use.
+ */
+export function BootstrapMark({ className = SIZE }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
+      <rect
+        x="1.6"
+        y="1.6"
+        width="20.8"
+        height="20.8"
+        rx="5"
+        fill="none"
+        stroke="#7952b3"
+        strokeWidth="2"
+      />
+      <path
+        fill="#7952b3"
+        d="M8.2 6.6h4.6c2.2 0 3.5 1 3.5 2.7 0 1.2-.8 2.2-1.9 2.4v.1c1.5.2 2.5 1.2 2.5 2.7 0 2-1.5 3.1-4 3.1H8.2Zm2.3 1.8v3h1.7c1.3 0 2-.5 2-1.5s-.7-1.5-1.9-1.5Zm0 4.6v3.4h2c1.4 0 2.2-.6 2.2-1.7s-.8-1.7-2.3-1.7Z"
+      />
     </svg>
   );
 }
