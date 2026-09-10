@@ -22,6 +22,7 @@ import { ArrowRight, CornerDownLeft, Search } from "lucide-react";
 import { CATALOG } from "@/lib/catalog";
 import { isReady, readyRank } from "@/lib/readiness";
 import { cn } from "@/lib/utils";
+import { restoreFocus } from "@/components/site/interactions";
 
 interface Item {
   id: string;
@@ -148,12 +149,30 @@ export function CommandMenu() {
 
   React.useEffect(() => setActive(0), [query]);
 
-  // Global shortcut.
+  /*
+   * The global shortcut, and Escape.
+   *
+   * Escape lived on the input's own `onKeyDown`, which only fires while focus
+   * is inside the input. That is true most of the time and not always: the
+   * dialog is opened by a shortcut from anywhere on the page, and focus moves
+   * into the field on a `setTimeout`, so there is a window in which the dialog
+   * is open and Escape does nothing. A dialog that cannot always be dismissed
+   * with Escape is a trap, and this is the second time the same handler-on-the-
+   * wrong-element shape has produced one here — `notify-dialog.tsx` had it too.
+   *
+   * The input keeps its own handler for the arrow keys and Enter, which do
+   * belong to the field.
+   */
   React.useEffect(() => {
     function onKey(event: KeyboardEvent) {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
         setOpen((v) => !v);
+        return;
+      }
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setOpen(false);
       }
     }
     window.addEventListener("keydown", onKey);
@@ -175,7 +194,7 @@ export function CommandMenu() {
       clearTimeout(focusTimer);
       document.body.style.overflow = overflow;
       app?.removeAttribute("aria-hidden");
-      (previouslyFocused ?? triggerRef.current)?.focus?.();
+      restoreFocus(previouslyFocused, triggerRef.current);
     };
   }, [open]);
 

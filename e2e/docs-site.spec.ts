@@ -629,6 +629,47 @@ test.describe("the app doors @a11y", () => {
 });
 
 test.describe("site chrome @a11y", () => {
+  /**
+   * The command menu gives focus back, and gives it back to the right place.
+   *
+   * Both halves have failed. The dialog restored `document.activeElement` as
+   * captured on open — and Safari follows the macOS convention of not focusing
+   * a `<button>` when you click it, so that was `<body>`, and `body.focus()`
+   * is a no-op. Focus ended up nowhere: dismiss the dialog and a keyboard
+   * reader is at the top of the document with no idea where they were. Only
+   * WebKit shows it, which is why it survived until a cross-engine run.
+   *
+   * The second case is why the fix is not simply "focus the trigger". This
+   * dialog opens from anywhere with a keyboard shortcut, so somebody who
+   * opened it from a link three screens down must be returned to that link and
+   * not to the search box in the header.
+   */
+  test("the command menu returns focus where it came from", async ({ page }) => {
+    await page.goto("/");
+    const trigger = page.getByRole("button", { name: /^Search/ });
+    const dialog = page.getByRole("dialog", { name: /search components and pages/i });
+
+    // Opened by clicking the trigger: focus comes back to the trigger.
+    await trigger.click();
+    await expect(dialog).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(dialog).toBeHidden();
+    await expect(trigger).toBeFocused();
+
+    /*
+     * Opened by shortcut from somewhere else: focus comes back *there*.
+     * `Meta+k` on this runner's platform and `Control+k` elsewhere — the
+     * component listens for both.
+     */
+    const link = page.getByRole("link", { name: "Components", exact: true }).first();
+    await link.focus();
+    await page.keyboard.press(process.platform === "darwin" ? "Meta+k" : "Control+k");
+    await expect(dialog).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(dialog).toBeHidden();
+    await expect(link).toBeFocused();
+  });
+
   test("the tab icon is declared and served", async ({ page, request }) => {
     await page.goto(CATALOG);
 

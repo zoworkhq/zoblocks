@@ -237,6 +237,35 @@ export function RevealRoot({ children }: { children: React.ReactNode }) {
 // Counter
 // ---------------------------------------------------------------------------
 
+/**
+ * Put focus back where it came from when a dialog closes.
+ *
+ * The obvious implementation — remember `document.activeElement` on open and
+ * focus it again on close — has a hole that only shows in WebKit. Safari
+ * follows the macOS convention of *not* focusing a `<button>` when you click
+ * it, so `activeElement` is `<body>`, and `body.focus()` is a no-op. Focus
+ * ends up nowhere: a keyboard reader who dismisses the dialog is returned to
+ * the top of the document with no idea where they were.
+ *
+ * So `previous` is used only when it is a real element that is still in the
+ * document, and the control that opens the dialog is the fallback. Both halves
+ * matter. A dialog reachable by a keyboard shortcut can be opened from
+ * anywhere, so returning to its trigger would be wrong when somebody was three
+ * links down the page; and a dialog opened by a mouse click has no meaningful
+ * "previous", so its trigger is the only sensible answer.
+ *
+ * Shared because there are two of these — the command menu and the notify
+ * dialog — and a third copy is how one of them quietly keeps the bug.
+ */
+export function restoreFocus(
+  previous: HTMLElement | null | undefined,
+  fallback: HTMLElement | null | undefined,
+) {
+  const target =
+    previous && previous !== document.body && previous.isConnected ? previous : fallback;
+  target?.focus?.();
+}
+
 /** Counts up once, when scrolled into view. Static under reduced motion. */
 export function Counter({
   to,

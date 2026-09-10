@@ -288,41 +288,39 @@ export function SiteFooter() {
             </p>
             <p className="axis-label mt-4">MIT core · v0.1.0</p>
 
-            {/* Who made it, at a size that says so.
+            {/* A maker's stamp, not a sentence.
 
-                This was the tail of the line above — "· by Zowork" in 10px
-                mono caps, the same weight as the licence and the version
-                number, which made the authorship read as one more piece of
-                metadata. It is the opposite: the licence is a fact about the
-                package and this is the reason to trust it.
+                Two problems with what was here. It read "Built by" followed by
+                a logo, which is the plainest possible way to say it and looked
+                like a caption someone forgot to style. And it used Tailwind's
+                `dark:invert-0` to un-invert the mark on dark grounds — see
+                `.zwStamp` in `globals.css` for why that silently did nothing.
 
-                The mark is Zowork's own one-colour file, inverted to black on
-                light grounds the same way the Pro plate does it — every opaque
-                pixel in `zowork.png` is pure white, so the inverse is pure
-                black and nothing else changes. `dark:invert-0` puts it back to
-                white where the ground is dark.
-
-                `unoptimized` because it is a 2 KB PNG already at its display
-                size, and `next/image` rather than a bare `img` because
-                `no-img-element` is a warning and `pnpm lint` runs at exactly
-                its ceiling. */}
+                It is a chip now, in the same language as the release chip on
+                `/pro`: a hairline border, a mono micro-label, the mark, and an
+                arrow that arrives on hover. A studio signing its work rather
+                than a line of body copy. */}
             <a
               href="https://www.zowork.com/"
               rel="noopener"
-              className="group mt-3 inline-flex items-center gap-2.5 text-sm text-graphite transition-colors duration-200 hover:text-ink"
+              className={
+                "zwStamp group mt-4 inline-flex items-center gap-2.5 rounded-full border " +
+                "border-rule bg-paper-sunk py-1.5 pl-3 pr-3.5 transition-colors duration-200 " +
+                "hover:border-rule-strong"
+              }
             >
-              Built by
+              <span className="axis-label text-graphite-soft">Built by</span>
               <Image
                 src="/brand/zowork.png"
                 alt="Zowork"
                 width={202}
                 height={52}
-                className="h-5 w-auto max-w-none invert dark:invert-0"
+                className="zwStampMark h-4 w-auto max-w-none"
                 unoptimized
               />
               <ArrowUpRight
                 aria-hidden="true"
-                className="size-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+                className="size-3 -ml-0.5 text-graphite-soft opacity-0 transition-opacity duration-200 group-hover:opacity-100"
               />
             </a>
 

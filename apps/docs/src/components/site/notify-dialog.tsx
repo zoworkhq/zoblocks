@@ -3,6 +3,7 @@
 import * as React from "react";
 import { createPortal } from "react-dom";
 import { Check, X } from "lucide-react";
+import { restoreFocus } from "@/components/site/interactions";
 
 /**
  * "Notify me when it ships", as a dialog rather than a `mailto:`.
@@ -85,20 +86,9 @@ export function NotifyDialog({
       document.body.style.overflow = overflow;
       app?.removeAttribute("aria-hidden");
 
-      /*
-       * The trigger first, and the previously focused element only if it is
-       * still in the document and can actually take focus.
-       *
-       * `document.activeElement` is `<body>` when a click moved focus nowhere,
-       * and `body.focus()` is a no-op — so restoring "what was focused before"
-       * left focus nowhere at all in WebKit, which is a keyboard reader
-       * stranded at the top of the document. This dialog is always opened by
-       * its own button, so that button is the right place to come back to.
-       */
-      const back =
-        triggerRef.current ??
-        (previouslyFocused && previouslyFocused !== document.body ? previouslyFocused : null);
-      back?.focus?.();
+      // See `restoreFocus`: `document.activeElement` is `<body>` after a mouse
+      // click in WebKit, and focusing the body does nothing.
+      restoreFocus(previouslyFocused, triggerRef.current);
     };
   }, [open]);
 

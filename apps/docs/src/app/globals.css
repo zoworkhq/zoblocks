@@ -1790,3 +1790,36 @@ html:not(.dark) .instrument-demo [class*="bg-panel"] {
    Every input in it spends the shared --zb-field-* tokens, so a date field
    and a dose field cannot drift apart in a customer's theme. */
 @import "../../../../registry/zoblocks/lib/datetime.css";
+
+/* ---------------------------------------------------------------------------
+ * The Zowork stamp in the footer.
+ *
+ * `zowork.png` is a one-colour mark: every opaque pixel is pure white on
+ * transparency, so `invert(1)` turns it pure black for a light ground and
+ * touches nothing else. The `.dark` rule takes the filter off again.
+ *
+ * **Written here rather than as `invert dark:invert-0`, because that does not
+ * work on this site.** Tailwind v4's `dark:` variant follows
+ * `prefers-color-scheme` unless a `@custom-variant dark` redefines it, and
+ * nothing here does — the site switches themes by toggling a `.dark` class on
+ * `<html>`. So `dark:invert-0` fired on the reader's *operating system*
+ * setting and ignored the site's own toggle: anybody on a light OS who chose
+ * the dark theme got a black mark on a near-black ground, which is to say no
+ * mark at all.
+ *
+ * This was the only `dark:` utility on the site. If more are added, either
+ * declare the variant once or keep writing rules like this one.
+ * ------------------------------------------------------------------------ */
+
+.zwStampMark {
+  filter: invert(1);
+}
+.dark .zwStampMark {
+  filter: none;
+}
+
+/* High contrast keeps the light-ground treatment: its paper is white, and a
+   pure black mark on it is the strongest this mark can be. */
+[data-zb-theme="high-contrast"] .zwStampMark {
+  filter: invert(1);
+}
