@@ -1811,11 +1811,79 @@ html:not(.dark) .instrument-demo [class*="bg-panel"] {
  * declare the variant once or keep writing rules like this one.
  * ------------------------------------------------------------------------ */
 
+/*
+ * The chip. Three things were out of alignment and each had its own cause,
+ * measured rather than nudged until it looked right.
+ */
+.zwStamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  /* Symmetric. It was 12px left and 14px right, which on a pill this small is
+     visible as a lean. */
+  padding: 0.375rem 0.75rem;
+  border: 1px solid var(--site-rule);
+  border-radius: 999px;
+  background: var(--site-paper-sunk);
+  transition: border-color 200ms ease;
+}
+.zwStamp:hover {
+  border-color: var(--site-rule-strong);
+}
+
+/*
+ * `axis-label` sets `letter-spacing: 1.8px`, and letter spacing is applied
+ * *after* the last character as well as between characters — so the label's
+ * box carried 1.8px of empty space on its right and the gap to the mark read
+ * as 11.8px where every other gap in the chip is 8px.
+ */
+.zwStampLabel {
+  margin-right: -1.8px;
+}
+
+/*
+ * The mark, optically centred and inverted for the ground.
+ *
+ * `zowork.png` is 202x52 and its ink stops 6px above the bottom edge with
+ * nothing at the top, so the artwork sits high inside its own box — about a
+ * pixel at this rendered size, which is exactly enough to look like a
+ * mistake next to 11px type. The translate is half that empty strip:
+ * 6/52 x 16px / 2.
+ *
+ * `invert(1)` is what makes it black. Every opaque pixel in the file is pure
+ * white on transparency, so inverting gives pure black and leaves the alpha
+ * alone. **Not `dark:invert-0`** — Tailwind v4's `dark:` variant follows
+ * `prefers-color-scheme` unless a `@custom-variant dark` redefines it, and
+ * nothing here does. This site switches themes with a `.dark` class, so that
+ * utility fired on the reader's operating system and ignored the site's own
+ * toggle: a light OS plus the dark theme gave a black mark on a near-black
+ * ground. It was the only `dark:` utility on the site.
+ */
 .zwStampMark {
+  display: block;
+  height: 1rem;
+  width: auto;
+  max-width: none;
+  transform: translateY(0.92px);
   filter: invert(1);
 }
 .dark .zwStampMark {
   filter: none;
+}
+
+/*
+ * Always drawn, dimmed. It used to appear only on hover, which meant its 12px
+ * plus the gap sat empty on the right at rest and made the chip look
+ * lopsided — the alignment problem people actually see. Fading rather than
+ * appearing also avoids the layout shift that revealing it would cause.
+ */
+.zwStampArrow {
+  color: var(--site-graphite-soft);
+  opacity: 0.45;
+  transition: opacity 200ms ease;
+}
+.zwStamp:hover .zwStampArrow {
+  opacity: 1;
 }
 
 /* High contrast keeps the light-ground treatment: its paper is white, and a

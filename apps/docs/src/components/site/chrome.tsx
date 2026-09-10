@@ -300,28 +300,17 @@ export function SiteFooter() {
                 `/pro`: a hairline border, a mono micro-label, the mark, and an
                 arrow that arrives on hover. A studio signing its work rather
                 than a line of body copy. */}
-            <a
-              href="https://www.zowork.com/"
-              rel="noopener"
-              className={
-                "zwStamp group mt-4 inline-flex items-center gap-2.5 rounded-full border " +
-                "border-rule bg-paper-sunk py-1.5 pl-3 pr-3.5 transition-colors duration-200 " +
-                "hover:border-rule-strong"
-              }
-            >
-              <span className="axis-label text-graphite-soft">Built by</span>
+            <a href="https://www.zowork.com/" rel="noopener" className="zwStamp group mt-4">
+              <span className="zwStampLabel axis-label text-graphite-soft">Built by</span>
               <Image
                 src="/brand/zowork.png"
                 alt="Zowork"
                 width={202}
                 height={52}
-                className="zwStampMark h-4 w-auto max-w-none"
+                className="zwStampMark"
                 unoptimized
               />
-              <ArrowUpRight
-                aria-hidden="true"
-                className="size-3 -ml-0.5 text-graphite-soft opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-              />
+              <ArrowUpRight aria-hidden="true" className="zwStampArrow size-3" />
             </a>
 
             {/* Where the theme picker goes when the header cannot hold it.
