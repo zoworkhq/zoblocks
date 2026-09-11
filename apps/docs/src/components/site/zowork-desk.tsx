@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
+import { zoworkDeskProof } from "@/lib/zowork";
 
 /**
  * Zowork, on the Pro page.
@@ -36,13 +37,15 @@ import { ArrowRight } from "lucide-react";
  * fix is to change it, not to soften it into a claim that cannot be checked.
  */
 
-/** Verified against zowork.com. Each is a fact, not a positioning line. */
-const PROOF: { value: string; label: string }[] = [
-  { value: "10 yrs", label: "In behavioral health" },
-  { value: "Bells.ai", label: "Built it. Netsmart bought it." },
-  { value: "~50%", label: "Documentation time returned" },
-  { value: "Zero", label: "Clients lost to churn" },
-];
+/*
+ * The four figures now live in `lib/zowork.ts`, shared with the home page.
+ *
+ * They were typed here and typed again there, which is how the first of them
+ * was going to go wrong: "10 yrs" was a literal, and a literal like that is
+ * correct until a January nobody is looking at this file. It is derived from
+ * the founding year now, and both surfaces read the same source.
+ */
+const PROOF = zoworkDeskProof();
 
 /** Written the way Zowork's own footer writes them: code above, city below. */
 const OFFICES: { code: string; city: string }[] = [

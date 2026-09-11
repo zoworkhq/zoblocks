@@ -1930,3 +1930,238 @@ html:not(.dark) .instrument-demo [class*="bg-panel"] {
 [data-zb-theme="high-contrast"] .zwStampMark {
   filter: invert(1);
 }
+
+/* ===========================================================================
+ * ZOWORK ON THE HOME PAGE — `components/site/zowork-practice.tsx`
+ *
+ * Every colour is a `--color-*` token, which is not a style preference here.
+ * The `/pro` panel this argument also appears on shipped literal-dark in both
+ * themes and had to be reversed: a light reader got a dark slab between a
+ * light header and a light footer, and the high-contrast reader — who asked
+ * for maximum contrast — was the only one denied it. Three themes, one block.
+ * ======================================================================== */
+
+.zwpMark {
+  display: block;
+  height: 1.5rem;
+  width: auto;
+  max-width: none;
+  /* The stretch guard, and it is not belt-and-braces: an image that is a flex
+     item in a column container gets stretched by the inherited
+     `align-items: stretch`, which overrides `width: auto` and paints the mark
+     at full column width with its height still pinned. Its container sets an
+     explicit alignment, so that path is closed — but `aspect-ratio` and
+     `object-fit` mean a future container that forgets letterboxes the mark
+     instead of smearing it. `align-self` is deliberately not used here: it
+     would win over the container's own alignment and pin the mark left. */
+  aspect-ratio: 202 / 52;
+  object-fit: contain;
+  /* `zowork.png` is a one-colour mark — every opaque pixel is pure white on
+     transparency — so inverting yields pure black and leaves the alpha alone.
+     Not `dark:invert-0`: this site switches on a class, and Tailwind's `dark:`
+     follows the operating system unless a custom variant redefines it. */
+  filter: invert(1);
+}
+
+.dark .zwpMark {
+  filter: none;
+}
+
+[data-zb-theme="high-contrast"] .zwpMark {
+  filter: invert(1);
+}
+
+/* ---------------------------------------------------------------------------
+ * The tenure rail.
+ *
+ * One track, spanning the company's own decade. The band inside it is the
+ * share of that decade the anchor clients have been present for — the solid
+ * core is the span all four cover, the lighter extension how much further the
+ * longest reaches. Both end at `now`, because none of them has ended.
+ * ------------------------------------------------------------------------ */
+
+.zwpRail {
+  margin: 0;
+  padding: clamp(1.25rem, 3vw, 1.75rem) clamp(1.25rem, 3vw, 2rem) clamp(1.125rem, 2.5vw, 1.5rem);
+  border-bottom: 1px solid var(--color-rule);
+}
+
+.zwpRailHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0;
+  margin-bottom: 1.375rem;
+}
+
+.zwpRailQuote {
+  font-size: 0.8125rem;
+  color: var(--color-graphite);
+}
+
+.zwpRailCite {
+  color: var(--color-graphite-soft);
+}
+
+.zwpRailTrack {
+  position: relative;
+  block-size: 0.625rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-rule-strong) 50%, transparent);
+}
+
+.zwpRailBar {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  border-radius: 999px;
+}
+
+/* The reach of the longest tenure: present, but not asserted as solid, because
+   only one of the four is known to run that far back. */
+.zwpRailBar--reach {
+  background: color-mix(in srgb, var(--color-brand) 30%, transparent);
+}
+
+/* The span every anchor covers. */
+.zwpRailBar--core {
+  background: var(--color-brand);
+}
+
+.zwpRailEnds {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  font-size: 0.625rem;
+  color: var(--color-graphite-soft);
+}
+
+.zwpRailKey {
+  margin: 1.125rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--color-graphite);
+}
+
+.zwpRailKey b {
+  color: var(--color-ink);
+  font-weight: 500;
+}
+
+.zwpRailNames {
+  margin: 0.375rem 0 0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--color-graphite-soft);
+}
+
+/* ---------------------------------------------------------------------------
+ * The four proof figures, under the rail.
+ * ------------------------------------------------------------------------ */
+
+.zwpProof {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+}
+
+.zwpProof > div {
+  min-width: 0;
+  padding: clamp(1rem, 2.5vw, 1.375rem) clamp(1.25rem, 3vw, 2rem);
+}
+
+.zwpProof > div + div {
+  border-left: 1px solid var(--color-rule);
+}
+
+.zwpProof > div:nth-child(3),
+.zwpProof > div:nth-child(4) {
+  border-top: 1px solid var(--color-rule);
+}
+
+.zwpProofV {
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 2.4vw, 1.75rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  color: var(--color-brand-deep);
+}
+
+.zwpProofL {
+  margin: 0.5rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--color-graphite);
+}
+
+@media (min-width: 40rem) {
+  .zwpProof {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .zwpProof > div:nth-child(3),
+  .zwpProof > div:nth-child(4) {
+    border-top: 0;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * The service tracks.
+ *
+ * Four ruled columns of names. Each name used to carry its published outcome
+ * on a second line, which doubled the block and made a list you glance at into
+ * one you have to read — see the component for the two cuts this took.
+ * ------------------------------------------------------------------------ */
+
+.zwpTracks {
+  display: grid;
+  gap: 1.5rem 0;
+  grid-template-columns: minmax(0, 1fr);
+  border-top: 1px solid var(--color-rule-strong);
+  padding-top: 1.5rem;
+}
+
+.zwpServices {
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.zwpServices li {
+  font-size: 0.875rem;
+  line-height: 1.3;
+  color: var(--color-ink);
+}
+
+.zwpServices li + li {
+  margin-top: 0.5rem;
+}
+
+@media (min-width: 40rem) {
+  .zwpTracks {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  .zwpTracks {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+  }
+
+  .zwpTracks > section {
+    padding-inline: clamp(1rem, 2.2vw, 1.75rem);
+  }
+
+  .zwpTracks > section:first-child {
+    padding-inline-start: 0;
+  }
+
+  .zwpTracks > section + section {
+    border-inline-start: 1px solid var(--color-rule);
+  }
+}

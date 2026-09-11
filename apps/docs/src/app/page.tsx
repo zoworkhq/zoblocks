@@ -7,6 +7,7 @@ import { SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { DataGridDemo } from "@/components/site/data-grid-demo";
 import { LoaderShowcase } from "@/components/site/loader-showcase";
 import { Counter, InstallCommand, RevealRoot } from "@/components/site/interactions";
+import { ZoworkPractice } from "@/components/site/zowork-practice";
 import { TelemetryTrace } from "@/components/site/telemetry-trace";
 
 /*
@@ -36,6 +37,16 @@ export default function HomePage() {
         <DataGridSection />
         <HomeFeatured total={CATALOG.length} />
         <Trust />
+        {/*
+          Between the quality claims and the install command, which is the only
+          place it works.
+
+          After `Trust`, because "claims we are willing to be held to" is
+          exactly the sentence a reader answers with "held to by whom?" — and
+          before `ClosingCta`, because that one hands them the free path out.
+          A commercial section placed after the exit is a section nobody reads.
+        */}
+        <ZoworkPractice />
         <ClosingCta />
       </main>
       <SiteFooter />
