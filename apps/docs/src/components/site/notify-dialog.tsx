@@ -38,9 +38,45 @@ import { restoreFocus } from "@/components/site/interactions";
 /** Where a fallback lands, and the address the showcase page already uses. */
 const FALLBACK = "hello@zowork.com";
 
-const mailtoFor = (email: string) =>
-  `mailto:${FALLBACK}?subject=${encodeURIComponent("Notify me when ZoBlocks Pro ships")}` +
-  `&body=${encodeURIComponent(`Please let me know when Pro ships.\n\n${email}\n`)}`;
+/**
+ * What the reader is asking to be told about.
+ *
+ * Two pages use this dialog now, and every string in it named Pro — so a
+ * marketplace visitor who left an address got a mail client open on "Please
+ * let me know when Pro ships". Wrong on the one screen where being wrong
+ * costs an actual lead.
+ *
+ * `source` is sent to the API so a configured webhook can tell the two apart.
+ * It is a key, not free text: the route allowlists it rather than pasting a
+ * client-supplied string into an outbound payload.
+ */
+export interface NotifyTopic {
+  /** The dialog's heading, and the subject of the fallback mail. */
+  title: string;
+  /** One line under it, saying what arrives and how often. */
+  blurb: string;
+  /** The first line of the fallback mail's body. */
+  ask: string;
+  source: "pro" | "marketplace";
+}
+
+export const NOTIFY_PRO: NotifyTopic = {
+  title: "Notify me when Pro ships",
+  blurb: "One message when the console is available. Nothing else.",
+  ask: "Please let me know when Pro ships.",
+  source: "pro",
+};
+
+export const NOTIFY_MARKETPLACE: NotifyTopic = {
+  title: "Notify me when the shop opens",
+  blurb: "One message when packs can be bought. Nothing else.",
+  ask: "Please let me know when the ZoBlocks marketplace opens.",
+  source: "marketplace",
+};
+
+const mailtoFor = (topic: NotifyTopic, email: string) =>
+  `mailto:${FALLBACK}?subject=${encodeURIComponent(topic.title)}` +
+  `&body=${encodeURIComponent(`${topic.ask}\n\n${email}\n`)}`;
 
 type Status =
   | { kind: "idle" }
@@ -53,9 +89,11 @@ type Status =
 export function NotifyDialog({
   className,
   children,
+  topic = NOTIFY_PRO,
 }: {
   className?: string;
   children: React.ReactNode;
+  topic?: NotifyTopic;
 }) {
   const [open, setOpen] = React.useState(false);
   const [email, setEmail] = React.useState("");
@@ -149,7 +187,7 @@ export function NotifyDialog({
       const response = await fetch("/api/notify", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ email: address }),
+        body: JSON.stringify({ email: address, source: topic.source }),
       });
 
       if (response.ok) {
@@ -164,7 +202,7 @@ export function NotifyDialog({
        */
       if (response.status === 501) {
         setStatus({ kind: "handoff" });
-        window.location.href = mailtoFor(address);
+        window.location.href = mailtoFor(topic, address);
         return;
       }
 
@@ -176,7 +214,7 @@ export function NotifyDialog({
     } catch {
       // Offline, or the request never left. Same answer: do not pretend.
       setStatus({ kind: "handoff" });
-      window.location.href = mailtoFor(address);
+      window.location.href = mailtoFor(topic, address);
     }
   }
 
@@ -212,11 +250,9 @@ export function NotifyDialog({
                 <div className="flex items-start justify-between gap-4 px-5 pt-5">
                   <div>
                     <h2 id="notify-title" className="font-display text-base font-semibold">
-                      Notify me when Pro ships
+                      {topic.title}
                     </h2>
-                    <p className="body-sm mt-1 text-graphite">
-                      One message when the console is available. Nothing else.
-                    </p>
+                    <p className="body-sm mt-1 text-graphite">{topic.blurb}</p>
                   </div>
                   <button
                     type="button"
@@ -234,8 +270,10 @@ export function NotifyDialog({
                       <Check aria-hidden="true" className="size-4" />
                       You are on the list.
                     </p>
+                    {/* Not "when it ships": this dialog serves two topics now,
+                        and one of them opens rather than ships. */}
                     <p className="body-sm mt-2 text-graphite">
-                      We will write to {email.trim()} once, when it ships.
+                      We will write to {email.trim()} once, and only about this.
                     </p>
                   </div>
                 ) : (

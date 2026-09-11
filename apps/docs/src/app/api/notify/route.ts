@@ -35,10 +35,26 @@ export const dynamic = "force-dynamic";
 const LOOKS_LIKE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_LENGTH = 254;
 
+/**
+ * Which page the address came from.
+ *
+ * Allowlisted rather than passed through. This value ends up in an outbound
+ * payload to somebody else's system, and a client-supplied string in that
+ * position is an injection waiting to happen. An unknown key reads as `pro`,
+ * which is where every address came from before the marketplace used this.
+ */
+const SOURCES = new Set(["pro", "marketplace"]);
+
+function origin(source: unknown): string {
+  const key = typeof source === "string" && SOURCES.has(source) ? source : "pro";
+  return `zoblocks.design/${key}`;
+}
+
 export async function POST(request: Request) {
   let email: unknown;
+  let source: unknown;
   try {
-    ({ email } = (await request.json()) as { email?: unknown });
+    ({ email, source } = (await request.json()) as { email?: unknown; source?: unknown });
   } catch {
     return NextResponse.json({ ok: false, reason: "malformed" }, { status: 400 });
   }
@@ -61,7 +77,7 @@ export async function POST(request: Request) {
     const forwarded = await fetch(webhook, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ email, source: "zoblocks.design/pro", at: new Date().toISOString() }),
+      body: JSON.stringify({ email, source: origin(source), at: new Date().toISOString() }),
     });
     if (!forwarded.ok) {
       return NextResponse.json({ ok: false, reason: "upstream" }, { status: 502 });

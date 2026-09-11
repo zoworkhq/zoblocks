@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { CATALOG } from "@/lib/catalog";
 import { SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { RevealRoot } from "@/components/site/interactions";
-import { NotifyDialog } from "@/components/site/notify-dialog";
+import { NOTIFY_PRO, NotifyDialog } from "@/components/site/notify-dialog";
 import { ProConsole } from "@/components/site/pro-console";
 import { ZoworkDesk } from "@/components/site/zowork-desk";
 
@@ -111,7 +111,9 @@ export default function ProPage() {
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3" data-reveal>
-              <NotifyDialog className="proCta">Notify me when it ships</NotifyDialog>
+              <NotifyDialog topic={NOTIFY_PRO} className="proCta">
+                Notify me when it ships
+              </NotifyDialog>
               <Link href="/components" className="proGhost">
                 View components
                 <ArrowRight aria-hidden="true" className="size-4" />

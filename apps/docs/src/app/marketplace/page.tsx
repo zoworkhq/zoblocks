@@ -3,8 +3,9 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { RevealRoot } from "@/components/site/interactions";
-import { KIND_LABEL, shelf, APP, type ShelfItem } from "@/lib/marketplace";
+import { KIND_LABEL, shelf, APP, SELLING_OPEN, type ShelfItem } from "@/lib/marketplace";
 import { PackPreview } from "@/components/site/pack-preview";
+import { NOTIFY_MARKETPLACE, NotifyDialog } from "@/components/site/notify-dialog";
 
 export const metadata: Metadata = {
   title: "Marketplace — clinical icon & theme packs",
@@ -44,17 +45,43 @@ export default async function MarketplacePage() {
             <p className="eyebrow eyebrow-rule text-brand-deep" data-reveal>
               Marketplace
             </p>
-            <h1 className="display-xl mt-5 max-w-4xl text-balance" data-reveal>
-              Artwork that knows what an empty field means.
+            {/*
+              The status is the heading, exactly as `/pro` does it.
+
+              The shop has been shut shelf-wide since `SELLING_OPEN` went
+              false, and this page said so once, in a paragraph most of the way
+              down the Announced section. That is the right amount of repeating
+              and the wrong place: a visitor reaches the cards before the
+              sentence that explains why none of them has a buy button.
+
+              It is derived from `SELLING_OPEN` rather than typed, because a
+              hard-coded "Coming soon" becomes a lie the day somebody flips
+              that flag — and flipping it is documented as a one-line change
+              with nothing else to move.
+            */}
+            <h1 className="display-lg mt-5 max-w-4xl text-balance" data-reveal>
+              {SELLING_OPEN ? "Artwork that knows what an empty field means." : "Coming soon"}
             </h1>
-            <p className="lede mt-6 max-w-2xl text-pretty" data-reveal>
+            {!SELLING_OPEN && (
+              <p className="body-lg mt-5 max-w-xl text-pretty text-ink" data-reveal>
+                Artwork that knows what an empty field means.
+              </p>
+            )}
+            <p className="lede mt-5 max-w-2xl text-pretty" data-reveal>
               Stock illustration draws one empty state and calls it <em>nothing to see here</em>. An
               empty allergy list is three facts — nobody asked, asked and none found, or you may not
               see it — and each needs a different drawing.
             </p>
+            {/*
+              "Coming soon" on its own reads as *nothing here yet*, which is the
+              one thing that is not true — several packs are finished and
+              measured. The same correction `/pro` makes two lines under its
+              own heading.
+            */}
             <p className="mt-4 max-w-2xl text-pretty text-graphite" data-reveal>
-              Every item states what was checked: contrast pairs, forced colours, and what it does
-              not claim.
+              Several packs are finished and measured, and every item states what was checked:
+              contrast pairs, forced colours, and what it does not claim. The shop is what is shut,
+              and it opens with the console.
             </p>
             {/*
               Said here rather than left to be inferred from a missing block.
@@ -65,6 +92,23 @@ export default async function MarketplacePage() {
             <p className="mt-3 max-w-2xl text-pretty text-sm text-graphite-soft" data-reveal>
               No pack has been reviewed by a registered clinician yet, and none claims otherwise.
             </p>
+
+            {!SELLING_OPEN && (
+              <div className="mt-8 flex flex-wrap gap-3" data-reveal>
+                <NotifyDialog
+                  topic={NOTIFY_MARKETPLACE}
+                  className="group inline-flex items-center gap-2 rounded-xl bg-cta px-5 py-3.5 text-sm font-medium text-paper transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:bg-cta-hover"
+                >
+                  Notify me when the shop opens
+                </NotifyDialog>
+                <Link
+                  href="/components"
+                  className="inline-flex items-center gap-2 rounded-xl border border-rule px-5 py-3.5 text-sm font-medium text-ink transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:border-brand/40"
+                >
+                  Browse components
+                </Link>
+              </div>
+            )}
           </div>
         </section>
 
@@ -109,13 +153,21 @@ export default async function MarketplacePage() {
                   }
                   data-reveal
                 >
-                  <h2 className="display-sm">Announced</h2>
+                  <h2 className="display-sm">The shelf</h2>
                   <p className="numeric text-xs text-graphite-soft">{announced.length} packs</p>
                 </div>
+                {/*
+                  It read "Announced", under an `h1` that already says "Coming
+                  soon" — two status words for one status, and the line under it
+                  explained our publishing policy rather than the list.
+
+                  The heading names the thing instead, and the sentence keeps
+                  the one idea that was worth keeping: a team can see what is
+                  coming before they spend a fortnight drawing it themselves.
+                */}
                 <p className="body-sm mt-2 max-w-2xl text-graphite" data-reveal>
-                  Announced rather than hidden — a team deciding whether to build one of these
-                  themselves deserves to know it is coming. Several are finished and measured; the
-                  shop is what is shut, and it opens with the console.
+                  Public before it is buyable, so a team weighing whether to draw these themselves
+                  does not have to guess.
                 </p>
 
                 <ul className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

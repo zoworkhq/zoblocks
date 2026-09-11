@@ -891,8 +891,14 @@ test.describe("the public marketplace @a11y", () => {
      * closed shelf-wide. Nothing is purchasable while `SELLING_OPEN` is false —
      * the console cannot take money — so the ready section renders empty and
      * the shelf is one list that announces rather than sells.
+     *
+     * The heading was "Announced" until the `h1` became "Coming soon", at
+     * which point the page carried two words for one status. Both are asserted
+     * now: the status belongs to the heading of the page, and the list below
+     * it is named for what it holds.
      */
-    await expect(page.getByRole("heading", { name: "Announced" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "Coming soon" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "The shelf" })).toBeVisible();
 
     const cards = page.locator("[data-zb-pack]");
     expect(await cards.count()).toBeGreaterThan(1);
