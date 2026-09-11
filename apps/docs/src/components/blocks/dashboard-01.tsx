@@ -95,7 +95,31 @@ export function Dashboard01() {
                 <p>Ordered by time remaining, not by severity label</p>
               </div>
             </div>
+            {/*
+              Ordered by time remaining, which is what the panel says and what
+              it did not do.
+
+              It read crit, crit, high — severity order exactly, with the one
+              row that had already blown its window sitting at the bottom. The
+              heading claimed the opposite of the list underneath it, and this
+              panel exists to make that distinction rather than to assert it.
+
+              Overdue is less than four hours, which is less than nineteen.
+              That puts the least severe row first, and that is the whole
+              point: a safety plan two days past its review outranks a risk
+              screen with most of its window still to run.
+            */}
             <div className="grow" style={{ borderTop: "1px solid var(--site-rule)" }}>
+              <RiskRow
+                sev="high"
+                who="S. Ferreira"
+                what="Safety plan 62 days old"
+                opened="11 Jun"
+                owner="E. Lake"
+                left="overdue"
+                usedPct={100}
+                windowLabel="60d review"
+              />
               <RiskRow
                 sev="crit"
                 who="R. Okonkwo"
@@ -116,21 +140,12 @@ export function Dashboard01() {
                 usedPct={21}
                 windowLabel="24h window"
               />
-              <RiskRow
-                sev="high"
-                who="S. Ferreira"
-                what="Safety plan 62 days old"
-                opened="11 Jun"
-                owner="E. Lake"
-                left="overdue"
-                usedPct={100}
-                windowLabel="60d review"
-              />
             </div>
             <p className="miniLegend">
               A red count with no clock is wallpaper. Each row carries how much of its window has
               already gone, because 19h left means one thing on a 24-hour window and another on a
-              60-day one.
+              60-day one. The first row is the least severe of the three — that is the ordering
+              working, not a fault.
             </p>
           </section>
 
