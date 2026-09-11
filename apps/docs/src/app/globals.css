@@ -1815,13 +1815,41 @@ html:not(.dark) .instrument-demo [class*="bg-panel"] {
  * The chip. Three things were out of alignment and each had its own cause,
  * measured rather than nudged until it looked right.
  */
+/*
+ * The chip's text line, which is *not* its centre line.
+ *
+ * `zowork.png` is a lockup, and a lockup is two things at two heights: the
+ * rocket occupies rows 0-45 of the 52px artboard, the wordmark only rows 20-44.
+ * So the wordmark's optical centre sits at 62.5% of the mark's height, while
+ * `align-items: center` puts the label and the arrow at 50% of the chip's.
+ *
+ * That gap is the misalignment people see. Measured at the shipped size, the
+ * label's cap centre landed 3.08px above the wordmark's — in a chip 30px tall,
+ * with 7px type. "BUILT BY" and "zowork" read as two lines of text that missed
+ * each other, which is the one thing a maker's stamp must not do.
+ *
+ * Centring the mark harder does not fix it; it is already centred, and the
+ * ink balance top-to-bottom depends on it staying so. What has to move is
+ * everything else: the label and the arrow drop onto the wordmark's line, and
+ * the rocket is left to rise above them the way the lockup draws it. After the
+ * shift the chip's ink clears its top edge by 7.9px and its bottom by 8.2px.
+ *
+ * Derivation, so a future size change can redo it rather than guess: the
+ * wordmark's ink centre sits at `0.625 x mark-height` below the mark's box top,
+ * the mark itself is nudged `0.058 x mark-height` down to centre its own ink,
+ * and the label's cap centre sits 7.35px below its box top at 10px JetBrains
+ * Mono. At a 1rem mark that is 10.92 - 7.85 = 3.07px.
+ */
 .zwStamp {
+  --zw-stamp-textline: 3.07px;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  /* Symmetric. It was 12px left and 14px right, which on a pill this small is
-     visible as a lean. */
-  padding: 0.375rem 0.75rem;
+  /* Optically symmetric, which is not the same as numerically symmetric. The
+     label's first glyph sits flush against its box; the arrow's glyph is inset
+     3px inside its own 12px box, so equal padding left and right renders as 3px
+     more air on the right. The right value is the left value minus that inset. */
+  padding: 0.375rem 0.5625rem 0.375rem 0.75rem;
   border: 1px solid var(--site-rule);
   border-radius: 999px;
   background: var(--site-paper-sunk);
@@ -1838,7 +1866,10 @@ html:not(.dark) .instrument-demo [class*="bg-panel"] {
  * as 11.8px where every other gap in the chip is 8px.
  */
 .zwStampLabel {
-  margin-right: -1.8px;
+  /* In `em`, because `axis-label` sets the spacing in `em` — a hard-coded
+     1.8px stops matching the moment the label's size does. */
+  margin-right: -0.18em;
+  transform: translateY(var(--zw-stamp-textline));
 }
 
 /*
@@ -1865,6 +1896,9 @@ html:not(.dark) .instrument-demo [class*="bg-panel"] {
   width: auto;
   max-width: none;
   transform: translateY(0.92px);
+  /* The artwork carries 2px of transparency on its right edge — 0.62px at this
+     size — which the 8px gap then adds to. */
+  margin-right: -0.62px;
   filter: invert(1);
 }
 .dark .zwStampMark {
@@ -1880,6 +1914,11 @@ html:not(.dark) .instrument-demo [class*="bg-panel"] {
 .zwStampArrow {
   color: var(--site-graphite-soft);
   opacity: 0.45;
+  /* Lucide draws this arrow on a 24-unit grid with its ink spanning 6-18, so a
+     quarter of the rendered box is transparent on each side. Left uncorrected
+     the chip has one interior gap of 8px and one of 11px. */
+  margin-left: -3px;
+  transform: translateY(var(--zw-stamp-textline));
   transition: opacity 200ms ease;
 }
 .zwStamp:hover .zwStampArrow {
