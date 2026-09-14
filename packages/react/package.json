@@ -1,6 +1,6 @@
 {
   "name": "@zoblocks/react",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Healthcare React components typed for the states a demo would skip. Accessible, themeable, reduced-motion aware, with zero runtime dependencies.",
   "license": "MIT",
   "homepage": "https://zoblocks.design",

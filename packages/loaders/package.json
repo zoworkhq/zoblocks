@@ -1,6 +1,6 @@
 {
   "name": "@zoblocks/loaders",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Healthcare page loaders as dependency-free custom elements. Heartbeat, rhythm strip, breath, helix, and infusion — themeable, accessible, and reduced-motion aware. Works in React, Vue, Angular, Svelte, or plain HTML.",
   "license": "MIT",
   "homepage": "https://zoblocks.design/components",

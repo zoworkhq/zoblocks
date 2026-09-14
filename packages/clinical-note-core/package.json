@@ -1,6 +1,6 @@
 {
   "name": "@zoblocks/clinical-note-core",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The engine behind ZoBlocks's ClinicalNote. Coded sections, per-range provenance, a composable sign gate, and deterministic FHIR/text serialization — no React, no DOM.",
   "license": "MIT",
   "homepage": "https://zoblocks.design/components/clinical-note",

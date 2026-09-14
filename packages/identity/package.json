@@ -1,6 +1,6 @@
 {
   "name": "@zoblocks/identity",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Patient identity for Ant Design: an avatar that says why a photo is missing, a chip that keeps two patients with one name apart, and a banner that knows what it is guarding. WCAG 2.2 AA, FHIR-shaped.",
   "license": "MIT",
   "homepage": "https://zoblocks.design/components/patient-banner",

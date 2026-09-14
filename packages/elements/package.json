@@ -1,6 +1,6 @@
 {
   "name": "@zoblocks/elements",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "ZoBlocks controls as dependency-free custom elements. A clinical switch that distinguishes off from never-asked, renders a write in flight without removing the control, and says which value the record holds when one fails. Works in React, Vue, Angular, Svelte, or plain HTML.",
   "license": "MIT",
   "homepage": "https://zoblocks.design/components",

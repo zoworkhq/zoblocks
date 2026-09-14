@@ -1,6 +1,6 @@
 {
   "name": "@zoblocks/recorder-core",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The signal engine behind ZoBlocks's Recorder. A peak envelope with instant attack and a 180 ms release, 30 Hz peak buckets, and the eleven-phase capture machine with the consent edge enforced in the engine — no React, no DOM, no dependencies.",
   "license": "MIT",
   "homepage": "https://zoblocks.design/components/recorder",

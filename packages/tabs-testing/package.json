@@ -1,6 +1,6 @@
 {
   "name": "@zoblocks/tabs-testing",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Assertions that read the accessibility tree of a tab strip. Catches the defects a snapshot test passes: a tablist of links, a strip with no tab stop, a dangling aria-controls.",
   "license": "MIT",
   "homepage": "https://zoblocks.design/components/tabs",
