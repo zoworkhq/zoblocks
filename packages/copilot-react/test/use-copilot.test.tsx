@@ -369,6 +369,57 @@ describe("verification signal", () => {
     expect(result.current.sourcesOpen).toBe(false);
   });
 
+  it("keeps sources opened mid-answer open when the answer completes", async () => {
+    // "Show sources" is on screen before the answer is marked complete. The
+    // drawer used to close on that transition, so a click in the gap opened it
+    // and shut it again a moment later — and the skin tests failed only when a
+    // runner was slow enough to land the click there.
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const provider = {
+      ...createStaticProvider({ events: grounded, disclosure }),
+      async *send() {
+        yield { type: "delta", text: "Rate control is reasonable." } as const;
+        yield { type: "citation", marker: 1, source } as const;
+        await gate;
+        yield { type: "done", finish: "stop" } as const;
+      },
+    };
+    const { result } = renderHook(() => useCopilot(baseOptions({ provider: provider as never })));
+
+    let pending!: Promise<void>;
+    act(() => {
+      pending = result.current.submit("AF first line?");
+    });
+    await waitFor(() => expect(result.current.state.status).toBe("streaming"));
+    act(() => result.current.openSources());
+    expect(result.current.sourcesOpen).toBe(true);
+
+    await act(async () => {
+      release();
+      await pending;
+    });
+    await waitFor(() => expect(result.current.state.status).toBe("complete"));
+    expect(result.current.sourcesOpen).toBe(true);
+  });
+
+  it("closes the drawer when a new question is sent", async () => {
+    const { result } = renderHook(() => useCopilot(baseOptions()));
+    await act(async () => {
+      await result.current.submit("AF first line?");
+    });
+    await waitFor(() => expect(result.current.state.status).toBe("complete"));
+    act(() => result.current.openSources());
+    expect(result.current.sourcesOpen).toBe(true);
+
+    await act(async () => {
+      await result.current.submit("and the second line?");
+    });
+    expect(result.current.sourcesOpen).toBe(false);
+  });
+
   it("emits structured feedback rather than free text", async () => {
     const events: TelemetryEvent[] = [];
     const { result } = renderHook(() =>

@@ -235,7 +235,11 @@ describe("the basis drawer", () => {
     fireEvent.keyDown(field(), { key: "Enter" });
     const button = await screen.findByRole("button", { name: /show sources/i });
     fireEvent.click(button);
-    const drawer = await screen.findByRole("region", { name: "Basis of this answer" });
+    const drawer = await screen.findByRole(
+      "region",
+      { name: "Basis of this answer" },
+      { timeout: 4000 },
+    );
 
     /*
      * Settle on the passage, not on the region that will hold it.
@@ -324,7 +328,11 @@ describe("the basis drawer", () => {
     fireEvent.keyDown(field(), { key: "Enter" });
     fireEvent.click(await screen.findByRole("button", { name: /show sources/i }));
 
-    const drawer = await screen.findByRole("region", { name: "Basis of this answer" });
+    const drawer = await screen.findByRole(
+      "region",
+      { name: "Basis of this answer" },
+      { timeout: 4000 },
+    );
     expect(drawer.textContent).toContain("Bisoprolol is preferred first-line for rate control.");
     expect(drawer.querySelector("mark")).toBeNull();
     expect(drawer.textContent).not.toContain("match");
@@ -365,7 +373,11 @@ describe("the basis drawer", () => {
 
     const older = screen.getByText("Older guideline says so.").closest("article") as HTMLElement;
     fireEvent.click(within(older).getByRole("button", { name: "Show sources" }));
-    const drawer = await screen.findByRole("region", { name: "Basis of this answer" });
+    const drawer = await screen.findByRole(
+      "region",
+      { name: "Basis of this answer" },
+      { timeout: 4000 },
+    );
     expect(within(drawer).getByText("Older guideline")).toBeInTheDocument();
     expect(within(drawer).queryByText("Newer guideline")).not.toBeInTheDocument();
     expect(within(drawer).getByText("2")).toBeInTheDocument();
@@ -374,7 +386,11 @@ describe("the basis drawer", () => {
     fireEvent.click(within(drawer).getByRole("button", { name: "Close" }));
     const newer = screen.getByText("Newer guideline says so.").closest("article") as HTMLElement;
     fireEvent.click(within(newer).getByRole("button", { name: /1/ }));
-    const reopened = await screen.findByRole("region", { name: "Basis of this answer" });
+    const reopened = await screen.findByRole(
+      "region",
+      { name: "Basis of this answer" },
+      { timeout: 4000 },
+    );
     expect(within(reopened).getByText("Newer guideline")).toBeInTheDocument();
   });
 });
@@ -646,7 +662,11 @@ describe("the sources panel", () => {
     fireEvent.keyDown(field(), { key: "Enter" });
 
     fireEvent.click(await screen.findByRole("button", { name: "Show sources" }, { timeout: 4000 }));
-    const panel = await screen.findByRole("region", { name: "Basis of this answer" });
+    const panel = await screen.findByRole(
+      "region",
+      { name: "Basis of this answer" },
+      { timeout: 4000 },
+    );
 
     /*
      * `findByRole`, not `getByRole`. The region and its list are two renders:

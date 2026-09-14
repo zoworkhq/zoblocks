@@ -352,9 +352,12 @@ export function useCopilot(options: UseCopilotOptions): CopilotApi {
     previousStatusRef.current = state.status;
     // An answer with a proposal lands in proposing. Dismissing that proposal
     // (proposing → complete) is not a new answer, so the clock keeps running.
+    // The drawer is not closed here. "Show sources" is on screen before an
+    // answer is marked complete, so closing on that transition shut a drawer
+    // the clinician had just opened. `submit` closes it when a new question
+    // is sent instead.
     if (state.status === "proposing" || (state.status === "complete" && previous !== "proposing")) {
       answeredAtRef.current = stamp();
-      setSourcesOpen(false);
     }
   }, [state.status]);
 
@@ -443,6 +446,12 @@ export function useCopilot(options: UseCopilotOptions): CopilotApi {
         return;
       }
       inFlightRef.current = true;
+
+      // A new question makes the open drawer describe the wrong answer, so it
+      // closes here, synchronously. A status effect could miss it: the
+      // complete → submitting → complete updates can land in one render.
+      setSourcesOpen(false);
+      setSourcesFor(null);
 
       const controller = new AbortController();
       abortRef.current = controller;
