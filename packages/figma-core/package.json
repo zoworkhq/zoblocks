@@ -1,6 +1,6 @@
 {
   "name": "@zoblocks/figma-core",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "ZoBlocks themes as Figma variable plans. Pure — no figma.*, no DOM, no network.",
   "license": "MIT",
   "homepage": "https://zoblocks.design",

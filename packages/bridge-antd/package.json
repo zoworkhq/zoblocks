@@ -1,6 +1,6 @@
 {
   "name": "@zoblocks/bridge-antd",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Theme bridge for Ant Design: reads a host's resolved antd theme and writes ZoBlocks's component token surface, so ZoBlocks components take the host's design language without importing antd.",
   "license": "MIT",
   "homepage": "https://zoblocks.design",

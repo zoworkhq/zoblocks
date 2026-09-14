@@ -1,5 +1,11 @@
 # @zoblocks/bridge-mui
 
+## 0.2.1
+
+### Patch Changes
+
+- @zoblocks/bridge-core@0.2.1
+
 ## 0.2.0
 
 ### Minor Changes
