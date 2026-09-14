@@ -221,6 +221,7 @@ describe("the typed path", () => {
     const fullName = within(dialog).getByLabelText(/full name/i);
     await waitFor(() => expect(fullName).toHaveFocus());
     await user.keyboard("Josh Randall");
+    await waitFor(() => expect(fullName).toHaveValue("Josh Randall"));
 
     // antd's Tabs use manual activation: arrow keys move focus along the
     // tablist and Enter selects. Tabbing past the tablist would skip it.
@@ -231,8 +232,10 @@ describe("the typed path", () => {
       "true",
     );
 
-    await tabTo(user, within(dialog).getByLabelText(/type your name to sign/i));
+    const typed = within(dialog).getByLabelText(/type your name to sign/i);
+    await tabTo(user, typed);
     await user.keyboard("Josh Randall");
+    await waitFor(() => expect(typed).toHaveValue("Josh Randall"));
 
     await tabTo(user, within(dialog).getByRole("button", { name: /sign and continue/i }));
     await user.keyboard("{Enter}");
@@ -241,7 +244,10 @@ describe("the typed path", () => {
     const value = onChange.mock.calls[0]?.[0] as SignatureValue;
     expect(value.outcome).toBe("signed");
     expect(value.outcome === "signed" && value.method).toBe("type");
-  });
+    // About forty keystrokes through an animating antd modal, each one a full
+    // keyboard event sequence. It passes in seconds locally, but a loaded CI
+    // runner took it past the 20s default on 14 Sept with unchanged code.
+  }, 45_000);
 
   it("never pre-fills the signature field", async () => {
     // Cunningham v. Zurich held a signature block was not a signature because
@@ -387,8 +393,14 @@ describe("the outcomes", () => {
     await user.click(screen.getByRole("button", { name: /add signature/i }));
     await user.click(await screen.findByRole("button", { name: /can't sign/i }));
 
-    const sheet = await screen.findByRole("dialog");
-    await user.type(within(sheet).getByRole("textbox"), "Wants to discuss with her daughter.");
+    // Found by name, not as "a dialog": the signing modal is replaced by this
+    // sheet, and on a loaded CI runner an unnamed query could resolve first.
+    // Then wait for the whole reason to land before recording. On 14 Sept CI
+    // recorded "W" — the check below fails at the step that went wrong.
+    const sheet = await screen.findByRole("dialog", { name: /record what happened instead/i });
+    const reason = within(sheet).getByRole("textbox");
+    await user.type(reason, "Wants to discuss with her daughter.");
+    await waitFor(() => expect(reason).toHaveValue("Wants to discuss with her daughter."));
     await user.click(within(sheet).getByRole("button", { name: /^record$/i }));
 
     await waitFor(() => expect(onChange).toHaveBeenCalled());
