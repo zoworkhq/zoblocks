@@ -49,18 +49,14 @@ jobs:
     name: Typecheck, test, build
     runs-on: ubuntu-latest
     # This one job does everything: install, generate, lint, format, typecheck,
-    # the unit suites, the same suites again under coverage, every build, the
-    # axe audit over sixteen pages in two themes, and the browser suite in
-    # three engines. Fifteen minutes fitted that when the catalog had six
-    # components; it now has twelve, plus three package families that did not
-    # exist. The run that prompted this was killed mid-e2e at 15m16s with
-    # nothing failing — a timeout reported as a test failure, which is the most
-    # expensive kind of red.
+    # the suites under coverage, every build, the tarball check, the axe audit,
+    # and the browser suite in three engines.
     #
-    # Deliberately not fixed by dropping the separate `Test` step: eight
-    # packages define `test` without `test:coverage`, so the coverage run does
-    # not cover them and removing it would quietly stop running their suites.
-    timeout-minutes: 25
+    # 25 minutes was set while coverage failed, so no run reached the browser
+    # suite. On 14 Sept the first run that did spent 16 minutes before it
+    # (coverage 490s, axe 154s, typecheck 129s, build 74s) and was killed 521s
+    # into e2e. A timeout reads as a test failure and blocks every deploy.
+    timeout-minutes: 45
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

@@ -75,11 +75,17 @@ describe("the changesets that gate the next release", () => {
   const workspace = workspacePackages();
   const all = changesets();
 
-  it("finds changesets to check at all", () => {
+  it("reads every changeset it finds", () => {
     // Guards the parser: a frontmatter format change would otherwise make
     // every assertion below pass against empty arrays.
-    expect(all.length).toBeGreaterThan(0);
-    expect(all.some((c) => c.packages.length > 0)).toBe(true);
+    //
+    // It used to require at least one changeset. Merging a Version PR consumes
+    // them all, so on 14 Sept that turned main red straight after the first
+    // release and failed the release job's own Test step before it could
+    // publish. An empty directory is a release that just happened; a file that
+    // parses to no packages is the parser failure this test exists to catch.
+    const unparsed = all.filter((c) => c.packages.length === 0).map((c) => c.file);
+    expect(unparsed, `no packages parsed from: ${unparsed.join(", ")}`).toEqual([]);
   });
 
   it("never mixes an ignored package with a released one", () => {

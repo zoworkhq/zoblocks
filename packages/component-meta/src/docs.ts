@@ -210,6 +210,7 @@ export const DOCUMENTED_ORDER: readonly string[] = [
   "recorder",
   "chart-context-menu",
   "data-grid",
+  "care-timeline",
 ];
 
 const DOCUMENTED = new Set(DOCUMENTED_ORDER);

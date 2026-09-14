@@ -19,6 +19,7 @@
 import { chromium } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
+import { isDocumented } from "@zoblocks/component-meta";
 import { CATALOG } from "../apps/docs/src/lib/generated/catalog";
 
 const requireFrom = createRequire(process.cwd() + "/");
@@ -27,11 +28,15 @@ const AXE_SOURCE = readFileSync(requireFrom.resolve("axe-core/axe.min.js"), "utf
 const BASE = process.argv[2] ?? "http://localhost:6001";
 
 /**
- * Every static page, plus one detail page per component in the generated
- * catalog. The component list used to be written out by hand here, which meant
- * a new component was audited only if someone remembered to add it, and a
- * removed one made the run fail on a 404. Deriving it from `pnpm gen` output
- * keeps the audit and the catalog the same list.
+ * Every static page, plus one detail page per documented component in the
+ * generated catalog. The component list used to be written out by hand here,
+ * which meant a new component was audited only if someone remembered to add
+ * it. Deriving it from `pnpm gen` output keeps the audit and the catalog the
+ * same list.
+ *
+ * Documented only: the route 404s for anything else. Until 14 Sept this took
+ * the whole catalog, so 15 of its pages were the not-found page, and each one
+ * "passed" by auditing a 404 instead of the component.
  */
 const PAGES = [
   "/",
@@ -42,7 +47,9 @@ const PAGES = [
   "/compare",
   "/showcase",
   "/marketplace",
-  ...CATALOG.map((component) => `/components/${component.name}`),
+  ...CATALOG.filter((component) => isDocumented(component.name)).map(
+    (component) => `/components/${component.name}`,
+  ),
 ];
 const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 

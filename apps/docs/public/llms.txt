@@ -79,9 +79,8 @@ Rules that matter when generating code with these components:
   fhir: CareTeam
   states: Available, In session — do not disturb, In group — eight patients, not one, On crisis line, On call, Signed out, with the cover named, Off shift, nobody covering, Presence degraded, with its age, Presence unknown, Assigned therapist, Compact — avatar only, Coverage resolved, Coverage gap, Someone else is documenting, Someone else is signing, Four in the chart, viewing only
   status: stable
-- Care Timeline: A patient's chronology that cannot be rendered without saying what it is a view of — the window, the sources, the filters and the order.
+- [Care Timeline](https://zoblocks.design/components/care-timeline): A patient's chronology that cannot be rendered without saying what it is a view of — the window, the sources, the filters and the order.
   install: npx @zoblocks/cli add care-timeline
-  docs: no page yet — this component installs from the registry today
   fhir: Encounter, Appointment, Communication, Observation, DiagnosticReport, Procedure, MedicationRequest, Immunization, DocumentReference, QuestionnaireResponse, Consent, Provenance
   states: Newest first, grouped by month, Planned, above the now marker, Lapsed — planned, and nothing recorded against it, Cancelled, Attempted and did not connect, Amended, with what changed, Entered in error, retained and struck, Restricted — it exists and you may not read it, Consent-gated, A thread with its own steps, A cluster, and a critical event promoted out of one, A stated gap in coverage, A source that could not be reached, Filtered, with the hidden count stated, New since last reviewed, An imprecise date, kept imprecise, No record · none in this window · none you may see, Patient-facing, with a result not yet reviewed
   status: experimental
