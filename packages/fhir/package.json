@@ -1,6 +1,6 @@
 {
   "name": "@zoblocks/fhir",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Narrow FHIR R4 type contracts and pure read helpers for healthcare UI. Zero runtime dependencies.",
   "license": "MIT",
   "homepage": "https://zoblocks.design",

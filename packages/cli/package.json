@@ -1,6 +1,6 @@
 {
   "name": "@zoblocks/cli",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Installs ZoBlocks components into your repository. Resolves the ZoBlocks registry, writes the source, and tells you what it touched.",
   "license": "MIT",
   "homepage": "https://zoblocks.design",

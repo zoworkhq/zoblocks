@@ -1,6 +1,6 @@
 {
   "name": "@zoblocks/theme",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Customer themes at runtime: the document model, the ramp generator, the three-point validation, and the CSS payload a published theme is served as.",
   "license": "MIT",
   "homepage": "https://zoblocks.design",

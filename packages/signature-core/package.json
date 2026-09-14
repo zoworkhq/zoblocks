@@ -1,6 +1,6 @@
 {
   "name": "@zoblocks/signature-core",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The capture engine behind ZoBlocks's signature component. Stroke model, smoothing, export, and the outcome union — no React, no DOM required, no dependencies.",
   "license": "MIT",
   "homepage": "https://zoblocks.design/components/signature",

@@ -1,6 +1,6 @@
 {
   "name": "@zoblocks/tokens",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "ZoBlocks design tokens: semantic clinical status, density modes, light/dark themes.",
   "license": "MIT",
   "homepage": "https://zoblocks.design",

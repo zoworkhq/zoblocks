@@ -1,6 +1,6 @@
 {
   "name": "@zoblocks/copilot",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A floating clinical copilot for Ant Design. Model-agnostic, source-attributed, and designed so that checking the answer is cheaper than accepting it.",
   "license": "MIT",
   "homepage": "https://zoblocks.design/components/copilot",
