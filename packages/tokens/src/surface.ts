@@ -1170,7 +1170,7 @@ export const TOKEN_SURFACE: readonly SurfaceEntry[] = [
     "component": "care-timeline",
     "source": "packages/react/src/styles.css",
     "kind": "color",
-    "semantic": "--zb-text-subtle",
+    "semantic": "--zb-text-muted",
     "frameworks": [],
     "fallback": true,
     "bridgeable": true

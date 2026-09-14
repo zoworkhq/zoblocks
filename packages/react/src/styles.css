@@ -10127,7 +10127,13 @@ button.zb-prov:focus-visible,
 
 .zb-care-timeline {
   --zb-care-timeline-divider: var(--zb-border, #e2e8f0);
-  --zb-care-timeline-meta: var(--zb-text-subtle, #64748b);
+  /*
+   * Secondary text is muted, not subtle. The token contract only holds
+   * text-subtle to AA on bg and surface (4.76:1 on white), and a timeline
+   * has no surface of its own: on a tinted card it fell to 4.24:1.
+   * text-muted clears AA on bg-subtle in every theme.
+   */
+  --zb-care-timeline-meta: var(--zb-text-muted, #475569);
 
   display: block;
   font-family: var(--zb-font-sans);
@@ -10192,7 +10198,7 @@ button.zb-prov:focus-visible,
   letter-spacing: 0.08em;
   text-transform: uppercase;
   font-weight: 600;
-  color: var(--zb-text-subtle);
+  color: var(--zb-text-muted);
   background: var(--zb-surface);
   position: sticky;
   inset-block-start: 0;
@@ -10210,7 +10216,7 @@ button.zb-prov:focus-visible,
   letter-spacing: 0;
   font-weight: 400;
   font-variant-numeric: tabular-nums;
-  color: var(--zb-text-subtle);
+  color: var(--zb-text-muted);
 }
 
 .zb-care-timeline__divider {
@@ -10223,8 +10229,14 @@ button.zb-prov:focus-visible,
   color: var(--zb-accent);
 }
 
+/* Amber text failed AA on tinted grounds (4.47:1); the rule carries it instead. */
 .zb-care-timeline__divider--now {
-  color: var(--zb-status-high);
+  color: var(--zb-text);
+}
+
+.zb-care-timeline__divider--now .zb-care-timeline__divider-rule {
+  background: var(--zb-status-high);
+  opacity: 1;
 }
 
 .zb-care-timeline__divider-rule {
@@ -10243,7 +10255,7 @@ button.zb-prov:focus-visible,
   letter-spacing: 0.07em;
   text-transform: uppercase;
   font-weight: 600;
-  color: var(--zb-text-subtle);
+  color: var(--zb-text-muted);
   margin-block-end: 0.125rem;
 }
 
@@ -10289,7 +10301,7 @@ button.zb-prov:focus-visible,
 .zb-care-timeline__item--in-error .zb-care-timeline__detail {
   text-decoration: line-through;
   text-decoration-thickness: 1px;
-  color: var(--zb-text-subtle);
+  color: var(--zb-text-muted);
 }
 
 .zb-care-timeline__note {
@@ -10348,7 +10360,7 @@ button.zb-prov:focus-visible,
 }
 
 .zb-care-timeline__step-time {
-  color: var(--zb-text-subtle);
+  color: var(--zb-text-muted);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -10453,7 +10465,7 @@ button.zb-prov:focus-visible,
 }
 
 .zb-care-timeline__source--excluded {
-  color: var(--zb-text-subtle);
+  color: var(--zb-text-muted);
 }
 
 .zb-care-timeline__source--excluded .zb-care-timeline__source-dot {
@@ -10511,7 +10523,7 @@ button.zb-prov:focus-visible,
 .zb-care-timeline__item--planned .zb-timeline__node {
   border-style: dashed;
   background: transparent;
-  color: var(--zb-text-subtle);
+  color: var(--zb-text-muted);
 }
 
 /* Register layout: which side an event is on IS its register, so this is the
@@ -10533,7 +10545,7 @@ button.zb-prov:focus-visible,
   letter-spacing: 0.08em;
   text-transform: uppercase;
   font-weight: 600;
-  color: var(--zb-text-subtle);
+  color: var(--zb-text-muted);
 }
 
 @media (min-width: 48rem) {
@@ -10573,7 +10585,7 @@ button.zb-prov:focus-visible,
 
 .zb-care-timeline__hint {
   font-size: var(--zb-text-xs);
-  color: var(--zb-text-subtle);
+  color: var(--zb-text-muted);
 }
 
 /* The group heading is a jump target, so it takes focus — without drawing a
@@ -10584,7 +10596,7 @@ button.zb-prov:focus-visible,
 }
 
 .zb-care-timeline__provenance {
-  color: var(--zb-text-subtle);
+  color: var(--zb-text-muted);
   font-weight: 400;
   text-transform: none;
   letter-spacing: 0;
@@ -10671,7 +10683,7 @@ button.zb-prov:focus-visible,
 }
 
 .zb-care-timeline__ago {
-  color: var(--zb-text-subtle);
+  color: var(--zb-text-muted);
 }
 
 .zb-care-timeline__banner-mark {
@@ -10693,7 +10705,7 @@ button.zb-prov:focus-visible,
 
 .zb-care-timeline__cluster-note {
   margin-inline-start: auto;
-  color: var(--zb-text-subtle);
+  color: var(--zb-text-muted);
 }
 
 /* The dotted rail. Its meaning is "records may be missing between these two
