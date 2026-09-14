@@ -1,5 +1,15 @@
 # @zoblocks/theme
 
+## 0.2.1
+
+### Patch Changes
+
+- Updated dependencies [470ee7e]
+  - @zoblocks/tokens@0.2.1
+  - @zoblocks/bridge-core@0.2.1
+  - @zoblocks/bridge-antd@0.2.1
+  - @zoblocks/bridge-mui@0.2.1
+
 ## 0.2.0
 
 ### Minor Changes
