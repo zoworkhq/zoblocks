@@ -71,7 +71,8 @@ const dockField = () => screen.getByRole("combobox", { name: DEFAULT_LOCALE.dock
 async function ask(user: ReturnType<typeof userEvent.setup>, text: string) {
   await user.type(dockField(), text);
   await user.keyboard("{Enter}");
-  await waitFor(() => expect(screen.getByRole("article")).toBeInTheDocument());
+  // The same 8s this file gives every other answer it waits for.
+  await waitFor(() => expect(screen.getByRole("article")).toBeInTheDocument(), { timeout: 8000 });
 }
 
 describe("the panel replaces the dock", () => {
@@ -85,7 +86,11 @@ describe("the panel replaces the dock", () => {
 
     expect(screen.queryByRole("complementary", { name: DEFAULT_LOCALE.dockLabel })).toBeNull();
     expect(screen.getAllByRole("button", { name: DEFAULT_LOCALE.send })).toHaveLength(1);
-  });
+    // The file's first test, so it absorbs the cold start of antd in jsdom as
+    // well as typing through the combobox. On 14 Sept a loaded CI runner took
+    // it past the 20s package timeout while every later `ask` in this file
+    // passed; four concurrent local runs all passed.
+  }, 45_000);
 
   it("carries the scope strip into the panel rather than losing it", async () => {
     const { user } = setup();
