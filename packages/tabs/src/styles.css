@@ -989,6 +989,18 @@
 }
 
 /* =====================================================================
+ * Hidden means hidden
+ *
+ * Every `display` above beats the UA `[hidden]` rule. The collapsed strip
+ * then sat visible beside its select, and a tab parked in the More menu
+ * showed twice. `!important` because `hidden` must win over any variant.
+ * ================================================================== */
+.zb-tabs__list[hidden],
+.zb-tabs__tab[hidden] {
+  display: none !important;
+}
+
+/* =====================================================================
  * Reduced motion
  *
  * Collapsed to 1ms rather than removed. Removing the transition means

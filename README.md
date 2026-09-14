@@ -363,13 +363,13 @@ words** — `expectStatedInWords` checks a state is readable without colour.
 
 ## Status
 
-Pre-release. The catalog is being rebuilt on a hardened foundation: **Loaders**
-and **Signature** ship today, and the clinical layer — which takes FHIR
-resources as props directly, with no adapter and no bespoke prop shape — follows.
+Pre-release. The registry carries loaders, signature, and a clinical layer that
+takes FHIR resources as props directly. Each component page states whether it is
+stable, beta or experimental.
 
-Nothing is published to npm yet; the release pipeline is gated and ready.
-Progress against the enterprise-readiness audit is tracked in
-[`ZOBLOCKS-UI-AUDIT.md`](ZOBLOCKS-UI-AUDIT.md).
+Nothing is published to npm yet; the release pipeline is gated and ready. The
+original enterprise-readiness audit is archived under
+[`content/archive/`](content/archive/).
 
 ---
 

@@ -196,6 +196,12 @@ export interface RecorderProps extends Omit<React.HTMLAttributes<HTMLDivElement>
    * has to surface, or the meter looks perfect under every condition.
    */
   readonly autoGainControl?: boolean;
+  /**
+   * How far the transcript trails the audio, in ms. The host's recogniser
+   * knows this; the component does not. Past four seconds while recording or
+   * transcribing, Stream says the transcript stalled.
+   */
+  readonly transcriptLagMs?: number;
   /** Milliseconds below the voice floor before the component escalates. */
   readonly silenceBudgetMs?: number;
   /**
@@ -280,6 +286,7 @@ export function Recorder({
   strikeWindowMs = 30_000,
   track = null,
   autoGainControl,
+  transcriptLagMs,
   silenceBudgetMs,
   motion = "auto",
   label = "Recorder",
@@ -339,9 +346,12 @@ export function Recorder({
     expectedDevice,
     disposition,
     autoGainControl,
+    transcriptLagMs,
     silenceBudgetMs,
   });
   const fault = primaryFault(faults);
+  // From every fault, not the primary: a worse one must not hide the stall.
+  const stalled = faults.some((candidate) => candidate.code === "recogniser-stalled");
 
   const lastFault = React.useRef<RecorderFault | null>(null);
   React.useEffect(() => {
@@ -351,8 +361,11 @@ export function Recorder({
     }
   }, [fault, onFault]);
 
-  const hasSignal = fault === null || fault.capturing === false ? true : false;
+  // A stalled recogniser says nothing about the audio, which is still arriving.
+  const hasSignal = fault === null || !fault.capturing || fault.code === "recogniser-stalled";
   const elapsed = frame?.elapsedMs ?? 0;
+  // Stream states the stall in place, politely. The banner would repeat it as an alert.
+  const bannerFault = variant === "stream" && fault?.code === "recogniser-stalled" ? null : fault;
 
   return (
     <RecorderFrame
@@ -364,6 +377,7 @@ export function Recorder({
       className={className}
       data-phase={phase}
       data-sensitivity={sensitivity}
+      data-stalled={variant === "stream" ? String(stalled) : undefined}
       aria-label={label}
       {...rest}
     >
@@ -382,7 +396,7 @@ export function Recorder({
           </span>
         </div>
       ) : (
-        <RecorderFaultBanner fault={fault} />
+        <RecorderFaultBanner fault={bannerFault} />
       )}
 
       {variant === "pulse" ? <PulseArt phase={phase} elapsed={elapsed} frame={frame} /> : null}
@@ -426,7 +440,7 @@ export function Recorder({
         />
       ) : null}
 
-      {variant === "stream" ? <StreamArt turns={turns} fault={fault} /> : null}
+      {variant === "stream" ? <StreamArt turns={turns} stalled={stalled} /> : null}
     </RecorderFrame>
   );
 }
@@ -756,14 +770,13 @@ function DuetArt({
  */
 function StreamArt({
   turns,
-  fault,
+  stalled,
 }: {
   readonly turns: readonly RecorderTurn[];
-  readonly fault: RecorderFault | null;
+  readonly stalled: boolean;
 }): React.JSX.Element {
-  const stalled = fault?.code === "recogniser-stalled";
   return (
-    <div data-stalled={stalled ? "true" : "false"}>
+    <div>
       <div className="zb-rec-log">
         {turns.map((turn) => (
           <div className="zb-rec-turn" key={turn.id}>

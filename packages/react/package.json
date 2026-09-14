@@ -83,14 +83,14 @@
     "check-tarball": "node scripts/check-tarball.mjs"
   },
   "devDependencies": {
-    "@zoblocks/tsconfig": "workspace:*",
     "@testing-library/jest-dom": "^7",
     "@testing-library/react": "^16",
     "@types/react": "^19.0.2",
+    "@zoblocks/tsconfig": "workspace:*",
     "jsdom": "^30",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "typescript": "^5.7.2",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.11"
   }
 }

@@ -34,6 +34,15 @@
 const NAME_LIKE =
   /^(name|names|given|givens|family|displayName|fullName|familyName|givenName|surname|firstName|lastName|patientName|chosenName|legalName|usualName|preferredName|title|label|text)$/;
 
+/** Nodes that wrap an expression without changing its value. */
+const WRAPPERS = new Set([
+  "ChainExpression",
+  "TSAsExpression",
+  "TSNonNullExpression",
+  "TSSatisfiesExpression",
+  "TSTypeAssertion",
+]);
+
 /** @type {import("eslint").Rule.RuleModule} */
 export default {
   meta: {
@@ -52,6 +61,10 @@ export default {
   create(context) {
     function isNameExpression(node) {
       if (!node) return false;
+
+      // identityKey={patient?.name} / {displayName as string} / {displayName!}
+      // The wrapper changes the type or the null handling, never the value.
+      if (WRAPPERS.has(node.type)) return isNameExpression(node.expression);
 
       // identityKey={displayName}
       if (node.type === "Identifier") return NAME_LIKE.test(node.name);

@@ -55,7 +55,8 @@ describe("yearsBetween", () => {
   });
 
   it("handles a year-only date", () => {
-    expect(yearsBetween("1985", NOW)).toBe(41);
+    // The fewest years 1985 allows on 16 Aug 2026; a birthday after today is 40.
+    expect(yearsBetween("1985", NOW)).toBe(40);
   });
 
   it("returns undefined for a future date", () => {
@@ -110,6 +111,72 @@ describe("resolveAge", () => {
 
   it("returns undefined for an unparseable death date", () => {
     expect(resolveAge("1961-01-04", NOW, "nonsense")).toBeUndefined();
+  });
+});
+
+describe("partial birth dates", () => {
+  const at = (iso: string) => new Date(`${iso}T09:00:00Z`);
+
+  it("does not age a month-precision date before that month begins", () => {
+    // "1985-03" was read as January, so staff saw 41 in February.
+    expect(yearsBetween("1985-03", at("2026-02-10"))).toBe(40);
+    expect(resolveAge("1985-03", at("2026-02-10"))?.text).toBe("40 y");
+  });
+
+  it("gives a range during the birth month, and the lower bound as a number", () => {
+    expect(yearsBetween("1985-03", at("2026-03-15"))).toBe(40);
+    expect(resolveAge("1985-03", at("2026-03-15"))?.text).toBe("40–41 y");
+    expect(resolveAge("1985-03", at("2026-04-01"))?.text).toBe("41 y");
+  });
+
+  it("gives a range for a year-only date until the year has passed", () => {
+    expect(yearsBetween("1985", NOW)).toBe(40);
+    expect(resolveAge("1985", NOW)?.text).toBe("40–41 y");
+    expect(resolveAge("1985", at("2026-12-31"))?.text).toBe("41 y");
+  });
+
+  it("keeps a year-only child under two in months, as a range", () => {
+    // Was "24320 mo": the year-only branch had no year at all.
+    expect(resolveAge("2025", NOW)?.text).toBe("7–19 mo");
+    expect(resolveAge("2026", NOW)?.text).toBe("0–7 mo");
+  });
+
+  it("uses months when the child might still be under two", () => {
+    expect(resolveAge("2024", NOW)?.text).toBe("19–31 mo");
+  });
+
+  it("never claims a single month for a month-precision infant", () => {
+    expect(resolveAge("2025-11", NOW)?.text).toBe("8–9 mo");
+    expect(resolveAge("2025-11", at("2026-08-30"))?.text).toBe("9 mo");
+  });
+
+  it("uses days and weeks as ranges for a month-precision neonate", () => {
+    expect(resolveAge("2026-08", NOW)?.text).toBe("0–15 d");
+    expect(resolveAge("2026-07", NOW)?.text).toBe("2–6 wk");
+    expect(resolveAge("2026-06", NOW)?.text).toBe("6–10 wk");
+  });
+
+  it("handles the short months", () => {
+    // February 2024 has 29 days, so on 28 Feb 2026 the child may not be two.
+    expect(resolveAge("2024-02", at("2026-02-28"))?.text).toBe("23–24 mo");
+    expect(resolveAge("2024-02", at("2026-03-01"))?.text).toBe("2 y");
+    // February 2025 has 28, so by the 28th every possible birthday has passed.
+    expect(resolveAge("2025-02", at("2026-02-28"))?.text).toBe("12 mo");
+  });
+
+  it("freezes a partial date's range at death", () => {
+    const age = resolveAge("1961", NOW, "2024-03-12");
+    expect(age).toMatchObject({ text: "62–63 y", atDeath: true });
+  });
+
+  it("returns undefined for a partial date wholly in the future", () => {
+    expect(yearsBetween("2026-09", NOW)).toBeUndefined();
+    expect(resolveAge("2027", NOW)).toBeUndefined();
+  });
+
+  it("returns undefined for an impossible month rather than guessing", () => {
+    expect(yearsBetween("1985-13", NOW)).toBeUndefined();
+    expect(resolveAge("1985-00", NOW)).toBeUndefined();
   });
 });
 

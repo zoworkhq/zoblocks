@@ -94,6 +94,13 @@ describe("no-disabled-with-reason", () => {
           errors: [{ messageId: "both" }],
           output: '<Switch label="Consent" readOnly lockedReason="Encounter signed." />',
         },
+        {
+          // The condition is kept. A bare `readOnly` would lock the control
+          // for everybody, including the people allowed to edit it.
+          code: '<Switch label="Consent" disabled={!canEdit} lockedReason="Encounter signed." />',
+          errors: [{ messageId: "both" }],
+          output: '<Switch label="Consent" readOnly={!canEdit} lockedReason="Encounter signed." />',
+        },
       ],
     });
   });

@@ -173,6 +173,10 @@ export default {
           items.value.expression.elements.every(
             (element) => element?.type === "ObjectExpression",
           ) &&
+          // A spread item could supply the href, same policy as a spread prop.
+          !items.value.expression.elements.some((element) =>
+            element.properties.some((property) => property.type === "SpreadElement"),
+          ) &&
           !hasHref
         ) {
           context.report({ node: items, messageId: "navWithoutHref" });

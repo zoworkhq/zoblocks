@@ -249,6 +249,38 @@ describe("createSignal — no source", () => {
   });
 });
 
+describe("createSignal — a smaller analyser", () => {
+  /**
+   * `AnalyserNode` fills only `fftSize` samples and leaves the rest of the
+   * array alone. Swapping to a smaller one used to leave the old tail in the
+   * buffer, read on every pass — a meter that never reached silence.
+   */
+  it("stops reading samples past the new analyser's fftSize", () => {
+    const loud = {
+      fftSize: 2048,
+      getFloatTimeDomainData(target: Float32Array) {
+        const n = Math.min(target.length, this.fftSize);
+        target.fill(0, 0, n);
+        target[n - 1] = 0.9;
+      },
+    };
+    const quiet = {
+      fftSize: 1024,
+      getFloatTimeDomainData(target: Float32Array) {
+        target.fill(0, 0, Math.min(target.length, this.fftSize));
+      },
+    };
+
+    const signal = createSignal({ source: loud, frameSize: 2048 });
+    expect(signal.step(16).level).toBeCloseTo(0.9, 6);
+
+    signal.setSource(quiet);
+    const frame = signal.pump(200, 16);
+    expect(frame.level).toBe(0);
+    expect(frame.quiet).toBe(true);
+  });
+});
+
 describe("createSignal — housekeeping", () => {
   it("notifies subscribers with every frame and stops on unsubscribe", () => {
     const signal = createSignal({ source: fakeSource(0.3) });

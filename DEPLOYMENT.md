@@ -48,6 +48,33 @@ nothing expires, and npm attests the tarball came from this repo at this commit.
 It has to be enabled on a package that already exists, so `NPM_TOKEN` remains
 supported as a fallback for the first publish of a new package.
 
+Before any release: `pnpm build && pnpm release:check`. It packs every
+publishable package with pnpm and fails on a missing README or LICENSE, an entry
+point absent from the tarball, a leftover `workspace:` range, test files, or an
+import Node cannot resolve. CI and the release job run the same script.
+
+### First publish under `@zoblocks`
+
+Nothing is on npm under this scope yet, so trusted publishing cannot be set up
+first. In order:
+
+1. **Token.** On npmjs.com, create a granular access token: read and write,
+   scoped to the `@zoblocks` org, 7-day expiry. Add it as the `NPM_TOKEN`
+   repository secret.
+2. **Version PR.** Either tick _Settings → Actions → General → Allow GitHub
+   Actions to create and approve pull requests_, or open the PR by hand from the
+   `changeset-release/main` branch the release job pushes. Check every package
+   reads `0.2.0` (`fhir` included) before merging.
+3. **Merge it.** The release job publishes all 27 packages with provenance.
+4. **Check.** `npm view @zoblocks/cli version` and
+   `npx @zoblocks/cli@latest add pulse-loader` in an empty project.
+5. **Switch to OIDC.** For each package on npmjs.com, add a trusted publisher:
+   repository `zoworkhq/zoblocks`, workflow `release.yml`. Then delete
+   `NPM_TOKEN` and revoke the token.
+6. **Retire the old scope.** Run `npm deprecate` on the two pre-rename packages
+   named in `.changeset/the-rename.md`, pointing each at its `@zoblocks`
+   equivalent. That changeset tells upgraders this has already happened.
+
 ## Setting up hq
 
 hq is a **separate Vercel project** on the same repository:

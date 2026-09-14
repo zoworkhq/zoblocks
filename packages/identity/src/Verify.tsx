@@ -34,6 +34,25 @@ export interface PatientVerifyProps {
   onFailure?: (attempt: string) => void;
 }
 
+const pad2 = (v = ""): string => v.padStart(2, "0");
+
+/**
+ * A typed date of birth as `YYYY-MM-DD`, or `undefined`.
+ *
+ * The prompt asks for DDMMYYYY, so bare digits are read that way. ISO order is
+ * accepted only with separators and the four-digit year first, where it cannot
+ * be misread.
+ */
+function typedBirthDate(entry: string): string | undefined {
+  const s = entry.trim();
+  const dmy =
+    /^(\d{2})(\d{2})(\d{4})$/.exec(s) ?? /^(\d{1,2})[\s/.-]+(\d{1,2})[\s/.-]+(\d{4})$/.exec(s);
+  if (dmy) return `${dmy[3]}-${pad2(dmy[2])}-${pad2(dmy[1])}`;
+  const ymd = /^(\d{4})[\s/.-]+(\d{1,2})[\s/.-]+(\d{1,2})$/.exec(s);
+  if (ymd) return `${ymd[1]}-${pad2(ymd[2])}-${pad2(ymd[3])}`;
+  return undefined;
+}
+
 export function PatientVerify(props: PatientVerifyProps): ReactNode {
   const { identity, action, mode = "initials", onConfirm, onCancel, onFailure } = props;
   const { policy } = useIdentityPolicy();
@@ -41,9 +60,16 @@ export function PatientVerify(props: PatientVerifyProps): ReactNode {
   const [state, setState] = useState<"idle" | "wrong" | "confirmed">("idle");
 
   const expected = useMemo(() => {
-    if (mode === "birth-date") return identity.birthDate?.value.replace(/-/g, "") ?? "";
+    // Day precision only. A partial date has no day to check, so it yields ""
+    // and never confirms — "1985" typed against "1985" proves nothing.
+    if (mode === "birth-date")
+      return /^\d{4}-\d{2}-\d{2}/.exec(identity.birthDate?.value ?? "")?.[0] ?? "";
     return identityInitials(identity.name, policy.locale);
   }, [identity, mode, policy.locale]);
+
+  // Birth-date mode with no full date on record can never pass. Offer no
+  // field to retype into; say why and point at a check that can work.
+  const noDateToCheck = mode === "birth-date" && expected === "";
 
   const submit = useCallback(() => {
     const given = entry
@@ -51,14 +77,16 @@ export function PatientVerify(props: PatientVerifyProps): ReactNode {
       .replace(/[\s/-]/g, "")
       .toUpperCase();
     if (!given) return;
-    if (given === expected.toUpperCase()) {
+    const matched =
+      mode === "birth-date" ? typedBirthDate(entry) === expected : given === expected.toUpperCase();
+    if (matched) {
       setState("confirmed");
       onConfirm();
       return;
     }
     setState("wrong");
     onFailure?.(given);
-  }, [entry, expected, onConfirm, onFailure]);
+  }, [entry, expected, mode, onConfirm, onFailure]);
 
   const label =
     mode === "birth-date"
@@ -76,7 +104,10 @@ export function PatientVerify(props: PatientVerifyProps): ReactNode {
       <div className="zb-verify__body">
         <p className="zb-verify__title">Confirm the patient before {action}</p>
         <p className="zb-verify__prompt">
-          You are about to <strong>{action}</strong>. {label}.
+          You are about to <strong>{action}</strong>.{" "}
+          {noDateToCheck
+            ? `${identity.birthDate ? "Date of birth has no day on record" : "Date of birth not recorded"}, so it cannot confirm this patient. Use initials or the wristband instead.`
+            : `${label}.`}
         </p>
         <div className="zb-verify__row">
           <div className="zb-verify__who">
@@ -91,27 +122,31 @@ export function PatientVerify(props: PatientVerifyProps): ReactNode {
                 .join(" · ")}
             </span>
           </div>
-          <label className="zb-verify__field">
-            <span className="zb-visually-hidden">{label}</span>
-            <input
-              className="zb-verify__input"
-              value={entry}
-              inputMode={mode === "birth-date" ? "numeric" : "text"}
-              autoComplete="off"
-              maxLength={mode === "birth-date" ? 10 : 4}
-              onChange={(e) => {
-                setEntry(e.target.value);
-                if (state === "wrong") setState("idle");
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") submit();
-              }}
-              placeholder={mode === "birth-date" ? "DDMMYYYY" : "Initials"}
-            />
-          </label>
-          <button type="button" className="zb-btn zb-btn--primary" onClick={submit}>
-            Confirm
-          </button>
+          {!noDateToCheck && (
+            <>
+              <label className="zb-verify__field">
+                <span className="zb-visually-hidden">{label}</span>
+                <input
+                  className="zb-verify__input"
+                  value={entry}
+                  inputMode={mode === "birth-date" ? "numeric" : "text"}
+                  autoComplete="off"
+                  maxLength={mode === "birth-date" ? 10 : 4}
+                  onChange={(e) => {
+                    setEntry(e.target.value);
+                    if (state === "wrong") setState("idle");
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") submit();
+                  }}
+                  placeholder={mode === "birth-date" ? "DDMMYYYY" : "Initials"}
+                />
+              </label>
+              <button type="button" className="zb-btn zb-btn--primary" onClick={submit}>
+                Confirm
+              </button>
+            </>
+          )}
           {onCancel && (
             <button type="button" className="zb-btn" onClick={onCancel}>
               Cancel

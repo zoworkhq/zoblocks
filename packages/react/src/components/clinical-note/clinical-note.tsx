@@ -828,6 +828,8 @@ export function ClinicalNote({
   });
 
   const [gateOpen, setGateOpen] = React.useState(false);
+  // Scoped per instance: a fixed id cross-wires two notes on one page.
+  const blockedId = `${React.useId()}-blocked`;
   const noteSections = React.useMemo(() => sections(api.doc), [api.doc]);
   const copied = Math.round(api.composition.ratio.copied * 100);
   const unreviewed = api.gate.findings.find(
@@ -986,7 +988,7 @@ export function ClinicalNote({
           <button
             type="button"
             onClick={() => setGateOpen(true)}
-            aria-describedby={api.gate.canSign ? undefined : "zb-note-blocked"}
+            aria-describedby={api.gate.canSign ? undefined : blockedId}
             className={cn(
               "inline-flex h-9 items-center gap-2 rounded-md px-4 text-sm font-medium",
               "bg-[var(--zb-accent)] text-[var(--zb-text-on-accent)] hover:bg-[var(--zb-accent-hover)]",
@@ -998,7 +1000,7 @@ export function ClinicalNote({
             Sign &amp; file
           </button>
           {!api.gate.canSign ? (
-            <span id="zb-note-blocked" className="sr-only">
+            <span id={blockedId} className="sr-only">
               {api.gate.blocking.length} item
               {api.gate.blocking.length === 1 ? "" : "s"} must be resolved before this note can be
               signed.

@@ -174,7 +174,7 @@ Rules that matter when generating code with these components:
   status: experimental
 - [Recorder](https://zoblocks.design/components/recorder): A capture surface that cannot lie about whether it is listening. Five arts over one signal engine, and thirteen failure modes it can tell apart.
   install: npx @zoblocks/cli add recorder
-  states: Recording, Armed, awaiting consent, Microphone muted, Device lost, Held, not yet uploaded, Playback with speakers, Playback without diarisation, Live transcript, Inline dictation, Single control
+  states: Recording, Armed, awaiting consent, Microphone muted, Device lost, Held, not yet uploaded, Playback with speakers, Playback without diarisation, Live transcript, Transcript stalled, Inline dictation, Single control
   status: beta
 
 ## Block

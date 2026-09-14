@@ -323,7 +323,8 @@ export function Copilot({
                   type="button"
                   aria-label="Start dictation"
                   onClick={api.dictation.start}
-                  className="grid size-8 shrink-0 place-items-center rounded-[10px] text-base text-[var(--zb-text-muted)]"
+                  disabled={api.state.status === "streaming" || api.state.status === "submitting"}
+                  className="grid size-8 shrink-0 place-items-center rounded-[10px] text-base text-[var(--zb-text-muted)] disabled:opacity-40"
                 >
                   <MicIcon />
                 </button>
@@ -615,7 +616,7 @@ function CopilotPanel({
                         <button
                           key={marker}
                           type="button"
-                          onClick={api.openSources}
+                          onClick={() => api.openSourcesFor(message.id)}
                           aria-label={citationLabel(marker, message.answer?.sources.get(marker))}
                           className="ms-px align-super rounded bg-[color-mix(in_oklab,var(--zb-accent)_15%,transparent)] px-1 text-[0.65em]"
                         >
@@ -631,7 +632,7 @@ function CopilotPanel({
                 <button
                   type="button"
                   aria-label="Helpful"
-                  onClick={() => api.sendFeedback("up")}
+                  onClick={() => api.sendFeedbackFor(message.id, "up")}
                   className="min-h-6 min-w-6 px-1"
                 >
                   <ThumbUpIcon />
@@ -639,7 +640,10 @@ function CopilotPanel({
                 <button
                   type="button"
                   aria-label="Not helpful"
-                  onClick={() => api.sendFeedback("down")}
+                  // No reason picker here, so record the thumbs-down at once.
+                  onClick={() =>
+                    api.sendFeedbackFor(message.id, "down", undefined, { askReason: false })
+                  }
                   className="min-h-6 min-w-6 px-1"
                 >
                   <ThumbDownIcon />
@@ -654,7 +658,8 @@ function CopilotPanel({
                 </button>
                 <button
                   type="button"
-                  onClick={api.openSources}
+                  // This answer's sources, not the latest answer's.
+                  onClick={() => api.openSourcesFor(message.id)}
                   className="inline-flex min-h-6 items-center gap-1 rounded-lg border border-[var(--zb-border)] px-2 py-0.5"
                 >
                   <VerifyIcon />
@@ -774,7 +779,8 @@ function CopilotPanel({
             </button>
           </div>
           <ol className="m-0 list-none p-0">
-            {api.sources.map((source, index) => (
+            {/* Numbered by citation marker, so "2" here is "2" in the answer. */}
+            {api.citations.map(({ marker, source }) => (
               <li
                 key={source.id}
                 className="border-t border-[var(--zb-border)] pt-2 first:border-t-0 first:pt-0"
@@ -784,7 +790,7 @@ function CopilotPanel({
                     aria-hidden="true"
                     className="rounded bg-[color-mix(in_oklab,var(--zb-accent)_15%,transparent)] px-1 text-xs"
                   >
-                    {index + 1}
+                    {marker}
                   </span>
                   {source.url ? (
                     <a
@@ -884,7 +890,9 @@ function CopilotPanel({
               type="button"
               aria-label="Start dictation"
               onClick={api.dictation.start}
-              className="min-h-6 min-w-6 rounded-lg px-1"
+              // Disabled mid-answer: dictating would leave `streaming` and remove Stop.
+              disabled={api.state.status === "streaming" || api.state.status === "submitting"}
+              className="min-h-6 min-w-6 rounded-lg px-1 disabled:opacity-40"
             >
               <MicIcon />
             </button>

@@ -68,6 +68,7 @@ ruleTester.run("no-hardcoded-count", noHardcodedCount, {
     // and a catalogue does not go from 3 to 4 unnoticed the way it goes from
     // 27 to 30.
     { code: "const a = <p>3 density modes.</p>;" },
+    { code: "const a = <p>3 components ship today.</p>;" },
   ],
 
   invalid: [

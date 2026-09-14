@@ -22,7 +22,11 @@
 
 import * as React from "react";
 import { ConfigProvider } from "antd";
-import { useZoBlocksTokens, type ZoBlocksTokens } from "@zoblocks/bridge-core";
+import {
+  useZoBlocksTokens,
+  type UseZoBlocksTokensOptions,
+  type ZoBlocksTokens,
+} from "@zoblocks/bridge-core";
 import { toAntdTheme } from "./inverse";
 
 export interface ZoBlocksAntdProviderProps {
@@ -37,10 +41,22 @@ export interface ZoBlocksAntdProviderProps {
   fallback?: ZoBlocksTokens;
   /** Merged over the derived tokens, so a host can keep a deliberate exception. */
   override?: Record<string, string | number>;
+  /**
+   * The element whose brand to read, when it is not the document's.
+   *
+   * A brand set on a wrapper (`data-zb-brand` on a section) is invisible from
+   * `<html>`; without this the provider themes the app in the root brand.
+   */
+  scope?: UseZoBlocksTokensOptions["scope"];
 }
 
-export function ZoBlocksAntdProvider({ children, fallback, override }: ZoBlocksAntdProviderProps) {
-  const tokens = useZoBlocksTokens({ fallback });
+export function ZoBlocksAntdProvider({
+  children,
+  fallback,
+  override,
+  scope,
+}: ZoBlocksAntdProviderProps) {
+  const tokens = useZoBlocksTokens({ fallback, scope });
 
   const theme = React.useMemo(() => {
     const derived = toAntdTheme(tokens);

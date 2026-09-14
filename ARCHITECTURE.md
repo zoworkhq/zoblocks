@@ -16,7 +16,7 @@ arguments.
 
 ## 1. The scaling problem, stated concretely
 
-The repository today ships 24 components through the ZoBlocks registry and works
+The repository today ships about thirty components through the ZoBlocks registry and works
 well at that size. Three properties of it do not survive multiplication.
 
 ### 1.1 Adding one component edits five shared files

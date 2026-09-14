@@ -29,6 +29,7 @@ export default defineComponentMeta({
     "Playback with speakers",
     "Playback without diarisation",
     "Live transcript",
+    "Transcript stalled",
     "Inline dictation",
     "Single control",
   ],
@@ -97,6 +98,9 @@ export default defineComponentMeta({
   expectedDevice={{ deviceId: "jabra", label: "Jabra Link 380" }}
   onFault={(fault) => fault && report(fault.code)}
 />
+
+// Live transcript. Pass the recogniser's lag; past 4 s it says it stalled.
+<Recorder variant="stream" phase="recording" turns={turns} transcriptLagMs={lagMs} />
 
 // Reviewing the take. Peaks and speakers come from the ingest sidecar.
 <Recorder

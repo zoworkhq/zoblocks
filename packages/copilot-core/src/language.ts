@@ -174,10 +174,14 @@ export function findStigma(
   return findings.sort((a, b) => a.index - b.index);
 }
 
-/** Spans inside straight or curly quotes, so quoted speech is left alone. */
+/**
+ * Spans inside straight or curly quotes, so quoted speech is left alone. A
+ * single quote touching a letter on the inside only ("patient's", "he's") is an
+ * apostrophe, never the start or end of a quotation.
+ */
 function quotedRanges(text: string): Array<[number, number]> {
   const ranges: Array<[number, number]> = [];
-  const pattern = /(["“'‘])(.*?)(["”'’])/gs;
+  const pattern = /["“].*?["”]|(?<![\p{L}\p{N}])['‘].*?['’](?![\p{L}\p{N}])/gsu;
   let match: RegExpExecArray | null;
   while ((match = pattern.exec(text)) !== null) {
     ranges.push([match.index, match.index + match[0].length]);

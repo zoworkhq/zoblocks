@@ -20,7 +20,7 @@
 
 import * as React from "react";
 import { describeTrigger, interpolate, type TabItem } from "@zoblocks/tabs-core";
-import { idFor, useTabsContext, type TriggerVisuals } from "./context.js";
+import { idFor, OverflowedValues, useTabsContext, type TriggerVisuals } from "./context.js";
 import { useIsoLayoutEffect } from "./internal.js";
 
 export interface TabsTriggerProps
@@ -128,6 +128,9 @@ export const TabsTrigger = React.forwardRef<HTMLElement, TabsTriggerProps>(funct
       entry.item = item;
       entry.element = elementRef.current;
     }
+    // A keyed trigger that moves does not re-register, so order is re-checked
+    // against the DOM on every commit.
+    ctx.orderRegistry();
   });
 
   const selected = ctx.value === value;
@@ -142,10 +145,19 @@ export const TabsTrigger = React.forwardRef<HTMLElement, TabsTriggerProps>(funct
    * during SSR — the registry is populated by a layout effect, which never
    * runs on the server — leaving the strip with no tab stop at all for anyone
    * who reaches it before hydration. Keying off the selected *value* needs no
-   * registry, and the "first item when nothing is selected" fallback keeps the
-   * group reachable once the registry does exist.
+   * registry, and the fallback keeps the group reachable once the registry
+   * does exist.
+   *
+   * The fallback covers a value that matches no trigger too — a stale
+   * controlled value, say. Keying it off `value === undefined` alone left
+   * every trigger at -1 there. It lands on the first enabled trigger.
    */
-  const tabIndex = selected ? 0 : ctx.value === undefined && index === 0 ? 0 : -1;
+  const entries = ctx.triggers.current;
+  const matched = ctx.value !== undefined && entries.some((entry) => entry.value === ctx.value);
+  const firstEnabled = entries.findIndex((entry) => !entry.item.disabled);
+  const fallback = matched ? -1 : Math.max(firstEnabled, 0);
+  const overflowed = React.useContext(OverflowedValues).has(value);
+  const tabIndex = overflowed ? -1 : selected || (index >= 0 && index === fallback) ? 0 : -1;
 
   /*
    * The announced name, composed rather than assembled from nodes.
@@ -211,6 +223,9 @@ export const TabsTrigger = React.forwardRef<HTMLElement, TabsTriggerProps>(funct
     "data-zb-state": state,
     "data-zb-availability": availability,
     "data-zb-selected": selected || undefined,
+    // Parked in the More menu: out of the strip and the accessibility tree.
+    "data-zb-overflowed": overflowed ? "" : undefined,
+    hidden: overflowed || undefined,
     onClick: handleClick,
     ...(composedLabel ? { "aria-label": composedLabel } : {}),
     ...(disabled ? { "aria-disabled": true as const } : {}),

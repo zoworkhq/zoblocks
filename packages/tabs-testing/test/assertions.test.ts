@@ -280,6 +280,26 @@ describe("expectNamedList", () => {
     const list = document.querySelector("[role='tablist']") as Element;
     expect(() => expectNamedList(list)).not.toThrow();
   });
+
+  it("accepts an aria-labelledby that lists several ids", () => {
+    mount(`
+      <div>
+        <h2 id="title">Chart</h2>
+        <span id="count">4 sections</span>
+        <div role="tablist" aria-labelledby="title  count"><button role="tab" tabindex="0">A</button></div>
+      </div>`);
+    const list = document.querySelector("[role='tablist']") as Element;
+    expect(() => expectNamedList(list)).not.toThrow();
+  });
+
+  it("catches an aria-labelledby whose ids all miss", () => {
+    mount(`
+      <div>
+        <div role="tablist" aria-labelledby="gone also-gone"><button role="tab" tabindex="0">A</button></div>
+      </div>`);
+    const list = document.querySelector("[role='tablist']") as Element;
+    expect(() => expectNamedList(list)).toThrow(/no accessible name/);
+  });
 });
 
 describe("expectDiscoverableDisabled", () => {
@@ -292,6 +312,21 @@ describe("expectDiscoverableDisabled", () => {
                   aria-disabled="true" aria-describedby="why">B</button>
         </div>
         <span id="why">Restricted — request access</span>
+      </div>`);
+    const list = document.querySelector("[role='tablist']") as Element;
+    expect(() => expectDiscoverableDisabled(list)).not.toThrow();
+  });
+
+  it("accepts an aria-describedby that lists several ids", () => {
+    mount(`
+      <div>
+        <div role="tablist" aria-label="Chart">
+          <button role="tab" aria-selected="true" tabindex="0">A</button>
+          <button role="tab" aria-selected="false" tabindex="-1"
+                  aria-disabled="true" aria-describedby="why how">B</button>
+        </div>
+        <span id="why">Restricted</span>
+        <span id="how">Request access</span>
       </div>`);
     const list = document.querySelector("[role='tablist']") as Element;
     expect(() => expectDiscoverableDisabled(list)).not.toThrow();

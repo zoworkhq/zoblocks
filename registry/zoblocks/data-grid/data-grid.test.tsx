@@ -44,6 +44,7 @@ import {
   toggleAllGridSelection,
   toggleGridSelection,
   type GridColumnSpec,
+  type GridValue,
 } from "@/lib/zoblocks-grid";
 
 const COLUMNS = CASELOAD_COLUMNS as DataGridColumn<CaseloadRow>[];
@@ -164,6 +165,76 @@ describe("absence is a value, not a hole", () => {
     expect(compareGridValues("44", "044", "identifier")).toBeGreaterThan(0);
     // A number column does the opposite, correctly.
     expect(compareGridValues(9, 10, "number")).toBeLessThan(0);
+  });
+
+  it("sorts a result with a comparator by its number, never as NaN", () => {
+    // eGFR ">90" and troponin "<0.01" are strings; `Number(">90")` is NaN, and
+    // a NaN comparator left a critical value wherever it happened to land.
+    type Lab = { id: string; value: GridValue };
+    const column: GridColumnSpec<Lab> = {
+      key: "value",
+      header: "Result",
+      kind: "measure",
+      value: (row) => row.value,
+    };
+    const rows: Lab[] = [
+      { id: "haemolysed", value: "haemolysed" },
+      { id: "gt90", value: ">90" },
+      { id: "absent", value: { absent: "awaiting" } },
+      { id: "n45", value: 45 },
+      { id: "lt001", value: "<0.01" },
+      { id: "n90", value: "90" },
+      { id: "ge90", value: ">= 90" },
+      { id: "le90", value: "<=90" },
+      { id: "lt90", value: "<90" },
+      { id: "n0.5", value: 0.5 },
+      { id: "nan", value: Number.NaN },
+      { id: "empty", value: "" },
+      { id: "bool", value: true },
+    ];
+
+    const up = sortGridRows(rows, column, "ascending").map((row) => row.id);
+    expect(up).toEqual([
+      "lt001",
+      "n0.5",
+      "n45",
+      "lt90",
+      "le90",
+      "n90",
+      "ge90",
+      "gt90",
+      // Text that is not a number sits after numbers in both directions, above
+      // absence; among itself it follows the direction like any text.
+      "empty",
+      "haemolysed",
+      "nan",
+      "bool",
+      "absent",
+    ]);
+
+    const down = sortGridRows(rows, column, "descending").map((row) => row.id);
+    expect(down).toEqual([
+      "gt90",
+      "ge90",
+      "n90",
+      "le90",
+      "lt90",
+      "n45",
+      "n0.5",
+      "lt001",
+      "bool",
+      "nan",
+      "haemolysed",
+      "empty",
+      "absent",
+    ]);
+
+    expect(compareGridValues("<0.01", 0.01, "number")).toBeLessThan(0);
+    expect(compareGridValues(">90", "90", "number")).toBeGreaterThan(0);
+    expect(compareGridValues("90", 90, "number")).toBe(0);
+    expect(compareGridValues("haemolysed", 1e9, "number")).toBeGreaterThan(0);
+    expect(compareGridValues(1e9, "haemolysed", "number")).toBeLessThan(0);
+    expect(Number.isNaN(compareGridValues("x", "y", "measure"))).toBe(false);
   });
 });
 

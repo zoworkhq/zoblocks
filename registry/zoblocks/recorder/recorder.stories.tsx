@@ -177,6 +177,17 @@ export const LiveTranscript: Story = {
   },
 };
 
+export const TranscriptStalled: Story = {
+  name: "Transcript stalled",
+  parameters: { state: "Transcript stalled" },
+  args: { variant: "stream", phase: "recording", turns: TURNS, transcriptLagMs: 7_000 },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // The recogniser is behind, not the recorder, and the status says which.
+    await expect(canvas.getByRole("status")).toHaveTextContent(/Transcript stalled/);
+  },
+};
+
 export const InlineDictation: Story = {
   name: "Inline dictation",
   parameters: { state: "Inline dictation" },

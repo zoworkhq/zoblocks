@@ -2245,6 +2245,8 @@ export const TimeRangeField = React.forwardRef<HTMLDivElement, TimeRangeFieldPro
       (candidate: number, from: number | null): string | null => {
         if (from == null) return null;
         const span = candidate - from;
+        // Empty, not a full day — the same rule `timeRangeMinutes` applies.
+        if (span === 0) return "the same as the start time";
         const length = span > 0 ? span : allowOvernight ? span + 1440 : span;
         if (length <= 0) return "before the start time";
         if (minDurationMinutes != null && length < minDurationMinutes) {
@@ -2286,9 +2288,10 @@ export const TimeRangeField = React.forwardRef<HTMLDivElement, TimeRangeFieldPro
         ? {
             tone: "error",
             invalid: true,
-            text: allowOvernight
-              ? "Choose an end time. This span is empty."
-              : "The end time is before the start time. Turn on overnight spans if that is what you meant.",
+            text:
+              duration === 0
+                ? "Choose an end time. This span is empty."
+                : "The end time is before the start time. Turn on overnight spans if that is what you meant.",
           }
         : duration != null && minDurationMinutes != null && duration < minDurationMinutes
           ? {
@@ -3578,6 +3581,9 @@ export const TimeSlotGrid = React.forwardRef<HTMLDivElement, TimeSlotGridProps>(
     } = props;
 
     const groups = React.useMemo(() => groupSlots(set.slots), [set.slots]);
+    // Scopes the group heading ids. `morning-head` alone collides with a second
+    // grid on the page, whose groups then read the first grid's headings.
+    const reactId = React.useId();
     const stale = now ? isStale(set, now) : false;
     const ageMinutes = now ? Math.max(0, Math.round(secondsSince(set, now) / 60)) : 0;
 
@@ -3624,12 +3630,16 @@ export const TimeSlotGrid = React.forwardRef<HTMLDivElement, TimeSlotGridProps>(
         <div className={cn(stale && "zb-dt-slots--stale")}>
           {groups.map((group) => (
             <section key={group.part} className="zb-dt-slotgroup">
-              <h6 className="zb-dt-slotgroup__head" id={`${group.part}-head`}>
+              <h6 className="zb-dt-slotgroup__head" id={`${reactId}-${group.part}-head`}>
                 {group.label}
                 <span className="zb-dt-slotgroup__rule" aria-hidden="true" />
                 <span>{`${group.openCount} open`}</span>
               </h6>
-              <div className="zb-dt-slots" role="group" aria-labelledby={`${group.part}-head`}>
+              <div
+                className="zb-dt-slots"
+                role="group"
+                aria-labelledby={`${reactId}-${group.part}-head`}
+              >
                 {group.slots.map((slot) => (
                   <SlotButton
                     key={slot.id}

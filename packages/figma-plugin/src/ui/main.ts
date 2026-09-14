@@ -9,7 +9,8 @@
  */
 
 import type { CollectionSummary, FromUi, Standing } from "../protocol";
-import { readUiMessage } from "../protocol";
+import { readUiEvent } from "../protocol";
+import { latestOnly } from "./latest";
 import {
   appApi,
   readOrigin,
@@ -55,6 +56,14 @@ const state: State = {
   anchor: "",
   busy: false,
 };
+
+/*
+ * One sequence per writer of `state.payload`. A theme fetch that lands after
+ * the designer picked another is dropped, or Apply sends the old theme under
+ * the new theme's preview.
+ */
+const payloadRequests = latestOnly();
+const previewRequests = latestOnly();
 
 function send(message: FromUi): void {
   parent.postMessage({ pluginMessage: message }, "*");
@@ -125,6 +134,9 @@ function paint(): void {
         onChoose: (slug) => {
           state.theme = slug;
           state.preview = undefined;
+          // A preview fetch still in flight is for the theme just left.
+          previewRequests.cancel();
+          state.busy = false;
           paint();
         },
         onPreview: () => void previewPull(),
@@ -224,7 +236,9 @@ async function loadPayload(slug: string): Promise<void> {
   const client = api();
   if (!client) return;
 
+  const isCurrent = payloadRequests.begin();
   const result = await client.resolved(slug);
+  if (!isCurrent() || state.theme !== slug) return;
   if (!result.ok) {
     fail(result.error);
     return;
@@ -236,13 +250,17 @@ async function loadPayload(slug: string): Promise<void> {
 
 async function previewPull(): Promise<void> {
   const client = api();
-  if (!client || !state.theme) return;
+  const slug = state.theme;
+  if (!client || !slug) return;
 
   state.busy = true;
   state.preview = undefined;
   paint();
 
-  const result = await client.resolved(state.theme);
+  const isCurrent = previewRequests.begin();
+  const result = await client.resolved(slug);
+  // Stale: a newer preview owns `busy`, or `onChoose` already reset it.
+  if (!isCurrent() || state.theme !== slug) return;
   state.busy = false;
   if (!result.ok) {
     fail(result.error);
@@ -254,10 +272,12 @@ async function previewPull(): Promise<void> {
 }
 
 async function applyPull(): Promise<void> {
-  if (!state.payload) return;
+  // Applies only what is on screen: the payload, the preview and the pick agree.
+  const { payload, preview, theme } = state;
+  if (!payload || !preview || payload.slug !== theme || preview.slug !== theme) return;
   state.busy = true;
   paint();
-  send({ type: "apply", payload: state.payload });
+  send({ type: "apply", payload });
 }
 
 async function propose(): Promise<void> {
@@ -290,7 +310,9 @@ function fail(message: string): void {
 /* --------------------------------------------------------------- messages */
 
 window.onmessage = (event: MessageEvent) => {
-  const message = readUiMessage(event.data);
+  // Only Figma's host window, and only in its envelope. Any other frame that
+  // can reach this one could otherwise hand the panel a credential to spend.
+  const message = readUiEvent(event, parent);
   if (!message) return;
 
   switch (message.type) {
@@ -320,6 +342,8 @@ window.onmessage = (event: MessageEvent) => {
     }
 
     case "preview": {
+      // A diff for the theme just left. `onChoose` already reset `busy`.
+      if (message.preview.slug !== state.theme) return;
       state.busy = false;
       state.preview = message.preview;
       paint();

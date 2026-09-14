@@ -58,6 +58,20 @@ const VALID_MODES = new Set<SemanticMode>(["tabs", "nav", "radiogroup", "steps"]
 /** Stable empty list, so the skip path does not churn the effect deps. */
 const EMPTY_ITEMS: readonly TabItem[] = [];
 
+/** Sorts the registry into DOM order in place. True when anything moved. */
+function sortByDocument(list: RegisteredTrigger[]): boolean {
+  const after = (a: RegisteredTrigger, b: RegisteredTrigger) =>
+    a.element !== null &&
+    b.element !== null &&
+    (b.element.compareDocumentPosition(a.element) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
+  const inOrder = list.every(
+    (entry, index) => index === 0 || !after(list[index - 1] as RegisteredTrigger, entry),
+  );
+  if (inOrder) return false;
+  list.sort((a, b) => (after(a, b) ? 1 : -1));
+  return true;
+}
+
 export interface TabsEditable {
   onClose?: (value: string) => void;
   onAdd?: () => void;
@@ -110,8 +124,8 @@ export interface TabsRootProps extends Omit<React.HTMLAttributes<HTMLDivElement>
    */
   mount?: MountStrategy;
   /**
-   * Restore each panel's scroll position when it is selected again. Off by default, because on
-   * a clinical surface returning to where somebody was is sometimes wrong.
+   * Restore each panel's scroll position when it is selected again. On by default; turn it off
+   * where returning somebody to where they were would be wrong.
    */
   keepScroll?: boolean;
   /**
@@ -277,10 +291,16 @@ export const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps>(function
     auditRef.current?.(at ? { ...event, at } : event);
   }, []);
 
+  // Read at request time, so a guard closing over `isDirty` sees today's value
+  // and one added after mount counts. Rebuilding the gate instead would drop
+  // an in-flight veto.
+  const beforeChangeRef = React.useRef(onBeforeChange);
+  beforeChangeRef.current = onBeforeChange;
+
   const gate = React.useMemo(
     () =>
       createChangeGate({
-        onBeforeChange,
+        onBeforeChange: (next, previous) => beforeChangeRef.current?.(next, previous) ?? true,
         onCommit: (next, source) => {
           runWithTransition(transitionRef.current === "view", () => setValue(next, source));
           setVisited((current) => {
@@ -293,9 +313,6 @@ export const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps>(function
         },
         onPendingChange: setPending,
       }),
-    // `onBeforeChange` is read through the closure at request time by design:
-    // recreating the gate on every render would drop an in-flight veto.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [setValue, audit],
   );
 
@@ -336,14 +353,33 @@ export const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps>(function
 
   const selectRef = React.useRef<(v: string, s: ChangeSource, i?: TabItem) => void>(() => {});
 
+  /*
+   * A URL value that names no tab is held, not committed.
+   *
+   * Committing `?tab=bogus` selected nothing and left every trigger at
+   * tabindex -1. It is applied if a matching tab registers later, so a deep
+   * link into tabs that load after mount still lands.
+   */
+  const pendingUrl = React.useRef<string | undefined>(undefined);
+  const fromUrl = React.useCallback((next: string) => {
+    const known = triggers.current.some((entry) => entry.value === next);
+    pendingUrl.current = known ? undefined : next;
+    if (known) selectRef.current(next, "url");
+  }, []);
+
+  React.useEffect(() => {
+    const next = pendingUrl.current;
+    if (next === undefined || !items.some((item) => item.value === next)) return;
+    pendingUrl.current = undefined;
+    selectRef.current(next, "url");
+  }, [items]);
+
   React.useEffect(() => {
     if (syncTo === false) return;
     const initial = adapter.read();
-    if (initial !== undefined && initial !== value) {
-      selectRef.current(initial, "url");
-    }
+    if (initial !== undefined && initial !== value) fromUrl(initial);
     return adapter.subscribe((next) => {
-      if (next !== undefined) selectRef.current(next, "url");
+      if (next !== undefined) fromUrl(next);
     });
     // Runs once per adapter: re-running on every value change would fight the
     // user's own navigation.
@@ -359,6 +395,8 @@ export const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps>(function
   /* ---------------- selection --------------------------------------- */
   const select = React.useCallback(
     (next: string, source: ChangeSource, item?: TabItem) => {
+      // Someone chose; a deep link still waiting for its tab no longer applies.
+      if (source !== "url") pendingUrl.current = undefined;
       const list = triggers.current.map((entry) => entry.item);
       const resolved = item ?? list.find((candidate) => candidate.value === next);
 
@@ -418,8 +456,15 @@ export const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps>(function
     select: (next, source, item) => selectRef.current(next, source, item),
   });
 
+  // Keyed triggers move without re-registering; each commit re-checks order.
+  const orderRegistry = React.useCallback(() => {
+    if (sortByDocument(triggers.current)) setRegistryVersion((n) => n + 1);
+  }, []);
+
   const register = React.useCallback((entry: RegisteredTrigger) => {
     triggers.current.push(entry);
+    // A tab inserted mid-strip appends here; put it where the DOM has it.
+    sortByDocument(triggers.current);
     setRegistryVersion((n) => n + 1);
     return () => {
       const index = triggers.current.indexOf(entry);
@@ -465,6 +510,7 @@ export const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps>(function
       select,
       triggers,
       register,
+      orderRegistry,
       registryVersion,
       visited,
       panels,
@@ -495,6 +541,7 @@ export const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps>(function
       pending,
       select,
       register,
+      orderRegistry,
       registryVersion,
       visited,
       panels,

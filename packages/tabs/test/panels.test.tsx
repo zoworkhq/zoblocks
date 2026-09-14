@@ -167,6 +167,57 @@ describe("panel focusability", () => {
   });
 });
 
+describe("keepScroll", () => {
+  /**
+   * A browser drops a `display: none` element's scroll offset, so reading it
+   * after `hidden` lands always gives 0. This stub does the same.
+   */
+  function stubPanelScroll(panel: HTMLElement) {
+    let stored = 0;
+    new MutationObserver(() => {
+      if (panel.hidden) stored = 0;
+    }).observe(panel, { attributes: true, attributeFilter: ["hidden"] });
+    Object.defineProperty(panel, "scrollTop", {
+      configurable: true,
+      get: () => (panel.hidden ? 0 : stored),
+      set: (next: number) => {
+        stored = panel.hidden ? 0 : next;
+      },
+    });
+  }
+
+  const items = [
+    { value: "a", label: "A", children: <p>Long list</p> },
+    { value: "b", label: "B", children: <p>Other</p> },
+  ];
+
+  it("restores a panel's scroll offset after switching away and back", async () => {
+    render(<Tabs as="tabs" aria-label="Chart" defaultValue="a" items={items} />);
+    const panel = screen.getByRole("tabpanel");
+    stubPanelScroll(panel);
+    panel.scrollTop = 240;
+    panel.dispatchEvent(new Event("scroll"));
+
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("tab", { name: "B" }));
+    await user.click(screen.getByRole("tab", { name: "A" }));
+    expect(panel.scrollTop).toBe(240);
+  });
+
+  it("leaves the offset alone when turned off", async () => {
+    render(<Tabs as="tabs" aria-label="Chart" defaultValue="a" items={items} keepScroll={false} />);
+    const panel = screen.getByRole("tabpanel");
+    stubPanelScroll(panel);
+    panel.scrollTop = 240;
+    panel.dispatchEvent(new Event("scroll"));
+
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("tab", { name: "B" }));
+    await user.click(screen.getByRole("tab", { name: "A" }));
+    expect(panel.scrollTop).toBe(0);
+  });
+});
+
 describe("controlled and uncontrolled", () => {
   it("an uncontrolled strip selects the first enabled tab when given no default", () => {
     render(

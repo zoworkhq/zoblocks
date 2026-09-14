@@ -158,6 +158,8 @@ export function CheckNotices(props: { findings: readonly CheckFinding[] }): Reac
  */
 export function SourcesPanel(props: {
   sources: readonly Source[];
+  /** Citation marker per source, so the numbers match the answer's. Defaults to position. */
+  markers?: readonly number[];
   onClose: () => void;
 }): React.ReactNode {
   const locale = useLocale();
@@ -175,7 +177,7 @@ export function SourcesPanel(props: {
           <li key={source.id} className="zb-copilot-source">
             <div className="zb-copilot-source-title">
               <span className="zb-copilot-source-marker" aria-hidden="true">
-                {index + 1}
+                {props.markers?.[index] ?? index + 1}
               </span>
               {source.url ? (
                 <a href={source.url} target="_blank" rel="noreferrer noopener">
@@ -398,8 +400,10 @@ function humanise(field: string): string {
  */
 export function ProposalCard(props: { api: CopilotApi }): React.ReactNode {
   const locale = useLocale();
-  const { proposal } = props.api;
+  const { proposal, proposalRisk } = props.api;
   if (!proposal) return null;
+  // A prohibited proposal renders no confirm control at all (actions.ts).
+  const prohibited = proposalRisk === "prohibited";
 
   return (
     <section className="zb-copilot-proposal" aria-label={locale.proposalTitle}>
@@ -410,14 +414,21 @@ export function ProposalCard(props: { api: CopilotApi }): React.ReactNode {
         ) : null}
         <ins className="zb-copilot-diff-added">{proposal.content}</ins>
       </div>
+      {prohibited ? (
+        <p className="zb-copilot-notice" role="status">
+          {locale.proposalProhibited}
+        </p>
+      ) : null}
       <Space>
         {/* Discard first, and autofocused. Confirm is never the default. */}
         <Button autoFocus onClick={props.api.dismissProposal}>
           {locale.proposalDismiss}
         </Button>
-        <Button type="primary" onClick={props.api.confirm}>
-          {locale.proposalConfirm}
-        </Button>
+        {prohibited ? null : (
+          <Button type="primary" onClick={props.api.confirm}>
+            {locale.proposalConfirm}
+          </Button>
+        )}
       </Space>
     </section>
   );

@@ -170,6 +170,33 @@ describe("stopping", () => {
 
     await waitFor(() => expect(screen.getByText(DEFAULT_LOCALE.stoppedNotice)).toBeInTheDocument());
   });
+
+  it("disables dictation while an answer is in flight, so Stop stays reachable", async () => {
+    const hanging = {
+      ...createStaticProvider({ events: [], disclosure }),
+      async *send(_request: unknown, signal: AbortSignal) {
+        yield { type: "delta", text: "Partial" } as const;
+        await new Promise<void>((resolve) => {
+          if (signal.aborted) return resolve();
+          signal.addEventListener("abort", () => resolve(), { once: true });
+        });
+        yield { type: "done", finish: "aborted" } as const;
+      },
+    };
+    const { user } = setup({ provider: hanging as never });
+
+    await user.type(field(), "AF?{Enter}");
+    const stop = await screen.findByRole("button", { name: DEFAULT_LOCALE.stop });
+    for (const mic of screen.getAllByRole("button", { name: DEFAULT_LOCALE.startDictation })) {
+      expect(mic).toBeDisabled();
+    }
+    await user.click(stop);
+    await waitFor(() =>
+      expect(
+        screen.getAllByRole("button", { name: DEFAULT_LOCALE.startDictation })[0],
+      ).toBeEnabled(),
+    );
+  });
 });
 
 describe("refusals without a redirect", () => {
@@ -308,5 +335,44 @@ describe("citation markers open the drawer", () => {
 
     const panel = screen.getByRole("region", { name: DEFAULT_LOCALE.basisOfAnswer });
     expect(within(panel).getByText(/Rate control is reasonable/)).toBeInTheDocument();
+  });
+
+  it("shows the sources of the answer clicked, numbered by its citation markers", async () => {
+    const guide = (id: string, title: string) => ({
+      id,
+      title,
+      passage: `${title} passage.`,
+      kind: "guideline" as const,
+      retrievedAt: "2026-08-16T09:00:00.000Z",
+    });
+    let call = 0;
+    const provider = {
+      ...createStaticProvider({ events: [], disclosure }),
+      async *send() {
+        call += 1;
+        const marker = call === 1 ? 2 : 1;
+        const title = call === 1 ? "Older guideline" : "Newer guideline";
+        yield { type: "delta", text: `${title} says so.` } as const;
+        yield { type: "citation", marker, source: guide(`s${call}`, title) } as const;
+        yield { type: "done", finish: "stop" } as const;
+      },
+    };
+    const { user } = setup({ provider: provider as never });
+
+    await user.type(field(), "first?{Enter}");
+    await waitFor(() => screen.getByText("Older guideline says so."));
+    await user.type(
+      screen.getByRole("textbox", { name: DEFAULT_LOCALE.followUp }),
+      "second?{Enter}",
+    );
+    await waitFor(() => screen.getByText("Newer guideline says so."));
+
+    const older = screen.getByText("Older guideline says so.").closest("article") as HTMLElement;
+    await user.click(within(older).getByRole("button", { name: DEFAULT_LOCALE.showSources }));
+
+    const panel = screen.getByRole("region", { name: DEFAULT_LOCALE.basisOfAnswer });
+    expect(within(panel).getByText("Older guideline")).toBeInTheDocument();
+    expect(within(panel).queryByText("Newer guideline")).not.toBeInTheDocument();
+    expect(panel.querySelector(".zb-copilot-source-marker")).toHaveTextContent("2");
   });
 });

@@ -225,6 +225,60 @@ describe("toFhirBundle", () => {
     expect(() => toFhirBundle(emptyNote("progress"), base, "")).not.toThrow();
   });
 
+  /*
+   * R4 transaction rules: every entry needs `request`, and a POST needs a
+   * `fullUrl` so other entries can reference the resource before it has an id.
+   * Without them a server rejects the whole bundle.
+   */
+  const UUID = /^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+
+  it("gives every entry a urn:uuid fullUrl and a POST request, as a transaction requires", () => {
+    const bundle = toFhirBundle(sampleNote(), { ...base, attestations: signed }, "");
+    for (const entry of bundle.entry) {
+      expect(entry.fullUrl).toMatch(UUID);
+      expect(entry.request).toEqual({ method: "POST", url: entry.resource.resourceType });
+    }
+    expect(new Set(bundle.entry.map((e) => e.fullUrl)).size).toBe(3);
+  });
+
+  it("points the Provenance at the Composition, and every bundle reference resolves", () => {
+    const bundle = toFhirBundle(sampleNote(), { ...base, attestations: signed }, "");
+    const composition = bundle.entry.find((e) => e.resource.resourceType === "Composition")!;
+    const provenance = bundle.entry.find((e) => e.resource.resourceType === "Provenance")!
+      .resource as FhirProvenance;
+    expect(provenance.target).toHaveLength(1);
+    expect(provenance.target[0]!.reference).toBe(composition.fullUrl);
+
+    const fullUrls = new Set(bundle.entry.map((e) => e.fullUrl));
+    const internal = JSON.stringify(bundle).match(/"urn:uuid:[^"]+"/g) ?? [];
+    for (const ref of internal) expect(fullUrls.has(JSON.parse(ref) as string)).toBe(true);
+  });
+
+  it("is reproducible by default, and takes the host's ids when given", () => {
+    const doc = sampleNote();
+    expect(toFhirBundle(doc, base, "")).toEqual(toFhirBundle(doc, base, ""));
+
+    let n = 0;
+    const bundle = toFhirBundle(
+      doc,
+      { ...base, uuid: () => `00000000-0000-4000-8000-00000000000${++n}` },
+      "",
+    );
+    expect(bundle.entry.map((e) => e.fullUrl)).toEqual([
+      "urn:uuid:00000000-0000-4000-8000-000000000001",
+      "urn:uuid:00000000-0000-4000-8000-000000000002",
+      "urn:uuid:00000000-0000-4000-8000-000000000003",
+    ]);
+  });
+
+  it("keeps fullUrl and request on the Provenance after sealing", () => {
+    const doc = sampleNote();
+    const bundle = toFhirBundle(doc, base, "");
+    const sealed = withDigest(bundle, doc, () => "x");
+    expect(sealed.entry[2]!.fullUrl).toBe(bundle.entry[2]!.fullUrl);
+    expect(sealed.entry[2]!.request).toEqual({ method: "POST", url: "Provenance" });
+  });
+
   it("is JSON-serialisable", () => {
     const bundle = toFhirBundle(sampleNote(), base, toText(sampleNote()));
     expect(() => JSON.parse(JSON.stringify(bundle))).not.toThrow();

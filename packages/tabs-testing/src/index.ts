@@ -181,12 +181,27 @@ export function expectOnlyTabsInList(list: Element): void {
   }
 }
 
+/**
+ * The text an id-reference attribute points at.
+ *
+ * `aria-labelledby` and `aria-describedby` take a space-separated list, so
+ * `"title count"` is two ids, not one that never matches.
+ */
+function textOfIds(ids: string | null): string {
+  if (!ids) return "";
+  return ids
+    .trim()
+    .split(/\s+/)
+    .map((id) => document.getElementById(id)?.textContent ?? "")
+    .join(" ")
+    .trim();
+}
+
 /** The list has an accessible name. */
 export function expectNamedList(list: Element): void {
   const label = list.getAttribute("aria-label");
-  const labelledBy = list.getAttribute("aria-labelledby");
   if (label?.trim()) return;
-  if (labelledBy && document.getElementById(labelledBy)?.textContent?.trim()) return;
+  if (textOfIds(list.getAttribute("aria-labelledby"))) return;
   fail(
     'the list has no accessible name, so it is announced as "tab list" and nothing else. Give it aria-label.',
   );
@@ -207,9 +222,7 @@ export function expectDiscoverableDisabled(list: Element): void {
       );
     }
     if (trigger.getAttribute("aria-disabled") !== "true") continue;
-    const describedBy = trigger.getAttribute("aria-describedby");
-    const described = describedBy ? document.getElementById(describedBy) : null;
-    if (!described?.textContent?.trim()) {
+    if (!textOfIds(trigger.getAttribute("aria-describedby"))) {
       fail(
         `trigger "${nameOf(trigger)}" is aria-disabled with no reason. A control that refuses without saying why is indistinguishable from one that is broken.`,
       );

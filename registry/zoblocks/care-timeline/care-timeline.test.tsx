@@ -370,6 +370,58 @@ describe("layout and grouping", () => {
     expect(headings.some((text) => text.includes("January 2019"))).toBe(false);
   });
 
+  it("heads an offset event with the month its own row shows", () => {
+    const { container } = render(
+      <CareTimeline
+        {...base}
+        events={[
+          {
+            id: "transfer",
+            kind: "note",
+            occurred: "2026-09-01T02:00:00+10:00",
+            title: "Transfer note",
+          },
+        ]}
+        now="2026-09-14T00:00:00Z"
+        coverage={HEALTHY_COVERAGE}
+        group="month"
+        headingLevel={3}
+      />,
+    );
+    const headings = [...container.querySelectorAll("h3")].map((h) => h.textContent ?? "");
+    expect(headings.some((text) => text.includes("September 2026"))).toBe(true);
+    expect(headings.some((text) => text.includes("August 2026"))).toBe(false);
+    expect(container.textContent).toMatch(/1 Sept? 2026/);
+  });
+
+  it("names a month that resumes after another as continued", () => {
+    // Mixed offsets can split a month around another in true order. Two
+    // identical "August 2026" jump options could not be told apart.
+    const { container } = render(
+      <CareTimeline
+        {...base}
+        events={[
+          { id: "aug-utc", kind: "note", occurred: "2026-08-31T20:00:00Z", title: "B" },
+          { id: "sep-local", kind: "note", occurred: "2026-09-01T02:00:00+10:00", title: "A" },
+          { id: "aug", kind: "note", occurred: "2026-08-30T12:00:00Z", title: "C" },
+        ]}
+        now="2026-09-14T00:00:00Z"
+        coverage={HEALTHY_COVERAGE}
+        group="month"
+        headingLevel={3}
+        jump
+      />,
+    );
+    const options = [...screen.getByLabelText(/Jump to/).querySelectorAll("option")]
+      .slice(1)
+      .map((option) => option.textContent);
+    expect(options).toEqual(["August 2026", "September 2026", "August 2026 (continued)"]);
+
+    const headings = [...container.querySelectorAll("h3")].map((h) => h.textContent ?? "");
+    expect(headings[2]).toContain("August 2026 (continued)");
+    expect(screen.getByRole("list", { name: /August 2026 \(continued\)/ })).toBeInTheDocument();
+  });
+
   it("renders no period heading when there is no period", () => {
     const { container } = render(
       <CareTimeline

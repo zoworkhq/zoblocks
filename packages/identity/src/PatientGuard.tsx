@@ -30,12 +30,17 @@
  */
 
 import type { Identity } from "@zoblocks/identity-core";
-import { createContext, useContext, useEffect, useRef, type ReactNode } from "react";
+import { createContext, useContext, useEffect, type ReactNode } from "react";
 
 const PatientContext = createContext<Identity | null>(null);
 
-/** Registry of mounted banners. The count is the assertion. */
-const mountedBanners = new Set<string>();
+/**
+ * Registry of mounted banners: patient key to how many are mounted.
+ *
+ * A count, not a set. With a set, unmounting one of two banners for the same
+ * patient forgot that patient, and a later banner for someone else passed.
+ */
+const mountedBanners = new Map<string, number>();
 
 export interface BannerViolation {
   kind: "duplicate-banner";
@@ -87,12 +92,10 @@ export function PatientContextProvider({
  * and a context-scoped check would miss it.
  */
 export function useBannerRegistration(key: string | undefined): void {
-  const registered = useRef<string | null>(null);
-
   useEffect(() => {
     if (!key) return;
     if (mountedBanners.size > 0 && !mountedBanners.has(key)) {
-      const other = [...mountedBanners][0] ?? "";
+      const other = [...mountedBanners.keys()][0] ?? "";
       // The banner still renders. A hard crash would take the whole record
       // down, which is worse than an ambiguous header the application has been
       // told about.
@@ -106,11 +109,11 @@ export function useBannerRegistration(key: string | undefined): void {
           `Use PatientChip for a reference to a second patient.`,
       });
     }
-    mountedBanners.add(key);
-    registered.current = key;
+    mountedBanners.set(key, (mountedBanners.get(key) ?? 0) + 1);
     return () => {
-      if (registered.current) mountedBanners.delete(registered.current);
-      registered.current = null;
+      const left = (mountedBanners.get(key) ?? 1) - 1;
+      if (left > 0) mountedBanners.set(key, left);
+      else mountedBanners.delete(key);
     };
   }, [key]);
 }

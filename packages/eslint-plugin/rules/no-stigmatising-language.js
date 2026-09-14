@@ -67,10 +67,16 @@ const CLINICAL_HINT =
 
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-/** Character ranges inside straight or curly quotes, which are exempt. */
+/**
+ * Character ranges inside straight or curly quotes, which are exempt.
+ *
+ * A quote mark only counts when it is not wedged between letters. Otherwise
+ * the apostrophes in "Don't call him an addict, he's in recovery" pair up as
+ * a quotation and hide the term between them.
+ */
 function quotedRanges(text) {
   const ranges = [];
-  const pattern = /(["“'‘])(.*?)(["”'’])/gs;
+  const pattern = /(?<![\p{L}\p{N}])(["“'‘])(.*?)(["”'’])(?![\p{L}\p{N}])/gsu;
   let match;
   while ((match = pattern.exec(text)) !== null) {
     ranges.push([match.index, match.index + match[0].length]);

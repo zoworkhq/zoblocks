@@ -534,7 +534,20 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
 
   React.useEffect(() => {
     if (!hasWindow || lapsed || shown !== true || !until) return;
-    const id = setTimeout(() => expireCb.current?.(until), Math.max(0, untilMs - nowMs));
+    // setTimeout overflows past 2^31-1 ms (~24.8 days) and fires at once, so a
+    // long window is waited out in legs.
+    const LEG_MS = 2 ** 31 - 1;
+    let id: ReturnType<typeof setTimeout>;
+    const wait = (remaining: number) => {
+      id = setTimeout(
+        () => {
+          if (remaining > LEG_MS) wait(remaining - LEG_MS);
+          else expireCb.current?.(until);
+        },
+        Math.min(remaining, LEG_MS),
+      );
+    };
+    wait(untilMs - nowMs);
     return () => clearTimeout(id);
   }, [hasWindow, lapsed, nowMs, shown, until, untilMs]);
 
@@ -804,7 +817,7 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
     notes.push(
       <span key="until" className="zb-switch__note">
         <span className={cn("zb-switch__until", lapsed && "zb-switch__until--lapsed")}>
-          {lapsed ? "lapsed" : "until"} {formatTime(until)}
+          {lapsed ? "lapsed" : "until"} {formatTime(until, now)}
         </span>{" "}
         {lapsed
           ? "This has ended. Confirm whether it still applies."
@@ -833,7 +846,7 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
   if (provenance) {
     notes.push(
       <span key="prov" className="zb-switch__provenance">
-        Last changed {formatTime(provenance.at)} by {provenance.by}
+        Last changed {formatTime(provenance.at, now)} by {provenance.by}
         {provenance.via ? `, ${provenance.via}` : ""}
       </span>,
     );
@@ -1170,11 +1183,39 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
  * is shown rather than a placeholder — a timestamp we cannot read is still
  * information, and substituting punctuation for it would be CONTENT.md §1's
  * first failure.
+ *
+ * The day is part of the time. A bare "08:00" for a hold ending tomorrow reads
+ * as this morning, and a bare "09:14" from three weeks ago reads as fresh. So
+ * only a time on `now`'s own day is bare; the next and previous days say so,
+ * and anything else carries its date. Without `now` there is no "today" to
+ * compare against, so the date is always shown.
  */
-function formatTime(iso: string): string {
+function formatTime(iso: string, now?: string): string {
   const ms = Date.parse(iso);
   if (!Number.isFinite(ms)) return iso;
-  return new Date(ms).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+  const at = new Date(ms);
+  const time = at.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+
+  const nowMs = now ? Date.parse(now) : Number.NaN;
+  const reference = Number.isFinite(nowMs) ? new Date(nowMs) : undefined;
+  if (reference) {
+    // Calendar days in the viewer's zone; rounding absorbs a 23- or 25-hour DST day.
+    const days = Math.round((startOfDay(at) - startOfDay(reference)) / 86_400_000);
+    if (days === 0) return time;
+    if (days === 1) return `${time} tomorrow`;
+    if (days === -1) return `${time} yesterday`;
+  }
+
+  const date = at.toLocaleDateString(undefined, {
+    day: "numeric",
+    month: "short",
+    ...(reference?.getFullYear() === at.getFullYear() ? {} : { year: "numeric" }),
+  });
+  return `${date}, ${time}`;
+}
+
+function startOfDay(date: Date): number {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
 }
 
 /* ------------------------------------------------------------------ */
@@ -1230,12 +1271,14 @@ export interface SwitchListProps extends Omit<React.HTMLAttributes<HTMLDivElemen
   counts?: { on: number; total: number; unknown?: number };
   /** Who last changed anything in this group. The first question anyone asks. */
   provenance?: { by: string; at: string };
+  /** The caller's clock, as ISO. A last change on this day shows a bare time; any other carries its day or date. Without it, the date is always shown. */
+  now?: string;
   /** The switches. Rendered into a group with the heading above, so each one inherits the group's name rather than repeating it. */
   children?: React.ReactNode;
 }
 
 export const SwitchList = React.forwardRef<HTMLDivElement, SwitchListProps>(function SwitchList(
-  { title, counts, provenance, children, className, ...rest },
+  { title, counts, provenance, now, children, className, ...rest },
   ref,
 ) {
   const reactId = React.useId();
@@ -1245,7 +1288,9 @@ export const SwitchList = React.forwardRef<HTMLDivElement, SwitchListProps>(func
     ? [
         `${counts.on} of ${counts.total} in effect`,
         counts.unknown ? `${counts.unknown} not asked` : undefined,
-        provenance ? `last changed ${formatTime(provenance.at)} by ${provenance.by}` : undefined,
+        provenance
+          ? `last changed ${formatTime(provenance.at, now)} by ${provenance.by}`
+          : undefined,
       ]
         .filter(Boolean)
         .join(" · ")

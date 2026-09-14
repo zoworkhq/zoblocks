@@ -397,6 +397,15 @@ describe("the keyboard model", () => {
     expect(screen.getByRole("tab", { selected: true })).toHaveTextContent("T. Boateng");
   });
 
+  it("keeps a tab stop when the active chart is not in the stack", () => {
+    // A stale activeId (the chart was closed elsewhere) must not take every
+    // tab out of the tab order.
+    render(<RecentPatientStack charts={charts} activeId="chart-closed-elsewhere" />);
+    const tabs = screen.getAllByRole("tab");
+
+    expect(tabs.filter((tab) => tab.getAttribute("tabindex") === "0")).toEqual([tabs[0]]);
+  });
+
   it("moves focus with the arrows without opening anything", async () => {
     const onActivate = vi.fn();
     render(<RecentPatientStack charts={charts} activeId="chart-vance" onActivate={onActivate} />);

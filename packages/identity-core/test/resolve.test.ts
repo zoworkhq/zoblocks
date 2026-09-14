@@ -300,6 +300,54 @@ describe("IdentityCache", () => {
     expect(b.identifiers[0]?.masked).toBe(true);
   });
 
+  it("re-resolves when the same id gains a security label, dies, or is merged", () => {
+    // A stale hit here renders a restricted, deceased or merged record as normal.
+    const cache = new IdentityCache(10);
+    const before = cache.resolve(F.patient(), P);
+    expect(before.states).toEqual([]);
+
+    const restricted = cache.resolve(F.patient({ meta: { security: [{ code: "PSY" }] } }), P);
+    expect(restricted.states.map((s) => s.kind)).toContain("restricted");
+
+    const deceased = cache.resolve(F.patient({ deceasedBoolean: true }), P);
+    expect(deceased.states.map((s) => s.kind)).toContain("deceased");
+
+    const merged = cache.resolve(
+      F.patient({ link: [{ type: "replaced-by", other: { reference: "Patient/pat-9" } }] }),
+      P,
+    );
+    expect(merged.states.map((s) => s.kind)).toContain("merged");
+
+    const renamed = cache.resolve(F.patient({ name: [{ family: "Adeyemi" }] }), P);
+    expect(renamed.name.text).toBe("Adeyemi");
+  });
+
+  it("re-resolves when the photograph changes", () => {
+    const cache = new IdentityCache(10);
+    const allow = policy({ now: F.NOW, photos: "allow" });
+    const a = cache.resolve(F.patient({ photo: [{ url: "https://img.invalid/a" }] }), allow);
+    const b = cache.resolve(F.patient({ photo: [{ url: "https://img.invalid/b" }] }), allow);
+    expect(b.photo).toEqual({ kind: "present", src: "https://img.invalid/b" });
+    expect(a).not.toBe(b);
+  });
+
+  it("re-resolves when the server version changes", () => {
+    const cache = new IdentityCache(10);
+    const v1 = cache.resolve(F.patient({ meta: { versionId: "1" } }), P);
+    const v2 = cache.resolve(F.patient({ meta: { versionId: "2" } }), P);
+    expect(v1).not.toBe(v2);
+  });
+
+  it("never caches a record with no id, identifier or name", () => {
+    // They all share the key "unknown", so one would render as another.
+    const cache = new IdentityCache(10);
+    const a = cache.resolve({ resourceType: "Patient", birthDate: "1985-03-08" }, P);
+    const b = cache.resolve({ resourceType: "Patient", birthDate: "1991-09-22" }, P);
+    expect(b.birthDate?.value).toBe("1991-09-22");
+    expect(a).not.toBe(b);
+    expect(cache.size).toBe(0);
+  });
+
   it("evicts least-recently-used past its bound", () => {
     const cache = new IdentityCache(2);
     cache.resolve(F.patient({ id: "a" }), P);

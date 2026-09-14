@@ -13,8 +13,8 @@
  */
 
 import * as React from "react";
-import { describe, expect, it, vi } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import {
   ChartContextMenu,
@@ -1058,5 +1058,733 @@ describe("consequence is visible even when the host supplies no icons", () => {
     await user.pointer({ keys: "[MouseRight]", target: screen.getByTestId("row") });
     const menu = await screen.findByRole("menu");
     expect(menu.querySelector(".zb-menu__avatar")?.textContent).toBe("AO");
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* Geometry                                                            */
+/* ------------------------------------------------------------------ */
+
+/*
+ * jsdom has no layout, so every measurement here is supplied by hand: a 240px
+ * menu in the default 1024 × 768 viewport. What is asserted is where the popup
+ * goes relative to the pointer or the row, which is the part a reader sees.
+ */
+
+function rectAt(top: number, left: number, height = 30, width = 360): DOMRect {
+  return {
+    top,
+    left,
+    bottom: top + height,
+    right: left + width,
+    width,
+    height,
+    x: left,
+    y: top,
+    toJSON: () => ({}),
+  } as DOMRect;
+}
+
+function measureMenus(width = 240, height = 0) {
+  vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockImplementation(function (
+    this: HTMLElement,
+  ) {
+    return this.classList.contains("zb-menu") ? width : 0;
+  });
+  vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockImplementation(function (
+    this: HTMLElement,
+  ) {
+    return this.classList.contains("zb-menu") ? height : 0;
+  });
+}
+
+const originOf = (menu: HTMLElement) => menu.style.getPropertyValue("--zb-menu-origin");
+
+describe("where the popup goes", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("opens to the left of the cursor near the right edge, rather than under it", () => {
+    measureMenus();
+    render(<Row />);
+    fireEvent.contextMenu(screen.getByTestId("row"), { clientX: 900, clientY: 100 });
+    const menu = screen.getByRole("menu");
+    expect(originOf(menu)).toBe("top right");
+    // The menu's right edge sits at the cursor: 900 - 240 + the 3px inset.
+    expect(menu.style.left).toBe("663px");
+  });
+
+  it("opens upward near the bottom edge, anchored by its bottom so the cursor lands on nothing", () => {
+    measureMenus();
+    render(<Row />);
+    fireEvent.contextMenu(screen.getByTestId("row"), { clientX: 100, clientY: 700 });
+    const menu = screen.getByRole("menu");
+    expect(originOf(menu)).toBe("bottom left");
+    expect(menu.style.top).toBe("");
+    // Its bottom edge is a padding above the cursor, not on it.
+    expect(menu.style.bottom).toBe("76px");
+  });
+
+  it("flips a keyboard-opened menu above its row, never on top of where focus returns", async () => {
+    measureMenus();
+    const user = userEvent.setup();
+    render(<Row />);
+    const row = screen.getByTestId("row");
+    row.getBoundingClientRect = () => rectAt(700, 40);
+    row.focus();
+    await user.keyboard("{Shift>}{F10}{/Shift}");
+    const menu = await screen.findByRole("menu");
+    expect(originOf(menu)).toBe("bottom left");
+    expect(menu.style.bottom).toBe("72px");
+  });
+
+  it("puts a child menu on the other side, bottom-anchored, when its row is in the corner", async () => {
+    measureMenus();
+    const user = userEvent.setup();
+    render(<Row actions={trendActions} />);
+    await user.pointer({ keys: "[MouseRight]", target: screen.getByTestId("row") });
+    const trend = await screen.findByRole("menuitem", { name: /Trend/ });
+    trend.getBoundingClientRect = () => rectAt(700, 800, 30, 200);
+    await user.click(trend);
+
+    const child = screen.getAllByRole("menu")[1]!;
+    expect(originOf(child)).toBe("bottom right");
+    expect(child.style.left).toBe("564px");
+    expect(child.style.bottom).toBe("8px");
+  });
+
+  it("follows its row when the page scrolls, and closes when the viewport resizes", () => {
+    measureMenus();
+    const onOpenChange = vi.fn();
+    render(<Row onOpenChange={onOpenChange} />);
+    const row = screen.getByTestId("row");
+    fireEvent.contextMenu(row, { clientX: 100, clientY: 100 });
+    const menu = screen.getByRole("menu");
+    expect(menu.style.top).toBe("97px");
+
+    row.getBoundingClientRect = () => rectAt(-50, 0);
+    act(() => {
+      window.dispatchEvent(new Event("scroll"));
+    });
+    // Still open, and still at the same point inside the row.
+    expect(screen.getByRole("menu").style.top).toBe("47px");
+
+    act(() => {
+      window.dispatchEvent(new Event("resize"));
+    });
+    expect(screen.queryByRole("menu")).toBeNull();
+    expect(onOpenChange).toHaveBeenLastCalledWith(false, medication);
+    // A reflow is not the reader choosing to go back to the row.
+    expect(document.activeElement).not.toBe(row);
+  });
+
+  it("still places the popup where there is no animation frame to measure in", () => {
+    measureMenus();
+    vi.stubGlobal("requestAnimationFrame", undefined);
+    try {
+      render(<Row />);
+      fireEvent.contextMenu(screen.getByTestId("row"), { clientX: 100, clientY: 100 });
+      const menu = screen.getByRole("menu");
+      expect(menu.style.visibility).toBe("");
+      expect(menu.style.top).toBe("97px");
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it("positions inside a bounded container rather than against the viewport", async () => {
+    measureMenus(240, 200);
+    const user = userEvent.setup();
+    const pane = document.createElement("div");
+    document.body.append(pane);
+    pane.getBoundingClientRect = () => rectAt(100, 50, 400, 600);
+    Object.defineProperty(pane, "clientHeight", { configurable: true, value: 400 });
+    Object.defineProperty(pane, "clientWidth", { configurable: true, value: 600 });
+
+    try {
+      render(<Row container={pane} actions={trendActions} />);
+      fireEvent.contextMenu(screen.getByTestId("row"), { clientX: 100, clientY: 700 });
+      const menu = within(pane).getByRole("menu");
+      expect(menu.hasAttribute("data-zb-contained")).toBe(true);
+      // Flipped, then resolved to a top edge and clamped to the pane's floor:
+      // 400 - 200 - 8. The last row can never fall off the stage.
+      expect(menu.style.top).toBe("192px");
+      expect(menu.style.left).toBe("47px");
+
+      const trend = within(menu).getByRole("menuitem", { name: /Trend/ });
+      trend.getBoundingClientRect = () => rectAt(700, 100);
+      await user.click(trend);
+      const child = within(pane).getAllByRole("menu")[1]!;
+      expect(child.style.top).toBe("");
+      expect(child.style.bottom).not.toBe("");
+    } finally {
+      pane.remove();
+    }
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* Touch and the sheet                                                 */
+/* ------------------------------------------------------------------ */
+
+function coarsePointer() {
+  vi.spyOn(window, "matchMedia").mockImplementation(
+    (query: string) =>
+      ({
+        matches: query === "(pointer: coarse)",
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      }) as MediaQueryList,
+  );
+}
+
+describe("the bottom sheet", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("opens as a sheet on a coarse pointer, and a tap on the backdrop dismisses it", () => {
+    coarsePointer();
+    render(<Row />);
+    const row = screen.getByTestId("row");
+    fireEvent.contextMenu(row);
+    const menu = screen.getByRole("menu");
+    expect(menu.className).toContain("zb-menu--sheet");
+    expect(menu.querySelector(".zb-menu__grip")).toBeTruthy();
+    // A sheet is placed by the stylesheet, not by the pointer.
+    expect(menu.getAttribute("style")).toBeNull();
+
+    fireEvent.click(document.querySelector(".zb-menu__backdrop")!);
+    expect(screen.queryByRole("menu")).toBeNull();
+    expect(document.activeElement).toBe(row);
+  });
+
+  it("keeps the presentation a host asked for, whatever the pointer", () => {
+    coarsePointer();
+    render(<Row presentation="popup" />);
+    fireEvent.contextMenu(screen.getByTestId("row"));
+    expect(screen.getByRole("menu").className).not.toContain("zb-menu--sheet");
+  });
+});
+
+describe("a long press", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  const touch = { pointerType: "touch", clientX: 40, clientY: 60 };
+
+  it("opens the sheet after half a second, and not before", () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    render(<Row />);
+    const row = screen.getByTestId("row");
+    // A move with no press in progress is just a finger passing over.
+    fireEvent.pointerMove(row, touch);
+    fireEvent.pointerDown(row, touch);
+    // A slight wobble is still a press.
+    fireEvent.pointerMove(row, { ...touch, clientX: 45, clientY: 64 });
+
+    act(() => vi.advanceTimersByTime(499));
+    expect(screen.queryByRole("menu")).toBeNull();
+    act(() => vi.advanceTimersByTime(1));
+    expect(screen.getByRole("menu").className).toContain("zb-menu--sheet");
+  });
+
+  it("treats a press that drifts as a scroll, so a palm on a tablet opens nothing", () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    render(<Row />);
+    const row = screen.getByTestId("row");
+    fireEvent.pointerDown(row, touch);
+    fireEvent.pointerMove(row, { ...touch, clientY: 90 });
+    act(() => vi.advanceTimersByTime(1000));
+    expect(screen.queryByRole("menu")).toBeNull();
+
+    fireEvent.pointerDown(row, touch);
+    fireEvent.pointerMove(row, { ...touch, clientX: 80 });
+    act(() => vi.advanceTimersByTime(1000));
+    expect(screen.queryByRole("menu")).toBeNull();
+  });
+
+  it("opens nothing when the finger lifts early", () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    render(<Row />);
+    const row = screen.getByTestId("row");
+    fireEvent.pointerDown(row, touch);
+    // A second press restarts the count rather than stacking two timers.
+    fireEvent.pointerDown(row, touch);
+    fireEvent.pointerUp(row, touch);
+    act(() => vi.advanceTimersByTime(1000));
+    expect(screen.queryByRole("menu")).toBeNull();
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* Keyboard, continued                                                 */
+/* ------------------------------------------------------------------ */
+
+describe("the trigger's guards", () => {
+  it("ignores the contextmenu a browser synthesises after Shift+F10", async () => {
+    const user = userEvent.setup();
+    const onOpenChange = vi.fn();
+    render(<Row onOpenChange={onOpenChange} />);
+    const row = screen.getByTestId("row");
+    row.focus();
+    await user.keyboard("{Shift>}{F10}{/Shift}");
+    await screen.findByRole("menu");
+    fireEvent.contextMenu(row);
+    // Still the keyboard open, highlight and all.
+    expect(document.activeElement!.textContent).toContain("Open order");
+    expect(onOpenChange).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not open from the keyboard when disabled either", async () => {
+    const user = userEvent.setup();
+    render(<Row disabled />);
+    screen.getByTestId("row").focus();
+    await user.keyboard("{Shift>}{F10}{/Shift}");
+    expect(screen.queryByRole("menu")).toBeNull();
+  });
+});
+
+describe("a menu the reader did not summon", () => {
+  it("leaves focus alone, and still closes on Escape", async () => {
+    const user = userEvent.setup();
+    render(<Row autoFocus={false} />);
+    await user.pointer({ keys: "[MouseRight]", target: screen.getByTestId("row") });
+    const menu = await screen.findByRole("menu");
+    expect(menu.contains(document.activeElement)).toBe(false);
+
+    await user.keyboard("a");
+    expect(screen.getByRole("menu")).toBeTruthy();
+    await user.keyboard("{Escape}");
+    expect(screen.queryByRole("menu")).toBeNull();
+  });
+
+  it("leaves a focused menu's Escape to the menu, one level at a time", async () => {
+    const user = userEvent.setup();
+    render(<Row actions={trendActions} />);
+    screen.getByTestId("row").focus();
+    await user.keyboard("{Shift>}{F10}{/Shift}");
+    await screen.findByRole("menu");
+    // An Escape that reaches the document while focus is inside is not a
+    // dismissal of everything.
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.getAllByRole("menu")).toHaveLength(1);
+
+    await user.keyboard("{ArrowDown}{ArrowRight}");
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.getAllByRole("menu")).toHaveLength(2);
+  });
+});
+
+describe("the panel's keyboard", () => {
+  async function openFromKeyboard(
+    props: Partial<React.ComponentProps<typeof ChartContextMenu>> = {},
+  ) {
+    const user = userEvent.setup();
+    render(<Row {...props} />);
+    screen.getByTestId("row").focus();
+    await user.keyboard("{Shift>}{F10}{/Shift}");
+    await screen.findByRole("menu");
+    return user;
+  }
+
+  const focused = () => document.activeElement!.textContent;
+
+  it("jumps to the ends with Home and End, and wraps upward from the first verb", async () => {
+    const user = await openFromKeyboard();
+    await user.keyboard("{End}");
+    expect(focused()).toContain("Reveal Part 2 content");
+    await user.keyboard("{Home}");
+    expect(focused()).toContain("Open order");
+    await user.keyboard("{ArrowUp}");
+    expect(focused()).toContain("Reveal Part 2 content");
+  });
+
+  it("moves to the next verb starting with a typed letter, and stays put when there is none", async () => {
+    const user = await openFromKeyboard();
+    await user.keyboard("d");
+    expect(focused()).toContain("Discontinue");
+    await user.keyboard("d");
+    expect(focused()).toContain("Discontinue");
+    // A shortcut chord is not a letter.
+    await user.keyboard("{Control>}o{/Control}");
+    expect(focused()).toContain("Discontinue");
+    await user.keyboard("{Meta>}o{/Meta}{Alt>}o{/Alt}");
+    expect(focused()).toContain("Discontinue");
+    await user.keyboard("o");
+    expect(focused()).toContain("Open order");
+  });
+
+  it("treats ArrowRight and ArrowLeft as no-ops on a row with no children", async () => {
+    const user = await openFromKeyboard();
+    await user.keyboard("{ArrowRight}{ArrowLeft}");
+    expect(screen.getAllByRole("menu")).toHaveLength(1);
+    expect(focused()).toContain("Open order");
+  });
+
+  it("runs the highlighted verb on Enter and returns focus to the row", async () => {
+    const onRun = vi.fn();
+    const user = await openFromKeyboard({ onRun });
+    await user.keyboard("{Enter}");
+    expect(onRun).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "open" }),
+      medication,
+      expect.objectContaining({ kind: "run" }),
+    );
+    expect(screen.queryByRole("menu")).toBeNull();
+    expect(document.activeElement).toBe(screen.getByTestId("row"));
+  });
+
+  it("asks for confirmation on Space, exactly as a click would", async () => {
+    const onRun = vi.fn();
+    const user = await openFromKeyboard({ onRun });
+    await user.keyboard("d[Space]");
+    expect(onRun).not.toHaveBeenCalled();
+    expect(screen.getByText(/next scheduled dose is 14:00/)).toBeTruthy();
+  });
+
+  it("closes on Tab rather than trapping focus in a transient popup", async () => {
+    const onOpenChange = vi.fn();
+    const user = await openFromKeyboard({ onOpenChange });
+    await user.keyboard("{Tab}");
+    expect(screen.queryByRole("menu")).toBeNull();
+    expect(onOpenChange).toHaveBeenLastCalledWith(false, medication);
+  });
+
+  it("does nothing on Enter when a pointer opened it and no row is highlighted", async () => {
+    const user = userEvent.setup();
+    const onRun = vi.fn();
+    render(<Row onRun={onRun} />);
+    await user.pointer({ keys: "[MouseRight]", target: screen.getByTestId("row") });
+    await screen.findByRole("menu");
+    await user.keyboard("{ArrowRight}{Enter}");
+    expect(onRun).not.toHaveBeenCalled();
+    expect(screen.getAllByRole("menu")).toHaveLength(1);
+  });
+});
+
+describe("a submenu opened by hovering", () => {
+  async function hoverOpen(props: Partial<React.ComponentProps<typeof ChartContextMenu>> = {}) {
+    const user = userEvent.setup();
+    const view = render(<Row actions={trendActions} {...props} />);
+    await user.pointer({ keys: "[MouseRight]", target: screen.getByTestId("row") });
+    const trend = await screen.findByRole("menuitem", { name: /Trend/ });
+    await user.hover(trend);
+    await waitFor(() => expect(screen.getAllByRole("menu")).toHaveLength(2));
+    return { user, view, trend };
+  }
+
+  it("opens after the intent delay and does not take focus, because a hover committed to nothing", async () => {
+    const { user, trend } = await hoverOpen();
+    const child = screen.getAllByRole("menu")[1]!;
+    expect(child.contains(document.activeElement)).toBe(false);
+    expect(trend.getAttribute("aria-expanded")).toBe("true");
+
+    // Resting on the same row again does not re-open or flicker the child.
+    await user.unhover(trend);
+    await user.hover(trend);
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    expect(screen.getAllByRole("menu")).toHaveLength(2);
+  });
+
+  it("closes the child on ArrowLeft and hands focus back to its row", async () => {
+    const { user, trend } = await hoverOpen();
+    await user.keyboard("{ArrowLeft}");
+    expect(screen.getAllByRole("menu")).toHaveLength(1);
+    expect(document.activeElement).toBe(trend);
+  });
+
+  it("closes only the child on Escape from the parent", async () => {
+    const { user } = await hoverOpen();
+    await user.keyboard("{Escape}");
+    expect(screen.getAllByRole("menu")).toHaveLength(1);
+  });
+
+  it("closes the child when the pointer reaches a different row", async () => {
+    const { user } = await hoverOpen();
+    await user.hover(screen.getByRole("menuitem", { name: /Open result/ }));
+    expect(screen.getAllByRole("menu")).toHaveLength(1);
+  });
+
+  it("runs nothing on Enter inside a hovered child when no item is highlighted", async () => {
+    const onRun = vi.fn();
+    const { user } = await hoverOpen({ onRun });
+    const child = screen.getAllByRole("menu")[1]!;
+    child.focus();
+    await user.keyboard("{Enter}");
+    expect(onRun).not.toHaveBeenCalled();
+    expect(screen.getAllByRole("menu")).toHaveLength(2);
+  });
+
+  it("highlights a child item under the pointer", async () => {
+    const { user } = await hoverOpen();
+    const child = screen.getAllByRole("menu")[1]!;
+    await user.hover(within(child).getByRole("menuitem", { name: "Last 7 days" }));
+    expect(
+      within(child).getByRole("menuitem", { name: "Last 7 days" }).hasAttribute("data-zb-active"),
+    ).toBe(true);
+  });
+});
+
+describe("a submenu from the keyboard", () => {
+  async function openChild(props: Partial<React.ComponentProps<typeof ChartContextMenu>> = {}) {
+    const user = userEvent.setup();
+    render(<Row actions={trendActions} {...props} />);
+    screen.getByTestId("row").focus();
+    await user.keyboard("{Shift>}{F10}{/Shift}");
+    await screen.findByRole("menu");
+    await user.keyboard("{ArrowDown}{ArrowRight}");
+    return user;
+  }
+
+  it("wraps in both directions and runs the highlighted child on Enter", async () => {
+    const onRun = vi.fn();
+    const user = await openChild({ onRun });
+    await user.keyboard("{ArrowDown}");
+    expect(document.activeElement?.textContent).toContain("Last 30 days");
+    await user.keyboard("{ArrowDown}");
+    expect(document.activeElement?.textContent).toContain("Last 7 days");
+    await user.keyboard("{ArrowUp}");
+    expect(document.activeElement?.textContent).toContain("Last 30 days");
+    // An unbound key inside the child does nothing to either menu.
+    await user.keyboard("x");
+    expect(screen.getAllByRole("menu")).toHaveLength(2);
+
+    await user.keyboard("{Enter}");
+    expect(onRun).toHaveBeenCalledWith(expect.objectContaining({ id: "t30" }), medication, {
+      kind: "run",
+    });
+    expect(screen.queryByRole("menu")).toBeNull();
+  });
+
+  it("runs a child on Space too", async () => {
+    const onRun = vi.fn();
+    const user = await openChild({ onRun });
+    await user.keyboard("[Space]");
+    expect(onRun.mock.calls[0]![0].id).toBe("t7");
+  });
+
+  it("carries a compact density onto both menus", async () => {
+    await openChild({ density: "compact" });
+    for (const menu of screen.getAllByRole("menu")) {
+      expect(menu.getAttribute("data-zb-density")).toBe("compact");
+    }
+  });
+});
+
+describe("a menu whose actions change while it is open", () => {
+  it("does not let a child outlive a parent that is no longer offered", async () => {
+    const user = userEvent.setup();
+    const view = render(<Row actions={trendActions} />);
+    await user.pointer({ keys: "[MouseRight]", target: screen.getByTestId("row") });
+    await user.click(await screen.findByRole("menuitem", { name: /Trend/ }));
+    expect(screen.getAllByRole("menu")).toHaveLength(2);
+
+    view.rerender(<Row actions={[trendActions[0]!]} />);
+    expect(screen.getAllByRole("menu")).toHaveLength(1);
+  });
+
+  it("opens nothing when the row a hover was resting on goes away", async () => {
+    const user = userEvent.setup();
+    const view = render(<Row actions={trendActions} />);
+    await user.pointer({ keys: "[MouseRight]", target: screen.getByTestId("row") });
+    await user.hover(await screen.findByRole("menuitem", { name: /Trend/ }));
+    view.rerender(<Row actions={[trendActions[0]!]} />);
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    expect(screen.getAllByRole("menu")).toHaveLength(1);
+  });
+
+  it("withdraws a pending confirmation when its verb becomes unavailable", async () => {
+    const user = userEvent.setup();
+    const onRun = vi.fn();
+    const view = render(<Row onRun={onRun} />);
+    await user.pointer({ keys: "[MouseRight]", target: screen.getByTestId("row") });
+    await user.click(await screen.findByRole("menuitem", { name: /Discontinue/ }));
+    expect(screen.getByRole("button", { name: "Discontinue" })).toBeTruthy();
+
+    view.rerender(
+      <Row
+        onRun={onRun}
+        actions={open({
+          id: "dc",
+          availability: { status: "unavailable", reason: "Order locked" },
+        })}
+      />,
+    );
+    expect(screen.queryByRole("button", { name: "Discontinue" })).toBeNull();
+    expect(screen.getByRole("menuitem", { name: /Discontinue/ }).textContent).toContain(
+      "Order locked",
+    );
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* The header, continued                                               */
+/* ------------------------------------------------------------------ */
+
+describe("the subject header's avatar", () => {
+  async function avatarFor(subject: MenuSubject) {
+    const user = userEvent.setup();
+    render(
+      <ChartContextMenu
+        subject={subject}
+        actions={[{ id: "copy", label: "Copy", tier: "routine" }]}
+      >
+        {(trigger) => (
+          <div {...trigger} data-testid="row">
+            row
+          </div>
+        )}
+      </ChartContextMenu>,
+    );
+    await user.pointer({ keys: "[MouseRight]", target: screen.getByTestId("row") });
+    return (await screen.findByRole("menu")).querySelector(".zb-menu__avatar")!;
+  }
+
+  it("uses initials for a clinician as well as a patient", async () => {
+    const avatar = await avatarFor({ resource: "Practitioner", id: "pr1", label: "Ama Mensah" });
+    expect(avatar.textContent).toBe("AM");
+  });
+
+  it("uses one initial for a one-word name", async () => {
+    expect((await avatarFor({ resource: "Patient", id: "p1", label: "Cher" })).textContent).toBe(
+      "C",
+    );
+  });
+
+  it("draws a placeholder rather than spelling nothing when the name has no letters", async () => {
+    const avatar = await avatarFor({ resource: "Patient", id: "p3", label: "004417" });
+    expect(avatar.textContent).toBe("··");
+  });
+
+  it("falls back to the resource's own initial for a type it has no glyph for", async () => {
+    const avatar = await avatarFor({ resource: "Coverage", id: "c1", label: "Blue Shield PPO" });
+    expect(avatar.textContent).toBe("C");
+  });
+
+  it("counts people for a selection and names no one member's detail", async () => {
+    const avatar = await avatarFor({
+      ...medication,
+      plural: "orders",
+      also: [{ resource: "MedicationRequest", id: "m2" }],
+    });
+    expect(avatar.querySelector("svg")).toBeTruthy();
+    expect(screen.getByRole("menu").querySelector(".zb-menu__what")).toBeNull();
+  });
+});
+
+describe("the scope a portalled menu carries", () => {
+  it("inherits the theme and direction of the row it was opened from", async () => {
+    const user = userEvent.setup();
+    render(
+      <div data-zb-theme="dark" dir="rtl">
+        <Row />
+      </div>,
+    );
+    await user.pointer({ keys: "[MouseRight]", target: screen.getByTestId("row") });
+    const menu = await screen.findByRole("menu");
+    expect(menu.getAttribute("data-zb-theme")).toBe("dark");
+    expect(menu.getAttribute("dir")).toBe("rtl");
+    expect(menu.hasAttribute("data-zb-brand")).toBe(false);
+  });
+});
+
+describe("the disclosure record, from the component", () => {
+  it("stamps a blank time rather than reading the clock when the host passed no `now`", async () => {
+    const user = userEvent.setup();
+    const onDisclose = vi.fn<(record: DisclosureRecord) => void>();
+    render(<Row now={undefined} onDisclose={onDisclose} />);
+    await user.pointer({ keys: "[MouseRight]", target: screen.getByTestId("row") });
+    await user.click(await screen.findByRole("menuitem", { name: /Reveal Part 2/ }));
+    expect(onDisclose.mock.calls[0]![0].at).toBe("");
+  });
+});
+
+describe("a bulk confirmation, from the component", () => {
+  it("states the count in the confirmation, not only in the header", async () => {
+    const user = userEvent.setup();
+    const twelve: MenuSubject = {
+      ...medication,
+      plural: "orders",
+      also: Array.from({ length: 11 }, (_, index) => ({
+        resource: "MedicationRequest",
+        id: `m-${index}`,
+      })),
+    };
+    render(
+      <Row
+        subject={twelve}
+        actions={open({ id: "dc", bulk: "allowed", bulkConfirm: "Stops {n} orders." })}
+      />,
+    );
+    await user.pointer({ keys: "[MouseRight]", target: screen.getByTestId("row") });
+    await user.click(await screen.findByRole("menuitem", { name: /Discontinue/ }));
+    expect(screen.getByRole("group", { name: "Discontinue" }).textContent).toContain(
+      "Stops 12 orders.",
+    );
+  });
+});
+
+describe("a pending timer does not outlive its row", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  const touch = { pointerType: "touch", clientX: 40, clientY: 60 };
+
+  it("opens nothing when the row is removed mid long-press", () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    const onOpenChange = vi.fn();
+    const view = render(<Row onOpenChange={onOpenChange} />);
+    fireEvent.pointerDown(screen.getByTestId("row"), touch);
+    view.unmount();
+    act(() => vi.advanceTimersByTime(1000));
+    // A menu for a patient no longer on screen is the wrong patient's menu.
+    expect(onOpenChange).not.toHaveBeenCalled();
+  });
+
+  it("opens nothing when the row now shows a different subject", () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    const onOpenChange = vi.fn();
+    const view = render(<Row onOpenChange={onOpenChange} />);
+    fireEvent.pointerDown(screen.getByTestId("row"), touch);
+    // A recycled virtual row: same element, another record.
+    view.rerender(<Row onOpenChange={onOpenChange} subject={{ ...medication, id: "med-9" }} />);
+    act(() => vi.advanceTimersByTime(1000));
+    expect(onOpenChange).not.toHaveBeenCalled();
+    expect(screen.queryByRole("menu")).toBeNull();
+  });
+
+  it("keeps a long press through a re-render that keeps the subject", () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    const onOpenChange = vi.fn();
+    const view = render(<Row onOpenChange={onOpenChange} />);
+    fireEvent.pointerDown(screen.getByTestId("row"), touch);
+    // A new object with the same identity is the same record.
+    view.rerender(<Row onOpenChange={onOpenChange} subject={{ ...medication }} />);
+    act(() => vi.advanceTimersByTime(500));
+    expect(onOpenChange).toHaveBeenCalledWith(true, expect.objectContaining({ id: "med-4471" }));
+  });
+
+  it("drops a pending submenu hover when the menu unmounts", () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    const view = render(<Row actions={trendActions} />);
+    fireEvent.contextMenu(screen.getByTestId("row"));
+    const trend = screen.getByRole("menuitem", { name: /Trend/ });
+    // React's scheduler shares the fake clock, so the timer is found by its delay.
+    const set = vi.spyOn(window, "setTimeout");
+    const clear = vi.spyOn(window, "clearTimeout");
+    fireEvent.mouseEnter(trend);
+    const index = set.mock.calls.findIndex(([, delay]) => typeof delay === "number" && delay > 0);
+    const id = set.mock.results[index]!.value;
+    view.unmount();
+    expect(clear).toHaveBeenCalledWith(id);
   });
 });

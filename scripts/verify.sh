@@ -101,6 +101,9 @@ if [ "$FAST" -eq 0 ]; then
   # dropped its separate `Test` step for the same reason.
   step "tests and coverage" "fix the tests, or coverage"  pnpm test:coverage
   step "build"              "fix the build"               pnpm build
+  # After build, because it packs dist. Catches a package that builds but
+  # would publish broken: missing README, extensionless imports, test files.
+  step "publishable tarballs" "see the ::error:: lines"   pnpm release:check
   # After build, because it measures dist. CI has always run this and this
   # script never did, so a blown budget could only be discovered from a red
   # pipeline — which is exactly how the last one was found.

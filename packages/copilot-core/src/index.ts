@@ -196,6 +196,7 @@ export {
   claimsOf,
   initialState,
   isBusy,
+  pendingProposal,
   reduce,
   sourcesOf,
   toHistoryText,

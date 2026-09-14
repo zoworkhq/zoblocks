@@ -232,6 +232,25 @@ export function instantOf(value: string | undefined): number {
   );
 }
 
+/**
+ * The value's wall-clock components, as epoch milliseconds read against UTC.
+ *
+ * What the row shows, offset ignored: `2026-09-01T02:00+10:00` is 1 September
+ * here and 31 August from `instantOf`. Order by `instantOf`; label by this.
+ */
+function wallClockOf(value: string): number {
+  const stamp = STAMP.exec(value.trim());
+  if (!stamp) return instantOf(value);
+  return Date.UTC(
+    Number(stamp[1]),
+    Number(stamp[2]) - 1,
+    Number(stamp[3]),
+    Number(stamp[4]),
+    Number(stamp[5]),
+    stamp[6] ? Number(stamp[6]) : 0,
+  );
+}
+
 const PRECISION_RANK: Readonly<Record<TimePrecision, number>> = {
   year: 0,
   month: 1,
@@ -637,6 +656,14 @@ export interface TimelineSection {
    * heading that says nothing is still a heading in the outline.
    */
   titled: boolean;
+  /**
+   * Whether an earlier section already carried this label.
+   *
+   * Mixed offsets can split a month around another in true order, so a label
+   * can repeat. Say so (`TimelineLocale.continued`) rather than print two
+   * identical headings a reader cannot tell apart.
+   */
+  continued?: boolean;
   rows: readonly TimelineRow[];
   /** Events in this section, counting cluster members individually. */
   count: number;
@@ -775,13 +802,19 @@ export function buildTimeline(options: BuildTimelineOptions): TimelineModel {
   } else {
     let current: ResolvedEvent[] = [];
     let currentKey: string | undefined;
+    const used = new Map<string, number>();
     const flush = () => {
       if (currentKey === undefined || current.length === 0) return;
+      // Mixed offsets can split a month around another in true order; the
+      // heading repeats, the key may not.
+      const seen = used.get(currentKey) ?? 0;
+      used.set(currentKey, seen + 1);
       sections.push({
         type: "period",
-        key: currentKey,
+        key: seen === 0 ? currentKey : `${currentKey}~${seen + 1}`,
         label: currentKey,
         titled: true,
+        continued: seen > 0,
         rows: withGaps(clusterRows(current, cluster), placedGaps),
         count: current.length,
       });
@@ -791,7 +824,7 @@ export function buildTimeline(options: BuildTimelineOptions): TimelineModel {
     for (const item of past) {
       const key = Number.isNaN(item.at)
         ? "undated"
-        : groupKeyFor(item.at, bucketFor(item.precision, grouping));
+        : groupKeyFor(wallClockOf(item.event.occurred), bucketFor(item.precision, grouping));
       if (key !== currentKey) {
         flush();
         currentKey = key;
@@ -999,6 +1032,8 @@ export interface TimelineLocale {
   registerColumnOther: string;
   jumpToDate: string;
   jumpToDateHint: string;
+  /** A period heading that resumes after another period, e.g. "August 2026 (continued)". */
+  continued: (label: string) => string;
   arrived: (count: number) => string;
   planned: string;
   now: string;
@@ -1100,6 +1135,7 @@ export const DEFAULT_TIMELINE_LOCALE: TimelineLocale = {
   registerColumnOther: "Administrative & contact",
   jumpToDate: "Jump to",
   jumpToDateHint: "Moves the reader to a period. It does not change what is shown.",
+  continued: (label) => `${label} (continued)`,
   arrived: (count) => `${count} new`,
   planned: "Planned",
   now: "Now",
@@ -1333,16 +1369,7 @@ export function formatFhirDateTime(
 
   const trimmed = value.trim();
   const stamp = STAMP.exec(trimmed);
-  const parts = stamp
-    ? Date.UTC(
-        Number(stamp[1]),
-        Number(stamp[2]) - 1,
-        Number(stamp[3]),
-        Number(stamp[4]),
-        Number(stamp[5]),
-        stamp[6] ? Number(stamp[6]) : 0,
-      )
-    : instantOf(trimmed);
+  const parts = wallClockOf(trimmed);
 
   if (Number.isNaN(parts)) return undefined;
 

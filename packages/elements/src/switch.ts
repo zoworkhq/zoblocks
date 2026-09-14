@@ -82,7 +82,18 @@ const CHECK =
 const QUERY =
   '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false" part="glyph" class="zb-switch__glyph"><path d="M8 4.2v5.2M8 12.4v.2" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
 
-export class ZbSwitchElement extends HTMLElement {
+/**
+ * The real `HTMLElement` in a browser, an inert stand-in on a server.
+ *
+ * `extends HTMLElement` is evaluated at import, so in Node (SSR builds) the
+ * bare form threw `ReferenceError` before anything rendered. The stand-in is
+ * never constructed: registration below is skipped without `customElements`.
+ * Same guard as `packages/loaders/src/base.ts`; `test/ssr.test.ts` enforces it.
+ */
+const ElementBase: typeof HTMLElement =
+  typeof HTMLElement === "undefined" ? (class {} as unknown as typeof HTMLElement) : HTMLElement;
+
+export class ZbSwitchElement extends ElementBase {
   static get observedAttributes(): readonly string[] {
     return OBSERVED;
   }
@@ -267,7 +278,9 @@ export class ZbSwitchElement extends HTMLElement {
       value === "unknown" ? "mixed" : String(value === "on"),
     );
     this.#control.setAttribute("aria-busy", String(phase === "pending"));
+    // Removed when cleared, or the control keeps announcing the old name.
     if (label) this.#control.setAttribute("aria-label", label);
+    else this.#control.removeAttribute("aria-label");
     if (this.readOnly) this.#control.setAttribute("aria-readonly", "true");
     else this.#control.removeAttribute("aria-readonly");
     if (this.disabled) this.#control.setAttribute("aria-disabled", "true");

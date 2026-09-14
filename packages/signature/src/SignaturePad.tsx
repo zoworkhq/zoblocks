@@ -63,9 +63,6 @@ export interface SignaturePadProps extends UseSignatureCaptureOptions {
   onChange?: (strokes: Stroke[]) => void;
 }
 
-let seq = 0;
-const nextId = () => `zb-sig-${++seq}`;
-
 export function SignaturePad({
   id,
   label,
@@ -89,7 +86,9 @@ export function SignaturePad({
   // height still wins — the variant sets a default, not a ceiling.
   const boxHeight = height ?? (variant === "initials" ? 120 : 190);
 
-  const base = id ?? `${reactId}${nextId()}`.replace(/:/g, "");
+  // `useId` alone: stable across renders and equal on server and client. A
+  // module counter changed the ids on every render and broke hydration.
+  const base = id ?? `zb-sig-${reactId.replace(/[^\w-]/g, "")}`;
 
   const labelId = `${base}-label`;
   const hintId = `${base}-hint`;

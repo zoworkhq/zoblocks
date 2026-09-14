@@ -225,9 +225,48 @@ function Tabs({ items, activeKey, defaultActiveKey, onChange, className, ...rest
   const active = items.find((item) => item.key === key) ?? items[0];
   const id = React.useId();
 
+  /**
+   * APG's tab keys, with manual activation: arrows move focus, Enter or Space
+   * (the button's own click) selects. Manual because antd's rc-tabs and MUI's
+   * default both are, and the switcher must not change how a strip is driven.
+   * Disabled tabs are skipped, as both frameworks skip them.
+   */
+  const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    const tabs = Array.from(
+      event.currentTarget.querySelectorAll<HTMLButtonElement>('[role="tab"]:not(:disabled)'),
+    );
+    if (tabs.length === 0) return;
+    const current = tabs.indexOf(event.target as HTMLButtonElement);
+    let next: number;
+    switch (event.key) {
+      case "ArrowRight":
+        next = (current + 1) % tabs.length;
+        break;
+      case "ArrowLeft":
+        // From outside the enabled set, -1 lands on the last tab.
+        next = (Math.max(current, 0) - 1 + tabs.length) % tabs.length;
+        break;
+      case "Home":
+        next = 0;
+        break;
+      case "End":
+        next = tabs.length - 1;
+        break;
+      default:
+        return;
+    }
+    event.preventDefault();
+    tabs[next]?.focus();
+  };
+
   return (
     <div className={cx("zb-host-tabs", className)}>
-      <div className="zb-host-tabs__strip" role="tablist" aria-label={rest["aria-label"]}>
+      <div
+        className="zb-host-tabs__strip"
+        role="tablist"
+        aria-label={rest["aria-label"]}
+        onKeyDown={onKeyDown}
+      >
         {items.map((item) => {
           const selected = item.key === active?.key;
           return (

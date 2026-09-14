@@ -155,6 +155,14 @@ export function SignatureModal({
    */
   const [nameEdited, setNameEdited] = React.useState(false);
   const [showOutcomes, setShowOutcomes] = React.useState(false);
+  /*
+   * Strokes to reload into the pad when it remounts after the outcome sheet.
+   *
+   * The sheet replaces the Modal, which unmounts the pad and empties its
+   * engine, while `strokes` keeps the ink. Without this, Back showed a blank
+   * pad whose Sign button submitted the earlier signature.
+   */
+  const [padSeed, setPadSeed] = React.useState<Stroke[] | undefined>(undefined);
   const [tooLittleInk, setTooLittleInk] = React.useState(false);
   // Black or blue. Some institutions still require blue to distinguish an
   // original from a photocopy, and the convention followed people into
@@ -200,7 +208,12 @@ export function SignatureModal({
   // Every opening starts clean. On a shared bedside tablet, carrying a previous
   // patient's ink into the next signing is a disclosure, not a convenience.
   React.useEffect(() => {
-    if (!open) return;
+    // Cleared on close, not open: the pad mounts on the opening render, before
+    // an open-time effect could run.
+    if (!open) {
+      setPadSeed(undefined);
+      return;
+    }
     setStrokes([]);
     setTypedName("");
     setUploaded(null);
@@ -383,6 +396,7 @@ export function SignatureModal({
             label={t.padLabel}
             locale={localeOverrides}
             ink={INK_HEX[inkColour]}
+            initialStrokes={padSeed}
             error={tooLittleInk ? t.tooLittleInk : undefined}
             onChange={(next) => {
               setStrokes(next);
@@ -411,7 +425,10 @@ export function SignatureModal({
         now={now}
         recordedBy={recordedBy}
         locale={localeOverrides}
-        onBack={() => setShowOutcomes(false)}
+        onBack={() => {
+          setPadSeed(strokes);
+          setShowOutcomes(false);
+        }}
         onCancel={onCancel}
         onSubmit={(value) => {
           audit(value.outcome);

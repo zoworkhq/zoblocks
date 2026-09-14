@@ -35,6 +35,10 @@ zoblocks add @zoblocks-pro/vitals-flowsheet    # a registry declared in zoblocks
 zoblocks add https://…/item.json             # a registry item by URL
 ```
 
+Dependencies come from the registry their component came from. A bare name
+like `utils` in an item added by URL resolves beside that URL, so a mirror
+stays self-contained. A dependency in another registry is written as a full URL.
+
 ### Options
 
 | Flag          | Effect                                                     |

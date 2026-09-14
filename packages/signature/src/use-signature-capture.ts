@@ -82,10 +82,14 @@ export function useSignatureCapture(options: UseSignatureCaptureOptions = {}): S
   // pointermove, and cloning it sixty times a second to satisfy immutability
   // would be the whole performance budget.
   const engine = React.useRef<SignatureCapture>(undefined as unknown as SignatureCapture);
+  // What the engine was seeded with, so a second set-up can seed it again.
+  const seed = React.useRef<readonly Stroke[] | undefined>(undefined);
   if (engine.current === undefined) {
     engine.current = new SignatureCapture(captureOptions);
+    seed.current = initialStrokes;
     if (initialStrokes?.length) engine.current.load(initialStrokes);
   }
+  const tornDown = React.useRef(false);
 
   // The clock is relative to the first contact, so the model contains no wall
   // time at all — see the note in signature-core/capture.ts.
@@ -130,8 +134,10 @@ export function useSignatureCapture(options: UseSignatureCaptureOptions = {}): S
   const onPointerDown = React.useCallback<React.PointerEventHandler<HTMLDivElement>>(
     (event) => {
       if (disabled) return;
-      // Secondary buttons and the eraser end of a stylus are not drawing.
-      if (event.button !== 0 && event.pointerType === "mouse") return;
+      // Only the primary contact draws. Not a mouse's other buttons, not a
+      // stylus's barrel button (2), and not its eraser end, which reports
+      // button 5 with buttons bit 32 — or on some drivers only the bit.
+      if (event.button !== 0 || (event.buttons & 32) !== 0) return;
 
       const sample = toSample(event);
       if (!sample || !engine.current.down(sample)) return;
@@ -174,11 +180,15 @@ export function useSignatureCapture(options: UseSignatureCaptureOptions = {}): S
     [commit, disabled, toSample],
   );
 
-  const onPointerCancel = React.useCallback<React.PointerEventHandler<HTMLDivElement>>(() => {
-    // The browser took the gesture — a scroll, an edge swipe, the tab hiding.
-    // Committing a half-drawn stroke would leave a mark nobody made.
-    if (engine.current.cancel()) commit();
-  }, [commit]);
+  const onPointerCancel = React.useCallback<React.PointerEventHandler<HTMLDivElement>>(
+    (event) => {
+      // The browser took the gesture — a scroll, an edge swipe, the tab hiding.
+      // Committing a half-drawn stroke would leave a mark nobody made. Only
+      // that pointer's stroke, though: a cancelled palm is not the pen.
+      if (engine.current.cancel(event.pointerId)) commit();
+    },
+    [commit],
+  );
 
   const act = React.useCallback(
     (fn: () => boolean | void) => {
@@ -203,10 +213,23 @@ export function useSignatureCapture(options: UseSignatureCaptureOptions = {}): S
    * render — and a host using the headless hook can hold that reference
    * across a route change. Emptying it here means the strokes are gone
    * whichever way the pad left the screen.
+   *
+   * A set-up after a clean-up on the same instance is StrictMode's rehearsal,
+   * or an `<Activity>` shown again. The seed comes back, because the host
+   * supplied it; anything drawn since does not.
    */
   React.useEffect(() => {
     const capture = engine.current;
-    return () => capture.clear();
+    if (tornDown.current) {
+      tornDown.current = false;
+      origin.current = null;
+      if (seed.current?.length) capture.load(seed.current);
+      setVersion((n) => n + 1);
+    }
+    return () => {
+      tornDown.current = true;
+      capture.clear();
+    };
   }, []);
 
   return {

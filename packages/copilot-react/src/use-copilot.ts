@@ -18,10 +18,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   assertClinicianFacing,
   categoryLabels,
+  classifyProposal,
   confirmProposal,
+  copilotError,
   disclosableWithheldCount,
   hasDisclosableWithholding,
   initialState,
+  pendingProposal,
   isReflexive,
   reduce,
   requireMode,
@@ -29,9 +32,13 @@ import {
   runExchange,
   type ActionProposal,
   type Actor,
+  type Answer,
+  type ConfirmedProposal,
   type CopilotContextResolver,
+  type CopilotMessage,
   type CopilotMode,
   type CopilotProvider,
+  type ProposalRisk,
   type CrisisLine,
   type FeedbackReason,
   type ModelDisclosure,
@@ -156,13 +163,21 @@ export interface CopilotApi {
     readonly stop: (final?: string) => void;
   };
 
+  /** The drawer's sources, in marker order. */
   readonly sources: readonly Source[];
+  /** The same sources with their citation markers, so a skin numbers them as the answer does. */
+  readonly citations: readonly CopilotCitation[];
   readonly sourcesOpen: boolean;
-  /** Opening the drawer emits the verification-rate signal. §17. */
+  /** Opens the latest answer's sources. Emits the verification-rate signal. §17. */
   readonly openSources: () => void;
+  /** Opens one assistant message's sources, so an older answer shows its own. */
+  readonly openSourcesFor: (messageId: string) => void;
   readonly closeSources: () => void;
 
+  /** Null until the answer carrying it has been checked. */
   readonly proposal: ActionProposal | null;
+  /** The proposal's risk under the active mode. A `prohibited` one renders no confirm. */
+  readonly proposalRisk: ProposalRisk | null;
   readonly confirm: () => void;
   readonly dismissProposal: () => void;
 
@@ -178,7 +193,20 @@ export interface CopilotApi {
    */
   readonly disclosure: ModelDisclosure;
 
+  /** Feedback on the latest answer. */
   readonly sendFeedback: (rating: "up" | "down", reason?: FeedbackReason) => void;
+  /**
+   * Feedback on one assistant message, recorded against the exchange that
+   * produced it. A bare thumbs-down sets `awaitingFeedbackReason` to that
+   * message's id, so a skin asks under the right answer. A skin with no reason
+   * picker passes `{ askReason: false }` to record it at once.
+   */
+  readonly sendFeedbackFor: (
+    messageId: string,
+    rating: "up" | "down",
+    reason?: FeedbackReason,
+    options?: { readonly askReason?: boolean },
+  ) => void;
 
   /**
    * Collapsed to a bubble.
@@ -215,6 +243,12 @@ export interface CopilotApi {
    */
   readonly awaitingFeedbackReason: string | null;
   readonly dismissFeedbackReason: () => void;
+}
+
+/** A source and the marker the answer cites it by. */
+export interface CopilotCitation {
+  readonly marker: number;
+  readonly source: Source;
 }
 
 export interface CopilotThreadSummary {
@@ -257,6 +291,19 @@ const defaultNewId = (): string =>
     ? crypto.randomUUID()
     : `copilot-${++fallbackId}`;
 
+/** A message's answer by id, or undefined when there is none. */
+function answerFor(messages: readonly CopilotMessage[], id: string | null): Answer | undefined {
+  return id === null ? undefined : messages.find((message) => message.id === id)?.answer;
+}
+
+/** An answer's sources paired with their markers, in marker order. */
+function citationsOf(answer: Answer | null | undefined): readonly CopilotCitation[] {
+  if (!answer) return [];
+  return [...answer.sources]
+    .map(([marker, source]) => ({ marker, source }))
+    .sort((a, b) => a.marker - b.marker);
+}
+
 export function useCopilot(options: UseCopilotOptions): CopilotApi {
   const {
     provider,
@@ -279,6 +326,8 @@ export function useCopilot(options: UseCopilotOptions): CopilotApi {
 
   const [state, dispatch] = useReducerState(initialModeId, provider.capabilities.citations);
   const [sourcesOpen, setSourcesOpen] = useState(false);
+  // Which answer the drawer shows, by message id. Null means the latest.
+  const [sourcesFor, setSourcesFor] = useState<string | null>(null);
   const [collapsed, setCollapsed] = useState(false);
   const [awaitingFeedbackReason, setAwaitingFeedbackReason] = useState<string | null>(null);
   const [threads, setThreads] = useState<readonly CopilotThreadSummary[]>([]);
@@ -297,16 +346,24 @@ export function useCopilot(options: UseCopilotOptions): CopilotApi {
 
   /* --- verification timing ----------------------------------------- */
 
+  const previousStatusRef = useRef(state.status);
   useEffect(() => {
-    if (state.status === "complete") {
+    const previous = previousStatusRef.current;
+    previousStatusRef.current = state.status;
+    // An answer with a proposal lands in proposing. Dismissing that proposal
+    // (proposing → complete) is not a new answer, so the clock keeps running.
+    if (state.status === "proposing" || (state.status === "complete" && previous !== "proposing")) {
       answeredAtRef.current = stamp();
       setSourcesOpen(false);
     }
   }, [state.status]);
 
+  // Stamped when the card can render, not when the event arrived, so dwell
+  // time never includes the stream.
+  const proposal = pendingProposal(state);
   useEffect(() => {
-    if (state.proposal) proposalShownAtRef.current = stamp();
-  }, [state.proposal]);
+    if (proposal) proposalShownAtRef.current = stamp();
+  }, [proposal]);
 
   /* --- actions ------------------------------------------------------ */
 
@@ -349,6 +406,7 @@ export function useCopilot(options: UseCopilotOptions): CopilotApi {
       setActiveThreadId(id);
       dispatch({ type: "new-thread" });
       setSourcesOpen(false);
+      setSourcesFor(null);
       setAwaitingFeedbackReason(null);
     },
     [dispatch],
@@ -358,6 +416,7 @@ export function useCopilot(options: UseCopilotOptions): CopilotApi {
     abortRef.current?.abort();
     dispatch({ type: "new-thread" });
     setSourcesOpen(false);
+    setSourcesFor(null);
     setAwaitingFeedbackReason(null);
     setActiveThreadId(newId());
   }, [dispatch, newId]);
@@ -476,35 +535,66 @@ export function useCopilot(options: UseCopilotOptions): CopilotApi {
   // Destructured first: the exhaustive-deps rule treats any `.current` access
   // as a ref, and `state.current` is the streaming answer rather than one.
   const streaming = state.current;
-  const sources = useMemo(() => (streaming ? [...streaming.sources.values()] : []), [streaming]);
+  const messages = state.messages;
+  const citations = useMemo(
+    () => citationsOf(answerFor(messages, sourcesFor) ?? streaming),
+    [messages, sourcesFor, streaming],
+  );
+  const sources = useMemo(() => citations.map((citation) => citation.source), [citations]);
 
-  const openSources = useCallback(() => {
-    setSourcesOpen(true);
-    // The verification signal. A falling rate is the automation-bias early
-    // warning, and `msToOpen` is Law 2 made measurable.
-    if (onTelemetry && state.exchangeId) {
-      onTelemetry({
-        type: "sources-opened",
-        exchangeId: state.exchangeId,
-        msToOpen: elapsed(answeredAtRef.current),
-        sourceCount: sources.length,
-      });
-    }
-  }, [onTelemetry, state.exchangeId, sources.length]);
+  const showSources = useCallback(
+    (target: string | null) => {
+      setSourcesFor(target);
+      setSourcesOpen(true);
+      // The verification signal. A falling rate is the automation-bias early
+      // warning, and `msToOpen` is Law 2 made measurable.
+      const latest = stateRef.current;
+      if (onTelemetry && latest.exchangeId) {
+        const answer = answerFor(latest.messages, target) ?? latest.current;
+        onTelemetry({
+          type: "sources-opened",
+          exchangeId: latest.exchangeId,
+          msToOpen: elapsed(answeredAtRef.current),
+          sourceCount: answer?.sources.size ?? 0,
+        });
+      }
+    },
+    [onTelemetry],
+  );
+  const openSources = useCallback(() => showSources(null), [showSources]);
+  const openSourcesFor = useCallback((id: string) => showSources(id), [showSources]);
 
   const closeSources = useCallback(() => setSourcesOpen(false), []);
 
   /* --- proposals ---------------------------------------------------- */
 
+  const proposalRisk = useMemo(
+    () =>
+      proposal ? classifyProposal(proposal, { forbidDosing: mode.output.forbidDosing }) : null,
+    [proposal, mode.output.forbidDosing],
+  );
+
   const confirm = useCallback(() => {
-    const proposal = stateRef.current.proposal;
+    const proposal = pendingProposal(stateRef.current);
     if (!proposal || !actor) return;
     const dwellMs = elapsed(proposalShownAtRef.current);
-    const confirmed = confirmProposal(proposal, actor, {
-      confirmedAt: now(),
-      dwellMs,
-      forbidDosing: mode.output.forbidDosing,
-    });
+    let confirmed: ConfirmedProposal;
+    try {
+      confirmed = confirmProposal(proposal, actor, {
+        confirmedAt: now(),
+        dwellMs,
+        forbidDosing: mode.output.forbidDosing,
+      });
+    } catch (cause) {
+      // A prohibited proposal is a contract violation, not a crash in a click
+      // handler. Shown as an error; the reducer drops the proposal.
+      const message = cause instanceof Error ? cause.message : "Proposal cannot be confirmed.";
+      dispatch({
+        type: "fail",
+        error: copilotError("contract-violation", message, { retryable: false, cause }),
+      });
+      return;
+    }
     onTelemetry?.({
       type: "proposal-confirmed",
       exchangeId: stateRef.current.exchangeId ?? "",
@@ -521,24 +611,44 @@ export function useCopilot(options: UseCopilotOptions): CopilotApi {
 
   const dismissFeedbackReason = useCallback(() => setAwaitingFeedbackReason(null), []);
 
-  const sendFeedback = useCallback(
-    (rating: "up" | "down", reason?: FeedbackReason) => {
+  const recordFeedback = useCallback(
+    (target: string | null, rating: "up" | "down", reason?: FeedbackReason, askReason = true) => {
+      const latest = stateRef.current;
+      // Null targets the latest answer; an id targets that message's exchange.
+      const message =
+        target === null
+          ? [...latest.messages].reverse().find((m) => m.role === "assistant")
+          : latest.messages.find((m) => m.id === target);
+      const exchangeId = target === null ? latest.exchangeId : message?.exchangeId;
       // A bare thumbs-down asks for the reason rather than recording a signal
       // nobody can act on. Thumbs-up records immediately: there is nothing to
       // diagnose about an answer that worked.
-      if (rating === "down" && reason === undefined) {
-        setAwaitingFeedbackReason(stateRef.current.exchangeId ?? "pending");
+      if (rating === "down" && reason === undefined && askReason) {
+        setAwaitingFeedbackReason(message?.id ?? "pending");
         return;
       }
       setAwaitingFeedbackReason(null);
       onTelemetry?.({
         type: "feedback",
-        exchangeId: stateRef.current.exchangeId ?? "",
+        exchangeId: exchangeId ?? "",
         rating,
         ...(reason ? { reason } : {}),
       });
     },
     [onTelemetry],
+  );
+  const sendFeedback = useCallback(
+    (rating: "up" | "down", reason?: FeedbackReason) => recordFeedback(null, rating, reason),
+    [recordFeedback],
+  );
+  const sendFeedbackFor = useCallback(
+    (
+      messageId: string,
+      rating: "up" | "down",
+      reason?: FeedbackReason,
+      options?: { readonly askReason?: boolean },
+    ) => recordFeedback(messageId, rating, reason, options?.askReason ?? true),
+    [recordFeedback],
   );
 
   /* --- derived ------------------------------------------------------ */
@@ -593,10 +703,13 @@ export function useCopilot(options: UseCopilotOptions): CopilotApi {
       state.status !== "crisis",
     dictation,
     sources,
+    citations,
     sourcesOpen,
     openSources,
+    openSourcesFor,
     closeSources,
-    proposal: state.proposal,
+    proposal,
+    proposalRisk,
     confirm,
     dismissProposal,
     crisisLines,
@@ -605,6 +718,7 @@ export function useCopilot(options: UseCopilotOptions): CopilotApi {
     suppressed,
     disclosure: provider.disclosure,
     sendFeedback,
+    sendFeedbackFor,
     collapsed,
     setCollapsed,
     threads,

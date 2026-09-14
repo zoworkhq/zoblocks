@@ -344,6 +344,10 @@ export async function addComment(form: FormData): Promise<void> {
   const body = z.string().trim().min(1).max(5000).safeParse(form.get("body"));
   if (!body.success) return;
 
+  // A well-formed id is not a task. Any member may comment, so no owner check.
+  const task = await db().tasks.findOne({ _id: taskId }, { projection: { _id: 1 } });
+  if (!task) throw new Error("Task not found.");
+
   await db().comments.insertOne({
     _id: new ObjectId(),
     taskId,

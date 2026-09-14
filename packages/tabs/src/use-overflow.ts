@@ -57,12 +57,17 @@ export function useOverflow({
     const list = listRef.current;
     if (!list) return null;
     const tabs = Array.from(list.querySelectorAll<HTMLElement>("[data-zb-tab]"));
-    // Everything visible for the duration of the read.
-    const restore = tabs.map((tab) => tab.style.display);
-    for (const tab of tabs) tab.style.display = "";
+    // Everything visible for the duration of the read — including tabs parked
+    // in the More menu, which are `hidden` and would measure zero.
+    const restore = tabs.map((tab) => ({ display: tab.style.display, hidden: tab.hidden }));
+    for (const tab of tabs) {
+      tab.style.display = "";
+      tab.hidden = false;
+    }
     const measured = tabs.map((tab) => tab.getBoundingClientRect().width);
     tabs.forEach((tab, i) => {
-      tab.style.display = restore[i] ?? "";
+      tab.style.display = restore[i]?.display ?? "";
+      tab.hidden = restore[i]?.hidden ?? false;
     });
     return measured;
   }, [listRef]);

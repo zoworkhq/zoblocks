@@ -84,8 +84,9 @@ describe("summariseSuite", () => {
     expect(suite.passed).toBe(3);
   });
 
-  it("treats an empty suite as passing rather than dividing by zero", () => {
-    expect(summariseSuite("s", true, []).rate).toBe(1);
+  it("scores an empty suite as zero rather than a pass", () => {
+    // An empty suite tests nothing, and 1.0 let the gate pass without testing.
+    expect(summariseSuite("s", true, []).rate).toBe(0);
   });
 });
 
@@ -113,6 +114,19 @@ describe("the release gate", () => {
     ]);
     expect(report.passed).toBe(false);
     expect(() => assertReleaseGate(report)).toThrow(ReleaseGateError);
+  });
+
+  it("fails a blocking suite that ran no cases, and says so", () => {
+    const report = buildReport([summariseSuite("empty", true, [])]);
+    expect(report.passed).toBe(false);
+    expect(report.blockingFailures).toContain("empty: no cases ran");
+    expect(() => assertReleaseGate(report)).toThrow(/empty: 0\/0/);
+  });
+
+  it("fails a run with no suites at all", () => {
+    const report = buildReport([]);
+    expect(report.passed).toBe(false);
+    expect(report.blockingFailures).toContain("no suites ran");
   });
 
   it("ignores non-blocking suites when deciding", () => {
@@ -171,6 +185,16 @@ describe("defaultGrade", () => {
 
   it("accepts a claim with no substantive tokens rather than failing it", () => {
     expect(defaultGrade("it is so", guideline.passage)).toBe(true);
+  });
+
+  it("grades a dosing claim made only of numbers, units and abbreviations", () => {
+    expect(defaultGrade("0.5 mg od", guideline.passage)).toBe(false);
+    expect(defaultGrade("5 mg od", "Start ramipril 5 mg od and review in two weeks.")).toBe(true);
+  });
+
+  it("fails a claim whose number the passage does not state", () => {
+    // Two of three tokens overlap; the one that differs is a tenfold error.
+    expect(defaultGrade("0.5 mg od", "Start at 5 mg od.")).toBe(false);
   });
 });
 

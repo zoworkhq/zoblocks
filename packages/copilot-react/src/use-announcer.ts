@@ -100,7 +100,9 @@ export function useAnnouncer(options: UseAnnouncerOptions): Announcer {
           lastSentence.current = 0;
           setMessage(messages.answering);
           return;
+        // An answer with a proposal goes straight from streaming to proposing.
         case "complete":
+        case "proposing":
           setMessage(answer?.partial ? messages.partial(words) : messages.complete(words, sources));
           return;
         case "refused":

@@ -126,7 +126,17 @@ export function ChartCommandPalette({
   const results = React.useMemo(() => applyScope(rank(term, items), scope), [term, items, scope]);
   const grouped = React.useMemo(() => group(results.visible), [results]);
   const flat = React.useMemo(() => grouped.flatMap((entry) => entry.items), [grouped]);
-  const current = flat[active]?.item;
+  /*
+   * The highlight, clamped to the list as it is now.
+   *
+   * The stored index resets when the query changes, but items and scope can
+   * change under a fixed query — a slow source landing, a chart closing — and
+   * an index past the end highlights nothing and makes Enter do nothing.
+   * Clamping rather than resetting keeps the reader's place when the list only
+   * grows, and survives a host that passes a fresh `items` array every render.
+   */
+  const activeIndex = Math.max(0, Math.min(active, flat.length - 1));
+  const current = flat[activeIndex]?.item;
   const withheld = describeWithheld(results.withheld, scope);
 
   /** Whether this term reached the patient index at all. */
@@ -210,10 +220,9 @@ export function ChartCommandPalette({
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();
       setConfirming(null);
-      setActive((index) => {
-        const next = index + (event.key === "ArrowDown" ? 1 : -1);
-        return Math.min(flat.length - 1, Math.max(0, next));
-      });
+      // From the clamped index, so a stale one past the end cannot swallow a keypress.
+      const next = activeIndex + (event.key === "ArrowDown" ? 1 : -1);
+      setActive(Math.max(0, Math.min(flat.length - 1, next)));
       return;
     }
 
@@ -272,7 +281,7 @@ export function ChartCommandPalette({
                 </p>
                 {entry.items.map(({ item }) => {
                   const index = flat.findIndex((candidate) => candidate.item.id === item.id);
-                  const isActive = index === active;
+                  const isActive = index === activeIndex;
                   // Armed, not "about to be armed": the prompt appears after
                   // the first Enter, not on every significant row from the
                   // moment it is listed. A confirmation shown before anybody

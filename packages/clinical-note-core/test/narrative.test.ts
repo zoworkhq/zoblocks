@@ -22,6 +22,19 @@ const FORBIDDEN =
   /<(script|form|iframe|object|frame|base|link|head|body|style)\b|<[a-z]+[^>]*\son[a-z]+=|xlink:/i;
 
 describe("escapeXml", () => {
+  it("removes characters XML 1.0 forbids, so a Word paste cannot invalidate the narrative", () => {
+    // Word's manual line break is U+000B; dropping it would join the words.
+    expect(escapeXml("line one\u000Bline two")).toBe("line one line two");
+    expect(escapeXml("a\u0000b\u001Fc\uFFFEd\uFFFF")).toBe("abcd");
+    expect(escapeXml("\uD800x")).toBe("x"); // a lone surrogate
+    expect(escapeXml("tab\tnew\nline\r\u{1F600}")).toBe("tab\tnew\nline\r\u{1F600}");
+  });
+
+  it("keeps a pasted control character out of the section narrative", () => {
+    const s = section({ code: "1", title: "S" }, p(t("K+ 4.1\u0007 mmol/L")));
+    expect(sectionNarrative(s)).toBe(`<div xmlns="${XHTML_NS}"><p>K+ 4.1 mmol/L</p></div>`);
+  });
+
   it("escapes ampersand first, so escapes are not double-escaped", () => {
     expect(escapeXml("a & b")).toBe("a &amp; b");
     expect(escapeXml("<b>")).toBe("&lt;b&gt;");

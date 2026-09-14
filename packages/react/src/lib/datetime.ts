@@ -648,6 +648,9 @@ export interface ZbTimeRange {
  * number when it does not. Returning the negative rather than clamping to zero
  * is deliberate: the field reports "ends before it starts" and offers a
  * correction, which is information a clamp destroys.
+ *
+ * An end equal to its start is empty either way, never 24 hours. There is no
+ * full-day option, and 07:00 to 07:00 is far likelier a typo than a full day.
  */
 export function timeRangeMinutes(
   range: ZbTimeRange,
@@ -656,8 +659,7 @@ export function timeRangeMinutes(
   const { start, end } = range;
   if (!start || !end) return null;
   const span = minutesOfTime(end) - minutesOfTime(start);
-  if (span > 0) return span;
-  if (span === 0) return options.allowOvernight ? 1440 : 0;
+  if (span >= 0) return span;
   return options.allowOvernight ? span + 1440 : span;
 }
 

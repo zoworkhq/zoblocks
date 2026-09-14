@@ -154,6 +154,22 @@ describe("one banner per screen", () => {
     expect(handler).not.toHaveBeenCalled();
   });
 
+  it("counts banners per patient, so unmounting one of two does not forget the patient", () => {
+    const handler = vi.fn();
+    onBannerViolation(handler);
+    const first = F.renderWithPolicy(<PatientBanner patient={F.amaraA} context="navigation" />);
+    F.renderWithPolicy(<PatientBanner patient={F.amaraA} context="navigation" />);
+    expect(handler).not.toHaveBeenCalled();
+
+    first.unmount();
+    F.renderWithPolicy(<PatientBanner patient={F.devraj} context="navigation" />);
+    expect(handler).toHaveBeenCalledTimes(1);
+    expect(handler.mock.calls[0]?.[0]).toMatchObject({
+      displayed: "pat-9038",
+      other: "pat-4471",
+    });
+  });
+
   it("unsubscribes cleanly", () => {
     const handler = vi.fn();
     const off = onBannerViolation(handler);

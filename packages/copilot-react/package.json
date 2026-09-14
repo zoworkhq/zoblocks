@@ -1,7 +1,7 @@
 {
   "name": "@zoblocks/copilot-react",
   "version": "0.1.0",
-  "description": "Headless React for ZoBlocks Copilot. Hooks and unstyled primitives that own state, keyboard, focus and ARIA \u2014 no design system, no styles.",
+  "description": "Headless React for ZoBlocks Copilot. Hooks and unstyled primitives that own state, keyboard, focus and ARIA — no design system, no styles.",
   "license": "MIT",
   "homepage": "https://zoblocks.design/components/copilot",
   "repository": {
@@ -62,19 +62,19 @@
     "react-dom": "^18.2.0 || ^19.0.0"
   },
   "devDependencies": {
-    "@zoblocks/tsconfig": "workspace:*",
     "@testing-library/dom": "^10",
     "@testing-library/jest-dom": "^7",
     "@testing-library/react": "^16",
     "@testing-library/user-event": "^14",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
-    "@vitest/coverage-v8": "^4.1.10",
+    "@vitest/coverage-v8": "^4.1.11",
+    "@zoblocks/tsconfig": "workspace:*",
     "axe-core": "^4.13.0",
     "jsdom": "^30",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "typescript": "^5.7.2",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.11"
   }
 }

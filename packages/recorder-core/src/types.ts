@@ -164,6 +164,8 @@ export interface RecorderDisposition {
 export interface TimeDomainSource {
   /** Fills `target` with time-domain samples in roughly [-1, 1]. */
   getFloatTimeDomainData(target: Float32Array): void;
+  /** Samples the source fills per read. `AnalyserNode` has it; fakes may omit it. */
+  readonly fftSize?: number;
 }
 
 /**

@@ -131,6 +131,29 @@ describe("<ZoBlocksMuiProvider>", () => {
     document.documentElement.removeAttribute("style");
   });
 
+  it("reads the brand from `scope` rather than the document", async () => {
+    document.documentElement.style.setProperty("--zb-accent", "#7c3aed");
+
+    function Branded() {
+      const ref = React.useRef<HTMLDivElement>(null);
+      return (
+        <div ref={ref} style={{ "--zb-accent": "#0f766e" } as React.CSSProperties}>
+          <ZoBlocksMuiProvider scope={ref}>
+            <Probe />
+          </ZoBlocksMuiProvider>
+        </div>
+      );
+    }
+    render(
+      <ThemeProvider theme={createTheme()}>
+        <Branded />
+      </ThemeProvider>,
+    );
+
+    expect(await screen.findByText("#0f766e")).toBeTruthy();
+    document.documentElement.removeAttribute("style");
+  });
+
   /**
    * Extends rather than replaces. A customer who set spacing or a breakpoint
    * keeps them — only the palette and shape this derives are supplied.
@@ -164,6 +187,87 @@ describe("<ZoBlocksMuiProvider>", () => {
       </ThemeProvider>,
     );
     expect(await screen.findByText("#b91c1c")).toBeTruthy();
+    document.documentElement.removeAttribute("style");
+  });
+
+  /*
+   * `createTheme(a, b, c)` deep-merges b and c raw, after the palette and the
+   * type scale are built. A brand passed that way kept MUI's blue `dark` and
+   * Roboto on every variant.
+   */
+  function DerivedProbe() {
+    const { palette, typography } = useTheme();
+    return (
+      <span data-testid="derived">
+        {[
+          palette.primary.main,
+          palette.primary.dark,
+          palette.primary.contrastText,
+          typography.body1.fontFamily,
+          typography.button.fontFamily,
+        ].join("|")}
+      </span>
+    );
+  }
+
+  const expected = (main: string, font: string) => {
+    const reference = createTheme({ palette: { primary: { main } } }).palette.primary;
+    return [main, reference.dark, reference.contrastText, font, font].join("|");
+  };
+
+  it("derives the primary shades and contrast text from the brand", async () => {
+    document.documentElement.style.setProperty("--zb-accent", "#7c3aed");
+    document.documentElement.style.setProperty("--zb-font-sans", "Georgia, serif");
+    render(
+      <ThemeProvider theme={createTheme()}>
+        <ZoBlocksMuiProvider>
+          <DerivedProbe />
+        </ZoBlocksMuiProvider>
+      </ThemeProvider>,
+    );
+    const text = expected("#7c3aed", "Georgia, serif");
+    expect(await screen.findByText(text)).toBeTruthy();
+    // Not the host's default blue.
+    expect(text).not.toContain(createTheme().palette.primary.dark);
+    document.documentElement.removeAttribute("style");
+  });
+
+  it("derives shades from an override's colour, not the brand's", async () => {
+    document.documentElement.style.setProperty("--zb-accent", "#7c3aed");
+    document.documentElement.style.setProperty("--zb-font-sans", "Georgia, serif");
+    render(
+      <ThemeProvider theme={createTheme()}>
+        <ZoBlocksMuiProvider override={{ palette: { primary: { main: "#b91c1c" } } }}>
+          <DerivedProbe />
+        </ZoBlocksMuiProvider>
+      </ThemeProvider>,
+    );
+    expect(await screen.findByText(expected("#b91c1c", "Georgia, serif"))).toBeTruthy();
+    document.documentElement.removeAttribute("style");
+  });
+
+  it("keeps a host's deliberate variant settings while taking the brand font", async () => {
+    function VariantProbe() {
+      const { typography } = useTheme();
+      return (
+        <span data-testid="variant">
+          {`${String(typography.h1.fontWeight)}|${typography.h2.fontFamily}|${typography.h1.fontFamily}`}
+        </span>
+      );
+    }
+    document.documentElement.style.setProperty("--zb-font-sans", "Georgia, serif");
+    render(
+      <ThemeProvider
+        theme={createTheme({
+          typography: { h1: { fontWeight: 900 }, h2: { fontFamily: "Courier, monospace" } },
+        })}
+      >
+        <ZoBlocksMuiProvider>
+          <VariantProbe />
+        </ZoBlocksMuiProvider>
+      </ThemeProvider>,
+    );
+    expect(await screen.findByText("900|Courier, monospace|Georgia, serif")).toBeTruthy();
     document.documentElement.removeAttribute("style");
   });
 });

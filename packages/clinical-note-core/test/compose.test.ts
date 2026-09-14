@@ -146,6 +146,64 @@ describe("foreignContent", () => {
     expect(foreignContent(d, "Patient/1")).toHaveLength(0);
   });
 
+  it("does not flag the same patient referenced by version", () => {
+    // A versioned reference used to block signing on the patient's own chart.
+    const d = doc(
+      section({ code: "1", title: "S" }, p(t("x", "copied", { source: "Patient/1/_history/2" }))),
+    );
+    expect(foreignContent(d, "Patient/1")).toHaveLength(0);
+  });
+
+  it("catches another patient referenced by absolute URL", () => {
+    const d = doc(
+      section(
+        { code: "1", title: "S" },
+        p(
+          t("theirs", "copied", { source: "https://fhir.example.org/r4/Patient/9999999" }),
+          t("mine", "copied", {
+            source: "https://fhir.example.org/r4/Patient/4471902/_history/3",
+          }),
+        ),
+      ),
+    );
+    const foreign = foreignContent(d, "Patient/4471902");
+    expect(foreign).toHaveLength(1);
+    expect(foreign[0]!.text).toBe("theirs");
+    expect(foreign[0]!.source).toBe("https://fhir.example.org/r4/Patient/9999999");
+  });
+
+  it("normalises the subject as well as the source", () => {
+    const d = doc(
+      section({ code: "1", title: "S" }, p(t("x", "copied", { source: "Patient/1?_format=json" }))),
+    );
+    expect(foreignContent(d, "https://fhir.example.org/Patient/1/_history/4")).toHaveLength(0);
+    expect(foreignContent(d, "https://fhir.example.org/Patient/2")).toHaveLength(1);
+  });
+
+  it("treats the same id on another server as another patient", () => {
+    const d = doc(
+      section(
+        { code: "1", title: "S" },
+        p(t("x", "copied", { source: "https://other.example.org/fhir/Patient/1" })),
+      ),
+    );
+    expect(foreignContent(d, "https://fhir.example.org/Patient/1")).toHaveLength(1);
+    // Scheme and host case carry no meaning.
+    expect(foreignContent(d, "HTTPS://OTHER.example.org/fhir/Patient/1")).toHaveLength(0);
+    // A relative subject is on the note's own server, which could be either.
+    expect(foreignContent(d, "Patient/1")).toHaveLength(0);
+  });
+
+  it("ignores an absolute reference to something that is not a patient", () => {
+    const d = doc(
+      section(
+        { code: "1", title: "S" },
+        p(t("x", "copied", { source: "https://fhir.example.org/DocumentReference/7" })),
+      ),
+    );
+    expect(foreignContent(d, "Patient/1")).toHaveLength(0);
+  });
+
   it("ignores copied text with no recorded source", () => {
     const d = doc(section({ code: "1", title: "S" }, p(t("x", "copied"))));
     expect(foreignContent(d, "Patient/1")).toHaveLength(0);

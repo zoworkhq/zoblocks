@@ -343,6 +343,57 @@ describe("grouping never invents a precision", () => {
   });
 });
 
+describe("a group heading agrees with the row under it", () => {
+  // Grouping by UTC put 2026-09-01T02:00+10:00 under August while its row read
+  // "1 Sep 2026, 02:00 +10:00". Headings read the record's own wall clock.
+  const LATER = "2030-01-01T00:00:00Z";
+  const keysFor = (occurred: string, group: "month" | "quarter" | "year") =>
+    buildTimeline({
+      events: [{ id: "a", kind: "note", occurred, title: "Letter" }],
+      now: LATER,
+      coverage: COVERAGE,
+      group,
+    }).sections.map((section) => section.key);
+
+  it.each([
+    ["2026-09-01T02:00:00+10:00", "month", "2026-09"],
+    ["2026-08-31T22:00:00-05:00", "month", "2026-08"],
+    ["2026-10-01T01:00:00+05:30", "quarter", "2026-Q4"],
+    ["2026-06-30T23:30:00-04:00", "quarter", "2026-Q2"],
+    ["2027-01-01T00:30:00+01:00", "year", "2027"],
+    ["2026-12-31T20:00:00-08:00", "year", "2026"],
+  ] as const)("%s by %s is %s", (occurred, group, key) => {
+    expect(keysFor(occurred, group)).toEqual([key]);
+  });
+
+  it("orders by true instant, and keeps keys unique when zones interleave months", () => {
+    const model = buildTimeline({
+      events: [
+        { id: "aug-utc", kind: "note", occurred: "2026-08-31T20:00:00Z", title: "B" },
+        // 2026-08-31T16:00Z — earlier than the row above, but September on its own clock.
+        { id: "sep-local", kind: "note", occurred: "2026-09-01T02:00:00+10:00", title: "A" },
+        { id: "aug", kind: "note", occurred: "2026-08-30T12:00:00Z", title: "C" },
+      ],
+      now: LATER,
+      coverage: COVERAGE,
+      group: "month",
+    });
+    const ids = model.sections.flatMap((section) =>
+      section.rows.flatMap((row) => (row.type === "event" ? [row.resolved.event.id] : [])),
+    );
+    expect(ids).toEqual(["aug-utc", "sep-local", "aug"]);
+    expect(model.sections.map((section) => section.label)).toEqual([
+      "2026-08",
+      "2026-09",
+      "2026-08",
+    ]);
+    expect(new Set(model.sections.map((section) => section.key)).size).toBe(3);
+    // The repeat is marked, so a caller can say so rather than print the same
+    // heading twice.
+    expect(model.sections.map((section) => section.continued)).toEqual([false, false, true]);
+  });
+});
+
 describe("planned and lapsed are derived, never written", () => {
   it("turns a planned event whose time has passed into a lapsed one", () => {
     const nowAt = instantOf(NOW);

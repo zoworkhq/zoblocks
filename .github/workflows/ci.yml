@@ -216,6 +216,11 @@ jobs:
       - name: Build
         run: pnpm build
 
+      # The release job runs this too, but there it fails after the merge that
+      # caused it. Here it fails on the pull request.
+      - name: Every package is publishable
+        run: node scripts/check-tarball.mjs
+
       # The site claims WCAG 2.2 AA and publishes per-component accessibility
       # notes. This is what makes that claim checkable rather than aspirational.
       # Its first run found four real violations, including a contrast failure

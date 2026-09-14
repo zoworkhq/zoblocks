@@ -55,6 +55,12 @@ export async function applyPull(figma: FigmaWriteApi, plan: ApplyPlan): Promise<
   const collections = await collectionIndex(figma);
   const existing = await variableIndex(figma);
 
+  /*
+   * Types are settled before the first write. Figma rejects a value of the
+   * wrong type, and finding that out mid-loop leaves half a pull applied.
+   */
+  const types = variableTypes(plan.write, existing);
+
   const result: ApplyResult = { created: 0, updated: 0, restored: [] };
   /** Token → Figma id, for the aliases written after their targets. */
   const ids = new Map<string, string>();
@@ -64,7 +70,9 @@ export async function applyPull(figma: FigmaWriteApi, plan: ApplyPlan): Promise<
     const collection = await ensureCollection(figma, collections, planned.collection);
     const found = existing.get(planned.token);
 
-    const variable = found ?? figma.variables.createVariable(planned.name, collection, "COLOR");
+    const variable =
+      found ??
+      figma.variables.createVariable(planned.name, collection, types.get(planned.token) ?? "COLOR");
     if (found) {
       result.updated += 1;
       // The label is the designer's until it drifts from the plan; restoring it
@@ -150,11 +158,72 @@ async function collectionIndex(
  */
 async function variableIndex(figma: FigmaWriteApi): Promise<Map<string, FigmaWritableVariable>> {
   const out = new Map<string, FigmaWritableVariable>();
-  for (const summary of await figma.variables.getLocalVariablesAsync("COLOR")) {
+  // Every type: a pulled string that is not indexed would be created again.
+  for (const summary of await figma.variables.getLocalVariablesAsync()) {
     const token = summary.getPluginData(TOKEN_KEY);
     if (!token) continue;
     const full = await figma.variables.getVariableByIdAsync(summary.id);
     if (full) out.set(token, full);
+  }
+  return out;
+}
+
+type VariableType = "COLOR" | "STRING" | "FLOAT";
+
+const TYPE_OF: Record<Exclude<PlannedValue["kind"], "alias">, VariableType> = {
+  color: "COLOR",
+  string: "STRING",
+  number: "FLOAT",
+};
+
+/**
+ * The Figma type each planned variable needs, from its values.
+ *
+ * An alias takes its target's type, from the plan or the file. A variable whose
+ * modes disagree, or whose existing type no longer fits, is refused by name:
+ * Figma would reject it partway through the write.
+ */
+function variableTypes(
+  write: PlannedVariable[],
+  existing: Map<string, FigmaWritableVariable>,
+): Map<string, VariableType> {
+  const planned = new Map(write.map((v) => [v.token, v]));
+  const out = new Map<string, VariableType>();
+
+  const typeOf = (token: string, seen: Set<string>): VariableType | undefined => {
+    const known = out.get(token);
+    if (known) return known;
+    const variable = planned.get(token);
+    if (!variable || seen.has(token)) {
+      const type = existing.get(token)?.resolvedType;
+      return type === "COLOR" || type === "STRING" || type === "FLOAT" ? type : undefined;
+    }
+    seen.add(token);
+
+    const kinds = new Set<VariableType>();
+    for (const value of Object.values(variable.values)) {
+      if (!value) continue;
+      const type = value.kind === "alias" ? typeOf(value.token, seen) : TYPE_OF[value.kind];
+      if (type) kinds.add(type);
+    }
+    if (kinds.size > 1) {
+      throw new Error(
+        `${variable.name} mixes ${[...kinds].join(" and ")} values across modes. Nothing was written.`,
+      );
+    }
+    const type = [...kinds][0] ?? "COLOR";
+    out.set(token, type);
+    return type;
+  };
+
+  for (const variable of write) {
+    const type = typeOf(variable.token, new Set());
+    const found = existing.get(variable.token);
+    if (found && type && found.resolvedType !== type) {
+      throw new Error(
+        `${variable.name} is a ${found.resolvedType} variable in this file, but the theme now makes it ${type}. Nothing was written.`,
+      );
+    }
   }
   return out;
 }

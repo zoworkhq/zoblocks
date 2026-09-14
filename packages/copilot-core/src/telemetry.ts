@@ -19,6 +19,7 @@
  */
 
 import type { AnswerRegister } from "./answer.js";
+import type { CopilotErrorCode } from "./errors.js";
 import type { CrisisAudience, CrisisSeverity, InjectionSeverity } from "./safety/index.js";
 
 export type TelemetryEvent =
@@ -76,6 +77,13 @@ export type TelemetryEvent =
       readonly reason: string;
     }
   | { readonly type: "stopped"; readonly exchangeId: string; readonly modeId: string }
+  /** The stream failed: a dropped connection or a provider error event. */
+  | {
+      readonly type: "failed";
+      readonly exchangeId: string;
+      readonly modeId: string;
+      readonly code: CopilotErrorCode;
+    }
   /** Abandonment after the answer began. The answer started badly. */
   | { readonly type: "abandoned"; readonly exchangeId: string; readonly afterMs: number }
   /**

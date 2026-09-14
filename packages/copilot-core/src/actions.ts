@@ -144,11 +144,35 @@ export function classifyProposal(
  */
 const DOSE_PATTERN =
   /\b\d+(?:\.\d+)?\s?(?:mcg|microgram|micrograms|mg|milligram|milligrams|g|gram|grams|kg|ml|millilitre|millilitres|milliliter|milliliters|l|unit|units|iu|mmol|mEq|meq)\b/i;
-const FREQUENCY_PATTERN =
-  /\b(?:od|bd|tds|qds|qid|tid|bid|prn|nocte|mane|q\d+h|hourly|daily|weekly)\b/i;
+const FREQUENCY_PATTERN = /\b(?:od|bd|tds|qds|qid|tid|bid|prn|nocte|mane|q\d+h)\b/i;
+/**
+ * "Daily", "weekly" and "hourly" are dosing only beside a medication: "once
+ * daily", "take it daily", "daily dose". "Attends weekly sessions" is not.
+ */
+const MEDICATION_FREQUENCY =
+  /\b(?:(?:once|twice|thrice|(?:one|two|three|four)\s+times)\s+(?:a\s+day|daily|weekly|hourly)|(?:take|taken|taking|give|given|administer(?:ed)?|apply|applied|inject(?:ed)?|tablets?|capsules?|puffs?|drops?|sachets?|patch(?:es)?|injections?)\b(?:\s+\w+){0,3}?\s+(?:daily|weekly|hourly)|(?:daily|weekly|hourly)\s+(?:doses?|dosing|tablets?|injections?))\b/i;
+
+/**
+ * A medication-like word: a common drug-name suffix, a common drug, or a route.
+ * Over-inclusive on purpose: "bisoprolol daily" is dosing without a unit.
+ */
+const MEDICATION =
+  "(?:[a-z]{2,}(?:olol|pril|sartan|statin|formin|azole|cillin|mycin|prazole|oxacin|cycline|pine|done|pam|lam|parin|xaban|gliptin|gliflozin|triptan|tidine|semide|thiazide|olone|asone|isone|profen|oxetine|alopram|tyline|ipramine|mab|nib)" +
+  "|aspirin|warfarin|paracetamol|acetaminophen|ibuprofen|naproxen|insulin|levothyroxine|thyroxine|digoxin|lithium|sertraline|mirtazapine|venlafaxine|duloxetine|gabapentin|pregabalin|spironolactone|methotrexate|allopurinol|colchicine|clopidogrel|tramadol|morphine|codeine|levetiracetam|lamotrigine|valproate|carbamazepine|haloperidol|tamsulosin|finasteride|salbutamol|albuterol|montelukast|ondansetron|folic\\s+acid|vitamin\\s+[a-z]\\d*" +
+  "|oral(?:ly)?|po|iv|im|sc|sl|subcut\\w*|intravenous(?:ly)?|intramuscular(?:ly)?|inhaled|nebuli[sz]ed|topical(?:ly)?|sublingual(?:ly)?|transdermal(?:ly)?|by\\s+mouth)";
+const FREQUENCY_WORD = "(?:daily|weekly|hourly|nightly|monthly|fortnightly)";
+const DRUG_FREQUENCY = new RegExp(
+  `\\b${MEDICATION}\\b(?:\\s+\\w+){0,2}?\\s+${FREQUENCY_WORD}\\b|\\b${FREQUENCY_WORD}\\s+(?:\\w+\\s+)?${MEDICATION}\\b`,
+  "i",
+);
 
 export function containsDosing(text: string): boolean {
-  return DOSE_PATTERN.test(text) || FREQUENCY_PATTERN.test(text);
+  return (
+    DOSE_PATTERN.test(text) ||
+    FREQUENCY_PATTERN.test(text) ||
+    MEDICATION_FREQUENCY.test(text) ||
+    DRUG_FREQUENCY.test(text)
+  );
 }
 
 /* ------------------------------------------------------------------ */

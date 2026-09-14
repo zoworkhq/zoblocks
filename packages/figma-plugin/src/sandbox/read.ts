@@ -44,7 +44,16 @@ export interface ReadResult {
 
 export async function readFile(figma: FigmaReadApi): Promise<ReadResult> {
   const collections = await figma.variables.getLocalVariableCollectionsAsync();
-  const variables = await figma.variables.getLocalVariablesAsync("COLOR");
+  /*
+   * Every colour, plus strings and numbers a pull made. A pulled duration is a
+   * STRING; reading colours only showed it as "create" on every preview. A
+   * hand-made string is left out, because the gate has nothing to say about it.
+   */
+  const variables = (await figma.variables.getLocalVariablesAsync()).filter(
+    (v) =>
+      v.resolvedType === "COLOR" ||
+      ((v.resolvedType === "STRING" || v.resolvedType === "FLOAT") && v.getPluginData(TOKEN_KEY)),
+  );
 
   const byId = new Map(collections.map((c) => [c.id, c]));
   const tokenById = new Map<string, string>();
@@ -69,6 +78,8 @@ export async function readFile(figma: FigmaReadApi): Promise<ReadResult> {
     };
     snapshot.variables.push(entry);
 
+    // The picker's counts are about colours, so the label stays "N colours, M ZoBlocks".
+    if (variable.resolvedType !== "COLOR") continue;
     const count = counts.get(collection.name) ?? { stamped: 0, colours: 0 };
     count.colours += 1;
     if (token) count.stamped += 1;

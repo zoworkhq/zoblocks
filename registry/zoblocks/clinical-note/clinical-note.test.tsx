@@ -226,6 +226,36 @@ describe("the sign gate", () => {
     expect(document.getElementById(describedBy!)?.textContent).toMatch(/must be resolved/i);
   });
 
+  it("keeps each note's blocked reason to itself when two share a page", () => {
+    // A fixed id made the second note's button describe itself with the first
+    // note's count.
+    render(
+      <>
+        <ClinicalNote
+          subject={SUBJECT}
+          author={AUTHOR}
+          noteType="progress"
+          now={NOW}
+          value={withAi()}
+        />
+        <ClinicalNote
+          subject={SUBJECT}
+          author={AUTHOR}
+          noteType="progress"
+          now={NOW}
+          value={withAi()}
+        />
+      </>,
+    );
+    const buttons = screen.getAllByRole("button", { name: /sign & file/i });
+    const ids = buttons.map((button) => button.getAttribute("aria-describedby"));
+
+    expect(new Set(ids).size).toBe(2);
+    buttons.forEach((button, index) => {
+      expect(document.getElementById(ids[index]!)?.parentElement).toBe(button.parentElement);
+    });
+  });
+
   it("drops the description once nothing is blocking", () => {
     setup({ value: complete() });
     expect(screen.getByRole("button", { name: /sign & file/i })).not.toHaveAttribute(

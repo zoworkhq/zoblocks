@@ -26,8 +26,119 @@ import type {
   ObservationReferenceRange,
   Patient,
   Quantity,
+  Range,
   Resource,
 } from "./types";
+
+// ---------------------------------------------------------------------------
+// Clock and calendar
+// ---------------------------------------------------------------------------
+
+/**
+ * The wall clock, read in exactly one place.
+ *
+ * Every helper that needs "now" takes it as `asOf`; this is only the default
+ * for a caller that passes none. Tests, server renders and visual regression
+ * pass their own.
+ */
+function wallClock(): Date {
+  // eslint-disable-next-line no-restricted-syntax -- the single default for `asOf`, see above
+  return new Date();
+}
+
+interface CalendarDay {
+  year: number;
+  month: number;
+  day: number;
+}
+
+/**
+ * The calendar date of an instant in `timeZone`. No zone means the runtime's;
+ * an invalid zone means UTC, never silently the runtime's.
+ */
+function calendarDay(at: Date, timeZone: string | undefined): CalendarDay {
+  if (timeZone === undefined) {
+    return { year: at.getFullYear(), month: at.getMonth() + 1, day: at.getDate() };
+  }
+  let parts: Intl.DateTimeFormatPart[];
+  try {
+    parts = new Intl.DateTimeFormat("en-US", {
+      timeZone,
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+    }).formatToParts(at);
+  } catch {
+    return { year: at.getUTCFullYear(), month: at.getUTCMonth() + 1, day: at.getUTCDate() };
+  }
+  const part = (type: string) => Number(parts.find((p) => p.type === type)?.value);
+  return { year: part("year"), month: part("month"), day: part("day") };
+}
+
+/**
+ * Calendar parts of a FHIR date ("2026", "2026-08", "2026-08-03") or of a
+ * dateTime's date. Undefined for anything unreadable or impossible — V8 reads
+ * "2026-02-30" as 2 March, which is a day nobody recorded.
+ */
+function parseCalendarDate(
+  value: string,
+): { year: number; month?: number; day?: number } | undefined {
+  const match = /^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?(T.*)?$/.exec(value);
+  if (!match || (match[4] !== undefined && Number.isNaN(Date.parse(value)))) return undefined;
+  const year = Number(match[1]);
+  const month = match[2] === undefined ? undefined : Number(match[2]);
+  const day = match[3] === undefined ? undefined : Number(match[3]);
+  if (month !== undefined && (month < 1 || month > 12)) return undefined;
+  if (month !== undefined && day !== undefined) {
+    const probe = new Date(Date.UTC(year, month - 1, day));
+    if (probe.getUTCMonth() !== month - 1 || probe.getUTCDate() !== day) return undefined;
+  }
+  return { year, month, day };
+}
+
+/**
+ * Where a period bound sits against `asOf`: -1 before, 0 within, 1 after.
+ *
+ * A full dateTime is an instant. A date without a time covers the whole of its
+ * day (or month, or year) in the evaluation zone — parsed as UTC midnight, the
+ * last valid day of a coverage read as lapsed. Undefined when the bound is
+ * absent or unreadable.
+ */
+function compareBound(
+  value: string | undefined,
+  asOf: Date,
+  timeZone: string | undefined,
+): -1 | 0 | 1 | undefined {
+  if (!value) return undefined;
+  if (value.includes("T")) {
+    const at = Date.parse(value);
+    if (Number.isNaN(at)) return undefined;
+    return at < asOf.getTime() ? -1 : at > asOf.getTime() ? 1 : 0;
+  }
+  const bound = parseCalendarDate(value);
+  if (!bound) return undefined;
+  const today = calendarDay(asOf, timeZone);
+  const pairs: Array<[number | undefined, number]> = [
+    [bound.year, today.year],
+    [bound.month, today.month],
+    [bound.day, today.day],
+  ];
+  for (const [mine, theirs] of pairs) {
+    if (mine === undefined) return 0;
+    if (mine !== theirs) return mine < theirs ? -1 : 1;
+  }
+  return 0;
+}
+
+/** True once a period has begun. A missing or unreadable start has. */
+function hasStarted(start: string | undefined, asOf: Date, timeZone?: string): boolean {
+  return compareBound(start, asOf, timeZone) !== 1;
+}
+
+/** True once a period has ended. A missing or unreadable end has not. */
+function hasEnded(end: string | undefined, asOf: Date, timeZone?: string): boolean {
+  return compareBound(end, asOf, timeZone) === -1;
+}
 
 // ---------------------------------------------------------------------------
 // Codings
@@ -125,21 +236,32 @@ export function maskIdentifier(value: string | undefined, visible = 4): string |
 /**
  * Age in whole years at `asOf`. Returns undefined rather than guessing when
  * birthDate is absent or unparseable — an unknown age must render as unknown.
+ *
+ * Computed from calendar dates, with `asOf` read in `timeZone` (default: the
+ * runtime's). Parsing the birth date as UTC and reading `asOf` locally aged
+ * patients a day early west of Greenwich.
  */
 export function calculateAge(
   birthDate: string | undefined,
-  asOf: Date = new Date(),
+  asOf: Date = wallClock(),
+  timeZone?: string,
 ): number | undefined {
-  if (!birthDate) return undefined;
-  const born = new Date(birthDate);
-  if (Number.isNaN(born.getTime())) return undefined;
-
-  let age = asOf.getFullYear() - born.getFullYear();
-  const monthDelta = asOf.getMonth() - born.getMonth();
-  if (monthDelta < 0 || (monthDelta === 0 && asOf.getDate() < born.getDate())) {
-    age -= 1;
-  }
+  const born = birthDate ? parseBirthDate(birthDate) : undefined;
+  if (!born) return undefined;
+  const age = wholeYears(born, calendarDay(asOf, timeZone));
   return age >= 0 ? age : undefined;
+}
+
+/** A birth date as a calendar day. A year- or month-only date starts on the 1st, as before. */
+function parseBirthDate(value: string): CalendarDay | undefined {
+  const parsed = parseCalendarDate(value);
+  return parsed && { year: parsed.year, month: parsed.month ?? 1, day: parsed.day ?? 1 };
+}
+
+function wholeYears(born: CalendarDay, today: CalendarDay): number {
+  const beforeBirthday =
+    today.month < born.month || (today.month === born.month && today.day < born.day);
+  return today.year - born.year - (beforeBirthday ? 1 : 0);
 }
 
 export function isDeceased(patient: Patient | undefined): boolean {
@@ -192,23 +314,81 @@ const INTERPRETATION_BY_CODE: Record<string, Interpretation> = {
  *
  * Deliberately does NOT infer clinical severity from anything else. A missing
  * interpretation renders as "unknown", not as "normal".
+ *
+ * A stated interpretation we cannot map is also "unknown": the payload said
+ * something, and a range comparison could contradict it.
  */
 export function getInterpretation(observation: Observation | undefined): Interpretation {
-  const codes = observation?.interpretation?.flatMap((i) => i.coding ?? []) ?? [];
-  for (const coding of codes) {
+  return interpret(
+    observation?.interpretation,
+    observation?.valueQuantity,
+    observation?.referenceRange?.[0],
+  );
+}
+
+function interpret(
+  stated: CodeableConcept[] | undefined,
+  quantity: Quantity | undefined,
+  range: ObservationReferenceRange | undefined,
+): Interpretation {
+  for (const coding of stated?.flatMap((i) => i.coding ?? []) ?? []) {
     const mapped = coding.code ? INTERPRETATION_BY_CODE[coding.code] : undefined;
     if (mapped) return mapped;
   }
+  if (stated?.some((i) => i.text || i.coding?.length)) return "unknown";
+  return compareToRange(quantity, range);
+}
 
-  const value = observation?.valueQuantity?.value;
-  const range = observation?.referenceRange?.[0];
-  if (typeof value === "number" && range) {
-    if (typeof range.high?.value === "number" && value > range.high.value) return "high";
-    if (typeof range.low?.value === "number" && value < range.low.value) return "low";
-    if (range.low?.value !== undefined || range.high?.value !== undefined) return "normal";
+/**
+ * A value against its own reference range, claiming only what the numbers
+ * prove. A censored value ("<0.01") is placed only when everything it could be
+ * falls on one side, and a unit that differs from the range's is not compared.
+ */
+function compareToRange(
+  quantity: Quantity | undefined,
+  range: ObservationReferenceRange | undefined,
+): Interpretation {
+  const value = quantity?.value;
+  if (!quantity || typeof value !== "number" || Number.isNaN(value) || !range) return "unknown";
+
+  const low = typeof range.low?.value === "number" ? range.low.value : undefined;
+  const high = typeof range.high?.value === "number" ? range.high.value : undefined;
+  if (low === undefined && high === undefined) return "unknown";
+  if ([range.low, range.high].some((bound) => bound && !unitsAgree(quantity, bound))) {
+    return "unknown";
   }
 
-  return "unknown";
+  switch (quantity.comparator) {
+    case undefined:
+      if (high !== undefined && value > high) return "high";
+      if (low !== undefined && value < low) return "low";
+      return "normal";
+    case "<":
+      if (low !== undefined && value <= low) return "low";
+      return low === undefined && high !== undefined && value <= high ? "normal" : "unknown";
+    case "<=":
+      if (low !== undefined && value < low) return "low";
+      return low === undefined && high !== undefined && value <= high ? "normal" : "unknown";
+    case ">":
+      if (high !== undefined && value >= high) return "high";
+      return high === undefined && low !== undefined && value >= low ? "normal" : "unknown";
+    case ">=":
+      if (high !== undefined && value > high) return "high";
+      return high === undefined && low !== undefined && value >= low ? "normal" : "unknown";
+    default:
+      // "ad" and anything off the wire that the type does not admit.
+      return "unknown";
+  }
+}
+
+/** False only when both sides state a unit and they differ. A shared code system's code wins. */
+function unitsAgree(a: Quantity, b: Quantity): boolean {
+  if (a.code && b.code && (a.system ?? b.system) === (b.system ?? a.system)) {
+    return a.code === b.code;
+  }
+  const left = a.unit ?? a.code;
+  const right = b.unit ?? b.code;
+  return !left || !right || left === right;
 }
 
 /** True for interpretations that warrant visual escalation. */
@@ -435,21 +615,11 @@ export function formatComponentValue(
 export function getComponentInterpretation(
   component: ObservationComponent | undefined,
 ): Interpretation {
-  const codes = component?.interpretation?.flatMap((i) => i.coding ?? []) ?? [];
-  for (const coding of codes) {
-    const mapped = coding.code ? INTERPRETATION_BY_CODE[coding.code] : undefined;
-    if (mapped) return mapped;
-  }
-
-  const value = component?.valueQuantity?.value;
-  const range = component?.referenceRange?.[0];
-  if (typeof value === "number" && range) {
-    if (typeof range.high?.value === "number" && value > range.high.value) return "high";
-    if (typeof range.low?.value === "number" && value < range.low.value) return "low";
-    if (range.low?.value !== undefined || range.high?.value !== undefined) return "normal";
-  }
-
-  return "unknown";
+  return interpret(
+    component?.interpretation,
+    component?.valueQuantity,
+    component?.referenceRange?.[0],
+  );
 }
 
 /** Severity order, worst first. Used to escalate a panel to its worst part. */
@@ -528,13 +698,23 @@ export function formatDosage(dosage: Dosage | undefined): string | undefined {
   if (dosage.text) return dosage.text;
 
   const parts: string[] = [];
+  const doseAndRate = dosage.doseAndRate ?? [];
 
-  const dose = dosage.doseAndRate?.find((d) => d.doseQuantity)?.doseQuantity;
-  const doseText = formatQuantity(dose);
+  const dose = doseAndRate.find((d) => d.doseQuantity ?? d.doseRange);
+  const doseText = formatQuantity(dose?.doseQuantity) ?? formatQuantityRange(dose?.doseRange);
   if (doseText) parts.push(doseText);
 
   const route = codeableText(dosage.route);
   if (route) parts.push(route);
+
+  const rate = doseAndRate.find((d) => d.rateQuantity ?? d.rateRange);
+  const rateText = formatQuantity(rate?.rateQuantity) ?? formatQuantityRange(rate?.rateRange);
+  if (rateText) parts.push(`at ${rateText}`);
+
+  // Kept beside a structured schedule too: if "BID" and the repeat disagree,
+  // the reader has to see both.
+  const timingCode = codeableText(dosage.timing?.code);
+  if (timingCode) parts.push(timingCode);
 
   const repeat = dosage.timing?.repeat;
   if (repeat?.frequency && repeat.period && repeat.periodUnit) {
@@ -549,7 +729,39 @@ export function formatDosage(dosage: Dosage | undefined): string | undefined {
   const asNeededFor = codeableText(dosage.asNeededCodeableConcept);
   if (asNeededFor) parts.push(`as needed for ${asNeededFor}`);
 
+  const max = formatMaxDose(dosage.maxDosePerPeriod);
+  if (max) parts.push(max);
+
   return parts.length ? parts.join(" · ") : undefined;
+}
+
+/** "1 – 2 tablet"; both units when they differ; one-sided as "up to" / "at least". */
+function formatQuantityRange(range: Range | undefined): string | undefined {
+  const low = range?.low;
+  const high = range?.high;
+  const lowText = formatQuantity(low);
+  const highText = formatQuantity(high);
+  if (lowText && highText) {
+    const lowUnit = low?.unit ?? low?.code;
+    const highUnit = high?.unit ?? high?.code;
+    if (lowUnit && highUnit && lowUnit !== highUnit) return `${lowText} – ${highText}`;
+    const unit = highUnit ?? lowUnit;
+    return `${low?.value} – ${high?.value}${unit ? ` ${unit}` : ""}`;
+  }
+  if (highText) return `up to ${highText}`;
+  if (lowText) return `at least ${lowText}`;
+  return undefined;
+}
+
+/** "max 4 g per day", "max 4 g per 24 h". */
+function formatMaxDose(max: Dosage["maxDosePerPeriod"]): string | undefined {
+  const amount = formatQuantity(max?.numerator);
+  if (!amount) return undefined;
+  const per = max?.denominator;
+  const unit = per?.unit ?? per?.code;
+  if (per?.value === 1 && unit) return `max ${amount} per ${TIMING_UNIT_LABEL[unit] ?? unit}`;
+  const period = formatQuantity(per);
+  return period ? `max ${amount} per ${period}` : `max ${amount}`;
 }
 
 /**
@@ -562,15 +774,16 @@ export function isMedicationInactive(request: MedicationRequest | undefined): bo
   return status === "stopped" || status === "cancelled" || status === "completed";
 }
 
-/** True when the dispense validity period has already ended. */
+/**
+ * True when the dispense validity period has already ended. A date-only end is
+ * valid through that whole day in `timeZone` (default: the runtime's).
+ */
 export function isMedicationExpired(
   request: MedicationRequest | undefined,
-  asOf: Date = new Date(),
+  asOf: Date = wallClock(),
+  timeZone?: string,
 ): boolean {
-  const end = request?.dispenseRequest?.validityPeriod?.end;
-  if (!end) return false;
-  const ends = new Date(end);
-  return !Number.isNaN(ends.getTime()) && ends < asOf;
+  return hasEnded(request?.dispenseRequest?.validityPeriod?.end, asOf, timeZone);
 }
 
 // ---------------------------------------------------------------------------
@@ -626,6 +839,9 @@ export function reactionManifestations(allergy: AllergyIntolerance | undefined):
  * Time zone is a required argument, not an optional one. Defaulting to the
  * browser's zone is how a clinic in one region books a patient in another for
  * the wrong hour — the caller must state which zone the time should be read in.
+ *
+ * An invalid zone renders in UTC, marked "(UTC)", rather than falling back to
+ * the browser's zone this argument exists to avoid.
  */
 export function formatAppointmentTime(
   appointment: Appointment | undefined,
@@ -635,23 +851,31 @@ export function formatAppointmentTime(
   if (!appointment?.start) return undefined;
   const start = new Date(appointment.start);
   if (Number.isNaN(start.getTime())) return undefined;
+  return formatInstant(start, timeZone, locale, true);
+}
 
+/** Format in a stated zone; an invalid one falls back to UTC and says so. */
+function formatInstant(
+  at: Date,
+  timeZone: string,
+  locale: string | undefined,
+  withTime: boolean,
+): string {
+  const options: Intl.DateTimeFormatOptions = {
+    dateStyle: "medium",
+    ...(withTime ? { timeStyle: "short" as const } : {}),
+  };
   try {
-    return new Intl.DateTimeFormat(locale, {
-      dateStyle: "medium",
-      timeStyle: "short",
-      timeZone,
-    }).format(start);
+    return new Intl.DateTimeFormat(locale, { ...options, timeZone }).format(at);
   } catch {
-    // An invalid IANA zone must not take the screen down with it.
-    return new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(
-      start,
-    );
+    // An invalid IANA zone must not take the screen down with it — nor
+    // silently show the browser's zone.
+    return `${new Intl.DateTimeFormat(locale, { ...options, timeZone: "UTC" }).format(at)} (UTC)`;
   }
 }
 
 /** Short time-zone label, e.g. "GMT+5:30". */
-export function timeZoneLabel(timeZone: string, at: Date = new Date()): string | undefined {
+export function timeZoneLabel(timeZone: string, at: Date = wallClock()): string | undefined {
   try {
     const parts = new Intl.DateTimeFormat("en", {
       timeZone,
@@ -690,21 +914,22 @@ export type CoverageState = "active" | "not-yet-effective" | "lapsed" | "cancell
  * `status: "active"` alone is not enough — a coverage can be marked active
  * while its period has already ended. Acting on lapsed coverage produces a
  * denied claim and a surprise bill, so the period is checked as well.
+ *
+ * A date-only bound covers its whole day in `timeZone` (default: the
+ * runtime's), so coverage is active on its last valid day.
  */
 export function coverageState(
   coverage: Coverage | undefined,
-  asOf: Date = new Date(),
+  asOf: Date = wallClock(),
+  timeZone?: string,
 ): CoverageState {
   if (!coverage) return "unknown";
   if (coverage.status === "cancelled" || coverage.status === "entered-in-error") return "cancelled";
   if (coverage.status !== "active") return "unknown";
 
   const { start, end } = coverage.period ?? {};
-  const startsAt = start ? new Date(start) : undefined;
-  const endsAt = end ? new Date(end) : undefined;
-
-  if (startsAt && !Number.isNaN(startsAt.getTime()) && startsAt > asOf) return "not-yet-effective";
-  if (endsAt && !Number.isNaN(endsAt.getTime()) && endsAt < asOf) return "lapsed";
+  if (!hasStarted(start, asOf, timeZone)) return "not-yet-effective";
+  if (hasEnded(end, asOf, timeZone)) return "lapsed";
   return "active";
 }
 
@@ -897,20 +1122,17 @@ export function formatClinicalDate(
   const parsed = new Date(precision === "day" ? `${value}T00:00:00Z` : value);
   if (Number.isNaN(parsed.getTime())) return undefined;
 
-  try {
-    return new Intl.DateTimeFormat(locale, {
-      dateStyle: "medium",
-      ...(precision === "time" ? { timeStyle: "short" as const } : {}),
-      timeZone: precision === "day" ? "UTC" : timeZone,
-    }).format(parsed);
-  } catch {
-    // An invalid IANA zone must not take the screen down with it.
-    return new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(parsed);
-  }
+  // An invalid zone renders in UTC, marked, never in the browser's zone.
+  return formatInstant(
+    parsed,
+    precision === "day" ? "UTC" : timeZone,
+    locale,
+    precision === "time",
+  );
 }
 
 /** True when an instant is in the future, which usually signals a data error. */
-export function isFutureDate(value: string | undefined, asOf: Date = new Date()): boolean {
+export function isFutureDate(value: string | undefined, asOf: Date = wallClock()): boolean {
   if (!value) return false;
   const parsed = new Date(value);
   return !Number.isNaN(parsed.getTime()) && parsed > asOf;
@@ -928,21 +1150,26 @@ export function isFutureDate(value: string | undefined, asOf: Date = new Date())
  */
 export function formatAge(
   birthDate: string | undefined,
-  asOf: Date = new Date(),
+  asOf: Date = wallClock(),
+  timeZone?: string,
 ): string | undefined {
-  if (!birthDate) return undefined;
-  const born = new Date(birthDate);
-  if (Number.isNaN(born.getTime()) || born > asOf) return undefined;
+  const born = birthDate ? parseBirthDate(birthDate) : undefined;
+  if (!born) return undefined;
+  const today = calendarDay(asOf, timeZone);
 
-  const days = Math.floor((asOf.getTime() - born.getTime()) / 86_400_000);
+  // Calendar days, so the count does not depend on the hour or the offset.
+  const days = Math.round(
+    (Date.UTC(today.year, today.month - 1, today.day) -
+      Date.UTC(born.year, born.month - 1, born.day)) /
+      86_400_000,
+  );
+  if (days < 0) return undefined;
   if (days < 28) return `${days} d`;
 
-  const years = calculateAge(birthDate, asOf);
-  if (years === undefined) return undefined;
+  const years = wholeYears(born, today);
   if (years < 2) {
-    let months =
-      (asOf.getFullYear() - born.getFullYear()) * 12 + (asOf.getMonth() - born.getMonth());
-    if (asOf.getDate() < born.getDate()) months -= 1;
+    let months = (today.year - born.year) * 12 + (today.month - born.month);
+    if (today.day < born.day) months -= 1;
     return `${Math.max(0, months)} mo`;
   }
   return `${years} y`;
@@ -1160,11 +1387,12 @@ export function summariseProvenance(
     source:
       provenance?.entity?.find((e) => e.role === "source")?.what?.display ?? resource?.meta?.source,
     method,
-    // versionId "1" is the original. Anything higher means it was revised, and
-    // a corrected result that looks identical to the original is a known harm.
+    // A corrected result that looks identical to the original is a known harm.
+    // But versionId is opaque in FHIR: only a small counter above 1 is read as
+    // a revision, because a timestamp-style id would flag every record.
     amended:
       Boolean(provenance?.entity?.some((e) => e.role === "revision")) ||
-      (versionId !== undefined && Number(versionId) > 1),
+      (versionId !== undefined && /^[1-9]\d{0,5}$/.test(versionId) && Number(versionId) > 1),
     versionId,
   };
 }
@@ -1181,16 +1409,19 @@ export const ENTRY_METHOD_LABEL: Record<EntryMethod, string> = {
 // Flags and precautions
 // ---------------------------------------------------------------------------
 
-/** True when a flag is active at `asOf`, rather than merely status: active. */
-export function isFlagActive(flag: Flag | undefined, asOf: Date = new Date()): boolean {
+/**
+ * True when a flag is active at `asOf`, rather than merely status: active. A
+ * date-only end runs through that day in `timeZone` (default: the runtime's).
+ */
+export function isFlagActive(
+  flag: Flag | undefined,
+  asOf: Date = wallClock(),
+  timeZone?: string,
+): boolean {
   if (flag?.status !== "active") return false;
   const { start, end } = flag.period ?? {};
-  const startsAt = start ? new Date(start) : undefined;
-  const endsAt = end ? new Date(end) : undefined;
-  if (startsAt && !Number.isNaN(startsAt.getTime()) && startsAt > asOf) return false;
   // A lapsed precaution left on screen teaches staff to ignore all of them.
-  if (endsAt && !Number.isNaN(endsAt.getTime()) && endsAt < asOf) return false;
-  return true;
+  return hasStarted(start, asOf, timeZone) && !hasEnded(end, asOf, timeZone);
 }
 
 /** Category code on a flag, e.g. "infection", "safety", "behavioral". */
@@ -1218,7 +1449,8 @@ export interface CareTeamMember {
  */
 export function careTeamMembers(
   team: CareTeam | undefined,
-  asOf: Date = new Date(),
+  asOf: Date = wallClock(),
+  timeZone?: string,
 ): CareTeamMember[] {
   const members: CareTeamMember[] = [];
   for (const participant of team?.participant ?? []) {
@@ -1227,15 +1459,13 @@ export function careTeamMembers(
     // inventing "Unknown member" would pad the team with a phantom.
     if (!name) continue;
 
-    const start = participant.period?.start ? new Date(participant.period.start) : undefined;
-    const end = participant.period?.end ? new Date(participant.period.end) : undefined;
-    const started = !start || Number.isNaN(start.getTime()) || start <= asOf;
-    const notEnded = !end || Number.isNaN(end.getTime()) || end >= asOf;
+    const { start, end } = participant.period ?? {};
 
     members.push({
       name,
       role: codeableText(participant.role?.[0]),
-      current: started && notEnded,
+      // A date-only end keeps the member current through that whole day.
+      current: hasStarted(start, asOf, timeZone) && !hasEnded(end, asOf, timeZone),
       reference: participant.member?.reference,
     });
   }

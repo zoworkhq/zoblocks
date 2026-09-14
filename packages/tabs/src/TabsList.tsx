@@ -19,7 +19,7 @@ import {
   textOf,
   type TabItem,
 } from "@zoblocks/tabs-core";
-import { useTabsContext } from "./context.js";
+import { OverflowedValues, useTabsContext } from "./context.js";
 import { useDirection, useIsoLayoutEffect, useTabsKeyboard } from "./internal.js";
 import { useIndicator } from "./use-indicator.js";
 import { useOverflow } from "./use-overflow.js";
@@ -106,27 +106,116 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(function
     [elementAt],
   );
 
-  const onKeyDown = useTabsKeyboard({
-    getItems: () => ctx.triggers.current.map((entry) => entry.item),
-    getFocusedIndex: () => {
-      const active = typeof document === "undefined" ? null : document.activeElement;
-      return ctx.triggers.current.findIndex((entry) => entry.element === active);
-    },
-    focusIndex,
-    select: ctx.select,
-    close: ctx.onCloseTab,
-    reorder: ctx.onReorderTab,
-    activation: ctx.activation,
-    orientation: ctx.orientation,
-    rtl,
-    enabled: ctx.roles.arrowKeys && !ctx.pending,
-  });
+  /*
+   * Focus follows a keyboard-moved tab, by value, once the host re-renders.
+   *
+   * Focusing at keydown lands on the neighbour still in the target slot, and
+   * moving the focused node blurs it in a real browser — either way a second
+   * Ctrl+Shift+Arrow moved the wrong tab.
+   */
+  const movedValue = React.useRef<string | undefined>(undefined);
+  const onReorderTab = ctx.onReorderTab;
+  const reorder = React.useMemo(
+    () =>
+      onReorderTab &&
+      ((from: number, to: number) => {
+        movedValue.current = ctx.triggers.current[from]?.value;
+        onReorderTab(from, to);
+      }),
+    [onReorderTab, ctx.triggers],
+  );
+
+  useIsoLayoutEffect(() => {
+    const value = movedValue.current;
+    movedValue.current = undefined;
+    if (value === undefined) return;
+    // Only reclaim focus the move dropped; never steal it from elsewhere.
+    const index = indexOfValue(items, value);
+    const active = document.activeElement;
+    if (active !== document.body && active !== elementAt(index)) return;
+    focusIndex(index);
+  }, [items, elementAt, focusIndex]);
 
   /* ---------------- overflow menu ------------------------------------ */
   const hidden = ctx.overflow === "menu" ? overflow.overflowIndices : [];
   const hiddenItems = hidden
     .map((index) => items[index])
     .filter((item): item is TabItem => item !== undefined);
+
+  /*
+   * A tab in the More menu leaves the strip.
+   *
+   * The menu used to be a copy: every overflowed tab showed twice, and the
+   * arrow keys walked into it. Its trigger stays mounted and registered, only
+   * hidden, so a re-fit never churns the registry. The selected tab is pinned
+   * by the fitter, and excluded here as well.
+   */
+  const overflowedKey = JSON.stringify(
+    hiddenItems.map((item) => item.value).filter((value) => value !== ctx.value),
+  );
+  const overflowed = React.useMemo(
+    () => new Set(JSON.parse(overflowedKey) as string[]),
+    [overflowedKey],
+  );
+  const inStrip = () => ctx.triggers.current.filter((entry) => !overflowed.has(entry.value));
+  // The keyboard model counts strip tabs only; map its indices to the registry.
+  const registryIndex = (stripIndex: number) => {
+    const entry = inStrip()[stripIndex];
+    return entry ? ctx.triggers.current.indexOf(entry) : -1;
+  };
+
+  const onKeyDown = useTabsKeyboard({
+    getItems: () => {
+      // Checked at lookup time too, for a memoised trigger that moved without
+      // re-rendering.
+      ctx.orderRegistry();
+      return inStrip().map((entry) => entry.item);
+    },
+    getFocusedIndex: () => {
+      const active = typeof document === "undefined" ? null : document.activeElement;
+      return inStrip().findIndex((entry) => entry.element === active);
+    },
+    focusIndex: (index: number) => focusIndex(registryIndex(index)),
+    select: ctx.select,
+    close: ctx.onCloseTab,
+    reorder:
+      reorder && ((from: number, to: number) => reorder(registryIndex(from), registryIndex(to))),
+    activation: ctx.activation,
+    orientation: ctx.orientation,
+    rtl,
+    enabled: ctx.roles.arrowKeys && !ctx.pending,
+  });
+
+  // APG menu keys. Escape is handled at the document, below.
+  const onMenuKeyDown = (event: React.KeyboardEvent<HTMLUListElement>) => {
+    // Focus moves on by itself; a menu left open behind it is the bug.
+    if (event.key === "Tab") {
+      setMenuOpen(false);
+      return;
+    }
+    const entries = Array.from(
+      event.currentTarget.querySelectorAll<HTMLElement>("[role='menuitem']"),
+    );
+    const current = entries.indexOf(document.activeElement as HTMLElement);
+    const last = entries.length - 1;
+    const next =
+      event.key === "ArrowDown"
+        ? current >= last
+          ? 0
+          : current + 1
+        : event.key === "ArrowUp"
+          ? current <= 0
+            ? last
+            : current - 1
+          : event.key === "Home"
+            ? 0
+            : event.key === "End"
+              ? last
+              : null;
+    if (next === null) return;
+    event.preventDefault();
+    entries[next]?.focus();
+  };
 
   useIsoLayoutEffect(() => {
     if (hidden.length === 0 && menuOpen) setMenuOpen(false);
@@ -194,7 +283,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(function
           data-zb-indicator={indicatorKind}
         />
       ) : null}
-      {children}
+      <OverflowedValues.Provider value={overflowed}>{children}</OverflowedValues.Provider>
     </ListTag>
   );
 
@@ -221,12 +310,20 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(function
         </button>
         {/* A real menu, not a second tablist. A tablist split across two
               containers reports an incoherent "n of m". */}
-        <ul ref={menuRef} className="zb-tabs__menu" role="menu" hidden={!menuOpen}>
+        <ul
+          ref={menuRef}
+          className="zb-tabs__menu"
+          role="menu"
+          hidden={!menuOpen}
+          onKeyDown={onMenuKeyDown}
+        >
           {hiddenItems.map((item) => (
             <li key={item.value} role="none">
               <button
                 type="button"
                 role="menuitem"
+                // Arrow keys move within the menu; Tab leaves it.
+                tabIndex={-1}
                 className="zb-tabs__menu-item"
                 aria-disabled={item.disabled || undefined}
                 onClick={() => {

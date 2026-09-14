@@ -198,10 +198,9 @@ export function useTabsKeyboard(options: KeyboardOptions) {
       );
       if (move) {
         event.preventDefault();
+        // No focus call here: the host has not re-rendered yet, so `move.to`
+        // still holds the neighbour. The reorder callback owns focus.
         opts.reorder(move.from, move.to);
-        // Focus follows the tab, not the position — otherwise a second press
-        // moves whatever slid into the old slot.
-        opts.focusIndex(move.to);
         return;
       }
     }

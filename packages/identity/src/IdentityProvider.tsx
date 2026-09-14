@@ -19,7 +19,20 @@ import {
   type PhotoPolicy,
 } from "@zoblocks/identity-core";
 import type { Patient } from "@zoblocks/fhir";
-import { createContext, useContext, useMemo, useRef, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+
+/** A layout effect in the browser; a no-op warning-free effect on a server. */
+const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 /**
  * The name context, as a discriminated union.
@@ -93,7 +106,7 @@ const IdentityContext = createContext<IdentityContextValue | null>(null);
  * every already-resolved patient rendered under the previous policy — a privacy
  * defect, not a performance one.
  */
-function versionOf(p: Omit<IdentityPolicy, "version" | "now">): string {
+function versionOf(p: Omit<IdentityPolicy, "version" | "now">, now: Date): string {
   return [
     p.locale,
     p.disclosure,
@@ -102,8 +115,34 @@ function versionOf(p: Omit<IdentityPolicy, "version" | "now">): string {
     p.legalNameReason ?? "-",
     p.swatchCount,
     p.demoMode ? "demo" : "live",
-    p.identifierSystems.map((s) => s.kind).join("+"),
+    systemsKey(p.identifierSystems),
+    // Age is resolved against the clock, so a moved clock is a new policy.
+    now.getTime(),
   ].join("|");
+}
+
+/** One number per validator function, so swapping a validator changes the key. */
+const validatorIds = new WeakMap<(raw: string) => boolean, number>();
+let validatorCount = 0;
+
+/**
+ * Every field of the identifier systems that changes what renders, as a string.
+ *
+ * Compared by value, so an inline array literal is not a new policy on every
+ * render. Kinds alone are not enough: a relabelled or regrouped system with
+ * the same kind would be served from the cache under its old label.
+ */
+function systemsKey(specs: IdentifierSystemSpec[]): string {
+  return JSON.stringify(
+    specs.map((s) => {
+      let check = 0;
+      if (s.checkDigit) {
+        check = validatorIds.get(s.checkDigit) ?? ++validatorCount;
+        validatorIds.set(s.checkDigit, check);
+      }
+      return [s.kind, s.label, s.systems, s.maskVisible, s.group, s.weight, check];
+    }),
+  );
 }
 
 export function IdentityProvider(props: IdentityProviderProps): ReactNode {
@@ -131,6 +170,36 @@ export function IdentityProvider(props: IdentityProviderProps): ReactNode {
   // `now?.getTime()` call inside the array cannot be verified by the lint rule.
   const nowMs = now?.getTime();
 
+  // A policy must carry a clock, and a provider given none has to read one
+  // somewhere. Once per mount: read per policy, every re-render moved ages.
+  // Passing `now` is how a visual-regression run and a server render get
+  // determinism, and every test in this package does.
+  // eslint-disable-next-line no-restricted-syntax
+  const [mountClock] = useState(() => new Date());
+
+  // By value, so `identifierSystems={[...]}` inline is not a new policy.
+  const systemsSignature = systemsKey(identifierSystems);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const systems = useMemo(() => identifierSystems, [systemsSignature]);
+
+  // Callbacks through a ref, so an inline arrow does not rebuild the policy
+  // and re-resolve every patient on screen. The context carries stable
+  // wrappers that call whatever was passed last.
+  const handlers = useRef({ onSensitiveReveal, onIdentifierCopy });
+  useIsomorphicLayoutEffect(() => {
+    handlers.current = { onSensitiveReveal, onIdentifierCopy };
+  });
+  const hasReveal = onSensitiveReveal !== undefined;
+  const hasCopy = onIdentifierCopy !== undefined;
+  const reveal = useCallback(
+    (event: SensitiveRevealEvent) => handlers.current.onSensitiveReveal?.(event),
+    [],
+  );
+  const copy = useCallback(
+    (event: IdentifierCopyEvent) => handlers.current.onIdentifierCopy?.(event),
+    [],
+  );
+
   const value = useMemo<IdentityContextValue>(() => {
     const base = {
       locale,
@@ -138,23 +207,20 @@ export function IdentityProvider(props: IdentityProviderProps): ReactNode {
       photos,
       nameContext,
       legalNameReason,
-      identifierSystems,
+      identifierSystems: systems,
       swatchCount,
       demoMode,
     } as Omit<IdentityPolicy, "version" | "now">;
-    const version = versionOf(base);
-    // The clock is deliberately snapshotted once per policy rather than read
-    // during render: a component that calls `new Date()` while rendering is
-    // neither testable nor safe to server-render.
-    // A policy must carry a clock, and a provider that was given none has to
-    // read one somewhere. Passing `now` is how a visual-regression run and a
-    // server render get determinism, and every test in this package does.
-    // eslint-disable-next-line no-restricted-syntax
-    const policy: IdentityPolicy = { ...base, now: now ?? new Date(), version };
-    cache.clear();
-    return { policy, cache, onSensitiveReveal, onIdentifierCopy };
-    // `now` is intentionally not a dependency when undefined: re-snapshotting
-    // the clock on every render would defeat the cache and make ages jitter.
+    const clock = now ?? mountClock;
+    const policy: IdentityPolicy = { ...base, now: clock, version: versionOf(base, clock) };
+    return {
+      policy,
+      cache,
+      onSensitiveReveal: hasReveal ? reveal : undefined,
+      onIdentifierCopy: hasCopy ? copy : undefined,
+    };
+    // `now` is keyed by its time, not its identity: `new Date(x)` inline is the
+    // same clock.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     locale,
@@ -162,14 +228,32 @@ export function IdentityProvider(props: IdentityProviderProps): ReactNode {
     photos,
     nameContext,
     legalNameReason,
-    identifierSystems,
+    systems,
     swatchCount,
     demoMode,
     nowMs,
-    onSensitiveReveal,
-    onIdentifierCopy,
+    mountClock,
+    hasReveal,
+    hasCopy,
+    reveal,
+    copy,
     cache,
   ]);
+
+  /*
+   * Emptied after a real policy change commits, never during render.
+   *
+   * The version is part of the cache key, so old entries can no longer be hit
+   * and this is memory, not correctness. Clearing inside `useMemo` ran on
+   * renders React may discard, and on every render an inline prop caused.
+   */
+  const version = value.policy.version;
+  const clearedFor = useRef(version);
+  useEffect(() => {
+    if (clearedFor.current === version) return;
+    clearedFor.current = version;
+    cache.clear();
+  }, [version, cache]);
 
   return <IdentityContext.Provider value={value}>{children}</IdentityContext.Provider>;
 }

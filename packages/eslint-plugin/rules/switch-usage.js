@@ -162,7 +162,9 @@ export const noDisabledWithReason = {
         context.report({
           node: disabled,
           messageId: "both",
-          fix: (fixer) => fixer.replaceText(disabled, "readOnly"),
+          // The name only. `disabled={!canEdit}` becomes `readOnly={!canEdit}`;
+          // replacing the whole attribute locked the control for everybody.
+          fix: (fixer) => fixer.replaceText(disabled.name, "readOnly"),
         });
       },
     };

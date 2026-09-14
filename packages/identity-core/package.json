@@ -57,9 +57,9 @@
     "@zoblocks/fhir": "workspace:*"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "^4.1.11",
     "@zoblocks/tsconfig": "workspace:*",
-    "@vitest/coverage-v8": "^4.1.10",
     "typescript": "^5.7.2",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.11"
   }
 }

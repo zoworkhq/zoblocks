@@ -51,25 +51,37 @@ export const TabsPanel = React.forwardRef<HTMLDivElement, TabsPanelProps>(functi
     setFocusable(element.querySelector(FOCUSABLE) !== null);
   }, [selected, children]);
 
-  // Scroll position is restored per panel so switching away and back does not
-  // dump the user at the top of a long result list.
-  useIsoLayoutEffect(() => {
-    const element = ref.current;
-    if (!element || !ctx.keepScroll) return;
-    if (selected) {
-      const saved = ctx.panelScroll.current.get(value);
-      if (saved !== undefined) element.scrollTop = saved;
-      return;
-    }
-    ctx.panelScroll.current.set(value, element.scrollTop);
-  }, [selected, value, ctx.keepScroll]);
-
   const shouldRender =
     ctx.roles.ownsPanels &&
     (strategy === "eager" ||
       selected ||
       (strategy === "lazy-once" && visited) ||
       keepMounted === true);
+
+  /*
+   * Scroll position is restored per panel so switching away and back does not
+   * dump the user at the top of a long result list.
+   *
+   * Saved as the user scrolls, not on the way out: by the time an effect sees
+   * `selected` go false, `hidden` has landed, and a hidden element reports 0.
+   */
+  const { keepScroll, panelScroll } = ctx;
+  React.useEffect(() => {
+    const element = ref.current;
+    if (!element || !keepScroll || !shouldRender) return;
+    const onScroll = () => {
+      if (!element.hidden) panelScroll.current.set(value, element.scrollTop);
+    };
+    element.addEventListener("scroll", onScroll, { passive: true });
+    return () => element.removeEventListener("scroll", onScroll);
+  }, [keepScroll, panelScroll, shouldRender, value]);
+
+  useIsoLayoutEffect(() => {
+    const element = ref.current;
+    if (!element || !keepScroll || !selected) return;
+    const saved = panelScroll.current.get(value);
+    if (saved !== undefined) element.scrollTop = saved;
+  }, [keepScroll, panelScroll, selected, value]);
 
   // Announce the panel's existence to the root so its trigger can point at it.
   // An `aria-controls` that references an element which is not in the DOM is

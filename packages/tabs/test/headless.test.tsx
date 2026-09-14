@@ -187,6 +187,29 @@ describe("programmatic control", () => {
     await userEvent.setup().click(screen.getByRole("button", { name: "Jump" }));
     expect(screen.getByTestId("value")).toHaveTextContent("a");
   });
+
+  it("reads the guard's current closure, not the first render's", async () => {
+    function Dirty() {
+      const [dirty, setDirty] = React.useState(false);
+      const tabs = useTabs({ as: "tabs", items, defaultValue: "a", onBeforeChange: () => !dirty });
+      return (
+        <>
+          <button type="button" onClick={() => setDirty(true)}>
+            Type
+          </button>
+          <button type="button" onClick={() => tabs.select("c")}>
+            Jump
+          </button>
+          <span data-testid="value">{tabs.value}</span>
+        </>
+      );
+    }
+    render(<Dirty />);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: "Type" }));
+    await user.click(screen.getByRole("button", { name: "Jump" }));
+    expect(screen.getByTestId("value")).toHaveTextContent("a");
+  });
 });
 
 describe("misuse", () => {

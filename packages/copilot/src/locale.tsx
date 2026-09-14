@@ -92,6 +92,8 @@ export interface CopilotLocale {
   proposalConfirm: string;
   proposalDismiss: string;
   proposalDiff: string;
+  /** Shown instead of Confirm when the active mode prohibits the proposal. */
+  proposalProhibited: string;
 
   /** Disclosure */
   disclosureTitle: string;
@@ -193,6 +195,7 @@ export const DEFAULT_LOCALE: CopilotLocale = {
   proposalConfirm: "Insert into the record",
   proposalDismiss: "Discard",
   proposalDiff: "What changes",
+  proposalProhibited: "This mode cannot insert this. It contains dosing.",
 
   disclosureTitle: "About this assistant",
   disclosureCompleteness: (answered, total) => `${answered} of ${total} attributes answered`,

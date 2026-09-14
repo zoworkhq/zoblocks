@@ -108,20 +108,18 @@ jobs:
       # publishConfig points at ./dist while dist does not contain what it
       # claims, or contains things it should not.
       #
-      # Every publishable package is inspected, not just the first one that
-      # ever needed it. This used to name packages/fhir directly, so a second
-      # package could be published with none of these checks run against it.
+      # Every publishable package is inspected. This used to loop over packages
+      # and run a check only where one existed — five of 27 — so the other 22
+      # would have published unchecked, 13 of them without a README and 9 with
+      # imports that throw in plain Node. The shared script packs each package
+      # with pnpm and reads the manifest inside the tarball.
       - name: Inspect every tarball before publishing
-        run: |
-          set -euo pipefail
-          failed=0
-          for pkg in packages/*/; do
-            if [ -f "${pkg}scripts/check-tarball.mjs" ]; then
-              echo "── ${pkg}"
-              (cd "$pkg" && node scripts/check-tarball.mjs) || failed=1
-            fi
-          done
-          exit $failed
+        run: node scripts/check-tarball.mjs
+
+      # Trusted publishing (OIDC) needs npm 11.5.1 or later; Node 22 ships npm
+      # 10. Without this the token-less publish fails at authentication.
+      - name: npm new enough for trusted publishing
+        run: npm install -g npm@^11.5.1
 
       # The four inputs below were renamed by changesets/action, and the action
       # hard-errors on the old spellings rather than falling back — so this step

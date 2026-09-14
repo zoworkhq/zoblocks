@@ -68,6 +68,12 @@ export interface IntlValue {
   locale: string;
   register: Register;
   messages: Messages;
+  /**
+   * The locale's own strings, without English underneath, so a translated
+   * general string beats an English register variant. When absent,
+   * `messages` stands in.
+   */
+  localeMessages?: Messages;
   /** Called when a key resolves to nothing. Never throws; never renders blank. */
   onMissing?: (key: string, locale: string) => void;
 }
@@ -96,18 +102,19 @@ export function IntlProvider({
   onMissing,
   children,
 }: IntlProviderProps) {
-  const value = React.useMemo<IntlValue>(
-    () => ({
+  const value = React.useMemo<IntlValue>(() => {
+    const localeMessages = { ...(BUILT_IN[locale] ?? {}), ...(messages ?? {}) };
+    return {
       locale,
       register,
       // English underneath always: a partial catalog inherits rather than
       // producing holes, so a half-translated locale degrades to English words
       // instead of blank labels.
-      messages: { ...EN, ...(BUILT_IN[locale] ?? {}), ...(messages ?? {}) },
+      messages: { ...EN, ...localeMessages },
+      localeMessages,
       onMissing,
-    }),
-    [locale, register, messages, onMissing],
-  );
+    };
+  }, [locale, register, messages, onMissing]);
 
   return React.createElement(IntlContext.Provider, { value }, children);
 }
@@ -136,6 +143,10 @@ export interface TranslateOptions {
  * `loader.label` with `register: "patient"` looks for `loader.label.patient`
  * first. That is what lets a component ask for one key and get the right words
  * for whoever is reading, without every call site branching.
+ *
+ * Language outranks register: locale + register, then locale, then English +
+ * register, then English. A German patient reads German clinician wording
+ * rather than English patient wording.
  */
 export function useMessage(key: string, options: TranslateOptions = {}): string {
   const intl = React.useContext(IntlContext);
@@ -144,7 +155,15 @@ export function useMessage(key: string, options: TranslateOptions = {}): string 
 
 export function resolve(intl: IntlValue, key: string, options: TranslateOptions = {}): string {
   const registerKey = `${key}.${intl.register}`;
-  const template = intl.messages[registerKey] ?? intl.messages[key] ?? options.fallback ?? EN[key];
+  const local = intl.localeMessages ?? intl.messages;
+  const template =
+    local[registerKey] ??
+    local[key] ??
+    intl.messages[registerKey] ??
+    intl.messages[key] ??
+    options.fallback ??
+    EN[registerKey] ??
+    EN[key];
 
   if (template === undefined) {
     intl.onMissing?.(key, intl.locale);
@@ -187,9 +206,55 @@ export function useNumberFormat(options?: Intl.NumberFormatOptions): Intl.Number
   return React.useMemo(() => new Intl.NumberFormat(locale, options), [locale, options]);
 }
 
+// Languages whose default script (per CLDR) runs right to left. Not Hausa or
+// Kurdish, which default to Latin; `ha-Arab` and `ku-Arab` are caught by script.
+const RTL_LANGUAGES = new Set([
+  "ar",
+  "arc",
+  "azb",
+  "ckb",
+  "dv",
+  "fa",
+  "he",
+  "iw",
+  "ji",
+  "khw",
+  "lrc",
+  "mzn",
+  "nqo",
+  "pnb",
+  "prs",
+  "ps",
+  "sd",
+  "syr",
+  "ug",
+  "ur",
+  "yi",
+]);
+
+const RTL_SCRIPTS = new Set([
+  "adlm",
+  "arab",
+  "aran",
+  "hebr",
+  "mand",
+  "mend",
+  "nkoo",
+  "rohg",
+  "samr",
+  "syrc",
+  "thaa",
+  "yezi",
+]);
+
 /** Whether a locale is written right to left. Drives `dir`, never layout maths. */
 export function isRtl(locale: string): boolean {
-  const RTL = ["ar", "arc", "dv", "fa", "ha", "he", "khw", "ks", "ku", "ps", "ur", "yi"];
-  const language = locale.split("-")[0]?.toLowerCase() ?? "";
-  return RTL.includes(language);
+  const [language = "", ...subtags] = locale.toLowerCase().split(/[-_]/);
+  // A stated script decides. It precedes any singleton, after which a
+  // four-letter subtag belongs to an extension (`-u-nu-arab`).
+  for (const subtag of subtags) {
+    if (subtag.length === 1) break;
+    if (/^[a-z]{4}$/.test(subtag)) return RTL_SCRIPTS.has(subtag);
+  }
+  return RTL_LANGUAGES.has(language);
 }

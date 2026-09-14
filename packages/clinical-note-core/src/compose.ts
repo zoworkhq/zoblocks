@@ -182,6 +182,10 @@ export interface ForeignRange {
  * a thing worth doing even if nothing else in this file existed.
  *
  * `subject` is the reference of the note being written, e.g. `Patient/4471902`.
+ * Both sides are compared by type and id, so a versioned (`/_history/2`) or
+ * absolute (`https://…/Patient/1`) reference to the same patient is not foreign.
+ * Two absolute references on different servers are foreign even with the same
+ * id: ids are only unique within one server.
  */
 export function foreignContent(doc: PMNode, subject: string): ForeignRange[] {
   const out: ForeignRange[] = [];
@@ -197,11 +201,33 @@ export function foreignContent(doc: PMNode, subject: string): ForeignRange[] {
 }
 
 function isForeign(subject: string): (a: ProvenanceAttrs) => boolean {
-  return (a) =>
-    a.origin === "copied" &&
-    a.source !== null &&
-    a.source.startsWith("Patient/") &&
-    a.source !== subject;
+  const own = referenceKey(subject);
+  return (a) => {
+    if (a.origin !== "copied" || a.source === null) return false;
+    const source = referenceKey(a.source);
+    if (source?.type !== "Patient") return false;
+    // A subject we cannot read matches no patient, as the string compare did.
+    if (own?.type !== "Patient" || own.id !== source.id) return true;
+    // A relative reference lives on the note's own server, so only two
+    // absolute bases can disagree.
+    return own.base !== null && source.base !== null && own.base !== source.base;
+  };
+}
+
+// `Type/id`, optionally `/_history/vid`, at the end of a relative or absolute reference.
+const REFERENCE =
+  /(?:^|\/)([A-Z][A-Za-z]*)\/([A-Za-z0-9\-.]{1,64})(?:\/_history\/[A-Za-z0-9\-.]{1,64})?$/;
+
+/**
+ * A FHIR reference reduced to server base, type and id; version, query and
+ * fragment dropped. `base` is null for a relative reference.
+ */
+function referenceKey(reference: string): { base: string | null; type: string; id: string } | null {
+  const path = (reference.trim().split(/[?#]/)[0] ?? "").replace(/\/+$/, "");
+  const match = REFERENCE.exec(path);
+  if (!match) return null;
+  const base = path.slice(0, match.index).toLowerCase();
+  return { base: base === "" ? null : base, type: match[1] ?? "", id: match[2] ?? "" };
 }
 
 /* ------------------------------------------------------------------ */

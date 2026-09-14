@@ -3,6 +3,8 @@
 **Status:** accepted · 6 August 2026
 
 > **Ratified 16 August 2026.** Implemented at five components rather than fifty, as this ADR argued. @zoblocks/intl ships with register-aware lookup and a missing-key path that never renders blank.
+>
+> **Partly done (14 September 2026).** The package exists, but registry components still hardcode their strings and none are routed through @zoblocks/intl yet. The retrofit this ADR asks for is still open.
 
 ## Context
 

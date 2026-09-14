@@ -95,6 +95,16 @@ describe("findStigma", () => {
     expect(findings).toHaveLength(1);
   });
 
+  it("reads an apostrophe between letters as an apostrophe, not a quotation", () => {
+    // The two apostrophes used to pair up as a quotation around "addict".
+    const findings = findStigma("The patient's partner is an addict, and he's not coping.");
+    expect(findings.map((f) => f.term)).toEqual(["addict"]);
+  });
+
+  it("still skips single-quoted speech that contains an apostrophe", () => {
+    expect(findStigma("Patient states 'I'm just an addict'.")).toHaveLength(0);
+  });
+
   it("can be told not to skip quotes", () => {
     const findings = findStigma('Patient states "I am just an addict".', { skipQuoted: false });
     expect(findings).toHaveLength(1);

@@ -102,6 +102,35 @@ describe("capture", () => {
     expect(pad.strokes).toHaveLength(0);
   });
 
+  it("cancelling another pointer leaves the active stroke alone", () => {
+    // The OS cancels a palm touch while the pen is mid-stroke. The pen's ink
+    // belongs to the pen; only the palm's gesture was taken away.
+    const pad = new SignatureCapture();
+    pad.down({ x: 0, y: 0, t: 0, pointerType: "pen", pointerId: 1 });
+    pad.move({ x: 30, y: 30, t: 16, pointerType: "pen", pointerId: 1 });
+    expect(pad.cancel(2)).toBe(false);
+    pad.move({ x: 60, y: 10, t: 32, pointerType: "pen", pointerId: 1 });
+    expect(pad.up({ x: 90, y: 20, t: 48, pointerType: "pen", pointerId: 1 })).toBe(true);
+    expect(pad.strokes).toHaveLength(1);
+    expect(pad.strokes[0]!.points).toHaveLength(4);
+  });
+
+  it("cancelling the owning pointer, or with no id, abandons the stroke", () => {
+    const pad = new SignatureCapture();
+    pad.down({ x: 0, y: 0, t: 0, pointerId: 1 });
+    expect(pad.cancel(1)).toBe(true);
+    expect(pad.strokes).toHaveLength(0);
+
+    pad.down({ x: 0, y: 0, t: 0, pointerId: 1 });
+    expect(pad.cancel()).toBe(true);
+    expect(pad.strokes).toHaveLength(0);
+
+    // A stroke begun with no id cannot be matched, so any cancel ends it.
+    pad.down({ x: 0, y: 0, t: 0 });
+    expect(pad.cancel(7)).toBe(true);
+    expect(pad.strokes).toHaveLength(0);
+  });
+
   it("refuses a second contact while one is active", () => {
     const pad = new SignatureCapture();
     pad.down({ x: 0, y: 0, t: 0, pointerId: 1 });

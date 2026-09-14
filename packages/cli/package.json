@@ -57,10 +57,10 @@
     "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
-    "@zoblocks/tsconfig": "workspace:*",
     "@types/node": "^22.10.2",
-    "@vitest/coverage-v8": "^4.1.10",
+    "@vitest/coverage-v8": "^4.1.11",
+    "@zoblocks/tsconfig": "workspace:*",
     "typescript": "^5.7.2",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.11"
   }
 }

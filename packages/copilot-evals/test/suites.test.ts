@@ -227,7 +227,8 @@ describe("the report", () => {
       refusalCorrectness({ modes: defaultModes, mode: lookUp, cases: [] }),
     ]);
     expect(report.suites.every((s) => s.blocking)).toBe(true);
-    expect(report.passed).toBe(true);
+    // Empty suites test nothing, so they cannot clear the gate.
+    expect(report.passed).toBe(false);
   });
 
   it("passes a suite sitting exactly on the floor", () => {
@@ -264,7 +265,7 @@ describe("the report", () => {
     expect(report.blockingFailures[0]).toBe("s/bare: failed");
   });
 
-  it("returns an overall rate of 1 for an empty run", () => {
-    expect(buildReport([]).overallRate).toBe(1);
+  it("returns an overall rate of 0 for an empty run", () => {
+    expect(buildReport([]).overallRate).toBe(0);
   });
 });

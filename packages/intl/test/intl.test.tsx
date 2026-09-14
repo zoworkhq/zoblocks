@@ -62,6 +62,38 @@ describe("message resolution", () => {
     expect(result.current).toBe("Try again");
   });
 
+  it("prefers a translated general string over the English register variant", () => {
+    const { result } = renderHook(() => useMessage("loader.label"), {
+      wrapper: wrapper({
+        locale: "de",
+        register: "patient",
+        messages: { "loader.label": "Wird geladen" },
+      }),
+    });
+    expect(result.current).toBe("Wird geladen");
+  });
+
+  it("prefers a translated register variant over a translated general string", () => {
+    const { result } = renderHook(() => useMessage("loader.label"), {
+      wrapper: wrapper({
+        locale: "de",
+        register: "patient",
+        messages: {
+          "loader.label": "Wird geladen",
+          "loader.label.patient": "Ihre Daten werden geladen",
+        },
+      }),
+    });
+    expect(result.current).toBe("Ihre Daten werden geladen");
+  });
+
+  it("falls back to the English register variant when the locale has neither", () => {
+    const { result } = renderHook(() => useMessage("loader.label"), {
+      wrapper: wrapper({ locale: "de", register: "patient", messages: { other: "x" } }),
+    });
+    expect(result.current).toBe("Loading your information");
+  });
+
   it("never renders blank for an unknown key, and reports it", () => {
     const onMissing = vi.fn();
     const { result } = renderHook(() => useMessage("loader.nonexistent"), {
@@ -160,6 +192,26 @@ describe("locale", () => {
     ["en", false],
     ["en-GB", false],
     ["de", false],
+    // Hausa is written in Latin script; "ks" is not a language.
+    ["ha", false],
+    ["ks", false],
+    // Kurdish defaults to Latin script; Sorani is Arabic.
+    ["ku", false],
+    ["ckb", true],
+    ["ur-PK", true],
+    ["yi", true],
+    // A script subtag overrides the language's usual direction.
+    ["ha-Arab", true],
+    ["pa-Arab-PK", true],
+    ["ku-Arab", true],
+    ["az-Arab", true],
+    ["sd-Latn", false],
+    ["ar-Latn", false],
+    ["he_IL", true],
+    // An extension that happens to be four letters is not a script.
+    ["ar-u-nu-latn", true],
+    ["en-u-nu-arab", false],
+    ["", false],
   ])("detects direction for %s", (locale, rtl) => {
     expect(isRtl(locale)).toBe(rtl);
   });

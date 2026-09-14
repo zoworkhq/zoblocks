@@ -283,6 +283,7 @@ export interface Dosage {
     type?: CodeableConcept;
     doseQuantity?: Quantity;
     doseRange?: Range;
+    rateRange?: Range;
     rateQuantity?: Quantity;
   }>;
   maxDosePerPeriod?: { numerator?: Quantity; denominator?: Quantity };

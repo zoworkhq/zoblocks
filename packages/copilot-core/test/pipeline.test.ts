@@ -18,7 +18,7 @@ import { minimalDisclosure } from "../src/disclosure.js";
 import type { ResolvedContext } from "../src/context.js";
 import type { AuditEvent } from "../src/fhir-types.js";
 import type { TelemetryEvent } from "../src/telemetry.js";
-import { PhiNotPermittedError } from "../src/errors.js";
+import { copilotError, PhiNotPermittedError } from "../src/errors.js";
 
 const disclosure = minimalDisclosure("test-model@1");
 
@@ -504,6 +504,87 @@ describe("aborting", () => {
 
     expect(outcome.kind).toBe("failed");
     expect(h.state().error?.code).toBe("network");
+  });
+
+  /** A resolver held open until the test settles it, so a stop can land mid-await. */
+  function heldResolver() {
+    let settle: (outcome: "resolve" | "reject") => void = () => {};
+    const resolve = vi.fn(
+      () =>
+        new Promise((done, fail) => {
+          settle = (outcome) =>
+            outcome === "resolve"
+              ? done({ resources: [], withheld: [], asOf: "2026-08-16T09:00:00.000Z" })
+              : fail(new Error("EHR down"));
+        }),
+    );
+    return { resolver: { resolve }, settle: (outcome: "resolve" | "reject") => settle(outcome) };
+  }
+
+  it.each(["resolve", "reject"] as const)(
+    "neither calls the provider nor touches a new thread when stopped while context is resolving (%s)",
+    async (outcome) => {
+      const held = heldResolver();
+      const send = vi.fn();
+      const h = harness({
+        contextResolver: held.resolver as never,
+        subject: { reference: "Patient/1" },
+        provider: {
+          ...createStaticProvider({ events: groundedStream, disclosure, phiPermitted: true }),
+          send,
+        } as never,
+      });
+      const controller = new AbortController();
+      const running = runExchange({
+        question: "summarise the record",
+        state: h.state(),
+        mode: prepare,
+        deps: h.deps,
+        dispatch: h.dispatch,
+        signal: controller.signal,
+      });
+      await vi.waitFor(() => expect(held.resolver.resolve).toHaveBeenCalled());
+
+      controller.abort();
+      h.dispatch({ type: "new-thread" });
+      held.settle(outcome);
+
+      expect((await running).kind).toBe("stopped");
+      expect(send).not.toHaveBeenCalled();
+      expect(h.state()).toMatchObject({ status: "idle", error: null, context: null });
+    },
+  );
+});
+
+describe("a provider error event", () => {
+  it("is recorded as a failure in the audit and telemetry, never as an answer", async () => {
+    const h = harness({
+      provider: {
+        ...createStaticProvider({ events: [], disclosure }),
+        async *send() {
+          yield { type: "delta", text: "Half an" } as const;
+          yield { type: "error", error: copilotError("provider", "rate limited") } as const;
+        },
+      } as never,
+    });
+
+    const outcome = await runExchange({
+      question: "AF first line?",
+      state: h.state(),
+      mode: lookUp,
+      deps: h.deps,
+      dispatch: h.dispatch,
+      signal: new AbortController().signal,
+    });
+
+    expect(outcome.kind).toBe("failed");
+    expect(h.state().status).toBe("error");
+    expect(h.audits).toHaveLength(1);
+    expect(h.audits[0]?.outcomeDesc).toBe("failed");
+    expect(h.telemetry.some((t) => t.type === "answered")).toBe(false);
+    expect(h.telemetry).toContainEqual(
+      expect.objectContaining({ type: "failed", code: "provider" }),
+    );
   });
 });
 

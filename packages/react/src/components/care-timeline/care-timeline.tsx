@@ -550,9 +550,7 @@ export function CareTimeline({
             </option>
             {model.sections.map((section) => (
               <option key={section.key} value={section.key}>
-                {section.type === "planned"
-                  ? locale.planned
-                  : formatGroupLabel(section.label, localeTag)}
+                {sectionHeading(section, locale, localeTag)}
               </option>
             ))}
           </select>
@@ -676,6 +674,22 @@ const HEADING_TAG = {
   6: "h6",
 } as const;
 
+/**
+ * A section's name, as the heading, its list and the jump control all say it.
+ *
+ * One function so the three cannot disagree: a jump option reading "August
+ * 2026 (continued)" must land on a heading that reads the same.
+ */
+function sectionHeading(
+  section: TimelineSection,
+  locale: TimelineLocale,
+  localeTag: string | undefined,
+): string {
+  if (section.type === "planned") return locale.planned;
+  const label = formatGroupLabel(section.label, localeTag);
+  return section.continued ? locale.continued(label) : label;
+}
+
 interface SectionProps {
   section: TimelineSection;
   previous: TimelineSection | undefined;
@@ -707,8 +721,7 @@ function Section({
   layout,
   registerHeading,
 }: SectionProps) {
-  const heading =
-    section.type === "planned" ? locale.planned : formatGroupLabel(section.label, localeTag);
+  const heading = sectionHeading(section, locale, localeTag);
   const Heading = HEADING_TAG[headingLevel ?? 0];
 
   /**

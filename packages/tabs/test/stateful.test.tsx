@@ -120,6 +120,44 @@ describe("onBeforeChange", () => {
     await userEvent.setup().click(screen.getByRole("tab", { name: "Preview" }));
     expect(guard).toHaveBeenCalledWith("preview", "compose");
   });
+
+  it("reads the guard's current closure, so a note that became dirty after mount blocks", async () => {
+    function Note() {
+      const [dirty, setDirty] = React.useState(false);
+      return (
+        <>
+          <button type="button" onClick={() => setDirty(true)}>
+            Type
+          </button>
+          <Tabs
+            as="tabs"
+            aria-label="Note"
+            defaultValue="compose"
+            items={base}
+            onBeforeChange={() => !dirty}
+          />
+        </>
+      );
+    }
+    render(<Note />);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: "Type" }));
+    await user.click(screen.getByRole("tab", { name: "Preview" }));
+    expect(screen.getByRole("tab", { name: "Compose" })).toHaveAttribute("aria-selected", "true");
+  });
+
+  it("honours a guard added after mount", async () => {
+    const props = {
+      as: "tabs",
+      "aria-label": "Note",
+      defaultValue: "compose",
+      items: base,
+    } as const;
+    const { rerender } = render(<Tabs {...props} />);
+    rerender(<Tabs {...props} onBeforeChange={() => false} />);
+    await userEvent.setup().click(screen.getByRole("tab", { name: "Preview" }));
+    expect(screen.getByRole("tab", { name: "Compose" })).toHaveAttribute("aria-selected", "true");
+  });
 });
 
 describe("steps", () => {
@@ -326,6 +364,56 @@ describe("editable tabs", () => {
     await user.tab();
     await user.keyboard("{Control>}{Shift>}{ArrowRight}{/Shift}{/Control}");
     expect(onReorder).toHaveBeenCalledWith(0, 1);
+  });
+
+  it("keeps focus on the moved tab, so a second move moves the same tab", async () => {
+    function Reorderable() {
+      const [items, setItems] = React.useState([
+        { value: "a", label: "A" },
+        { value: "b", label: "B" },
+        { value: "c", label: "C" },
+      ]);
+      return (
+        <Tabs
+          as="tabs"
+          aria-label="Notes"
+          defaultValue="a"
+          items={items}
+          editable={{
+            onReorder: (from, to) =>
+              setItems((current) => {
+                const next = [...current];
+                const [moved] = next.splice(from, 1);
+                if (moved) next.splice(to, 0, moved);
+                return next;
+              }),
+          }}
+        />
+      );
+    }
+    render(<Reorderable />);
+    const user = userEvent.setup();
+    await user.tab();
+    await user.keyboard("{Control>}{Shift>}{ArrowRight}{/Shift}{/Control}");
+    await user.keyboard("{Control>}{Shift>}{ArrowRight}{/Shift}{/Control}");
+    expect(screen.getAllByRole("tab").map((tab) => tab.textContent)).toEqual(["B", "C", "A"]);
+    expect(screen.getByRole("tab", { name: "A" })).toHaveFocus();
+  });
+
+  it("arrows follow the visual order after keyed triggers move", async () => {
+    const items = [
+      { value: "a", label: "A" },
+      { value: "b", label: "B" },
+      { value: "c", label: "C" },
+    ];
+    const props = { as: "tabs", "aria-label": "Notes", defaultValue: "a" } as const;
+    const { rerender } = render(<Tabs {...props} items={items} />);
+    rerender(<Tabs {...props} items={[items[1]!, items[0]!, items[2]!]} />);
+    const user = userEvent.setup();
+    await user.tab();
+    expect(screen.getByRole("tab", { name: "A" })).toHaveFocus();
+    await user.keyboard("{ArrowRight}");
+    expect(screen.getByRole("tab", { name: "C" })).toHaveFocus();
   });
 });
 

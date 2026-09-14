@@ -1,7 +1,11 @@
-import { describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   ABSENT_REASON_LABEL,
   calculateAge,
+  coverageState,
+  formatAppointmentTime,
+  formatDosage,
+  isMedicationExpired,
   formatComponentValue,
   formatObservationValue,
   formatReferenceRange,
@@ -33,7 +37,14 @@ import {
   resolvePatientName,
   worstInterpretation,
 } from "./helpers";
-import type { Observation, Patient } from "./types";
+import type {
+  CareTeam,
+  Coverage,
+  MedicationRequest,
+  Observation,
+  ObservationReferenceRange,
+  Patient,
+} from "./types";
 
 describe("resolvePatientName", () => {
   it("prefers the official name over a nickname", () => {
@@ -65,7 +76,8 @@ describe("resolvePatientName", () => {
 });
 
 describe("calculateAge", () => {
-  const asOf = new Date("2026-08-03T00:00:00Z");
+  // Midday UTC, so the calendar date is 3 August in every runtime zone.
+  const asOf = new Date("2026-08-03T12:00:00Z");
 
   it("does not round up before the birthday has passed", () => {
     expect(calculateAge("1990-12-25", asOf)).toBe(35);
@@ -561,6 +573,17 @@ describe("summariseProvenance", () => {
     expect(summariseProvenance(undefined, { meta: { versionId: "1" } }).amended).toBe(false);
     expect(summariseProvenance({ entity: [{ role: "revision" }] }).amended).toBe(true);
   });
+
+  it("does not read an opaque or timestamp versionId as a revision count", () => {
+    // Many servers stamp versionId with a time; every record would read amended.
+    expect(summariseProvenance(undefined, { meta: { versionId: "1723456789012" } }).amended).toBe(
+      false,
+    );
+    expect(summariseProvenance(undefined, { meta: { versionId: "20260803101500" } }).amended).toBe(
+      false,
+    );
+    expect(summariseProvenance(undefined, { meta: { versionId: "2" } }).amended).toBe(true);
+  });
 });
 
 describe("isFlagActive", () => {
@@ -610,6 +633,227 @@ describe("careTeamMembers", () => {
 
   it("returns an empty list for a missing team", () => {
     expect(careTeamMembers(undefined)).toEqual([]);
+  });
+});
+
+describe("date-only period bounds", () => {
+  // 21:00 on 3 August in New York is already 4 August in UTC.
+  const lastEvening = new Date("2026-08-04T01:00:00Z");
+  const nextMorning = new Date("2026-08-04T13:00:00Z");
+  const lastAfternoon = new Date("2026-08-03T15:00:00Z");
+
+  it("keeps coverage active through the whole of its last day", () => {
+    const coverage: Coverage = { status: "active", period: { end: "2026-08-03" } };
+    expect(coverageState(coverage, lastAfternoon, "UTC")).toBe("active");
+    expect(coverageState(coverage, lastEvening, "America/New_York")).toBe("active");
+    expect(coverageState(coverage, nextMorning, "America/New_York")).toBe("lapsed");
+  });
+
+  it("starts coverage at the start of its first day in the evaluation zone", () => {
+    const coverage: Coverage = { status: "active", period: { start: "2026-08-04" } };
+    expect(coverageState(coverage, lastEvening, "America/New_York")).toBe("not-yet-effective");
+    expect(coverageState(coverage, lastEvening, "UTC")).toBe("active");
+  });
+
+  it("keeps a flag and a care-team member current on their last day", () => {
+    expect(
+      isFlagActive({ status: "active", period: { end: "2026-08-03" } }, lastAfternoon, "UTC"),
+    ).toBe(true);
+    const team: CareTeam = {
+      participant: [{ member: { display: "A. Bensouda" }, period: { end: "2026-08-03" } }],
+    };
+    expect(careTeamMembers(team, lastAfternoon, "UTC")[0]?.current).toBe(true);
+    expect(careTeamMembers(team, nextMorning, "UTC")[0]?.current).toBe(false);
+  });
+
+  it("does not expire a prescription on its last valid day", () => {
+    const request: MedicationRequest = {
+      dispenseRequest: { validityPeriod: { end: "2026-08-03" } },
+    };
+    expect(isMedicationExpired(request, lastAfternoon, "UTC")).toBe(false);
+    expect(isMedicationExpired(request, nextMorning, "UTC")).toBe(true);
+  });
+
+  it("reads a month-only end as the whole month", () => {
+    const coverage: Coverage = { status: "active", period: { end: "2026-08" } };
+    expect(coverageState(coverage, new Date("2026-08-31T12:00:00Z"), "UTC")).toBe("active");
+    expect(coverageState(coverage, new Date("2026-09-01T12:00:00Z"), "UTC")).toBe("lapsed");
+  });
+
+  it("still compares a full instant as an instant", () => {
+    const coverage: Coverage = { status: "active", period: { end: "2026-08-03T10:00:00Z" } };
+    expect(coverageState(coverage, lastAfternoon, "UTC")).toBe("lapsed");
+  });
+
+  it("ignores an impossible calendar date rather than rolling it into March", () => {
+    // V8 parses "2026-02-30" as 2 March.
+    const coverage: Coverage = { status: "active", period: { end: "2026-02-30" } };
+    expect(coverageState(coverage, new Date("2026-03-02T12:00:00Z"), "UTC")).toBe("active");
+  });
+});
+
+describe("in a UTC-negative runtime zone", () => {
+  const original = process.env.TZ;
+  beforeAll(() => {
+    process.env.TZ = "America/New_York";
+  });
+  afterAll(() => {
+    if (original === undefined) delete process.env.TZ;
+    else process.env.TZ = original;
+  });
+
+  it("does not age a patient on the evening before their birthday", () => {
+    const eve = new Date(2026, 7, 2, 21); // 21:00 on 2 August, local
+    expect(calculateAge("1990-08-03", eve)).toBe(35);
+    expect(calculateAge("1990-08-03", new Date(2026, 7, 3, 9))).toBe(36);
+  });
+
+  it("counts a neonate's days by calendar date", () => {
+    expect(formatAge("2026-07-28", new Date(2026, 7, 2, 21))).toBe("5 d");
+  });
+
+  it("reads age in a stated zone", () => {
+    const at = new Date("2026-08-03T02:00:00Z"); // 22:00 on 2 August in New York
+    expect(calculateAge("1990-08-03", at, "America/New_York")).toBe(35);
+    expect(calculateAge("1990-08-03", at, "Asia/Kolkata")).toBe(36);
+  });
+
+  it("rejects an impossible birth date", () => {
+    expect(calculateAge("1990-02-30", new Date(2026, 7, 3))).toBeUndefined();
+  });
+
+  it("shows an instant in marked UTC, never the runtime zone, when the zone is invalid", () => {
+    // New York would read 03:40.
+    const appointment = formatAppointmentTime(
+      { start: "2026-08-03T07:40:00Z" },
+      "Not/AZone",
+      "en-US",
+    );
+    expect(appointment).toContain("7:40");
+    expect(appointment).toContain("UTC");
+    const clinical = formatClinicalDate("2026-08-03T07:40:00Z", "Not/AZone", "en-US");
+    expect(clinical).toContain("7:40");
+    expect(clinical).toContain("UTC");
+  });
+
+  it("evaluates a date-only bound in UTC, not the runtime zone, when the zone is invalid", () => {
+    // 22:00 on 3 August in New York; 4 August in UTC.
+    const coverage: Coverage = { status: "active", period: { end: "2026-08-03" } };
+    expect(coverageState(coverage, new Date("2026-08-04T02:00:00Z"), "Not/AZone")).toBe("lapsed");
+  });
+});
+
+describe("getInterpretation — what the payload does not prove", () => {
+  const range = [{ low: { value: 70, unit: "mg/dL" }, high: { value: 100, unit: "mg/dL" } }];
+  const potassium: ObservationReferenceRange[] = [{ low: { value: 3.5 }, high: { value: 5.1 } }];
+
+  it("never reads an unrecognised interpretation as normal", () => {
+    const value = { value: 85, unit: "mg/dL" };
+    expect(
+      getInterpretation({
+        valueQuantity: value,
+        referenceRange: range,
+        interpretation: [{ coding: [{ code: "IND" }] }],
+      }),
+    ).toBe("unknown");
+    expect(
+      getInterpretation({
+        valueQuantity: value,
+        referenceRange: range,
+        interpretation: [{ text: "Borderline" }],
+      }),
+    ).toBe("unknown");
+  });
+
+  it("does not judge a censored value in range unless it provably is", () => {
+    const at = (quantity: Observation["valueQuantity"], ranges = potassium) =>
+      getInterpretation({ valueQuantity: quantity, referenceRange: ranges });
+    // "<5" could be below the low bound.
+    expect(at({ value: 5, comparator: "<" })).toBe("unknown");
+    expect(at({ value: 4, comparator: ">" })).toBe("unknown");
+    // Everything below 0.01 is below 0.04.
+    expect(at({ value: 0.01, comparator: "<" }, [{ high: { value: 0.04 } }])).toBe("normal");
+    expect(at({ value: 10, comparator: ">" })).toBe("high");
+    expect(at({ value: 2, comparator: "<=" })).toBe("low");
+    expect(at({ value: 4, comparator: ">=" }, [{ low: { value: 3.5 } }])).toBe("normal");
+  });
+
+  it("leaves a value uninterpreted when its unit differs from the range's", () => {
+    expect(
+      getInterpretation({ valueQuantity: { value: 5.5, unit: "mmol/L" }, referenceRange: range }),
+    ).toBe("unknown");
+    expect(
+      getComponentInterpretation({
+        valueQuantity: { value: 85, unit: "mmol/L" },
+        referenceRange: range,
+      }),
+    ).toBe("unknown");
+  });
+
+  it("matches units by UCUM code when both sides carry one", () => {
+    const ucum = "http://unitsofmeasure.org";
+    expect(
+      getInterpretation({
+        valueQuantity: { value: 85, unit: "mg/dl", system: ucum, code: "mg/dL" },
+        referenceRange: [
+          {
+            low: { value: 70, unit: "mg/dL", system: ucum, code: "mg/dL" },
+            high: { value: 100, unit: "mg/dL", system: ucum, code: "mg/dL" },
+          },
+        ],
+      }),
+    ).toBe("normal");
+  });
+});
+
+describe("formatDosage", () => {
+  it("renders a dose range", () => {
+    expect(
+      formatDosage({
+        doseAndRate: [
+          { doseRange: { low: { value: 1, unit: "tablet" }, high: { value: 2, unit: "tablet" } } },
+        ],
+      }),
+    ).toBe("1 – 2 tablet");
+  });
+
+  it("renders a timing code such as BID", () => {
+    expect(
+      formatDosage({
+        doseAndRate: [{ doseQuantity: { value: 500, unit: "mg" } }],
+        timing: { code: { coding: [{ code: "BID" }] } },
+      }),
+    ).toBe("500 mg · BID");
+  });
+
+  it("renders an infusion rate", () => {
+    expect(
+      formatDosage({
+        route: { text: "IV" },
+        doseAndRate: [{ rateQuantity: { value: 100, unit: "mL/h" } }],
+      }),
+    ).toBe("IV · at 100 mL/h");
+  });
+
+  it("renders the maximum dose per period", () => {
+    expect(
+      formatDosage({
+        doseAndRate: [{ doseQuantity: { value: 1, unit: "g" } }],
+        asNeededBoolean: true,
+        maxDosePerPeriod: {
+          numerator: { value: 4, unit: "g" },
+          denominator: { value: 1, code: "d" },
+        },
+      }),
+    ).toBe("1 g · as needed · max 4 g per day");
+    expect(
+      formatDosage({
+        maxDosePerPeriod: {
+          numerator: { value: 4, unit: "g" },
+          denominator: { value: 24, unit: "h" },
+        },
+      }),
+    ).toBe("max 4 g per 24 h");
   });
 });
 

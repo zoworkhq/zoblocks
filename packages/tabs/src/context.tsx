@@ -56,10 +56,11 @@ export interface TabsContextValue {
   pending: boolean;
   select: (value: string, source: ChangeSource, item?: TabItem) => void;
 
-  /** Ordered registry, maintained by the list so keyboard order matches DOM
-   *  order even when triggers are declared out of order. */
+  /** Registry in DOM order, so keyboard order matches what is on screen. */
   triggers: React.RefObject<RegisteredTrigger[]>;
   register: (entry: RegisteredTrigger) => () => void;
+  /** Re-sorts the registry if keyed triggers moved; bumps the version if so. */
+  orderRegistry: () => void;
   /** Bumped whenever registration changes, to re-run measurement. */
   registryVersion: number;
 
@@ -99,6 +100,13 @@ export const TabsContext = React.createContext<TabsContextValue | null>(null);
  * is how you get an `AggregateError` whose message is the empty string.
  */
 export const ValidatedByParent = React.createContext(false);
+
+/**
+ * Values currently parked in the More menu, provided by `Tabs.List`.
+ *
+ * Their triggers hide from the strip, so no tab shows in both places.
+ */
+export const OverflowedValues = React.createContext<ReadonlySet<string>>(new Set());
 
 export function useTabsContext(part: string): TabsContextValue {
   const context = React.useContext(TabsContext);

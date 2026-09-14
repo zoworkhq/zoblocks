@@ -347,12 +347,44 @@ export function resolveIdentity(
 }
 
 /**
+ * Every field `resolveIdentity` reads, as a string.
+ *
+ * The id alone is not enough: a record gains a security label, a death or a
+ * merge without its id changing, and a stale hit renders it as unrestricted.
+ * Photo data is sampled rather than copied, because it can be megabytes.
+ */
+function identityFingerprint(patient: Patient): string {
+  const { meta } = patient;
+  const photo = patient.photo?.map((a) => [
+    a.url,
+    a.contentType,
+    a.data?.length,
+    a.data?.slice(-64),
+  ]);
+  return JSON.stringify([
+    meta?.versionId,
+    meta?.lastUpdated,
+    meta?.security,
+    meta?.tag,
+    patient.active,
+    patient.deceasedBoolean,
+    patient.deceasedDateTime,
+    patient.link,
+    patient.name,
+    patient.birthDate,
+    patient.identifier,
+    patient.extension,
+    photo,
+  ]);
+}
+
+/**
  * A bounded cache for the resolved value.
  *
  * The policy version is part of the key. Without it a disclosure-level change
  * would leave two thousand patients rendered under the previous policy — which,
  * given what disclosure level controls, is a privacy defect and not a
- * performance one.
+ * performance one. So is a fingerprint of the record, for the same reason.
  */
 export class IdentityCache {
   private readonly max: number;
@@ -367,7 +399,10 @@ export class IdentityCache {
   }
 
   resolve(patient: Patient, p: IdentityPolicy, options: ResolveOptions = {}): Identity {
-    const key = `${identityKey(patient, options.key)}|${p.version}`;
+    const base = identityKey(patient, options.key);
+    // Every unkeyed record shares "unknown", so a hit would be someone else.
+    if (base === "unknown") return resolveIdentity(patient, p, options);
+    const key = `${base}|${p.version}|${identityFingerprint(patient)}`;
     const hit = this.map.get(key);
     if (hit) {
       // Refresh recency: delete then set moves it to the end of the Map order.

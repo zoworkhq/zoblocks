@@ -101,10 +101,14 @@ export interface RunExchangeOptions {
  * tests, not for rendering.
  */
 export async function runExchange(options: RunExchangeOptions): Promise<ExchangeOutcome> {
-  const { question, state, mode, deps, dispatch, signal } = options;
+  const { question, state, mode, deps, signal } = options;
   const classifiers = { ...defaultClassifiers, ...deps.classifiers };
   const exchangeId = deps.newId();
   const startedAt = deps.now();
+  // Tagged, so an action landing after a stop or a new thread is ignored rather
+  // than applied to whatever replaced this exchange.
+  const dispatch = (action: SessionAction): void =>
+    options.dispatch({ ...action, exchangeId } as SessionAction);
 
   dispatch({ type: "submit", exchangeId, messageId: deps.newId(), question });
 
@@ -156,6 +160,13 @@ export async function runExchange(options: RunExchangeOptions): Promise<Exchange
   /* --- 3. resolve -------------------------------------------------- */
 
   const contextOutcome = await resolveContext(mode, deps.subject, deps.contextResolver);
+  // Stopped or replaced while the record was being read. The only await before
+  // the stream, so the provider is never called with an aborted signal.
+  if (signal.aborted) {
+    dispatch({ type: "stop" });
+    deps.telemetry?.({ type: "stopped", exchangeId, modeId: mode.id });
+    return { kind: "stopped" };
+  }
   if (!contextOutcome.ok) {
     dispatch({ type: "fail", error: contextOutcome.error });
     await emitAudit(deps, {
@@ -298,6 +309,21 @@ export async function runExchange(options: RunExchangeOptions): Promise<Exchange
         }
       }
 
+      if (event.type === "error") {
+        // A failure, not an empty answer: no checks, no "answered".
+        dispatch({ type: "event", event });
+        deps.telemetry?.({ type: "failed", exchangeId, modeId: mode.id, code: event.error.code });
+        await emitAudit(deps, {
+          exchangeId,
+          mode,
+          startedAt,
+          outcome: "failed",
+          safety,
+          withheld: context.withheld,
+        });
+        return { kind: "failed" };
+      }
+
       working = applyLocally(working, event);
       dispatch({ type: "event", event });
     }
@@ -310,6 +336,7 @@ export async function runExchange(options: RunExchangeOptions): Promise<Exchange
       type: "fail",
       error: copilotError("network", "The connection to the assistant failed.", { cause }),
     });
+    deps.telemetry?.({ type: "failed", exchangeId, modeId: mode.id, code: "network" });
     await emitAudit(deps, {
       exchangeId,
       mode,

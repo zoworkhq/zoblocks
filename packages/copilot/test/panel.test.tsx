@@ -227,6 +227,41 @@ describe("feedback asks why", () => {
     );
   });
 
+  it("asks under the answer marked down, and records it against that answer", async () => {
+    const onTelemetry = vi.fn();
+    const { user } = setup({ onTelemetry });
+    await ask(user, "AF first line?");
+    await user.type(
+      screen.getByRole("textbox", { name: DEFAULT_LOCALE.followUp }),
+      "and second line?{Enter}",
+    );
+    await waitFor(() => expect(screen.getAllByRole("article")).toHaveLength(2), { timeout: 8000 });
+
+    const first = screen.getAllByRole("article")[0] as HTMLElement;
+    await user.click(within(first).getByRole("button", { name: DEFAULT_LOCALE.notHelpful }));
+    const groups = await screen.findAllByRole(
+      "group",
+      { name: DEFAULT_LOCALE.whyNotHelpful },
+      { timeout: 8000 },
+    );
+    expect(groups).toHaveLength(1);
+    expect(first).toContainElement(groups[0] ?? null);
+
+    await user.click(within(groups[0] as HTMLElement).getByRole("button", { name: "Wrong" }));
+    const answered = onTelemetry.mock.calls
+      .map(([event]) => event as { type: string; exchangeId: string })
+      .filter((event) => event.type === "answered");
+    await waitFor(() =>
+      expect(onTelemetry).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "feedback",
+          reason: "wrong",
+          exchangeId: answered[0]?.exchangeId,
+        }),
+      ),
+    );
+  });
+
   it("can be dismissed without recording anything", async () => {
     const onTelemetry = vi.fn();
     const { user } = setup({ onTelemetry });

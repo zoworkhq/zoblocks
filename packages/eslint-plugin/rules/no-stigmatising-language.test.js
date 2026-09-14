@@ -23,6 +23,8 @@ describe("no-stigmatising-language", () => {
         // A patient's own words. Rewriting a quotation falsifies a record.
         'const note = `Patient states "I am just an addict" repeatedly.`;',
         "const note = 'The client said \"I have been clean for a year\".';",
+        "const note = \"Patient said 'I am an addict, I don't deny it' at intake.\";",
+        'const note = "Patient said ‘I am an addict’ at intake.";',
 
         // Ambiguous words outside a clinical string stay quiet, or the rule
         // becomes the one everybody disables.
@@ -89,6 +91,16 @@ describe("no-stigmatising-language", () => {
         },
         {
           code: "const el = <p>The patient is an addict.</p>;",
+          errors: 1,
+        },
+        // An apostrophe is not a quotation mark. "Don't" and "he's" once
+        // paired up as a quote and hid the term between them.
+        {
+          code: "const note = \"Don't call him an addict, he's in recovery.\";",
+          errors: 1,
+        },
+        {
+          code: 'const note = "Don’t call him an addict, he’s in recovery.";',
           errors: 1,
         },
         // One report per term per string, not one per occurrence.

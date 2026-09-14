@@ -67,6 +67,7 @@ const GATE_COMMANDS: Record<string, string> = {
   Typecheck: "pnpm typecheck",
   "Coverage thresholds": "pnpm test:coverage",
   Build: "pnpm build",
+  "Every package is publishable": "pnpm release:check",
   "Accessibility (WCAG 2.2 AA, both themes)": "scripts/verify-a11y.sh",
   "Browser accessibility and cross-framework smoke": "pnpm e2e:ci",
   "Bundle budgets": "pnpm size",

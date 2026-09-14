@@ -63,6 +63,8 @@ export interface CopilotMessage {
   readonly id: string;
   readonly role: "clinician" | "assistant";
   readonly text: string;
+  /** The exchange that produced it, so feedback lands on the right one. */
+  readonly exchangeId?: string;
   /** Present on assistant messages only. */
   readonly answer?: Answer;
   readonly checks?: CheckResult;
@@ -111,6 +113,15 @@ export function initialState(modeId: string, providerCanCite = true): SessionSta
 /* Actions                                                             */
 /* ------------------------------------------------------------------ */
 
+/**
+ * The exchange an action belongs to. The pipeline tags every action; one that
+ * lands after a stop or a new thread replaced its exchange is ignored.
+ * Untagged actions (from the UI) always apply.
+ */
+interface Scoped {
+  readonly exchangeId?: string;
+}
+
 export type SessionAction =
   | { readonly type: "set-mode"; readonly modeId: string }
   | { readonly type: "set-draft"; readonly draft: string }
@@ -123,19 +134,19 @@ export type SessionAction =
       readonly messageId: string;
       readonly question: string;
     }
-  | { readonly type: "context-resolved"; readonly context: ResolvedContext }
-  | { readonly type: "refuse"; readonly error: CopilotError }
-  | { readonly type: "crisis"; readonly safety: SafetyVerdict }
-  | { readonly type: "stream-start" }
-  | { readonly type: "event"; readonly event: CopilotEvent }
-  | {
+  | ({ readonly type: "context-resolved"; readonly context: ResolvedContext } & Scoped)
+  | ({ readonly type: "refuse"; readonly error: CopilotError } & Scoped)
+  | ({ readonly type: "crisis"; readonly safety: SafetyVerdict } & Scoped)
+  | ({ readonly type: "stream-start" } & Scoped)
+  | ({ readonly type: "event"; readonly event: CopilotEvent } & Scoped)
+  | ({
       readonly type: "complete";
       readonly messageId: string;
       readonly checks: CheckResult;
       readonly finish: "stop" | "length" | "aborted" | "refused";
-    }
-  | { readonly type: "stop" }
-  | { readonly type: "fail"; readonly error: CopilotError }
+    } & Scoped)
+  | ({ readonly type: "stop" } & Scoped)
+  | ({ readonly type: "fail"; readonly error: CopilotError } & Scoped)
   | { readonly type: "confirm"; readonly confirmed: ConfirmedProposal }
   | { readonly type: "dismiss-proposal" }
   | { readonly type: "new-thread" };
@@ -155,12 +166,33 @@ export function reduce(state: SessionState, action: SessionAction): SessionState
     return state;
   }
 
+  // A late action from an exchange that is no longer current.
+  if (
+    action.type !== "submit" &&
+    "exchangeId" in action &&
+    action.exchangeId !== undefined &&
+    action.exchangeId !== state.exchangeId
+  ) {
+    return state;
+  }
+
   switch (action.type) {
     case "set-mode":
       // Changing mode mid-stream would mean an answer governed by one output
       // contract rendered under another. Ignored rather than queued.
       if (state.status === "streaming" || state.status === "submitting") return state;
-      return { ...state, modeId: action.modeId, error: null };
+      if (action.modeId === state.modeId || !state.proposal) {
+        return { ...state, modeId: action.modeId, error: null };
+      }
+      // A pending proposal was produced under the old mode's contract, and
+      // confirming it would check the new mode's rules. Dropped, not carried.
+      return {
+        ...state,
+        modeId: action.modeId,
+        error: null,
+        proposal: null,
+        status: state.status === "proposing" ? "complete" : state.status,
+      };
 
     case "set-draft":
       return {
@@ -171,6 +203,9 @@ export function reduce(state: SessionState, action: SessionAction): SessionState
       };
 
     case "dictation-start":
+      // Not while an answer is in flight: leaving `streaming` would drop the
+      // rest of the answer and take Stop with it.
+      if (isBusy(state)) return state;
       return { ...state, status: "dictating", transcript: "" };
 
     case "dictation-partial":
@@ -192,6 +227,7 @@ export function reduce(state: SessionState, action: SessionAction): SessionState
         id: action.messageId,
         role: "clinician",
         text: action.question,
+        exchangeId: action.exchangeId,
       };
       return {
         ...state,
@@ -209,13 +245,21 @@ export function reduce(state: SessionState, action: SessionAction): SessionState
     case "context-resolved":
       return { ...state, context: action.context };
 
+    // refuse, crisis, stop and fail all drop a pending proposal: a confirm
+    // control must never outlive the exchange that produced it.
     case "refuse":
-      return { ...state, status: "refused", error: action.error, current: null };
+      return { ...state, status: "refused", error: action.error, current: null, proposal: null };
 
     case "crisis":
       // The answer in flight is discarded, not annotated. Appending a hotline
       // to an otherwise helpful answer produces something people scroll past.
-      return { ...state, status: "crisis", safety: action.safety, current: null };
+      return {
+        ...state,
+        status: "crisis",
+        safety: action.safety,
+        current: null,
+        proposal: null,
+      };
 
     case "stream-start":
       if (state.status !== "submitting") return state;
@@ -238,21 +282,25 @@ export function reduce(state: SessionState, action: SessionAction): SessionState
         text: answer.text,
         answer,
         checks: action.checks,
+        ...(state.exchangeId ? { exchangeId: state.exchangeId } : {}),
       };
+      // A proposal from an answer the checks refused never reaches a confirm.
+      const proposal = action.checks.refused ? null : state.proposal;
       return {
         ...state,
-        status: state.proposal ? "proposing" : "complete",
+        status: proposal ? "proposing" : "complete",
         current: answer,
+        proposal,
         messages: [...state.messages, message],
       };
     }
 
     case "stop":
       if (state.status !== "streaming" && state.status !== "submitting") return state;
-      return { ...state, status: "stopped" };
+      return { ...state, status: "stopped", proposal: null };
 
     case "fail":
-      return { ...state, status: "error", error: action.error, current: null };
+      return { ...state, status: "error", error: action.error, current: null, proposal: null };
 
     case "confirm":
       // Reachable only with a ConfirmedProposal, which only confirmProposal()
@@ -311,12 +359,18 @@ function applyEvent(state: SessionState, event: CopilotEvent): SessionState {
       // A blocking verdict from the endpoint short-circuits here, before any
       // more of the answer accumulates.
       if (event.verdict.blocking) {
-        return { ...state, status: "crisis", safety: event.verdict, current: null };
+        return {
+          ...state,
+          status: "crisis",
+          safety: event.verdict,
+          current: null,
+          proposal: null,
+        };
       }
       return { ...state, safety: event.verdict };
 
     case "error":
-      return { ...state, status: "error", error: event.error, current: null };
+      return { ...state, status: "error", error: event.error, current: null, proposal: null };
 
     // `tool-call`, `usage` and `done` carry no state the reducer owns. Tool
     // calls are decided by the pipeline against the mode's allowlist; usage is
@@ -362,6 +416,14 @@ export function isBusy(state: SessionState): boolean {
 /** Can the clinician type right now? */
 export function canCompose(state: SessionState): boolean {
   return !isBusy(state) && state.status !== "crisis";
+}
+
+/**
+ * The proposal a skin may render. A proposal event arrives mid-stream, before
+ * the checks run on the finished answer, so it stays hidden until they have.
+ */
+export function pendingProposal(state: SessionState): ActionProposal | null {
+  return isBusy(state) ? null : state.proposal;
 }
 
 export function sourcesOf(state: SessionState): readonly Source[] {

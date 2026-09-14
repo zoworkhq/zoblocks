@@ -66,8 +66,11 @@ const WORDS =
   "|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|hundred";
 
 const COUNT = new RegExp(
-  // A digit run of any length, or a spelled-out number, optionally carrying a
-  // vague suffix — "300-plus documented states" was one of the real defects.
+  // Two or more digits, or a spelled-out number, optionally carrying a vague
+  // suffix — "300-plus documented states" was one of the real defects. Single
+  // digits are skipped on purpose: a catalogue does not drift from 3 to 4
+  // unnoticed the way it drifts from 27 to 30, and `\d+` mostly adds noise
+  // ("4 kB component").
   String.raw`\b(\d{2,}|${WORDS})(?:-plus|\+)?\s+` +
     /*
      * Up to two adjectives between the number and its noun — "27 accessible

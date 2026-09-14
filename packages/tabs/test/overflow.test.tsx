@@ -5,6 +5,9 @@
  * still does every piece of arithmetic itself.
  */
 
+import { readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import * as React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { act, render, screen, waitFor, within } from "@testing-library/react";
@@ -231,6 +234,182 @@ describe('overflow="collapse"', () => {
     await settle();
     expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
     expect(screen.getByRole("tablist")).toBeInTheDocument();
+  });
+});
+
+describe("hidden controls stay hidden under the stylesheet", () => {
+  // A string, not `new URL(...)`: jsdom replaces the URL global with one
+  // `fileURLToPath` rejects.
+  const css = readFileSync(
+    resolve(dirname(fileURLToPath(import.meta.url)), "../src/styles.css"),
+    "utf8",
+  );
+  let sheet: HTMLStyleElement | null = null;
+  afterEach(() => {
+    sheet?.remove();
+    sheet = null;
+  });
+  function installStyles() {
+    sheet = document.createElement("style");
+    sheet.textContent = css;
+    document.head.append(sheet);
+  }
+
+  it("the collapsed tablist is display:none, not just hidden", async () => {
+    installStyles();
+    render(
+      <Tabs
+        as="tabs"
+        aria-label="Chart section"
+        defaultValue="t0"
+        items={many}
+        overflow="collapse"
+        fill="equal"
+      />,
+    );
+    const list = screen.getByRole("tablist");
+    restore = stubGeometry(list, { clientWidth: 320, scrollWidth: 800, tabWidth: 100 });
+    await settle();
+    await screen.findByRole("combobox");
+
+    expect(list).toHaveAttribute("hidden");
+    // `.zb-tabs__list { display: flex }` beats the UA `[hidden]` rule, so
+    // without an explicit rule the strip sat visible beside the select.
+    expect(css).toMatch(/\.zb-tabs__list\[hidden\][^{]*\{\s*display:\s*none\s*!important/);
+    expect(getComputedStyle(list).display).toBe("none");
+  });
+
+  it("an overflowed trigger is display:none in the strip", async () => {
+    installStyles();
+    render(<Tabs as="tabs" aria-label="Report" defaultValue="t0" items={many} overflow="menu" />);
+    const list = screen.getByRole("tablist");
+    restore = stubGeometry(list, { clientWidth: 400, scrollWidth: 800, tabWidth: 100 });
+    await settle();
+
+    const overflowed = list.querySelector<HTMLElement>("[data-zb-overflowed]");
+    expect(overflowed).not.toBeNull();
+    expect(css).toMatch(/\.zb-tabs__tab\[hidden\][^{]*\{\s*display:\s*none\s*!important/);
+    expect(getComputedStyle(overflowed as HTMLElement).display).toBe("none");
+  });
+});
+
+describe('overflow="menu": one place per tab', () => {
+  async function renderMenu(defaultValue = "t0") {
+    render(
+      <Tabs
+        as="tabs"
+        aria-label="Report"
+        defaultValue={defaultValue}
+        items={many}
+        overflow="menu"
+      />,
+    );
+    const list = screen.getByRole("tablist");
+    restore = stubGeometry(list, { clientWidth: 400, scrollWidth: 800, tabWidth: 100 });
+    await settle();
+    return list;
+  }
+
+  it("hides overflowed tabs from the strip, so none appears twice", async () => {
+    const list = await renderMenu();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: /More/ }));
+    const inMenu = within(screen.getByRole("menu"))
+      .getAllByRole("menuitem")
+      .map((item) => item.textContent);
+    const inStrip = within(list)
+      .getAllByRole("tab")
+      .map((tab) => tab.textContent);
+
+    expect(inMenu.length).toBeGreaterThan(0);
+    for (const label of inMenu) expect(inStrip).not.toContain(label);
+    expect(inStrip.length + inMenu.length).toBe(many.length);
+
+    for (const tab of Array.from(list.querySelectorAll<HTMLElement>("[data-zb-overflowed]"))) {
+      expect(tab).toHaveAttribute("hidden");
+      expect(tab).toHaveAttribute("tabindex", "-1");
+    }
+  });
+
+  it("keeps the arrow keys on the tabs that are still in the strip", async () => {
+    const list = await renderMenu();
+    const visible = within(list).getAllByRole("tab");
+    const user = userEvent.setup();
+    (visible[0] as HTMLElement).focus();
+    await user.keyboard("{End}");
+    expect(visible[visible.length - 1]).toHaveFocus();
+    await user.keyboard("{ArrowRight}");
+    // Wraps to the first visible tab rather than a hidden one.
+    expect(visible[0]).toHaveFocus();
+  });
+
+  it("brings a tab back into the strip once it is selected from the menu", async () => {
+    const list = await renderMenu();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: /More/ }));
+    const last = within(screen.getByRole("menu")).getAllByRole("menuitem").at(-1) as HTMLElement;
+    const label = last.textContent as string;
+    await user.click(last);
+    await settle();
+    expect(within(list).getByRole("tab", { name: label })).toHaveAttribute("aria-selected", "true");
+  });
+});
+
+describe("overflow menu keyboard", () => {
+  async function openMenu() {
+    render(<Tabs as="tabs" aria-label="Report" defaultValue="t0" items={many} overflow="menu" />);
+    const list = screen.getByRole("tablist");
+    restore = stubGeometry(list, { clientWidth: 400, scrollWidth: 800, tabWidth: 100 });
+    await settle();
+    const user = userEvent.setup();
+    const more = screen.getByRole("button", { name: /More/ });
+    await user.click(more);
+    const menu = screen.getByRole("menu");
+    const items = within(menu).getAllByRole("menuitem");
+    return { user, more, menu, items };
+  }
+
+  it("moves focus with the arrow keys, Home and End", async () => {
+    const { user, items } = await openMenu();
+    expect(items.length).toBeGreaterThan(2);
+    const first = items[0] as HTMLElement;
+    const second = items[1] as HTMLElement;
+    const last = items.at(-1) as HTMLElement;
+    await waitFor(() => expect(first).toHaveFocus());
+
+    await user.keyboard("{ArrowDown}");
+    expect(second).toHaveFocus();
+    await user.keyboard("{ArrowUp}");
+    expect(first).toHaveFocus();
+    await user.keyboard("{ArrowUp}");
+    expect(last).toHaveFocus();
+    await user.keyboard("{ArrowDown}");
+    expect(first).toHaveFocus();
+    await user.keyboard("{End}");
+    expect(last).toHaveFocus();
+    await user.keyboard("{Home}");
+    expect(first).toHaveFocus();
+  });
+
+  it("keeps menu items out of the tab order", async () => {
+    const { items } = await openMenu();
+    for (const item of items) expect(item).toHaveAttribute("tabindex", "-1");
+  });
+
+  it("closes when Tab leaves it", async () => {
+    const { user, items } = await openMenu();
+    await waitFor(() => expect(items[0]).toHaveFocus());
+    await user.tab();
+    await waitFor(() => expect(screen.queryByRole("menu")).not.toBeInTheDocument());
+    expect(screen.getByRole("button", { name: /More/ })).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("closes on Escape from inside the menu and returns focus to the button", async () => {
+    const { user, more, items } = await openMenu();
+    await waitFor(() => expect(items[0]).toHaveFocus());
+    await user.keyboard("{ArrowDown}{Escape}");
+    await waitFor(() => expect(screen.queryByRole("menu")).not.toBeInTheDocument());
+    expect(more).toHaveFocus();
   });
 });
 

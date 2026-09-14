@@ -3,7 +3,7 @@
  *
  * This package had no such check, and the release workflow gated on the script's
  * existence — so tokens was the one publishable package inspected by nothing.
- * The consequence shipped: `@zoblocks/tokens@0.1.0` on npm predates the
+ * The consequence shipped: the pre-rename tokens package (0.1.0) on npm predates the
  * token pipeline entirely, exports two paths where the source declares six, and
  * still contains the zero-alpha `surface-overlay` that renders every dialog and
  * popover fully transparent — a bug fixed in source and never republished.

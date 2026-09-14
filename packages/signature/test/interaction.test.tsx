@@ -10,6 +10,7 @@ import * as React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { renderToString } from "react-dom/server";
 import {
   DEFAULT_LOCALE,
   Signature,
@@ -190,6 +191,44 @@ describe("drawing", () => {
     );
 
     expect(onChange.mock.calls.at(-1)?.[0]).toHaveLength(1);
+  });
+
+  it("keeps the pen stroke when the OS cancels a palm touch", () => {
+    // The palm is rejected, then the OS cancels it. That cancel names the
+    // palm's pointer, not the pen's, and must not take the pen's ink with it.
+    const onChange = vi.fn();
+    const { container } = render(<SignaturePad onChange={onChange} />);
+    const surface = surfaceOf(container);
+    const pen = { pointerId: 1, pointerType: "pen", pressure: 0.5 };
+    const palm = { pointerId: 2, pointerType: "touch", pressure: 0.5 };
+
+    fireEvent.pointerDown(surface, { ...pen, clientX: 40, clientY: 120, button: 0 });
+    fireEvent.pointerMove(surface, { ...pen, clientX: 120, clientY: 60 });
+    fireEvent.pointerDown(surface, { ...palm, clientX: 500, clientY: 180, button: 0 });
+    fireEvent.pointerCancel(surface, palm);
+    fireEvent.pointerMove(surface, { ...pen, clientX: 240, clientY: 140 });
+    fireEvent.pointerUp(surface, { ...pen, clientX: 350, clientY: 80 });
+
+    const strokes = onChange.mock.calls.at(-1)?.[0];
+    expect(strokes).toHaveLength(1);
+    expect(strokes[0].points).toHaveLength(4);
+  });
+
+  it.each([
+    ["button 5", { button: 5, buttons: 32 }],
+    ["buttons 32 only", { button: 0, buttons: 32 }],
+    ["the barrel button", { button: 2, buttons: 2 }],
+  ])("draws nothing with a stylus eraser or barrel (%s)", (_name, buttons) => {
+    const onChange = vi.fn();
+    const { container } = render(<SignaturePad onChange={onChange} />);
+    const surface = surfaceOf(container);
+    const eraser = { pointerId: 1, pointerType: "pen", pressure: 0.5, ...buttons };
+
+    fireEvent.pointerDown(surface, { ...eraser, clientX: 40, clientY: 120 });
+    fireEvent.pointerMove(surface, { ...eraser, clientX: 300, clientY: 60 });
+    fireEvent.pointerUp(surface, { ...eraser, clientX: 350, clientY: 80 });
+
+    expect(onChange).not.toHaveBeenCalled();
   });
 });
 
@@ -708,6 +747,45 @@ describe("outcome sheet branches", () => {
       .getAllByRole("radio")
       .map((r) => r.closest("label")?.textContent ?? "");
     expect(labels[0]).toMatch(/declined/i);
+  });
+
+  it("brings the drawn signature back after 'Can't sign?' then Back", async () => {
+    // The sheet unmounts the pad. What Sign submits must be what the pad shows.
+    const user = userEvent.setup({ pointerEventsCheck: 0 });
+    const onChange = vi.fn();
+    render(<Signature now={NOW} onChange={onChange} signer={{ name: "Josh Randall" }} />);
+    await user.click(screen.getByRole("button", { name: /add signature/i }));
+    let dialog = await screen.findByRole("dialog");
+    draw(dialog.querySelector<HTMLElement>("[data-zb-signature-pad]")!, SIGNATURE);
+
+    await user.click(within(dialog).getByRole("button", { name: /can't sign/i }));
+    await user.click(await screen.findByRole("button", { name: /^back$/i }));
+    dialog = await screen.findByRole("dialog");
+
+    expect(dialog.querySelector(".zb-signature__ink path")).not.toBeNull();
+    await user.click(within(dialog).getByRole("button", { name: /sign and continue/i }));
+    await waitFor(() => expect(onChange).toHaveBeenCalled());
+    const value = onChange.mock.calls[0]?.[0] as SignatureValue;
+    expect(value.outcome === "signed" && value.ink.strokes).toHaveLength(1);
+  });
+
+  it("restores the pad as it was last left, not as it was first drawn", async () => {
+    // Undo after the first Back, then round-trip again: the pad must stay empty.
+    const user = userEvent.setup({ pointerEventsCheck: 0 });
+    render(<Signature now={NOW} signer={{ name: "Josh Randall" }} />);
+    await user.click(screen.getByRole("button", { name: /add signature/i }));
+    let dialog = await screen.findByRole("dialog");
+    draw(dialog.querySelector<HTMLElement>("[data-zb-signature-pad]")!, SIGNATURE);
+    await user.click(within(dialog).getByRole("button", { name: /can't sign/i }));
+    await user.click(await screen.findByRole("button", { name: /^back$/i }));
+    dialog = await screen.findByRole("dialog");
+    await user.click(within(dialog).getByRole("button", { name: /undo/i }));
+
+    await user.click(within(dialog).getByRole("button", { name: /can't sign/i }));
+    await user.click(await screen.findByRole("button", { name: /^back$/i }));
+    dialog = await screen.findByRole("dialog");
+    expect(dialog.querySelector(".zb-signature__ink path")).toBeNull();
+    expect(within(dialog).getByRole("button", { name: /sign and continue/i })).toBeDisabled();
   });
 
   it("hides 'Can't sign?' entirely when no outcomes are offered", async () => {
@@ -1447,6 +1525,56 @@ describe("the kiosk case", () => {
     const second = render(<SignaturePad onChange={onChange} />);
     expect(second.container.querySelector(".zb-signature__ink")?.innerHTML).not.toContain("<path");
     expect(screen.getByRole("button", { name: /clear/i })).toBeDisabled();
+  });
+
+  it("keeps a restored signature under StrictMode", () => {
+    // StrictMode mounts, cleans up and mounts again. The cleanup empties the
+    // engine; the second mount must put the restored strokes back, or they
+    // vanish on the next commit.
+    const onChange = vi.fn();
+    const initial = [
+      {
+        pointerType: "pen" as const,
+        points: SIGNATURE.map(([x, y], i) => ({ x, y, t: i * 16, pressure: 0.5 })),
+      },
+    ];
+    const { container } = render(
+      <React.StrictMode>
+        <SignaturePad initialStrokes={initial} onChange={onChange} />
+      </React.StrictMode>,
+    );
+    expect(container.querySelector(".zb-signature__ink path")).not.toBeNull();
+
+    draw(surfaceOf(container), [
+      [40, 40],
+      [300, 40],
+    ]);
+    expect(onChange.mock.calls.at(-1)?.[0]).toHaveLength(2);
+  });
+});
+
+describe("ids", () => {
+  it("keeps the label and hint ids across renders", () => {
+    const { container, rerender } = render(<SignaturePad hint="Sign inside the box" />);
+    const group = container.querySelector<HTMLElement>('[role="group"]')!;
+    const labelledBy = group.getAttribute("aria-labelledby");
+    const describedBy = group.getAttribute("aria-describedby");
+
+    rerender(<SignaturePad hint="Sign inside the box" height={200} />);
+    expect(group.getAttribute("aria-labelledby")).toBe(labelledBy);
+    expect(group.getAttribute("aria-describedby")).toBe(describedBy);
+    expect(document.getElementById(labelledBy!)).not.toBeNull();
+    expect(document.getElementById(describedBy!)).toHaveTextContent("Sign inside the box");
+  });
+
+  it("renders the same ids every time, so hydration matches the server", () => {
+    const html = () => renderToString(<SignaturePad hint="Sign inside the box" />);
+    expect(html()).toBe(html());
+  });
+
+  it("uses an explicit id when given one", () => {
+    const { container } = render(<SignaturePad id="consent-sig" />);
+    expect(container.querySelector("#consent-sig-label")).not.toBeNull();
   });
 });
 

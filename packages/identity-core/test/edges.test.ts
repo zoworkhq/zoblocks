@@ -135,7 +135,8 @@ describe("dates — the precision boundaries", () => {
   });
 
   it("computes an age from a year-only birth date", () => {
-    expect(resolveAge("1985", F.NOW)?.text).toBe("41 y");
+    // Some day in 1985: 40 if the birthday is after 16 Aug, 41 if before.
+    expect(resolveAge("1985", F.NOW)?.text).toBe("40–41 y");
   });
 
   it("computes an age from a month-precision birth date", () => {

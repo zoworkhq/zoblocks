@@ -1009,6 +1009,34 @@ describe("until", () => {
     vi.useRealTimers();
   });
 
+  it("waits out a window longer than setTimeout can hold", async () => {
+    // setTimeout overflows past 2^31-1 ms (~24.8 days) and fires at once, so a
+    // 30-day consent reported itself expired on mount.
+    vi.useFakeTimers();
+    const DAY = 24 * 60 * 60 * 1000;
+    const until = new Date(Date.parse(NOW) + 30 * DAY).toISOString();
+    const onExpire = vi.fn();
+    render(<Switch label="Consent to share" checked until={until} now={NOW} onExpire={onExpire} />);
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(DAY);
+    });
+    expect(onExpire).not.toHaveBeenCalled();
+
+    // Past the first 24.8-day leg, still short of the deadline.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(28 * DAY);
+    });
+    expect(onExpire).not.toHaveBeenCalled();
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(DAY);
+    });
+    expect(onExpire).toHaveBeenCalledTimes(1);
+    expect(onExpire).toHaveBeenCalledWith(until);
+    vi.useRealTimers();
+  });
+
   it("renders nothing about a window while the value is off", () => {
     const view = render(
       <Switch label="Nil by mouth" checked={false} until={IN_EFFECT} now={NOW} />,
@@ -1304,6 +1332,100 @@ describe("impact and provenance", () => {
       />,
     );
     expect(view.container.textContent).toMatch(/last changed .* by K\. Osei, on the ward round/i);
+  });
+});
+
+/**
+ * A bare "08:00" for a hold ending tomorrow reads as this morning, and a bare
+ * "09:14" from three weeks ago reads as fresh. The day is part of the time.
+ */
+describe("timestamps say which day", () => {
+  // Built from local wall-clock parts, so the day boundary holds in any zone.
+  const at = (day: number, hour: number, minute = 0, month = 7, year = 2026) =>
+    new Date(year, month, day, hour, minute).toISOString();
+  const NOON = at(16, 12);
+
+  it("marks a window ending tomorrow as tomorrow, in the description too", () => {
+    const view = render(
+      <Switch
+        label="Nil by mouth"
+        checked
+        until={at(17, 8)}
+        now={NOON}
+        readOnly
+        lockedReason="Set by anaesthetics"
+      />,
+    );
+    expect(view.container.querySelector(".zb-switch__until")?.textContent).toMatch(
+      /^until .+ tomorrow$/,
+    );
+    expect(control()).toHaveAccessibleDescription(/until .+ tomorrow/);
+  });
+
+  it("leaves a time on the same day bare", () => {
+    const view = render(<Switch label="Nil by mouth" checked until={at(16, 14)} now={NOON} />);
+    expect(view.container.querySelector(".zb-switch__until")?.textContent).not.toMatch(
+      /tomorrow|yesterday|Aug/,
+    );
+  });
+
+  it("says yesterday for a change made yesterday", () => {
+    const view = render(
+      <Switch
+        label="Consent"
+        checked
+        provenance={{ by: "K. Osei", at: at(15, 9, 14) }}
+        now={NOON}
+      />,
+    );
+    expect(view.container.textContent).toMatch(/last changed .+ yesterday by K\. Osei/i);
+  });
+
+  it("dates an older change, without a year inside the same year", () => {
+    const view = render(
+      <Switch
+        label="Consent"
+        checked
+        provenance={{ by: "K. Osei", at: at(12, 9, 14) }}
+        now={NOON}
+      />,
+    );
+    const text = view.container.querySelector(".zb-switch__provenance")?.textContent ?? "";
+    expect(text).toMatch(/last changed .*Aug.*, .+ by K\. Osei/i);
+    expect(text).not.toMatch(/2026/);
+  });
+
+  it("adds the year to a change from another year", () => {
+    const view = render(
+      <Switch
+        label="Consent"
+        checked
+        provenance={{ by: "K. Osei", at: at(12, 9, 14, 7, 2025) }}
+        now={NOON}
+      />,
+    );
+    expect(view.container.textContent).toMatch(/2025/);
+  });
+
+  it("dates every timestamp when there is no clock to compare against", () => {
+    const view = render(
+      <Switch label="Consent" checked provenance={{ by: "K. Osei", at: at(16, 9, 14) }} />,
+    );
+    expect(view.container.textContent).toMatch(/last changed .*Aug.*2026.* by K\. Osei/i);
+  });
+
+  it("dates the group's last change against the list's clock", () => {
+    render(
+      <SwitchList
+        title="Isolation precautions"
+        counts={{ on: 1, total: 2 }}
+        provenance={{ by: "S. Mehta", at: at(12, 9, 14) }}
+        now={NOON}
+      />,
+    );
+    const summary = screen.getByText(/last changed .* by S\. Mehta/i);
+    expect(summary.textContent).toMatch(/Aug/);
+    expect(summary.textContent).not.toMatch(/2026/);
   });
 });
 

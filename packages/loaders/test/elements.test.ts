@@ -336,4 +336,40 @@ describe("timing and events", () => {
     expect(onSlow).not.toHaveBeenCalled();
     document.removeEventListener("zb-loader-slow", onSlow);
   });
+
+  // A framework that re-parents a node (keyed list reorder, portal move) runs
+  // disconnect then connect. The loader must survive that inside min-duration.
+  it("still closes when moved inside its minimum duration", () => {
+    const element = mount("zb-breath-loader", { "min-duration": "400" });
+    vi.advanceTimersByTime(100);
+    element.remove();
+    document.body.append(element);
+
+    element.setAttribute("open", "false");
+    expect(element.hasAttribute("hidden")).toBe(false);
+    vi.advanceTimersByTime(400);
+    expect(element.hasAttribute("hidden")).toBe(true);
+  });
+
+  it("honours a close requested before the move", () => {
+    const element = mount("zb-breath-loader", { "min-duration": "400" });
+    vi.advanceTimersByTime(100);
+    element.setAttribute("open", "false");
+    element.remove();
+    document.body.append(element);
+    vi.advanceTimersByTime(400);
+    expect(element.hasAttribute("hidden")).toBe(true);
+  });
+
+  it("re-arms the stall timer when moved while visible", () => {
+    const onSlow = vi.fn();
+    document.addEventListener("zb-loader-slow", onSlow);
+    const element = mount("zb-breath-loader", { "slow-after": "1000", "min-duration": "0" });
+    vi.advanceTimersByTime(500);
+    element.remove();
+    document.body.append(element);
+    vi.advanceTimersByTime(1000);
+    expect(onSlow).toHaveBeenCalledTimes(1);
+    document.removeEventListener("zb-loader-slow", onSlow);
+  });
 });

@@ -20,9 +20,6 @@ import type { FigmaClientStorage } from "./api";
 const KEY = "ox.credential";
 
 export async function loadCredential(storage: FigmaClientStorage): Promise<Credential | undefined> {
-  const raw = await storage.getAsync(KEY).catch(() => undefined);
-  if (typeof raw !== "object" || raw === null) return undefined;
-
   /*
    * Re-validated on the way out, not trusted because we wrote it.
    *
@@ -30,19 +27,29 @@ export async function loadCredential(storage: FigmaClientStorage): Promise<Crede
    * no longer matches the prefix is one the app will refuse anyway — better
    * to ask for it again than to send it and report a 404.
    */
-  const { origin, token } = raw as { origin?: unknown; token?: unknown };
-  const validOrigin = typeof origin === "string" ? readOrigin(origin) : undefined;
-  const validToken = typeof token === "string" ? readToken(token) : undefined;
-  if (!validOrigin || !validToken) return undefined;
-
-  return { origin: validOrigin, token: validToken };
+  return validCredential(await storage.getAsync(KEY).catch(() => undefined));
 }
 
+/**
+ * Validated on the way in too. The message crossed `postMessage`, and a
+ * credential stored unchecked is spent on every request after it.
+ */
 export async function saveCredential(
   storage: FigmaClientStorage,
   credential: Credential,
 ): Promise<void> {
-  await storage.setAsync(KEY, credential);
+  const valid = validCredential(credential);
+  if (!valid) throw new Error("That key was not saved. Paste it again from the app.");
+  await storage.setAsync(KEY, valid);
+}
+
+function validCredential(raw: unknown): Credential | undefined {
+  if (typeof raw !== "object" || raw === null) return undefined;
+  const { origin, token } = raw as { origin?: unknown; token?: unknown };
+  const validOrigin = typeof origin === "string" ? readOrigin(origin) : undefined;
+  const validToken = typeof token === "string" ? readToken(token) : undefined;
+  if (!validOrigin || !validToken) return undefined;
+  return { origin: validOrigin, token: validToken };
 }
 
 export async function forgetCredential(storage: FigmaClientStorage): Promise<void> {

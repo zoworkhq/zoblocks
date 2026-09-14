@@ -1231,6 +1231,23 @@ describe("slot grid", () => {
     }
   });
 
+  it("labels each time group by its own heading when two grids share a page", () => {
+    const { container } = render(
+      <>
+        <TimeSlotGrid set={AVAILABILITY} label="Dr Osei" />
+        <TimeSlotGrid set={AVAILABILITY} label="M. Reyes" />
+      </>,
+    );
+    const heads = [...container.querySelectorAll("h6")].map((head) => head.id);
+    expect(heads.length).toBeGreaterThan(1);
+    expect(new Set(heads).size).toBe(heads.length);
+    for (const group of container.querySelectorAll('[role="group"][aria-labelledby]')) {
+      const head = document.getElementById(group.getAttribute("aria-labelledby")!);
+      // Resolves inside its own section, not the first grid's.
+      expect(group.parentElement!.contains(head)).toBe(true);
+    }
+  });
+
   it("says nothing is available rather than showing an empty box", () => {
     const { container } = render(
       <DatePicker
@@ -3565,6 +3582,51 @@ describe("the time range field", () => {
     expect(within(container).getByRole("alert").textContent).toMatch(/overnight/i);
   });
 
+  it("calls an end equal to its start empty, even where overnight is allowed", () => {
+    // 07:00 to 07:00 is a typo far more often than a 24-hour shift, and the
+    // field has no full-day option that would say otherwise.
+    const same = { start: plainTime(7, 0), end: plainTime(7, 0) };
+    expect(timeRangeMinutes(same, { allowOvernight: true })).toBe(0);
+    expect(timeRangeMinutes(same)).toBe(0);
+
+    const overnight = render(<TimeRangeField allowOvernight defaultValue={same} />);
+    expect(within(overnight.container).getByRole("alert").textContent).toBe(
+      "Choose an end time. This span is empty.",
+    );
+    expect(overnight.container.querySelector(".zb-dt-range__span")?.textContent ?? "").not.toMatch(
+      /24/,
+    );
+    overnight.unmount();
+
+    // Without overnight it is still empty, not "before the start".
+    const sameDay = render(<TimeRangeField defaultValue={same} />);
+    expect(within(sameDay.container).getByRole("alert").textContent).toBe(
+      "Choose an end time. This span is empty.",
+    );
+  });
+
+  it("strikes the start time itself from the ends, overnight or not", () => {
+    render(
+      <TimeRangeField
+        label="Time range"
+        stepMinutes={60}
+        allowOvernight
+        defaultValue={{ start: plainTime(7, 0), end: plainTime(10, 0) }}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Choose from a list of times" }));
+    const [, ends] = within(screen.getByRole("dialog", { name: "Time range" })).getAllByRole(
+      "listbox",
+    );
+    const blocked = within(ends!)
+      .getAllByRole("option")
+      .filter((o) => o.getAttribute("aria-disabled") === "true");
+    expect(blocked).toHaveLength(1);
+    expect(blocked[0]!.getAttribute("aria-label")).toMatch(
+      /unavailable, the same as the start time/,
+    );
+  });
+
   it("accepts a night shift and states the crossing in words", () => {
     // Refusing 22:00 to 06:30 teaches staff to type the wrong time to get
     // past the validator, which is how the real data is lost.
@@ -3703,5 +3765,655 @@ describe("the range variants", () => {
 
     const times = render(<DatePicker variant="time-range" label="Shift" />);
     expect(times.container.querySelector("[data-zb-time-range]")).toBeTruthy();
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* The paths only a host reaches                                       */
+/* ------------------------------------------------------------------ */
+
+/** Both halves of a range field, start first. */
+const halves = (root: HTMLElement) => [
+  ...root.querySelectorAll<HTMLElement>('[role="group"].zb-dt-field'),
+];
+
+const paste = (target: HTMLElement, text: string) =>
+  fireEvent.paste(target, { clipboardData: { getData: () => text } });
+
+describe("an explicit calendar outside range mode", () => {
+  it("holds a single date behind Done, then commits it", () => {
+    const onChange = vi.fn();
+    const onCommit = vi.fn();
+    const { container } = render(
+      <Calendar
+        commit="explicit"
+        now={TODAY}
+        defaultMonth={{ y: 2026, m: 8 }}
+        onChange={onChange}
+        onCommit={onCommit}
+      />,
+    );
+    fireEvent.click(within(container).getByRole("gridcell", { name: /August 10, 2026/ }));
+    // Drawn as chosen, but the host has not been told.
+    expect(onChange).not.toHaveBeenCalled();
+    expect(container.querySelectorAll(".zb-dt-cal__day--selected").length).toBe(1);
+
+    fireEvent.click(within(container).getByRole("button", { name: "Done" }));
+    expect(onChange).toHaveBeenCalledWith(plainDate(2026, 8, 10));
+    expect(onCommit).toHaveBeenCalledTimes(1);
+  });
+
+  it("holds a set of dates behind Done, then commits the whole set", () => {
+    const onDatesChange = vi.fn();
+    const { container } = render(
+      <Calendar
+        mode="multiple"
+        commit="explicit"
+        now={TODAY}
+        defaultMonth={{ y: 2026, m: 8 }}
+        onDatesChange={onDatesChange}
+      />,
+    );
+    const done = within(container).getByRole("button", { name: "Done" }) as HTMLButtonElement;
+    expect(done.disabled).toBe(true);
+    fireEvent.click(within(container).getByRole("gridcell", { name: /August 9, 2026/ }));
+    fireEvent.click(within(container).getByRole("gridcell", { name: /August 4, 2026/ }));
+    expect(onDatesChange).not.toHaveBeenCalled();
+    fireEvent.click(done);
+    expect(onDatesChange).toHaveBeenCalledWith([plainDate(2026, 8, 4), plainDate(2026, 8, 9)]);
+  });
+});
+
+describe("Custom clears the selection it names", () => {
+  it("empties a range", () => {
+    const onRangeChange = vi.fn();
+    const { container } = render(
+      <Calendar
+        mode="range"
+        now={TODAY}
+        presets={dateRangePresets(TODAY)}
+        showCustomPreset
+        defaultMonth={{ y: 2026, m: 8 }}
+        defaultRange={{ start: plainDate(2026, 8, 3), end: plainDate(2026, 8, 9) }}
+        onRangeChange={onRangeChange}
+      />,
+    );
+    const custom = within(container).getByRole("button", { name: "Custom" });
+    expect(custom.getAttribute("aria-pressed")).toBe("true");
+    fireEvent.click(custom);
+    expect(onRangeChange).toHaveBeenCalledWith({ start: null, end: null });
+    // Nothing is selected, so nothing is custom.
+    expect(custom.getAttribute("aria-pressed")).toBe("false");
+  });
+
+  it("empties a set of dates", () => {
+    const onDatesChange = vi.fn();
+    const { container } = render(
+      <Calendar
+        mode="multiple"
+        now={TODAY}
+        shortcuts={relativeDateOptions(TODAY)}
+        showCustomPreset
+        defaultMonth={{ y: 2026, m: 8 }}
+        defaultDates={[plainDate(2026, 8, 4)]}
+        onDatesChange={onDatesChange}
+      />,
+    );
+    fireEvent.click(within(container).getByRole("button", { name: "Custom" }));
+    expect(onDatesChange).toHaveBeenCalledWith([]);
+    expect(container.querySelectorAll(".zb-dt-cal__day--selected").length).toBe(0);
+  });
+
+  it("empties a single date", () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <Calendar
+        now={TODAY}
+        shortcuts={relativeDateOptions(TODAY)}
+        showCustomPreset
+        defaultMonth={{ y: 2026, m: 8 }}
+        defaultValue={plainDate(2026, 8, 4)}
+        onChange={onChange}
+      />,
+    );
+    fireEvent.click(within(container).getByRole("button", { name: "Custom" }));
+    expect(onChange).toHaveBeenCalledWith(null);
+  });
+});
+
+describe("a date field given an error and no clock", () => {
+  it("says the host's error, and still opens a calendar", () => {
+    render(<DateField label="Date of service" showCalendar error="Outside the episode." />);
+    expect(screen.getByRole("alert").textContent).toBe("Outside the episode.");
+    expect(group().getAttribute("aria-invalid")).toBe("true");
+    fireEvent.click(screen.getByRole("button", { name: "Choose from calendar" }));
+    expect(within(screen.getByRole("dialog")).getByRole("grid")).toBeTruthy();
+  });
+});
+
+describe("the date range field, driven by a host", () => {
+  it("redraws both halves when the host replaces the range", () => {
+    const { container, rerender } = render(
+      <DateRangeField now={TODAY} value={{ start: null, end: null }} />,
+    );
+    rerender(
+      <DateRangeField
+        now={TODAY}
+        value={{ start: plainDate(2026, 8, 10), end: plainDate(2026, 8, 14) }}
+      />,
+    );
+    const [start, end] = halves(container);
+    expect(
+      within(start!)
+        .getAllByRole("spinbutton")
+        .map((s) => s.textContent),
+    ).toEqual(["08", "10", "2026"]);
+    expect(
+      within(end!)
+        .getAllByRole("spinbutton")
+        .map((s) => s.textContent),
+    ).toEqual(["08", "14", "2026"]);
+  });
+
+  it("emits the end as the end half is typed", () => {
+    const onChange = vi.fn();
+    const { container } = render(<DateRangeField now={TODAY} onChange={onChange} />);
+    const [, end] = halves(container);
+    act(() => end!.focus());
+    for (const digit of "08142026") fireEvent.keyDown(end!, { key: digit });
+    expect(onChange).toHaveBeenLastCalledWith({ start: null, end: plainDate(2026, 8, 14) });
+  });
+
+  it("takes a paste into either half, and ignores one it cannot read or already has", () => {
+    const onChange = vi.fn();
+    const { container } = render(<DateRangeField now={TODAY} onChange={onChange} />);
+    const [start, end] = halves(container);
+
+    paste(start!, "08/10/2026");
+    expect(onChange).toHaveBeenLastCalledWith({ start: plainDate(2026, 8, 10), end: null });
+    paste(end!, "08/14/2026");
+    expect(onChange).toHaveBeenLastCalledWith({
+      start: plainDate(2026, 8, 10),
+      end: plainDate(2026, 8, 14),
+    });
+    onChange.mockClear();
+
+    // The same date again is not a change, and prose is not a date.
+    paste(start!, "08/10/2026");
+    paste(start!, "next tuesday");
+    paste(end!, "whenever");
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it("marks itself required or optional, and says the hint or the host's error", () => {
+    const required = render(<DateRangeField label="Window" required now={TODAY} />);
+    expect(required.container.querySelector(".zb-dt-label__required")?.textContent).toBe("*");
+    required.unmount();
+
+    const optional = render(
+      <DateRangeField label="Window" optional hint="Leave blank for open-ended" now={TODAY} />,
+    );
+    expect(optional.container.textContent).toContain("Optional");
+    const [start] = halves(optional.container);
+    const hint = document.getElementById(start!.getAttribute("aria-describedby")!);
+    expect(hint?.textContent).toBe("Leave blank for open-ended");
+    optional.unmount();
+
+    const refused = render(<DateRangeField now={TODAY} error="Overlaps another episode." />);
+    expect(within(refused.container).getByRole("alert").textContent).toBe(
+      "Overlaps another episode.",
+    );
+  });
+
+  it("offers no calendar when it cannot be edited", () => {
+    const disabled = render(<DateRangeField disabled now={TODAY} />);
+    expect(within(disabled.container).queryByRole("button", { name: /calendar/ })).toBeNull();
+    for (const half of halves(disabled.container)) {
+      expect(half.getAttribute("aria-disabled")).toBe("true");
+    }
+    disabled.unmount();
+
+    const readOnly = render(
+      <DateRangeField
+        readOnly
+        now={TODAY}
+        defaultValue={{ start: plainDate(2026, 8, 1), end: plainDate(2026, 8, 7) }}
+      />,
+    );
+    expect(within(readOnly.container).queryByRole("button", { name: /calendar/ })).toBeNull();
+  });
+
+  it("counts a one-day span in the singular, and posts an empty range as empty", () => {
+    const single = render(
+      <DateRangeField
+        now={TODAY}
+        showSpan
+        defaultValue={{ start: plainDate(2026, 8, 3), end: plainDate(2026, 8, 3) }}
+      />,
+    );
+    expect(single.container.querySelector(".zb-dt-range__span")?.textContent).toBe("1 day");
+    single.unmount();
+
+    const empty = render(<DateRangeField name="auth" now={TODAY} />);
+    const inputs = [...empty.container.querySelectorAll<HTMLInputElement>('input[type="hidden"]')];
+    expect(inputs.map((i) => [i.name, i.value])).toEqual([
+      ["auth-start", ""],
+      ["auth-end", ""],
+    ]);
+  });
+
+  it("reports each click and stays open when the commit is immediate", () => {
+    const onChange = vi.fn();
+    render(<DateRangeField label="Window" now={TODAY} commit="immediate" onChange={onChange} />);
+    fireEvent.click(screen.getByRole("button", { name: "Choose from calendar" }));
+    const panel = screen.getByRole("dialog", { name: "Window" });
+    fireEvent.click(within(panel).getAllByRole("gridcell", { name: /August 10, 2026/ })[0]!);
+    expect(onChange).toHaveBeenLastCalledWith({ start: plainDate(2026, 8, 10), end: null });
+    fireEvent.click(within(panel).getAllByRole("gridcell", { name: /August 14, 2026/ })[0]!);
+    expect(onChange).toHaveBeenLastCalledWith({
+      start: plainDate(2026, 8, 10),
+      end: plainDate(2026, 8, 14),
+    });
+    // Immediate means no Done to press, so the panel does not close itself.
+    expect(screen.getByRole("dialog", { name: "Window" })).toBeTruthy();
+  });
+
+  it("opens a calendar with no clock, on the range it was given", () => {
+    render(
+      <DateRangeField
+        defaultValue={{ start: plainDate(2026, 3, 2), end: plainDate(2026, 3, 6) }}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Choose from calendar" }));
+    const panel = screen.getByRole("dialog", { name: "Choose a date range" });
+    expect(within(panel).getAllByRole("grid")[0]!.getAttribute("aria-label")).toBe("March 2026");
+    // No clock means no day is marked as today.
+    expect(panel.querySelector('[aria-current="date"]')).toBeNull();
+  });
+});
+
+describe("a twelve-hour time with seconds", () => {
+  it("keeps the seconds and applies the meridiem", () => {
+    expect(segmentsToTime({ h: 9, mi: 30, s: 15, ap: 1 }, { showSecond: true })).toMatchObject({
+      h: 21,
+      mi: 30,
+      s: 15,
+    });
+  });
+});
+
+describe("the time range field, driven by a host", () => {
+  const RANGE = { start: plainTime(7, 0), end: plainTime(10, 0) };
+  const openPanel = () =>
+    fireEvent.click(screen.getByRole("button", { name: "Choose from a list of times" }));
+  const columns = () => within(screen.getByRole("dialog")).getAllByRole("listbox");
+  const blockedIn = (list: HTMLElement) =>
+    within(list)
+      .getAllByRole("option")
+      .filter((o) => o.getAttribute("aria-disabled") === "true")
+      .map((o) => o.textContent);
+
+  it("redraws both halves when the host replaces the range", () => {
+    const { container, rerender } = render(
+      <TimeRangeField hour24 value={{ start: null, end: null }} />,
+    );
+    rerender(<TimeRangeField hour24 value={{ start: plainTime(7, 5), end: plainTime(19, 30) }} />);
+    const [start, end] = halves(container);
+    expect(
+      within(start!)
+        .getAllByRole("spinbutton")
+        .map((s) => Number(s.textContent)),
+    ).toEqual([7, 5]);
+    expect(
+      within(end!)
+        .getAllByRole("spinbutton")
+        .map((s) => Number(s.textContent)),
+    ).toEqual([19, 30]);
+  });
+
+  it("emits each half as it is stepped, and an emptied half as empty", () => {
+    const onChange = vi.fn();
+    const { container } = render(<TimeRangeField defaultValue={RANGE} onChange={onChange} />);
+    const [start, end] = halves(container);
+
+    act(() => start!.focus());
+    fireEvent.keyDown(start!, { key: "ArrowUp" });
+    expect(onChange).toHaveBeenLastCalledWith({ start: plainTime(8, 0), end: plainTime(10, 0) });
+
+    act(() => end!.focus());
+    fireEvent.keyDown(end!, { key: "ArrowUp" });
+    expect(onChange).toHaveBeenLastCalledWith({ start: plainTime(8, 0), end: plainTime(11, 0) });
+
+    fireEvent.keyDown(end!, { key: "Backspace" });
+    expect(onChange).toHaveBeenLastCalledWith({ start: plainTime(8, 0), end: null });
+  });
+
+  it("takes a paste into the end, and ignores one it cannot read or already has", () => {
+    const onChange = vi.fn();
+    const { container } = render(<TimeRangeField defaultValue={RANGE} onChange={onChange} />);
+    const [start, end] = halves(container);
+
+    paste(end!, "10:00 AM");
+    paste(start!, "lunchtime");
+    expect(onChange).not.toHaveBeenCalled();
+
+    paste(end!, "11:30 AM");
+    expect(onChange).toHaveBeenLastCalledWith({ start: plainTime(7, 0), end: plainTime(11, 30) });
+  });
+
+  it("marks itself required or optional, and says the hint or the host's error", () => {
+    const required = render(<TimeRangeField label="Shift" required />);
+    expect(required.container.querySelector(".zb-dt-label__required")?.textContent).toBe("*");
+    required.unmount();
+
+    const optional = render(<TimeRangeField label="Shift" optional hint="Local time" />);
+    expect(optional.container.textContent).toContain("Optional");
+    const [start] = halves(optional.container);
+    expect(document.getElementById(start!.getAttribute("aria-describedby")!)?.textContent).toBe(
+      "Local time",
+    );
+    optional.unmount();
+
+    const refused = render(<TimeRangeField error="Clashes with a group." defaultValue={RANGE} />);
+    expect(within(refused.container).getByRole("alert").textContent).toBe("Clashes with a group.");
+  });
+
+  it("offers no list when it cannot be edited, and posts an empty range as empty", () => {
+    const disabled = render(<TimeRangeField disabled name="shift" />);
+    expect(within(disabled.container).queryByRole("button", { name: /list of times/ })).toBeNull();
+    for (const half of halves(disabled.container)) {
+      expect(half.getAttribute("aria-disabled")).toBe("true");
+    }
+    const inputs = [
+      ...disabled.container.querySelectorAll<HTMLInputElement>('input[type="hidden"]'),
+    ];
+    expect(inputs.map((i) => i.value)).toEqual(["", ""]);
+    disabled.unmount();
+
+    const readOnly = render(<TimeRangeField readOnly defaultValue={RANGE} />);
+    expect(within(readOnly.container).queryByRole("button", { name: /list of times/ })).toBeNull();
+  });
+
+  it("blocks no end at all until there is a start", () => {
+    render(<TimeRangeField label="Shift" stepMinutes={60} />);
+    openPanel();
+    expect(blockedIn(columns()[1]!)).toEqual([]);
+  });
+
+  it("offers an overnight end, and strikes ends outside the stated length", () => {
+    const overnight = render(
+      <TimeRangeField
+        label="Shift"
+        stepMinutes={60}
+        allowOvernight
+        defaultValue={{ start: plainTime(22, 0), end: plainTime(6, 0) }}
+      />,
+    );
+    openPanel();
+    // An end earlier on the clock is the next morning, not a mistake.
+    expect(within(columns()[1]!).getByRole("option", { name: "6:00 AM" })).toBeTruthy();
+    overnight.unmount();
+
+    const bounded = render(
+      <TimeRangeField
+        label="Shift"
+        stepMinutes={60}
+        minDurationMinutes={120}
+        maxDurationMinutes={240}
+        defaultValue={{ start: plainTime(7, 0), end: plainTime(10, 0) }}
+      />,
+    );
+    openPanel();
+    const ends = columns()[1]!;
+    expect(
+      within(ends)
+        .getByRole("option", { name: /^8:00 AM, unavailable/ })
+        .getAttribute("aria-label"),
+    ).toMatch(/shorter than/);
+    expect(
+      within(ends)
+        .getByRole("option", { name: /^12:00 PM, unavailable/ })
+        .getAttribute("aria-label"),
+    ).toMatch(/longer than/);
+    expect(within(ends).getByRole("option", { name: "9:00 AM" })).toBeTruthy();
+    bounded.unmount();
+  });
+
+  it("keeps an end the new start still allows", () => {
+    const onChange = vi.fn();
+    render(
+      <TimeRangeField
+        label="Shift"
+        stepMinutes={60}
+        commit="immediate"
+        defaultValue={RANGE}
+        onChange={onChange}
+      />,
+    );
+    openPanel();
+    fireEvent.click(within(columns()[0]!).getByRole("option", { name: "8:00 AM" }));
+    expect(onChange).toHaveBeenLastCalledWith({ start: plainTime(8, 0), end: plainTime(10, 0) });
+  });
+
+  it("does nothing when a struck end is clicked", () => {
+    const onChange = vi.fn();
+    render(
+      <TimeRangeField
+        label="Shift"
+        stepMinutes={60}
+        commit="immediate"
+        defaultValue={RANGE}
+        onChange={onChange}
+      />,
+    );
+    openPanel();
+    const struck = within(columns()[1]!).getByRole("option", { name: /^6:00 AM, unavailable/ });
+    fireEvent.click(struck);
+    expect(onChange).not.toHaveBeenCalled();
+    expect(struck.getAttribute("aria-selected")).toBe("false");
+  });
+
+  it("moves focus through a column with the arrow, page and edge keys", () => {
+    render(<TimeRangeField label="Shift" stepMinutes={60} defaultValue={RANGE} />);
+    openPanel();
+    const starts = columns()[0]!;
+    const focused = () => (document.activeElement as HTMLElement).textContent;
+
+    fireEvent.keyDown(starts, { key: "ArrowDown" });
+    expect(focused()).toBe("8:00 AM");
+    fireEvent.keyDown(starts, { key: "ArrowUp" });
+    expect(focused()).toBe("7:00 AM");
+    fireEvent.keyDown(starts, { key: "PageDown" });
+    expect(focused()).toBe("12:00 PM");
+    fireEvent.keyDown(starts, { key: "PageUp" });
+    expect(focused()).toBe("7:00 AM");
+    fireEvent.keyDown(starts, { key: "End" });
+    expect(focused()).toBe("11:00 PM");
+    fireEvent.keyDown(starts, { key: "Home" });
+    expect(focused()).toBe("12:00 AM");
+
+    // Moving is not choosing: arrowing past 3 PM must not book 3 PM.
+    expect(within(starts).getByRole("option", { selected: true }).textContent).toBe("7:00 AM");
+    // A key the column does not own is left for the page.
+    expect(fireEvent.keyDown(starts, { key: "a" })).toBe(true);
+    expect(focused()).toBe("12:00 AM");
+  });
+
+  it("scrolls the chosen time into view where the browser can", () => {
+    const scrollIntoView = vi.fn();
+    Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
+      configurable: true,
+      value: scrollIntoView,
+    });
+    try {
+      render(<TimeRangeField label="Shift" stepMinutes={60} defaultValue={RANGE} />);
+      openPanel();
+      expect(scrollIntoView).toHaveBeenCalledWith({ block: "center" });
+      const scrolled = scrollIntoView.mock.contexts as HTMLElement[];
+      expect(scrolled.map((node) => node.textContent)).toEqual(["7:00 AM", "10:00 AM"]);
+    } finally {
+      delete (HTMLElement.prototype as { scrollIntoView?: unknown }).scrollIntoView;
+    }
+  });
+
+  it("puts the tabstop on the first time when every end is struck", () => {
+    render(
+      <TimeRangeField
+        label="Shift"
+        stepMinutes={60}
+        defaultValue={{ start: plainTime(23, 0), end: null }}
+      />,
+    );
+    openPanel();
+    const ends = columns()[1]!;
+    // Every end is before an 11 PM start; the column must still be reachable.
+    expect(blockedIn(ends).length).toBe(24);
+    const stop = ends.querySelector<HTMLElement>('[tabindex="0"]');
+    expect(stop?.textContent).toBe("12:00 AM");
+  });
+
+  it("survives a window with no times in it", () => {
+    render(<TimeRangeField label="Shift" fromMinutes={600} toMinutes={540} />);
+    openPanel();
+    const [starts, ends] = columns();
+    expect(within(starts!).queryAllByRole("option")).toEqual([]);
+    expect(ends!.querySelector('[tabindex="0"]')).toBeNull();
+    const before = document.activeElement;
+    for (const key of ["ArrowDown", "Home", "End"]) fireEvent.keyDown(starts!, { key });
+    expect(document.activeElement).toBe(before);
+  });
+});
+
+describe("the remaining readouts and controls", () => {
+  it("offers no correction when no nearby end would fit the maximum", () => {
+    // 9:00 AM to 8:00 AM is twenty-three hours, and 8:00 PM is still eleven.
+    const absurd = withSessionEnd(sessionFrom(plainTime(9, 0), 60), plainTime(8, 0), {
+      allowOvernight: true,
+    });
+    expect(absurd.suggestedEnd).toBeUndefined();
+    const { container } = render(<SessionTimeField value={absurd} allowOvernight />);
+    expect(within(container).getByRole("alert").textContent).toMatch(/maximum/);
+    expect(within(container).queryByRole("button", { name: /instead/ })).toBeNull();
+  });
+
+  it("strikes future days in the birth-date calendar, and closes on Cancel", () => {
+    render(
+      <BirthDateField
+        now={TODAY}
+        defaultValue={plainDate(2026, 8, 20)}
+        calendarCommit="explicit"
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Open calendar" }));
+    const panel = screen.getByRole("dialog");
+    expect(
+      within(panel).getByRole("gridcell", { name: /August 27, 2026, unavailable, in the future/ }),
+    ).toBeTruthy();
+    fireEvent.click(within(panel).getByRole("button", { name: "Cancel" }));
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
+  it("dates the reader's own time when the zone shift crosses midnight", () => {
+    // 8:12 AM in New York is 12:12 AM the next day in Auckland.
+    const { container } = render(
+      <ClinicalDateTime as="time" value={SIGNED} viewerZone="Pacific/Auckland" showZone />,
+    );
+    expect(container.textContent).toMatch(/Aug 25.*12:12 AM your time/);
+  });
+
+  it("reads an imported rule with an unknown frequency in weeks, and an unset interval as one", () => {
+    const unknown = render(
+      <RecurrenceField
+        startDate={plainDate(2026, 9, 1)}
+        value={{ freq: "YEARLY" as never, interval: 2, count: 4 }}
+      />,
+    );
+    expect(
+      within(unknown.container)
+        .getByRole("button", { name: "2 weeks" })
+        .getAttribute("aria-pressed"),
+    ).toBe("true");
+    unknown.unmount();
+
+    const { container } = render(
+      <RecurrenceField
+        startDate={plainDate(2026, 9, 1)}
+        value={{ freq: "DAILY", count: 4 }}
+        allowNoEnd={false}
+        showRRule={false}
+      />,
+    );
+    expect(
+      within(container).getByRole("button", { name: "day" }).getAttribute("aria-pressed"),
+    ).toBe("true");
+    // Neither the unbounded choice nor the integrator's RRULE is offered.
+    expect(within(container).queryByRole("button", { name: "No end date" })).toBeNull();
+    expect(container.querySelector("code")).toBeNull();
+  });
+
+  it("asks for no availability when there is nobody to ask about", () => {
+    const onDateChange = vi.fn();
+    const onRequestAvailability = vi.fn();
+    const { container } = render(
+      <AppointmentScheduler
+        providers={[]}
+        availability={AVAILABILITY}
+        now={NOW}
+        onDateChange={onDateChange}
+        onRequestAvailability={onRequestAvailability}
+      />,
+    );
+    fireEvent.click(
+      within(container).getByRole("button", { name: /August 27, 2026, availability not loaded/ }),
+    );
+    expect(onDateChange).toHaveBeenCalledWith(plainDate(2026, 8, 27));
+    expect(onRequestAvailability).not.toHaveBeenCalled();
+  });
+
+  it("will not move to a day with no times", () => {
+    const onDateChange = vi.fn();
+    const { container } = render(
+      <AppointmentScheduler
+        providers={PROVIDERS}
+        availability={AVAILABILITY}
+        now={NOW}
+        dayLoads={[{ date: plainDate(2026, 8, 27), openCount: 0 }]}
+        onDateChange={onDateChange}
+      />,
+    );
+    const full = within(container).getByRole("button", { name: /no times available/ });
+    expect(full.getAttribute("aria-disabled")).toBe("true");
+    fireEvent.click(full);
+    expect(onDateChange).not.toHaveBeenCalled();
+    expect(full.getAttribute("aria-pressed")).toBe("false");
+  });
+
+  it("pulls an open conflict through the cap, but not a date already excluded", () => {
+    const { container } = render(
+      <RecurringSeriesScheduler
+        rule={{
+          freq: "WEEKLY",
+          interval: 1,
+          count: 6,
+          exceptions: [plainDate(2026, 9, 29)],
+        }}
+        startDate={plainDate(2026, 9, 1)}
+        visibleRows={2}
+        verdicts={[
+          { date: "2026-09-08", reason: "Room clash" },
+          { date: "2026-09-29", reason: "Room clash" },
+          { date: "2026-10-06", reason: "Dr Osei on leave" },
+        ]}
+      />,
+    );
+    const rows = [...container.querySelectorAll("[data-zb-occurrence]")];
+    expect(rows.map((row) => row.getAttribute("data-zb-occurrence"))).toEqual([
+      "open",
+      "conflict",
+      "conflict",
+      // Sep 15, Sep 22 and the excluded Sep 29 are counted, not listed.
+      "more",
+    ]);
+    expect(within(container).getByRole("status").textContent).toMatch(/2 conflicts to resolve/);
   });
 });

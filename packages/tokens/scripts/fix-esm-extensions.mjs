@@ -26,9 +26,14 @@
 
 import { readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 
-const dist = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "dist");
+// The dist of the package *running* the script, not the one it lives in. Six
+// packages call this as `node ../tokens/scripts/fix-esm-extensions.mjs`; while
+// this was resolved from the script's own location, every one of those runs
+// rewrote tokens' dist again and left its own untouched — which the build
+// could not notice and only packing the tarball showed.
+const dist = process.argv[2] ? path.resolve(process.argv[2]) : path.join(process.cwd(), "dist");
+const label = path.basename(path.dirname(dist));
 
 // A relative specifier in a from-clause or dynamic import that carries no
 // extension. Anything already ending in a known extension is left alone.
@@ -57,6 +62,6 @@ for (const entry of await readdir(dist, { withFileTypes: true, recursive: true }
 
 console.log(
   changed === 0
-    ? "[tokens] esm extensions: nothing to rewrite"
-    : `[tokens] esm extensions: rewrote ${changed} file(s) — ${touched.join(", ")}`,
+    ? `[${label}] esm extensions: nothing to rewrite`
+    : `[${label}] esm extensions: rewrote ${changed} file(s) — ${touched.join(", ")}`,
 );

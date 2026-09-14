@@ -79,6 +79,17 @@ describe("useAnnouncer — the completion summary", () => {
     expect(result.current.busy).toBe(false);
   });
 
+  it("announces an answer that arrives with a proposal", () => {
+    // Streaming goes straight to proposing when a proposal is pending.
+    const { result, rerender } = renderHook(
+      (props: { status: "streaming" | "proposing" }) =>
+        useAnnouncer({ status: props.status, answer: answer() }),
+      { initialProps: { status: "streaming" as const } },
+    );
+    rerender({ status: "proposing" });
+    expect(result.current.message).toMatch(/^Answer complete\./);
+  });
+
   it("pluralises correctly", () => {
     const two = new Map([
       [1, source],

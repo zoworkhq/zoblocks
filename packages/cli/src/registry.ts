@@ -82,6 +82,39 @@ export function resolveSpecifier(
   };
 }
 
+/**
+ * One `registryDependencies` entry, read relative to the item that named it.
+ *
+ * ADR 0016: a bare name means "the registry this item came from". Inside a
+ * namespaced item it stays in that namespace; inside an item fetched by URL it
+ * is the sibling `<name>.json`, so a mirror resolves within itself instead of
+ * reaching back to the public catalog. For a public item the two agree.
+ * Absolute URLs and `@namespace/` specifiers are taken as written.
+ */
+export function resolveDependency(
+  dependency: string,
+  parent: ResolvedSpecifier,
+  config: ZoBlocksConfig,
+  env: NodeJS.ProcessEnv,
+): ResolvedSpecifier {
+  if (/^https?:\/\//.test(dependency)) return resolveSpecifier(dependency, config, env);
+  if (parent.namespace) return resolveSpecifier(`${parent.namespace}/${dependency}`, config, env);
+  if (dependency.startsWith("@")) return resolveSpecifier(dependency, config, env);
+
+  // A name, not a path: "../x" or "//host/x" would leave the item's registry.
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(dependency)) {
+    throw new RegistryError(
+      `"${parent.raw}" depends on "${dependency}", which is not a component name. ` +
+        `A dependency in another registry must be a full URL.`,
+    );
+  }
+
+  const url = new URL(`${dependency}.json`, parent.url).href;
+  const published = resolveSpecifier(dependency, config, env);
+  if (url === published.url) return published;
+  return { raw: url, name: dependency, url, headers: {} };
+}
+
 function itemNameFromUrl(url: string): string {
   try {
     const { pathname } = new URL(url);
@@ -226,18 +259,8 @@ export async function collectItems(
     const item = await fetchItem(current, options);
     const dependencies: string[] = [];
 
-    /*
-     * `registryDependencies` may be bare names or absolute URLs. A bare name
-     * inside a namespaced item stays in that namespace, because a Pro
-     * component depending on "utils" means that registry's "utils".
-     */
     for (const dependency of item.registryDependencies ?? []) {
-      const specifier = /^https?:\/\//.test(dependency)
-        ? dependency
-        : current.namespace
-          ? `${current.namespace}/${dependency}`
-          : dependency;
-      const next = resolveSpecifier(specifier, config, env);
+      const next = resolveDependency(dependency, current, config, env);
       dependencies.push(next.url);
       if (!nodes.has(next.url)) queue.push(next);
     }

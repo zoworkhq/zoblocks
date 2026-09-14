@@ -469,6 +469,17 @@ describe("task ownership", () => {
     await addComment(form({ taskId: taskId.toHexString(), body: "Looks stuck — need help?" }));
     expect(await db().comments.countDocuments({ taskId })).toBe(1);
   });
+
+  /** A well-formed id is not a task. An orphan comment is invisible and permanent. */
+  it("refuses a comment on a task that does not exist", async () => {
+    await signedInAs({ role: "member" });
+    const taskId = new ObjectId();
+
+    await expect(
+      addComment(form({ taskId: taskId.toHexString(), body: "Anyone there?" })),
+    ).rejects.toThrow("Task not found.");
+    expect(await db().comments.countDocuments({ taskId })).toBe(0);
+  });
 });
 
 describe("administering people", () => {

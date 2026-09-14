@@ -174,6 +174,13 @@ describe("SourcesPanel", () => {
     ).not.toThrow();
   });
 
+  it("numbers each source by its citation marker when markers are given", () => {
+    const { container } = render(
+      <SourcesPanel sources={[source]} markers={[4]} onClose={vi.fn()} />,
+    );
+    expect(container.querySelector(".zb-copilot-source-marker")).toHaveTextContent("4");
+  });
+
   it("closes", async () => {
     const onClose = vi.fn();
     const user = userEvent.setup({ pointerEventsCheck: 0 });
@@ -302,6 +309,17 @@ describe("ProposalCard", () => {
     render(<ProposalCard api={api()} />);
     // A confirmation people click through reflexively is worse than none.
     expect(document.activeElement).toHaveTextContent(DEFAULT_LOCALE.proposalDismiss);
+  });
+
+  it("renders no Confirm for a proposal the mode prohibits, only Discard", () => {
+    render(<ProposalCard api={api({ proposalRisk: "prohibited" })} />);
+    expect(
+      screen.queryByRole("button", { name: DEFAULT_LOCALE.proposalConfirm }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: DEFAULT_LOCALE.proposalDismiss }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(DEFAULT_LOCALE.proposalProhibited)).toBeInTheDocument();
   });
 
   it("wires both controls", async () => {

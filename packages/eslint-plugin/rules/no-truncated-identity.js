@@ -20,7 +20,7 @@
  * that mentions a name or an identifier — because `truncate` on a free-text
  * note is legitimate and firing on it would train everyone to ignore the rule.
  *
- * See ACCESSIBILITY.md § Reflow, and the Identity brief §8.9.
+ * See ARCHITECTURE.md §10 (reflow), and the Identity brief §8.9.
  */
 
 /** CSS class names that clip text. */

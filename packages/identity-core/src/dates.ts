@@ -86,24 +86,75 @@ export function precise(value: string | undefined): PreciseDate | undefined {
   };
 }
 
+/** A calendar day in UTC. The month is zero-based, as `Date` has it. */
+interface Day {
+  y: number;
+  m: number;
+  d: number;
+}
+
+const dayOf = (date: Date): Day => ({
+  y: date.getUTCFullYear(),
+  m: date.getUTCMonth(),
+  d: date.getUTCDate(),
+});
+
+const isBefore = (a: Day, b: Day): boolean =>
+  a.y !== b.y ? a.y < b.y : a.m !== b.m ? a.m < b.m : a.d < b.d;
+
+const wholeYears = (born: Day, on: Day): number =>
+  on.y - born.y - (on.m < born.m || (on.m === born.m && on.d < born.d) ? 1 : 0);
+
+const wholeMonths = (born: Day, on: Day): number =>
+  (on.y - born.y) * 12 + (on.m - born.m) - (on.d < born.d ? 1 : 0);
+
+/**
+ * The oldest and youngest the patient can be, as birthdays, on `on`.
+ *
+ * `1985-03` is some day in March: as old as a 1 March birth, as young as a
+ * 31 March one. Reading it as 1 January aged people up to a year early. The
+ * youngest bound is cut at `on`, since nobody is born after today. Returns
+ * `undefined` when the whole window is in the future or the month is not one.
+ */
+function birthWindow(
+  birth: string,
+  on: Day,
+): { oldest: Day; youngest: Day; exact: boolean } | undefined {
+  const r = /^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?/.exec(birth);
+  if (!r) return undefined;
+  const y = Number(r[1]);
+  const m = Number(r[2] ?? 1) - 1;
+
+  let oldest: Day;
+  let youngest: Day;
+  if (r[3] !== undefined) {
+    oldest = youngest = { y, m, d: Number(r[3]) };
+  } else if (r[2] === undefined) {
+    oldest = { y, m: 0, d: 1 };
+    youngest = { y, m: 11, d: 31 };
+  } else {
+    if (m < 0 || m > 11) return undefined;
+    oldest = { y, m, d: 1 };
+    youngest = { y, m, d: new Date(Date.UTC(y, m + 1, 0)).getUTCDate() };
+  }
+
+  if (isBefore(on, oldest)) return undefined;
+  return { oldest, youngest: isBefore(on, youngest) ? on : youngest, exact: r[3] !== undefined };
+}
+
 /**
  * Whole years between two dates, floor. Returns `undefined` when the birth date
  * is unparseable or in the future.
+ *
+ * For a partial date this is the fewest years the date allows. A number cannot
+ * carry a range, and an age that is too low by one is the safer error than an
+ * adult threshold crossed early.
  */
 export function yearsBetween(birth: string | undefined, asOf: Date): number | undefined {
   if (!birth) return undefined;
-  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(birth);
-  const y = /^(\d{4})/.exec(birth);
-  if (!y?.[1]) return undefined;
-
-  const by = Number(y[1]);
-  const bm = m?.[2] ? Number(m[2]) - 1 : 0;
-  const bd = m?.[3] ? Number(m[3]) : 1;
-
-  let years = asOf.getUTCFullYear() - by;
-  const monthDiff = asOf.getUTCMonth() - bm;
-  if (monthDiff < 0 || (monthDiff === 0 && asOf.getUTCDate() < bd)) years -= 1;
-  return years < 0 ? undefined : years;
+  const on = dayOf(asOf);
+  const window = birthWindow(birth, on);
+  return window && wholeYears(window.youngest, on);
 }
 
 /** Whole days between two dates, floor. */
@@ -122,6 +173,11 @@ function daysBetween(birth: string, asOf: Date): number | undefined {
  * three months, months below two years, years after that.
  *
  * When the subject is deceased the value is age *at death* and stops advancing.
+ *
+ * A partial birth date renders a range whenever its window straddles a
+ * boundary: `1985` is `40–41 y` until New Year's Eve, `2025` is `7–19 mo`.
+ * The unit follows the oldest the patient can be, except that anyone who may
+ * still be under two stays in months — the dosing reason above.
  */
 export function resolveAge(
   birthDate: string | undefined,
@@ -135,30 +191,36 @@ export function resolveAge(
     : asOf;
   if (Number.isNaN(reference.getTime())) return undefined;
 
-  const days = daysBetween(birthDate, reference);
-  const years = yearsBetween(birthDate, reference);
-  if (years === undefined) return undefined;
+  const on = dayOf(reference);
+  const window = birthWindow(birthDate, on);
+  if (!window) return undefined;
+  const { oldest, youngest } = window;
 
-  const stamp = asOf.toISOString();
+  const range = (lo: number, hi: number, unit: string): string =>
+    hi > lo ? `${lo}–${hi} ${unit}` : `${lo} ${unit}`;
+  const daysSince = (born: Day): number =>
+    Math.floor((reference.getTime() - Date.UTC(born.y, born.m, born.d)) / 86_400_000);
+
+  // An exact date keeps its time of birth, which matters on the first day.
+  const exactDays = window.exact ? daysBetween(birthDate, reference) : undefined;
+  const days: [number, number] | undefined = window.exact
+    ? exactDays === undefined
+      ? undefined
+      : [exactDays, exactDays]
+    : [daysSince(youngest), daysSince(oldest)];
+
   let text: string;
-
-  if (days !== undefined && days < 28) {
-    text = `${Math.max(0, days)} d`;
-  } else if (days !== undefined && days < 91) {
-    text = `${Math.floor(days / 7)} wk`;
-  } else if (years < 2) {
-    const bm = /^(\d{4})-(\d{2})/.exec(birthDate);
-    const by = Number(bm?.[1] ?? 0);
-    const bmo = Number(bm?.[2] ?? 1) - 1;
-    const bd = Number(/^\d{4}-\d{2}-(\d{2})/.exec(birthDate)?.[1] ?? 1);
-    let months = (reference.getUTCFullYear() - by) * 12 + (reference.getUTCMonth() - bmo);
-    if (reference.getUTCDate() < bd) months -= 1;
-    text = `${Math.max(0, months)} mo`;
+  if (days && days[1] < 28) {
+    text = range(Math.max(0, days[0]), Math.max(0, days[1]), "d");
+  } else if (days && days[1] < 91) {
+    text = range(Math.floor(days[0] / 7), Math.floor(days[1] / 7), "wk");
+  } else if (wholeYears(youngest, on) < 2) {
+    text = range(Math.max(0, wholeMonths(youngest, on)), wholeMonths(oldest, on), "mo");
   } else {
-    text = `${years} y`;
+    text = range(wholeYears(youngest, on), wholeYears(oldest, on), "y");
   }
 
-  return { text, asOf: stamp, atDeath };
+  return { text, asOf: asOf.toISOString(), atDeath };
 }
 
 /** True when `value` is after `asOf`. A future date of birth is a data defect. */

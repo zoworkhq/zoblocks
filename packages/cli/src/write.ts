@@ -9,7 +9,7 @@
  */
 
 import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { existsSync } from "node:fs";
+import { existsSync, lstatSync, realpathSync, type Stats } from "node:fs";
 import path from "node:path";
 import { resolveTarget, type ZoBlocksConfig } from "./config.js";
 import { assertSafeTarget, type RegistryItem } from "./schema.js";
@@ -62,6 +62,7 @@ export async function planInstall(
           `${item.name}: "${relative}" resolves outside the project and will not be written.`,
         );
       }
+      assertOnDiskInside(absolute, cwd, relative, item.name);
 
       /*
        * Two items claiming one path is a registry bug that would otherwise
@@ -91,6 +92,44 @@ export async function planInstall(
   }
 
   return { files, dependencies };
+}
+
+/**
+ * The string check above is lexical, and a symlink defeats it: a linked
+ * `src/lib` passes as "inside" and writes wherever it points. So the directory
+ * that will actually receive the file is resolved on disk and checked against
+ * the project's real path.
+ */
+function assertOnDiskInside(absolute: string, cwd: string, relative: string, item: string): void {
+  const outside = new Error(
+    `${item}: "${relative}" resolves outside the project and will not be written.`,
+  );
+
+  // `writeFile` follows a link at the target itself, so refuse one outright.
+  if (lstatOrUndefined(absolute)?.isSymbolicLink()) {
+    throw new Error(`${item}: "${relative}" is a symlink and will not be written through.`);
+  }
+
+  // The nearest ancestor that exists is where `mkdir` and `writeFile` land.
+  let probe = absolute;
+  while (!lstatOrUndefined(probe) && path.dirname(probe) !== probe) probe = path.dirname(probe);
+
+  let real: string;
+  try {
+    real = realpathSync(probe);
+  } catch {
+    throw outside; // A dangling link: nowhere we can vouch for.
+  }
+  const root = realpathSync(path.resolve(cwd));
+  if (real !== root && !real.startsWith(root + path.sep)) throw outside;
+}
+
+function lstatOrUndefined(target: string): Stats | undefined {
+  try {
+    return lstatSync(target);
+  } catch {
+    return undefined;
+  }
 }
 
 /**

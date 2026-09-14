@@ -30,6 +30,9 @@ import { sectionAttrs, sections, wildcardHint } from "./schema.js";
 /** The XHTML namespace every FHIR narrative div must declare. */
 export const XHTML_NS = "http://www.w3.org/1999/xhtml";
 
+// Anything outside XML 1.0's Char production, lone surrogates included.
+const XML_ILLEGAL = /[^\t\n\r -퟿-�\u{10000}-\u{10FFFF}]/gu;
+
 /* ------------------------------------------------------------------ */
 /* Escaping                                                            */
 /* ------------------------------------------------------------------ */
@@ -40,9 +43,15 @@ export const XHTML_NS = "http://www.w3.org/1999/xhtml";
  * Ampersand first, or the escapes get double-escaped. Quotes are escaped in
  * text content as well as attributes: it costs nothing, and it removes the
  * class of bug where a helper is reused in the other context.
+ *
+ * Characters XML 1.0 forbids are removed first, or one pasted control character
+ * makes the whole narrative unparseable. Vertical tab and form feed (Word's line
+ * and page breaks) become spaces, so the words either side do not join.
  */
 export function escapeXml(text: string): string {
   return text
+    .replace(/[\v\f]/g, " ")
+    .replace(XML_ILLEGAL, "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")

@@ -130,6 +130,25 @@ describe("<ZoBlocksAntdProvider>", () => {
     document.documentElement.removeAttribute("style");
   });
 
+  it("reads the brand from `scope` rather than the document", async () => {
+    document.documentElement.style.setProperty("--zb-accent", "#7c3aed");
+
+    function Branded() {
+      const ref = React.useRef<HTMLDivElement>(null);
+      return (
+        <div ref={ref} style={{ "--zb-accent": "#0f766e" } as React.CSSProperties}>
+          <ZoBlocksAntdProvider scope={ref}>
+            <Probe />
+          </ZoBlocksAntdProvider>
+        </div>
+      );
+    }
+    render(<Branded />);
+
+    expect(await screen.findByText("#0f766e")).toBeTruthy();
+    document.documentElement.removeAttribute("style");
+  });
+
   it("lets a host keep a deliberate exception", async () => {
     document.documentElement.style.setProperty("--zb-accent", "#7c3aed");
 

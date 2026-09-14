@@ -72,9 +72,41 @@ describe("containsDosing", () => {
     "the patient is 68 years old",
     "40% of patients",
     "seen 3 times this year",
+    "attends weekly sessions",
+    "reviewed daily on the ward",
+    "hourly observations overnight",
+    "PHQ-9 repeated weekly",
   ])("does not fire on %j", (text) => {
     expect(containsDosing(text)).toBe(false);
   });
+
+  it.each([
+    "take it daily",
+    "bisoprolol once daily",
+    "methotrexate once weekly",
+    "apply the patch weekly",
+    "two tablets daily",
+    "the daily dose",
+    // A drug name with a bare frequency is still a dosing instruction.
+    "bisoprolol daily",
+    "metformin twice daily",
+    "atorvastatin nightly",
+    "omeprazole daily",
+    "aspirin daily",
+    "lithium weekly",
+    "daily ramipril",
+    "PO daily",
+    "inhaled weekly",
+  ])("detects a frequency attached to a medication: %j", (text) => {
+    expect(containsDosing(text)).toBe(true);
+  });
+
+  it.each(["daily walks", "attends weekly sessions", "weekly clinic review", "spine weekly"])(
+    "does not read %j as a medication frequency",
+    (text) => {
+      expect(containsDosing(text)).toBe(false);
+    },
+  );
 });
 
 describe("classifyProposal", () => {

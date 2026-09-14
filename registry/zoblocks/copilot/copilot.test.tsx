@@ -329,6 +329,72 @@ describe("the basis drawer", () => {
     expect(drawer.querySelector("mark")).toBeNull();
     expect(drawer.textContent).not.toContain("match");
   });
+
+  it("shows the sources of the answer clicked, numbered by its citation markers", async () => {
+    // "Show sources" on an older answer used to show the latest answer's
+    // sources, numbered by position rather than by the marker in the text.
+    const guide = (id: string, title: string): Source => ({
+      id,
+      title,
+      passage: `${title} passage.`,
+      kind: "guideline",
+      retrievedAt: "2026-08-16T09:00:00.000Z",
+    });
+    let call = 0;
+    const provider = {
+      ...createStaticProvider({ events: [], disclosure }),
+      async *send() {
+        call += 1;
+        const title = call === 1 ? "Older guideline" : "Newer guideline";
+        yield { type: "delta", text: `${title} says so.` } as const;
+        const marker = call === 1 ? 2 : 1;
+        yield { type: "citation", marker, source: guide(`s${call}`, title) } as const;
+        yield { type: "claim", claim: { span: [0, 24], markers: [marker] } } as const;
+        yield { type: "done", finish: "stop" } as const;
+      },
+    };
+    renderCopilot({ provider: provider as never });
+
+    type("first?");
+    fireEvent.keyDown(field(), { key: "Enter" });
+    await screen.findByText("Older guideline says so.", {}, { timeout: 4000 });
+    const followUp = screen.getByRole("textbox", { name: "Ask a follow-up…" });
+    fireEvent.change(followUp, { target: { value: "second?" } });
+    fireEvent.keyDown(followUp, { key: "Enter" });
+    await screen.findByText("Newer guideline says so.", {}, { timeout: 4000 });
+
+    const older = screen.getByText("Older guideline says so.").closest("article") as HTMLElement;
+    fireEvent.click(within(older).getByRole("button", { name: "Show sources" }));
+    const drawer = await screen.findByRole("region", { name: "Basis of this answer" });
+    expect(within(drawer).getByText("Older guideline")).toBeInTheDocument();
+    expect(within(drawer).queryByText("Newer guideline")).not.toBeInTheDocument();
+    expect(within(drawer).getByText("2")).toBeInTheDocument();
+
+    // The citation marker in the older answer opens the same answer's sources.
+    fireEvent.click(within(drawer).getByRole("button", { name: "Close" }));
+    const newer = screen.getByText("Newer guideline says so.").closest("article") as HTMLElement;
+    fireEvent.click(within(newer).getByRole("button", { name: /1/ }));
+    const reopened = await screen.findByRole("region", { name: "Basis of this answer" });
+    expect(within(reopened).getByText("Newer guideline")).toBeInTheDocument();
+  });
+});
+
+describe("feedback", () => {
+  it.each([
+    ["Not helpful", "down"],
+    ["Helpful", "up"],
+  ] as const)("records %s at once, against that answer's exchange", async (label, rating) => {
+    // This skin has no reason picker, so a thumbs-down used to record nothing.
+    const onTelemetry = vi.fn();
+    renderCopilot({ onTelemetry });
+    type("AF first line?");
+    fireEvent.keyDown(field(), { key: "Enter" });
+    fireEvent.click(await screen.findByRole("button", { name: label }, { timeout: 4000 }));
+    const feedback = onTelemetry.mock.calls.map(([e]) => e).filter((e) => e.type === "feedback");
+    expect(feedback).toHaveLength(1);
+    expect(feedback[0]).toMatchObject({ rating, exchangeId: expect.any(String) });
+    expect(feedback[0].exchangeId).not.toBe("");
+  });
 });
 
 describe("the scope line", () => {
@@ -898,6 +964,33 @@ describe("the non-happy states", () => {
 });
 
 describe("mid-stream", () => {
+  it("disables dictation while an answer is in flight, so Stop stays reachable", async () => {
+    // Starting dictation mid-stream used to move the session out of streaming,
+    // dropping the rest of the answer and taking the Stop button with it.
+    renderCopilot({
+      provider: {
+        ...createStaticProvider({ events: [], disclosure }),
+        async *send(_request: unknown, signal: AbortSignal) {
+          yield { type: "delta", text: "Partial" } as const;
+          await new Promise<void>((resolve) => {
+            if (signal.aborted) return resolve();
+            signal.addEventListener("abort", () => resolve(), { once: true });
+          });
+          yield { type: "done", finish: "aborted" } as const;
+        },
+      } as never,
+    });
+    type("AF first line?");
+    fireEvent.keyDown(field(), { key: "Enter" });
+
+    const stop = await screen.findByRole("button", { name: "Stop" }, { timeout: 4000 });
+    expect(screen.getByRole("button", { name: "Start dictation" })).toBeDisabled();
+    fireEvent.click(stop);
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Start dictation" })).toBeEnabled(),
+    );
+  });
+
   it("renders the partial answer in a region that announces nothing", async () => {
     // The streaming frame: aria-live is off and aria-busy is set, because
     // announcing tokens as they arrive produces an unusable stutter. The

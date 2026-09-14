@@ -124,10 +124,18 @@ export interface FhirProvenance {
   extension?: FhirExtension[];
 }
 
+export interface FhirBundleEntry {
+  /** `urn:uuid:…`, so entries can reference each other before the server assigns ids. */
+  fullUrl: string;
+  resource: FhirComposition | FhirDocumentReference | FhirProvenance;
+  /** Required on every entry of a transaction. */
+  request: { method: "POST"; url: FhirBundleEntry["resource"]["resourceType"] };
+}
+
 export interface FhirBundle {
   resourceType: "Bundle";
   type: "transaction";
-  entry: { resource: FhirComposition | FhirDocumentReference | FhirProvenance }[];
+  entry: FhirBundleEntry[];
 }
 
 /* ------------------------------------------------------------------ */
@@ -210,6 +218,13 @@ export interface ToFhirOptions {
   narrative?: NarrativeOptions;
   /** Warnings the author acknowledged at signing. Recorded on the Provenance. */
   acknowledgedWarnings?: readonly string[];
+  /**
+   * The UUID behind each bundle entry's `urn:uuid:` fullUrl, called once per
+   * resource in bundle order. Defaults to one derived from the note, so the same
+   * note always serializes the same way. Pass a random UUID generator for ids
+   * that differ between exports.
+   */
+  uuid?: (resourceType: FhirBundleEntry["resource"]["resourceType"]) => string;
 }
 
 /* ------------------------------------------------------------------ */
@@ -357,14 +372,24 @@ export function toProvenance(
  */
 export function toFhirBundle(doc: PMNode, options: ToFhirOptions, text: string): FhirBundle {
   const composed = toComposition(doc, options);
+  const seed = `${toCanonical(doc)}|${options.date}|${options.subject.reference ?? ""}`;
+  const uuid = options.uuid ?? ((type: string) => derivedUuid(`${seed}|${type}`));
+
+  // R4 transactions need `request` on every entry and a `fullUrl` for a POST.
+  const entry = (resource: FhirBundleEntry["resource"]): FhirBundleEntry => ({
+    fullUrl: `urn:uuid:${uuid(resource.resourceType)}`,
+    resource,
+    request: { method: "POST", url: resource.resourceType },
+  });
+
+  const compositionEntry = entry(composed);
+  const documentEntry = entry(toDocumentReference(doc, options, text));
+  // The signature's target is the Composition in this bundle, not a title.
+  const target = { reference: compositionEntry.fullUrl, display: composed.title };
   return {
     resourceType: "Bundle",
     type: "transaction",
-    entry: [
-      { resource: composed },
-      { resource: toDocumentReference(doc, options, text) },
-      { resource: toProvenance(doc, options, { display: composed.title }) },
-    ],
+    entry: [compositionEntry, documentEntry, entry(toProvenance(doc, options, target))],
   };
 }
 
@@ -399,6 +424,7 @@ export function withDigest(
       if (entry.resource.resourceType !== "Provenance") return entry;
       const provenance = entry.resource;
       return {
+        ...entry,
         resource: {
           ...provenance,
           extension: [
@@ -417,6 +443,25 @@ export function withDigest(
 /* ------------------------------------------------------------------ */
 /* Helpers                                                             */
 /* ------------------------------------------------------------------ */
+
+/**
+ * A UUID-shaped id from a string: FNV-1a in four rounds, stamped version 8
+ * (custom) with the RFC 9562 variant. Not a digest and not for security; it
+ * only needs to be stable and distinct within one bundle.
+ */
+function derivedUuid(seed: string): string {
+  let hex = "";
+  for (let round = 0; hex.length < 32; round++) {
+    let h = 0x811c9dc5;
+    const input = `${round}:${seed}`;
+    for (let i = 0; i < input.length; i++) {
+      h = Math.imul(h ^ input.charCodeAt(i), 0x01000193);
+    }
+    hex += (h >>> 0).toString(16).padStart(8, "0");
+  }
+  const variant = ((parseInt(hex.charAt(16), 16) & 0x3) | 0x8).toString(16);
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-8${hex.slice(13, 16)}-${variant}${hex.slice(17, 20)}-${hex.slice(20, 32)}`;
+}
 
 /**
  * UTF-8 safe base64, without assuming Node's `Buffer` or the browser's `btoa`.

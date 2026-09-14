@@ -120,14 +120,18 @@ export function useTabs(options: UseTabsOptions): UseTabsApi {
     onChange: onChange ? (next, via) => onChange(next, { via }) : undefined,
   });
 
+  // Read at request time — see `Tabs.Root`: a guard over `isDirty` must see
+  // the current value, and rebuilding the gate would drop an in-flight veto.
+  const beforeChangeRef = React.useRef(onBeforeChange);
+  beforeChangeRef.current = onBeforeChange;
+
   const gate = React.useMemo(
     () =>
       createChangeGate({
-        onBeforeChange,
+        onBeforeChange: (next, previous) => beforeChangeRef.current?.(next, previous) ?? true,
         onCommit: (next, source) => setValue(next, source),
         onPendingChange: setPending,
       }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [setValue],
   );
 

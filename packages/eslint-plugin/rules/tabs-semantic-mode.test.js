@@ -93,6 +93,9 @@ ruleTester.run("tabs-semantic-mode", tabsSemanticMode, {
     { code: 'const a = <Tabs as="nav" items={sections.map(toItem)} />;' },
     { code: 'const a = <Tabs as="nav" items={items} />;' },
     { code: 'const a = <Tabs as="tabs" overflow={strategy} items={items} />;' },
+    // A spread item could carry the href, so a missing one is a guess.
+    { code: 'const a = <Tabs as="nav" items={[{ ...home }, { ...billing }]} />;' },
+    { code: 'const a = <Tabs as="nav" items={[{ ...home, value: "a" }]} />;' },
     // An empty literal array tells us nothing about hrefs either way.
     { code: 'const a = <Tabs as="nav" items={[]} />;' },
   ],

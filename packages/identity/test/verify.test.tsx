@@ -100,6 +100,94 @@ describe("PatientVerify — the ID-reentry step", () => {
     expect(onConfirm).toHaveBeenCalled();
   });
 
+  it.each(["08031985", "08/03/1985", "08-03-1985", "08.03.1985", "08 03 1985", "8/3/1985"])(
+    "confirms a date of birth typed as prompted (%s)",
+    async (typed) => {
+      const onConfirm = vi.fn();
+      F.renderWithPolicy(
+        <PatientVerify
+          identity={amara}
+          action="ordering"
+          mode="birth-date"
+          onConfirm={onConfirm}
+        />,
+      );
+      expect(screen.getByRole("textbox")).toHaveAttribute("placeholder", "DDMMYYYY");
+      await userEvent.type(screen.getByRole("textbox"), typed);
+      await userEvent.click(screen.getByRole("button", { name: "Confirm" }));
+      expect(onConfirm).toHaveBeenCalled();
+    },
+  );
+
+  it.each(["19850308", "03081985", "08031986", "0803198"])(
+    "refuses a date of birth that is not this patient's in DDMMYYYY (%s)",
+    async (typed) => {
+      const onConfirm = vi.fn();
+      F.renderWithPolicy(
+        <PatientVerify
+          identity={amara}
+          action="ordering"
+          mode="birth-date"
+          onConfirm={onConfirm}
+        />,
+      );
+      await userEvent.type(screen.getByRole("textbox"), typed);
+      await userEvent.click(screen.getByRole("button", { name: "Confirm" }));
+      expect(onConfirm).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each([
+    ["1985-03", "Mar 1985"],
+    ["1985", "1985"],
+  ])("offers no date-of-birth field when the record has no day (%s)", (birthDate, shown) => {
+    // A field that can never match leaves staff retyping a correct answer.
+    // Say why, and point at a check that can work.
+    const partial = resolveIdentity(F.patient({ birthDate }), P);
+    const onConfirm = vi.fn();
+    const onCancel = vi.fn();
+    F.renderWithPolicy(
+      <PatientVerify
+        identity={partial}
+        action="ordering"
+        mode="birth-date"
+        onConfirm={onConfirm}
+        onCancel={onCancel}
+      />,
+    );
+    expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Confirm" })).not.toBeInTheDocument();
+    const dialog = screen.getByRole("alertdialog");
+    expect(dialog).toHaveTextContent(shown);
+    expect(dialog).toHaveTextContent("Date of birth has no day on record");
+    expect(dialog).toHaveTextContent(/initials or the wristband/);
+    screen.getByRole("button", { name: "Cancel" }).click();
+    expect(onCancel).toHaveBeenCalled();
+    expect(onConfirm).not.toHaveBeenCalled();
+  });
+
+  it("offers no date-of-birth field when no date of birth is recorded", () => {
+    const record = F.patient();
+    delete record.birthDate;
+    const none = resolveIdentity(record, P);
+    F.renderWithPolicy(
+      <PatientVerify identity={none} action="ordering" mode="birth-date" onConfirm={() => {}} />,
+    );
+    expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
+    expect(screen.getByRole("alertdialog")).toHaveTextContent("Date of birth not recorded");
+  });
+
+  it("still offers the field for a date of birth recorded with a time", async () => {
+    const onConfirm = vi.fn();
+    const timed = resolveIdentity(F.patient({ birthDate: "1985-03-08T14:30:00Z" }), P);
+    F.renderWithPolicy(
+      <PatientVerify identity={timed} action="ordering" mode="birth-date" onConfirm={onConfirm} />,
+    );
+    await userEvent.type(screen.getByRole("textbox"), "08031985");
+    await userEvent.click(screen.getByRole("button", { name: "Confirm" }));
+    expect(onConfirm).toHaveBeenCalled();
+  });
+
   it("announces the result to assistive technology", () => {
     F.renderWithPolicy(<PatientVerify identity={amara} action="ordering" onConfirm={() => {}} />);
     expect(screen.getByRole("status")).toBeInTheDocument();

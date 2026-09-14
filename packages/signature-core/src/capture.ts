@@ -160,9 +160,16 @@ export class SignatureCapture {
    * a scroll starting, a system edge swipe, the tab being hidden. Committing a
    * half-drawn stroke there would leave a stray line the person did not intend
    * and cannot easily explain.
+   *
+   * Pass the cancelled pointer's id. A cancel names one contact: when the OS
+   * cancels a rejected palm touch, the pen stroke still being drawn is not
+   * the palm's to abandon. With no id, or a stroke begun without one, any
+   * cancel ends the stroke.
    */
-  cancel(): boolean {
+  cancel(pointerId?: number): boolean {
     if (!this.#active) return false;
+    const owner = this.#activePointerId;
+    if (pointerId !== undefined && owner !== null && pointerId !== owner) return false;
     this.#active = null;
     this.#activePointerId = null;
     return true;

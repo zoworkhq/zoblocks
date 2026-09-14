@@ -183,10 +183,26 @@ export function createSignal(options: SignalOptions = {}): Signal {
 
   const listeners = new Set<(frame: SignalFrame) => void>();
 
+  /*
+   * Sized to the analyser on every read.
+   *
+   * `AnalyserNode` fills only `fftSize` samples and leaves the rest of the
+   * array alone. After a swap to a smaller analyser the old tail stayed in the
+   * buffer and was read forever, so the meter never showed silence. A source
+   * without `fftSize` fills whatever it is given.
+   */
+  let view: Float32Array = samples;
+
   function read(): number {
     if (source === null) return 0;
-    source.getFloatTimeDomainData(samples);
-    return framePeak(samples);
+    const size = source.fftSize;
+    const length =
+      typeof size === "number" && Number.isInteger(size) && size > 0
+        ? Math.min(size, samples.length)
+        : samples.length;
+    if (view.length !== length) view = samples.subarray(0, length);
+    source.getFloatTimeDomainData(view);
+    return framePeak(view);
   }
 
   function step(dtMs: number): SignalFrame {

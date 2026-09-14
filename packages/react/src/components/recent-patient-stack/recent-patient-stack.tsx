@@ -222,6 +222,8 @@ export function RecentPatientStack({
     tabs.current[next]?.focus();
   };
 
+  const hasActive = ordered.some((chart) => chart.id === activeId);
+
   return (
     <div
       {...rest}
@@ -251,7 +253,9 @@ export function RecentPatientStack({
                 role="tab"
                 aria-selected={active}
                 // Roving: one stop for the whole stack, arrows within it.
-                tabIndex={active || (!activeId && index === 0) ? 0 : -1}
+                // An activeId that matches no chart (closed elsewhere, or not
+                // yet loaded) falls back to the first tab, never to none.
+                tabIndex={active || (!hasActive && index === 0) ? 0 : -1}
                 className="zb-stack__tab"
                 data-zb-accent={chartAccent(chart.id)}
                 data-zb-active={active ? "" : undefined}

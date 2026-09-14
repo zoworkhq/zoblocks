@@ -472,5 +472,5 @@ contain (10.4), and the American spellings in prose positions (10.8).
   level target. This document is how to answer those.
 - [`ARCHITECTURE.md`](ARCHITECTURE.md) §10 — internationalisation, and why
   patient and clinician catalogs are separate.
-- [`ACCESSIBILITY.md`](ACCESSIBILITY.md) — conformance, and why a text label is
-  mandatory rather than decorative.
+- [`ENGINEERING.md`](ENGINEERING.md) §6 — the accessibility bar every component
+  must clear, including why a text label is mandatory rather than decorative.

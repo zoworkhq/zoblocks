@@ -48,6 +48,23 @@ ruleTester.run("identity-requires-stable-key", identityRequiresStableKey, {
       code: `<PatientChip patient={p} identityKey={given + " " + family} />`,
       errors: [{ messageId: "nameKeyed" }],
     },
+    // Optional chaining and TypeScript wrappers are the same name underneath.
+    {
+      code: `<PatientChip patient={p} identityKey={patient?.name} />`,
+      errors: [{ messageId: "nameKeyed" }],
+    },
+    {
+      code: `<PatientChip patient={p} identityKey={displayName as string} />`,
+      errors: [{ messageId: "nameKeyed" }],
+    },
+    {
+      code: `<PatientChip patient={p} identityKey={displayName!} />`,
+      errors: [{ messageId: "nameKeyed" }],
+    },
+    {
+      code: `identitySwatch(patient?.name?.[0]?.text)`,
+      errors: [{ messageId: "nameKeyed" }],
+    },
     {
       code: `<PatientChip patient={p} identityKey={formatHumanName(n)} />`,
       errors: [{ messageId: "nameKeyed" }],

@@ -13,6 +13,7 @@ import {
   claimsOf,
   initialState,
   isBusy,
+  pendingProposal,
   reduce,
   sourcesOf,
   toHistoryText,
@@ -122,6 +123,22 @@ describe("dictation", () => {
       { type: "dictation-stop", transcript: "amlodipine" },
     );
     expect(state.draft).toBe("amlodipine");
+  });
+
+  it.each<[string, () => SessionState]>([
+    ["streaming", submitted],
+    [
+      "submitting",
+      () =>
+        reduce(initialState("look-up"), {
+          type: "submit",
+          exchangeId: "x1",
+          messageId: "m1",
+          question: "q",
+        }),
+    ],
+  ])("ignores dictation-start while %s, so Stop is never lost", (status, state) => {
+    expect(reduce(state(), { type: "dictation-start" }).status).toBe(status);
   });
 
   it("ignores a partial that arrives when dictation is not running", () => {
@@ -405,6 +422,90 @@ describe("errors and refusals", () => {
     );
     expect(after.current).toEqual(before.current);
     expect(after.status).toBe("streaming");
+  });
+});
+
+describe("a proposal never outlives its exchange", () => {
+  const proposing = () =>
+    run(submitted(), {
+      type: "event",
+      event: {
+        type: "proposal",
+        proposal: { id: "p1", kind: "note-text", summary: "s", content: "c" },
+      },
+    });
+  const blocking = {
+    crisis: { severity: "imminent", audience: "user", rules: [], blocking: true },
+    blocking: true,
+  } as const;
+
+  it.each<[string, SessionAction]>([
+    ["stop", { type: "stop" }],
+    ["fail", { type: "fail", error: copilotError("provider", "500") }],
+    ["crisis", { type: "crisis", safety: blocking }],
+    ["a blocking safety event", { type: "event", event: { type: "safety", verdict: blocking } }],
+    [
+      "an error event",
+      { type: "event", event: { type: "error", error: copilotError("network", "x") } },
+    ],
+  ])("clears it on %s", (_label, action) => {
+    expect(proposing().proposal).not.toBeNull();
+    expect(reduce(proposing(), action).proposal).toBeNull();
+  });
+
+  it("clears it when the mode changes, so confirm never runs under another mode's rules", () => {
+    const state = run(
+      proposing(),
+      { type: "complete", messageId: "a1", checks, finish: "stop" },
+      { type: "set-mode", modeId: "prepare" },
+    );
+    expect(state.modeId).toBe("prepare");
+    expect(state.proposal).toBeNull();
+    expect(state.status).toBe("complete");
+  });
+
+  it("withholds it while streaming, before the checks have run", () => {
+    expect(pendingProposal(proposing())).toBeNull();
+    const checked = run(proposing(), { type: "complete", messageId: "a1", checks, finish: "stop" });
+    expect(pendingProposal(checked)?.id).toBe("p1");
+  });
+
+  it("drops it when the checks refuse the answer", () => {
+    const refused = run(proposing(), {
+      type: "complete",
+      messageId: "a1",
+      checks: { ...checks, refused: true },
+      finish: "stop",
+    });
+    expect(refused.proposal).toBeNull();
+    expect(refused.status).toBe("complete");
+  });
+});
+
+describe("stale exchanges", () => {
+  it("ignores a late action tagged with an exchange a new thread replaced", () => {
+    const fresh = run(submitted(), { type: "new-thread" });
+    const late = run(fresh, {
+      type: "fail",
+      exchangeId: "x1",
+      error: copilotError("network", "late"),
+    });
+    expect(late).toBe(fresh);
+  });
+
+  it("does not let a stale stop end the next exchange", () => {
+    const state = run(
+      submitted(),
+      { type: "stop" },
+      { type: "submit", exchangeId: "x2", messageId: "m2", question: "again?" },
+      { type: "stream-start" },
+      { type: "stop", exchangeId: "x1" },
+    );
+    expect(state.status).toBe("streaming");
+  });
+
+  it("still applies an untagged action", () => {
+    expect(run(submitted(), { type: "stop" }).status).toBe("stopped");
   });
 });
 

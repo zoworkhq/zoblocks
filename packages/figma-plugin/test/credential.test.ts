@@ -51,6 +51,32 @@ describe("the credential store", () => {
     }
   });
 
+  it("refuses to save a credential it would refuse to load", async () => {
+    const figma = new FakeFigma();
+    for (const bad of [
+      { origin: "http://app.example.test", token: credential.token },
+      { origin: credential.origin, token: "sk_live_wrong" },
+      { origin: 42, token: credential.token },
+      { origin: credential.origin },
+      null,
+    ]) {
+      await expect(
+        saveCredential(figma.clientStorage, bad as never),
+        JSON.stringify(bad),
+      ).rejects.toThrow();
+      expect(await figma.clientStorage.getAsync("ox.credential")).toBeUndefined();
+    }
+  });
+
+  it("stores the normalised form", async () => {
+    const figma = new FakeFigma();
+    await saveCredential(figma.clientStorage, {
+      origin: `${credential.origin}/`,
+      token: `  ${credential.token} `,
+    });
+    expect(await figma.clientStorage.getAsync("ox.credential")).toEqual(credential);
+  });
+
   it("survives a storage read that throws", async () => {
     const storage = {
       getAsync: () => Promise.reject(new Error("quota")),

@@ -418,7 +418,16 @@ function DictationButton(props: { api: ReturnType<typeof useCopilot> }): React.R
     );
   }
 
-  return <Button aria-label={locale.startDictation} onClick={dictation.start} icon={<MicIcon />} />;
+  // Disabled mid-answer: dictating would leave `streaming` and remove Stop.
+  const busy = props.api.state.status === "streaming" || props.api.state.status === "submitting";
+  return (
+    <Button
+      aria-label={locale.startDictation}
+      onClick={dictation.start}
+      icon={<MicIcon />}
+      disabled={busy}
+    />
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -519,7 +528,7 @@ function CopilotPanel(props: {
 
               {message.answer ? <RegisterBadge answer={message.answer} /> : null}
               {message.answer ? (
-                <AnswerBody answer={message.answer} onCite={() => api.openSources()} />
+                <AnswerBody answer={message.answer} onCite={() => api.openSourcesFor(message.id)} />
               ) : null}
               {message.checks ? <CheckNotices findings={message.checks.findings} /> : null}
 
@@ -529,7 +538,7 @@ function CopilotPanel(props: {
                     type="text"
                     size="small"
                     aria-label={locale.helpful}
-                    onClick={() => api.sendFeedback("up")}
+                    onClick={() => api.sendFeedbackFor(message.id, "up")}
                   >
                     <ThumbUpIcon />
                   </Button>
@@ -539,7 +548,7 @@ function CopilotPanel(props: {
                     type="text"
                     size="small"
                     aria-label={locale.notHelpful}
-                    onClick={() => api.sendFeedback("down")}
+                    onClick={() => api.sendFeedbackFor(message.id, "down")}
                   >
                     <ThumbDownIcon />
                   </Button>
@@ -549,7 +558,7 @@ function CopilotPanel(props: {
                   size="small"
                   className="zb-copilot-verify"
                   icon={<VerifyIcon />}
-                  onClick={api.openSources}
+                  onClick={() => api.openSourcesFor(message.id)}
                 >
                   {locale.showSources}
                 </Button>
@@ -585,7 +594,7 @@ function CopilotPanel(props: {
                       { key: "disclosure", label: locale.disclosureTitle, icon: <BookIcon /> },
                     ],
                     onClick: ({ key }) => {
-                      if (key === "flag") api.sendFeedback("down");
+                      if (key === "flag") api.sendFeedbackFor(message.id, "down");
                       else props.onOpenDisclosure?.();
                     },
                   }}
@@ -599,14 +608,15 @@ function CopilotPanel(props: {
               {/* The reason picker. A bare thumbs-down records nothing
                   analysable, so it asks — from a closed list, because free text
                   produces "bad" and nothing else. */}
-              {api.awaitingFeedbackReason ? (
+              {/* Only under the answer that was marked down. */}
+              {api.awaitingFeedbackReason === message.id ? (
                 <div className="zb-copilot-feedback" role="group" aria-label={locale.whyNotHelpful}>
                   <span className="zb-copilot-feedback-q">{locale.whyNotHelpful}</span>
                   {FEEDBACK_REASONS.map((reason) => (
                     <Button
                       key={reason}
                       size="small"
-                      onClick={() => api.sendFeedback("down", reason)}
+                      onClick={() => api.sendFeedbackFor(message.id, "down", reason)}
                     >
                       {locale.feedbackReason(reason)}
                     </Button>
@@ -673,7 +683,13 @@ function CopilotPanel(props: {
         <ProposalCard api={api} />
       </div>
 
-      {api.sourcesOpen ? <SourcesPanel sources={api.sources} onClose={api.closeSources} /> : null}
+      {api.sourcesOpen ? (
+        <SourcesPanel
+          sources={api.sources}
+          markers={api.citations.map((citation) => citation.marker)}
+          onClose={api.closeSources}
+        />
+      ) : null}
 
       {props.scope}
 

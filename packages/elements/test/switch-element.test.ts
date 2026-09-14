@@ -34,6 +34,18 @@ describe("upgrade", () => {
     expect(customElements.get("zb-switch")).toBeTruthy();
   });
 
+  it("drops the accessible name when the label is cleared", () => {
+    const element = mount({ label: "Contact precautions", value: "on" });
+    expect(control(element).getAttribute("aria-label")).toBe("Contact precautions");
+
+    element.setAttribute("label", "");
+    expect(control(element).hasAttribute("aria-label")).toBe(false);
+
+    element.setAttribute("label", "Falls risk");
+    element.removeAttribute("label");
+    expect(control(element).hasAttribute("aria-label")).toBe(false);
+  });
+
   it("upgrades with a shadow root and a real switch inside it", () => {
     const element = mount({ label: "Contact precautions", value: "on" });
     expect(element.shadowRoot).toBeTruthy();

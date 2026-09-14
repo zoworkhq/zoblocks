@@ -10150,6 +10150,7 @@ export const CATALOG: ComponentDoc[] = [
       "Playback with speakers",
       "Playback without diarisation",
       "Live transcript",
+      "Transcript stalled",
       "Inline dictation",
       "Single control"
     ],
@@ -10338,6 +10339,12 @@ export const CATALOG: ComponentDoc[] = [
         "description": "The live state of the capture track — `readyState` and `muted`. This is what separates the four faults that are byte-identical at the signal layer. An OS mute, a headset mute, a device that ended and a device that was swapped all deliver near-silence on schedule; only the track and the device tell them apart, which is why the component asks for them rather than trying to read them out of the waveform.",
         "required": false,
         "default": "null"
+      },
+      {
+        "name": "transcriptLagMs",
+        "type": "number",
+        "description": "How far the transcript trails the audio, in ms. The host's recogniser knows this; the component does not. Past four seconds while recording or transcribing, Stream says the transcript stalled.",
+        "required": false
       },
       {
         "name": "turns",
@@ -10545,6 +10552,12 @@ export const CATALOG: ComponentDoc[] = [
             "default": "null"
           },
           {
+            "name": "transcriptLagMs",
+            "type": "number",
+            "description": "How far the transcript trails the audio, in ms. The host's recogniser knows this; the component does not. Past four seconds while recording or transcribing, Stream says the transcript stalled.",
+            "required": false
+          },
+          {
             "name": "turns",
             "type": "readonly RecorderTurn[]",
             "description": "Turns for the transcript art. `interim` is drawn as a guess.",
@@ -10601,7 +10614,7 @@ export const CATALOG: ComponentDoc[] = [
         "extendsType": "React.HTMLAttributes<HTMLDivElement>"
       }
     ],
-    "usage": "import { Recorder } from \"@/components/zoblocks/recorder\";\n\n// Ambient capture. The host owns getUserMedia; the component owns the truth\n// about what is arriving.\n<Recorder\n  variant=\"bars\"\n  phase=\"recording\"\n  source={analyser}\n  device={{ deviceId: \"jabra\", label: \"Jabra Link 380\" }}\n  expectedDevice={{ deviceId: \"jabra\", label: \"Jabra Link 380\" }}\n  onFault={(fault) => fault && report(fault.code)}\n/>\n\n// Reviewing the take. Peaks and speakers come from the ingest sidecar.\n<Recorder\n  variant=\"duet\"\n  phase=\"ready\"\n  peaks={peaks}\n  speakers={speakers}\n  position={0.44}\n  durationMs={754_000}\n  speakerLabels={[\"Dr Okafor\", \"Patient\"]}\n/>",
+    "usage": "import { Recorder } from \"@/components/zoblocks/recorder\";\n\n// Ambient capture. The host owns getUserMedia; the component owns the truth\n// about what is arriving.\n<Recorder\n  variant=\"bars\"\n  phase=\"recording\"\n  source={analyser}\n  device={{ deviceId: \"jabra\", label: \"Jabra Link 380\" }}\n  expectedDevice={{ deviceId: \"jabra\", label: \"Jabra Link 380\" }}\n  onFault={(fault) => fault && report(fault.code)}\n/>\n\n// Live transcript. Pass the recogniser's lag; past 4 s it says it stalled.\n<Recorder variant=\"stream\" phase=\"recording\" turns={turns} transcriptLagMs={lagMs} />\n\n// Reviewing the take. Peaks and speakers come from the ingest sidecar.\n<Recorder\n  variant=\"duet\"\n  phase=\"ready\"\n  peaks={peaks}\n  speakers={speakers}\n  position={0.44}\n  durationMs={754_000}\n  speakerLabels={[\"Dr Okafor\", \"Patient\"]}\n/>",
     "guidance": {
       "use": [
         "Ambient documentation and dictation, where the clinician is looking at the patient rather than the screen and needs to see at a glance that capture is working.",
@@ -12878,6 +12891,12 @@ export const CATALOG: ComponentDoc[] = [
             "required": false
           },
           {
+            "name": "now",
+            "type": "string",
+            "description": "The caller's clock, as ISO. A last change on this day shows a bare time; any other carries its day or date. Without it, the date is always shown.",
+            "required": false
+          },
+          {
             "name": "provenance",
             "type": "{ by: string; at: string; }",
             "description": "Who last changed anything in this group. The first question anyone asks.",
@@ -14700,7 +14719,7 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "keepScroll",
         "type": "boolean",
-        "description": "Restore each panel's scroll position when it is selected again. Off by default, because on a clinical surface returning to where somebody was is sometimes wrong.",
+        "description": "Restore each panel's scroll position when it is selected again. On by default; turn it off where returning somebody to where they were would be wrong.",
         "required": false
       },
       {
@@ -14885,7 +14904,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "keepScroll",
             "type": "boolean",
-            "description": "Restore each panel's scroll position when it is selected again. Off by default, because on a clinical surface returning to where somebody was is sometimes wrong.",
+            "description": "Restore each panel's scroll position when it is selected again. On by default; turn it off where returning somebody to where they were would be wrong.",
             "required": false
           },
           {

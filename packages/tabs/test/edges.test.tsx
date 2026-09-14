@@ -300,6 +300,144 @@ describe("audit timestamps come from the host's clock", () => {
   });
 });
 
+describe("a value that matches no trigger", () => {
+  const original = window.location.href;
+  afterEach(() => {
+    window.history.replaceState(null, "", original);
+  });
+
+  function stops() {
+    return screen.getAllByRole("tab").filter((tab) => tab.getAttribute("tabindex") === "0");
+  }
+
+  it("keeps the strip reachable when a controlled value matches nothing", () => {
+    render(
+      <Tabs.Root as="tabs" value="bogus">
+        <Tabs.List aria-label="Chart">
+          <Tabs.Trigger value="a" disabled disabledReason="Restricted">
+            Alpha
+          </Tabs.Trigger>
+          <Tabs.Trigger value="b">Bravo</Tabs.Trigger>
+          <Tabs.Trigger value="c">Charlie</Tabs.Trigger>
+        </Tabs.List>
+      </Tabs.Root>,
+    );
+    // Every trigger at -1 is a strip no keyboard can reach.
+    expect(stops()).toHaveLength(1);
+    expect(stops()[0]).toHaveAccessibleName("Bravo");
+  });
+
+  it("falls back to the first trigger when every one is disabled", () => {
+    render(
+      <Tabs.Root as="tabs" value="bogus">
+        <Tabs.List aria-label="Chart">
+          <Tabs.Trigger value="a" disabled disabledReason="Restricted">
+            Alpha
+          </Tabs.Trigger>
+          <Tabs.Trigger value="b" disabled disabledReason="Restricted">
+            Bravo
+          </Tabs.Trigger>
+        </Tabs.List>
+      </Tabs.Root>,
+    );
+    expect(stops()).toHaveLength(1);
+    expect(stops()[0]).toHaveAccessibleName("Alpha");
+  });
+
+  it("does not commit an unknown value from the URL", async () => {
+    window.history.replaceState(null, "", "?tab=bogus");
+    const onChange = vi.fn();
+    render(
+      <Tabs
+        as="tabs"
+        aria-label="Docs"
+        defaultValue="a"
+        syncTo="search"
+        onChange={onChange}
+        items={[
+          { value: "a", label: "Alpha" },
+          { value: "b", label: "Bravo" },
+        ]}
+      />,
+    );
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    expect(onChange).not.toHaveBeenCalledWith("bogus", expect.anything());
+    expect(screen.getByRole("tab", { name: "Alpha" })).toHaveAttribute("aria-selected", "true");
+    expect(stops()).toHaveLength(1);
+  });
+
+  it("ignores an unknown value from a later navigation", async () => {
+    const onChange = vi.fn();
+    render(
+      <Tabs
+        as="tabs"
+        aria-label="Docs"
+        defaultValue="a"
+        syncTo="hash"
+        onChange={onChange}
+        items={[
+          { value: "a", label: "Alpha" },
+          { value: "b", label: "Bravo" },
+        ]}
+      />,
+    );
+    await act(async () => {
+      window.history.replaceState(null, "", "#bogus");
+      window.dispatchEvent(new Event("popstate"));
+    });
+    expect(onChange).not.toHaveBeenCalled();
+    expect(screen.getByRole("tab", { name: "Alpha" })).toHaveAttribute("aria-selected", "true");
+  });
+
+  it("applies a URL value once a matching tab arrives", async () => {
+    window.history.replaceState(null, "", "#labs");
+    const first = [{ value: "a", label: "Alpha" }];
+    const { rerender } = render(
+      <Tabs as="tabs" aria-label="Docs" defaultValue="a" syncTo="hash" items={first} />,
+    );
+    // Tabs that load after mount still honour a deep link to one of them.
+    rerender(
+      <Tabs
+        as="tabs"
+        aria-label="Docs"
+        defaultValue="a"
+        syncTo="hash"
+        items={[...first, { value: "labs", label: "Labs" }]}
+      />,
+    );
+    await waitFor(() =>
+      expect(screen.getByRole("tab", { name: "Labs" })).toHaveAttribute("aria-selected", "true"),
+    );
+  });
+
+  it("drops a pending URL value once the user picks a tab", async () => {
+    window.history.replaceState(null, "", "#labs");
+    const first = [
+      { value: "a", label: "Alpha" },
+      { value: "b", label: "Bravo" },
+    ];
+    const { rerender } = render(
+      <Tabs as="tabs" aria-label="Docs" defaultValue="a" syncTo="hash" items={first} />,
+    );
+    await userEvent.setup().click(screen.getByRole("tab", { name: "Bravo" }));
+    rerender(
+      <Tabs
+        as="tabs"
+        aria-label="Docs"
+        defaultValue="a"
+        syncTo="hash"
+        items={[...first, { value: "labs", label: "Labs" }]}
+      />,
+    );
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    expect(screen.getByRole("tab", { name: "Bravo" })).toHaveAttribute("aria-selected", "true");
+  });
+});
+
 describe("URL sync after mount", () => {
   const original = window.location.href;
   afterEach(() => {

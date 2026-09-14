@@ -228,6 +228,56 @@ describe("dictation", () => {
   });
 });
 
+describe("feedback targets the message it was given on", () => {
+  it("records feedback on an older answer against that answer's exchange", async () => {
+    const events: TelemetryEvent[] = [];
+    const { result } = renderHook(() =>
+      useCopilot(baseOptions({ onTelemetry: (e) => void events.push(e) })),
+    );
+    await act(async () => {
+      await result.current.submit("first?");
+    });
+    await act(async () => {
+      await result.current.submit("second?");
+    });
+    await waitFor(() => expect(result.current.state.messages).toHaveLength(4));
+    const first = result.current.state.messages[1];
+    expect(first?.exchangeId).toBeDefined();
+    expect(first?.exchangeId).not.toBe(result.current.state.exchangeId);
+
+    act(() => result.current.sendFeedbackFor(first?.id ?? "", "down"));
+    expect(result.current.awaitingFeedbackReason).toBe(first?.id);
+
+    act(() => result.current.sendFeedbackFor(first?.id ?? "", "down", "wrong"));
+    expect(events.find((e) => e.type === "feedback")).toMatchObject({
+      exchangeId: first?.exchangeId,
+      reason: "wrong",
+    });
+    expect(result.current.awaitingFeedbackReason).toBeNull();
+  });
+
+  it("records a bare thumbs-down at once when the skin has no reason picker", async () => {
+    const events: TelemetryEvent[] = [];
+    const { result } = renderHook(() =>
+      useCopilot(baseOptions({ onTelemetry: (e) => void events.push(e) })),
+    );
+    await act(async () => {
+      await result.current.submit("first?");
+    });
+    await waitFor(() => expect(result.current.state.messages).toHaveLength(2));
+    const answer = result.current.state.messages[1];
+
+    act(() =>
+      result.current.sendFeedbackFor(answer?.id ?? "", "down", undefined, { askReason: false }),
+    );
+    const feedback = events.filter((e) => e.type === "feedback");
+    expect(feedback).toEqual([
+      { type: "feedback", exchangeId: answer?.exchangeId, rating: "down" },
+    ]);
+    expect(result.current.awaitingFeedbackReason).toBeNull();
+  });
+});
+
 describe("verification signal", () => {
   it("emits sources-opened with a source count when the drawer opens", async () => {
     const events: TelemetryEvent[] = [];
@@ -245,6 +295,68 @@ describe("verification signal", () => {
     const opened = events.find((e) => e.type === "sources-opened");
     expect(opened).toMatchObject({ sourceCount: 1 });
     expect(result.current.sourcesOpen).toBe(true);
+  });
+
+  it("starts the verification clock for an answer that arrives with a proposal", async () => {
+    const withProposal: CopilotEvent[] = [
+      ...grounded.slice(0, -1),
+      {
+        type: "proposal",
+        proposal: { id: "p1", kind: "note-text", summary: "Add", content: "AF, rate controlled." },
+      },
+      { type: "done", finish: "stop" },
+    ];
+    let clock = 1_000;
+    const now = vi.spyOn(Date, "now").mockImplementation(() => clock);
+    const events: TelemetryEvent[] = [];
+    const { result } = renderHook(() =>
+      useCopilot(
+        baseOptions({
+          provider: createStaticProvider({ events: withProposal, disclosure }),
+          onTelemetry: (e) => void events.push(e),
+        }),
+      ),
+    );
+    await act(async () => {
+      await result.current.submit("summarise for the note");
+    });
+    await waitFor(() => expect(result.current.state.status).toBe("proposing"));
+
+    clock = 4_000;
+    act(() => result.current.openSources());
+    now.mockRestore();
+    expect(events.find((e) => e.type === "sources-opened")).toMatchObject({ msToOpen: 3_000 });
+  });
+
+  it("opens the sources of the message asked for, not the latest answer", async () => {
+    const other: Source = { ...source, id: "s2", title: "Second guideline" };
+    let call = 0;
+    const provider = {
+      ...createStaticProvider({ events: grounded, disclosure }),
+      async *send() {
+        call += 1;
+        const cited = call === 1 ? source : other;
+        yield { type: "delta", text: "Rate control is reasonable." } as const;
+        yield { type: "citation", marker: call === 1 ? 1 : 3, source: cited } as const;
+        yield { type: "done", finish: "stop" } as const;
+      },
+    };
+    const { result } = renderHook(() => useCopilot(baseOptions({ provider: provider as never })));
+    await act(async () => {
+      await result.current.submit("first?");
+    });
+    await act(async () => {
+      await result.current.submit("second?");
+    });
+    await waitFor(() => expect(result.current.state.messages).toHaveLength(4));
+
+    const firstAnswer = result.current.state.messages[1];
+    act(() => result.current.openSourcesFor(firstAnswer?.id ?? ""));
+    expect(result.current.sources.map((s) => s.id)).toEqual(["s1"]);
+    expect(result.current.citations.map((c) => c.marker)).toEqual([1]);
+
+    act(() => result.current.openSources());
+    expect(result.current.citations).toEqual([{ marker: 3, source: other }]);
   });
 
   it("closes the drawer", async () => {
@@ -302,6 +414,101 @@ describe("proposals", () => {
     });
     await waitFor(() => expect(result.current.proposal?.id).toBe("p1"));
     expect(result.current.state.status).toBe("proposing");
+  });
+
+  it("reports a prohibited proposal as a contract violation instead of throwing", async () => {
+    const dosing: CopilotEvent[] = withProposal.map((event) =>
+      event.type === "proposal"
+        ? { ...event, proposal: { ...event.proposal, content: "Start bisoprolol 2.5 mg od." } }
+        : event,
+    );
+    // Look up with dosing forbidden, so the dose in the proposal is prohibited.
+    const noDosing = { ...lookUp, output: { ...lookUp.output, forbidDosing: true } };
+    const { result } = renderHook(() =>
+      useCopilot(
+        baseOptions({
+          modes: [noDosing],
+          provider: createStaticProvider({ events: dosing, disclosure }),
+        }),
+      ),
+    );
+    await act(async () => {
+      await result.current.submit("summarise for the note");
+    });
+    await waitFor(() => expect(result.current.proposal).not.toBeNull());
+
+    expect(() => act(() => result.current.confirm())).not.toThrow();
+    expect(result.current.proposal).toBeNull();
+    expect(result.current.state.error?.code).toBe("contract-violation");
+  });
+
+  it("exposes no proposal mid-stream, only once the checks have run", async () => {
+    let release = () => {};
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const provider = {
+      ...createStaticProvider({ events: [], disclosure }),
+      async *send() {
+        for (const event of withProposal) {
+          if (event.type === "done") await gate;
+          yield event;
+        }
+      },
+    };
+    const { result } = renderHook(() => useCopilot(baseOptions({ provider: provider as never })));
+    let pending: Promise<void> = Promise.resolve();
+    act(() => {
+      pending = result.current.submit("summarise for the note");
+    });
+    await waitFor(() => expect(result.current.state.proposal).not.toBeNull());
+    expect(result.current.state.status).toBe("streaming");
+    expect(result.current.proposal).toBeNull();
+    expect(result.current.proposalRisk).toBeNull();
+
+    await act(async () => {
+      release();
+      await pending;
+    });
+    expect(result.current.proposal?.id).toBe("p1");
+    expect(result.current.proposalRisk).toBe("routine");
+  });
+
+  it("classifies a proposal the mode forbids as prohibited", async () => {
+    const dosing: CopilotEvent[] = withProposal.map((event) =>
+      event.type === "proposal"
+        ? { ...event, proposal: { ...event.proposal, content: "Start bisoprolol 2.5 mg od." } }
+        : event,
+    );
+    const noDosing = { ...lookUp, output: { ...lookUp.output, forbidDosing: true } };
+    const { result } = renderHook(() =>
+      useCopilot(
+        baseOptions({
+          modes: [noDosing],
+          provider: createStaticProvider({ events: dosing, disclosure }),
+        }),
+      ),
+    );
+    await act(async () => {
+      await result.current.submit("summarise for the note");
+    });
+    await waitFor(() => expect(result.current.proposal).not.toBeNull());
+    expect(result.current.proposalRisk).toBe("prohibited");
+  });
+
+  it("drops the proposal when the mode changes", async () => {
+    const { result } = renderHook(() =>
+      useCopilot(
+        baseOptions({ provider: createStaticProvider({ events: withProposal, disclosure }) }),
+      ),
+    );
+    await act(async () => {
+      await result.current.submit("summarise for the note");
+    });
+    await waitFor(() => expect(result.current.proposal).not.toBeNull());
+
+    act(() => result.current.setMode("prepare"));
+    expect(result.current.proposal).toBeNull();
   });
 
   it("records dwell time and reflexiveness on confirm", async () => {

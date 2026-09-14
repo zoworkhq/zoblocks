@@ -1200,6 +1200,21 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
     }
   }, []);
 
+  /*
+   * A pending long press or submenu hover belongs to the subject it began on.
+   * Left running, a row removed or recycled mid-press still opened a menu —
+   * and told the host so — for a patient no longer on screen. Keyed on the
+   * record, not the object, so an inline `subject={{…}}` does not cancel it.
+   */
+  const subjectKey = `${subject.resource}/${subject.id}`;
+  React.useEffect(
+    () => () => {
+      cancelPress();
+      cancelSubTimer();
+    },
+    [subjectKey, cancelPress, cancelSubTimer],
+  );
+
   const closeSub = React.useCallback(
     (returnFocus: boolean) => {
       cancelSubTimer();

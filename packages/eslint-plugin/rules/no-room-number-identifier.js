@@ -14,7 +14,7 @@
  * The failure this prevents is a banner that satisfies the two-identifier type
  * with a name and a bed, which is one identifier and a piece of geography.
  *
- * See ACCESSIBILITY.md, CONTENT.md § Identity and people, and the Identity
+ * See ENGINEERING.md §6, CONTENT.md § Identity and people, and the Identity
  * brief §3.
  */
 

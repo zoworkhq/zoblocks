@@ -202,6 +202,69 @@ describe("a designer who edited the file", () => {
   });
 });
 
+describe("a theme with values that are not colours", () => {
+  // The shape of `--zb-duration-identity-swap` in tokens/semantic/shared.json.
+  const withDuration: ResolvedPayload = {
+    ...payload,
+    semantic: {
+      light: { ...payload.semantic.light, "--zb-duration-identity-swap": "180ms" },
+      dark: { ...payload.semantic.dark, "--zb-duration-identity-swap": "180ms" },
+      "high-contrast": {
+        ...payload.semantic["high-contrast"],
+        "--zb-duration-identity-swap": "180ms",
+      },
+    },
+  };
+
+  it("applies the whole pull rather than stopping at the first string", async () => {
+    await pull(withDuration);
+    const swap = figma.variable("--zb-duration-identity-swap")!;
+    expect(swap.resolvedType).toBe("STRING");
+    expect(Object.values(swap.valuesByMode)).toEqual(["180ms", "180ms", "180ms"]);
+    expect(figma.variable("--zb-status-critical")).toBeDefined();
+  });
+
+  it("sees the string variable on the next read, so pulling again writes nothing", async () => {
+    await pull(withDuration);
+    figma.settle();
+
+    const { preview } = await pull(withDuration);
+
+    expect(preview.diff.create).toEqual([]);
+    expect(figma.total).toBe(0);
+  });
+
+  it("refuses before writing anything when a variable's type no longer fits", async () => {
+    const fresh = new FakeFigma();
+    const semantic = fresh.seedCollection("ZoBlocks / Semantic", ["light", "dark"]);
+    // A previous pull made this a colour; the theme now says it is a string.
+    fresh.seedVariable("--zb-motion", "motion", semantic, {}, { type: "COLOR" });
+
+    await expect(
+      applyPull(fresh.api(), {
+        write: [
+          {
+            token: "--zb-text",
+            name: "text",
+            tier: "semantic",
+            collection: "ZoBlocks / Semantic",
+            values: { light: { kind: "color", hex: "#16181d", rgb: hexToFigmaRgb("#16181d")! } },
+          },
+          {
+            token: "--zb-motion",
+            name: "motion",
+            tier: "semantic",
+            collection: "ZoBlocks / Semantic",
+            values: { light: { kind: "string", value: "180ms" } },
+          },
+        ],
+        pin: { slug: "clinical", version: 1 },
+      }),
+    ).rejects.toThrowError(/motion.*COLOR.*STRING/);
+    expect(fresh.total).toBe(0);
+  });
+});
+
 describe("moving between versions", () => {
   it("re-pins, and writes only what changed", async () => {
     await pull();
@@ -270,8 +333,9 @@ describe("the file in states nobody planned for", () => {
   });
 
   it("writes a variable that is not a colour", async () => {
-    // Figma collections hold strings and numbers too. The adapter has a branch
-    // for each and neither is reachable from a theme today.
+    // Reachable from a theme: a duration like "180ms" is not a hex, so the plan
+    // carries it as a string. Figma rejects a string on a COLOR variable, so the
+    // variable must be created with the type its values need.
     await applyPull(figma.api(), {
       write: [
         {
@@ -294,6 +358,8 @@ describe("the file in states nobody planned for", () => {
 
     const family = figma.variable("--zb-font-family")!;
     const radius = figma.variable("--zb-radius-md")!;
+    expect(family.resolvedType).toBe("STRING");
+    expect(radius.resolvedType).toBe("FLOAT");
     expect(Object.values(family.valuesByMode)).toEqual(["Inter"]);
     expect(Object.values(radius.valuesByMode)).toEqual([8]);
   });

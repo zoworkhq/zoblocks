@@ -363,12 +363,19 @@ export abstract class ZbLoaderElement extends ElementBase {
 
   connectedCallback(): void {
     this.#build();
+    // Re-connected while showing (a framework moved the node): disconnect
+    // cleared the timers, and #syncGate returns early for a visible loader.
+    if (this.#visible && this.isOpen) this.#arm();
     this.#syncGate();
     document.addEventListener("visibilitychange", this.#onVisibilityChange);
   }
 
   disconnectedCallback(): void {
     this.#clearTimers();
+    // The hold timer is gone, so nothing would ever clear the hold. Drop it
+    // with its pending close; connect re-arms or closes as the state demands.
+    this.#held = false;
+    this.#pendingClose = false;
     document.removeEventListener("visibilitychange", this.#onVisibilityChange);
   }
 
@@ -452,7 +459,18 @@ export abstract class ZbLoaderElement extends ElementBase {
   #show(): void {
     this.#visible = true;
     this.#applyVisibility();
+    this.#arm();
+    this.#render();
+    this.dispatchEvent(new CustomEvent("zb-loader-show", { bubbles: true, composed: true }));
+  }
 
+  /**
+   * Start the minimum-duration hold and the stall countdown.
+   *
+   * Also called on re-connect, which restarts both from zero rather than
+   * reading the clock: a moved loader may stay up to one extra min-duration.
+   */
+  #arm(): void {
     const minDuration = this.minDuration;
     clearTimeout(this.#holdTimer);
     this.#held = minDuration > 0;
@@ -464,12 +482,10 @@ export abstract class ZbLoaderElement extends ElementBase {
       }, minDuration);
     }
 
-    this.#render();
-    this.dispatchEvent(new CustomEvent("zb-loader-show", { bubbles: true, composed: true }));
-
     const slowAfter = this.slowAfter;
     clearTimeout(this.#slowTimer);
-    if (slowAfter > 0) {
+    // A loader already showing the stall wording does not announce it twice.
+    if (slowAfter > 0 && !this.#slow) {
       this.#slowTimer = setTimeout(() => {
         this.#slow = true;
         this.#render();

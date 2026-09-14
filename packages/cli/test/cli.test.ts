@@ -5,7 +5,7 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -492,6 +492,68 @@ describe("registry resolution", () => {
     expect(() => resolveSpecifier("@zoblocks-pro", config, {})).toThrowError(RegistryError);
   });
 
+  /*
+   * ADR 0016: a bare dependency means "the registry this item came from". An
+   * item fetched by URL resolving its bare names against zoblocks.design sent
+   * a mirror's installs back to production.
+   */
+  it("resolves a bare dependency of a URL item beside that item, not in the public catalog", async () => {
+    const seen: Array<{ url: string; headers: Headers }> = [];
+    const lib = (name: string) => ({
+      name,
+      type: "zoblocks:lib",
+      title: name,
+      description: "",
+      files: [{ path: `${name}.ts`, type: "zoblocks:lib", target: `${name}.ts`, content: "x\n" }],
+    });
+
+    const items = await collectItems(["https://mirror.example/r/panel.json"], config, {
+      env: {},
+      fetchImpl: stubFetch(
+        {
+          "https://mirror.example/r/panel.json": item({ registryDependencies: ["utils"] }),
+          "https://mirror.example/r/utils.json": lib("utils"),
+          "https://zoblocks.design/r/utils.json": lib("public-utils"),
+        },
+        seen,
+      ),
+    });
+
+    expect(items.map((i) => i.name)).toEqual(["utils", "vitals-panel"]);
+    expect(seen.map((s) => s.url)).not.toContain("https://zoblocks.design/r/utils.json");
+  });
+
+  it("refuses a bare dependency that would climb out of the item's registry", async () => {
+    await expect(
+      collectItems(["https://mirror.example/r/panel.json"], config, {
+        env: {},
+        fetchImpl: stubFetch({
+          "https://mirror.example/r/panel.json": item({
+            registryDependencies: ["//evil.example/x"],
+          }),
+          // Served, so only a refusal (not a 404) passes.
+          "https://evil.example/x.json": item({ name: "x" }),
+          "https://zoblocks.design/r///evil.example/x.json": item({ name: "x" }),
+        }),
+      }),
+    ).rejects.toThrowError(RegistryError);
+  });
+
+  it("keeps a bare dependency of a public item in the public catalog", async () => {
+    const seen: Array<{ url: string; headers: Headers }> = [];
+    await collectItems(["vitals-panel"], config, {
+      env: {},
+      fetchImpl: stubFetch(
+        {
+          "https://zoblocks.design/r/vitals-panel.json": item({ registryDependencies: ["utils"] }),
+          "https://zoblocks.design/r/utils.json": item({ name: "utils" }),
+        },
+        seen,
+      ),
+    });
+    expect(seen.map((s) => s.url)).toContain("https://zoblocks.design/r/utils.json");
+  });
+
   it("orders a shared dependency before both of its dependents", async () => {
     const shared = {
       name: "core",
@@ -927,6 +989,82 @@ describe("writing", () => {
         }),
       }),
     ).rejects.toThrowError(/want to write .*same\.tsx/);
+  });
+
+  /*
+   * The lexical check passes a path that walks through a symlink, so the
+   * directory on disk is what gets checked. Reproduced by a reviewer: a linked
+   * `components/` wrote into whatever it pointed at.
+   */
+  it("refuses to write through a symlinked directory that leaves the project", async () => {
+    await writeFile(path.join(dir, "zoblocks.json"), JSON.stringify({ root: ".", registries: {} }));
+    const outside = await mkdtemp(path.join(tmpdir(), "zoblocks-outside-"));
+    try {
+      await symlink(outside, path.join(dir, "components"), "dir");
+      const out = capture();
+
+      await expect(
+        run({
+          argv: ["add", "vitals-panel", "--no-deps"],
+          cwd: dir,
+          env: {},
+          out: out.write,
+          err: out.write,
+          version: "0.0.0",
+          fetchImpl: stubFetch({ "https://zoblocks.design/r/vitals-panel.json": item() }),
+        }),
+      ).rejects.toThrowError(/outside the project/);
+      expect(existsSync(path.join(outside, "zoblocks/vitals-panel.tsx"))).toBe(false);
+    } finally {
+      await rm(outside, { recursive: true, force: true });
+    }
+  });
+
+  it("refuses to overwrite a target that is itself a symlink", async () => {
+    await writeFile(path.join(dir, "zoblocks.json"), JSON.stringify({ root: ".", registries: {} }));
+    const outside = await mkdtemp(path.join(tmpdir(), "zoblocks-outside-"));
+    try {
+      const victim = path.join(outside, "victim.txt");
+      await writeFile(victim, "theirs\n");
+      await mkdir(path.join(dir, "components/zoblocks"), { recursive: true });
+      await symlink(victim, path.join(dir, "components/zoblocks/vitals-panel.tsx"));
+      const out = capture();
+
+      await expect(
+        run({
+          argv: ["add", "vitals-panel", "--no-deps", "--overwrite"],
+          cwd: dir,
+          env: {},
+          out: out.write,
+          err: out.write,
+          version: "0.0.0",
+          fetchImpl: stubFetch({ "https://zoblocks.design/r/vitals-panel.json": item() }),
+        }),
+      ).rejects.toThrowError(/symlink/);
+      expect(await readFile(victim, "utf8")).toBe("theirs\n");
+    } finally {
+      await rm(outside, { recursive: true, force: true });
+    }
+  });
+
+  it("still writes through a symlink that stays inside the project", async () => {
+    await writeFile(path.join(dir, "zoblocks.json"), JSON.stringify({ root: ".", registries: {} }));
+    await mkdir(path.join(dir, "real"));
+    await symlink(path.join(dir, "real"), path.join(dir, "components"), "dir");
+    const out = capture();
+
+    const code = await run({
+      argv: ["add", "vitals-panel", "--no-deps"],
+      cwd: dir,
+      env: {},
+      out: out.write,
+      err: out.write,
+      version: "0.0.0",
+      fetchImpl: stubFetch({ "https://zoblocks.design/r/vitals-panel.json": item() }),
+    });
+
+    expect(code).toBe(0);
+    expect(existsSync(path.join(dir, "real/zoblocks/vitals-panel.tsx"))).toBe(true);
   });
 });
 

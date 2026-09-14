@@ -28,7 +28,7 @@
     "name": "react \u2014 the whole barrel",
     "path": "packages/react/dist/index.js",
     "import": "*",
-    "limit": "113 KB",
+    "limit": "117.5 KB",
     "ignore": ["react", "react-dom"]
   },
   {
@@ -101,7 +101,7 @@
     "name": "react \u2014 copilot alone (pattern layer: pulls copilot-core and copilot-react)",
     "path": "packages/react/dist/components/copilot/copilot.js",
     "import": "{ Copilot }",
-    "limit": "24 KB",
+    "limit": "29 KB",
     "ignore": ["react", "react-dom"]
   },
   {

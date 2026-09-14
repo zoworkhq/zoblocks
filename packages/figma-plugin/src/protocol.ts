@@ -95,16 +95,53 @@ export function readPluginMessage(data: unknown): FromUi | undefined {
   if (typeof data !== "object" || data === null) return undefined;
   const message = (data as { pluginMessage?: unknown }).pluginMessage ?? data;
   if (typeof message !== "object" || message === null) return undefined;
-  const type = (message as { type?: unknown }).type;
+  const fields = message as { type?: unknown; width?: unknown; height?: unknown };
   const accepted = ["ready", "inspect", "resize", "connect", "disconnect", "preview", "apply"];
-  return accepted.includes(type as string) ? (message as FromUi) : undefined;
+  if (!accepted.includes(fields.type as string)) return undefined;
+
+  // `Math.max(380, NaN)` is NaN, so a resize is two finite numbers or nothing.
+  if (
+    fields.type === "resize" &&
+    !(isFiniteNumber(fields.width) && isFiniteNumber(fields.height))
+  ) {
+    return undefined;
+  }
+  // The shape only. `saveCredential` decides whether the values are a key.
+  if (fields.type === "connect") {
+    const credential = (message as { credential?: unknown }).credential;
+    if (typeof credential !== "object" || credential === null) return undefined;
+    const { origin, token } = credential as { origin?: unknown; token?: unknown };
+    if (typeof origin !== "string" || typeof token !== "string") return undefined;
+  }
+  return message as FromUi;
 }
 
+/**
+ * The panel's side. The envelope is required: Figma always wraps what the
+ * sandbox posts, so a bare message came from something else.
+ */
 export function readUiMessage(data: unknown): ToUi | undefined {
   if (typeof data !== "object" || data === null) return undefined;
-  const message = (data as { pluginMessage?: unknown }).pluginMessage ?? data;
+  const message = (data as { pluginMessage?: unknown }).pluginMessage;
   if (typeof message !== "object" || message === null) return undefined;
   const type = (message as { type?: unknown }).type;
   const accepted = ["collections", "report", "standing", "preview", "applied", "error"];
   return accepted.includes(type as string) ? (message as ToUi) : undefined;
+}
+
+/**
+ * A message event, accepted only from `host` — the window Figma relays the
+ * sandbox through. Any other frame that can reach the panel is refused, since
+ * a `standing` message carries the credential the panel spends.
+ */
+export function readUiEvent(
+  event: { source: unknown; data: unknown },
+  host: unknown,
+): ToUi | undefined {
+  if (host === null || host === undefined || event.source !== host) return undefined;
+  return readUiMessage(event.data);
+}
+
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value);
 }

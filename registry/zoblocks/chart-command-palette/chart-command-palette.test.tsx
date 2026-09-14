@@ -448,6 +448,49 @@ describe("the keyboard model", () => {
     );
   });
 
+  it("keeps an option active when the results shrink under it", async () => {
+    const onRun = vi.fn();
+    const { rerender } = render(<ChartCommandPalette open items={items} onRun={onRun} />);
+    const input = screen.getByRole("combobox");
+
+    await userEvent.type(input, "phq");
+    await userEvent.keyboard("{ArrowDown}");
+    expect(input.getAttribute("aria-activedescendant")).toBe(
+      `${screen.getByRole("listbox").id}-phq-doc`,
+    );
+
+    // Same query, fewer items: the highlight must not point past the end.
+    rerender(
+      <ChartCommandPalette
+        open
+        items={items.filter((item) => item.id !== "phq-doc")}
+        onRun={onRun}
+      />,
+    );
+    expect(input.getAttribute("aria-activedescendant")).toBe(
+      `${screen.getByRole("listbox").id}-phq`,
+    );
+    await userEvent.keyboard("{Enter}");
+    expect(onRun).toHaveBeenCalledWith(expect.objectContaining({ id: "phq" }));
+  });
+
+  it("highlights the first result that arrives after arrowing an empty list", async () => {
+    const { rerender } = render(<ChartCommandPalette open items={items} />);
+    const input = screen.getByRole("combobox");
+
+    await userEvent.type(input, "ferritin");
+    await userEvent.keyboard("{ArrowDown}");
+    rerender(
+      <ChartCommandPalette
+        open
+        items={[...items, { id: "ferritin", kind: "chart-resource", label: "Ferritin, 14 Aug" }]}
+      />,
+    );
+    expect(input.getAttribute("aria-activedescendant")).toBe(
+      `${screen.getByRole("listbox").id}-ferritin`,
+    );
+  });
+
   it("accepts an argument with Tab", async () => {
     render(<ChartCommandPalette open items={items} />);
     const input = screen.getByRole("combobox") as HTMLInputElement;

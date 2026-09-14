@@ -16,6 +16,7 @@ import type {
   FigmaWritableVariable,
   FigmaWriteApi,
 } from "../src/sandbox/api";
+import { isAlias, isRgba } from "../src/sandbox/api";
 
 export interface Writes {
   createdCollections: string[];
@@ -141,9 +142,9 @@ export class FakeFigma {
     name: string,
     collection: FigmaWritableCollection,
     values: Record<string, FigmaVariableValue>,
-    options: { description?: string; locked?: string } = {},
+    options: { description?: string; locked?: string; type?: VariableType } = {},
   ): FigmaWritableVariable {
-    const variable = this.makeVariable(name, collection);
+    const variable = this.makeVariable(name, collection, options.type ?? "COLOR");
     this.writes.createdVariables.pop();
     variable.setPluginData("ox.token", token);
     if (options.locked) variable.setPluginData("ox.locked", options.locked);
@@ -156,7 +157,11 @@ export class FakeFigma {
     return variable;
   }
 
-  private makeVariable(name: string, collection: FigmaWritableCollection): FigmaWritableVariable {
+  private makeVariable(
+    name: string,
+    collection: FigmaWritableCollection,
+    type: VariableType,
+  ): FigmaWritableVariable {
     const writes = this.writes;
     const data = new Map<string, string>();
     let description = "";
@@ -164,7 +169,7 @@ export class FakeFigma {
 
     const variable: FigmaWritableVariable = {
       id: this.id(),
-      resolvedType: "COLOR",
+      resolvedType: type,
       variableCollectionId: collection.id,
       valuesByMode: {},
       get name() {
@@ -182,6 +187,13 @@ export class FakeFigma {
         description = next;
       },
       setValueForMode: (modeId, value) => {
+        // Real Figma throws on a value of the wrong type, alias targets included.
+        const actual = isAlias(value)
+          ? this.vars.find((v) => v.id === value.id)?.resolvedType
+          : typeOfValue(value);
+        if (actual !== type) {
+          throw new Error(`Mismatched type: ${name} is ${type}, got ${actual ?? "unknown"}`);
+        }
         writes.values += 1;
         variable.valuesByMode[modeId] = value;
       },
@@ -202,13 +214,25 @@ export class FakeFigma {
       clientStorage: this.clientStorage,
       variables: {
         getLocalVariableCollectionsAsync: () => Promise.resolve([...this.collections]),
-        getLocalVariablesAsync: () => Promise.resolve([...this.vars]),
+        // Filtered like Figma's, so a read that asks for one type misses the rest.
+        getLocalVariablesAsync: (type) =>
+          Promise.resolve(this.vars.filter((v) => !type || v.resolvedType === type)),
         getVariableByIdAsync: (id) => Promise.resolve(this.vars.find((v) => v.id === id) ?? null),
         getVariableCollectionByIdAsync: (id) =>
           Promise.resolve(this.collections.find((c) => c.id === id) ?? null),
         createVariableCollection: (name) => this.makeCollection(name, ["Mode 1"]),
-        createVariable: (name, collection) => this.makeVariable(name, collection),
+        createVariable: (name, collection, type) => this.makeVariable(name, collection, type),
       },
     };
   }
+}
+
+type VariableType = "COLOR" | "STRING" | "FLOAT" | "BOOLEAN";
+
+function typeOfValue(value: FigmaVariableValue): VariableType | undefined {
+  if (isRgba(value)) return "COLOR";
+  if (typeof value === "string") return "STRING";
+  if (typeof value === "number") return "FLOAT";
+  if (typeof value === "boolean") return "BOOLEAN";
+  return undefined;
 }

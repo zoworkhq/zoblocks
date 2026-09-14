@@ -19,6 +19,7 @@ export * from "./icons.js";
 export {
   useCopilot,
   type CopilotApi,
+  type CopilotCitation,
   type CopilotThreadSummary,
   type ScopeSummary,
   type UseCopilotOptions,

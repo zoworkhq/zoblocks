@@ -24,6 +24,7 @@ interface Spec {
   name: string;
   collection: string;
   token?: string;
+  type?: string;
   values: Record<string, FigmaVariableValue>;
 }
 
@@ -31,7 +32,7 @@ function fakeFigma(collections: FigmaVariableCollection[], specs: Spec[]): Figma
   const variables: FigmaVariable[] = specs.map((spec) => ({
     id: spec.id,
     name: spec.name,
-    resolvedType: "COLOR",
+    resolvedType: spec.type ?? "COLOR",
     variableCollectionId: spec.collection,
     valuesByMode: spec.values,
     getPluginData: (key: string) => (key === TOKEN_KEY ? (spec.token ?? "") : ""),
@@ -40,7 +41,9 @@ function fakeFigma(collections: FigmaVariableCollection[], specs: Spec[]): Figma
   return {
     variables: {
       getLocalVariableCollectionsAsync: () => Promise.resolve(collections),
-      getLocalVariablesAsync: () => Promise.resolve(variables),
+      // Filtered like Figma's: asking for one type returns only that type.
+      getLocalVariablesAsync: (type?: string) =>
+        Promise.resolve(variables.filter((v) => !type || v.resolvedType === type)),
     },
   };
 }
@@ -250,5 +253,33 @@ describe("values that are not colours", () => {
     // A boolean is a Figma variable type this plugin has no reading for, and
     // inventing one would put it in a contrast table.
     expect(snapshot.variables[2]!.values.default).toBeUndefined();
+  });
+
+  it("reads STRING and FLOAT variables, and does not count them as colours", async () => {
+    const figma = fakeFigma(
+      [BRAND],
+      [
+        { id: "v1", name: "brand/600", collection: "c1", values: { m1: rgb("#1d63c9") } },
+        {
+          id: "v2",
+          name: "duration",
+          collection: "c1",
+          token: "--zb-duration",
+          type: "STRING",
+          values: { m1: "180ms" },
+        },
+        { id: "v3", name: "radius", collection: "c1", type: "FLOAT", values: { m1: 8 } },
+      ],
+    );
+
+    const { snapshot, collections } = await readFile(figma);
+    // Missing from the read, a pulled string shows as "create" on every preview.
+    // The unstamped number is somebody's own, and the gate has no use for it.
+    expect(snapshot.variables.map((v) => v.token ?? v.name)).toEqual([
+      "brand/600",
+      "--zb-duration",
+    ]);
+    expect(snapshot.variables[1]!.values.default).toEqual({ kind: "string", value: "180ms" });
+    expect(collections[0]).toMatchObject({ stamped: 0, colours: 1 });
   });
 });

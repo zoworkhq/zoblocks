@@ -276,6 +276,30 @@ export function nextGridSort<Row>(
   return null;
 }
 
+/** "<x" sits just below x and ">x" just above, with "<=" and ">=" between. */
+const COMPARATOR_BIAS: Readonly<Record<string, number>> = {
+  "<": -2,
+  "<=": -1,
+  "": 0,
+  ">=": 1,
+  ">": 2,
+};
+
+const QUANTITY = /^\s*(<=|>=|<|>)?\s*([-+]?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?)\s*$/i;
+
+/**
+ * A value as a quantity, or `undefined` when it is text.
+ *
+ * Labs report beyond their range as ">90" or "<0.01". Those are numbers with a
+ * bound, and `Number(">90")` is NaN — which leaves an out-of-range troponin
+ * wherever it happened to land.
+ */
+function gridQuantity(value: GridValue): { at: number; bias: number } | undefined {
+  if (typeof value === "number") return Number.isFinite(value) ? { at: value, bias: 0 } : undefined;
+  const match = QUANTITY.exec(String(value));
+  return match ? { at: Number(match[2]), bias: COMPARATOR_BIAS[match[1] ?? ""] ?? 0 } : undefined;
+}
+
 /**
  * Compare two cell values.
  *
@@ -299,7 +323,12 @@ export function compareGridValues(
   if (bAbsent) return -1;
 
   if (kind === "number" || kind === "measure") {
-    return Number(a) - Number(b);
+    const qa = gridQuantity(a);
+    const qb = gridQuantity(b);
+    if (qa && qb) return qa.at === qb.at ? qa.bias - qb.bias : qa.at < qb.at ? -1 : 1;
+    // Text in a quantity column goes after every number; two texts fall
+    // through and compare as text.
+    if (qa || qb) return qa ? -1 : 1;
   }
 
   if (kind === "status" && order) {
@@ -329,17 +358,21 @@ export function sortGridRows<Row>(
 ): Row[] {
   if (!column) return [...rows];
   const sign = direction === "ascending" ? 1 : -1;
+  const quantitative = column.kind === "number" || column.kind === "measure";
 
   // Decorate–sort–undecorate: `value` is caller code and may be expensive, and
   // a comparator calls it O(n log n) times. This calls it once per row.
   return rows
-    .map((row, index) => ({ row, index, value: column.value(row) }))
+    .map((row, index) => {
+      const value = column.value(row);
+      // 0 a value, 1 text in a quantity column, 2 absent.
+      const tier = isGridAbsent(value) ? 2 : quantitative && !gridQuantity(value) ? 1 : 0;
+      return { row, index, value, tier };
+    })
     .sort((a, b) => {
-      const absent = isGridAbsent(a.value) ? 1 : 0;
-      const bAbsent = isGridAbsent(b.value) ? 1 : 0;
-      // Applied before the sign so that absence stays at the bottom when the
-      // direction flips, rather than being promoted to the top.
-      if (absent !== bAbsent) return absent - bAbsent;
+      // Applied before the sign so that absence (and text among numbers) stays
+      // at the bottom when the direction flips, rather than being promoted.
+      if (a.tier !== b.tier) return a.tier - b.tier;
 
       const compared = compareGridValues(a.value, b.value, column.kind, column.order);
       // Stable on ties, so re-sorting by a column full of equal values does not

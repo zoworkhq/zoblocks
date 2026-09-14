@@ -1,16 +1,45 @@
 {
   "name": "@zoblocks/figma-core",
   "version": "0.1.0",
-  "type": "module",
-  "private": false,
   "description": "ZoBlocks themes as Figma variable plans. Pure — no figma.*, no DOM, no network.",
+  "license": "MIT",
+  "homepage": "https://zoblocks.design",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zoworkhq/zoblocks.git",
+    "directory": "packages/figma-core"
+  },
+  "keywords": [
+    "figma",
+    "figma-variables",
+    "design-tokens",
+    "design-system",
+    "healthcare"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
     "./package.json": "./package.json"
   },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=20.11.0"
+  },
   "publishConfig": {
+    "access": "public",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
     "exports": {
-      ".": "./dist/index.js",
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
       "./package.json": "./package.json"
     }
   },
@@ -24,9 +53,9 @@
     "@zoblocks/tokens": "workspace:*"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "^4.1.11",
     "@zoblocks/tsconfig": "workspace:*",
-    "@vitest/coverage-v8": "^4.1.10",
     "typescript": "^5.7.2",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.11"
   }
 }
