@@ -276,7 +276,10 @@ function Tabs({ items, activeKey, defaultActiveKey, onChange, className, ...rest
               role="tab"
               id={`${id}-tab-${item.key}`}
               aria-selected={selected}
-              aria-controls={`${id}-panel-${item.key}`}
+              // Only the active item's panel is ever rendered, and only when it
+              // has children. A reference to a panel that is not in the page is
+              // invalid ARIA, and axe fails the docs host chrome on it.
+              aria-controls={selected && item.children ? `${id}-panel-${item.key}` : undefined}
               // Roving tabindex, as APG's tab pattern requires: the strip is
               // one tab stop rather than one per tab.
               tabIndex={selected ? 0 : -1}

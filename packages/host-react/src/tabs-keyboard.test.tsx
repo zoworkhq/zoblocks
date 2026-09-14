@@ -47,6 +47,43 @@ function Strip({ onChange }: { onChange?: (key: string) => void }) {
 
 const tab = (name: string) => screen.getByRole("tab", { name });
 
+/**
+ * `aria-controls` must name an element that exists. The docs page's host
+ * chrome renders a strip with no panels, and axe failed five component pages
+ * on `aria-valid-attr-value` because every tab pointed at a panel never drawn.
+ */
+describe("the zoblocks host's tabs point only at panels that exist", () => {
+  function Bare({ withPanels }: { withPanels: boolean }) {
+    const { Tabs } = useHost();
+    return (
+      <Tabs
+        aria-label="Sections"
+        items={[
+          { key: "results", label: "Results", ...(withPanels ? { children: <p>R</p> } : {}) },
+          { key: "trend", label: "Trend", ...(withPanels ? { children: <p>T</p> } : {}) },
+        ]}
+      />
+    );
+  }
+
+  it.each([false, true])("with panels: %s", (withPanels) => {
+    render(
+      <ZoBlocksHost mode="light">
+        <Bare withPanels={withPanels} />
+      </ZoBlocksHost>,
+    );
+    const dangling = screen
+      .getAllByRole("tab")
+      .map((t) => t.getAttribute("aria-controls"))
+      .filter((ref): ref is string => ref !== null)
+      .filter((ref) => document.getElementById(ref) === null);
+    expect(dangling).toEqual([]);
+    if (withPanels) {
+      expect(tab("Results").getAttribute("aria-controls")).toBe(screen.getByRole("tabpanel").id);
+    }
+  });
+});
+
 describe.each(HOSTS)("the %s host's tabs, by keyboard", (_id, Host) => {
   async function focusStrip(onChange?: (key: string) => void) {
     const user = userEvent.setup();
