@@ -65,7 +65,7 @@ HITS=$(git grep -I -n -i -E 'oxygen' -- . \
     ':!packages/codemod/test/oxygen-to-zoblocks.test.ts' \
     ':!packages/codemod/README.md' \
     ':!.changeset' \
-    ':!CHANGELOG.md' \
+    ':(exclude,glob)**/CHANGELOG.md' \
     ':!scripts/retired-names.sh' \
   2>/dev/null \
   | grep -v 'rename-sweep-exempt' \
@@ -87,7 +87,7 @@ ABBREV=$(git grep -I -n -E \
     -- . \
     ':!content/archive' \
     ':!.changeset' \
-    ':!CHANGELOG.md' \
+    ':(exclude,glob)**/CHANGELOG.md' \
     ':!scripts/retired-names.sh' \
     ':!packages/codemod/src/oxygen-to-zoblocks.ts' \
     ':!packages/codemod/test/oxygen-to-zoblocks.test.ts' \
