@@ -19,11 +19,11 @@
     "@zoblocks/tokens": "workspace:*"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "^4.1.11",
+    "@vitest/coverage-v8": "^5.0.0",
     "@zoblocks/tsconfig": "workspace:*",
     "esbuild": "^0.28.2",
     "jsdom": "^30",
     "typescript": "^5.7.2",
-    "vitest": "^4.1.11"
+    "vitest": "^5.0.0"
   }
 }
