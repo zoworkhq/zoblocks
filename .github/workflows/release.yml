@@ -200,7 +200,7 @@ jobs:
         # the job for anything that is not the PR-permission case, so a broken
         # publish is still a broken build.
         continue-on-error: true
-        uses: changesets/action@198f833dd7d863100ea6e28967bc9a9fdefadb0a # v2 branch head
+        uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2 branch head
         with:
           version-script: pnpm changeset version
           publish-script: pnpm changeset publish
