@@ -1045,7 +1045,16 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                   accessibility panel is how a library ends up asserting
                   conformance it has never measured. The schema requires the
                   evidence column; this renders it. */}
-                    <div className="scroll-thin mt-8 overflow-x-auto" data-reveal>
+                    {/* Focusable and named: on a phone the 44rem table scrolls
+                        sideways, and a scrolling region has to be reachable
+                        by keyboard (axe `scrollable-region-focusable`). */}
+                    <div
+                      className="scroll-thin mt-8 overflow-x-auto"
+                      data-reveal
+                      tabIndex={0}
+                      role="region"
+                      aria-label="Accessibility checks"
+                    >
                       <table className="w-full min-w-[44rem] border-collapse text-left text-sm">
                         <thead>
                           <tr className="border-b border-rule">

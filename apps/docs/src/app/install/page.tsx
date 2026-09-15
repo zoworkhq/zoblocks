@@ -295,7 +295,14 @@ function Step({ n, title, body, code }: { n: string; title: string; body: string
       {/* The panel treatment, because this is code rather than a component
           demo — `instrument-demo` follows the page theme and would render a
           code block on paper, which is not what a reader expects here. */}
-      <pre className="scroll-thin-dark instrument overflow-x-auto rounded-2xl p-5 font-mono text-[0.75rem] leading-relaxed text-panel-fg/90">
+      {/* `tabIndex={0}`: this block scrolls now that `.instrument` no longer
+          clips it, and a region that scrolls has to be reachable by keyboard
+          (axe `scrollable-region-focusable`). The component page's usage
+          block does the same. */}
+      <pre
+        tabIndex={0}
+        className="scroll-thin-dark instrument overflow-x-auto rounded-2xl p-5 font-mono text-[0.75rem] leading-relaxed text-panel-fg/90"
+      >
         <code>{code}</code>
       </pre>
     </div>

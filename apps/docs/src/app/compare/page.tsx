@@ -187,9 +187,15 @@ export default function ComparePage() {
               building a clinical grid. These figures come from reading its published ES build.
             </p>
 
+            {/* Focusable and named: on a phone the 46rem table scrolls
+                sideways, and a scrolling region has to be reachable by
+                keyboard (axe `scrollable-region-focusable`). */}
             <div
               className="scroll-thin mt-8 overflow-x-auto rounded-2xl border border-rule"
               data-reveal
+              tabIndex={0}
+              role="region"
+              aria-label="rc-table measurements"
             >
               <table className="w-full min-w-[46rem] border-collapse text-left text-sm">
                 <thead>
