@@ -18,7 +18,7 @@ reference range, the restricted record, the patient who refused to sign.
 [![Status](https://img.shields.io/badge/status-pre--release-orange.svg)](#status)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-[**Documentation**](https://zoblocks.design) · [**Architecture**](ARCHITECTURE.md) · [**Engineering standard**](ENGINEERING.md) · [**Decisions**](content/decisions/)
+[**Documentation**](https://oxygenui.design) · [**Install guide**](docs/getting-started.md) · [**Architecture**](ARCHITECTURE.md) · [**Engineering standard**](ENGINEERING.md) · [**Decisions**](content/decisions/)
 
 </div>
 
@@ -147,6 +147,10 @@ npx @zoblocks/cli add pulse-loader
 ```
 
 The public catalog needs no configuration, no namespace, and no account.
+
+The rest of the setup — the `@/` alias, the Tailwind sources, and the two
+stylesheets — is in [`docs/getting-started.md`](docs/getting-started.md), with
+framework-specific pages for [Next.js](docs/nextjs.md) and [Vite](docs/vite.md).
 
 <details>
 <summary>Paid components</summary>
@@ -288,7 +292,8 @@ zoblocks/
 │  ├─ smoke/             # HTML · React 19 · Vue · Angular · Svelte
 │  └─ smoke-react18/     # React 18, which cannot share a node_modules with 19
 ├─ packages/             # the published packages (see the table above)
-├─ registry/zoblocks/      # component source — this is what customers receive
+├─ registry/oxygen/      # component source — this is what customers receive
+├─ docs/                 # installing Oxygen UI into an existing React app
 ├─ content/decisions/    # nine architecture decision records
 ├─ scripts/gen/          # the generator
 ├─ e2e/                  # Playwright: VRT, a11y, reflow, cross-framework

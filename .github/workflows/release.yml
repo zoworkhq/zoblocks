@@ -121,6 +121,56 @@ jobs:
       - name: npm new enough for trusted publishing
         run: npm install -g npm@^11.5.1
 
+      # A publish needs a credential, and the two ways of holding one fail very
+      # differently. A missing NPM_TOKEN surfaces as a 401 from deep inside
+      # `changeset publish`, after every gate above has already run — twenty
+      # minutes to learn a secret was never set. Trusted publishing (OIDC) has
+      # no secret at all, so an empty token is not by itself wrong.
+      #
+      # This cannot tell the two apart, so it warns rather than fails: loud
+      # enough to read in the log, quiet enough not to break the OIDC setup
+      # this repository would rather be using.
+      - name: Note how this run will authenticate to npm
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -n "${NPM_TOKEN:-}" ]; then
+            echo "::notice::Authenticating to npm with the NPM_TOKEN secret."
+          else
+            echo "::warning::No NPM_TOKEN secret is set. Versioning still works, but a publish will 401 unless npm trusted publishing (OIDC) is configured for every package in the @zoblocks scope."
+          fi
+
+      # npm attests provenance against the repository that built the tarball,
+      # and the registry rejects the attestation when `repository.url` in the
+      # manifest names a different repository. Every manifest here declares
+      # zoworkhq/zoblocks while this repository is still zoworkhq/oxygenui, so
+      # asking for provenance unconditionally would fail the publish outright
+      # rather than merely skip the attestation.
+      #
+      # The declared repository is read from a manifest and compared with the
+      # one running the job, so provenance turns itself back on the moment the
+      # repository is renamed — no workflow edit, and no window where a release
+      # silently ships unattested because someone forgot to flip a flag back.
+      - name: Can this run attest provenance?
+        id: provenance
+        run: |
+          set -euo pipefail
+          # Single-quoted so the shell hands the script to node untouched. The
+          # regexes contain $ and \, both of which a double-quoted string would
+          # be free to reinterpret.
+          declared=$(node -e '
+            const { url } = require("./packages/react/package.json").repository;
+            const { pathname } = new URL(url.replace(/^git\+/, ""));
+            process.stdout.write(pathname.replace(/^\//, "").replace(/\.git$/, ""));
+          ')
+          if [ "$declared" = "$GITHUB_REPOSITORY" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::Publishing with provenance."
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Publishing without provenance: manifests declare $declared but this repository is $GITHUB_REPOSITORY. Rename the repository, or update repository.url, to restore attestation."
+          fi
+
       # The four inputs below were renamed by changesets/action, and the action
       # hard-errors on the old spellings rather than falling back — so this step
       # failed on every push to main, which is every merge. Nothing was
@@ -165,7 +215,7 @@ jobs:
           # publishing has to be enabled on a package that already exists.
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_CONFIG_PROVENANCE: "true"
+          NPM_CONFIG_PROVENANCE: ${{ steps.provenance.outputs.enabled }}
 
       # Opening the pull request is the one thing this job cannot do for
       # itself. `pull-requests: write` above is declared and then overridden by

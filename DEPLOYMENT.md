@@ -45,15 +45,146 @@ Preferred is **trusted publishing** (OIDC): configure it per package in the npm
 UI against this repository, and `NPM_TOKEN` can stay unset. Nothing is stored,
 nothing expires, and npm attests the tarball came from this repo at this commit.
 
-It has to be enabled on a package that already exists, so `NPM_TOKEN` remains
-supported as a fallback for the first publish of a new package.
+Two limits decide how the first release has to work. Trusted publishing
+authenticates with an OIDC token that only a CI runner can mint, so it cannot
+publish from a laptop at all; and it is configured per package under Packages →
+the package → Settings → Trusted publishing, which requires the package to
+already exist. All 27 of ours are new, so OIDC cannot perform their first
+publish however it is set up. A granular access token with _Bypass two-factor
+authentication_ is the only way to bootstrap them.
+
+That bootstrap credential is on a clock. npm is deprecating direct publishing
+with bypass-2FA tokens: since August 2026 they can no longer perform
+account-identity or governance actions, and **the ability to publish with one
+is removed in January 2027**. The trigger was Mini Shai-Hulud, where a single
+stolen token pushed 639 malicious versions across 323 packages in 22 minutes.
+
+So the token is a one-time bootstrap, not the steady state. Configure trusted
+publishing on all 27 packages as soon as the first release lands, then revoke
+it. Leaving the migration until the deadline means doing it under time pressure
+across 27 packages at once.
+
+### pnpm cannot do OIDC or provenance, and changesets picks pnpm
+
+This is the constraint that shapes the whole release design, so it is worth
+stating plainly. `changeset publish` chooses its publish tool by detecting the
+workspace — `getPublishTool` in `@changesets/cli` returns pnpm here — and
+`pnpm publish --help` on 9.15.4 offers only `--access`, `--otp` and `--tag`.
+There is no `--provenance` and no OIDC.
+
+Two consequences, both easy to miss because neither fails loudly:
+
+- `NPM_CONFIG_PROVENANCE` is inert. It has been set in `release.yml` since
+  provenance was introduced, and no release has ever been attested, because the
+  tool reading it was never npm.
+- Configuring trusted publishing and deleting `NPM_TOKEN` would break the
+  release outright. pnpm would have no credential and no way to mint one.
+
+Swapping to `npm publish` is not the fix either: `publishConfig`'s rewrite of
+`main`, `types` and `exports` to `./dist` is a pnpm feature that npm ignores, so
+npm would publish entry points still pointing at `./src/index.ts`.
+
+The way out is that `pnpm pack` bakes the rewritten manifest _into the tarball_ —
+verified: the tarball for `@zoblocks/intl` carries `main: ./dist/index.js`. A
+tarball published by npm keeps the manifest it already has. So packing with pnpm
+and publishing that tarball with npm gets both halves: pnpm resolves the
+workspace ranges and applies `publishConfig`, npm supplies OIDC and provenance.
+
+Upgrading to pnpm 10, which did support OIDC, is the other option. Note that
+pnpm 11 regressed it, so that route needs a version pin and a watch on the
+upstream issue.
+
+Until one of those lands, CI publishes with `NPM_TOKEN` and ships unattested.
 
 Before any release: `pnpm build && pnpm release:check`. It packs every
 publishable package with pnpm and fails on a missing README or LICENSE, an entry
 point absent from the tarball, a leftover `workspace:` range, test files, or an
 import Node cannot resolve. CI and the release job run the same script.
 
-### First publish under `@zoblocks`
+### The `@zoblocks` scope is not the `zoworkhq` org
+
+An npm scope maps one-to-one onto the account of the same name. Owning the
+`zoworkhq` org grants `@zoworkhq/*` and nothing else, so `@zoblocks/react` needs
+an account literally named `zoblocks` — there is no way to alias one scope onto
+another org, and no setting that grants it.
+
+Orgs are free for unlimited public packages, so the fix is to create a second
+one named `zoblocks` and publish under that. Renaming the packages instead would
+mean rewriting the scope in about 570 files and would leave the docs site, the
+registry and the `zoblocks` CLI binary reading as a different product.
+
+### Provenance needs the repository names to agree
+
+Every manifest declares `repository.url` as `github.com/zoworkhq/zoblocks`, and
+the repository is still called `zoworkhq/oxygenui`. npm attests provenance
+against the repository that built the tarball and the registry rejects an
+attestation that names a different one, so asking for provenance while the two
+disagree fails the publish rather than skipping the attestation.
+
+`release.yml` therefore reads the declared repository, compares it with the one
+running the job, and sets `NPM_CONFIG_PROVENANCE` from the result. Releases ship
+unattested with a warning in the log until the repository is renamed, and
+attestation turns itself back on the moment it is — no workflow edit, and no
+window where a release quietly ships unattested because a flag was left off.
+
+Publishing from a laptop is unattested either way: provenance requires the OIDC
+token only a CI run holds.
+
+### Publishing from a developer machine
+
+The first release is being cut by hand, before CI holds any credential. `pnpm
+release` is the same path the workflow takes — build, inspect every tarball,
+then `changeset publish`.
+
+1. **Log in.** `npm login`, then `npm whoami` to confirm. `npm org ls zoblocks`
+   should list you.
+2. **Version.** `pnpm changeset version`. This consumes the pending changesets
+   and writes the CHANGELOG entries. Do it before publishing, not after: the
+   changes those changesets describe are already in the code, so publishing
+   first ships them under a version whose changelog does not mention them.
+3. **Prove the permission on one package.** `pnpm build`, then
+   `cd packages/intl && pnpm publish --access public --no-git-checks`.
+
+   pnpm, never npm — `publishConfig` here rewrites `main`, `types` and
+   `exports` to `./dist`, and that rewrite is a pnpm feature. npm honours only
+   `access`, `registry`, `tag` and `provenance`, so an `npm publish` ships
+   entry points still pointing at `./src/index.ts` and breaks every consumer
+   that does not compile TypeScript out of `node_modules`. `--no-git-checks`
+   because step 2 has just left version bumps uncommitted in the tree.
+
+   `intl` is one of six packages carrying a `prepublishOnly` guard that refuses
+   npm outright; the other 21 would publish a broken tarball without complaint.
+   `pnpm release` is safe for all 27 whatever the guard says — `changeset
+publish` detects the workspace and shells out to `pnpm publish` — so the gap
+   only bites a hand-run `npm publish`, which is to say this step.
+
+   This release creates 27 packages that do not yet exist, and creating a
+   package is a different permission from publishing a new version of one. An
+   account with developer rather than admin rights on the org is exactly where
+   that distinction bites, and `changeset publish` walks the packages one at a
+   time: a permission error partway leaves some of the 27 on npm and the rest
+   not. A published version cannot be replaced, and an unpublished name is
+   blocked for 24 hours, so an aborted run is genuinely awkward to redo.
+
+   `intl` is the cheapest probe — eight files, no `@zoblocks` dependencies, so
+   it can go first without anything else being on the registry yet. A 403 here
+   means ask an org owner for publish rights; nothing else has moved.
+
+4. **Publish the rest.** `pnpm release`. It skips `intl`, whose version is now
+   on the registry, and publishes the other 26. Commit the version bumps
+   afterwards.
+5. **Check.** `npm view @zoblocks/cli version`, then
+   `npx @zoblocks/cli@latest add pulse-loader` in an empty directory.
+
+If the account has 2FA set to "authorization and writes", `changeset publish`
+will prompt for an OTP once per package — 27 times. Either set 2FA to
+"authorization only" for the duration, or publish with a granular access token,
+which is exempt.
+
+Everything after this first release should go through CI, which runs gates a
+laptop does not.
+
+### First publish through CI
 
 Nothing is on npm under this scope yet, so trusted publishing cannot be set up
 first. In order:
@@ -65,15 +196,21 @@ first. In order:
    Actions to create and approve pull requests_, or open the PR by hand from the
    `changeset-release/main` branch the release job pushes. Check every package
    reads `0.2.0` (`fhir` included) before merging.
-3. **Merge it.** The release job publishes all 27 packages with provenance.
+3. **Merge it.** The release job publishes all 27 packages — with provenance
+   only once the repository rename above has landed.
 4. **Check.** `npm view @zoblocks/cli version` and
    `npx @zoblocks/cli@latest add pulse-loader` in an empty project.
 5. **Switch to OIDC.** For each package on npmjs.com, add a trusted publisher:
    repository `zoworkhq/zoblocks`, workflow `release.yml`. Then delete
    `NPM_TOKEN` and revoke the token.
-6. **Retire the old scope.** Run `npm deprecate` on the two pre-rename packages
-   named in `.changeset/the-rename.md`, pointing each at its `@zoblocks`
-   equivalent. That changeset tells upgraders this has already happened.
+
+There is no old scope to retire. This step used to say to `npm deprecate` the
+two pre-rename packages named in `.changeset/the-rename.md`; that changeset has
+since been consumed, and `@oxygenui/intl` and `@oxygenui-design/react` both
+return 404 on the registry — the rename happened before anything was ever
+published. `@zoblocks/codemod` still rewrites those imports, which is worth
+keeping for anyone who used the packages from source, but nothing on npm needs
+deprecating.
 
 ## Setting up hq
 

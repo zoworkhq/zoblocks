@@ -24,6 +24,18 @@ export default tseslint.config(
       "**/.next/**",
       "**/.turbo/**",
       /*
+       * `next export` output, the static twin of `.next/`. Gitignored like the
+       * others but missed here, so linting a tree that had been built reported
+       * 5,122 errors in minified vendor bundles — `self is not defined`, on one
+       * line of someone else's compiled JavaScript.
+       *
+       * CI never saw it because `pnpm lint` runs before `pnpm build` there. It
+       * fails only on a machine that has built, which includes every machine
+       * running a release: `pnpm release` builds, and `pnpm verify` afterwards
+       * then lints the output of the build it just made.
+       */
+      "**/out/**",
+      /*
        * Agent worktrees — checkouts of this same repository under a scratch
        * directory. Linting them counts every warning in the repo once per
        * worktree, so three stale checkouts put the `--max-warnings` ratchet
