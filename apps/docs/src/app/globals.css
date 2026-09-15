@@ -462,6 +462,104 @@ body {
   overflow-x: clip;
 }
 
+/*
+ * A grid with no column count gets one column that cannot outgrow the grid.
+ *
+ * Without a `grid-cols-*` a grid has one `auto` track, sized to its content's
+ * min-content — which can be wider than the grid itself. The marketplace
+ * shelf's track came to 360px in a 335px box, and the Blocks gallery's to
+ * 546px at 320. `overflow-x: clip` above then hid the loss rather than letting
+ * anyone scroll to it. `minmax(0, 1fr)` is what `grid-cols-1` compiles to, and
+ * the layer keeps every `grid-cols-*` utility winning over it.
+ */
+@layer components {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/*
+ * No field under 16px on a touch screen.
+ *
+ * iOS Safari zooms the page when a field under 16px takes focus, and does not
+ * zoom back. Nine pages had one, from 12px selects to the 15px search field.
+ * Unlayered on purpose, so it beats `text-sm` and friends — but only where the
+ * pointer is coarse, so a desktop keeps its compact type.
+ */
+@media (pointer: coarse) {
+  input:not(
+    [type="checkbox"],
+    [type="radio"],
+    [type="range"],
+    [type="color"],
+    [type="file"],
+    [type="button"],
+    [type="submit"],
+    [type="reset"],
+    [type="image"]
+  ),
+  /* `:not([hidden])` only raises specificity to match the input rule above: a
+     bare `select` lost to `.zb-host-field__input` and stayed at 14px. */
+  select:not([hidden]),
+  textarea:not([hidden]) {
+    font-size: max(16px, 1em);
+  }
+}
+
+/*
+ * A tab strip that scrolls fades at the edge that hides tabs.
+ *
+ * `section-tabs.tsx` sets the attributes from the scroll position; the width
+ * is its `FADE`. Both edges fade in the middle of a scroll.
+ */
+.tab-strip {
+  --tab-fade: 28px;
+}
+.tab-strip[data-fade-end] {
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - var(--tab-fade)), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - var(--tab-fade)), transparent);
+}
+.tab-strip[data-fade-start] {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 var(--tab-fade));
+  mask-image: linear-gradient(to right, transparent, #000 var(--tab-fade));
+}
+.tab-strip[data-fade-start][data-fade-end] {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 var(--tab-fade),
+    #000 calc(100% - var(--tab-fade)),
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 var(--tab-fade),
+    #000 calc(100% - var(--tab-fade)),
+    transparent
+  );
+}
+
+/* The phone menu drops from the header rather than scaling up like a dialog. */
+.site-menu-panel {
+  box-shadow: 0 24px 48px -24px rgb(8 17 15 / 0.35);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .site-menu-panel {
+    animation: site-menu-in 260ms var(--ease-out-expo) both;
+  }
+}
+@keyframes site-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* ---------------------------------------------------------------------------
  * Scrollbars
  *
@@ -710,8 +808,10 @@ body {
   will-change: transform;
 }
 
-.lift:hover {
-  transform: translateY(-3px);
+@media (hover: hover) {
+  .lift:hover {
+    transform: translateY(-3px);
+  }
 }
 
 /* Orchestrated entrance for above-the-fold content. Unlike [data-reveal],
@@ -798,8 +898,10 @@ body {
     width 240ms var(--ease-out-expo);
 }
 
-.rail-link:hover {
-  color: var(--color-ink);
+@media (hover: hover) {
+  .rail-link:hover {
+    color: var(--color-ink);
+  }
 }
 
 .rail-link[aria-current="true"] {
@@ -1262,10 +1364,12 @@ body {
     background-color 200ms ease-out;
 }
 
-.hero-resource-chip:hover {
-  border-color: color-mix(in oklab, var(--color-brand) 45%, var(--color-rule));
-  background: color-mix(in oklab, var(--color-brand) 6%, transparent);
-  color: var(--color-ink);
+@media (hover: hover) {
+  .hero-resource-chip:hover {
+    border-color: color-mix(in oklab, var(--color-brand) 45%, var(--color-rule));
+    background: color-mix(in oklab, var(--color-brand) 6%, transparent);
+    color: var(--color-ink);
+  }
 }
 
 .signal-field {
@@ -1508,7 +1612,21 @@ html:not(.dark) .signal-status {
     0 0 0 1px rgb(255 255 255 / 0.02) inset,
     0 30px 70px -24px rgb(0 0 0 / 0.5),
     0 8px 24px -12px rgb(0 0 0 / 0.34);
-  overflow: hidden;
+}
+
+/*
+ * The instrument clips, from inside a layer.
+ *
+ * Unlayered, this `overflow: hidden` beat every utility on the same element,
+ * so `overflow-x-auto` on an instrument `<pre>` did nothing: the install page
+ * showed 278px of config lines up to 645px long, cut mid-word, with no way to
+ * scroll to the rest. In `components` it still clips every other instrument,
+ * and a utility can now say otherwise.
+ */
+@layer components {
+  .instrument {
+    overflow: hidden;
+  }
 }
 
 /*
@@ -1784,6 +1902,52 @@ html:not(.dark) .instrument-demo [class*="bg-panel"] {
   }
 }
 
+/*
+ * On a phone the worked example is a sequence, not a constellation.
+ *
+ * The three cards are placed absolutely around the core, which needs about
+ * 480px. At 375 the input card sat on the reading, the "No range" card sat on
+ * the trace, and the core's "ZB" showed through the 6.8. Stacked, they read in
+ * the order the argument runs: what came in, what it became, what it refused.
+ */
+@media (max-width: 479px) {
+  .signal-field {
+    min-height: 0;
+  }
+
+  .signal-field__stage {
+    position: relative;
+    inset: auto;
+    display: grid;
+    gap: 0.75rem;
+    padding: 1rem 0.75rem 4.25rem;
+  }
+
+  .signal-core {
+    display: none;
+  }
+
+  .signal-card,
+  .signal-card--source,
+  .signal-card--main,
+  .signal-card--quiet {
+    position: relative;
+    inset: auto;
+    width: auto;
+    transform: none;
+  }
+
+  .signal-card--source {
+    justify-self: start;
+    width: min(10.25rem, 70%);
+  }
+
+  .signal-card--quiet {
+    justify-self: end;
+    width: min(11rem, 70%);
+  }
+}
+
 /* The date, time and session family. Shipped to a consumer as
    styles/zoblocks-datetime.css by the `datetime-core` registry item, and
    imported here so the docs render the same chrome the CLI installs.
@@ -1855,8 +2019,10 @@ html:not(.dark) .instrument-demo [class*="bg-panel"] {
   background: var(--site-paper-sunk);
   transition: border-color 200ms ease;
 }
-.zwStamp:hover {
-  border-color: var(--site-rule-strong);
+@media (hover: hover) {
+  .zwStamp:hover {
+    border-color: var(--site-rule-strong);
+  }
 }
 
 /*
@@ -1921,8 +2087,10 @@ html:not(.dark) .instrument-demo [class*="bg-panel"] {
   transform: translateY(var(--zw-stamp-textline));
   transition: opacity 200ms ease;
 }
-.zwStamp:hover .zwStampArrow {
-  opacity: 1;
+@media (hover: hover) {
+  .zwStamp:hover .zwStampArrow {
+    opacity: 1;
+  }
 }
 
 /* High contrast keeps the light-ground treatment: its paper is white, and a

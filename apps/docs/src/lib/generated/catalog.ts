@@ -5616,9 +5616,9 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "pinnedColumns",
         "type": "number",
-        "description": "How many leading columns stay put while the rest scroll sideways. The identity column is the one a reader must never lose: scrolled twelve columns right with no name in view, every row is the same row. Offsets are measured rather than declared, so a pinned column needs no fixed width.",
+        "description": "How many leading columns stay put while the rest scroll sideways. The identity column is the one a reader must never lose: scrolled twelve columns right with no name in view, every row is the same row. Offsets are measured rather than declared, so a pinned column needs no fixed width. Defaults to 1, the identity column; pass 0 to pin nothing.",
         "required": false,
-        "default": "0"
+        "default": "1"
       },
       {
         "name": "selectedKeys",
@@ -5808,9 +5808,9 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "pinnedColumns",
             "type": "number",
-            "description": "How many leading columns stay put while the rest scroll sideways. The identity column is the one a reader must never lose: scrolled twelve columns right with no name in view, every row is the same row. Offsets are measured rather than declared, so a pinned column needs no fixed width.",
+            "description": "How many leading columns stay put while the rest scroll sideways. The identity column is the one a reader must never lose: scrolled twelve columns right with no name in view, every row is the same row. Offsets are measured rather than declared, so a pinned column needs no fixed width. Defaults to 1, the identity column; pass 0 to pin nothing.",
             "required": false,
-            "default": "0"
+            "default": "1"
           },
           {
             "name": "selectedKeys",
@@ -5982,7 +5982,7 @@ export const CATALOG: ComponentDoc[] = [
         "min": 0,
         "max": 2,
         "step": 1,
-        "defaultValue": 0
+        "defaultValue": 1
       },
       {
         "prop": "onSortChange",

@@ -39,6 +39,8 @@ function Prov({
       className={`prov ${origin.cls}`}
       onMouseEnter={() => onHover(origin.label)}
       onMouseLeave={() => onHover(null)}
+      // A finger has no hover: a tap names the origin and it stays named.
+      onClick={() => onHover(origin.label)}
       title={origin.label}
     >
       {children}
@@ -46,7 +48,7 @@ function Prov({
   );
 }
 
-const HINT = "Hover any passage for its origin";
+const HINT = "Hover or tap a passage for its origin";
 
 export function Note01() {
   const [hint, setHint] = React.useState(HINT);

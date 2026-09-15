@@ -76,11 +76,14 @@ export function LanguageSwitch({ className }: { className?: string }) {
             className={cn(
               // min-h-8 clears WCAG 2.5.8; the label makes these wider than
               // the theme toggle's icon-only buttons, not shorter.
-              "inline-flex min-h-8 items-center gap-1.5 rounded-md px-2 py-1 text-[0.8125rem] transition-colors duration-200",
+              // `whitespace-nowrap`: "Ant Design" broke onto two lines at 375px.
+              "inline-flex min-h-8 items-center gap-1.5 whitespace-nowrap rounded-md px-2 py-1 text-[0.8125rem] transition-colors duration-200",
               selected ? "bg-paper-sunk font-medium text-ink" : "text-graphite hover:text-ink",
             )}
           >
-            <Mark className="size-3.5 shrink-0" />
+            {/* The label carries the name; below 360px the mark gives way so
+                all three still fit on one line. */}
+            <Mark className="size-3.5 shrink-0 max-[359px]:hidden" />
             {HOST_LABEL[id]}
           </button>
         );

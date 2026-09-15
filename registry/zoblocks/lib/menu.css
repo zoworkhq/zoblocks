@@ -91,6 +91,21 @@
   user-select: none;
 }
 
+/*
+ * The row being long-pressed, on a touch screen.
+ *
+ * The menu opens after a 500ms hold, and without this the same hold selects
+ * the row's text and raises the iOS callout over the menu it just opened.
+ * Coarse pointers only, so a mouse can still select and copy a row.
+ */
+@media (pointer: coarse) {
+  [data-zb-menu] {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+
 .zb-menu__avatar {
   display: grid;
   place-items: center;
@@ -526,7 +541,8 @@
   inset-block-end: 0;
   max-inline-size: none;
   min-inline-size: 0;
-  padding-block-end: 0.5rem;
+  /* Clear the home indicator, so the last row is not under it. */
+  padding-block-end: max(0.5rem, env(safe-area-inset-bottom));
   border-inline: 0;
   border-block-end: 0;
   border-start-start-radius: 1rem;

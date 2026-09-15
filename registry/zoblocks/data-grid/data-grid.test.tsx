@@ -10,7 +10,7 @@
  * cheapest to keep true.
  */
 
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { expectStatedInWords, itMeetsTheContract } from "../../../test/contract";
@@ -876,6 +876,69 @@ describe("the pinned column, measured rather than guessed", () => {
     rerender(<DataGrid {...props} density="regular" />);
     const first = document.querySelector(".zb-grid__pin") as HTMLElement | null;
     expect(first?.style.left).toBe("0px");
+  });
+
+  it("pins the identity column without being asked, and marks where the pin ends", () => {
+    // A phone scrolls every grid sideways. The name leaving the screen is the
+    // wrong-patient error, so keeping it is the default rather than an option.
+    render(<DataGrid {...base} coverage={CASELOAD_COVERAGE} />);
+    const [identity, next] = screen.getAllByRole("columnheader");
+    expect(identity).toHaveClass("zb-grid__pin", "zb-grid__pin--edge");
+    expect(next).not.toHaveClass("zb-grid__pin");
+    expect(document.querySelectorAll("td.zb-grid__pin--edge")).toHaveLength(CASELOAD.length);
+  });
+
+  it("pins nothing when told to, and never more columns than exist", () => {
+    const { unmount } = render(
+      <DataGrid {...base} coverage={CASELOAD_COVERAGE} pinnedColumns={0} />,
+    );
+    expect(document.querySelector(".zb-grid__pin, .zb-grid__pin--edge")).toBeNull();
+    unmount();
+
+    render(<DataGrid {...base} coverage={CASELOAD_COVERAGE} pinnedColumns={99} />);
+    const headers = screen.getAllByRole("columnheader");
+    expect(headers.every((header) => header.classList.contains("zb-grid__pin"))).toBe(true);
+    expect(headers.at(-1)).toHaveClass("zb-grid__pin--edge");
+  });
+
+  it("says when something has scrolled under the pinned column, and only when it changes", () => {
+    render(<DataGrid {...base} coverage={CASELOAD_COVERAGE} />);
+    const scroller = document.querySelector(".zb-grid__scroll") as HTMLElement;
+    const scrollTo = (left: number) => {
+      Object.defineProperty(scroller, "scrollLeft", { configurable: true, value: left });
+      fireEvent.scroll(scroller);
+    };
+
+    scrollTo(200);
+    expect(scroller.dataset.zbScrolled).toBe("true");
+    scrollTo(240);
+    expect(scroller.dataset.zbScrolled).toBe("true");
+    // RTL reports a negative scrollLeft; it is still scrolled.
+    scrollTo(-40);
+    expect(scroller.dataset.zbScrolled).toBe("true");
+    scrollTo(0);
+    expect(scroller.dataset.zbScrolled).toBe("false");
+  });
+
+  it("takes a tap on the area around a checkbox, not only on its 15px box", async () => {
+    const onSelectionChange = vi.fn();
+    render(
+      <DataGrid
+        {...base}
+        coverage={CASELOAD_COVERAGE}
+        selectedKeys={[]}
+        onSelectionChange={onSelectionChange}
+      />,
+    );
+    const box = screen.getByRole("checkbox", { name: "Select row 1" });
+    const target = box.closest("label");
+    expect(target).toHaveClass("zb-grid__hit");
+    await userEvent.setup().click(target as HTMLElement);
+    expect(onSelectionChange).toHaveBeenCalledWith([CASELOAD[0]?.mrn]);
+
+    const all = screen.getByRole("checkbox", { name: /Select all/ });
+    await userEvent.setup().click(all.closest("label") as HTMLElement);
+    expect(onSelectionChange).toHaveBeenLastCalledWith(CASELOAD.map((row) => row.mrn));
   });
 });
 

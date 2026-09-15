@@ -272,6 +272,7 @@ export interface DataGridProps<Row> {
    * The identity column is the one a reader must never lose: scrolled twelve
    * columns right with no name in view, every row is the same row. Offsets are
    * measured rather than declared, so a pinned column needs no fixed width.
+   * Defaults to 1, the identity column; pass 0 to pin nothing.
    */
   pinnedColumns?: number;
 
@@ -410,7 +411,7 @@ export function DataGrid<Row>({
   selectedKeys,
   onSelectionChange,
   bulkActions,
-  pinnedColumns = 0,
+  pinnedColumns = 1,
   onReachEnd,
   loadingMore = false,
   exhausted = false,
@@ -460,7 +461,21 @@ export function DataGrid<Row>({
   const sentinelRef = React.useRef<HTMLDivElement>(null);
   const scrollRef = React.useRef<HTMLDivElement>(null);
 
+  /*
+   * Whether anything has scrolled under the pinned columns, for the seam.
+   *
+   * Written to the element rather than to state: scroll fires every frame, and
+   * a stylesheet selector is the only thing that reads it.
+   */
+  const onScroll = React.useCallback((event: React.UIEvent<HTMLDivElement>) => {
+    const node = event.currentTarget;
+    const scrolled = Math.abs(node.scrollLeft) > 0 ? "true" : "false";
+    if (node.dataset.zbScrolled !== scrolled) node.dataset.zbScrolled = scrolled;
+  }, []);
+
   const selectable = Boolean(selectedKeys && onSelectionChange);
+  /* More pinned columns than there are columns pins them all, not a phantom. */
+  const pinned = Math.max(0, Math.min(pinnedColumns, columns.length));
   const selected = React.useMemo(() => selectedKeys ?? [], [selectedKeys]);
 
   /*
@@ -475,7 +490,7 @@ export function DataGrid<Row>({
   const [pinOffsets, setPinOffsets] = React.useState<number[]>([]);
   React.useLayoutEffect(() => {
     const head = headRef.current;
-    if (!head || pinnedColumns <= 0) {
+    if (!head || pinned <= 0) {
       setPinOffsets([]);
       return;
     }
@@ -483,7 +498,7 @@ export function DataGrid<Row>({
       const cells = [...head.children] as HTMLElement[];
       const offsets: number[] = [];
       let running = 0;
-      for (let i = 0; i < pinnedColumns + (selectable ? 1 : 0); i += 1) {
+      for (let i = 0; i < pinned + (selectable ? 1 : 0); i += 1) {
         offsets.push(running);
         running += cells[i]?.offsetWidth ?? 0;
       }
@@ -497,7 +512,7 @@ export function DataGrid<Row>({
     const observer = new ResizeObserver(measure);
     observer.observe(head);
     return () => observer.disconnect();
-  }, [pinnedColumns, selectable, columns, density]);
+  }, [pinned, selectable, columns, density]);
 
   const refusal = gridCapacityRefusal(rows.length, ceiling);
 
@@ -674,7 +689,7 @@ export function DataGrid<Row>({
   /* The slot exists if either occupant could ever appear, so neither arriving
      changes the height of anything below it. */
   const stripVisible = held > 0 || Boolean(selectable && bulkActions);
-  const pinnedCount = pinnedColumns + (selectable ? 1 : 0);
+  const pinnedCount = pinned + (selectable ? 1 : 0);
   const pinStyle = (index: number) =>
     index < pinOffsets.length ? { left: pinOffsets[index] } : undefined;
 
@@ -791,6 +806,7 @@ export function DataGrid<Row>({
       <div
         className="zb-grid__scroll"
         ref={scrollRef}
+        onScroll={onScroll}
         style={maxHeight ? { maxBlockSize: maxHeight } : undefined}
       >
         <table
@@ -824,16 +840,18 @@ export function DataGrid<Row>({
                   className={cn("zb-grid__th zb-grid__th--select", pinnedCount && "zb-grid__pin")}
                   style={pinStyle(0)}
                 >
-                  <input
-                    type="checkbox"
-                    className="zb-grid__check"
-                    checked={selectState === "all"}
-                    ref={(node) => {
-                      if (node) node.indeterminate = selectState === "some";
-                    }}
-                    aria-label={`Select all ${keys.length} rows on this page`}
-                    onChange={() => onSelectionChange?.(toggleAllGridSelection(selected, keys))}
-                  />
+                  <label className="zb-grid__hit">
+                    <input
+                      type="checkbox"
+                      className="zb-grid__check"
+                      checked={selectState === "all"}
+                      ref={(node) => {
+                        if (node) node.indeterminate = selectState === "some";
+                      }}
+                      aria-label={`Select all ${keys.length} rows on this page`}
+                      onChange={() => onSelectionChange?.(toggleAllGridSelection(selected, keys))}
+                    />
+                  </label>
                 </th>
               ) : null}
               {columns.map((column, index) => {
@@ -855,7 +873,8 @@ export function DataGrid<Row>({
                       "zb-grid__th",
                       ALIGN_CLASS[defaultAlign(column)].th,
                       active && "zb-grid__th--sorted",
-                      index < pinnedColumns && "zb-grid__pin",
+                      index < pinned && "zb-grid__pin",
+                      index === pinned - 1 && "zb-grid__pin--edge",
                     )}
                     style={{
                       ...(column.width ? { width: column.width } : null),
@@ -944,17 +963,19 @@ export function DataGrid<Row>({
                       className={cn("zb-grid__td zb-grid__td--select", "zb-grid__pin")}
                       style={pinStyle(0)}
                     >
-                      <input
-                        type="checkbox"
-                        className="zb-grid__check"
-                        checked={selected.includes(key)}
-                        aria-label={
-                          identify
-                            ? `Select ${identify(row).primary}`
-                            : `Select row ${rowIndex + 1}`
-                        }
-                        onChange={() => onSelectionChange?.(toggleGridSelection(selected, key))}
-                      />
+                      <label className="zb-grid__hit">
+                        <input
+                          type="checkbox"
+                          className="zb-grid__check"
+                          checked={selected.includes(key)}
+                          aria-label={
+                            identify
+                              ? `Select ${identify(row).primary}`
+                              : `Select row ${rowIndex + 1}`
+                          }
+                          onChange={() => onSelectionChange?.(toggleGridSelection(selected, key))}
+                        />
+                      </label>
                     </td>
                   ) : null}
                   {columns.map((column, index) => {
@@ -974,7 +995,8 @@ export function DataGrid<Row>({
                           "zb-grid__td",
                           ALIGN_CLASS[defaultAlign(column)].td,
                           column.kind && KIND_CLASS[column.kind],
-                          index < pinnedColumns && "zb-grid__pin",
+                          index < pinned && "zb-grid__pin",
+                          index === pinned - 1 && "zb-grid__pin--edge",
                         )}
                         style={pinStyle(index + (selectable ? 1 : 0))}
                       >

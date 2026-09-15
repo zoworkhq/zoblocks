@@ -48,8 +48,10 @@
     color 180ms var(--ease-out-expo);
   cursor: pointer;
 }
-.zb-gallery__switch:hover {
-  color: var(--color-ink);
+@media (hover: hover) {
+  .zb-gallery__switch:hover {
+    color: var(--color-ink);
+  }
 }
 .zb-gallery__switch[aria-pressed="true"] {
   background: var(--color-ink);
@@ -163,9 +165,11 @@
     color 140ms ease,
     background-color 140ms ease;
 }
-.zb-dt-chapter:hover {
-  border-color: var(--color-rule-strong, var(--color-rule));
-  color: var(--color-ink, inherit);
+@media (hover: hover) {
+  .zb-dt-chapter:hover {
+    border-color: var(--color-rule-strong, var(--color-rule));
+    color: var(--color-ink, inherit);
+  }
 }
 .zb-dt-chapter[aria-checked="true"] {
   border-color: currentColor;
@@ -368,8 +372,10 @@
   content: "−";
 }
 
-.zb-demo__more > summary:hover {
-  color: var(--color-ink);
+@media (hover: hover) {
+  .zb-demo__more > summary:hover {
+    color: var(--color-ink);
+  }
 }
 
 .zb-demo__more > summary:focus-visible {
@@ -714,8 +720,10 @@
   cursor: pointer;
 }
 
-.zb-dt-tour__toggle:hover {
-  background: var(--zb-bg-muted);
+@media (hover: hover) {
+  .zb-dt-tour__toggle:hover {
+    background: var(--zb-bg-muted);
+  }
 }
 
 .zb-dt-tour__toggle:focus-visible {
@@ -778,8 +786,10 @@
     border-color var(--zb-duration-fast, 90ms) var(--zb-ease, ease);
 }
 
-.zb-dt-tour__note:hover {
-  background: var(--zb-bg-muted);
+@media (hover: hover) {
+  .zb-dt-tour__note:hover {
+    background: var(--zb-bg-muted);
+  }
 }
 
 .zb-dt-tour__note:focus-visible {
@@ -874,8 +884,10 @@
   flex: none;
 }
 
-.zb-dt-card__toggle:hover {
-  background: var(--zb-bg-muted);
+@media (hover: hover) {
+  .zb-dt-card__toggle:hover {
+    background: var(--zb-bg-muted);
+  }
 }
 
 .zb-dt-card__toggle:focus-visible {

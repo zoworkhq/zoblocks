@@ -284,16 +284,25 @@ export function ContextMenuArt({ featured = false }: { featured?: boolean }) {
       style={{
         inlineSize: "100%",
         maxInlineSize: featured ? 340 : 268,
-        blockSize: featured ? 168 : 148,
+        // The card's art band: `STANDARD_ART` / `FEATURED_ART` in component-card.tsx.
+        blockSize: featured ? 184 : 156,
         contain: "layout paint",
       }}
       // The card is decorative: the real component is one scroll further down.
       aria-hidden="true"
     >
       <div ref={rowRef}>
+        {/*
+          Two actions, one routine and one clinical, so the whole menu fits.
+          Five made a 277px menu in a 148px stage: the card showed a sliced
+          header and half a row, and the catalogue test counted the crop as art
+          painted outside its frame.
+        */}
         <Row
           subject={MEDICATION}
-          actions={MEDICATION_ACTIONS.slice(0, 5)}
+          actions={MEDICATION_ACTIONS.filter(
+            (action) => action.id === "open" || action.id === "dc",
+          )}
           container={stage}
           right="14:00"
         />

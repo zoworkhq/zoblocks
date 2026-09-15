@@ -49,6 +49,7 @@ import {
   runWithTransition,
   useBaseId,
   useControllableValue,
+  useIsoLayoutEffect,
   useTabsHotkeys,
   useValidateConfig,
 } from "./internal.js";
@@ -57,6 +58,37 @@ const VALID_MODES = new Set<SemanticMode>(["tabs", "nav", "radiogroup", "steps"]
 
 /** Stable empty list, so the skip path does not churn the effect deps. */
 const EMPTY_ITEMS: readonly TabItem[] = [];
+
+/** Narrower than this, a vertical strip has no room for its panel beside it. */
+const STACK_BELOW_REM = 28;
+
+/**
+ * Whether the root is too narrow to sit a vertical strip beside its panel.
+ *
+ * Measured from the root rather than the viewport, so a rail in a narrow
+ * sidebar on a wide screen stacks too. A width of 0 is a box that has not been
+ * laid out — hidden, or no layout engine — and says nothing either way.
+ */
+function useNarrow(ref: React.RefObject<HTMLDivElement | null>, enabled: boolean): boolean {
+  const [narrow, setNarrow] = React.useState(false);
+  useIsoLayoutEffect(() => {
+    const node = ref.current;
+    if (!enabled || !node || typeof ResizeObserver === "undefined") {
+      setNarrow(false);
+      return;
+    }
+    const measure = () => {
+      const width = node.getBoundingClientRect().width;
+      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      setNarrow(width > 0 && width < STACK_BELOW_REM * rem);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [enabled, ref]);
+  return narrow;
+}
 
 /** Sorts the registry into DOM order in place. True when anything moved. */
 function sortByDocument(list: RegisteredTrigger[]): boolean {
@@ -243,6 +275,18 @@ export const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps>(function
   const [panels, setPanels] = React.useState<ReadonlySet<string>>(() => new Set<string>());
   const [pending, setPending] = React.useState(false);
   const [, forceMeasure] = React.useReducer((n: number) => n + 1, 0);
+
+  const rootRef = React.useRef<HTMLDivElement | null>(null);
+  const setRootRef = React.useCallback(
+    (node: HTMLDivElement | null) => {
+      rootRef.current = node;
+      if (typeof forwardedRef === "function") forwardedRef(node);
+      else if (forwardedRef) forwardedRef.current = node;
+    },
+    [forwardedRef],
+  );
+  // A vertical strip stacks when narrow; a stepper tightens its steps.
+  const narrow = useNarrow(rootRef, orientation === "vertical" || variant === "stepper");
 
   const items = React.useMemo(() => {
     // `registryVersion` really is the dependency. The registry is a ref, so
@@ -556,11 +600,12 @@ export const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps>(function
     <TabsContext.Provider value={context}>
       <div
         {...rest}
-        ref={forwardedRef}
+        ref={setRootRef}
         className={["zb-tabs", className].filter(Boolean).join(" ")}
         data-zb-variant={variant}
         data-zb-mode={mode}
         data-zb-orientation={orientation}
+        data-zb-narrow={narrow || undefined}
         data-zb-size={size}
         data-zb-fill={fill}
         data-zb-overflow={overflow}

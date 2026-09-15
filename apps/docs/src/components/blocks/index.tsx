@@ -8,6 +8,10 @@
  * the block. Container queries would be the honest tool; they are not reliable
  * enough across the browsers this site supports to hang the whole gallery on,
  * so the frame states its own width and the CSS reads it.
+ *
+ * `auto` measures that width instead of being told it. The block pages used
+ * the default, which was `desktop`, so a phone got a 216px sidebar beside a
+ * 60px page — while the mobile CSS for every block sat unused.
  */
 
 import * as React from "react";
@@ -28,11 +32,32 @@ const BY_SLUG: Record<BlockSlug, () => React.JSX.Element> = {
   "copilot-01": Copilot01,
 };
 
-export function BlockBody({ slug, vp = "desktop" }: { slug: BlockSlug; vp?: Viewport }) {
+/** The frame widths the gallery viewer offers: 390px mobile, 768px tablet. */
+export function viewportFor(width: number): Viewport {
+  if (width < 640) return "mobile";
+  if (width < 1024) return "tablet";
+  return "desktop";
+}
+
+export function BlockBody({ slug, vp = "auto" }: { slug: BlockSlug; vp?: Viewport | "auto" }) {
+  const frame = React.useRef<HTMLDivElement>(null);
+  const [measured, setMeasured] = React.useState<Viewport>("desktop");
+
+  React.useEffect(() => {
+    if (vp !== "auto") return;
+    const el = frame.current;
+    if (!el) return;
+    const observer = new ResizeObserver(([entry]) => {
+      if (entry) setMeasured(viewportFor(entry.contentRect.width));
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [vp]);
+
   const Body = BY_SLUG[slug];
   if (!Body) return null;
   return (
-    <div className="oxb" data-vp={vp}>
+    <div ref={frame} className="oxb" data-vp={vp === "auto" ? measured : vp}>
       <Body />
     </div>
   );

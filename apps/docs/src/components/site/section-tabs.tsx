@@ -45,6 +45,9 @@ export interface RailSection {
 /** Height of the scrolled site header: `top-13`, which is what the bar sticks under. */
 const HEADER = 52;
 
+/** Width of the edge fade on a strip that scrolls: `.tab-strip` in globals.css. */
+const FADE = 28;
+
 export function SectionTabs({
   sections,
   children,
@@ -58,6 +61,32 @@ export function SectionTabs({
   const bar = React.useRef<HTMLElement>(null);
   const list = React.useRef<HTMLUListElement>(null);
   const uid = React.useId();
+
+  /*
+   * Which edges of the strip hide tabs.
+   *
+   * On a phone eight tabs need about 700px and the strip has 300. The
+   * scrollbar is hidden, so nothing said the other five existed. A fade at the
+   * clipped edge is that sign, and it goes away at the end of the scroll.
+   */
+  const [edges, setEdges] = React.useState({ start: false, end: false });
+  React.useEffect(() => {
+    const el = list.current;
+    if (!el) return;
+    const read = () => {
+      const start = el.scrollLeft > 1;
+      const end = el.scrollLeft + el.clientWidth < el.scrollWidth - 1;
+      setEdges((prev) => (prev.start === start && prev.end === end ? prev : { start, end }));
+    };
+    read();
+    el.addEventListener("scroll", read, { passive: true });
+    const observer = new ResizeObserver(read);
+    observer.observe(el);
+    return () => {
+      el.removeEventListener("scroll", read);
+      observer.disconnect();
+    };
+  }, []);
 
   /*
    * The hash chooses the tab — on arrival, and whenever it changes.
@@ -123,8 +152,10 @@ export function SectionTabs({
     if (!el || !item) return;
     const listBox = el.getBoundingClientRect();
     const itemBox = item.getBoundingClientRect();
-    if (itemBox.left < listBox.left) el.scrollLeft -= listBox.left - itemBox.left;
-    else if (itemBox.right > listBox.right) el.scrollLeft += itemBox.right - listBox.right;
+    // Clear of the edge fade, not merely inside the strip.
+    if (itemBox.left < listBox.left + FADE) el.scrollLeft -= listBox.left + FADE - itemBox.left;
+    else if (itemBox.right > listBox.right - FADE)
+      el.scrollLeft += itemBox.right - (listBox.right - FADE);
   }, [active]);
 
   const onKey = (event: React.KeyboardEvent<HTMLUListElement>) => {
@@ -177,14 +208,21 @@ export function SectionTabs({
       <nav
         ref={bar}
         aria-label="On this page"
-        className="sticky top-13 z-30 border-b border-rule bg-paper"
+        /*
+          Not sticky on a short screen. A landscape phone is 393px tall, and
+          the header plus this bar took 97 of them on every scrolled frame.
+        */
+        className="sticky top-13 z-30 border-b border-rule bg-paper [@media(max-height:500px)]:static"
       >
-        <div className="mx-auto max-w-6xl px-5 sm:px-8">
+        {/* No gutter of its own under `sm`: the component page already has one. */}
+        <div className="mx-auto max-w-6xl px-5 max-sm:px-0 sm:px-8">
           <ul
             ref={list}
             role="tablist"
             onKeyDown={onKey}
-            className="scroll-hidden flex gap-1 overflow-x-auto"
+            data-fade-start={edges.start || undefined}
+            data-fade-end={edges.end || undefined}
+            className="tab-strip scroll-hidden flex gap-1 overflow-x-auto"
           >
             {sections.map((section) => {
               const current = active === section.id;

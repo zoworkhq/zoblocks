@@ -399,13 +399,18 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
           section keeps its own `mx-auto max-w-6xl` container and simply
           centres inside the narrower column; the two wide previews fill it.
         */}
+        {/*
+          The sections below repeat this gutter from `sm` up, where the page
+          has room for both. Under `sm` they drop theirs: two 20px gutters left
+          a 375px phone 295px of content, and the previews inside lost the most.
+        */}
         <div className="mx-auto grid max-w-[92rem] px-5 sm:px-8 lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-x-10">
           <ComponentNav items={navItems} soon={navSoon} current={component.name} />
 
           <div className="min-w-0">
             {/* Header ------------------------------------------------------- */}
             <section className="border-b border-rule">
-              <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+              <div className="mx-auto max-w-6xl section-minor px-5 max-sm:px-0 sm:px-8">
                 <Link
                   href="/components"
                   className="inline-flex items-center gap-1.5 text-sm text-graphite transition-colors hover:text-ink"
@@ -579,7 +584,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
             colour does not.
           */}
                 <div
-                  className={`mx-auto section-minor px-5 sm:px-8 ${
+                  className={`mx-auto section-minor px-5 max-sm:px-0 sm:px-8 ${
                     WIDE_PREVIEW.has(component.name) ? "max-w-[92rem]" : "max-w-6xl"
                   }`}
                 >
@@ -712,7 +717,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
           and falls back to the whole string when there is no clean one.
         */}
               <section id="why" className="scroll-mt-24 border-b border-rule">
-                <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+                <div className="mx-auto max-w-6xl section-minor px-5 max-sm:px-0 sm:px-8">
                   <SectionHeading
                     eyebrow="Why it exists"
                     title={leadOf(component.rationale).lead}
@@ -751,7 +756,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
               {/* Playground --------------------------------------------------- */}
               {playable && (
                 <section id="playground" className="scroll-mt-24 border-b border-rule">
-                  <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+                  <div className="mx-auto max-w-6xl section-minor px-5 max-sm:px-0 sm:px-8">
                     <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
                       <SectionHeading
                         eyebrow="Playground"
@@ -777,7 +782,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
               {/* Variants ----------------------------------------------------- */}
               {variants.length > 0 && (
                 <section id="variants" className="scroll-mt-24 border-b border-rule">
-                  <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+                  <div className="mx-auto max-w-6xl section-minor px-5 max-sm:px-0 sm:px-8">
                     <SectionHeading
                       eyebrow="Variants"
                       title="One component, and what each skin is for."
@@ -818,7 +823,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
               {/* Usage & props ------------------------------------------------ */}
               {component.usage && (
                 <section id="usage" className="scroll-mt-24 border-b border-rule">
-                  <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+                  <div className="mx-auto max-w-6xl section-minor px-5 max-sm:px-0 sm:px-8">
                     <SectionHeading eyebrow="Usage" title="Props are the FHIR resource." />
 
                     {/*
@@ -904,7 +909,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                   id="examples"
                   className="scroll-mt-24 border-b border-rule bg-paper-sunk/40"
                 >
-                  <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+                  <div className="mx-auto max-w-6xl section-minor px-5 max-sm:px-0 sm:px-8">
                     <SectionHeading eyebrow="Examples" title="The cases worth copying." />
                     {/*
                 Under the heading rather than beside it.
@@ -967,7 +972,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
               {/* Clinical ----------------------------------------------------- */}
               {hasClinical && domain && (
                 <section id="clinical" className="scroll-mt-24 border-b border-rule">
-                  <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+                  <div className="mx-auto max-w-6xl section-minor px-5 max-sm:px-0 sm:px-8">
                     <SectionHeading eyebrow="Clinical" title="Where it sits in the record." />
 
                     {domain.clinicalContext && (
@@ -1024,7 +1029,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                   id="conformance"
                   className="scroll-mt-24 border-b border-rule bg-paper-sunk/40"
                 >
-                  <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+                  <div className="mx-auto max-w-6xl section-minor px-5 max-sm:px-0 sm:px-8">
                     <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
                       <SectionHeading
                         eyebrow="Conformance"
@@ -1088,7 +1093,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
               {/* Source ------------------------------------------------------- */}
               {source && (
                 <section id="source" className="scroll-mt-24 border-b border-rule bg-paper-sunk/40">
-                  <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+                  <div className="mx-auto max-w-6xl section-minor px-5 max-sm:px-0 sm:px-8">
                     <SectionHeading
                       eyebrow="Source"
                       title="Exactly what lands in your repository."
@@ -1122,7 +1127,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                 builtWith.length > 0 ||
                 usedIn.length > 0) && (
                 <section id="related" className="scroll-mt-24">
-                  <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+                  <div className="mx-auto max-w-6xl section-minor px-5 max-sm:px-0 sm:px-8">
                     <SectionHeading eyebrow="Related" title="Pairs well with." />
 
                     {/* "Use X instead when Y" is the single strongest trust signal a

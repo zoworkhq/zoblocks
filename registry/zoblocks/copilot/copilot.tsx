@@ -284,7 +284,7 @@ export function Copilot({
                 {...(menu.inputProps["aria-activedescendant"]
                   ? { "aria-activedescendant": menu.inputProps["aria-activedescendant"] }
                   : {})}
-                className="min-w-0 flex-1 bg-transparent px-1 text-[var(--zb-text)] outline-none placeholder:text-[var(--zb-text-muted)]"
+                className="min-w-0 flex-1 bg-transparent px-1 text-[var(--zb-text)] outline-none placeholder:text-[var(--zb-text-muted)] [@media(pointer:coarse)]:text-[length:max(16px,1em)]"
               />
 
               {(() => {
@@ -501,7 +501,7 @@ function CopilotPanel({
       aria-label="Assistant conversation"
       // A column, not a banner. The record stays readable beside it, which is
       // the whole reason a clinician opened a thread about that record.
-      className="flex max-h-[min(78vh,44rem)] w-full max-w-md flex-col overflow-hidden rounded-2xl border border-[var(--zb-border)] bg-[var(--zb-surface)] shadow-[0_1px_2px_rgb(0_0_0/0.05),0_16px_40px_-16px_rgb(0_0_0/0.28)]"
+      className="flex max-h-[min(78dvh,44rem)] w-full max-w-md flex-col overflow-hidden rounded-2xl border border-[var(--zb-border)] bg-[var(--zb-surface)] shadow-[0_1px_2px_rgb(0_0_0/0.05),0_16px_40px_-16px_rgb(0_0_0/0.28)]"
     >
       <header className="flex items-center justify-between border-b border-[var(--zb-border)] px-3 py-2">
         {api.threads.length > 1 ? (
@@ -842,7 +842,7 @@ function CopilotPanel({
               void api.submit();
             }
           }}
-          className="w-full bg-transparent text-sm text-[var(--zb-text)] outline-none"
+          className="w-full bg-transparent text-sm text-[var(--zb-text)] outline-none [@media(pointer:coarse)]:text-[length:max(16px,1em)]"
         />
         <div className="mt-1 flex items-center gap-1">
           <button

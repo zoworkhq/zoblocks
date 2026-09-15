@@ -186,20 +186,39 @@ function ScaledArt({
   fit?: number;
   children: React.ReactNode;
 }) {
+  const outer = React.useRef<HTMLDivElement>(null);
   const inner = React.useRef<HTMLDivElement>(null);
   const [natural, setNatural] = React.useState<{ w: number; h: number } | null>(null);
+  const [room, setRoom] = React.useState<number | null>(null);
 
   React.useLayoutEffect(() => {
     const el = inner.current;
+    const band = outer.current?.parentElement;
     if (!el) return;
-    const read = () => setNatural({ w: el.offsetWidth, h: el.offsetHeight });
+    /*
+     * The wider of the box and what paints inside it.
+     *
+     * `offsetWidth` alone missed both cards that overflowed: Data Grid pins a
+     * 380px box and its table is wider than that, and Recorder's duet wants
+     * ~370px of bars whatever box it is given. Their boxes fitted; their
+     * content did not, and sliced off at the frame's edge.
+     */
+    const read = () => {
+      setNatural({ w: Math.max(el.offsetWidth, el.scrollWidth), h: el.offsetHeight });
+      if (band) setRoom(band.clientWidth);
+    };
     read();
     const observer = new ResizeObserver(read);
     observer.observe(el);
+    if (band) observer.observe(band);
     return () => observer.disconnect();
   }, []);
 
-  const applied = natural && fit && natural.h > 0 ? Math.min(scale, fit / natural.h) : scale;
+  // Height is `fit`'s guard; width is the frame's. A card that already fits
+  // both keeps exactly the scale it was authored at.
+  const byHeight = natural && fit && natural.h > 0 ? fit / natural.h : Infinity;
+  const byWidth = natural && room && natural.w > 0 ? room / natural.w : Infinity;
+  const applied = Math.min(scale, byHeight, byWidth);
 
   return (
     // No `overflow-hidden`. It was here to clip an inner box deliberately made
@@ -208,6 +227,7 @@ function ScaledArt({
     // paints past its own border box — which showed up as a severed row at the
     // bottom of the Accordion and SafetyPlan cards.
     <div
+      ref={outer}
       style={
         natural ? { width: natural.w * applied, height: natural.h * applied } : { width: "100%" }
       }
@@ -354,18 +374,22 @@ const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
    * card cannot ask for a microphone. Duet is a rendered take: it is honest
    * standing still, and it is the art nobody else ships.
    */
+  // Scaled rather than squeezed: the duet's bars have a pitch, and a narrower
+  // box painted them past the frame — 62px over at 1280, 134px at 320.
   recorder: (featured) => (
-    <Recorder
-      variant="duet"
-      phase="ready"
-      peaks={REC_PEAKS}
-      speakers={REC_SPEAKERS}
-      position={featured ? 0.44 : 0.36}
-      durationMs={754_000}
-      speakerLabels={["Dr Okafor", "Patient"]}
-      title="Consultation — 14 Aug, 09:12"
-      markers={featured ? REC_CARD_MARKERS : undefined}
-    />
+    <ScaledArt scale={1} fit={featured ? FEATURED_ART : STANDARD_ART}>
+      <Recorder
+        variant="duet"
+        phase="ready"
+        peaks={REC_PEAKS}
+        speakers={REC_SPEAKERS}
+        position={featured ? 0.44 : 0.36}
+        durationMs={754_000}
+        speakerLabels={["Dr Okafor", "Patient"]}
+        title="Consultation — 14 Aug, 09:12"
+        markers={featured ? REC_CARD_MARKERS : undefined}
+      />
+    </ScaledArt>
   ),
   "pulse-loader": (featured) => (
     <PulseLoader size={featured ? 124 : 96} label="Loading your records" />

@@ -18,7 +18,7 @@
 import * as React from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
-import { ArrowRight, CornerDownLeft, Search } from "lucide-react";
+import { ArrowRight, CornerDownLeft, Search, X } from "lucide-react";
 import { CATALOG } from "@/lib/catalog";
 import { isReady, readyRank } from "@/lib/readiness";
 import { cn } from "@/lib/utils";
@@ -241,9 +241,9 @@ export function CommandMenu() {
         type="button"
         onClick={() => setOpen(true)}
         aria-label="Search — press Command K"
-        className="group inline-flex items-center gap-2 rounded-lg border border-rule bg-paper-sunk/60 py-1.5 pl-2.5 pr-1.5 text-sm text-graphite transition-colors duration-200 hover:border-rule-strong hover:text-ink"
+        className="group inline-flex items-center gap-2 rounded-lg border border-rule bg-paper-sunk/60 py-1.5 pl-2.5 pr-1.5 text-sm text-graphite transition-colors duration-200 hover:border-rule-strong hover:text-ink max-md:size-10 max-md:justify-center max-md:p-0"
       >
-        <Search aria-hidden="true" className="size-3.5" />
+        <Search aria-hidden="true" className="size-3.5 max-md:size-4" />
         <span className="hidden lg:inline">Search</span>
         <kbd className="numeric hidden rounded border border-rule bg-paper px-1.5 py-0.5 text-[0.625rem] text-graphite-soft lg:inline">
           ⌘K
@@ -253,14 +253,18 @@ export function CommandMenu() {
       {open &&
         mounted &&
         createPortal(
-          <div
-            className="fixed inset-0 z-50 flex items-start justify-center px-4 pt-[12vh]"
-            onMouseDown={(event) => {
-              if (event.target === event.currentTarget) setOpen(false);
-            }}
-          >
+          <div className="fixed inset-0 z-50 flex items-start justify-center px-4 pt-[max(1rem,8dvh)] sm:pt-[12vh]">
+            {/*
+              The backdrop closes on its own click.
+
+              The container used to test `target === currentTarget`, which is
+              never true: this backdrop covers all of it, so every press outside
+              the panel landed here instead. Only Escape closed the palette — a
+              key a phone does not have.
+            */}
             <div
               aria-hidden="true"
+              onClick={() => setOpen(false)}
               className="absolute inset-0 bg-ink/40 backdrop-blur-[2px] motion-safe:animate-[overlay-in_200ms_ease-out]"
             />
 
@@ -287,9 +291,18 @@ export function CommandMenu() {
                   spellCheck={false}
                   className="focus-ring-none w-full bg-transparent py-4 text-[0.9375rem] text-ink outline-none placeholder:text-graphite-soft"
                 />
-                <kbd className="numeric shrink-0 rounded border border-rule px-1.5 py-0.5 text-[0.625rem] text-graphite-soft">
-                  ESC
-                </kbd>
+                {/* A real button: `ESC` for a keyboard, a cross for a finger. */}
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  aria-label="Close search"
+                  className="-mr-2 inline-flex shrink-0 items-center justify-center rounded-md p-2 text-graphite-soft transition-colors duration-200 hover:text-ink"
+                >
+                  <kbd className="numeric rounded border border-rule px-1.5 py-0.5 text-[0.625rem] [@media(hover:none)]:hidden">
+                    ESC
+                  </kbd>
+                  <X aria-hidden="true" className="hidden size-4 [@media(hover:none)]:block" />
+                </button>
               </div>
 
               <ul
@@ -297,7 +310,7 @@ export function CommandMenu() {
                 id="command-list"
                 role="listbox"
                 aria-label="Results"
-                className="scroll-thin max-h-[46vh] overflow-y-auto p-2"
+                className="scroll-thin max-h-[46dvh] overflow-y-auto p-2"
               >
                 {results.length === 0 && (
                   <li className="px-3 py-8 text-center text-sm text-graphite">
@@ -348,10 +361,11 @@ export function CommandMenu() {
               </ul>
 
               <div className="flex items-center gap-4 border-t border-rule px-4 py-2.5 text-[0.6875rem] text-graphite-soft">
-                <span className="inline-flex items-center gap-1.5">
+                {/* Keyboard hints mean nothing to a finger. */}
+                <span className="inline-flex items-center gap-1.5 [@media(hover:none)]:hidden">
                   <kbd className="numeric rounded border border-rule px-1 py-0.5">↑↓</kbd> navigate
                 </span>
-                <span className="inline-flex items-center gap-1.5">
+                <span className="inline-flex items-center gap-1.5 [@media(hover:none)]:hidden">
                   <kbd className="numeric rounded border border-rule px-1 py-0.5">
                     <CornerDownLeft className="size-2.5" aria-hidden="true" />
                   </kbd>

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowUpRight, Github } from "lucide-react";
 import { CommandMenu } from "@/components/site/command-menu";
+import { SiteMenu } from "@/components/site/site-menu";
 import { ThemeToggle } from "@/components/site/theme-toggle";
 import { cn } from "@/lib/utils";
 
@@ -134,7 +135,7 @@ export function SiteHeader() {
          * does.
          */
         scrolled
-          ? "h-13 border-b border-rule bg-paper/80"
+          ? "h-13 border-b border-rule bg-paper/90"
           : "h-16 border-b border-transparent bg-paper/40",
       )}
     >
@@ -223,6 +224,8 @@ export function SiteHeader() {
           <div className="ml-1 hidden sm:block">
             <ThemeToggle />
           </div>
+
+          <SiteMenu mark={<ZoBlocksMark className="h-4 w-7" />} />
 
           {/* No Sign in and no Request access.
 
@@ -333,24 +336,27 @@ export function SiteFooter() {
             {FOOTER_LINKS.map((column) => (
               <div key={column.title}>
                 <p className="axis-label">{column.title}</p>
+                {/* 24px rows, the WCAG 2.5.8 floor. They were 17px; with
+                    `space-y-2` the pitch stays the 32px it was. */}
                 <ul className="mt-3 space-y-2">
                   {column.links.map((link) => (
                     <li key={link.href}>
                       {"external" in link && link.external ? (
                         <a
                           href={link.href}
-                          className="group inline-flex items-center gap-1 text-sm text-graphite transition-colors duration-200 hover:text-ink"
+                          className="group inline-flex min-h-6 items-center gap-1 text-sm text-graphite transition-colors duration-200 hover:text-ink"
                         >
                           {link.label}
+                          {/* Shown outright where there is no hover to reveal it. */}
                           <ArrowUpRight
                             aria-hidden="true"
-                            className="size-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+                            className="size-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100 [@media(hover:none)]:opacity-100"
                           />
                         </a>
                       ) : (
                         <Link
                           href={link.href}
-                          className="text-sm text-graphite transition-colors duration-200 hover:text-ink"
+                          className="inline-flex min-h-6 items-center text-sm text-graphite transition-colors duration-200 hover:text-ink"
                         >
                           {link.label}
                         </Link>

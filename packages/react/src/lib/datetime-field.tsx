@@ -786,7 +786,10 @@ export function CalendarGrid(props: CalendarGridProps) {
     className,
   } = props;
 
-  const monthCount = Math.max(1, Math.min(4, Math.round(monthCountProp)));
+  // A bottom sheet on a phone has room for one month, whatever the host asked
+  // for: a second month side by side is 600px wide, and stacked is a scroll.
+  const inSheet = React.useContext(TemporalSheetContext);
+  const monthCount = inSheet ? 1 : Math.max(1, Math.min(4, Math.round(monthCountProp)));
   const showOutside = showOutsideDays ?? monthCount === 1;
 
   const [pane, setPane] = React.useState<"days" | "months" | "years">("days");
@@ -1231,6 +1234,64 @@ export interface TemporalPopoverProps {
   children: React.ReactNode;
 }
 
+/** True inside a popover presented as a bottom sheet. */
+const TemporalSheetContext = React.createContext(false);
+
+/**
+ * When the popover becomes a bottom sheet.
+ *
+ * A narrow viewport, or a touch device held landscape. The second matters as
+ * much as the first: a phone on its side is 850px wide and under 400px tall,
+ * and an anchored calendar there covers the field that opened it.
+ */
+const SHEET_QUERIES = ["(max-width: 40rem)", "(pointer: coarse) and (max-height: 30rem)"];
+
+export function prefersTemporalSheet(): boolean {
+  if (typeof window.matchMedia !== "function") return false;
+  return SHEET_QUERIES.some((query) => window.matchMedia(query).matches);
+}
+
+function subscribeTemporalSheet(onChange: () => void): () => void {
+  if (typeof window.matchMedia !== "function") return () => undefined;
+  const lists = SHEET_QUERIES.map((query) => window.matchMedia(query));
+  for (const list of lists) list.addEventListener("change", onChange);
+  return () => {
+    for (const list of lists) list.removeEventListener("change", onChange);
+  };
+}
+
+const serverPrefersSheet = () => false;
+
+/** The gap the anchored popover keeps from every viewport edge. */
+const VIEWPORT_GUTTER = 8;
+
+/**
+ * Where the anchored popover goes.
+ *
+ * Below the field, or above it when there is genuinely more room there. Then
+ * clamped inside the viewport: a 483px panel opened from a field 61px in from
+ * the left of a 375px screen used to end 169px past the right edge, with the
+ * calendar cut after Tuesday.
+ */
+export function placeTemporalPopover(
+  field: { top: number; bottom: number; left: number },
+  panel: { width: number; height: number },
+  viewport: { width: number; height: number },
+): { top: number; left: number; above: boolean } {
+  const g = VIEWPORT_GUTTER;
+  const below = viewport.height - field.bottom;
+  // SC 2.4.11: the popover may never be the thing that hides the field that
+  // opened it. Flip above only when there is genuinely more room there, so a
+  // short viewport does not just move the problem.
+  const above = panel.height > 0 && below < panel.height + g && field.top > below;
+  const top = above ? field.top - panel.height - 4 : field.bottom + 4;
+  return {
+    top: Math.max(g, Math.min(top, viewport.height - panel.height - g)),
+    left: Math.max(g, Math.min(field.left, viewport.width - panel.width - g)),
+    above,
+  };
+}
+
 /**
  * A dialog anchored to the field that opened it.
  *
@@ -1251,33 +1312,16 @@ export function TemporalPopover(props: TemporalPopoverProps) {
   const [mounted, setMounted] = React.useState(false);
   React.useEffect(() => setMounted(true), []);
 
+  // Read during render rather than in an effect, so a range calendar mounts
+  // with the one month it will keep instead of mounting two and losing one.
+  const sheet = React.useSyncExternalStore(
+    subscribeTemporalSheet,
+    prefersTemporalSheet,
+    serverPrefersSheet,
+  );
+
   React.useLayoutEffect(() => {
     if (!open || !mounted) return undefined;
-
-    const place = () => {
-      const anchor = anchorRef.current?.parentElement;
-      const panel = panelRef.current;
-      if (!anchor || typeof anchor.getBoundingClientRect !== "function") return;
-      const field = anchor.getBoundingClientRect();
-      const height = panel?.getBoundingClientRect().height ?? 0;
-      const viewport = typeof window === "undefined" ? 0 : window.innerHeight;
-
-      // SC 2.4.11: the popover may never be the thing that hides the field
-      // that opened it. Flip above only when there is genuinely more room
-      // there, so a short viewport does not just move the problem.
-      const below = viewport - field.bottom;
-      const above = height > 0 && below < height + 8 && field.top > below;
-      setBox({
-        top: above ? field.top - height - 4 : field.bottom + 4,
-        left: field.left,
-        above,
-      });
-    };
-
-    place();
-    // A second pass once the panel has a measured height, so the flip decision
-    // is made against the real one rather than zero.
-    const raf = typeof requestAnimationFrame === "function" ? requestAnimationFrame(place) : null;
 
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -1285,28 +1329,102 @@ export function TemporalPopover(props: TemporalPopoverProps) {
         onDismiss();
       }
     };
-    const onPointer = (event: MouseEvent) => {
+    document.addEventListener("keydown", onKey, true);
+
+    if (sheet) {
+      // The page under a sheet does not scroll: a drag that overshoots the
+      // calendar would otherwise move the form behind the scrim.
+      const body = document.body;
+      const overflow = body.style.overflow;
+      body.style.overflow = "hidden";
+
+      // The preset row scrolls sideways, and a chip cut by the edge looks cut
+      // rather than scrollable. Mark the sides that still hide chips so the
+      // stylesheet can fade them. `Math.abs` because an RTL row scrolls into
+      // negative offsets.
+      const fade = () => {
+        const rails = document.querySelectorAll<HTMLElement>(".zb-dt-pop--sheet .zb-dt-cal__rail");
+        for (const rail of rails) {
+          const offset = Math.abs(rail.scrollLeft);
+          rail.toggleAttribute("data-zb-fade-start", offset > 1);
+          rail.toggleAttribute(
+            "data-zb-fade-end",
+            offset < rail.scrollWidth - rail.clientWidth - 1,
+          );
+        }
+      };
+      fade();
+      // A selection adds the Custom chip and bolds the active one, and neither
+      // is a scroll. Only child lists and classes are watched, so the fade's
+      // own data attributes cannot feed back into it.
+      const observer = new MutationObserver(fade);
+      observer.observe(body, { childList: true, subtree: true, attributeFilter: ["class"] });
+      document.addEventListener("scroll", fade, true);
+      window.addEventListener("resize", fade);
+      return () => {
+        document.removeEventListener("keydown", onKey, true);
+        document.removeEventListener("scroll", fade, true);
+        window.removeEventListener("resize", fade);
+        observer.disconnect();
+        body.style.overflow = overflow;
+      };
+    }
+
+    const place = () => {
+      const anchor = anchorRef.current?.parentElement;
+      if (!anchor || typeof anchor.getBoundingClientRect !== "function") return;
+      const { width, height } = panelRef.current?.getBoundingClientRect() ?? {
+        width: 0,
+        height: 0,
+      };
+      setBox(
+        placeTemporalPopover(
+          anchor.getBoundingClientRect(),
+          { width, height },
+          // `clientWidth` leaves out a classic scrollbar, which `innerWidth`
+          // counts as room.
+          {
+            width: document.documentElement.clientWidth || window.innerWidth,
+            height: window.innerHeight,
+          },
+        ),
+      );
+    };
+
+    place();
+    // A second pass once the panel has a measured size, so the flip and the
+    // clamp are decided against the real one rather than zero.
+    const raf = typeof requestAnimationFrame === "function" ? requestAnimationFrame(place) : null;
+
+    // `pointerdown`, not `mousedown`: iOS does not reliably send compatibility
+    // mouse events for a tap on content that is not itself clickable.
+    const onPointer = (event: Event) => {
       const target = event.target as Node;
       if (panelRef.current?.contains(target)) return;
       if (anchorRef.current?.parentElement?.contains(target)) return;
       onDismiss();
     };
 
-    document.addEventListener("keydown", onKey, true);
-    document.addEventListener("mousedown", onPointer);
+    document.addEventListener("pointerdown", onPointer);
     // `capture` catches scrolling in any ancestor, not just the page: the
     // panel is fixed to the viewport, so an ancestor that scrolls would slide
-    // out from under it.
+    // out from under it. The visual viewport moves on its own when a phone's
+    // keyboard or browser chrome comes and goes.
+    const visual = window.visualViewport;
     window.addEventListener("scroll", place, true);
     window.addEventListener("resize", place);
+    visual?.addEventListener("resize", place);
+    visual?.addEventListener("scroll", place);
     return () => {
       if (raf !== null && typeof cancelAnimationFrame === "function") cancelAnimationFrame(raf);
       document.removeEventListener("keydown", onKey, true);
-      document.removeEventListener("mousedown", onPointer);
+      document.removeEventListener("pointerdown", onPointer);
       window.removeEventListener("scroll", place, true);
       window.removeEventListener("resize", place);
+      visual?.removeEventListener("resize", place);
+      visual?.removeEventListener("scroll", place);
     };
-  }, [open, mounted, onDismiss]);
+  }, [open, mounted, onDismiss, sheet]);
 
   // The anchor is a zero-size marker that stays in the tree, so the panel can
   // find the field it belongs to after being portalled away from it.
@@ -1318,16 +1436,30 @@ export function TemporalPopover(props: TemporalPopoverProps) {
     <>
       {marker}
       {createPortal(
-        <div
-          ref={panelRef}
-          role="dialog"
-          aria-label={label}
-          className={cn("zb-dt-pop", box?.above && "zb-dt-pop--above")}
-          style={box ? { top: box.top, left: box.left } : { visibility: "hidden" }}
-          {...scopeOf(anchorRef.current)}
-        >
-          {children}
-        </div>,
+        <>
+          {/* The scrim closes on `click`, not on `pointerdown`: removing it
+              under a finger that is still down sends the tap's click through
+              to whatever was behind it. */}
+          {sheet ? (
+            <div className="zb-dt-pop__scrim" aria-hidden="true" onClick={onDismiss} />
+          ) : null}
+          <div
+            ref={panelRef}
+            role="dialog"
+            aria-label={label}
+            className={cn(
+              "zb-dt-pop",
+              sheet ? "zb-dt-pop--sheet" : box?.above && "zb-dt-pop--above",
+            )}
+            style={
+              sheet ? undefined : box ? { top: box.top, left: box.left } : { visibility: "hidden" }
+            }
+            {...scopeOf(anchorRef.current)}
+          >
+            {sheet ? <div className="zb-dt-pop__grip" aria-hidden="true" /> : null}
+            <TemporalSheetContext.Provider value={sheet}>{children}</TemporalSheetContext.Provider>
+          </div>
+        </>,
         document.body,
       )}
     </>

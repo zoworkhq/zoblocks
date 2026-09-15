@@ -232,9 +232,12 @@
   cursor: pointer;
 }
 
-.zb-grid__admit:hover {
-  border-color: var(--zb-grid-accent);
-  background: var(--zb-grid-sunk);
+/* Hover only where there is hover: on a touch screen it sticks after the tap. */
+@media (hover: hover) {
+  .zb-grid__admit:hover {
+    border-color: var(--zb-grid-accent);
+    background: var(--zb-grid-sunk);
+  }
 }
 
 /* ---------------------------------------------------------------- */
@@ -283,8 +286,10 @@
   cursor: pointer;
 }
 
-.zb-grid__bulkclear:hover {
-  color: var(--zb-grid-ink);
+@media (hover: hover) {
+  .zb-grid__bulkclear:hover {
+    color: var(--zb-grid-ink);
+  }
 }
 
 .zb-grid__bulkactions {
@@ -366,13 +371,39 @@
   background: var(--zb-grid-surface);
 }
 
+/* The corner: above the sticky header and above the pinned body cells. */
 .zb-grid__th.zb-grid__pin {
   z-index: 3;
 }
 
-/* Only the last pinned cell carries the seam, so the group reads as one slab. */
-.zb-grid__pin + :not(.zb-grid__pin) {
-  box-shadow: inset 6px 0 6px -6px rgb(0 0 0 / 0.12);
+/*
+ * The seam, on the last pinned cell and only once something is under it.
+ *
+ * It used to be an inset shadow on the first unpinned cell, which is the cell
+ * that scrolls away — so the seam left with the content it was meant to divide
+ * the pinned column from. Drawn from the pinned cell instead, it stays at the
+ * boundary. Hidden at rest, so a grid that fits its box looks as it always did.
+ */
+.zb-grid__pin--edge::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  left: 100%;
+  inline-size: 6px;
+  pointer-events: none;
+  /*
+   * A rule as well as a shadow. A collapsed border stays where the table put
+   * it rather than travelling with a sticky cell, so the column's own rule is
+   * gone once content scrolls under it, and a black shadow alone is invisible
+   * on a dark surface.
+   */
+  border-inline-start: 1px solid var(--zb-grid-rule);
+  background: linear-gradient(to right, rgb(0 0 0 / 0.12), transparent);
+  opacity: 0;
+}
+
+.zb-grid__scroll[data-zb-scrolled="true"] .zb-grid__pin--edge::after {
+  opacity: 1;
 }
 
 .zb-grid__tr--current > .zb-grid__pin {
@@ -408,6 +439,35 @@
   margin: 0;
   accent-color: var(--zb-grid-accent);
   cursor: pointer;
+}
+
+/*
+ * A 24px target around a 15px box.
+ *
+ * The box stays the size a dense ledger wants; the label around it takes the
+ * tap. The label hugs the box — an inline-block with no line height of its
+ * own, sitting on the same baseline — so the row lays out exactly as it did and
+ * the extra area is centred on the box rather than on the line of text. The
+ * pseudo-element is that area: a tap on it is a tap on the label, which toggles
+ * the checkbox.
+ */
+.zb-grid__hit {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+  cursor: pointer;
+}
+
+.zb-grid__hit::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  inline-size: 2.25rem;
+  /* 26px: over the 24px floor with margin, under the 27px compact row, so two
+     rows' targets never overlap. */
+  block-size: 1.625rem;
+  transform: translate(-50%, -50%);
 }
 
 /* Selection paints below, after the current row, because the two states
@@ -453,9 +513,11 @@
   cursor: pointer;
 }
 
-.zb-grid__sort:hover {
-  color: var(--zb-grid-ink);
-  background: var(--zb-grid-sunk);
+@media (hover: hover) {
+  .zb-grid__sort:hover {
+    color: var(--zb-grid-ink);
+    background: var(--zb-grid-sunk);
+  }
 }
 
 .zb-grid__th--end .zb-grid__sort,

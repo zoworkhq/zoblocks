@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { BLOCKS, getBlock } from "@/lib/blocks";
 import { getComponent } from "@/lib/catalog";
+import { isReady } from "@/lib/readiness";
 import { BlockBody } from "@/components/blocks";
 import { SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { RevealRoot } from "@/components/site/interactions";
@@ -60,7 +61,10 @@ export default async function BlockPage({ params }: { params: Promise<{ slug: st
             </p>
             <div className="mt-5 flex flex-wrap gap-1.5">
               {block.uses.map((item) =>
-                getComponent(item) ? (
+                // A link only where a page exists. Being in the catalogue is not
+                // enough: `timeline`, `chart-accordion` and `clinical-note` are,
+                // and all three links returned 404.
+                getComponent(item) && isReady(item) ? (
                   <Link
                     key={item}
                     href={`/components/${item}`}

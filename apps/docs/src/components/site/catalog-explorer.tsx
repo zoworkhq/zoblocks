@@ -190,9 +190,14 @@ export function CatalogExplorer({ catalog }: { catalog: readonly ComponentDoc[] 
         pickers and typeahead all come free and none of them can be got subtly
         wrong here.
       */}
+      {/*
+        Not sticky on a phone. There the row wraps to three lines, and 140px
+        pinned under the header left a 667px screen with little room for
+        the cards it filters.
+      */}
       <div
         className={cn(
-          "surface-2 sticky z-20 flex flex-wrap items-center gap-2 rounded-xl px-2.5 py-2 backdrop-blur-md",
+          "surface-2 sticky z-20 flex flex-wrap items-center gap-2 rounded-xl px-2.5 py-2 backdrop-blur-md max-sm:static",
           "top-[calc(var(--header-h)+0.5rem)]",
         )}
       >

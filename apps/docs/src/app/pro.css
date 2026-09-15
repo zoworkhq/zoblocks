@@ -43,9 +43,11 @@
     transform 0.45s var(--p-ease),
     box-shadow 0.45s var(--p-ease);
 }
-.zbp .glance:hover {
-  border-color: var(--site-rule-strong);
-  transform: translateY(-3px);
+@media (hover: hover) {
+  .zbp .glance:hover {
+    border-color: var(--site-rule-strong);
+    transform: translateY(-3px);
+  }
 }
 .zbp .stage {
   height: 132px;
@@ -488,8 +490,10 @@
   white-space: nowrap;
   transition: color 0.2s;
 }
-.zbp .fTabs button:hover {
-  color: var(--site-ink);
+@media (hover: hover) {
+  .zbp .fTabs button:hover {
+    color: var(--site-ink);
+  }
 }
 .zbp .fTabs button[aria-selected="true"] {
   color: var(--site-ink);
@@ -595,9 +599,11 @@
     border-color 0.3s,
     transform 0.4s var(--p-ease);
 }
-.zbp .tier:hover {
-  border-color: var(--site-rule-strong);
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .zbp .tier:hover {
+    border-color: var(--site-rule-strong);
+    transform: translateY(-2px);
+  }
 }
 .zbp .tier[data-featured] {
   border-color: color-mix(in srgb, var(--site-brand) 55%, transparent);
@@ -684,16 +690,20 @@
     background 0.2s,
     border-color 0.2s;
 }
-.zbp .tier .tcta:hover {
-  background: var(--site-paper);
+@media (hover: hover) {
+  .zbp .tier .tcta:hover {
+    background: var(--site-paper);
+  }
 }
 .zbp .tier[data-featured] .tcta {
   background: var(--site-cta);
   border-color: transparent;
   color: var(--site-paper);
 }
-.zbp .tier[data-featured] .tcta:hover {
-  background: var(--site-cta-hover);
+@media (hover: hover) {
+  .zbp .tier[data-featured] .tcta:hover {
+    background: var(--site-cta-hover);
+  }
 }
 .zbp .tier .tnote {
   font-size: 10.5px;

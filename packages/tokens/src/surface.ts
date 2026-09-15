@@ -13,7 +13,7 @@
  * change, because customers style against these names. The manifest is
  * committed so that change shows up as a reviewable diff.
  *
- * 358 tokens across 31 components:
+ * 361 tokens across 32 components:
  *
  *   switch          55
  *   tabs            44
@@ -37,6 +37,7 @@
  *   avatar           4
  *   rv               4
  *   absent           3
+ *   dt-pop           3
  *   value            3
  *   care-timeline    2
  *   presence         2
@@ -1750,6 +1751,33 @@ export const TOKEN_SURFACE: readonly SurfaceEntry[] = [
     "source": "packages/tokens/tokens/component.json",
     "kind": "color",
     "semantic": "--zb-text-muted",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--zb-dt-fade-dir",
+    "component": "dt-pop",
+    "source": "packages/react/src/styles.css",
+    "kind": "dimension",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--zb-dt-fade-end",
+    "component": "dt-pop",
+    "source": "packages/react/src/styles.css",
+    "kind": "dimension",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--zb-dt-fade-start",
+    "component": "dt-pop",
+    "source": "packages/react/src/styles.css",
+    "kind": "dimension",
     "frameworks": [],
     "fallback": true,
     "bridgeable": true
@@ -3727,6 +3755,7 @@ export const SURFACE_COMPONENTS: readonly string[] = [
   "copilot",
   "cs",
   "datetime",
+  "dt-pop",
   "field",
   "grid",
   "loader",
@@ -3856,6 +3885,9 @@ export const BRIDGEABLE: readonly string[] = [
   "--zb-datetime-target",
   "--zb-datetime-today-marker",
   "--zb-datetime-weekday-fg",
+  "--zb-dt-fade-dir",
+  "--zb-dt-fade-end",
+  "--zb-dt-fade-start",
   "--zb-field-bg",
   "--zb-field-border",
   "--zb-field-border-focus",

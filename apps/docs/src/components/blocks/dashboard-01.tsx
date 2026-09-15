@@ -174,36 +174,40 @@ export function Dashboard01() {
             </div>
             <span className="seeAll">68 active</span>
           </div>
-          <table className="dt">
-            <thead>
-              <tr>
-                <th>Patient</th>
-                <th>Instrument</th>
-                <th>Trend</th>
-                <th>Sessions</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {CASELOAD.map((r) => (
-                <tr key={r[1]}>
-                  <td>
-                    <SevRail sev={r[0] as never} />
-                    <span className="whoCell">
-                      <Face name={r[1]} src={FACE(r[1])} />
-                      {r[1]}
-                    </span>
-                  </td>
-                  <td className="mono">{r[2]}</td>
-                  <td className="mono">{r[3]}</td>
-                  <td className="mono">{r[4]}</td>
-                  <td>
-                    <Status sev={r[6] as never}>{r[5]}</Status>
-                  </td>
+          {/* Its own scroller: five columns do not fit a phone, and the block
+              frame clips rather than letting the page scroll. */}
+          <div className="dtScroll">
+            <table className="dt">
+              <thead>
+                <tr>
+                  <th>Patient</th>
+                  <th>Instrument</th>
+                  <th>Trend</th>
+                  <th>Sessions</th>
+                  <th>Status</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {CASELOAD.map((r) => (
+                  <tr key={r[1]}>
+                    <td>
+                      <SevRail sev={r[0] as never} />
+                      <span className="whoCell">
+                        <Face name={r[1]} src={FACE(r[1])} />
+                        {r[1]}
+                      </span>
+                    </td>
+                    <td className="mono">{r[2]}</td>
+                    <td className="mono">{r[3]}</td>
+                    <td className="mono">{r[4]}</td>
+                    <td>
+                      <Status sev={r[6] as never}>{r[5]}</Status>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
       </div>
     </div>

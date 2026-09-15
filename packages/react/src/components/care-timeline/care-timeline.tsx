@@ -1013,7 +1013,15 @@ function eventItem(resolved: ResolvedEvent, context: RenderContext): TimelineIte
         ) : null}
 
         <p className="zb-care-timeline__when">
-          <time dateTime={event.occurred}>{absolute ?? event.occurred}</time>
+          {/*
+            `suppressHydrationWarning`: the instant is the same on both sides,
+            but the words are the runtime's ICU data. Node renders
+            "2 Sep 2026 at 09:30" and Safari "2 Sept 2026, 09:30" for the same
+            `en-GB`, and the mismatch threw on every page with a timeline.
+          */}
+          <time dateTime={event.occurred} suppressHydrationWarning>
+            {absolute ?? event.occurred}
+          </time>
           {relative ? (
             <span aria-hidden="true" className="zb-care-timeline__ago">
               {relative}

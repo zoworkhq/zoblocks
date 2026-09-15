@@ -594,6 +594,71 @@
   transform: translate3d(0, var(--zb-tabs-ind-y, 0), 0);
 }
 
+/*
+ * A rail with no room beside it stacks above its panel.
+ *
+ * The rail holds 190px, so in a phone-width box the panel had less than
+ * nothing left and was painted over the rail's labels. Below 28rem the list
+ * goes full width on top and the panel follows. Only the drawing changes: the
+ * tablist is still vertical, so the arrow keys still go up and down.
+ *
+ * `data-zb-narrow` is measured from the root's own width, so a narrow sidebar
+ * on a wide screen stacks too. The media query is the same rule before
+ * JavaScript runs: a viewport under 28rem cannot hold a wider rail.
+ */
+.zb-tabs[data-zb-variant="rail"][data-zb-narrow] {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem;
+}
+.zb-tabs[data-zb-variant="rail"][data-zb-narrow] > .zb-tabs__list,
+.zb-tabs[data-zb-variant="rail"][data-zb-narrow] > * > .zb-tabs__list {
+  min-inline-size: 0;
+  padding-inline-end: 0;
+  padding-block-end: 0.5rem;
+  border-inline-end: 0;
+  border-block-end: 1px solid var(--zb-tabs-rail);
+}
+/* The bar rides a divider that is no longer there, and behind a rounded
+   selected tab it only shows at the corners. Stacked, selection is the tab's
+   own ground and weight. Moved inside as well as hidden: a hidden box still
+   overflows, and a bar left hanging past the inline end made the full-width
+   list report horizontal overflow and drew scroll nudges around a list that
+   does not scroll. */
+.zb-tabs[data-zb-variant="rail"][data-zb-narrow] .zb-tabs__line {
+  inset-inline-start: 0;
+  inset-inline-end: auto;
+  visibility: hidden;
+}
+/* Steps a quarter of a phone wide spend less of it on padding and more on the
+   name. */
+.zb-tabs[data-zb-variant="stepper"][data-zb-narrow] .zb-tabs__tab {
+  padding-inline: 0.5rem;
+}
+@media (max-width: 28rem) {
+  .zb-tabs[data-zb-variant="rail"] {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  .zb-tabs[data-zb-variant="rail"] > .zb-tabs__list,
+  .zb-tabs[data-zb-variant="rail"] > * > .zb-tabs__list {
+    min-inline-size: 0;
+    padding-inline-end: 0;
+    padding-block-end: 0.5rem;
+    border-inline-end: 0;
+    border-block-end: 1px solid var(--zb-tabs-rail);
+  }
+  .zb-tabs[data-zb-variant="rail"] .zb-tabs__line {
+    inset-inline-start: 0;
+    inset-inline-end: auto;
+    visibility: hidden;
+  }
+  .zb-tabs[data-zb-variant="stepper"] .zb-tabs__tab {
+    padding-inline: 0.5rem;
+  }
+}
+
 /* =====================================================================
  * Variant: ghost — no track, no rail, no indicator element
  * ================================================================== */
@@ -645,6 +710,24 @@
   min-inline-size: 0;
   justify-content: flex-start;
   border-radius: 0;
+}
+/*
+ * A step name that does not fit ends in an ellipsis, not mid-letter.
+ *
+ * Steps share the strip equally, so at phone width "Insurance" gets a third of
+ * 290px and was clipped to "Insurar". A block rather than the grid the base
+ * label uses: `text-overflow` needs the text in a box it can style, and the
+ * bold-width reservation is not needed when every step is the same width. The
+ * full name stays in the text, so the accessible name is unchanged.
+ */
+[data-zb-variant="stepper"] .zb-tabs__label {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+[data-zb-variant="stepper"] .zb-tabs__label::after {
+  content: none;
 }
 [data-zb-variant="stepper"] .zb-tabs__tab + .zb-tabs__tab {
   border-inline-start: 1px solid var(--zb-tabs-border);

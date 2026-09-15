@@ -17,6 +17,8 @@
   /* `8vh` for the same reason, capped so a short containing block keeps room
      for the panel rather than pushing it out of view. */
   padding: min(8vh, 12%) 1rem 1rem;
+  /* `dvh` where supported: `vh` on a phone includes the collapsed toolbar. */
+  padding: min(8dvh, 12%) 1rem 1rem;
   background: rgb(0 0 0 / 0.4);
   font-family: var(--zb-font-sans, inherit);
 }
@@ -46,6 +48,7 @@
    * fit.
    */
   max-block-size: min(70vh, 100%);
+  max-block-size: min(70dvh, 100%);
   overflow: hidden;
   border: 1px solid var(--zb-border, #e2e8f0);
   border-radius: var(--zb-radius-lg, 8px);
@@ -64,6 +67,13 @@
   color: inherit;
   font: inherit;
   font-size: var(--zb-text-sm, 0.9375rem);
+}
+
+/* iOS zooms the page into any focused field set below 16px. */
+@media (pointer: coarse) {
+  .zb-palette__input {
+    font-size: max(16px, 1em);
+  }
 }
 
 .zb-palette__input:focus {

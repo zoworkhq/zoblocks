@@ -35,7 +35,11 @@ import {
   timeGrid,
   timeToSegments,
 } from "./date-picker";
-import { ClockGlyph } from "@/lib/zoblocks-datetime-field";
+import {
+  ClockGlyph,
+  placeTemporalPopover,
+  prefersTemporalSheet,
+} from "@/lib/zoblocks-datetime-field";
 import { buildSlots, type AvailabilitySet } from "@/lib/zoblocks-availability";
 import {
   compareDates,
@@ -1145,11 +1149,16 @@ describe("the popover dismisses the way a popover should", () => {
     expect(screen.getByRole("dialog")).toBeTruthy();
 
     // Inside the panel: still open.
-    fireEvent.mouseDown(screen.getByRole("grid"));
+    fireEvent.pointerDown(screen.getByRole("grid"));
+    expect(screen.queryByRole("dialog")).toBeTruthy();
+
+    // A compatibility `mousedown` alone is not the signal: iOS may never send
+    // one for a tap on content that is not clickable.
+    fireEvent.mouseDown(screen.getByRole("button", { name: "elsewhere" }));
     expect(screen.queryByRole("dialog")).toBeTruthy();
 
     // Outside: dismissed.
-    fireEvent.mouseDown(screen.getByRole("button", { name: "elsewhere" }));
+    fireEvent.pointerDown(screen.getByRole("button", { name: "elsewhere" }));
     expect(screen.queryByRole("dialog")).toBeNull();
   });
 
@@ -4415,5 +4424,260 @@ describe("the remaining readouts and controls", () => {
       "more",
     ]);
     expect(within(container).getByRole("status").textContent).toMatch(/2 conflicts to resolve/);
+  });
+});
+
+describe("the anchored popover stays inside the viewport", () => {
+  const viewport = { width: 1024, height: 768 };
+
+  it("leaves a panel that already fits exactly where it was", () => {
+    expect(
+      placeTemporalPopover(
+        { top: 100, bottom: 140, left: 20 },
+        { width: 320, height: 300 },
+        viewport,
+      ),
+    ).toEqual({ top: 144, left: 20, above: false });
+  });
+
+  it("pulls a panel back from the right edge, keeping an 8px gutter", () => {
+    expect(
+      placeTemporalPopover(
+        { top: 100, bottom: 140, left: 900 },
+        { width: 300, height: 300 },
+        viewport,
+      ).left,
+    ).toBe(716);
+  });
+
+  it("never starts a panel left of the gutter, even one wider than the room", () => {
+    const narrow = { width: 375, height: 667 };
+    expect(
+      placeTemporalPopover({ top: 100, bottom: 140, left: 61 }, { width: 483, height: 300 }, narrow)
+        .left,
+    ).toBe(8);
+    expect(
+      placeTemporalPopover(
+        { top: 100, bottom: 140, left: -30 },
+        { width: 200, height: 300 },
+        narrow,
+      ).left,
+    ).toBe(8);
+  });
+
+  it("keeps a flipped panel from rising above the top of the viewport", () => {
+    const short = { width: 1024, height: 400 };
+    const box = placeTemporalPopover(
+      { top: 250, bottom: 290, left: 20 },
+      { width: 300, height: 380 },
+      short,
+    );
+    expect(box.above).toBe(true);
+    expect(box.top).toBe(8);
+  });
+
+  it("measures the viewport without a classic scrollbar", async () => {
+    const rect = (left: number, top: number, width: number, height: number) =>
+      ({
+        top,
+        bottom: top + height,
+        left,
+        right: left + width,
+        width,
+        height,
+        x: left,
+        y: top,
+        toJSON: () => ({}),
+      }) as DOMRect;
+    const original = Element.prototype.getBoundingClientRect;
+    Element.prototype.getBoundingClientRect = function (this: Element) {
+      if (this.classList.contains("zb-dt-anchor")) return rect(300, 100, 200, 40);
+      if (this.classList.contains("zb-dt-pop")) return rect(0, 0, 320, 300);
+      return original.call(this);
+    };
+    const root = document.documentElement;
+    Object.defineProperty(root, "clientWidth", { configurable: true, value: 400 });
+    try {
+      render(<DatePicker variant="picker" label="Date" now={TODAY} />);
+      await userEvent.click(screen.getByRole("button", { name: /calendar/i }));
+      expect(screen.getByRole("dialog").style.left).toBe("72px");
+    } finally {
+      Element.prototype.getBoundingClientRect = original;
+      delete (root as { clientWidth?: number }).clientWidth;
+    }
+  });
+
+  it("re-places on the visual viewport as well as the window", async () => {
+    const visual = { addEventListener: vi.fn(), removeEventListener: vi.fn() };
+    Object.defineProperty(window, "visualViewport", { configurable: true, value: visual });
+    try {
+      render(<DatePicker variant="picker" label="Date" now={TODAY} />);
+      await userEvent.click(screen.getByRole("button", { name: /calendar/i }));
+      const events = visual.addEventListener.mock.calls.map(([type]) => type);
+      expect(events).toEqual(expect.arrayContaining(["resize", "scroll"]));
+      await userEvent.keyboard("{Escape}");
+      expect(visual.removeEventListener.mock.calls.map(([type]) => type)).toEqual(
+        expect.arrayContaining(["resize", "scroll"]),
+      );
+    } finally {
+      delete (window as { visualViewport?: unknown }).visualViewport;
+    }
+  });
+});
+
+describe("on a phone the popover is a bottom sheet", () => {
+  type Listener = () => void;
+  function mockMedia(matching: (query: string) => boolean) {
+    const listeners = new Set<Listener>();
+    const state = { matching };
+    const matchMedia = vi.fn((query: string) => ({
+      get matches() {
+        return state.matching(query);
+      },
+      media: query,
+      addEventListener: (_: string, listener: Listener) => listeners.add(listener),
+      removeEventListener: (_: string, listener: Listener) => listeners.delete(listener),
+    }));
+    const original = window.matchMedia;
+    Object.defineProperty(window, "matchMedia", { configurable: true, value: matchMedia });
+    return {
+      listeners,
+      change(next: (query: string) => boolean) {
+        state.matching = next;
+        act(() => listeners.forEach((listener) => listener()));
+      },
+      restore() {
+        Object.defineProperty(window, "matchMedia", { configurable: true, value: original });
+      },
+    };
+  }
+
+  it("is a popover on the server, and where media queries cannot be asked", async () => {
+    const { renderToString } = await import("react-dom/server");
+    expect(renderToString(<DatePicker variant="picker" label="Date" now={TODAY} />)).not.toContain(
+      "zb-dt-pop",
+    );
+
+    const original = window.matchMedia;
+    Object.defineProperty(window, "matchMedia", { configurable: true, value: undefined });
+    try {
+      expect(prefersTemporalSheet()).toBe(false);
+      const { unmount } = render(<DatePicker variant="picker" label="Date" now={TODAY} />);
+      await userEvent.click(screen.getByRole("button", { name: /calendar/i }));
+      expect(screen.getByRole("dialog").className).not.toContain("zb-dt-pop--sheet");
+      unmount();
+    } finally {
+      Object.defineProperty(window, "matchMedia", { configurable: true, value: original });
+    }
+  });
+
+  it("is chosen below 40rem, or on a touch screen held landscape, and not otherwise", () => {
+    const media = mockMedia((query) => query === "(max-width: 40rem)");
+    try {
+      expect(prefersTemporalSheet()).toBe(true);
+      media.change((query) => query === "(pointer: coarse) and (max-height: 30rem)");
+      expect(prefersTemporalSheet()).toBe(true);
+      media.change(() => false);
+      expect(prefersTemporalSheet()).toBe(false);
+    } finally {
+      media.restore();
+    }
+  });
+
+  it("shows one month, locks the page, and closes from its scrim", async () => {
+    const media = mockMedia((query) => query === "(max-width: 40rem)");
+    document.body.style.overflow = "auto";
+    try {
+      render(
+        <div>
+          <DateRangeField label="Stay" months={2} now={TODAY} />
+          <button type="button">elsewhere</button>
+        </div>,
+      );
+      await userEvent.click(screen.getByRole("button", { name: /calendar/i }));
+      const sheet = screen.getByRole("dialog");
+      expect(sheet.className).toContain("zb-dt-pop--sheet");
+      expect(sheet.getAttribute("style")).toBeNull();
+      expect(within(sheet).getAllByRole("grid")).toHaveLength(1);
+      expect(document.body.style.overflow).toBe("hidden");
+
+      // The scrim covers the page, so a press is not a dismissal until it
+      // becomes a click on the scrim itself.
+      fireEvent.pointerDown(screen.getByRole("button", { name: "elsewhere" }));
+      expect(screen.queryByRole("dialog")).toBeTruthy();
+
+      fireEvent.click(document.querySelector(".zb-dt-pop__scrim")!);
+      expect(screen.queryByRole("dialog")).toBeNull();
+      expect(document.body.style.overflow).toBe("auto");
+    } finally {
+      document.body.style.overflow = "";
+      media.restore();
+    }
+  });
+
+  it("fades the preset row on whichever side still hides a chip", async () => {
+    const media = mockMedia((query) => query === "(max-width: 40rem)");
+    try {
+      render(<DateRangeField label="Stay" now={TODAY} presets={dateRangePresets(TODAY)} />);
+      await userEvent.click(screen.getByRole("button", { name: /calendar/i }));
+      const rail = screen.getByRole("dialog").querySelector<HTMLElement>(".zb-dt-cal__rail")!;
+      // jsdom has no layout: a 300px row holding 500px of chips.
+      let left = 0;
+      Object.defineProperty(rail, "scrollWidth", { configurable: true, value: 500 });
+      Object.defineProperty(rail, "clientWidth", { configurable: true, value: 300 });
+      Object.defineProperty(rail, "scrollLeft", { configurable: true, get: () => left });
+
+      fireEvent.scroll(rail);
+      expect(rail.hasAttribute("data-zb-fade-start")).toBe(false);
+      expect(rail.hasAttribute("data-zb-fade-end")).toBe(true);
+
+      left = 100;
+      fireEvent.scroll(rail);
+      expect(rail.hasAttribute("data-zb-fade-start")).toBe(true);
+      expect(rail.hasAttribute("data-zb-fade-end")).toBe(true);
+
+      // An RTL row scrolls into negative offsets, and reaching its far end
+      // clears the fade there.
+      left = -200;
+      fireEvent.scroll(rail);
+      expect(rail.hasAttribute("data-zb-fade-start")).toBe(true);
+      expect(rail.hasAttribute("data-zb-fade-end")).toBe(false);
+
+      // A change of content, not a scroll, is picked up too.
+      left = 0;
+      rail.appendChild(document.createElement("span"));
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      });
+      expect(rail.hasAttribute("data-zb-fade-start")).toBe(false);
+
+      fireEvent(window, new Event("resize"));
+      expect(rail.hasAttribute("data-zb-fade-end")).toBe(true);
+    } finally {
+      media.restore();
+    }
+  });
+
+  it("keeps Escape, and turns back into a popover when the screen widens", async () => {
+    const media = mockMedia((query) => query === "(max-width: 40rem)");
+    try {
+      const { unmount } = render(<DateRangeField label="Stay" months={2} now={TODAY} />);
+      await userEvent.click(screen.getByRole("button", { name: /calendar/i }));
+      expect(screen.getByRole("dialog").className).toContain("zb-dt-pop--sheet");
+
+      media.change(() => false);
+      const panel = screen.getByRole("dialog");
+      expect(panel.className).not.toContain("zb-dt-pop--sheet");
+      expect(within(panel).getAllByRole("grid")).toHaveLength(2);
+      expect(document.querySelector(".zb-dt-pop__scrim")).toBeNull();
+
+      media.change((query) => query === "(max-width: 40rem)");
+      await userEvent.keyboard("{Escape}");
+      expect(screen.queryByRole("dialog")).toBeNull();
+      unmount();
+      expect(media.listeners.size).toBe(0);
+    } finally {
+      media.restore();
+    }
   });
 });

@@ -1321,27 +1321,50 @@ export function emptyStateOf(
 /* Rendering a time                                                    */
 /* ------------------------------------------------------------------ */
 
-const MONTH_FORMAT: Readonly<Record<TimePrecision, Intl.DateTimeFormatOptions>> = {
+/** The date half of a time, at each precision. The clock half is `TIME_PART`. */
+const DATE_PART: Readonly<Record<TimePrecision, Intl.DateTimeFormatOptions>> = {
   year: { year: "numeric", timeZone: "UTC" },
   month: { year: "numeric", month: "long", timeZone: "UTC" },
   day: { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" },
-  minute: {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "UTC",
-  },
-  second: {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "UTC",
-  },
+  minute: { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" },
+  second: { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" },
 };
+
+const TIME_PART: Intl.DateTimeFormatOptions = {
+  hour: "2-digit",
+  minute: "2-digit",
+  timeZone: "UTC",
+};
+
+/**
+ * One formatter's output, made the same in every runtime.
+ *
+ * The same `en-GB` instant rendered "2 Sep 2026 at 09:30" in Node and
+ * "2 Sept 2026, 09:30" in Safari: each runtime ships its own CLDR, and CLDR has
+ * changed both the September abbreviation and the date–time joiner. The server
+ * render then disagreed with the client's and hydration threw on every page
+ * with a timeline. So the date and the clock are formatted apart and joined
+ * here, an English short month is cut from the long name, which has not
+ * changed, and the narrow no-break space newer data puts before "AM" is folded
+ * to a plain space.
+ */
+function stableFormat(
+  locale: string | undefined,
+  options: Intl.DateTimeFormatOptions,
+  at: Date,
+): string {
+  const format = new Intl.DateTimeFormat(locale, options);
+  const english = format.resolvedOptions().locale.toLowerCase().startsWith("en");
+  const longMonth =
+    english && options.month === "short"
+      ? new Intl.DateTimeFormat(locale, { month: "long", timeZone: "UTC" }).format(at)
+      : undefined;
+  return format
+    .formatToParts(at)
+    .map((part) => (part.type === "month" && longMonth ? longMonth.slice(0, 3) : part.value))
+    .join("")
+    .replace(/[\u202f\u00a0]/g, " ");
+}
 
 /**
  * A time, rendered at the precision the record holds it.
@@ -1373,9 +1396,12 @@ export function formatFhirDateTime(
 
   if (Number.isNaN(parts)) return undefined;
 
-  const rendered = new Intl.DateTimeFormat(options.locale, MONTH_FORMAT[precision]).format(
-    new Date(parts),
-  );
+  const at = new Date(parts);
+  const date = stableFormat(options.locale, DATE_PART[precision], at);
+  const rendered =
+    precision === "minute" || precision === "second"
+      ? `${date}, ${stableFormat(options.locale, TIME_PART, at)}`
+      : date;
 
   const zone = stamp?.[7];
   if (!zone || options.showZone === false) return rendered;

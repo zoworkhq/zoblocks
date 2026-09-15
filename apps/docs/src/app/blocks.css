@@ -129,9 +129,11 @@
   transform-origin: center;
   transition: transform 0.32s var(--b-ease);
 }
-.oxb .railItem:hover {
-  background: color-mix(in srgb, var(--site-paper) 55%, transparent);
-  color: var(--site-ink);
+@media (hover: hover) {
+  .oxb .railItem:hover {
+    background: color-mix(in srgb, var(--site-paper) 55%, transparent);
+    color: var(--site-ink);
+  }
 }
 .oxb .railItem[aria-current] {
   color: var(--site-ink);
@@ -234,9 +236,11 @@
     border-color 0.3s,
     transform 0.4s var(--b-ease);
 }
-.oxb .tile:hover {
-  border-color: var(--site-rule-strong);
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .oxb .tile:hover {
+    border-color: var(--site-rule-strong);
+    transform: translateY(-2px);
+  }
 }
 /* One line, always. A caption allowed to wrap pushes the figure down by a
    line, and four tiles then read their numbers at four different heights —
@@ -467,6 +471,18 @@
 }
 
 /* ---------- table ---------- */
+.oxb .dtScroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+/* Wide enough that a name stays on one line; the scroller carries the rest. */
+.oxb[data-vp="mobile"] table.dt {
+  min-width: 34rem;
+}
+.oxb[data-vp="mobile"] table.dt td,
+.oxb[data-vp="mobile"] table.dt th {
+  white-space: nowrap;
+}
 .oxb table.dt {
   width: 100%;
   border-collapse: collapse;
@@ -491,8 +507,10 @@
 .oxb table.dt tbody tr {
   transition: background 0.18s;
 }
-.oxb table.dt tbody tr:hover {
-  background: color-mix(in srgb, var(--site-paper) 70%, transparent);
+@media (hover: hover) {
+  .oxb table.dt tbody tr:hover {
+    background: color-mix(in srgb, var(--site-paper) 70%, transparent);
+  }
 }
 /* Status as a dot and a word, everywhere. Bordered chips read as buttons,
    and nothing in a read-only table is pressable. */
@@ -686,8 +704,10 @@
 .oxb .attnRow:last-child {
   border-bottom: 0;
 }
-.oxb .attnRow:hover {
-  background: color-mix(in srgb, var(--site-paper) 55%, transparent);
+@media (hover: hover) {
+  .oxb .attnRow:hover {
+    background: color-mix(in srgb, var(--site-paper) 55%, transparent);
+  }
 }
 .oxb .attnRow .who {
   font-size: 11.5px;
@@ -763,9 +783,11 @@
     border-color 0.25s,
     transform 0.4s var(--b-ease);
 }
-.oxb .instr:hover {
-  border-color: var(--site-rule-strong);
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .oxb .instr:hover {
+    border-color: var(--site-rule-strong);
+    transform: translateY(-2px);
+  }
 }
 .oxb .instrTop {
   display: flex;
@@ -850,8 +872,10 @@
 .oxb .lrow:last-child {
   border-bottom: 0;
 }
-.oxb .lrow:hover {
-  background: color-mix(in srgb, var(--site-paper) 60%, transparent);
+@media (hover: hover) {
+  .oxb .lrow:hover {
+    background: color-mix(in srgb, var(--site-paper) 60%, transparent);
+  }
 }
 .oxb .lrow .bar3 {
   grid-row: 1 / span 2;
@@ -1054,8 +1078,10 @@
   color: inherit;
   transition: background 0.18s;
 }
-.oxb .accBtn:hover {
-  background: color-mix(in srgb, var(--site-paper) 60%, transparent);
+@media (hover: hover) {
+  .oxb .accBtn:hover {
+    background: color-mix(in srgb, var(--site-paper) 60%, transparent);
+  }
 }
 .oxb .accBtn .cw {
   flex: 1;
@@ -1203,8 +1229,10 @@
   background: var(--site-cta);
   color: var(--site-paper);
 }
-.oxb .btn.primary:hover:not([disabled]) {
-  background: var(--site-cta-hover);
+@media (hover: hover) {
+  .oxb .btn.primary:hover:not([disabled]) {
+    background: var(--site-cta-hover);
+  }
 }
 .oxb .btn[disabled] {
   opacity: 0.42;
@@ -1215,8 +1243,10 @@
   background: transparent;
   color: var(--site-ink);
 }
-.oxb .btn.ghost:hover {
-  background: var(--site-paper);
+@media (hover: hover) {
+  .oxb .btn.ghost:hover {
+    background: var(--site-paper);
+  }
 }
 
 /* ---------- copilot ---------- */
@@ -1275,8 +1305,10 @@
   cursor: pointer;
   transition: 0.18s var(--b-ease);
 }
-.oxb .cite:hover {
-  background: color-mix(in srgb, var(--site-brand) 30%, transparent);
+@media (hover: hover) {
+  .oxb .cite:hover {
+    background: color-mix(in srgb, var(--site-brand) 30%, transparent);
+  }
 }
 .oxb .copDock {
   border-top: 1px solid var(--site-rule);
@@ -1296,6 +1328,12 @@
   color: var(--site-ink);
   font: inherit;
   font-size: 13px;
+}
+/* 16px on a touch screen, or iOS zooms the page when the field takes focus. */
+@media (pointer: coarse) {
+  .oxb .copInput {
+    font-size: 16px;
+  }
 }
 .oxb .srcCard {
   margin-top: 9px;
@@ -1344,8 +1382,10 @@
 .oxb .riskRow:last-child {
   border-bottom: 0;
 }
-.oxb .riskRow:hover {
-  background: color-mix(in srgb, var(--site-paper) 55%, transparent);
+@media (hover: hover) {
+  .oxb .riskRow:hover {
+    background: color-mix(in srgb, var(--site-paper) 55%, transparent);
+  }
 }
 .oxb .riskRow .bar3 {
   grid-row: 1 / span 3;

@@ -14,7 +14,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { ArrowUpRight, X } from "lucide-react";
-import type { BlockDoc } from "@/lib/blocks";
+import type { BlockDoc, BlockSlug } from "@/lib/blocks";
 import { BlockBody, type Viewport } from "@/components/blocks";
 import { cn } from "@/lib/utils";
 
@@ -64,6 +64,9 @@ export function BlockGallery({ blocks }: { blocks: readonly BlockDoc[] }) {
   /** A modified click is the reader asking for a real navigation. Let it go. */
   const intercept = (e: React.MouseEvent, block: BlockDoc) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    // A phone follows the link. The viewer's toolbar is wider than the screen,
+    // and the block page already lays out for the width it is given.
+    if (window.matchMedia("(max-width: 47.99rem)").matches) return;
     e.preventDefault();
     returnTo.current = e.currentTarget as HTMLElement;
     setVp("desktop");
@@ -98,23 +101,7 @@ export function BlockGallery({ blocks }: { blocks: readonly BlockDoc[] }) {
                 </span>
               </div>
 
-              {/* A scaled rendering, genuinely inert.
-                  `aria-hidden` alone was a violation: the preview is a whole
-                  application tree, so hiding it from the accessibility tree
-                  while its buttons stayed tabbable left keyboard users landing
-                  on controls a screen reader could not announce. `inert`
-                  removes them from the tab order as well, which is the half
-                  `aria-hidden` never did. */}
-              <div className="relative h-[248px] overflow-hidden border-b border-rule bg-paper">
-                <div
-                  aria-hidden="true"
-                  inert
-                  className="pointer-events-none origin-top-left"
-                  style={{ transform: "scale(.52)", width: "192.3%", height: "192.3%" }}
-                >
-                  <BlockBody slug={block.slug} />
-                </div>
-              </div>
+              <BlockThumb slug={block.slug} />
 
               <div className="px-4 py-4">
                 <h3 className="text-[1.0625rem] font-semibold tracking-tight">{block.title}</h3>
@@ -200,5 +187,62 @@ export function BlockGallery({ blocks }: { blocks: readonly BlockDoc[] }) {
         </div>
       ) : null}
     </>
+  );
+}
+
+const THUMB_HEIGHT = 248;
+const THUMB_SCALE = 0.52;
+/** Below this card width the thumbnail shows the phone layout at a phone width. */
+const THUMB_NARROW = 480;
+const PHONE_WIDTH = 390;
+
+/**
+ * A block drawn small, at a width it was designed for.
+ *
+ * It was always `scale(.52)` of a 192.3% box, which suits a 532px card. On a
+ * phone the card is about 300px, the scaled desktop inside it still wanted
+ * about 540px, and the grid track grew to fit — pushing the card 138–248px
+ * past the screen. The frame is measured now: a wide card keeps exactly the
+ * old rendering, a narrow one shows the phone layout.
+ */
+function BlockThumb({ slug }: { slug: BlockSlug }) {
+  const frame = React.useRef<HTMLDivElement>(null);
+  const [width, setWidth] = React.useState<number | null>(null);
+
+  React.useEffect(() => {
+    const el = frame.current;
+    if (!el) return;
+    const observer = new ResizeObserver(([entry]) => {
+      if (entry) setWidth(entry.contentRect.width);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const narrow = width !== null && width < THUMB_NARROW;
+  const scale = narrow ? width / PHONE_WIDTH : THUMB_SCALE;
+
+  return (
+    <div ref={frame} className="relative h-[248px] overflow-hidden border-b border-rule bg-paper">
+      {/* A scaled rendering, genuinely inert.
+          `aria-hidden` alone was a violation: the preview is a whole
+          application tree, so hiding it from the accessibility tree
+          while its buttons stayed tabbable left keyboard users landing
+          on controls a screen reader could not announce. `inert`
+          removes them from the tab order as well, which is the half
+          `aria-hidden` never did. */}
+      <div
+        aria-hidden="true"
+        inert
+        className="pointer-events-none origin-top-left"
+        style={
+          narrow
+            ? { transform: `scale(${scale})`, width: PHONE_WIDTH, height: THUMB_HEIGHT / scale }
+            : { transform: `scale(${THUMB_SCALE})`, width: "192.3%", height: "192.3%" }
+        }
+      >
+        <BlockBody slug={slug} vp={narrow ? "mobile" : "desktop"} />
+      </div>
+    </div>
   );
 }

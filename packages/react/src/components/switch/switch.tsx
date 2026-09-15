@@ -655,6 +655,14 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
     [confirm, editable, hold, holdMs, requestValue, shown],
   );
 
+  /* A cancelled pointer never commits, however long it was held: the browser
+     took the touch back (a scroll began, a system gesture) and the person did
+     not let go on the control. */
+  const onPointerCancel = React.useCallback(() => {
+    if (!editable || confirm !== "hold" || holdMs <= 0) return;
+    hold.stop();
+  }, [confirm, editable, hold, holdMs]);
+
   /* ---- announcement -------------------------------------------- */
 
   const plainLabel =
@@ -713,6 +721,7 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
     onPointerDown,
     onPointerUp: onPointerEnd,
     onPointerLeave: onPointerEnd,
+    onPointerCancel,
   };
 
   /* ---- pieces ---------------------------------------------------- */

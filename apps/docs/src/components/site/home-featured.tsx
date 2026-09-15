@@ -303,10 +303,10 @@ function ContextMenuDemo() {
               >
                 <PatientPortrait src={WORKLIST_FACE(person.label)} size={32} />
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-medium text-ink">
+                  <span className="block break-words text-sm font-medium text-ink">
                     {person.label}
                   </span>
-                  <span className="numeric block truncate text-xs text-graphite-soft">
+                  <span className="numeric block break-words text-xs text-graphite-soft">
                     {person.detail}
                   </span>
                 </span>
@@ -477,6 +477,26 @@ const SCRIPT: Beat[] = [
   { find: dayNamed("Friday, September 11"), act: "press", hold: 1500 },
 ];
 
+/** The same range, kept inside August, for a stage with room for one month. */
+const SCRIPT_ONE_MONTH: Beat[] = [
+  { find: actionNamed("Cancel"), act: "press", hold: 520 },
+  { find: dayNamed("Monday, August 17"), act: "hover", hold: 340 },
+  { find: dayNamed("Monday, August 17"), act: "press", hold: 460 },
+  { find: dayNamed("Friday, August 21"), act: "hover", hold: 230 },
+  { find: dayNamed("Tuesday, August 25"), act: "hover", hold: 230 },
+  { find: dayNamed("Friday, August 28"), act: "hover", hold: 260 },
+  { find: dayNamed("Monday, August 31"), act: "press", hold: 1500 },
+];
+
+/**
+ * The narrowest stage that shows two months.
+ *
+ * Two months are about 620px. On a phone the stage is under 300px, and it was
+ * showing the first month and a half with Sunday clipped off — so below this
+ * the card shows one month and the script stays inside it.
+ */
+const TWO_MONTHS = 620;
+
 /**
  * The card's live demo: a range being chosen, by a pointer that is drawn.
  *
@@ -505,6 +525,20 @@ function DateDemo() {
   const [pressed, setPressed] = React.useState(false);
   const reduced = usePrefersReducedMotion();
 
+  // Two months when the stage holds them, one when it does not. Measured on
+  // the stage rather than the window: the card halves at `lg`.
+  const [months, setMonths] = React.useState<1 | 2>(2);
+  React.useEffect(() => {
+    const node = stageRef.current;
+    if (!node) return undefined;
+    const observer = new ResizeObserver(([entry]) => {
+      if (entry) setMonths(entry.contentRect.width >= TWO_MONTHS ? 2 : 1);
+    });
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+  const script = months === 2 ? SCRIPT : SCRIPT_ONE_MONTH;
+
   // Only once it is actually on screen. A card animating above the fold that
   // nobody has scrolled to is spending attention where there is none.
   const [seen, setSeen] = React.useState(false);
@@ -528,7 +562,7 @@ function DateDemo() {
     const root = stageRef.current;
     if (!root) return undefined;
 
-    const step = SCRIPT[beat % SCRIPT.length];
+    const step = script[beat % script.length];
     const target = step?.find(root) ?? null;
 
     // The cursor travels first and the event fires where it landed, so what a
@@ -558,7 +592,7 @@ function DateDemo() {
       clearTimeout(fire);
       clearTimeout(advance);
     };
-  }, [playing, beat]);
+  }, [playing, beat, script]);
 
   return (
     <div className="zb-dt-card">
@@ -586,7 +620,8 @@ function DateDemo() {
       >
         <Calendar
           mode="range"
-          months={2}
+          months={months}
+          fluid={months === 1}
           weekStart={1}
           commit="explicit"
           hints

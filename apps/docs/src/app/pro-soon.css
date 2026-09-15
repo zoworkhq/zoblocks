@@ -206,8 +206,10 @@
   font-weight: 700;
   white-space: nowrap;
 }
-.zwDesk .zwDeskCta:hover {
-  filter: brightness(1.07);
+@media (hover: hover) {
+  .zwDesk .zwDeskCta:hover {
+    filter: brightness(1.07);
+  }
 }
 .zwDesk .zwDeskGhost {
   display: inline-flex;
@@ -218,8 +220,10 @@
   font-weight: 500;
   opacity: 0.85;
 }
-.zwDesk .zwDeskGhost:hover {
-  opacity: 1;
+@media (hover: hover) {
+  .zwDesk .zwDeskGhost:hover {
+    opacity: 1;
+  }
 }
 
 /* ---- the contact plate ---- */
@@ -294,8 +298,10 @@
   color: var(--zw-fg);
   border-bottom: 1px solid var(--zw-rule);
 }
-.zwDesk .zwDeskV a:hover {
-  border-bottom-color: var(--zw-accent);
+@media (hover: hover) {
+  .zwDesk .zwDeskV a:hover {
+    border-bottom-color: var(--zw-accent);
+  }
 }
 
 .zwDesk .zwDeskTri {
@@ -320,8 +326,10 @@
   font-family: var(--font-mono);
   font-size: 0.8125rem;
 }
-.zwDesk .zwDeskTri a:hover {
-  color: var(--zw-accent-text);
+@media (hover: hover) {
+  .zwDesk .zwDeskTri a:hover {
+    color: var(--zw-accent-text);
+  }
 }
 
 .zwDesk .zwDeskCities {
@@ -363,9 +371,11 @@
   border-radius: 0.4375rem;
   color: var(--zw-muted);
 }
-.zwDesk .zwDeskSocial a:hover {
-  border-color: var(--zw-accent);
-  color: var(--zw-accent-text);
+@media (hover: hover) {
+  .zwDesk .zwDeskSocial a:hover {
+    border-color: var(--zw-accent);
+    color: var(--zw-accent-text);
+  }
 }
 .zwDesk .zwDeskSocial svg {
   display: block;

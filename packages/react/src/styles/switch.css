@@ -78,6 +78,17 @@
   block-size: max(var(--zb-switch-track-h), var(--zb-switch-target-min));
 }
 
+/* A press-and-hold on a phone would otherwise select text and raise the iOS
+   callout partway through the hold. */
+@media (pointer: coarse) {
+  .zb-switch__control,
+  .zb-switch__chip {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+
 .zb-switch__control:focus-visible {
   outline: none;
 }
@@ -651,6 +662,13 @@
   border: 1px solid var(--zb-switch-segment-border);
   background: var(--zb-surface);
   color: var(--zb-text);
+}
+
+/* iOS zooms the page into any focused field set below 16px. */
+@media (pointer: coarse) {
+  .zb-switch__attest {
+    font-size: max(16px, 1em);
+  }
 }
 
 .zb-switch__action {

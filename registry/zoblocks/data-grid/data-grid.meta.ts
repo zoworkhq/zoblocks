@@ -247,7 +247,7 @@ const columns: DataGridColumn<Row>[] = [
       min: 0,
       max: 2,
       step: 1,
-      defaultValue: 0,
+      defaultValue: 1,
     },
     { prop: "onSortChange", control: "event", label: "onSortChange" },
     { prop: "onSelectionChange", control: "event", label: "onSelectionChange" },

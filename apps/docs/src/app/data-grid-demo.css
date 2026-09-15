@@ -127,9 +127,11 @@
   cursor: pointer;
 }
 
-.oxw__btn:hover {
-  background: var(--zbw-sunk);
-  color: var(--zbw-ink);
+@media (hover: hover) {
+  .oxw__btn:hover {
+    background: var(--zbw-sunk);
+    color: var(--zbw-ink);
+  }
 }
 
 .oxw__btn--ghost {
@@ -138,8 +140,10 @@
   color: var(--zbw-accent);
 }
 
-.oxw__btn--ghost:hover {
-  background: var(--zbw-accent-bg);
+@media (hover: hover) {
+  .oxw__btn--ghost:hover {
+    background: var(--zbw-accent-bg);
+  }
 }
 
 /* ---------------------------------------------------------------- */
@@ -173,8 +177,10 @@
   cursor: pointer;
 }
 
-.oxw__view:hover {
-  color: var(--zbw-ink);
+@media (hover: hover) {
+  .oxw__view:hover {
+    color: var(--zbw-ink);
+  }
 }
 
 .oxw__view[aria-current="true"] {
@@ -296,9 +302,11 @@
   cursor: pointer;
 }
 
-.oxw__addmenu button:hover {
-  background: var(--zbw-sunk);
-  color: var(--zbw-ink);
+@media (hover: hover) {
+  .oxw__addmenu button:hover {
+    background: var(--zbw-sunk);
+    color: var(--zbw-ink);
+  }
 }
 
 .oxw__addmenu b {
@@ -324,6 +332,7 @@
 }
 
 .oxw__pill button {
+  position: relative;
   min-inline-size: 1.125rem;
   min-block-size: 1.125rem;
   border: 0;
@@ -336,9 +345,18 @@
   cursor: pointer;
 }
 
-.oxw__pill button:hover {
-  opacity: 1;
-  background: color-mix(in srgb, currentColor 14%, transparent);
+/* The drawn circle stays 18px; the target is 24px, the WCAG 2.5.8 floor. */
+.oxw__pill button::after {
+  content: "";
+  position: absolute;
+  inset: -0.1875rem;
+}
+
+@media (hover: hover) {
+  .oxw__pill button:hover {
+    opacity: 1;
+    background: color-mix(in srgb, currentColor 14%, transparent);
+  }
 }
 
 /* ---------------------------------------------------------------- */

@@ -2045,6 +2045,17 @@
   block-size: max(var(--zb-switch-track-h), var(--zb-switch-target-min));
 }
 
+/* A press-and-hold on a phone would otherwise select text and raise the iOS
+   callout partway through the hold. */
+@media (pointer: coarse) {
+  .zb-switch__control,
+  .zb-switch__chip {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+
 .zb-switch__control:focus-visible {
   outline: none;
 }
@@ -2618,6 +2629,13 @@
   border: 1px solid var(--zb-switch-segment-border);
   background: var(--zb-surface);
   color: var(--zb-text);
+}
+
+/* iOS zooms the page into any focused field set below 16px. */
+@media (pointer: coarse) {
+  .zb-switch__attest {
+    font-size: max(16px, 1em);
+  }
 }
 
 .zb-switch__action {
@@ -6259,6 +6277,8 @@ button.zb-prov:focus-visible,
   /* `8vh` for the same reason, capped so a short containing block keeps room
      for the panel rather than pushing it out of view. */
   padding: min(8vh, 12%) 1rem 1rem;
+  /* `dvh` where supported: `vh` on a phone includes the collapsed toolbar. */
+  padding: min(8dvh, 12%) 1rem 1rem;
   background: rgb(0 0 0 / 0.4);
   font-family: var(--zb-font-sans, inherit);
 }
@@ -6288,6 +6308,7 @@ button.zb-prov:focus-visible,
    * fit.
    */
   max-block-size: min(70vh, 100%);
+  max-block-size: min(70dvh, 100%);
   overflow: hidden;
   border: 1px solid var(--zb-border, #e2e8f0);
   border-radius: var(--zb-radius-lg, 8px);
@@ -6306,6 +6327,13 @@ button.zb-prov:focus-visible,
   color: inherit;
   font: inherit;
   font-size: var(--zb-text-sm, 0.9375rem);
+}
+
+/* iOS zooms the page into any focused field set below 16px. */
+@media (pointer: coarse) {
+  .zb-palette__input {
+    font-size: max(16px, 1em);
+  }
 }
 
 .zb-palette__input:focus {
@@ -6633,6 +6661,21 @@ button.zb-prov:focus-visible,
   cursor: default;
   -webkit-user-select: none;
   user-select: none;
+}
+
+/*
+ * The row being long-pressed, on a touch screen.
+ *
+ * The menu opens after a 500ms hold, and without this the same hold selects
+ * the row's text and raises the iOS callout over the menu it just opened.
+ * Coarse pointers only, so a mouse can still select and copy a row.
+ */
+@media (pointer: coarse) {
+  [data-zb-menu] {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
 }
 
 .zb-menu__avatar {
@@ -7070,7 +7113,8 @@ button.zb-prov:focus-visible,
   inset-block-end: 0;
   max-inline-size: none;
   min-inline-size: 0;
-  padding-block-end: 0.5rem;
+  /* Clear the home indicator, so the last row is not under it. */
+  padding-block-end: max(0.5rem, env(safe-area-inset-bottom));
   border-inline: 0;
   border-block-end: 0;
   border-start-start-radius: 1rem;
@@ -7446,9 +7490,12 @@ button.zb-prov:focus-visible,
   cursor: pointer;
 }
 
-.zb-grid__admit:hover {
-  border-color: var(--zb-grid-accent);
-  background: var(--zb-grid-sunk);
+/* Hover only where there is hover: on a touch screen it sticks after the tap. */
+@media (hover: hover) {
+  .zb-grid__admit:hover {
+    border-color: var(--zb-grid-accent);
+    background: var(--zb-grid-sunk);
+  }
 }
 
 /* ---------------------------------------------------------------- */
@@ -7497,8 +7544,10 @@ button.zb-prov:focus-visible,
   cursor: pointer;
 }
 
-.zb-grid__bulkclear:hover {
-  color: var(--zb-grid-ink);
+@media (hover: hover) {
+  .zb-grid__bulkclear:hover {
+    color: var(--zb-grid-ink);
+  }
 }
 
 .zb-grid__bulkactions {
@@ -7580,13 +7629,39 @@ button.zb-prov:focus-visible,
   background: var(--zb-grid-surface);
 }
 
+/* The corner: above the sticky header and above the pinned body cells. */
 .zb-grid__th.zb-grid__pin {
   z-index: 3;
 }
 
-/* Only the last pinned cell carries the seam, so the group reads as one slab. */
-.zb-grid__pin + :not(.zb-grid__pin) {
-  box-shadow: inset 6px 0 6px -6px rgb(0 0 0 / 0.12);
+/*
+ * The seam, on the last pinned cell and only once something is under it.
+ *
+ * It used to be an inset shadow on the first unpinned cell, which is the cell
+ * that scrolls away — so the seam left with the content it was meant to divide
+ * the pinned column from. Drawn from the pinned cell instead, it stays at the
+ * boundary. Hidden at rest, so a grid that fits its box looks as it always did.
+ */
+.zb-grid__pin--edge::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  left: 100%;
+  inline-size: 6px;
+  pointer-events: none;
+  /*
+   * A rule as well as a shadow. A collapsed border stays where the table put
+   * it rather than travelling with a sticky cell, so the column's own rule is
+   * gone once content scrolls under it, and a black shadow alone is invisible
+   * on a dark surface.
+   */
+  border-inline-start: 1px solid var(--zb-grid-rule);
+  background: linear-gradient(to right, rgb(0 0 0 / 0.12), transparent);
+  opacity: 0;
+}
+
+.zb-grid__scroll[data-zb-scrolled="true"] .zb-grid__pin--edge::after {
+  opacity: 1;
 }
 
 .zb-grid__tr--current > .zb-grid__pin {
@@ -7622,6 +7697,35 @@ button.zb-prov:focus-visible,
   margin: 0;
   accent-color: var(--zb-grid-accent);
   cursor: pointer;
+}
+
+/*
+ * A 24px target around a 15px box.
+ *
+ * The box stays the size a dense ledger wants; the label around it takes the
+ * tap. The label hugs the box — an inline-block with no line height of its
+ * own, sitting on the same baseline — so the row lays out exactly as it did and
+ * the extra area is centred on the box rather than on the line of text. The
+ * pseudo-element is that area: a tap on it is a tap on the label, which toggles
+ * the checkbox.
+ */
+.zb-grid__hit {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+  cursor: pointer;
+}
+
+.zb-grid__hit::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  inline-size: 2.25rem;
+  /* 26px: over the 24px floor with margin, under the 27px compact row, so two
+     rows' targets never overlap. */
+  block-size: 1.625rem;
+  transform: translate(-50%, -50%);
 }
 
 /* Selection paints below, after the current row, because the two states
@@ -7667,9 +7771,11 @@ button.zb-prov:focus-visible,
   cursor: pointer;
 }
 
-.zb-grid__sort:hover {
-  color: var(--zb-grid-ink);
-  background: var(--zb-grid-sunk);
+@media (hover: hover) {
+  .zb-grid__sort:hover {
+    color: var(--zb-grid-ink);
+    background: var(--zb-grid-sunk);
+  }
 }
 
 .zb-grid__th--end .zb-grid__sort,
@@ -8405,6 +8511,14 @@ button.zb-prov:focus-visible,
 .zb-dt-cal--fluid,
 .zb-dt-cal--fluid .zb-dt-cal__month {
   inline-size: 100%;
+}
+
+/* A fluid calendar fills its container, so its wrapper has to as well. As a
+   flex item the wrapper sized to its content: in a 269px card the grid took
+   185px and Cancel / Done ended 84px short of the card's edge. */
+[data-zb-calendar]:has(> .zb-dt-cal--fluid) {
+  flex: 1 1 auto;
+  min-inline-size: 0;
 }
 
 .zb-dt-cal--fluid .zb-dt-cal__month {
@@ -9179,6 +9293,227 @@ button.zb-prov:focus-visible,
   font-family: var(--zb-font-sans, inherit);
   box-shadow: var(--zb-shadow-lg, 0 14px 34px -10px rgb(15 23 42 / 0.2));
   animation: zb-dt-pop-in var(--zb-duration, 200ms) var(--zb-ease, ease) both;
+  /* Never larger than the viewport less the 8px gutter the script clamps to.
+     A panel that fits is unchanged; one that does not scrolls inside itself
+     instead of running off a screen it cannot be scrolled back from. */
+  box-sizing: border-box;
+  max-inline-size: calc(100vw - 16px);
+  max-block-size: calc(100vh - 16px);
+  max-block-size: calc(100dvh - 16px);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+/*
+ * The phone presentation: a bottom sheet.
+ *
+ * Chosen in script below 40rem, or on a touch screen held landscape. Full
+ * width, one month, presets as a row above the grid, and day cells a finger
+ * can hit. The dialog, its label, Escape and focus are the popover's own —
+ * only the geometry changes.
+ */
+.zb-dt-pop--sheet {
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: 41;
+  max-inline-size: none;
+  max-block-size: 85vh;
+  max-block-size: min(85dvh, 100%);
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-block-start: 0;
+  padding-block-end: max(1rem, env(safe-area-inset-bottom));
+  border-inline: 0;
+  border-block-end: 0;
+  border-radius: 0;
+  border-start-start-radius: var(--zb-radius-xl, 1rem);
+  border-start-end-radius: var(--zb-radius-xl, 1rem);
+  animation-name: zb-dt-sheet-up;
+}
+
+.zb-dt-pop__scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgb(0 0 0 / 0.35);
+  animation: zb-dt-scrim-in var(--zb-duration, 200ms) var(--zb-ease, ease) both;
+}
+
+.zb-dt-pop__grip {
+  inline-size: 2.125rem;
+  block-size: 0.25rem;
+  margin: 0.5rem auto 0.75rem;
+  border-radius: 2px;
+  background: var(--zb-border-strong, #cbd5e1);
+}
+
+/* The content keeps a readable measure on a landscape phone rather than
+   stretching seven day cells across 850px. */
+.zb-dt-pop--sheet .zb-dt-cal,
+.zb-dt-pop--sheet .zb-dt-timerange {
+  inline-size: 100%;
+  min-inline-size: 0;
+  max-inline-size: 26rem;
+  margin-inline: auto;
+}
+
+.zb-dt-pop--sheet .zb-dt-cal__preset {
+  min-block-size: 2.5rem;
+  padding-block: 0;
+}
+
+/* A phone held upright: one column, presets above the grid as a single
+   scrolling row, bled to the sheet's edges so a clipped chip reads as "there
+   is more" rather than as a cut-off. */
+@media (max-width: 40rem) {
+  .zb-dt-pop--sheet .zb-dt-cal {
+    flex-direction: column;
+  }
+
+  .zb-dt-pop--sheet .zb-dt-cal__month {
+    flex: 1;
+    inline-size: 100%;
+    min-inline-size: 0;
+  }
+
+  .zb-dt-pop--sheet .zb-dt-cal__aside {
+    min-inline-size: 0;
+    margin-inline: -1rem;
+    margin-block-end: 0.75rem;
+    padding-inline: 0;
+    padding-block-end: 0.75rem;
+    border-inline-end: 0;
+    border-block-end: 1px solid var(--zb-border, #e2e8f0);
+  }
+
+  .zb-dt-pop--sheet .zb-dt-cal__rail {
+    flex-direction: row;
+    gap: 0.375rem;
+    min-inline-size: 0;
+    max-block-size: none;
+    padding-inline: 1rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-padding-inline: 1rem;
+    scrollbar-width: none;
+  }
+
+  .zb-dt-pop--sheet .zb-dt-cal__preset {
+    flex: none;
+    border: 1px solid var(--zb-border, #e2e8f0);
+    border-radius: 999px;
+  }
+}
+
+/* The commit row never scrolls out of reach. It sticks to the bottom of the
+   sheet on the sheet's own surface, bleeds into the side padding so its rule
+   reads edge to edge, and carries the home-indicator inset itself — so the
+   sheet drops its own bottom padding whenever there is a footer to hold it. */
+.zb-dt-pop--sheet:has(.zb-dt-cal__foot) {
+  padding-block-end: 0;
+}
+
+.zb-dt-pop--sheet .zb-dt-cal__foot {
+  position: sticky;
+  inset-block-end: 0;
+  z-index: 1;
+  min-inline-size: calc(100% + 2rem);
+  margin-inline: -1rem;
+  padding-inline: 1rem;
+  padding-block-end: max(1rem, env(safe-area-inset-bottom));
+  background: var(--zb-datetime-popover-bg, #fff);
+}
+
+/* The chip row fades on whichever side still hides a chip, so a clipped
+   "Next Monday" reads as more to scroll rather than as a cut. The side is set
+   in script from the scroll position. */
+@media (max-width: 40rem) {
+  .zb-dt-pop--sheet .zb-dt-cal__rail {
+    --zb-dt-fade-start: 0px;
+    --zb-dt-fade-end: 0px;
+    --zb-dt-fade-dir: to right;
+    -webkit-mask-image: linear-gradient(
+      var(--zb-dt-fade-dir),
+      transparent,
+      #000 var(--zb-dt-fade-start),
+      #000 calc(100% - var(--zb-dt-fade-end)),
+      transparent
+    );
+    mask-image: linear-gradient(
+      var(--zb-dt-fade-dir),
+      transparent,
+      #000 var(--zb-dt-fade-start),
+      #000 calc(100% - var(--zb-dt-fade-end)),
+      transparent
+    );
+  }
+
+  .zb-dt-pop--sheet[dir="rtl"] .zb-dt-cal__rail {
+    --zb-dt-fade-dir: to left;
+  }
+
+  .zb-dt-pop--sheet .zb-dt-cal__rail[data-zb-fade-start] {
+    --zb-dt-fade-start: 2rem;
+  }
+
+  .zb-dt-pop--sheet .zb-dt-cal__rail[data-zb-fade-end] {
+    --zb-dt-fade-end: 2rem;
+  }
+}
+
+/* A phone on its side has width to spare and no height: the rail goes back
+   beside the month, which saves the row it would take above it. */
+@media (min-width: 40.0625rem) {
+  .zb-dt-pop--sheet .zb-dt-cal {
+    inline-size: fit-content;
+    max-inline-size: none;
+  }
+
+  .zb-dt-pop--sheet .zb-dt-cal__month {
+    inline-size: 20rem;
+  }
+}
+
+/* 2.5rem = 40px, and a 320px screen still gives each column 41px. */
+.zb-dt-pop--sheet .zb-dt-cal__day {
+  block-size: 2.5rem;
+}
+
+.zb-dt-pop--sheet .zb-dt-cal__nav,
+.zb-dt-pop--sheet .zb-dt-cal__title {
+  min-inline-size: 2.5rem;
+  block-size: 2.5rem;
+}
+
+.zb-dt-pop--sheet .zb-dt-cal__pane button {
+  block-size: 2.5rem;
+}
+
+/* A legend of arrow keys is noise on a screen with no hover, which in
+   practice means no keyboard in hand. In a 269px card it wrapped to two lines
+   and pushed the actions down; in the sheet it cost the row that lets the
+   month fit without scrolling. */
+@media (hover: none) {
+  .zb-dt-cal__hints {
+    display: none;
+  }
+}
+
+@keyframes zb-dt-sheet-up {
+  from {
+    opacity: 0;
+    translate: 0 14px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes zb-dt-scrim-in {
+  from {
+    opacity: 0;
+  }
 }
 
 /* The flip is decided in script now, because it needs the panel's measured
@@ -9446,7 +9781,8 @@ button.zb-prov:focus-visible,
     transition-duration: 1ms;
   }
 
-  .zb-dt-pop {
+  .zb-dt-pop,
+  .zb-dt-pop__scrim {
     animation: none;
   }
 }

@@ -1186,6 +1186,35 @@ describe("confirmation", () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
+  it("hold abandons a press the browser cancelled, however long it was held", async () => {
+    const onChange = vi.fn();
+    render(
+      <Switch
+        label="Suspend alarm"
+        checked={false}
+        confirm="hold"
+        holdMs={20}
+        onChange={onChange}
+      />,
+    );
+    // A touch that turns into a scroll is cancelled, not released. Held past
+    // the threshold, it still must not commit on the pointer-up that follows.
+    await act(async () => {
+      fireEvent.pointerDown(control());
+      await new Promise((resolve) => setTimeout(resolve, 40));
+      fireEvent.pointerCancel(control());
+      fireEvent.pointerUp(control());
+    });
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it("ignores a cancelled pointer on a switch that asks for no hold", () => {
+    const onChange = vi.fn();
+    render(<Switch label="Mute chime" checked={false} onChange={onChange} />);
+    fireEvent.pointerCancel(control());
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
   /**
    * Holding is a timed input, so SC 2.2.1 applies. A keyboard user must reach
    * an equivalent confirmation, not a degraded one.
