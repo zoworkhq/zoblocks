@@ -1,5 +1,26 @@
 # @zoblocks/react
 
+## 0.2.2
+
+### Patch Changes
+
+- 27b41d0: Date and time pickers now fit on phones. Below 40rem, or on a touch screen held landscape, the calendar opens as a bottom sheet: full width, one month, presets in a scrolling row above the grid that fades at whichever edge still hides a preset, 40px day cells, a Cancel / Done footer that stays in view while the month scrolls, and a scrim that closes it. The page behind stops scrolling while it is open. Escape, focus and the dialog's label work as before.
+
+  On wider screens the popover stays anchored to its field but no longer runs off the edge. It keeps 8px from every side, scrolls inside itself when taller than the window, and follows the visual viewport as a phone's keyboard or browser bar moves. Tapping outside now closes it on iOS, where it listened for `mousedown` and a tap on plain content did not always send one.
+
+  On screens with no hover, the calendar's arrow-key legend is hidden. A `fluid` calendar placed in a flex container now fills it, so its grid and its Cancel / Done row reach the container's edge.
+
+- 27b41d0: Touch and phone fixes.
+
+  - **DataGrid** pins the identity column by default (`pinnedColumns` now defaults to 1; pass 0 for none), so the client name stays in view when a phone scrolls the grid sideways. The pin seam shows only once content has scrolled under it. Row checkboxes have a 24px tap target around the same 15px box, and hover styles no longer stick after a tap.
+  - **Switch** abandons a press-and-hold when the browser cancels the pointer, and suppresses text selection and the iOS callout during the hold.
+  - **ChartContextMenu** rows no longer select text or raise the iOS callout on long-press. The bottom sheet clears the home indicator.
+  - **ChartCommandPalette**, **Switch** attestation and **Copilot** inputs use at least 16px text on touch screens, so iOS no longer zooms on focus. Viewport-relative heights use `dvh`.
+
+- 27b41d0: **CareTimeline** dates render the same on the server and in every browser, so pages with a timeline no longer throw a hydration error in Safari. Node and Safari ship different locale data. For the same `en-GB` time one rendered "2 Sep 2026 at 09:30" and the other "2 Sept 2026, 09:30". Dates and times are now formatted separately and joined with a comma. English short months are cut from the full month name. The narrow space some runtimes put before "AM" is now a plain space.
+
+  Visible change: English timelines now read "2 Sep 2026, 09:30" everywhere.
+
 ## 0.2.1
 
 ### Patch Changes

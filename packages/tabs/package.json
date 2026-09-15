@@ -1,6 +1,6 @@
 {
   "name": "@zoblocks/tabs",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Tabs that know what they are. Four semantic modes — view switch, navigation, form value, wizard — across eleven skins, with the WAI-ARIA keyboard model, priority-plus overflow and WCAG 2.2 AA states.",
   "license": "MIT",
   "homepage": "https://zoblocks.design/components/tabs",
