@@ -1,0 +1,7 @@
+# actionlint knows only GitHub-hosted runner labels. A label for our own
+# self-hosted runners has to be declared here, or `pnpm lint:actions` fails
+# on every workflow that uses it.
+self-hosted-runner:
+  labels:
+    # The AWS spot runners (`runner_extra_labels`), used by test-spot-runner.yml.
+    - on-demand
