@@ -1,0 +1,30 @@
+name: Test AWS Runner
+
+on:
+  workflow_dispatch: # Allows manual trigger from the GitHub UI
+
+jobs:
+  test-run:
+    name: Validate EC2 Runner Execution
+    runs-on: [self-hosted, on-demand] # Must match your runner_extra_labels
+
+    steps:
+      - name: Check System Details
+        run: |
+          echo "=== Runner Host Information ==="
+          hostname
+          uname -a
+          uptime
+
+      - name: Verify Public Outbound Connectivity
+        run: |
+          echo "=== Testing Internet Access ==="
+          curl -I https://github.com
+          curl -s ifconfig.me && echo ""
+
+      - name: Inspect IAM & IMDSv2 Protection
+        run: |
+          echo "=== Testing IMDSv2 Token Fetch ==="
+          TOKEN=$(curl -s -S -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+          INSTANCE_TYPE=$(curl -s -S -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-type)
+          echo "Running on EC2 instance type: $INSTANCE_TYPE"
