@@ -1,0 +1,974 @@
+/* ===========================================================================
+ * Northwind Health — the application shell and its shared furniture.
+ *
+ * Scoped under `.oxb`, like `blocks.css`, and built from the same tokens. Each
+ * screen keeps its own rules in `blocks-nw-<screen>.css`.
+ * =========================================================================== */
+
+.oxb .app.nw {
+  position: relative;
+  min-height: 680px;
+  align-items: stretch;
+}
+.oxb .appBody {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  outline: none;
+}
+/* A screen that is the old `.main` fills the body the same way. */
+.oxb .appBody > .main {
+  flex: 1;
+}
+
+/* ---------- rail, now interactive ---------- */
+.oxb .nw .rail {
+  align-self: stretch;
+}
+.oxb .nw .railBrand,
+.oxb .nw .railItem {
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  width: 100%;
+}
+.oxb .nw .railBrand {
+  cursor: pointer;
+  font-weight: 640;
+  font-size: 14px;
+  letter-spacing: -0.02em;
+  color: var(--site-ink);
+}
+.oxb .nw .railItem {
+  cursor: pointer;
+  color: var(--site-graphite);
+  font-size: 13.5px;
+}
+.oxb .nw .railItem[aria-current] {
+  color: var(--site-ink);
+}
+.oxb .nw .railItem:focus-visible,
+.oxb .nw .railBrand:focus-visible {
+  outline: 2px solid var(--site-brand);
+  outline-offset: -2px;
+  border-radius: 6px;
+}
+.oxb .railLabel {
+  flex: 1;
+  min-width: 0;
+}
+.oxb .railBadge {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 16px;
+  min-width: 18px;
+  height: 16px;
+  padding: 0 5px;
+  border-radius: 8px;
+  text-align: center;
+  color: var(--site-ink);
+  background: color-mix(in srgb, var(--site-ink) 9%, transparent);
+}
+.oxb .railBadge.crit {
+  color: var(--crit-text);
+  background: color-mix(in srgb, var(--crit) 14%, transparent);
+}
+.oxb .railMe {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 14px 16px 2px;
+  border-top: 1px solid var(--site-rule);
+}
+.oxb .railMeText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-size: 11px;
+  color: var(--site-graphite-soft);
+  line-height: 1.35;
+}
+.oxb .railMeText b {
+  font-size: 12px;
+  font-weight: 560;
+  color: var(--site-ink);
+  white-space: nowrap;
+}
+
+/* ---------- narrow frames: a bar instead of a rail ---------- */
+.oxb .appBar {
+  display: none;
+}
+.oxb[data-vp="tablet"] .appBar,
+.oxb[data-vp="mobile"] .appBar {
+  display: block;
+  border-bottom: 1px solid var(--site-rule);
+  background: var(--site-paper-sunk);
+  min-width: 0;
+}
+.oxb .appBarTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 16px 4px;
+}
+.oxb .appBarTop .railBrand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0;
+  width: auto;
+}
+.oxb .appBarMe {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 10.5px;
+  color: var(--site-graphite-soft);
+  white-space: nowrap;
+}
+.oxb .appBarNav {
+  display: flex;
+  gap: 2px;
+  padding: 0 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.oxb .appBarNav::-webkit-scrollbar {
+  display: none;
+}
+.oxb .appBarNav button {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  color: var(--site-graphite);
+  padding: 10px 8px 11px;
+  position: relative;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.oxb .appBarNav button[aria-current] {
+  color: var(--site-ink);
+  font-weight: 560;
+}
+.oxb .appBarNav button::after {
+  content: "";
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 0;
+  height: 2px;
+  background: var(--site-brand);
+  transform: scaleX(0);
+  transition: transform 0.3s var(--b-ease);
+}
+.oxb .appBarNav button[aria-current]::after {
+  transform: scaleX(1);
+}
+
+/* ---------- toasts ---------- */
+.oxb .toasts {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  pointer-events: none;
+  z-index: 5;
+}
+.oxb .toast {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 13px;
+  border-radius: 10px;
+  background: var(--site-ink);
+  color: var(--site-paper);
+  font-size: 12.5px;
+  font-weight: 500;
+  box-shadow: 0 10px 28px -12px rgb(0 0 0 / 0.45);
+  animation: nw-toast 0.35s var(--b-ease);
+}
+.oxb .toastDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--site-brand);
+}
+@keyframes nw-toast {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+.oxb[data-vp="mobile"] .toasts {
+  left: 14px;
+  right: 14px;
+  align-items: stretch;
+}
+
+/* ---------- screen head & body ---------- */
+.oxb .scrHead {
+  padding: 18px 20px 16px;
+  border-bottom: 1px solid var(--site-rule);
+}
+.oxb .scrCrumbs {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--site-graphite);
+  margin-bottom: 8px;
+}
+.oxb .scrCrumbs button {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+.oxb .scrCrumbs button:hover {
+  color: var(--site-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.oxb .scrRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 16px;
+  flex-wrap: wrap;
+}
+.oxb .scrText {
+  min-width: 0;
+}
+.oxb .scrHead h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 660;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+.oxb .scrHead p {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  color: var(--site-graphite);
+}
+.oxb .scrActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.oxb .scrBody {
+  padding: 18px 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+.oxb .toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.oxb .toolbar .grow {
+  flex: 1;
+}
+.oxb[data-vp="mobile"] .scrHead {
+  padding: 14px 14px 13px;
+}
+.oxb[data-vp="mobile"] .scrBody {
+  padding: 14px;
+}
+.oxb[data-vp="mobile"] .scrRow {
+  flex-direction: column;
+  align-items: stretch;
+}
+.oxb[data-vp="mobile"] .toolbar > * {
+  flex: 1 1 100%;
+}
+
+/* ---------- buttons ---------- */
+.oxb .btn.sm {
+  padding: 5px 10px;
+  font-size: 12px;
+  border-radius: 8px;
+}
+.oxb .btn:focus-visible,
+.oxb .iconBtn:focus-visible,
+.oxb .chip:focus-visible,
+.oxb .seg button:focus-visible,
+.oxb .tabbar button:focus-visible,
+.oxb .appBarNav button:focus-visible,
+.oxb .ptLink:focus-visible,
+.oxb .rowBtn:focus-visible {
+  outline: 2px solid var(--site-brand);
+  outline-offset: 2px;
+}
+.oxb .btn.danger {
+  background: var(--crit);
+  color: #fff;
+}
+@media (hover: hover) {
+  .oxb .btn.danger:hover:not([disabled]) {
+    background: color-mix(in srgb, var(--crit) 85%, black);
+  }
+}
+.oxb .btn.ghost[disabled]:hover {
+  background: transparent;
+}
+.oxb .iconBtn {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid var(--site-rule);
+  background: transparent;
+  color: var(--site-graphite);
+  cursor: pointer;
+  flex: none;
+  transition:
+    background 0.18s,
+    color 0.18s,
+    border-color 0.18s;
+}
+@media (hover: hover) {
+  .oxb .iconBtn:hover {
+    background: var(--site-paper);
+    color: var(--site-ink);
+    border-color: var(--site-rule-strong);
+  }
+}
+.oxb .linkBtn {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-size: 11.5px;
+  color: var(--site-accent-text);
+  cursor: pointer;
+  font-weight: 520;
+}
+.oxb .linkBtn:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.oxb .seeAll.linkBtn {
+  color: var(--site-graphite);
+}
+.oxb .seeAll.linkBtn:hover {
+  color: var(--site-ink);
+}
+
+/* ---------- search & select ---------- */
+.oxb .search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 10px;
+  min-width: 220px;
+  border: 1px solid var(--site-rule);
+  border-radius: 9px;
+  background: var(--site-paper);
+  color: var(--site-graphite-soft);
+  transition: border-color 0.18s;
+}
+.oxb .search:focus-within {
+  border-color: var(--site-brand);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--site-brand) 18%, transparent);
+}
+.oxb .search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  color: var(--site-ink);
+}
+.oxb .search input::-webkit-search-cancel-button {
+  display: none;
+}
+.oxb .search input::placeholder {
+  color: var(--site-graphite-soft);
+}
+.oxb .searchClear {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 0;
+  background: color-mix(in srgb, var(--site-ink) 10%, transparent);
+  color: var(--site-graphite);
+  cursor: pointer;
+}
+.oxb .select {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.oxb .select select {
+  appearance: none;
+  height: 34px;
+  padding: 0 30px 0 11px;
+  border: 1px solid var(--site-rule);
+  border-radius: 9px;
+  background: var(--site-paper);
+  color: var(--site-ink);
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+  width: 100%;
+}
+.oxb .select select:focus-visible {
+  outline: 2px solid var(--site-brand);
+  outline-offset: 1px;
+}
+.oxb .select svg {
+  position: absolute;
+  right: 11px;
+  pointer-events: none;
+  color: var(--site-graphite);
+}
+@media (pointer: coarse) {
+  .oxb .search input,
+  .oxb .select select {
+    font-size: 16px;
+  }
+}
+
+/* ---------- segmented counts, chips, tab counts ---------- */
+.oxb .seg button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.oxb .segCount,
+.oxb .chipCount,
+.oxb .tabCount {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 10px;
+  font-weight: 600;
+}
+.oxb .chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.oxb .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid var(--site-rule);
+  background: var(--site-paper);
+  color: var(--site-graphite);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.18s,
+    color 0.18s,
+    border-color 0.18s;
+}
+@media (hover: hover) {
+  .oxb .chip:hover {
+    border-color: var(--site-rule-strong);
+    color: var(--site-ink);
+  }
+}
+.oxb .chip[aria-pressed="true"] {
+  background: var(--site-ink);
+  border-color: var(--site-ink);
+  color: var(--site-paper);
+}
+.oxb .tabCount {
+  margin-left: 6px;
+}
+.oxb .tabPanel {
+  min-width: 0;
+}
+
+/* ---------- pager ---------- */
+.oxb .pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--site-rule);
+}
+.oxb .pagerInfo {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  color: var(--site-graphite-soft);
+}
+.oxb .pagerBtns {
+  display: flex;
+  gap: 6px;
+}
+
+/* ---------- rows that open something ---------- */
+.oxb .ptLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  max-width: 100%;
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.oxb .ptLinkText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.oxb .ptLinkName {
+  font-weight: 545;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.oxb .ptLink:hover .ptLinkName {
+  text-decoration: underline;
+  text-decoration-color: var(--site-rule-strong);
+  text-underline-offset: 3px;
+}
+.oxb .ptLinkSub {
+  font-size: 11px;
+  color: var(--site-graphite-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.oxb table.dt tbody tr.clickable {
+  cursor: pointer;
+}
+/* A row-sized button: the whole line is the target, the markup stays a list. */
+.oxb .rowBtn {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.oxb .rowBtn[aria-pressed="true"],
+.oxb .rowBtn[aria-current="true"] {
+  background: color-mix(in srgb, var(--site-brand) 8%, transparent);
+}
+.oxb table.dt th button.sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+.oxb table.dt th button.sort:hover,
+.oxb table.dt th[aria-sort] button.sort {
+  color: var(--site-ink);
+}
+.oxb table.dt td.num,
+.oxb table.dt th.num {
+  text-align: right;
+}
+.oxb .mono {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+}
+.oxb .spark {
+  display: block;
+}
+.oxb .sparkNone {
+  color: var(--site-graphite-soft);
+}
+.oxb .emptyTitle {
+  display: block;
+  color: var(--site-ink);
+  font-weight: 580;
+  font-size: 13px;
+}
+.oxb .emptyText {
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+/* ---------- sheet ---------- */
+/* Fixed, said outright: the site's reset leaves a modal dialog absolute, so
+   it sat at the top of the document and focusing it scrolled the page there. */
+.oxb dialog.sheet {
+  position: fixed;
+  inset: 0 0 0 auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-left: 1px solid var(--site-rule);
+  width: min(440px, 100vw);
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: 100dvh;
+  background: var(--site-paper);
+  color: var(--site-ink);
+  box-shadow: -24px 0 60px -30px rgb(0 0 0 / 0.5);
+  overscroll-behavior: contain;
+}
+.oxb dialog.sheet[open] {
+  animation: nw-sheet 0.38s var(--b-ease);
+}
+.oxb dialog.sheet::backdrop {
+  background: rgb(4 10 9 / 0.42);
+  backdrop-filter: blur(2px);
+}
+@keyframes nw-sheet {
+  from {
+    transform: translateX(28px);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .oxb dialog.sheet[open],
+  .oxb .toast {
+    animation: none;
+  }
+}
+.oxb .sheetInner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.oxb .sheetHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 20px 16px;
+  border-bottom: 1px solid var(--site-rule);
+}
+.oxb .sheetHead h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+}
+.oxb .sheetHead p {
+  margin: 3px 0 0;
+  font-size: 12.5px;
+  color: var(--site-graphite);
+}
+.oxb .sheetBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.oxb .sheetFoot {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--site-rule);
+  background: var(--site-paper-sunk);
+}
+.oxb .sheetSection h4 {
+  margin: 0 0 8px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--site-graphite-soft);
+}
+.oxb .kv {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 14px;
+  padding: 7px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--site-rule) 60%, transparent);
+  font-size: 12.5px;
+}
+.oxb .kv:last-child {
+  border-bottom: 0;
+}
+.oxb .kvK {
+  color: var(--site-graphite);
+  flex: none;
+}
+.oxb .kvV {
+  text-align: right;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- form bits ---------- */
+.oxb .field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--site-graphite);
+}
+.oxb .field textarea,
+.oxb .field input[type="text"],
+.oxb .field input[type="time"],
+.oxb .field input[type="date"] {
+  width: 100%;
+  border: 1px solid var(--site-rule);
+  border-radius: 9px;
+  background: var(--site-paper);
+  color: var(--site-ink);
+  font: inherit;
+  font-size: 13px;
+  padding: 8px 11px;
+  resize: vertical;
+}
+.oxb .field textarea:focus,
+.oxb .field input:focus {
+  outline: none;
+  border-color: var(--site-brand);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--site-brand) 18%, transparent);
+}
+@media (pointer: coarse) {
+  .oxb .field textarea,
+  .oxb .field input {
+    font-size: 16px;
+  }
+}
+.oxb .check {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  font-size: 13px;
+  color: var(--site-ink);
+  cursor: pointer;
+  line-height: 1.4;
+}
+.oxb .check input {
+  margin-top: 2px;
+  accent-color: var(--site-cta);
+  width: 15px;
+  height: 15px;
+  flex: none;
+}
+
+/* ---------- clickable kit pieces ---------- */
+.oxb button.tile {
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+}
+.oxb button.tile:focus-visible,
+.oxb button.riskRow:focus-visible {
+  outline: 2px solid var(--site-brand);
+  outline-offset: 2px;
+}
+.oxb button.riskRow {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--site-rule) 55%, transparent);
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.oxb button.riskRow:last-child {
+  border-bottom: 0;
+}
+.oxb .riskRow .winTrk {
+  display: block;
+}
+.oxb .riskRow.closed .who2 {
+  color: var(--site-graphite);
+}
+
+/* ---------- dashboard ---------- */
+.oxb .db-legend {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--site-rule);
+  font-size: 12px;
+}
+.oxb .db-legendK {
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--site-graphite-soft);
+}
+.oxb .db-legend .ptLinkText {
+  flex-direction: row;
+  align-items: baseline;
+  gap: 6px;
+}
+.oxb .db-legend .ptLinkSub {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 10.5px;
+}
+.oxb .db-legendAll {
+  margin-left: auto;
+}
+.oxb .db-who {
+  display: inline-flex;
+  align-items: center;
+}
+.oxb .db-noteRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--site-rule) 60%, transparent);
+}
+.oxb .db-noteRow .ptLink {
+  flex: 1;
+}
+.oxb .db-noteAge {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  color: var(--high-text);
+}
+.oxb[data-vp="mobile"] .db-legendAll {
+  margin-left: 0;
+}
+
+/* ---------- note ---------- */
+.oxb .nt-saved {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  color: var(--site-graphite-soft);
+}
+.oxb .prov:focus-visible {
+  outline: 2px solid var(--site-brand);
+  outline-offset: 1px;
+}
+
+/* ---------- copilot ---------- */
+.oxb .copGrid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  min-height: 0;
+}
+.oxb[data-vp="tablet"] .copGrid {
+  grid-template-columns: minmax(0, 1fr) 310px;
+}
+.oxb[data-vp="mobile"] .copGrid {
+  grid-template-columns: 1fr;
+}
+.oxb .copGrid .copThread {
+  max-height: 520px;
+}
+.oxb .cp-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 13px 14px;
+  border-bottom: 1px solid var(--site-rule);
+  font-size: 13.5px;
+}
+.oxb .cp-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--site-brand);
+}
+.oxb .cp-audited {
+  margin: 0 0 0 auto;
+  padding: 0;
+}
+.oxb .cp-caret {
+  display: inline-block;
+  width: 7px;
+  height: 15px;
+  background: var(--site-brand);
+  vertical-align: -2px;
+}
+.oxb .cp-suggest {
+  justify-content: flex-end;
+}
+.oxb .cp-suggest .chip {
+  height: auto;
+  min-height: 28px;
+  padding: 5px 10px;
+  white-space: normal;
+  text-align: left;
+}
+
+/* ---------- tiles: caption and status on two lines ----------
+   At a 1086px frame a tile is 170px inside, and "Risk follow-up" beside
+   "C-SSRS positive" does not fit — both were cut to an ellipsis. Two fixed
+   lines keep every word and still land all four figures at one height. */
+.oxb .nw .tHead {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 3px;
+  height: auto;
+}
+.oxb .nw .tile .cap {
+  max-width: 100%;
+  color: var(--site-ink);
+  font-weight: 560;
+}
+.oxb .nw .tile .stat {
+  max-width: 100%;
+}
+
+/* A dated footing breaks between "12" and "Aug" in a 150px card. */
+.oxb .nw .instrFoot span {
+  white-space: nowrap;
+}
+/* In a half-width pair a diagnosis reads better on two lines than cut. */
+.oxb .nw .two .lrow .t,
+.oxb .nw .two .lrow .m {
+  white-space: normal;
+  overflow: visible;
+}

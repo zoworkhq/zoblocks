@@ -1,0 +1,872 @@
+/* ===========================================================================
+ * Northwind — Schedule.
+ *
+ * Type colours are marks, never the only signal: every card also names its
+ * type or clinician, and the legend spells them out. Medication management
+ * takes a blue-red mix because the six clinical hues are already spoken for.
+ * =========================================================================== */
+
+.oxb .t-individual {
+  --ev: var(--site-brand);
+}
+.oxb .t-intake {
+  --ev: var(--low);
+}
+.oxb .t-med {
+  --ev: color-mix(in srgb, var(--low) 55%, var(--crit));
+}
+.oxb .t-risk {
+  --ev: var(--crit);
+}
+.oxb .t-group {
+  --ev: var(--high);
+}
+.oxb .t-admin,
+.oxb .t-supervision {
+  --ev: var(--unk);
+}
+
+/* ---------- toolbar ---------- */
+.oxb .sc-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.oxb .sc-nav .btn.sm {
+  height: 30px;
+}
+.oxb .sc-nav .btn[aria-pressed="true"] {
+  background: var(--site-paper);
+}
+.oxb .sc-weekLabel {
+  margin-left: 8px;
+  font-size: 14px;
+  font-weight: 620;
+  letter-spacing: -0.015em;
+  white-space: nowrap;
+}
+
+/* ---------- layout ---------- */
+.oxb .sc-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.oxb .sc-main {
+  min-width: 0;
+}
+/* Under the grid, not beside it: the week needs the width more than the summary does. */
+.oxb .sc-side {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  align-items: start;
+  min-width: 0;
+}
+
+/* ---------- week grid ---------- */
+.oxb .sc-gridScroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+.oxb .sc-grid {
+  min-width: 470px;
+}
+.oxb .sc-gh,
+.oxb .sc-tasks,
+.oxb .sc-gb {
+  display: grid;
+  grid-template-columns: 46px repeat(5, minmax(0, 1fr));
+}
+.oxb .sc-gh {
+  border-bottom: 1px solid var(--site-rule);
+}
+.oxb .sc-dh {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  min-width: 0;
+  padding: 10px 8px 9px;
+  border: 0;
+  border-left: 1px solid var(--site-rule);
+  background: transparent;
+  color: var(--site-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.18s;
+}
+@media (hover: hover) {
+  .oxb .sc-dh:hover {
+    background: var(--site-paper);
+  }
+}
+.oxb .sc-dh:focus-visible {
+  outline: 2px solid var(--site-brand);
+  outline-offset: -2px;
+}
+.oxb .sc-dhWd {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--site-graphite-soft);
+}
+.oxb .sc-dhN {
+  font-size: 16px;
+  font-weight: 620;
+  line-height: 1.25;
+  padding: 0 5px;
+  margin-left: -5px;
+  border-radius: 6px;
+}
+.oxb .sc-dh[aria-current] .sc-dhN {
+  background: var(--site-ink);
+  color: var(--site-paper);
+}
+.oxb .sc-dhCount {
+  font-size: 10.5px;
+  color: var(--site-graphite-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.oxb .sc-tasks {
+  border-bottom: 1px solid var(--site-rule);
+}
+.oxb .sc-tasksLabel {
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--site-graphite-soft);
+}
+.oxb .sc-taskCell {
+  min-width: 0;
+  padding: 4px;
+  border-left: 1px solid var(--site-rule);
+}
+.oxb .sc-task {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  min-height: 24px;
+  padding: 3px 6px;
+  border: 1px solid color-mix(in srgb, var(--crit) 40%, transparent);
+  border-radius: 6px;
+  background: var(--crit-bg);
+  color: var(--crit-text);
+  font: inherit;
+  font-size: 10.5px;
+  text-align: left;
+  cursor: pointer;
+}
+.oxb .sc-task svg {
+  flex: none;
+}
+.oxb .sc-task > span {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.oxb .sc-task:focus-visible {
+  outline: 2px solid var(--site-brand);
+  outline-offset: 1px;
+}
+
+.oxb .sc-gb {
+  position: relative;
+  height: calc(var(--sc-hour) * 10);
+  margin-bottom: 8px;
+}
+.oxb .sc-hours {
+  position: relative;
+}
+.oxb .sc-hours span {
+  position: absolute;
+  right: 7px;
+  transform: translateY(-50%);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 10px;
+  color: var(--site-graphite-soft);
+  background: var(--site-paper-sunk);
+  line-height: 1.3;
+}
+.oxb .sc-hours span:first-child {
+  transform: none;
+  top: 2px !important;
+}
+.oxb .sc-hours .sc-nowTag {
+  z-index: 1;
+  color: var(--crit-text);
+  font-weight: 650;
+}
+.oxb .sc-col {
+  position: relative;
+  min-width: 0;
+  border-left: 1px solid var(--site-rule);
+  background-image:
+    linear-gradient(to bottom, var(--site-rule) 1px, transparent 1px),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--site-rule) 45%, transparent) 1px,
+      transparent 1px
+    );
+  background-size:
+    100% var(--sc-hour),
+    100% calc(var(--sc-hour) / 2);
+}
+.oxb .sc-col.is-today {
+  background-color: color-mix(in srgb, var(--site-brand) 5%, transparent);
+}
+.oxb .sc-now {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  margin-top: -1px;
+  background: var(--crit);
+  z-index: 3;
+  pointer-events: none;
+}
+.oxb .sc-now::before {
+  content: "";
+  position: absolute;
+  left: -4px;
+  top: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--crit);
+}
+
+/* ---------- event cards ---------- */
+.oxb .sc-ev {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  margin-top: 1px;
+  padding: 3px 6px 3px 9px;
+  border: 1px solid color-mix(in srgb, var(--ev) 32%, transparent);
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--ev) 12%, var(--site-paper));
+  color: var(--site-ink);
+  font: inherit;
+  font-size: 11.5px;
+  line-height: 1.3;
+  text-align: left;
+  overflow: hidden;
+  cursor: pointer;
+  transition:
+    background 0.18s,
+    box-shadow 0.18s;
+}
+.oxb .sc-ev::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--ev);
+}
+@media (hover: hover) {
+  .oxb .sc-ev:hover {
+    background: color-mix(in srgb, var(--ev) 20%, var(--site-paper));
+    z-index: 2;
+  }
+}
+.oxb .sc-ev:focus-visible {
+  outline: 2px solid var(--site-brand);
+  outline-offset: 1px;
+  z-index: 2;
+}
+.oxb .sc-evTop {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+.oxb .sc-evT {
+  flex: none;
+  font-size: 10.5px;
+  color: var(--site-graphite);
+}
+.oxb .sc-evName {
+  min-width: 0;
+  font-weight: 590;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.oxb .sc-evDot {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--high);
+}
+.oxb .sc-evRisk {
+  flex: none;
+  color: var(--crit);
+}
+.oxb .sc-evMeta,
+.oxb .sc-evL3 {
+  font-size: 10.5px;
+  line-height: 1.3;
+  color: var(--site-graphite);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.oxb .sc-evL3.is-st {
+  font-weight: 600;
+}
+.oxb .sc-ev.s-no-show .sc-evL3 {
+  color: var(--crit-text);
+}
+.oxb .sc-ev.is-short {
+  flex-direction: row;
+  align-items: center;
+  padding-top: 0;
+  padding-bottom: 0;
+  font-size: 11px;
+}
+.oxb .sc-ev.is-narrow {
+  padding-left: 6px;
+  padding-right: 3px;
+  font-size: 10.5px;
+}
+.oxb .sc-ev.is-narrow .sc-evRisk {
+  width: 10px;
+  height: 10px;
+}
+
+/* Admin, supervision and the group are time, not sessions: no tint, dashed edge. */
+.oxb .sc-ev.is-block {
+  background: var(--site-paper-sunk);
+  border-style: dashed;
+  border-color: var(--site-rule-strong);
+}
+.oxb .sc-ev.is-block .sc-evName {
+  font-weight: 540;
+  color: var(--site-graphite);
+}
+@media (hover: hover) {
+  .oxb .sc-ev.is-block:hover {
+    background: var(--site-paper);
+  }
+}
+
+/* Done is quieter, never fainter: the tint drops, the text keeps its contrast. */
+.oxb .sc-ev.is-past {
+  background: color-mix(in srgb, var(--ev) 5%, var(--site-paper-sunk));
+  border-color: var(--site-rule);
+}
+.oxb .sc-ev.is-past::before {
+  background: color-mix(in srgb, var(--ev) 45%, var(--site-rule));
+}
+.oxb .sc-ev.is-past .sc-evName {
+  font-weight: 520;
+  color: var(--site-graphite);
+}
+.oxb .sc-ev.s-checked-in {
+  background: color-mix(in srgb, var(--ev) 22%, var(--site-paper));
+  border-color: var(--ev);
+}
+.oxb .sc-ev.s-no-show,
+.oxb .sc-ev.s-cancelled {
+  background-color: var(--site-paper-sunk);
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent 0 5px,
+    color-mix(in srgb, var(--site-rule) 70%, transparent) 5px 6px
+  );
+  border-style: dashed;
+}
+.oxb .sc-ev.s-no-show .sc-evName,
+.oxb .sc-ev.s-cancelled .sc-evName {
+  text-decoration: line-through;
+  color: var(--site-graphite);
+}
+.oxb .sc-ev.is-hl {
+  box-shadow:
+    0 0 0 2px var(--site-paper),
+    0 0 0 4px var(--site-brand);
+  z-index: 2;
+  animation: sc-pulse 1.2s var(--b-ease) 1;
+}
+@keyframes sc-pulse {
+  0% {
+    box-shadow:
+      0 0 0 2px var(--site-paper),
+      0 0 0 10px color-mix(in srgb, var(--site-brand) 40%, transparent);
+  }
+}
+
+/* ---------- day agenda ---------- */
+.oxb .sc-dayOnly {
+  display: none;
+}
+.oxb .sc-dayChips {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--site-rule);
+}
+.oxb .sc-agenda {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.oxb .sc-ag {
+  display: grid;
+  grid-template-columns: 52px 3px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 4px 12px;
+  padding: 10px 14px;
+  border-top: 1px solid color-mix(in srgb, var(--site-rule) 60%, transparent);
+  cursor: pointer;
+  transition: background 0.18s;
+}
+.oxb .sc-ag:first-child {
+  border-top: 0;
+}
+@media (hover: hover) {
+  .oxb .sc-ag:hover {
+    background: color-mix(in srgb, var(--site-paper) 70%, transparent);
+  }
+}
+.oxb .sc-ag.is-hl {
+  background: color-mix(in srgb, var(--site-brand) 9%, transparent);
+}
+.oxb .sc-ag.is-task {
+  cursor: default;
+  background: var(--crit-bg);
+}
+.oxb .sc-agTime {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+.oxb .sc-agTime .mono {
+  font-size: 13px;
+  font-weight: 580;
+}
+.oxb .sc-agTime span + span {
+  font-size: 10.5px;
+  color: var(--site-graphite-soft);
+}
+.oxb .sc-ag.is-past .sc-agTime .mono {
+  color: var(--site-graphite);
+}
+.oxb .sc-agRail {
+  align-self: stretch;
+  width: 3px;
+  min-height: 30px;
+  border-radius: 2px;
+  background: var(--ev);
+}
+.oxb .sc-agMain {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-size: 13px;
+}
+.oxb .sc-agMain > b {
+  font-weight: 560;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.oxb .sc-agMain > span {
+  font-size: 11px;
+  color: var(--site-graphite-soft);
+}
+.oxb .sc-ag.s-no-show .ptLinkName,
+.oxb .sc-ag.s-cancelled .ptLinkName {
+  text-decoration: line-through;
+}
+.oxb .sc-agTags {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+}
+.oxb .sc-riskTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 580;
+  color: var(--crit-text);
+}
+
+/* ---------- legend ---------- */
+.oxb .sc-legend {
+  gap: 6px 14px;
+}
+.oxb .sc-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.oxb .sc-sw {
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+  background: var(--ev);
+}
+
+/* ---------- side column ---------- */
+.oxb .sc-card .cardTop h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 620;
+  letter-spacing: -0.015em;
+}
+.oxb .sc-cardSub {
+  font-size: 11px;
+  color: var(--site-graphite-soft);
+  white-space: nowrap;
+}
+.oxb .sc-quiet {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--site-graphite);
+}
+.oxb .sc-card > .sc-quiet {
+  padding: 12px 14px 14px;
+}
+.oxb .sc-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  border-bottom: 1px solid var(--site-rule);
+}
+.oxb .sc-stats > div {
+  padding: 10px 14px;
+  border-left: 1px solid var(--site-rule);
+}
+.oxb .sc-stats > div:first-child {
+  border-left: 0;
+}
+.oxb .sc-stats dt {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--site-graphite-soft);
+}
+.oxb .sc-stats dd {
+  margin: 2px 0 0;
+  font-size: 20px;
+  font-weight: 620;
+  letter-spacing: -0.02em;
+}
+.oxb .sc-mini {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+}
+.oxb .sc-miniRow {
+  display: grid;
+  grid-template-columns: 38px 7px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  font-size: 12.5px;
+  transition: background 0.18s;
+}
+@media (hover: hover) {
+  .oxb .sc-miniRow:hover {
+    background: color-mix(in srgb, var(--site-paper) 70%, transparent);
+  }
+}
+.oxb .sc-miniT {
+  font-size: 11.5px;
+  color: var(--site-graphite);
+}
+.oxb .sc-miniDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ev);
+}
+.oxb .sc-miniName {
+  font-weight: 540;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.oxb .sc-miniSt {
+  font-size: 11px;
+  color: var(--site-graphite-soft);
+  white-space: nowrap;
+}
+.oxb .sc-cardFoot {
+  padding: 9px 14px;
+  border-top: 1px solid var(--site-rule);
+}
+
+.oxb .sc-due.is-open {
+  border-color: color-mix(in srgb, var(--crit) 45%, var(--site-rule));
+  box-shadow: inset 3px 0 0 var(--crit);
+}
+.oxb .sc-dueBody {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px 14px;
+}
+.oxb .sc-dueLine {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  width: 100%;
+  margin: 0;
+}
+.oxb .sc-dueLeft {
+  font-size: 11px;
+  font-weight: 620;
+  color: var(--crit-text);
+}
+.oxb .sc-dueBar {
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--site-ink) 8%, transparent);
+  overflow: hidden;
+}
+.oxb .sc-dueBar span {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--crit);
+}
+
+.oxb .sc-cal {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 2px;
+  padding: 10px 12px 12px;
+}
+.oxb .sc-calWd {
+  padding-bottom: 4px;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--site-graphite-soft);
+}
+.oxb .sc-calDay {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 30px;
+  min-width: 24px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--site-ink);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.18s;
+}
+.oxb span.sc-calDay {
+  cursor: default;
+}
+.oxb .sc-calDay.is-weekend {
+  color: var(--site-graphite-soft);
+}
+@media (hover: hover) {
+  .oxb button.sc-calDay:hover {
+    background: var(--site-paper);
+  }
+}
+.oxb .sc-calDay:focus-visible {
+  outline: 2px solid var(--site-brand);
+  outline-offset: 1px;
+}
+.oxb .sc-calDay.is-today {
+  font-weight: 700;
+  box-shadow: inset 0 0 0 1px var(--site-brand);
+}
+.oxb .sc-calDay[aria-pressed="true"],
+.oxb .sc-calDay[aria-pressed="true"]:hover {
+  background: var(--site-ink);
+  color: var(--site-paper);
+}
+.oxb .sc-calDot {
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  margin-left: -2px;
+  border-radius: 50%;
+  background: var(--site-brand);
+}
+.oxb .sc-calDay[aria-pressed="true"] .sc-calDot {
+  background: var(--site-paper);
+}
+
+/* ---------- sheets ---------- */
+.oxb .sc-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.oxb .sc-actions .btn.sm {
+  min-height: 28px;
+}
+.oxb .btn.ghost.sc-danger {
+  color: var(--crit-text);
+  border-color: color-mix(in srgb, var(--crit) 45%, var(--site-rule));
+}
+.oxb .sc-inline {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid var(--site-rule);
+  border-radius: 10px;
+  background: var(--site-paper-sunk);
+}
+.oxb .sc-slotLabel {
+  margin: 0 0 6px;
+  font-size: 11.5px;
+  font-weight: 560;
+  color: var(--site-graphite);
+}
+.oxb .sc-slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.oxb .sc-slots .chip {
+  font-size: 11.5px;
+}
+.oxb .sc-reason {
+  font-size: 12px;
+  color: var(--site-graphite);
+}
+.oxb .sc-riskLink {
+  color: var(--crit-text);
+  text-align: right;
+  font-size: 12.5px;
+}
+.oxb .sc-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.oxb .sc-formRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.oxb .sc-form .select,
+.oxb .sc-inline .select {
+  width: 100%;
+}
+.oxb .sc-form .seg {
+  align-self: flex-start;
+}
+.oxb .sc-noSlot {
+  display: flex;
+  align-items: center;
+  height: 34px;
+  font-size: 12.5px;
+  color: var(--crit-text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oxb .sc-ev.is-hl {
+    animation: none;
+  }
+}
+
+/* ---------- tablet ---------- */
+.oxb[data-vp="tablet"] .sc-side {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.oxb[data-vp="mobile"] .sc-side {
+  grid-template-columns: minmax(0, 1fr);
+}
+.oxb[data-vp="tablet"] .sc-grid {
+  min-width: 640px;
+}
+
+/* ---------- mobile: day chips and the agenda, never the grid ---------- */
+.oxb[data-vp="mobile"] .sc-wkOnly,
+.oxb[data-vp="mobile"] .sc-modes,
+.oxb[data-vp="mobile"] .sc-bar > .grow {
+  display: none;
+}
+.oxb[data-vp="mobile"] .sc-dayOnly {
+  display: block;
+}
+.oxb[data-vp="mobile"] .sc-filter .select {
+  width: 100%;
+}
+.oxb[data-vp="mobile"] .sc-weekLabel {
+  margin-left: auto;
+}
+.oxb[data-vp="mobile"] .sc-dayChips {
+  padding: 10px 12px;
+}
+.oxb[data-vp="mobile"] .sc-ag {
+  grid-template-columns: 44px 3px minmax(0, 1fr) auto;
+  gap: 6px 10px;
+  padding: 10px 12px;
+}
+.oxb[data-vp="mobile"] .sc-agTime {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  align-self: start;
+}
+.oxb[data-vp="mobile"] .sc-agRail {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+.oxb[data-vp="mobile"] .sc-agMain {
+  grid-column: 3;
+  grid-row: 1;
+}
+.oxb[data-vp="mobile"] .sc-agTags {
+  grid-column: 3;
+  grid-row: 2;
+  justify-content: flex-start;
+}
+.oxb[data-vp="mobile"] .sc-ag > :last-child {
+  grid-column: 4;
+  grid-row: 1 / span 2;
+}
+.oxb[data-vp="mobile"] .sc-formRow {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* A 150px column fits the time and the label; a tablet's 110px does not, and
+   the label is the half worth keeping. The name is in the task's own label. */
+.oxb[data-vp="tablet"] .sc-ev.is-short .sc-evT,
+.oxb[data-vp="tablet"] .sc-taskWho {
+  display: none;
+}

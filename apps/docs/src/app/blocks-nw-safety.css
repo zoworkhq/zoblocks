@@ -1,0 +1,481 @@
+/* ===========================================================================
+ * Northwind — Safety (risk follow-up queue). Scoped under `.oxb .sf-`.
+ * =========================================================================== */
+
+/* ---------- summary strip ---------- */
+.oxb .sf-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+.oxb .sf-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+  padding: 10px 13px;
+  border: 1px solid var(--site-rule);
+  border-radius: 13px;
+  background: var(--site-paper-sunk);
+  color: var(--site-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.18s,
+    background 0.18s;
+}
+@media (hover: hover) {
+  .oxb .sf-stat:hover {
+    border-color: var(--site-rule-strong);
+  }
+}
+.oxb .sf-stat[aria-pressed="true"] {
+  border-color: var(--site-ink);
+  box-shadow: inset 0 0 0 1px var(--site-ink);
+}
+.oxb .sf-stat:focus-visible {
+  outline: 2px solid var(--site-brand);
+  outline-offset: 2px;
+}
+.oxb .sf-statN {
+  font-size: 20px;
+  font-weight: 620;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+.oxb .sf-statK {
+  font-size: 11.5px;
+  color: var(--site-graphite);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* ---------- layout ---------- */
+.oxb .sf-cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 16px;
+  align-items: start;
+}
+.oxb .sf-main {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.oxb .sf-queue .panelTop {
+  border-bottom: 1px solid var(--site-rule);
+}
+.oxb .sf-emptyWrap {
+  padding: 8px 0;
+}
+
+/* ---------- queue ---------- */
+.oxb .sf-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.oxb .sf-item {
+  display: grid;
+  grid-template-columns: 3px minmax(0, 1fr);
+  gap: 0 12px;
+  padding: 13px 14px 12px;
+  border-bottom: 1px solid color-mix(in srgb, var(--site-rule) 55%, transparent);
+  scroll-margin: 80px;
+  transition: background 0.4s;
+}
+.oxb .sf-item:last-child {
+  border-bottom: 0;
+}
+.oxb .sf-rail {
+  border-radius: 2px;
+  align-self: stretch;
+}
+.oxb .sf-flash {
+  animation: sf-flash 2.4s var(--b-ease);
+}
+@keyframes sf-flash {
+  0%,
+  40% {
+    background: color-mix(in srgb, var(--site-brand) 12%, transparent);
+  }
+  100% {
+    background: transparent;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .oxb .sf-flash {
+    animation: none;
+    background: color-mix(in srgb, var(--site-brand) 8%, transparent);
+  }
+}
+.oxb .sf-body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.oxb .sf-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.oxb .sf-who {
+  min-width: 0;
+  font-size: 13.5px;
+}
+.oxb .sf-who .ptLinkName {
+  font-weight: 580;
+  letter-spacing: -0.01em;
+}
+.oxb .sf-who .ptLinkSub {
+  font-size: 11.5px;
+  color: var(--site-graphite);
+  white-space: normal;
+}
+.oxb .sf-left {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-align: right;
+  padding-top: 2px;
+}
+.oxb .sf-win {
+  min-width: 0;
+}
+.oxb .sf-winTrk {
+  height: 4px;
+  border-radius: 3px;
+  background: var(--site-rule);
+  position: relative;
+  overflow: hidden;
+}
+.oxb .sf-winTrk i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 3px;
+}
+.oxb .sf-winLbl {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+  font-size: 10.5px;
+  color: var(--site-graphite);
+  margin-top: 4px;
+}
+.oxb .sf-outcome {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  font-size: 12px;
+}
+.oxb .sf-outcome .mono {
+  font-size: 11.5px;
+  color: var(--site-graphite);
+}
+.oxb .sf-closed .sf-who .ptLinkName {
+  color: var(--site-graphite);
+}
+.oxb .sf-attempt {
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--site-graphite);
+}
+.oxb .sf-attempt .mono {
+  color: var(--site-ink);
+}
+.oxb .sf-attemptHint {
+  color: var(--high-text);
+}
+.oxb .sf-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+.oxb .sf-owner {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11.5px;
+  color: var(--site-graphite);
+  white-space: nowrap;
+}
+.oxb .sf-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* ---------- reassign ---------- */
+.oxb .sf-reassign {
+  border: 1px solid var(--site-rule);
+  border-radius: 11px;
+  background: var(--site-paper);
+  padding: 10px;
+}
+.oxb .sf-reassignK {
+  display: block;
+  font-size: 11px;
+  color: var(--site-graphite);
+  margin: 0 2px 8px;
+}
+.oxb .sf-reassignList {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+.oxb .sf-pick {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  min-height: 36px;
+  padding: 6px 9px;
+  border: 1px solid var(--site-rule);
+  border-radius: 9px;
+  background: var(--site-paper-sunk);
+  color: var(--site-ink);
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+.oxb .sf-pick > span:last-child {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+.oxb .sf-pick small {
+  font-size: 10.5px;
+  color: var(--site-graphite);
+}
+@media (hover: hover) {
+  .oxb .sf-pick:hover {
+    border-color: var(--site-rule-strong);
+  }
+}
+.oxb .sf-pick[aria-pressed="true"] {
+  border-color: var(--site-ink);
+}
+.oxb .sf-pick:focus-visible {
+  outline: 2px solid var(--site-brand);
+  outline-offset: 2px;
+}
+
+/* ---------- side column ---------- */
+.oxb .sf-side {
+  min-width: 0;
+}
+.oxb .sf-plans {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.oxb .sf-plans li + li {
+  border-top: 1px solid color-mix(in srgb, var(--site-rule) 55%, transparent);
+}
+.oxb .sf-plan {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 14px;
+}
+@media (hover: hover) {
+  .oxb .sf-plan:hover {
+    background: color-mix(in srgb, var(--site-paper) 55%, transparent);
+  }
+}
+.oxb .sf-planTop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.oxb .sf-planName {
+  flex: 1;
+  min-width: 0;
+  font-size: 12.5px;
+  font-weight: 545;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.oxb .sf-planState {
+  font-size: 11px;
+  font-weight: 560;
+  white-space: nowrap;
+}
+.oxb .sf-planTrk {
+  display: block;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--site-rule);
+  overflow: hidden;
+}
+.oxb .sf-planTrk i {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+}
+.oxb .sf-planSub {
+  font-size: 10.5px;
+  color: var(--site-graphite);
+}
+.oxb .sf-cardBody {
+  padding: 12px 14px 14px;
+}
+.oxb .sf-figs {
+  display: flex;
+  gap: 22px;
+  margin-bottom: 12px;
+}
+.oxb .sf-figs > div {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.oxb .sf-fig {
+  font-size: 20px;
+  font-weight: 620;
+  letter-spacing: -0.02em;
+}
+.oxb .sf-figK {
+  font-size: 11.5px;
+  color: var(--site-graphite);
+}
+.oxb .sf-oncall {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+}
+.oxb .sf-oncallText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.35;
+  font-size: 11.5px;
+  color: var(--site-graphite);
+}
+.oxb .sf-oncallText b {
+  font-size: 12.5px;
+  font-weight: 580;
+  color: var(--site-ink);
+}
+
+/* ---------- sheets ---------- */
+.oxb .sf-sheetPt {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.oxb .sf-sheetPt .face {
+  border-radius: 12px;
+  flex: none;
+}
+.oxb .sf-sheetPt > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--site-graphite);
+}
+.oxb .sf-sheetPt b {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--site-ink);
+  letter-spacing: -0.015em;
+}
+.oxb .sf-sheetPt .stDot {
+  margin-top: 3px;
+  font-size: 12px;
+  font-weight: 560;
+}
+.oxb .sf-sheetPt + .sheetSection .sf-attempt {
+  margin-top: 8px;
+}
+.oxb .sf-fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  min-width: 0;
+}
+.oxb .sf-fieldset legend {
+  padding: 0;
+  margin-bottom: 9px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--site-graphite);
+}
+.oxb .sf-callout {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--site-rule);
+  border-left: 3px solid var(--crit);
+  background: var(--site-paper-sunk);
+  font-size: 12.5px;
+  color: var(--site-ink);
+  line-height: 1.45;
+}
+.oxb .field .select,
+.oxb .field .seg {
+  align-self: stretch;
+}
+
+/* ---------- narrower frames ---------- */
+.oxb[data-vp="tablet"] .sf-cols,
+.oxb[data-vp="mobile"] .sf-cols {
+  grid-template-columns: minmax(0, 1fr);
+}
+.oxb[data-vp="tablet"] .sf-side {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+.oxb[data-vp="mobile"] .sf-stats {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.oxb[data-vp="mobile"] .sf-top {
+  flex-direction: column;
+  gap: 4px;
+}
+.oxb[data-vp="mobile"] .sf-left {
+  text-align: left;
+  padding-top: 0;
+}
+.oxb[data-vp="mobile"] .sf-item {
+  padding: 12px;
+}
+.oxb[data-vp="mobile"] .sf-actions {
+  width: 100%;
+}
+.oxb[data-vp="mobile"] .sf-actions .btn {
+  flex: 1 1 auto;
+  justify-content: center;
+}
+.oxb[data-vp="mobile"] .sf-reassignList {
+  grid-template-columns: minmax(0, 1fr);
+}
+.oxb[data-vp="mobile"] .toolbar .grow {
+  display: none;
+}

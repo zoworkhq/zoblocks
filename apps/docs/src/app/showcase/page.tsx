@@ -9,7 +9,7 @@ import { BlockGallery } from "@/components/site/block-gallery";
 export const metadata: Metadata = {
   title: "Blocks — clinical screens built from ZoBlocks",
   description:
-    "Production-shaped clinical screens built from ZoBlocks: caseload dashboard, progress note with provenance, patient view, sourced copilot. Live, synthetic data.",
+    "A working clinical app built from ZoBlocks: dashboard, caseload, schedule, messages, safety queue, instruments, reports and the patient record. Live, synthetic data.",
   alternates: { canonical: "/showcase" },
 };
 
@@ -94,8 +94,8 @@ export default function ShowcasePage() {
               {BLOCKS.length} screens, assembled from the catalogue.
             </h2>
             <p className="mt-3 max-w-2xl text-pretty text-graphite" data-reveal>
-              Each one is a live composition on synthetic data, not a screenshot. Open any block to
-              read how it is built and which components it uses.
+              One working application on synthetic data, opened at a different screen each time. The
+              rail navigates, and every control does something.
             </p>
             <div className="mt-10">
               <BlockGallery blocks={BLOCKS} />

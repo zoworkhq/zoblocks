@@ -11,12 +11,35 @@
 import { expect, test, type Page } from "@playwright/test";
 import { source as AXE_SOURCE } from "axe-core";
 
-const SLUGS = ["dashboard-01", "note-01", "patient-01", "copilot-01"] as const;
+const SLUGS = [
+  "dashboard-01",
+  "caseload-01",
+  "patient-01",
+  "schedule-01",
+  "messages-01",
+  "note-01",
+  "safety-01",
+  "instruments-01",
+  "reports-01",
+  "directory-01",
+  "copilot-01",
+] as const;
+
+/** The rail's destinations, and the heading each screen opens with. */
+const SCREENS = [
+  ["Caseload", "Caseload"],
+  ["Schedule", "Schedule"],
+  ["Messages", "Messages"],
+  ["Reports", "Reports"],
+  ["Patients", "Patients"],
+  ["Instruments", "Instruments"],
+  ["Safety", "Safety"],
+] as const;
 
 /**
  * Scoped to the gallery on purpose.
  *
- * The page's "On this page" list links to the same four addresses, so an
+ * The page's "On this page" list links to the same addresses, so an
  * unscoped `a[href="/showcase/…"]` matches the nav entry first — which has no
  * preview inside it and navigates rather than opening the overlay. The first
  * run of this file failed on exactly that and the test was wrong, not the page.
@@ -122,6 +145,51 @@ test.describe("the block gallery @a11y", () => {
     });
   }
 
+  /**
+   * Every block is the same application. The rail used to be a picture of
+   * navigation with one destination built; each entry now has to open a
+   * screen, and the screen has to say which one it is.
+   */
+  test("the rail opens every screen, and a record opens from the caseload", async ({ page }) => {
+    await page.goto("/showcase/dashboard-01");
+    const app = page.locator(".oxb .app");
+    const rail = app.getByRole("navigation", { name: "Application" }).first();
+    for (const [entry, heading] of SCREENS) {
+      await rail.getByRole("button", { name: new RegExp(`^${entry}`) }).click();
+      await expect(
+        app.getByRole("heading", { level: 2, name: heading, exact: true }),
+      ).toBeVisible();
+      await expect(rail.getByRole("button", { name: new RegExp(`^${entry}`) })).toHaveAttribute(
+        "aria-current",
+        "page",
+      );
+    }
+
+    await rail.getByRole("button", { name: /^Caseload/ }).click();
+    await app
+      .getByRole("button", { name: /R\. Okonkwo/ })
+      .first()
+      .click();
+    await expect(app.getByRole("heading", { level: 2, name: "Okonkwo, Rachel" })).toBeVisible();
+  });
+
+  test("closing a risk follow-up clears it from the dashboard queue", async ({ page }) => {
+    await page.goto("/showcase/dashboard-01");
+    const app = page.locator(".oxb .app");
+    await app.getByRole("button", { name: /R\. Okonkwo.*C-SSRS positive/ }).click();
+    const sheet = page.getByRole("dialog");
+    await expect(sheet).toBeVisible();
+    await sheet.getByRole("radio", { name: /Reached — safe/ }).check();
+    await sheet.getByRole("button", { name: /^Save/ }).click();
+    await expect(sheet).toBeHidden();
+
+    await app
+      .getByRole("button", { name: /^Dashboard/ })
+      .first()
+      .click();
+    await expect(app.getByRole("button", { name: /R\. Okonkwo.*C-SSRS positive/ })).toHaveCount(0);
+  });
+
   test("a slug with no block is a 404, not an empty frame", async ({ page }) => {
     const response = await page.goto("/showcase/not-a-block");
     expect(response?.status()).toBe(404);
@@ -146,7 +214,18 @@ test.describe("the block gallery @a11y", () => {
 
   test("the gallery and a block page have no WCAG 2.2 AA violations", async ({ page }) => {
     const failures: string[] = [];
-    for (const path of ["/showcase", "/showcase/patient-01", "/showcase/dashboard-01"]) {
+    for (const path of [
+      "/showcase",
+      "/showcase/dashboard-01",
+      "/showcase/caseload-01",
+      "/showcase/patient-01",
+      "/showcase/schedule-01",
+      "/showcase/messages-01",
+      "/showcase/safety-01",
+      "/showcase/instruments-01",
+      "/showcase/reports-01",
+      "/showcase/directory-01",
+    ]) {
       await page.goto(path);
       await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
       await settle(page);

@@ -1,0 +1,484 @@
+/* ===========================================================================
+ * Northwind — Reports. Prefix `.rp-`.
+ * =========================================================================== */
+
+.oxb .rp-tabs .tabbar {
+  padding: 0 14px;
+}
+.oxb[data-vp="mobile"] .rp-tabs .tabbar {
+  padding: 0 6px;
+}
+.oxb .rp-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.oxb .rp-axis {
+  font-size: 10.5px;
+}
+
+/* ---------- tiles that navigate ---------- */
+.oxb .rp-tileBtn {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  padding: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 13px;
+}
+.oxb .rp-tileBtn > .tile {
+  flex: 1;
+  min-width: 0;
+}
+.oxb .rp-tileBtn:focus-visible {
+  outline: 2px solid var(--site-brand);
+  outline-offset: 2px;
+}
+@media (hover: hover) {
+  .oxb .rp-tileBtn:hover > .tile {
+    border-color: var(--site-brand);
+  }
+}
+
+/* ---------- response by program ---------- */
+.oxb .rp-prog {
+  border-top: 1px solid var(--site-rule);
+}
+.oxb .rp-progRow {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: 8px 16px;
+  align-items: center;
+  padding: 11px 16px;
+  border-bottom: 1px solid color-mix(in srgb, var(--site-rule) 60%, transparent);
+}
+.oxb .rp-progRow:last-child {
+  border-bottom: 0;
+}
+.oxb .rp-progLbl {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 3px 8px;
+  min-width: 0;
+}
+.oxb .rp-progLbl b {
+  font-size: 13px;
+  font-weight: 560;
+  white-space: nowrap;
+}
+.oxb .rp-progLbl .mono {
+  font-size: 11px;
+  color: var(--site-graphite);
+}
+.oxb .rp-smallTag {
+  font-size: 10.5px;
+  font-weight: 560;
+  color: var(--high-text);
+  border: 1px dashed color-mix(in srgb, var(--high) 55%, transparent);
+  border-radius: 5px;
+  padding: 0 5px;
+  white-space: nowrap;
+}
+.oxb .rp-progBars {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.oxb .rp-hbar {
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr) 64px;
+  align-items: center;
+  gap: 10px;
+}
+.oxb .rp-hbarK {
+  font-size: 11px;
+  color: var(--site-graphite);
+}
+.oxb .rp-hbarTrk {
+  position: relative;
+  height: 9px;
+  border-radius: 3px;
+  background: var(--site-rule);
+}
+.oxb .rp-hbarTrk i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 3px;
+  transition: width 0.45s var(--b-ease);
+}
+.oxb .rp-hbarTrk i.resp,
+.oxb .rp-key i.resp {
+  background: var(--norm);
+}
+.oxb .rp-hbarTrk i.rem,
+.oxb .rp-key i.rem {
+  background: var(--low);
+}
+/* A small denominator is drawn lighter and hatched, so it cannot be read at
+   the same weight as a program with forty episodes behind it. */
+.oxb .rp-progRow.small .rp-hbarTrk i,
+.oxb .rp-key i.hatch {
+  background-color: transparent;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    color-mix(in srgb, var(--site-graphite) 55%, transparent) 0 2px,
+    transparent 2px 5px
+  );
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--site-graphite) 45%, transparent);
+}
+.oxb .rp-progRow.small .rp-hbarTrk i.resp {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    color-mix(in srgb, var(--norm) 65%, transparent) 0 2px,
+    transparent 2px 5px
+  );
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--norm) 60%, transparent);
+}
+.oxb .rp-progRow.small .rp-hbarTrk i.rem {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    color-mix(in srgb, var(--low) 65%, transparent) 0 2px,
+    transparent 2px 5px
+  );
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--low) 60%, transparent);
+}
+.oxb .rp-mark50 {
+  position: absolute;
+  left: 50%;
+  top: -2px;
+  bottom: -2px;
+  width: 1px;
+  background: var(--site-ink);
+  opacity: 0.35;
+}
+.oxb .rp-hbarV {
+  font-size: 12px;
+  font-weight: 620;
+  text-align: right;
+  white-space: nowrap;
+}
+.oxb .rp-hbarV span {
+  font-weight: 400;
+  color: var(--site-graphite);
+  margin-left: 3px;
+}
+.oxb .rp-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.oxb .rp-key i {
+  display: inline-block;
+  width: 12px;
+  height: 8px;
+  border-radius: 2px;
+}
+.oxb[data-vp="mobile"] .rp-progRow,
+.oxb[data-vp="tablet"] .rp-progRow {
+  grid-template-columns: 1fr;
+}
+.oxb[data-vp="mobile"] .rp-progRow {
+  padding: 11px 14px;
+}
+.oxb[data-vp="mobile"] .rp-hbar {
+  grid-template-columns: 62px minmax(0, 1fr) 56px;
+  gap: 8px;
+}
+
+/* ---------- line chart ---------- */
+.oxb .rp-lineBox {
+  position: relative;
+}
+.oxb .rp-pt {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+  border: 0;
+  padding: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+.oxb .rp-pt:focus-visible {
+  outline: 2px solid var(--site-brand);
+  outline-offset: -4px;
+}
+.oxb .rp-tip {
+  position: absolute;
+  transform: translate(-50%, calc(-100% - 14px));
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 7px 10px;
+  border-radius: 9px;
+  background: var(--site-ink);
+  color: var(--site-paper);
+  font-size: 11.5px;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 8px 22px -12px rgb(0 0 0 / 0.5);
+  z-index: 2;
+}
+.oxb .rp-tip.start {
+  transform: translate(-14px, calc(-100% - 14px));
+}
+.oxb .rp-tip.end {
+  transform: translate(calc(-100% + 14px), calc(-100% - 14px));
+}
+.oxb .rp-tip b {
+  font-weight: 620;
+  font-size: 12px;
+}
+
+/* ---------- wait distribution ---------- */
+.oxb .rp-cols {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  align-items: end;
+  padding-top: 26px;
+}
+.oxb .rp-col {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 5px;
+  min-width: 0;
+  text-align: center;
+}
+.oxb .rp-colV {
+  font-size: 13px;
+  font-weight: 660;
+}
+.oxb .rp-colTrk {
+  position: relative;
+  height: 128px;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--site-rule) 45%, transparent);
+}
+.oxb .rp-colTrk i {
+  position: absolute;
+  inset: auto 0 0 0;
+  border-radius: 5px;
+  opacity: 0.8;
+  transition: height 0.45s var(--b-ease);
+}
+.oxb .rp-colK {
+  font-size: 11.5px;
+  color: var(--site-ink);
+  white-space: nowrap;
+}
+.oxb .rp-colP {
+  font-size: 10.5px;
+  color: var(--site-graphite);
+}
+/* The 7-day target sits on the boundary between the first two buckets. */
+.oxb .rp-target {
+  position: absolute;
+  top: 0;
+  bottom: 38px;
+  right: -8px;
+  width: 2px;
+  background: var(--site-ink);
+  border-radius: 1px;
+}
+.oxb .rp-target span {
+  position: absolute;
+  top: -22px;
+  left: -4px;
+  font-size: 10.5px;
+  font-weight: 560;
+  color: var(--site-ink);
+  white-space: nowrap;
+  background: var(--site-paper-sunk);
+  padding: 0 3px;
+  border-radius: 3px;
+}
+.oxb[data-vp="mobile"] .rp-cols {
+  gap: 10px;
+}
+.oxb[data-vp="mobile"] .rp-colK {
+  font-size: 10.5px;
+}
+
+/* ---------- waitlist ---------- */
+.oxb .rp-wlWrap {
+  justify-content: flex-start;
+}
+.oxb .rp-wl td {
+  vertical-align: middle;
+}
+.oxb .rp-wlName {
+  display: block;
+  font-weight: 545;
+  white-space: nowrap;
+}
+.oxb .rp-wlSub {
+  display: block;
+  font-size: 11px;
+  color: var(--site-graphite);
+  white-space: nowrap;
+}
+.oxb .rp-wlProg {
+  font-size: 12px;
+  color: var(--site-graphite);
+}
+.oxb .rp-days {
+  font-weight: 650;
+}
+.oxb[data-vp="mobile"] table.dt.rp-wl {
+  min-width: 26rem;
+}
+
+/* ---------- no-show ---------- */
+.oxb .rp-ns + .rp-ns {
+  margin-top: 16px;
+}
+.oxb .rp-nsTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+.oxb .rp-nsTop b {
+  font-size: 13px;
+  font-weight: 560;
+}
+.oxb .rp-nsTop .mono {
+  font-size: 18px;
+  font-weight: 680;
+  letter-spacing: -0.03em;
+}
+.oxb .rp-nsTrk {
+  display: block;
+  position: relative;
+  height: 8px;
+  margin-top: 6px;
+  border-radius: 4px;
+  background: var(--site-rule);
+  overflow: hidden;
+}
+.oxb .rp-nsTrk i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 4px;
+  transition: width 0.45s var(--b-ease);
+}
+.oxb .rp-nsSub {
+  display: block;
+  margin-top: 5px;
+  font-size: 11px;
+  color: var(--site-graphite);
+}
+
+/* ---------- attendance ---------- */
+.oxb svg.rp-att rect {
+  transition:
+    y 0.45s var(--b-ease),
+    height 0.45s var(--b-ease);
+}
+
+/* ---------- clinicians ---------- */
+.oxb .rp-cl th button.sort {
+  white-space: nowrap;
+}
+.oxb .rp-cl th.num button.sort {
+  justify-content: flex-end;
+}
+.oxb .rp-cl th button.sort:focus-visible {
+  outline: 2px solid var(--site-brand);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+.oxb .rp-sortIc {
+  font-size: 10px;
+  opacity: 0.8;
+}
+.oxb .rp-cl td.num {
+  white-space: nowrap;
+}
+.oxb .rp-clBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 28px;
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.oxb .rp-clBtn:focus-visible {
+  outline: 2px solid var(--site-brand);
+  outline-offset: 2px;
+}
+.oxb .rp-clText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.oxb .rp-clName {
+  font-weight: 545;
+  white-space: nowrap;
+}
+@media (hover: hover) {
+  .oxb .rp-clBtn:hover .rp-clName {
+    text-decoration: underline;
+    text-decoration-color: var(--site-rule-strong);
+    text-underline-offset: 3px;
+  }
+}
+.oxb .rp-clRole {
+  font-size: 11px;
+  color: var(--site-graphite);
+}
+.oxb[data-vp="mobile"] table.dt.rp-cl {
+  min-width: 46rem;
+}
+.oxb .rp-mix {
+  display: flex;
+  gap: 2px;
+  height: 8px;
+  margin-bottom: 6px;
+}
+.oxb .rp-mix i {
+  flex-basis: 0;
+  min-width: 3px;
+  border-radius: 2px;
+}
+.oxb .rp-notList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.oxb .rp-notList li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--site-rule) 60%, transparent);
+}
+.oxb .rp-notList li:last-child {
+  border-bottom: 0;
+}
+.oxb .rp-none {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--site-graphite);
+}
+.oxb[data-vp="mobile"] .rp-target {
+  right: -6px;
+}

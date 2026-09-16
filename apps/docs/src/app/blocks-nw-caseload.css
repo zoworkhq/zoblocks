@@ -1,0 +1,365 @@
+/* ===========================================================================
+ * Northwind — Caseload. Every selector is `.oxb .cl-*`.
+ * =========================================================================== */
+
+/* ---------- summary strip ---------- */
+.oxb .cl-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+.oxb .cl-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+  padding: 11px 13px 12px;
+  border: 1px solid var(--site-rule);
+  border-radius: 13px;
+  background: var(--site-paper-sunk);
+  color: var(--site-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.18s,
+    background 0.18s,
+    box-shadow 0.18s;
+}
+@media (hover: hover) {
+  .oxb .cl-stat:hover {
+    border-color: var(--site-rule-strong);
+  }
+}
+.oxb .cl-stat[aria-pressed="true"] {
+  border-color: var(--site-ink);
+  box-shadow: inset 0 0 0 1px var(--site-ink);
+  background: var(--site-paper);
+}
+.oxb .cl-stat:focus-visible {
+  outline: 2px solid var(--site-brand);
+  outline-offset: 2px;
+}
+.oxb .cl-statCap {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11.5px;
+  font-weight: 540;
+  color: var(--site-graphite);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.oxb .cl-statDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: none;
+}
+.oxb .cl-statN {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin-top: 3px;
+}
+.oxb .cl-statHint {
+  font-size: 11px;
+  color: var(--site-graphite-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* ---------- panel head & filters ---------- */
+.oxb .cl-top {
+  align-items: center;
+}
+.oxb .cl-search .search {
+  min-width: 240px;
+}
+.oxb .cl-filters {
+  justify-content: space-between;
+  padding: 0 16px 12px;
+  gap: 10px 14px;
+}
+.oxb .cl-selects {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.oxb .cl-quick {
+  background: var(--site-ink);
+  border-color: var(--site-ink);
+  color: var(--site-paper);
+}
+@media (hover: hover) {
+  .oxb .cl-quick:hover {
+    color: var(--site-paper);
+    background: color-mix(in srgb, var(--site-ink) 85%, var(--site-paper));
+  }
+}
+
+/* ---------- selection bar ---------- */
+.oxb .cl-selbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  font-size: 12.5px;
+  color: var(--site-graphite);
+}
+.oxb .cl-selbar:not(:empty) {
+  padding: 8px 16px;
+  border-top: 1px solid var(--site-rule);
+  background: color-mix(in srgb, var(--site-brand) 8%, transparent);
+}
+.oxb .cl-selbar b {
+  color: var(--site-ink);
+  font-weight: 580;
+}
+.oxb .cl-selbar .linkBtn {
+  font-size: 12.5px;
+  min-height: 24px;
+}
+.oxb .cl-selbar .cl-clear {
+  color: var(--site-graphite);
+}
+
+/* ---------- table ---------- */
+.oxb table.dt.cl-table {
+  min-width: 50rem;
+}
+.oxb .cl-table td {
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.oxb .cl-table th.cl-cbx,
+.oxb .cl-table td.cl-cbx {
+  width: 36px;
+  padding-right: 0;
+}
+.oxb .cl-table th.cl-act,
+.oxb .cl-table td.cl-act {
+  width: 44px;
+  padding-left: 0;
+  text-align: right;
+}
+.oxb .cl-check {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  display: block;
+  accent-color: var(--site-cta);
+  cursor: pointer;
+}
+.oxb .cl-table tbody tr.cl-on {
+  background: color-mix(in srgb, var(--site-brand) 7%, transparent);
+}
+.oxb .cl-who {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+}
+.oxb .cl-who .rail-sev {
+  margin-right: 10px;
+}
+.oxb .cl-who .ptLinkName {
+  font-size: 13px;
+}
+.oxb .cl-who .ptLinkSub {
+  font-size: 10.5px;
+}
+.oxb .cl-dim {
+  color: var(--site-graphite);
+  font-size: 12.5px;
+}
+.oxb .cl-none {
+  color: var(--high-text);
+  font-size: 12px;
+  font-weight: 520;
+}
+.oxb .cl-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+.oxb .cl-trend > .mono {
+  min-width: 34px;
+}
+.oxb .cl-status {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.oxb .cl-sent {
+  font-size: 10.5px;
+  color: var(--site-graphite-soft);
+  padding-left: 12px;
+}
+.oxb .cl-more {
+  width: 28px;
+  height: 28px;
+  border-color: transparent;
+}
+.oxb .cl-more[aria-expanded="true"] {
+  background: var(--site-paper);
+  border-color: var(--site-rule-strong);
+  color: var(--site-ink);
+}
+
+/* ---------- row menu (a popover, in the top layer) ---------- */
+.oxb .cl-menu {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  min-width: 180px;
+  padding: 5px;
+  border: 1px solid var(--site-rule-strong);
+  border-radius: 11px;
+  background: var(--site-paper);
+  color: var(--site-ink);
+  box-shadow: 0 16px 40px -18px rgb(0 0 0 / 0.45);
+  overflow: visible;
+}
+.oxb .cl-menu:popover-open {
+  display: flex;
+  flex-direction: column;
+}
+.oxb .cl-menu [role="menuitem"] {
+  display: block;
+  width: 100%;
+  min-height: 30px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--site-ink);
+  font: inherit;
+  font-size: 12.5px;
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.oxb .cl-menu [role="menuitem"]:hover,
+.oxb .cl-menu [role="menuitem"]:focus-visible {
+  background: color-mix(in srgb, var(--site-ink) 7%, transparent);
+  outline: none;
+}
+.oxb .cl-menu [role="menuitem"]:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--site-brand);
+}
+.oxb .cl-menu [role="menuitem"][aria-disabled="true"] {
+  color: var(--site-graphite);
+  cursor: default;
+}
+
+/* ---------- send sheet ---------- */
+.oxb .cl-sheetNote {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--site-graphite);
+  line-height: 1.5;
+}
+.oxb .cl-sendList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--site-rule);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.oxb .cl-sendList li + li {
+  border-top: 1px solid color-mix(in srgb, var(--site-rule) 60%, transparent);
+}
+.oxb .cl-sendRow {
+  align-items: center;
+  padding: 9px 12px;
+}
+.oxb .cl-sendRow input {
+  margin-top: 0;
+}
+.oxb .cl-sendName {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.oxb .cl-sendName b {
+  font-weight: 560;
+  font-size: 13px;
+}
+.oxb .cl-sendName span {
+  font-size: 11px;
+  color: var(--site-graphite-soft);
+}
+.oxb .cl-sendInst {
+  font-size: 11px;
+  color: var(--site-graphite);
+  white-space: nowrap;
+}
+
+/* ---------- narrow frames ---------- */
+.oxb[data-vp="tablet"] .cl-stats {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.oxb[data-vp="mobile"] .cl-stats {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.oxb[data-vp="mobile"] .cl-stat {
+  padding: 10px 11px;
+}
+.oxb[data-vp="mobile"] .cl-statN {
+  font-size: 19px;
+}
+.oxb[data-vp="mobile"] .cl-top {
+  flex-direction: column;
+  align-items: stretch;
+}
+.oxb[data-vp="mobile"] .cl-search .search {
+  min-width: 0;
+  width: 100%;
+}
+.oxb[data-vp="mobile"] .cl-filters {
+  padding: 0 14px 12px;
+}
+.oxb[data-vp="mobile"] .cl-selects {
+  flex-direction: column;
+  align-items: stretch;
+}
+.oxb[data-vp="mobile"] .cl-selects .select {
+  width: 100%;
+}
+.oxb[data-vp="mobile"] .cl-selects .cl-quick {
+  align-self: flex-start;
+}
+.oxb[data-vp="mobile"] .cl-filters .chips {
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.oxb[data-vp="mobile"] table.dt.cl-table {
+  min-width: 50rem;
+}
+
+/* Two facts to a cell, so eight columns fit the desktop frame unscrolled. */
+.oxb .cl-two {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  white-space: nowrap;
+}
+.oxb .cl-sub {
+  font-size: 11px;
+  color: var(--site-graphite-soft);
+}
+.oxb .cl-table td,
+.oxb .cl-table th {
+  padding-left: 11px;
+  padding-right: 11px;
+}

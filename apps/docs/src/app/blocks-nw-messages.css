@@ -1,0 +1,536 @@
+/* ===========================================================================
+ * Northwind — Messages. Two panes on wide frames; on a phone the open thread
+ * replaces the list, so neither is squeezed to half of 390px.
+ * =========================================================================== */
+
+.oxb .ms-body {
+  flex: 1;
+}
+.oxb .ms-split {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  height: 660px;
+  border: 1px solid var(--site-rule);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--site-paper);
+}
+
+/* ---------- list pane ---------- */
+.oxb .ms-list {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  border-right: 1px solid var(--site-rule);
+  background: var(--site-paper-sunk);
+}
+.oxb .ms-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border-bottom: 1px solid var(--site-rule);
+}
+.oxb .ms-filters .search {
+  min-width: 0;
+}
+.oxb .ms-filters .seg {
+  display: flex;
+  width: 100%;
+}
+.oxb .ms-filters .seg button {
+  flex: 1 1 auto;
+  padding: 6px 5px;
+  font-size: 11.5px;
+  gap: 4px;
+}
+.oxb .ms-filters .chips {
+  gap: 5px;
+}
+.oxb .ms-filters .chip {
+  height: 26px;
+  padding: 0 9px;
+  font-size: 11.5px;
+}
+.oxb .ms-listScroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.oxb .ms-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.oxb .ms-rowWrap {
+  border-bottom: 1px solid color-mix(in srgb, var(--site-rule) 60%, transparent);
+}
+.oxb .ms-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 7px 32px minmax(0, 1fr);
+  align-items: start;
+  gap: 9px;
+  padding: 11px 12px 11px 8px;
+  transition: background 0.18s;
+}
+.oxb .ms-row:focus-visible {
+  outline-offset: -2px;
+}
+@media (hover: hover) {
+  .oxb .ms-row:hover {
+    background: color-mix(in srgb, var(--site-ink) 4%, transparent);
+  }
+}
+.oxb .ms-row[aria-current="true"]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--site-brand);
+}
+.oxb .ms-dot {
+  width: 7px;
+  height: 7px;
+  margin-top: 13px;
+  border-radius: 50%;
+}
+.oxb .ms-rowWrap.unread .ms-dot {
+  background: var(--site-brand);
+}
+.oxb .ms-row .face,
+.oxb .ms-row .tAv {
+  margin-top: 1px;
+}
+.oxb .ms-org {
+  font-size: 12px;
+  border-radius: 10px;
+  color: var(--site-accent-text);
+  background: color-mix(in srgb, var(--site-brand) 12%, var(--site-paper));
+  border-color: color-mix(in srgb, var(--site-brand) 30%, transparent);
+}
+.oxb .ms-rowMain {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 1px;
+}
+.oxb .ms-rowTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.oxb .ms-sender,
+.oxb .ms-subj,
+.oxb .ms-prev {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.oxb .ms-sender {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--site-ink);
+}
+.oxb .ms-time {
+  flex: none;
+  font-size: 10.5px;
+  color: var(--site-graphite-soft);
+}
+.oxb .ms-subj {
+  font-size: 12.5px;
+  color: var(--site-ink);
+}
+.oxb .ms-prev {
+  font-size: 12px;
+  color: var(--site-graphite);
+}
+.oxb .ms-rowWrap.unread .ms-sender,
+.oxb .ms-rowWrap.unread .ms-subj {
+  font-weight: 650;
+}
+.oxb .ms-rowWrap.unread .ms-time {
+  color: var(--site-ink);
+  font-weight: 600;
+}
+.oxb .ms-rowMeta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 7px;
+  margin-top: 5px;
+  font-size: 10.5px;
+  color: var(--site-graphite-soft);
+}
+.oxb .ms-ptChip {
+  padding: 1px 6px;
+  border: 1px solid var(--site-rule);
+  border-radius: 5px;
+  background: var(--site-paper);
+  color: var(--site-graphite);
+  white-space: nowrap;
+}
+.oxb .ms-metaIc {
+  display: inline-flex;
+  color: var(--site-graphite);
+}
+.oxb .ms-flag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--high-text);
+  font-weight: 560;
+}
+
+/* ---------- reading pane ---------- */
+.oxb .ms-pane {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+.oxb .ms-none {
+  flex: 1;
+  display: grid;
+  place-items: center;
+}
+.oxb .ms-read {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.oxb .ms-readHead {
+  padding: 14px 18px 12px;
+  border-bottom: 1px solid var(--site-rule);
+}
+.oxb .ms-back {
+  display: none;
+  margin-bottom: 10px;
+}
+.oxb .ms-titleRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.oxb .ms-titleText {
+  min-width: 0;
+}
+.oxb .ms-titleText h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 640;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+.oxb .ms-parts {
+  margin: 3px 0 0;
+  font-size: 12px;
+  color: var(--site-graphite);
+}
+.oxb .ms-tools {
+  display: flex;
+  gap: 6px;
+  flex: none;
+}
+.oxb .ms-tools .iconBtn[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--site-ink) 8%, transparent);
+  border-color: var(--site-rule-strong);
+  color: var(--site-ink);
+}
+.oxb .ms-tools .iconBtn[disabled] {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+.oxb .ms-relRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 10px;
+  font-size: 12.5px;
+}
+.oxb .ms-rel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.oxb .ms-relK {
+  font-size: 11px;
+  color: var(--site-graphite);
+}
+.oxb .ms-prov {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  color: var(--norm-text);
+}
+
+/* The patient beside the conversation. */
+.oxb .ms-ctx {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  padding: 10px 18px;
+  border-bottom: 1px solid var(--site-rule);
+  background: var(--site-paper-sunk);
+  font-size: 12.5px;
+}
+.oxb .ms-ctxItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.oxb .ms-ctxK {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--site-graphite-soft);
+}
+.oxb .ms-ctxV {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--site-ink);
+}
+.oxb .ms-ctxActs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+}
+.oxb .ms-risk.btn.ghost {
+  color: var(--crit-text);
+  border-color: color-mix(in srgb, var(--crit) 40%, transparent);
+  background: var(--crit-bg);
+}
+
+.oxb .ms-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 16px 18px;
+}
+.oxb .ms-thread {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.oxb .ms-msg {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  max-width: 84%;
+}
+.oxb .ms-msg.us {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+.oxb .ms-meta {
+  font-size: 11px;
+  color: var(--site-graphite-soft);
+}
+.oxb .ms-bub {
+  padding: 10px 13px;
+  border-radius: 13px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.oxb .ms-msg.them .ms-bub {
+  background: var(--site-paper-sunk);
+  border: 1px solid var(--site-rule);
+  border-bottom-left-radius: 4px;
+  color: var(--site-ink);
+}
+.oxb .ms-msg.us .ms-bub {
+  background: var(--site-ink);
+  color: var(--site-paper);
+  border-bottom-right-radius: 4px;
+}
+.oxb .ms-att {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 26px;
+  max-width: 100%;
+  padding: 3px 9px;
+  border: 1px solid var(--site-rule);
+  border-radius: 7px;
+  background: var(--site-paper);
+  color: var(--site-ink);
+  font: inherit;
+  font-size: 11.5px;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+@media (hover: hover) {
+  .oxb .ms-att:hover {
+    border-color: var(--site-rule-strong);
+  }
+}
+.oxb .ms-att:focus-visible {
+  outline: 2px solid var(--site-brand);
+  outline-offset: 2px;
+}
+.oxb .ms-delivered {
+  font-size: 10.5px;
+  color: var(--site-graphite-soft);
+}
+.oxb .ms-sys {
+  align-self: center;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--site-ink) 6%, transparent);
+  font-size: 11.5px;
+  color: var(--site-graphite);
+  text-align: center;
+}
+
+/* ---------- composer ---------- */
+.oxb .ms-composer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 14px 12px;
+  border-top: 1px solid var(--site-rule);
+  background: var(--site-paper-sunk);
+}
+.oxb .ms-tpl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.oxb .ms-tpl .chip {
+  height: 26px;
+  font-size: 11.5px;
+}
+.oxb .ms-input {
+  display: block;
+  width: 100%;
+  min-height: 56px;
+  max-height: 122px;
+  padding: 8px 11px;
+  border: 1px solid var(--site-rule);
+  border-radius: 9px;
+  background: var(--site-paper);
+  color: var(--site-ink);
+  font: inherit;
+  font-size: 13.5px;
+  line-height: 1.45;
+  resize: none;
+  overflow-y: auto;
+}
+.oxb .ms-input::placeholder {
+  color: var(--site-graphite-soft);
+}
+.oxb .ms-input:focus {
+  outline: none;
+  border-color: var(--site-brand);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--site-brand) 18%, transparent);
+}
+@media (pointer: coarse) {
+  .oxb .ms-input {
+    font-size: 16px;
+  }
+}
+.oxb .ms-compFoot {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+.oxb .ms-fileCheck {
+  font-size: 12.5px;
+  align-items: center;
+}
+.oxb .ms-fileCheck input {
+  margin-top: 0;
+}
+.oxb .ms-kbd {
+  margin-left: auto;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 10.5px;
+  color: var(--site-graphite-soft);
+}
+.oxb .ms-hint {
+  color: var(--site-graphite-soft);
+  font-size: 12px;
+}
+
+/* ---------- tablet ---------- */
+.oxb[data-vp="tablet"] .ms-split {
+  grid-template-columns: 280px minmax(0, 1fr);
+  height: 640px;
+}
+.oxb[data-vp="tablet"] .ms-ctxActs {
+  margin-left: 0;
+}
+
+/* ---------- phone: one pane at a time ---------- */
+.oxb[data-vp="mobile"] .ms-split {
+  grid-template-columns: minmax(0, 1fr);
+  height: auto;
+}
+.oxb[data-vp="mobile"] .ms-split[data-open="true"] .ms-list,
+.oxb[data-vp="mobile"] .ms-split[data-open="false"] .ms-pane {
+  display: none;
+}
+.oxb[data-vp="mobile"] .ms-list {
+  border-right: 0;
+}
+.oxb[data-vp="mobile"] .ms-listScroll,
+.oxb[data-vp="mobile"] .ms-scroll {
+  overflow: visible;
+}
+.oxb[data-vp="mobile"] .ms-back {
+  display: inline-flex;
+}
+.oxb[data-vp="mobile"] .ms-readHead,
+.oxb[data-vp="mobile"] .ms-ctx,
+.oxb[data-vp="mobile"] .ms-scroll {
+  padding-left: 14px;
+  padding-right: 14px;
+}
+.oxb[data-vp="mobile"] .ms-titleRow {
+  flex-direction: column;
+  gap: 10px;
+}
+.oxb[data-vp="mobile"] .ms-ctxActs {
+  margin-left: 0;
+  width: 100%;
+}
+.oxb[data-vp="mobile"] .ms-msg {
+  max-width: 92%;
+}
+.oxb[data-vp="mobile"] .ms-kbd {
+  display: none;
+}
+.oxb[data-vp="mobile"] .ms-compFoot .btn {
+  margin-left: auto;
+}
+.oxb[data-vp="mobile"] .ms-filters .seg button {
+  padding: 7px 3px;
+  font-size: 11px;
+}

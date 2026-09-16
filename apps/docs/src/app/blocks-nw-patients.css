@@ -1,0 +1,335 @@
+/* ===========================================================================
+ * Northwind — Patients directory. Every selector is `.oxb .pd-*`.
+ * =========================================================================== */
+
+/* ---------- recently viewed ---------- */
+.oxb .pd-recent {
+  display: flex;
+  align-items: center;
+  gap: 10px 12px;
+  flex-wrap: wrap;
+}
+.oxb .pd-recent h3 {
+  margin: 0;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--site-graphite-soft);
+}
+.oxb .pd-recent ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.oxb .pd-recentChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 30px;
+  padding: 0 11px 0 4px;
+  border-radius: 999px;
+  border: 1px solid var(--site-rule);
+  background: var(--site-paper-sunk);
+  color: var(--site-ink);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 530;
+  cursor: pointer;
+  transition:
+    border-color 0.18s,
+    background 0.18s;
+}
+@media (hover: hover) {
+  .oxb .pd-recentChip:hover {
+    border-color: var(--site-rule-strong);
+    background: var(--site-paper);
+  }
+}
+.oxb .pd-recentChip:focus-visible,
+.oxb .pd-card:focus-visible {
+  outline: 2px solid var(--site-brand);
+  outline-offset: 2px;
+}
+
+/* ---------- toolbar ---------- */
+.oxb .pd-toolbar {
+  gap: 10px 12px;
+}
+.oxb .pd-search .search {
+  min-width: 240px;
+}
+.oxb .pd-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+.oxb .pd-view {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.oxb .pd-viewIc {
+  display: none;
+}
+.oxb .pd-count {
+  margin: -6px 0 -4px;
+  font-size: 12px;
+  color: var(--site-graphite);
+}
+.oxb .pd-count b {
+  color: var(--site-ink);
+  font-weight: 600;
+}
+
+/* ---------- cards ---------- */
+.oxb .pd-cards {
+  min-width: 0;
+}
+.oxb .pd-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px;
+}
+/* A letter is a row of the grid, never a cell of it. */
+.oxb .pd-letter {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 10px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+  color: var(--site-graphite);
+}
+.oxb .pd-letter:first-child {
+  margin-top: 0;
+}
+.oxb .pd-letter::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--site-rule);
+}
+.oxb .pd-pager {
+  margin-top: 14px;
+  border: 1px solid var(--site-rule);
+  border-radius: 13px;
+  background: var(--site-paper-sunk);
+  overflow: hidden;
+}
+.oxb .pd-pager .pager {
+  border-top: 0;
+}
+.oxb .pd-card {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 13px 14px 12px;
+  border: 1px solid var(--site-rule);
+  border-radius: 13px;
+  background: var(--site-paper-sunk);
+  color: var(--site-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.18s,
+    background 0.18s,
+    transform 0.25s var(--b-ease);
+}
+@media (hover: hover) {
+  .oxb .pd-card:hover {
+    border-color: var(--site-rule-strong);
+    background: var(--site-paper);
+  }
+  .oxb .pd-card:hover .pd-name {
+    text-decoration: underline;
+    text-decoration-color: var(--site-rule-strong);
+    text-underline-offset: 3px;
+  }
+}
+.oxb .pd-card.pd-ref {
+  border-style: dashed;
+  border-color: var(--site-rule-strong);
+}
+.oxb .pd-cardHead {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+.oxb .pd-cardId {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.oxb .pd-name {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.oxb .pd-meta {
+  font-size: 10.5px;
+  color: var(--site-graphite-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.oxb .pd-init {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 640;
+  color: var(--low-text);
+  background: var(--low-bg);
+  box-shadow: 0 0 0 1px var(--site-rule-strong);
+}
+.oxb .pd-init.sm {
+  width: 24px;
+  height: 24px;
+  font-size: 9.5px;
+}
+.oxb .pd-prog {
+  font-size: 12px;
+  color: var(--site-graphite);
+}
+.oxb .pd-cardRows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 9px;
+  border-top: 1px solid color-mix(in srgb, var(--site-rule) 60%, transparent);
+}
+.oxb .pd-cardRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+  min-width: 0;
+}
+.oxb .pd-k {
+  color: var(--site-graphite);
+  flex: none;
+}
+.oxb .pd-v {
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+.oxb .pd-clin {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  font-size: 12px;
+  min-width: 0;
+}
+.oxb .pd-clin .tAv {
+  font-weight: 640;
+}
+.oxb .pd-none {
+  color: var(--high-text);
+  font-size: 12px;
+  font-weight: 520;
+  white-space: nowrap;
+}
+.oxb .pd-cardFoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin-top: auto;
+}
+
+/* ---------- list ---------- */
+.oxb table.dt.pd-table {
+  min-width: 52rem;
+}
+.oxb .pd-table td {
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.oxb .pd-table .ptLinkSub {
+  font-size: 10.5px;
+}
+.oxb .pd-table td.mono {
+  font-size: 12px;
+}
+.oxb .pd-dim {
+  color: var(--site-graphite);
+  font-size: 12.5px;
+}
+.oxb .pd-statusCell {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ---------- referral form ---------- */
+.oxb .pd-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.oxb .pd-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.oxb .pd-form .select {
+  display: flex;
+}
+.oxb .pd-hint {
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--site-graphite);
+}
+
+/* ---------- narrow frames ---------- */
+.oxb[data-vp="tablet"] .pd-right {
+  margin-left: 0;
+}
+.oxb[data-vp="mobile"] .pd-search .search {
+  min-width: 0;
+  width: 100%;
+}
+.oxb[data-vp="mobile"] .pd-toolbar .chips {
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.oxb[data-vp="mobile"] .pd-right {
+  margin-left: 0;
+  justify-content: space-between;
+}
+.oxb[data-vp="mobile"] .pd-right .select {
+  flex: 1;
+  min-width: 0;
+}
+.oxb[data-vp="mobile"] .pd-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+.oxb[data-vp="mobile"] .pd-pair {
+  grid-template-columns: minmax(0, 1fr);
+}
+.oxb[data-vp="mobile"] .pd-recent {
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 8px;
+}

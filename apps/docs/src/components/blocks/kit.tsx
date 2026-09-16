@@ -60,7 +60,7 @@ const ICON: Record<string, React.ReactNode> = {
   Safety: <path d="M8 1.8l5 2v4.3c0 3.2-2.1 5.4-5 6.1-2.9-.7-5-2.9-5-6.1V3.8z" />,
 };
 
-function Ic({ name }: { name: string }) {
+export function Ic({ name }: { name: string }) {
   return (
     <svg
       width="15"
@@ -85,33 +85,6 @@ export function ZbMark() {
       <circle cx="8" cy="8" r="5.5" fill="none" stroke="currentColor" strokeWidth="2" />
       <circle cx="20" cy="8" r="5.5" fill="none" stroke="currentColor" strokeWidth="2" />
     </svg>
-  );
-}
-
-const NAV = ["Dashboard", "Caseload", "Schedule", "Messages", "Reports"] as const;
-const CLINICAL = ["Patients", "Instruments", "Safety"] as const;
-
-export function Rail({ active }: { active: string }) {
-  return (
-    <nav className="rail" aria-label="Application">
-      <div className="railBrand">
-        <ZbMark />
-        Northwind Health
-      </div>
-      {NAV.map((t) => (
-        <div key={t} className="railItem" {...(t === active ? { "aria-current": "page" } : {})}>
-          <Ic name={t} />
-          {t}
-        </div>
-      ))}
-      <p className="railGroup">Clinical</p>
-      {CLINICAL.map((t) => (
-        <div key={t} className="railItem" {...(t === active ? { "aria-current": "page" } : {})}>
-          <Ic name={t} />
-          {t}
-        </div>
-      ))}
-    </nav>
   );
 }
 
@@ -172,6 +145,7 @@ export function Tile({
   bar,
   footLeft,
   footRight,
+  onClick,
 }: {
   cap: string;
   status: string;
@@ -181,9 +155,12 @@ export function Tile({
   bar: React.ReactNode;
   footLeft: string;
   footRight: string;
+  /** A tile that opens the list behind its number. */
+  onClick?: () => void;
 }) {
+  const Tag = onClick ? "button" : "div";
   return (
-    <div className="tile">
+    <Tag className="tile" {...(onClick ? { type: "button" as const, onClick } : {})}>
       <div className="tHead">
         <span className="cap">{cap}</span>
         <span className="stat" style={{ color: sevText(sev) }}>
@@ -199,7 +176,7 @@ export function Tile({
         <span>{footLeft}</span>
         <span>{footRight}</span>
       </div>
-    </div>
+    </Tag>
   );
 }
 
@@ -431,39 +408,56 @@ export function RiskRow({
   left,
   usedPct,
   windowLabel,
+  onClick,
+  closed,
 }: {
   sev: Sev;
-  who: string;
+  who: React.ReactNode;
   what: string;
   opened: string;
   owner: string;
   left: string;
   usedPct: number;
   windowLabel: string;
+  /** Opens the item. The whole row is the target. */
+  onClick?: () => void;
+  /** How the item was closed, when it has been. */
+  closed?: string;
 }) {
+  const shown: Sev = closed ? "norm" : sev;
+  const Tag = onClick ? "button" : "div";
   return (
-    <div className="riskRow">
-      <span className="bar3" style={{ background: sevVar(sev) }} aria-hidden="true" />
-      <div className="who2">{who}</div>
-      <div className="left" style={{ color: sevText(sev) }}>
-        {left}
-      </div>
-      <div className="meta2">
+    <Tag
+      className={`riskRow${closed ? " closed" : ""}`}
+      {...(onClick ? { type: "button" as const, onClick } : {})}
+    >
+      <span className="bar3" style={{ background: sevVar(shown) }} aria-hidden="true" />
+      <span className="who2">{who}</span>
+      <span className="left" style={{ color: sevText(shown) }}>
+        {closed ? "closed" : left}
+      </span>
+      <span className="meta2">
         {what} · opened {opened}
-      </div>
-      <div className="owner2">{owner}</div>
-      <div className="win">
-        <div className="winTrk">
-          <i style={{ width: `${usedPct}%`, background: sevVar(sev) }} />
-        </div>
-        <div className="winLbl">
-          <span>
-            {usedPct}% of the {windowLabel} used
-          </span>
-          <span>{left} remaining</span>
-        </div>
-      </div>
-    </div>
+      </span>
+      <span className="owner2">{owner}</span>
+      <span className="win">
+        <span className="winTrk">
+          <i style={{ width: `${closed ? 100 : usedPct}%`, background: sevVar(shown) }} />
+        </span>
+        <span className="winLbl">
+          {closed ? (
+            <span>{closed}</span>
+          ) : (
+            <>
+              <span>
+                {usedPct}% of the {windowLabel} used
+              </span>
+              <span>{left === "overdue" ? "past its window" : `${left} remaining`}</span>
+            </>
+          )}
+        </span>
+      </span>
+    </Tag>
   );
 }
 
@@ -497,32 +491,6 @@ export function AccItem({
       <div className="accBody" {...(open ? { "data-open": "" } : {})}>
         <div>{children}</div>
       </div>
-    </div>
-  );
-}
-
-export function Seg({ options, initial = 0 }: { options: readonly string[]; initial?: number }) {
-  const [i, setI] = React.useState(initial);
-  return (
-    <div className="seg">
-      {options.map((o, n) => (
-        <button key={o} type="button" aria-pressed={n === i} onClick={() => setI(n)}>
-          {o}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-export function TabBar({ tabs }: { tabs: readonly string[] }) {
-  const [i, setI] = React.useState(0);
-  return (
-    <div className="tabbar" role="tablist">
-      {tabs.map((t, n) => (
-        <button key={t} type="button" role="tab" aria-selected={n === i} onClick={() => setI(n)}>
-          {t}
-        </button>
-      ))}
     </div>
   );
 }

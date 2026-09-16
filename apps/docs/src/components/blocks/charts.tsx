@@ -21,13 +21,70 @@ import * as React from "react";
  * decline. Drawn against the band, the same two points say "this treatment is
  * not working" while there is still time to change it.
  */
-export function TrajectoryPanel() {
+export type TrajectoryFocus = "not-on-track" | "slow" | "all";
+
+interface Line {
+  points: string;
+  sev: "crit" | "high" | "norm";
+  group: "not-on-track" | "slow" | "responding";
+  opacity: number;
+  width: number;
+}
+
+const LINES: readonly Line[] = [
+  {
+    points: "40,72 120,92 200,108 280,122 360,134 440,144 520,152 600,158 680,163",
+    sev: "norm",
+    group: "responding",
+    opacity: 0.75,
+    width: 2,
+  },
+  {
+    points: "40,80 120,96 200,110 280,120 360,130 440,138 520,146 600,150 680,156",
+    sev: "norm",
+    group: "responding",
+    opacity: 0.45,
+    width: 2,
+  },
+  {
+    points: "40,70 120,78 200,86 280,96 360,104 440,112 520,118 600,122 680,126",
+    sev: "high",
+    group: "slow",
+    opacity: 1,
+    width: 2,
+  },
+  {
+    points: "40,72 120,72 200,76 280,74 360,78 440,76 520,80 600,76 680,78",
+    sev: "crit",
+    group: "not-on-track",
+    opacity: 1,
+    width: 2.2,
+  },
+  {
+    points: "40,64 120,66 200,64 280,68 360,66 440,70 520,68 600,72 680,70",
+    sev: "crit",
+    group: "not-on-track",
+    opacity: 0.7,
+    width: 2.2,
+  },
+];
+
+function shown(line: Line, focus: TrajectoryFocus): boolean {
+  return focus === "all" || line.group === focus;
+}
+
+/**
+ * The focus dims rather than removes. A filtered chart that drops the other
+ * lines loses the band's context — the not-on-track pair only reads as failing
+ * next to the ones that are not.
+ */
+export function TrajectoryPanel({ focus = "all" }: { focus?: TrajectoryFocus }) {
   return (
     <svg
       className="chart"
       viewBox="0 0 720 220"
       role="img"
-      aria-label="PHQ-9 trajectories for six patients against the expected response band. Two remain above the band across every session and are flagged as not on track."
+      aria-label="PHQ-9 trajectories for five patients against the expected response band. Two remain above the band across every session and are flagged as not on track; one is falling more slowly than the band."
     >
       <g className="axis">
         <text x="0" y="16">
@@ -63,73 +120,36 @@ export function TrajectoryPanel() {
         expected response band
       </text>
 
-      {/* responding */}
-      <polyline
-        className="draw"
-        style={{ ["--len" as string]: "800", ["--dd" as string]: "300ms" }}
-        points="40,72 120,92 200,108 280,122 360,134 440,144 520,152 600,158 680,163"
-        fill="none"
-        stroke="var(--norm)"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        opacity=".75"
-      />
-      <polyline
-        className="draw"
-        style={{ ["--len" as string]: "800", ["--dd" as string]: "420ms" }}
-        points="40,80 120,96 200,110 280,120 360,130 440,138 520,146 600,150 680,156"
-        fill="none"
-        stroke="var(--norm)"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        opacity=".45"
-      />
-      {/* slow */}
-      <polyline
-        className="draw"
-        style={{ ["--len" as string]: "800", ["--dd" as string]: "540ms" }}
-        points="40,70 120,78 200,86 280,96 360,104 440,112 520,118 600,122 680,126"
-        fill="none"
-        stroke="var(--high)"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      {/* not on track */}
-      <polyline
-        className="draw"
-        style={{ ["--len" as string]: "800", ["--dd" as string]: "660ms" }}
-        points="40,72 120,72 200,76 280,74 360,78 440,76 520,80 600,76 680,78"
-        fill="none"
-        stroke="var(--crit)"
-        strokeWidth="2.2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <polyline
-        className="draw"
-        style={{ ["--len" as string]: "800", ["--dd" as string]: "780ms" }}
-        points="40,64 120,66 200,64 280,68 360,66 440,70 520,68 600,72 680,70"
-        fill="none"
-        stroke="var(--crit)"
-        strokeWidth="2.2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        opacity=".7"
-      />
-      {/* The one looping animation in the set, because it is the alert. */}
-      <circle
-        className="pulseRing"
-        cx="680"
-        cy="78"
-        fill="none"
-        stroke="var(--crit)"
-        strokeWidth="1.5"
-        r="4"
-      />
-      <circle cx="680" cy="78" r="4" fill="var(--crit)" />
+      {LINES.map((line, i) => {
+        const on = shown(line, focus);
+        return (
+          <polyline
+            key={line.points}
+            className="draw trajLine"
+            style={{ ["--len" as string]: "800", ["--dd" as string]: `${300 + i * 120}ms` }}
+            points={line.points}
+            fill="none"
+            stroke={`var(--${line.sev})`}
+            strokeWidth={line.width}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            opacity={on ? line.opacity : 0.14}
+          />
+        );
+      })}
+      <g opacity={focus === "slow" ? 0.14 : 1}>
+        {/* The one looping animation in the set, because it is the alert. */}
+        <circle
+          className="pulseRing"
+          cx="680"
+          cy="78"
+          fill="none"
+          stroke="var(--crit)"
+          strokeWidth="1.5"
+          r="4"
+        />
+        <circle cx="680" cy="78" r="4" fill="var(--crit)" />
+      </g>
       <g className="axis">
         <text x="34" y="212">
           intake

@@ -1,17 +1,20 @@
 "use client";
 
 /**
- * note-01 — a progress note that knows where its text came from.
+ * Progress note — a note that knows where its text came from.
  *
- * One passage in this note is copied forward from last week and contradicted
- * by the paragraph after it. That is the whole reason the signing gate exists:
- * a signature is an attestation that you read what you are signing, and the
- * meter makes that precondition visible instead of turning it into a refusal
- * at the last click.
+ * One passage is copied forward from last week and contradicted by the
+ * paragraph after it. That is the whole reason the signing gate exists: a
+ * signature attests that you read what you are signing, and the meter makes
+ * that precondition visible instead of a refusal at the last click.
  */
 
 import * as React from "react";
-import { AttnRow, Instrument, Pill } from "./kit";
+import { AttnRow, Instrument, Pill } from "../../kit";
+import { stamp, useNav } from "../shell";
+import { ScreenHead } from "../ui";
+
+const NOTE_ID = "okonkwo-0812";
 
 type Origin = { cls: string; label: string };
 
@@ -41,6 +44,9 @@ function Prov({
       onMouseLeave={() => onHover(null)}
       // A finger has no hover: a tap names the origin and it stays named.
       onClick={() => onHover(origin.label)}
+      onFocus={() => onHover(origin.label)}
+      onBlur={() => onHover(null)}
+      tabIndex={0}
       title={origin.label}
     >
       {children}
@@ -50,10 +56,12 @@ function Prov({
 
 const HINT = "Hover or tap a passage for its origin";
 
-export function Note01() {
+export function NoteScreen() {
+  const { go, back, store, patch, toast } = useNav();
   const [hint, setHint] = React.useState(HINT);
   const [read, setRead] = React.useState(0);
-  const [signed, setSigned] = React.useState(false);
+  const signed = Boolean(store.signed[NOTE_ID]);
+  const [draftAt, setDraftAt] = React.useState<string | null>(null);
   const body = React.useRef<HTMLDivElement>(null);
 
   const measure = React.useCallback(() => {
@@ -75,16 +83,58 @@ export function Note01() {
   const canSign = read > 0.985;
   const onHover = (s: string | null) => setHint(s ?? HINT);
 
+  const sign = () => {
+    patch((s) => ({ ...s, signed: { ...s.signed, [NOTE_ID]: true } }));
+    toast(`Note signed · E. Lake · ${stamp()}`);
+  };
+
   return (
-    <div className="app">
-      <div className="main" style={{ gridColumn: "1 / -1" }}>
-        <section className="panel" aria-label="Progress note">
+    <>
+      <ScreenHead
+        crumbs={
+          <>
+            <button type="button" onClick={() => go({ screen: "patients" })}>
+              Patients
+            </button>
+            <span aria-hidden="true">›</span>
+            <button type="button" onClick={() => back({ screen: "record", patient: "okonkwo" })}>
+              Okonkwo, Rachel
+            </button>
+            <span aria-hidden="true">›</span>
+            <b>Progress note</b>
+          </>
+        }
+        title="Progress note · 12 Aug 2026"
+        sub="R. Okonkwo · Individual therapy, 50 min · CPT 90834"
+        actions={
+          <>
+            <button
+              type="button"
+              className="btn ghost"
+              onClick={() => go({ screen: "copilot", patient: "okonkwo" })}
+            >
+              Ask copilot
+            </button>
+            <button
+              type="button"
+              className="btn ghost"
+              onClick={() => go({ screen: "record", patient: "okonkwo" })}
+            >
+              Open record
+            </button>
+          </>
+        }
+      />
+      <div className="main">
+        <section className="panel" aria-labelledby="nt-note">
           <div className="panelTop">
             <div>
-              <h3>Progress note · 12 Aug 2026</h3>
-              <p>R. Okonkwo · Individual therapy, 50 min · CPT 90834</p>
+              <h3 id="nt-note">Session note</h3>
+              <p>Every passage records where its text came from</p>
             </div>
-            <Pill sev={signed ? "norm" : "high"}>{signed ? "Signed" : "Unsigned · 2d"}</Pill>
+            <Pill sev={signed ? "norm" : "high"}>
+              {signed ? "Signed · E. Lake" : "Unsigned · 20h"}
+            </Pill>
           </div>
 
           <div className="note" ref={body} onScroll={measure}>
@@ -170,14 +220,23 @@ export function Note01() {
               </div>
             </div>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-              <button type="button" className="btn ghost">
+              {draftAt ? <span className="nt-saved">Draft saved {draftAt}</span> : null}
+              <button
+                type="button"
+                className="btn ghost"
+                disabled={signed}
+                onClick={() => {
+                  setDraftAt(stamp());
+                  toast("Draft saved");
+                }}
+              >
                 Save draft
               </button>
               <button
                 type="button"
                 className="btn primary"
                 disabled={!canSign || signed}
-                onClick={() => setSigned(true)}
+                onClick={sign}
               >
                 {signed ? "Signed · E. Lake" : canSign ? "Sign note ✓" : "Sign note"}
               </button>
@@ -186,12 +245,19 @@ export function Note01() {
         </section>
 
         <div className="two">
-          <section className="panel" aria-label="Measure taken this session">
+          <section className="panel" aria-labelledby="nt-measure">
             <div className="panelTop">
               <div>
-                <h3>Measure taken this session</h3>
+                <h3 id="nt-measure">Measure taken this session</h3>
                 <p>Rendered from the instrument, not retyped into prose</p>
               </div>
+              <button
+                type="button"
+                className="linkBtn seeAll"
+                onClick={() => go({ screen: "record", patient: "okonkwo", view: "measures" })}
+              >
+                History ›
+              </button>
             </div>
             <div style={{ padding: "12px 14px" }}>
               <Instrument
@@ -212,17 +278,25 @@ export function Note01() {
             </p>
           </section>
 
-          <section className="panel" aria-label="Raised for supervision">
+          <section className="panel" aria-labelledby="nt-sup">
             <div className="panelTop">
               <div>
-                <h3>Raised for supervision</h3>
+                <h3 id="nt-sup">Raised for supervision</h3>
+                <p>P. Osei · today 14:00</p>
               </div>
+              <button
+                type="button"
+                className="linkBtn seeAll"
+                onClick={() => go({ screen: "schedule" })}
+              >
+                Schedule ›
+              </button>
             </div>
             <div style={{ borderTop: "1px solid var(--site-rule)" }}>
               <AttnRow
                 sev="high"
                 text="Flat PHQ-9 against reported functional gain"
-                who="Thu 14:00"
+                who="today 14:00"
                 clock="review"
               />
               <AttnRow
@@ -238,6 +312,6 @@ export function Note01() {
           </section>
         </div>
       </div>
-    </div>
+    </>
   );
 }

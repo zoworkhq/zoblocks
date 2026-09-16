@@ -129,6 +129,15 @@
 /* Showcase blocks. Scoped under `.oxb`, so the plain class names inside a
    block cannot collide with the site around it. */
 @import "./blocks.css";
+@import "./blocks-northwind.css";
+@import "./blocks-nw-caseload.css";
+@import "./blocks-nw-patients.css";
+@import "./blocks-nw-record.css";
+@import "./blocks-nw-schedule.css";
+@import "./blocks-nw-messages.css";
+@import "./blocks-nw-reports.css";
+@import "./blocks-nw-instruments.css";
+@import "./blocks-nw-safety.css";
 
 /* The application chrome around the home page's Data Grid — page header, saved
    views, filter pills, density control and the cells the demo supplies.

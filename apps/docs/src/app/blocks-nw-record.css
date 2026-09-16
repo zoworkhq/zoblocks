@@ -1,0 +1,355 @@
+/* Patient record (Northwind). Layout classes come from blocks.css; these are
+   the pieces patient-01 used to carry as inline styles, plus the tabs it drew
+   but never built. */
+
+.oxb .rc-root {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.oxb .rc-crumb {
+  border: 0;
+  background: none;
+  padding: 2px 0;
+  min-height: 24px;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.oxb .rc-crumb:hover {
+  color: var(--site-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.oxb .rc-crumb:focus-visible,
+.oxb .rc-pillBtn:focus-visible,
+.oxb .rc-sideBtn:focus-visible {
+  outline: 2px solid var(--site-brand);
+  outline-offset: 2px;
+}
+.oxb .rc-root .crumbs b {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The name is the screen's h2; it keeps the record header's type. */
+.oxb .rc-root .nameRow h2 {
+  font-size: 19px;
+  font-weight: 660;
+  letter-spacing: -0.028em;
+  line-height: 1.25;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.oxb[data-vp="mobile"] .rc-root .nameRow h2 {
+  font-size: 17px;
+  width: 100%;
+}
+.oxb .rc-pillBtn {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  border-radius: 6px;
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+}
+@media (hover: hover) {
+  .oxb .rc-pillBtn:hover .pill {
+    border-color: var(--crit);
+  }
+}
+.oxb .rc-btnRow {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+.oxb .rc-grow {
+  flex: 1;
+  min-width: 0;
+}
+.oxb .rc-allergy {
+  color: var(--crit-text);
+}
+.oxb .rc-ink {
+  color: var(--site-ink);
+  font-weight: 600;
+}
+.oxb .rc-strong {
+  font-weight: 545;
+}
+.oxb .rc-soft {
+  color: var(--site-graphite);
+  font-size: 12px;
+}
+.oxb .rc-pad {
+  padding: 12px 14px;
+}
+.oxb .rc-note {
+  font-size: 11.5px;
+  color: var(--site-graphite);
+  margin: 12px 0 0;
+}
+.oxb .rc-emptySub {
+  margin-top: 5px;
+  font-size: 11.5px;
+}
+.oxb .rc-gateAct {
+  margin-top: 9px;
+}
+
+/* ---------- instruments ---------- */
+.oxb .rc-grid2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.oxb .rc-scaleIdle {
+  background: var(--site-rule);
+  opacity: 1;
+}
+.oxb .rc-instrNote {
+  height: 34px;
+  margin: 8px 0 0;
+  display: flex;
+  align-items: center;
+  font-size: 11.5px;
+  color: var(--site-graphite);
+}
+
+/* ---------- next contact ---------- */
+.oxb .rc-next {
+  padding: 13px 14px;
+}
+.oxb .rc-nextDay {
+  font-size: 20px;
+  font-weight: 640;
+  letter-spacing: -0.03em;
+}
+.oxb .rc-nextSub {
+  color: var(--site-graphite);
+  font-size: 12.5px;
+  margin-top: 3px;
+}
+.oxb .rc-due {
+  margin-top: 11px;
+  padding: 9px 11px;
+  border-radius: 9px;
+  background: var(--crit-bg);
+  border: 1px solid color-mix(in srgb, var(--crit) 30%, transparent);
+  font-size: 11.5px;
+}
+.oxb .rc-due b {
+  color: var(--crit-text);
+}
+
+/* ---------- details rows as buttons ---------- */
+.oxb .rc-sideBtn {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--site-rule) 55%, transparent);
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.oxb .rc-sideBtn:last-child {
+  border-bottom: 0;
+}
+@media (hover: hover) {
+  .oxb .rc-sideBtn:hover {
+    background: color-mix(in srgb, var(--site-paper) 70%, transparent);
+  }
+}
+.oxb .rc-sideVal {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  color: var(--site-graphite);
+  font-size: 12px;
+}
+
+/* ---------- tab panes ---------- */
+.oxb .rc-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px 18px;
+  min-width: 0;
+}
+.oxb[data-vp="mobile"] .rc-pane {
+  padding: 14px;
+}
+.oxb .rc-wrapTop {
+  flex-wrap: wrap;
+}
+.oxb .rc-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.oxb .rc-count {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  color: var(--site-graphite);
+}
+.oxb .rc-root .card table.dt thead th {
+  border-top: 0;
+}
+.oxb .rc-root .card table.dt tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+/* ---------- list rows (notes, documents) ---------- */
+.oxb .rc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.oxb .rc-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-right: 14px;
+  border-bottom: 1px solid color-mix(in srgb, var(--site-rule) 55%, transparent);
+}
+.oxb .rc-item:last-child {
+  border-bottom: 0;
+}
+.oxb .rc-itemMain {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  padding: 11px 0 11px 14px;
+  transition: background 0.18s;
+}
+@media (hover: hover) {
+  .oxb .rc-item:hover {
+    background: color-mix(in srgb, var(--site-paper) 70%, transparent);
+  }
+}
+.oxb .rc-itemDate {
+  flex: none;
+  width: 48px;
+  font-size: 11px;
+  color: var(--site-graphite);
+}
+.oxb .rc-itemText {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+.oxb .rc-itemTitle {
+  font-size: 13px;
+  font-weight: 545;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.oxb .rc-itemSub {
+  font-size: 11.5px;
+  color: var(--site-graphite);
+}
+.oxb .rc-docIc {
+  flex: none;
+  width: 22px;
+  height: 28px;
+  border-radius: 4px;
+  border: 1px solid var(--site-rule-strong);
+  background: linear-gradient(
+    var(--site-paper) 0 30%,
+    var(--site-rule) 30% 34%,
+    var(--site-paper) 34% 48%,
+    var(--site-rule) 48% 52%,
+    var(--site-paper) 52% 66%,
+    var(--site-rule) 66% 70%,
+    var(--site-paper) 70%
+  );
+}
+.oxb[data-vp="mobile"] .rc-itemMain {
+  flex-wrap: wrap;
+  row-gap: 6px;
+}
+.oxb[data-vp="mobile"] .rc-itemMain > .pill,
+.oxb[data-vp="mobile"] .rc-itemMain > .stDot {
+  margin-left: 60px;
+}
+
+/* ---------- safety ---------- */
+.oxb .rc-callout {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--crit-bg);
+  border: 1px solid color-mix(in srgb, var(--crit) 30%, transparent);
+  font-size: 13px;
+}
+.oxb .rc-callout b {
+  color: var(--crit-text);
+  font-weight: 600;
+}
+.oxb .rc-calloutSub {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--site-graphite);
+}
+.oxb .rc-bullets {
+  margin: 0;
+  padding: 0 16px 14px 34px;
+  font-size: 13px;
+  color: var(--site-graphite);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  list-style: disc;
+}
+
+/* ---------- sheets ---------- */
+.oxb .rc-body {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+.oxb .rc-page {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px;
+  border: 1px solid var(--site-rule);
+  border-radius: 10px;
+  background: var(--site-paper-sunk);
+  font-size: 12.5px;
+}
+.oxb .rc-page span {
+  color: var(--site-graphite);
+  font-size: 11.5px;
+  margin-bottom: 6px;
+}
+.oxb .rc-page i {
+  display: block;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--site-rule);
+}
+
+/* ---------- header on phones ---------- */
+.oxb[data-vp="mobile"] .rc-btnRow > .btn:nth-child(3) {
+  grid-column: 1 / -1;
+}
+.oxb .rc-bookBtn {
+  margin-top: 10px;
+}
