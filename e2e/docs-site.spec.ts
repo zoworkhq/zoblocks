@@ -847,6 +847,8 @@ test.describe("the public marketplace @a11y", () => {
     // still has to work.
     await expect(cards.first()).toBeVisible();
     expect(await cards.count()).toBeGreaterThan(1);
+    // Curated to five on 16 Sep 2026.
+    expect(await cards.count()).toBeLessThanOrEqual(5);
 
     const first = cards.first();
     // No card links anywhere while nothing can be bought — the detail page
@@ -872,7 +874,7 @@ test.describe("the public marketplace @a11y", () => {
   test("says the shop is shut once, not on every card", async ({ page }) => {
     await page.goto("/marketplace");
 
-    await expect(page.getByText(/the shop is what is shut/i)).toBeVisible();
+    await expect(page.getByText(/Purchasing opens with the ZoBlocks console/)).toBeVisible();
 
     const cards = page.locator("[data-zb-pack]");
     for (const card of await cards.all()) {
@@ -898,7 +900,7 @@ test.describe("the public marketplace @a11y", () => {
      * it is named for what it holds.
      */
     await expect(page.getByRole("heading", { level: 1, name: "Coming soon" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "The shelf" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Product catalogue" })).toBeVisible();
 
     const cards = page.locator("[data-zb-pack]");
     expect(await cards.count()).toBeGreaterThan(1);

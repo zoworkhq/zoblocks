@@ -146,6 +146,9 @@
 
 @import "./pro-soon.css";
 
+/* The marketplace shelf and its animated previews. Scoped under `.zbm`. */
+@import "./marketplace.css";
+
 /* ===========================================================================
  * zoblocks.design — site design layer
  *

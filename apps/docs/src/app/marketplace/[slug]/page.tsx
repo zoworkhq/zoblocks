@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, Check, CircleAlert, Info } from "lucide-react";
 import { SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { RevealRoot } from "@/components/site/interactions";
 import { KIND_LABEL, buyHref, findItem, priceLabel, shelf } from "@/lib/marketplace";
 import { DOES_NOT_CLAIM } from "@/lib/market-preview";
+import { collectionEntry, inCollection } from "@/lib/market-collection";
 
 export const revalidate = 600;
 
@@ -22,7 +23,11 @@ export async function generateStaticParams() {
   // The shelf, not the console. With the console unreachable this used to
   // return nothing, so not one detail page was generated — every /marketplace
   // link was a 404 waiting for a service that does not exist yet.
-  return (await shelf()).map((item) => ({ slug: item.slug }));
+  //
+  // Only the curated five: the other announced packs are off the public shelf.
+  return (await shelf())
+    .filter((item) => inCollection(item.slug))
+    .map((item) => ({ slug: item.slug }));
 }
 
 export async function generateMetadata({
@@ -31,11 +36,11 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const item = await findItem(slug);
+  const item = inCollection(slug) ? await findItem(slug) : undefined;
   if (!item) return {};
 
   return {
-    title: `${item.title} — ${KIND_LABEL[item.kind]} for healthcare interfaces`,
+    title: `${collectionEntry(slug)?.name ?? item.title} — ${KIND_LABEL[item.kind]} for healthcare interfaces`,
     description: item.blurb,
     alternates: { canonical: `/marketplace/${item.slug}` },
   };
@@ -55,6 +60,8 @@ export default async function MarketplaceItemPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  // A pack taken off the shelf sends its old address to the shelf.
+  if (!inCollection(slug)) permanentRedirect("/marketplace");
   const item = await findItem(slug);
   if (!item) notFound();
 
@@ -79,7 +86,7 @@ export default async function MarketplaceItemPage({
               {KIND_LABEL[item.kind]}
             </p>
             <h1 className="display-xl mt-5 max-w-4xl text-balance" data-reveal>
-              {item.title}
+              {collectionEntry(slug)?.name ?? item.title}
             </h1>
             <p className="lede mt-6 max-w-2xl text-pretty" data-reveal>
               {item.blurb}

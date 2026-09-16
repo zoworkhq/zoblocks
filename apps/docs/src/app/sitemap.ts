@@ -3,6 +3,7 @@ import { BLOCKS } from "@/lib/blocks";
 import { CATALOG } from "@/lib/catalog";
 import { isReady } from "@/lib/readiness";
 import { shelf } from "@/lib/marketplace";
+import { inCollection } from "@/lib/market-collection";
 
 /**
  * The sitemap, derived from the catalog rather than listed by hand.
@@ -43,11 +44,13 @@ const STATIC_ROUTES: ReadonlyArray<{ path: string; priority: number }> = [
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const packs = await shelf()
     .then((items) =>
-      items.map((item) => ({
-        url: `${SITE}/marketplace/${item.slug}`,
-        changeFrequency: "monthly" as const,
-        priority: 0.5,
-      })),
+      items
+        .filter((item) => inCollection(item.slug))
+        .map((item) => ({
+          url: `${SITE}/marketplace/${item.slug}`,
+          changeFrequency: "monthly" as const,
+          priority: 0.5,
+        })),
     )
     // A sitemap that throws is a sitemap that 500s. Losing the packs is worth
     // keeping the other 57 URLs indexable.
