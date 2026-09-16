@@ -493,6 +493,34 @@
   font-size: 11px;
   color: var(--site-graphite-soft);
 }
+.oxb .sc-agBlock {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.oxb .sc-agIc {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px dashed var(--site-rule-strong);
+  color: var(--site-graphite);
+}
+.oxb .sc-agBlockText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.oxb .sc-agBlockText > b {
+  font-weight: 545;
+}
+.oxb .sc-agBlockText > span {
+  font-size: 11px;
+  color: var(--site-graphite-soft);
+}
 .oxb .sc-ag.s-no-show .ptLinkName,
 .oxb .sc-ag.s-cancelled .ptLinkName {
   text-decoration: line-through;
@@ -611,6 +639,14 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.oxb .sc-miniRow.s-no-show .sc-miniName,
+.oxb .sc-miniRow.s-cancelled .sc-miniName {
+  text-decoration: line-through;
+  color: var(--site-graphite);
+}
+.oxb .sc-miniRow.s-no-show .sc-miniSt {
+  color: var(--crit-text);
+}
 .oxb .sc-miniSt {
   font-size: 11px;
   color: var(--site-graphite-soft);
@@ -728,32 +764,25 @@
 }
 
 /* ---------- sheets ---------- */
-.oxb .sc-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-.oxb .sc-actions .btn.sm {
-  min-height: 28px;
-}
 .oxb .btn.ghost.sc-danger {
   color: var(--crit-text);
   border-color: color-mix(in srgb, var(--crit) 45%, var(--site-rule));
 }
-.oxb .sc-inline {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 12px;
-  padding: 12px;
-  border: 1px solid var(--site-rule);
-  border-radius: 10px;
-  background: var(--site-paper-sunk);
+.oxb .sc-slotDay + .sc-slotDay {
+  margin-top: 14px;
 }
 .oxb .sc-slotLabel {
-  margin: 0 0 6px;
-  font-size: 11.5px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 8px;
+  font-size: 12.5px;
   font-weight: 560;
+  color: var(--site-ink);
+}
+.oxb .sc-slotLabel span {
+  font-size: 11.5px;
+  font-weight: 450;
   color: var(--site-graphite);
 }
 .oxb .sc-slots {
@@ -773,6 +802,62 @@
   text-align: right;
   font-size: 12.5px;
 }
+/* White on the dark-theme red is 3.3:1; the page colour clears 4.5:1 in both themes. */
+.oxb .btn.danger.sc-dangerBtn {
+  color: var(--site-paper);
+}
+.oxb .sc-ptRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--site-rule);
+}
+.oxb .sc-ptRow .ptLinkName {
+  font-size: 14px;
+}
+.oxb .sc-ptRow .ptLinkSub {
+  font-size: 12px;
+  color: var(--site-graphite);
+}
+.oxb .sheetFoot .sc-footLead {
+  margin-right: auto;
+}
+.oxb .linkBtn.sc-rowAct {
+  font-size: 12.5px;
+}
+.oxb .sc-note {
+  margin-top: 10px;
+}
+.oxb .sc-hist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.oxb .sc-histRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 34px;
+  padding: 7px 8px;
+  margin: 0 -8px;
+  width: calc(100% + 16px);
+  border-radius: 8px;
+  font-size: 12.5px;
+}
+.oxb .sc-hist li + li .sc-histRow {
+  border-top: 1px solid color-mix(in srgb, var(--site-rule) 60%, transparent);
+}
+@media (hover: hover) {
+  .oxb .sc-histRow:hover {
+    background: var(--site-paper-sunk);
+  }
+}
+.oxb .sc-histType {
+  color: var(--site-graphite);
+}
 .oxb .sc-form {
   display: flex;
   flex-direction: column;
@@ -784,7 +869,7 @@
   gap: 12px;
 }
 .oxb .sc-form .select,
-.oxb .sc-inline .select {
+.oxb .nwSheet .field .select {
   width: 100%;
 }
 .oxb .sc-form .seg {
@@ -830,6 +915,9 @@
 .oxb[data-vp="mobile"] .sc-weekLabel {
   margin-left: auto;
 }
+.oxb[data-vp="mobile"] .sc-todayFoot {
+  display: none;
+}
 .oxb[data-vp="mobile"] .sc-dayChips {
   padding: 10px 12px;
 }
@@ -869,4 +957,78 @@
 .oxb[data-vp="tablet"] .sc-ev.is-short .sc-evT,
 .oxb[data-vp="tablet"] .sc-taskWho {
   display: none;
+}
+
+/* Narrow agenda rows wrap their second line rather than cut it. */
+.oxb[data-vp="mobile"] .sc-ag .ptLinkSub,
+.oxb[data-vp="mobile"] .sc-agMain > b,
+.oxb .sc-dueBody .ptLinkSub {
+  white-space: normal;
+}
+
+/* Four footer actions do not fit one phone row; two by two keeps the primary bottom-right. */
+.oxb[data-vp="mobile"] .nwSheet .sheetFoot:has(.sc-footLead) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.oxb[data-vp="mobile"] .nwSheet .sheetFoot:has(.sc-footLead) .btn {
+  justify-content: center;
+  margin: 0;
+}
+.oxb[data-vp="mobile"] .sc-dayChips .chips {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.oxb[data-vp="mobile"] .nwSheet .sheetFoot:has(.sc-footLead) .btn:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+/* The team view packs up to four lanes a day; on a tablet it scrolls rather than squeezes. */
+.oxb[data-vp="tablet"] .sc-grid.is-all {
+  min-width: 840px;
+}
+
+.oxb .sc-dayChip {
+  gap: 5px;
+}
+.oxb .sc-short {
+  display: none;
+}
+.oxb[data-vp="mobile"] .sc-ag .sc-long {
+  display: none;
+}
+.oxb[data-vp="mobile"] .sc-ag .sc-short {
+  display: inline;
+}
+/* Five days in one phone row: stacked weekday and date, count beside the date. */
+.oxb[data-vp="mobile"] .sc-dayChips .chips.sc-days {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 4px;
+  overflow: visible;
+}
+.oxb[data-vp="mobile"] .sc-dayChip {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: center;
+  gap: 0 3px;
+  height: auto;
+  min-height: 40px;
+  padding: 4px 2px;
+  border-radius: 10px;
+  font-size: 11px;
+  line-height: 1.25;
+}
+.oxb[data-vp="mobile"] .sc-dayChip > span:first-child {
+  grid-column: 1 / -1;
+  text-align: center;
+}
+.oxb[data-vp="mobile"] .sc-stats > div {
+  padding: 9px 10px;
+}
+.oxb[data-vp="mobile"] .sc-stats dt {
+  font-size: 11px;
+  letter-spacing: 0;
+  text-transform: none;
 }

@@ -80,7 +80,7 @@ export const THREADS: readonly Thread[] = [
   {
     id: "th-osei",
     kind: "team",
-    subject: "Covering outreach for L. Haddad",
+    subject: "Covering outreach call",
     participants: ["P. Osei, PhD", "E. Lake, LCSW"],
     party: { type: "clinician", id: "osei" },
     patient: "haddad",
@@ -171,7 +171,7 @@ export const THREADS: readonly Thread[] = [
   {
     id: "th-mwangi",
     kind: "team",
-    subject: "D. Mwangi, crisis call overnight",
+    subject: "Crisis call overnight",
     participants: ["J. Tashpulatov, MD", "E. Lake, LCSW"],
     party: { type: "clinician", id: "tash" },
     patient: "mwangi",
@@ -225,7 +225,7 @@ export const THREADS: readonly Thread[] = [
   {
     id: "th-reyes-auth",
     kind: "admin",
-    subject: "Aetna prior auth, C. Reyes",
+    subject: "Aetna prior authorization",
     participants: ["Billing team", "E. Lake, LCSW"],
     party: { type: "org", name: "Billing team", initial: "B" },
     patient: "reyes",
@@ -268,7 +268,7 @@ export const THREADS: readonly Thread[] = [
   {
     id: "th-nakamura",
     kind: "admin",
-    subject: "Intake paperwork, A. Nakamura",
+    subject: "Intake paperwork",
     participants: ["Front desk", "E. Lake, LCSW"],
     party: { type: "org", name: "Front desk", initial: "F" },
     patient: "nakamura",

@@ -33,9 +33,8 @@
   }
 }
 .oxb .cl-stat[aria-pressed="true"] {
-  border-color: var(--site-ink);
-  box-shadow: inset 0 0 0 1px var(--site-ink);
-  background: var(--site-paper);
+  border-color: color-mix(in srgb, var(--site-brand) 70%, var(--site-rule-strong));
+  background: color-mix(in srgb, var(--site-brand) 8%, var(--site-paper-sunk));
 }
 .oxb .cl-stat:focus-visible {
   outline: 2px solid var(--site-brand);
@@ -255,14 +254,20 @@
   box-shadow: inset 0 0 0 2px var(--site-brand);
 }
 .oxb .cl-menu [role="menuitem"][aria-disabled="true"] {
-  color: var(--site-graphite);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--norm-text);
   cursor: default;
+}
+.oxb .cl-menu [role="menuitem"][aria-disabled="true"]:hover {
+  background: transparent;
 }
 
 /* ---------- send sheet ---------- */
 .oxb .cl-sheetNote {
-  margin: 0;
-  font-size: 12.5px;
+  margin: 10px 0 0;
+  font-size: 12px;
   color: var(--site-graphite);
   line-height: 1.5;
 }
@@ -362,4 +367,10 @@
 .oxb .cl-table th {
   padding-left: 11px;
   padding-right: 11px;
+}
+.oxb .cl-table .cl-two > .mono {
+  font-size: 12.5px;
+}
+.oxb .cl-noTrend {
+  color: var(--site-graphite-soft);
 }

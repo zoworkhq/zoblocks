@@ -237,6 +237,9 @@
   font-size: 12px;
   color: var(--site-graphite);
 }
+.oxb .ms-nb {
+  white-space: nowrap;
+}
 .oxb .ms-tools {
   display: flex;
   gap: 6px;
@@ -280,23 +283,29 @@
 /* The patient beside the conversation. */
 .oxb .ms-ctx {
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px 22px;
-  padding: 10px 18px;
+  flex-direction: column;
+  gap: 10px;
+  padding: 11px 18px 12px;
   border-bottom: 1px solid var(--site-rule);
   background: var(--site-paper-sunk);
   font-size: 12.5px;
 }
+.oxb .ms-ctxFacts {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 8px 26px;
+}
 .oxb .ms-ctxItem {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   min-width: 0;
 }
 .oxb .ms-ctxK {
   font-size: 10px;
   font-weight: 600;
+  line-height: 14px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--site-graphite-soft);
@@ -305,13 +314,23 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  min-height: 22px;
   color: var(--site-ink);
+  white-space: nowrap;
 }
 .oxb .ms-ctxActs {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
+  gap: 6px 10px;
+}
+.oxb .ms-done {
+  display: inline-flex;
+  align-items: center;
   gap: 6px;
-  margin-left: auto;
+  font-size: 12px;
+  font-weight: 550;
+  color: var(--norm-text);
 }
 .oxb .ms-risk.btn.ghost {
   color: var(--crit-text);
@@ -325,6 +344,10 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: 16px 18px;
+}
+.oxb .ms-scroll:focus-visible {
+  outline: 2px solid var(--site-brand);
+  outline-offset: -2px;
 }
 .oxb .ms-thread {
   list-style: none;
@@ -482,10 +505,7 @@
 /* ---------- tablet ---------- */
 .oxb[data-vp="tablet"] .ms-split {
   grid-template-columns: 280px minmax(0, 1fr);
-  height: 640px;
-}
-.oxb[data-vp="tablet"] .ms-ctxActs {
-  margin-left: 0;
+  height: 720px;
 }
 
 /* ---------- phone: one pane at a time ---------- */
@@ -517,10 +537,6 @@
   flex-direction: column;
   gap: 10px;
 }
-.oxb[data-vp="mobile"] .ms-ctxActs {
-  margin-left: 0;
-  width: 100%;
-}
 .oxb[data-vp="mobile"] .ms-msg {
   max-width: 92%;
 }
@@ -533,4 +549,21 @@
 .oxb[data-vp="mobile"] .ms-filters .seg button {
   padding: 7px 3px;
   font-size: 11px;
+}
+.oxb[data-vp="mobile"] .ms-subj {
+  white-space: normal;
+}
+
+/* The list pane, not the frame, decides when four folders stop fitting a row. */
+.oxb .ms-filters {
+  container-type: inline-size;
+}
+@container (max-width: 300px) {
+  .oxb .ms-filters .seg {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .oxb .ms-filters .seg button {
+    padding: 7px 6px;
+  }
 }

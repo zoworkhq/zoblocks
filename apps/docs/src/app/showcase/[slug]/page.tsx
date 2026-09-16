@@ -87,7 +87,7 @@ export default async function BlockPage({ params }: { params: Promise<{ slug: st
 
         <section className="border-b border-rule bg-paper-sunk/40">
           <div className="mx-auto max-w-6xl px-5 py-8 sm:px-8">
-            <div className="overflow-hidden rounded-2xl border border-rule bg-paper">
+            <div className="overflow-clip rounded-2xl border border-rule bg-paper">
               <BlockBody slug={block.slug} />
             </div>
             <p className="mt-4 max-w-3xl border-l-2 border-brand/40 pl-4 text-sm leading-relaxed text-graphite">

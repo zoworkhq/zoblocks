@@ -328,10 +328,6 @@
   color: var(--site-graphite);
   white-space: nowrap;
 }
-.oxb .rp-wlProg {
-  font-size: 12px;
-  color: var(--site-graphite);
-}
 .oxb .rp-days {
   font-weight: 650;
 }
@@ -444,9 +440,6 @@
   font-size: 11px;
   color: var(--site-graphite);
 }
-.oxb[data-vp="mobile"] table.dt.rp-cl {
-  min-width: 46rem;
-}
 .oxb .rp-mix {
   display: flex;
   gap: 2px;
@@ -481,4 +474,50 @@
 }
 .oxb[data-vp="mobile"] .rp-target {
   right: -6px;
+}
+.oxb .rp-notScore {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--crit-text);
+  white-space: nowrap;
+}
+.oxb .rp-lineScroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  /* Room for the tooltip above the top gridline. */
+  padding-top: 20px;
+}
+.oxb[data-vp="mobile"] .rp-export {
+  justify-content: center;
+}
+.oxb[data-vp="mobile"] .rp-tabs .tabbar button {
+  padding-left: 9px;
+  padding-right: 9px;
+}
+.oxb[data-vp="mobile"] .rp-tabs .tabbar button::after {
+  left: 9px;
+  right: 9px;
+}
+/* Seven columns: tighter gutters and tracking so the last one is not clipped. */
+.oxb table.dt.rp-cl th,
+.oxb table.dt.rp-cl td {
+  padding-left: 11px;
+  padding-right: 11px;
+}
+.oxb table.dt.rp-cl th {
+  letter-spacing: 0.05em;
+}
+.oxb:not([data-vp="desktop"]) table.dt.rp-cl th,
+.oxb:not([data-vp="desktop"]) table.dt.rp-cl td {
+  padding-left: 9px;
+  padding-right: 9px;
+}
+/* Narrow frames: the median sessions column lives in the sheet instead. */
+.oxb:not([data-vp="desktop"]) table.dt.rp-cl .rp-colSessions {
+  display: none;
+}
+.oxb[data-vp="mobile"] table.dt.rp-cl {
+  min-width: 36rem;
 }

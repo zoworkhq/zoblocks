@@ -11,7 +11,7 @@
  */
 
 import * as React from "react";
-import { NOW, RISKS } from "./data";
+import { NOW, RISKS, type RiskItem } from "./data";
 import { Ic, ZbMark } from "../kit";
 
 export type Screen =
@@ -48,6 +48,8 @@ export interface Store {
   signed: Record<string, true>;
   /** Patient id → instrument sent for completion this session. */
   sent: Record<string, string>;
+  /** Follow-ups opened in this session by logging a positive screen. */
+  logged: RiskItem[];
 }
 
 /** Threads unread when the demo opens. Messages owns them; the rail counts them. */
@@ -101,7 +103,7 @@ function section(screen: Screen): Screen {
 
 function useBadges(store: Store) {
   const unread = UNREAD_THREADS.filter((id) => !store.read[id]).length;
-  const open = RISKS.filter((r) => !store.resolved[r.id]).length;
+  const open = [...RISKS, ...store.logged].filter((r) => !store.resolved[r.id]).length;
   return { messages: unread, safety: open } as Partial<Record<Screen, number>>;
 }
 
@@ -171,19 +173,40 @@ function AppBar({
   go: (r: Route) => void;
   badges: Partial<Record<Screen, number>>;
 }) {
-  const strip = React.useRef<HTMLDivElement>(null);
+  const strip = React.useRef<HTMLElement>(null);
+  const [fade, setFade] = React.useState({ start: false, end: false });
 
-  // Keep the current entry in view when the strip scrolls.
-  React.useEffect(() => {
-    const el = strip.current?.querySelector<HTMLElement>("[aria-current]");
-    if (!el || !strip.current) return;
+  // The strip hides its scrollbar, so a fade at each clipped edge is the only
+  // sign there is more of it.
+  const edges = React.useCallback(() => {
     const box = strip.current;
-    const left = el.offsetLeft - 14;
-    if (
-      left < box.scrollLeft ||
-      el.offsetLeft + el.offsetWidth > box.scrollLeft + box.clientWidth
-    ) {
-      box.scrollTo({ left, behavior: "smooth" });
+    if (!box) return;
+    const start = box.scrollLeft > 2;
+    const end = box.scrollLeft + box.clientWidth < box.scrollWidth - 2;
+    setFade((f) => (f.start === start && f.end === end ? f : { start, end }));
+  }, []);
+
+  React.useEffect(() => {
+    const box = strip.current;
+    if (!box) return;
+    edges();
+    const observer = new ResizeObserver(edges);
+    observer.observe(box);
+    return () => observer.disconnect();
+  }, [edges]);
+
+  // Keep the current entry in view, clear of the fade on either side.
+  React.useEffect(() => {
+    const box = strip.current;
+    const el = box?.querySelector<HTMLElement>("[aria-current]");
+    if (!el || !box) return;
+    const pad = 28;
+    const start = el.offsetLeft - box.offsetLeft;
+    const end = start + el.offsetWidth;
+    if (start - pad < box.scrollLeft) {
+      box.scrollTo({ left: Math.max(0, start - pad), behavior: "smooth" });
+    } else if (end + pad > box.scrollLeft + box.clientWidth) {
+      box.scrollTo({ left: end + pad - box.clientWidth, behavior: "smooth" });
     }
   }, [current]);
 
@@ -198,7 +221,14 @@ function AppBar({
           {NOW.day} · {NOW.time}
         </span>
       </div>
-      <nav className="appBarNav" aria-label="Application" ref={strip}>
+      <nav
+        className="appBarNav"
+        aria-label="Application"
+        ref={strip}
+        onScroll={edges}
+        data-fade-start={fade.start || undefined}
+        data-fade-end={fade.end || undefined}
+      >
         {[...NAV, ...CLINICAL].map((entry) => {
           const active = section(current) === entry.screen;
           const count = badges[entry.screen];
@@ -213,6 +243,7 @@ function AppBar({
               {count ? (
                 <span className={`railBadge${entry.screen === "safety" ? " crit" : ""}`}>
                   {count}
+                  <span className="sr-only">{entry.screen === "safety" ? " open" : " unread"}</span>
                 </span>
               ) : null}
             </button>
@@ -231,7 +262,13 @@ export function NorthwindApp({
   screens: Record<Screen, () => React.JSX.Element>;
 }) {
   const [stack, setStack] = React.useState<Route[]>([initial]);
-  const [store, setStore] = React.useState<Store>({ resolved: {}, read: {}, signed: {}, sent: {} });
+  const [store, setStore] = React.useState<Store>({
+    resolved: {},
+    read: {},
+    signed: {},
+    sent: {},
+    logged: [],
+  });
   const [toasts, setToasts] = React.useState<{ id: number; message: string }[]>([]);
   const root = React.useRef<HTMLDivElement>(null);
   const main = React.useRef<HTMLDivElement>(null);
@@ -280,9 +317,27 @@ export function NorthwindApp({
   const toast = React.useCallback((message: string) => {
     seq.current += 1;
     const id = seq.current;
-    setToasts((t) => [...t.slice(-2), { id, message }]);
+    setToasts((t) => [...t.slice(-1), { id, message }]);
     window.setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 3200);
   }, []);
+
+  // A toast raised from inside a sheet would sit under the modal. While a
+  // dialog is open the layer joins the top layer as a manual popover, opened
+  // after the dialog so it stacks above it.
+  const toastLayer = React.useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    const layer = toastLayer.current;
+    if (!layer || typeof layer.showPopover !== "function") return;
+    const lift = toasts.length > 0 && Boolean(root.current?.querySelector("dialog[open]"));
+    if (layer.matches(":popover-open")) layer.hidePopover();
+    layer.toggleAttribute("data-over-sheet", lift);
+    if (lift) {
+      layer.setAttribute("popover", "manual");
+      layer.showPopover();
+    } else {
+      layer.removeAttribute("popover");
+    }
+  }, [toasts]);
 
   const patch = React.useCallback((update: (s: Store) => Store) => setStore(update), []);
 
@@ -305,10 +360,13 @@ export function NorthwindApp({
         <div className="appBody" ref={main} tabIndex={-1} key={key}>
           <Body />
         </div>
-        <div className="toasts" role="status" aria-live="polite">
+        <p className="sr-only" role="status" aria-live="polite">
+          {toasts[toasts.length - 1]?.message}
+        </p>
+        <div className="toasts" ref={toastLayer} aria-hidden="true">
           {toasts.map((t) => (
             <div className="toast" key={t.id}>
-              <span className="toastDot" aria-hidden="true" />
+              <span className="toastDot" />
               {t.message}
             </div>
           ))}

@@ -64,6 +64,13 @@ import {
 type Folder = "inbox" | "flagged" | "sent" | "archived";
 type KindFilter = "all" | ThreadKind;
 
+const PARTS_LABEL: Record<ThreadKind, string> = {
+  patient: "Patient portal",
+  team: "Care team",
+  pharmacy: "Pharmacy",
+  admin: "Admin",
+};
+
 const INITIAL_UNREAD: readonly string[] = UNREAD_THREADS;
 const OFFER_LINE = "Offered 10:30 today";
 
@@ -303,28 +310,38 @@ function ContextCard({ t, onOffer }: { t: Thread; onOffer: () => void }) {
   const risk = RISKS.find((r) => r.patient === p.id && !store.resolved[r.id]);
   const offered = t.messages.some((m) => m.side === "system" && m.body === OFFER_LINE);
   const track = TRACK[p.track];
+  const canOffer = t.id === "th-almeida";
 
   return (
     <section className="ms-ctx" aria-label={`${p.name} at a glance`}>
-      <h4 className="sr-only">{p.name} at a glance</h4>
-      <div className="ms-ctxItem">
-        <span className="ms-ctxK">Latest</span>
-        <span className="ms-ctxV">
-          <span className="mono">{reading(p)}</span>
-          {b ? <Pill sev={b.sev}>{b.label}</Pill> : null}
-        </span>
+      <div className="ms-ctxFacts">
+        <div className="ms-ctxItem">
+          <span className="ms-ctxK">Latest</span>
+          <span className="ms-ctxV">
+            {v === null ? (
+              "Awaiting baseline"
+            ) : (
+              <>
+                <span className="mono">{reading(p)}</span>
+                {b ? <Pill sev={b.sev}>{b.label}</Pill> : null}
+              </>
+            )}
+          </span>
+        </div>
+        {p.track !== "baseline" ? (
+          <div className="ms-ctxItem">
+            <span className="ms-ctxK">Track</span>
+            <span className="ms-ctxV">
+              <Status sev={track.sev}>{track.label}</Status>
+            </span>
+          </div>
+        ) : null}
+        <div className="ms-ctxItem">
+          <span className="ms-ctxK">Next contact</span>
+          <span className="ms-ctxV">{p.next}</span>
+        </div>
       </div>
-      <div className="ms-ctxItem">
-        <span className="ms-ctxK">Track</span>
-        <span className="ms-ctxV">
-          <Status sev={track.sev}>{track.label}</Status>
-        </span>
-      </div>
-      <div className="ms-ctxItem">
-        <span className="ms-ctxK">Next contact</span>
-        <span className="ms-ctxV mono">{p.next}</span>
-      </div>
-      {risk || t.id === "th-almeida" ? (
+      {risk || canOffer ? (
         <div className="ms-ctxActs">
           {risk ? (
             <button
@@ -336,11 +353,17 @@ function ContextCard({ t, onOffer }: { t: Thread; onOffer: () => void }) {
               {risk.what} · {risk.left}
             </button>
           ) : null}
-          {t.id === "th-almeida" ? (
-            <button type="button" className="btn primary sm" disabled={offered} onClick={onOffer}>
+          {canOffer && !offered ? (
+            <button type="button" className="btn primary sm" onClick={onOffer}>
               <CalendarClock aria-hidden="true" size={13} strokeWidth={1.8} />
-              {offered ? "10:30 offered" : "Offer earlier slot"}
+              Offer earlier slot
             </button>
+          ) : null}
+          {canOffer && offered ? (
+            <span className="ms-done">
+              <CalendarClock aria-hidden="true" size={13} strokeWidth={1.8} />
+              10:30 today offered
+            </span>
           ) : null}
         </div>
       ) : null}
@@ -348,29 +371,37 @@ function ContextCard({ t, onOffer }: { t: Thread; onOffer: () => void }) {
   );
 }
 
+/** Quick replies. Only the first one inserted carries the greeting. */
 function templates(t: Thread): { value: string; label: string; text: string }[] {
   const p = t.patient ? patient(t.patient) : null;
-  const toPatient = t.kind === "patient" && p;
-  const hi = toPatient ? `Hi ${firstName(p.id)}, ` : "";
-  return [
+  const toPatient = t.kind === "patient" && p !== null;
+  const out = [
     {
       value: "confirm",
       label: "Confirm appointment",
       text: p
-        ? `${hi}${toPatient ? "c" : "C"}onfirming ${toPatient ? "your" : `${p.name}'s`} appointment on ${p.next}. Reply here if it needs to change.`
+        ? `Confirming ${toPatient ? "your" : `${p.name}'s`} appointment on ${p.next}. Reply here if it needs to change.`
         : "Confirming the appointment. Reply here if it needs to change.",
     },
-    {
+  ];
+  if (toPatient) {
+    out.push({
       value: "crisis",
       label: "Crisis resources",
-      text: `${hi}${toPatient ? "i" : "I"}f you feel unsafe or in crisis, call or text 988 (Suicide & Crisis Lifeline) any time, day or night. If you are in immediate danger, call 911 or go to the nearest emergency department.`,
-    },
-    {
-      value: "callback",
-      label: "Request callback",
-      text: `${hi}${toPatient ? "c" : "C"}ould you let me know a good time to call today? I'll ring from the clinic line.`,
-    },
-  ];
+      text: "If you feel unsafe or in crisis, call or text 988 (Suicide & Crisis Lifeline) any time, day or night. If you are in immediate danger, call 911 or go to the nearest emergency department.",
+    });
+  }
+  out.push({
+    value: "callback",
+    label: "Request callback",
+    text: "Could you let me know a good time to call today? I'll ring from the clinic line.",
+  });
+  return out;
+}
+
+function greet(t: Thread, text: string): string {
+  if (t.kind !== "patient" || !t.patient) return text;
+  return `Hi ${firstName(t.patient)}, ${text.charAt(0).toLowerCase()}${text.slice(1)}`;
 }
 
 function Composer({ t, onSend }: { t: Thread; onSend: (body: string, file: boolean) => void }) {
@@ -397,7 +428,7 @@ function Composer({ t, onSend }: { t: Thread; onSend: (body: string, file: boole
   };
 
   const insert = (text: string) => {
-    setDraft((d) => (d.trim() ? `${d.trimEnd()}\n\n${text}` : text));
+    setDraft((d) => (d.trim() ? `${d.trimEnd()}\n\n${text}` : greet(t, text)));
     ref.current?.focus();
   };
 
@@ -453,8 +484,10 @@ function Reader({
   onBack,
   onUpdate,
   onMarkUnread,
+  backLabel,
 }: {
   t: Thread;
+  backLabel: string;
   onBack: () => void;
   onUpdate: (id: string, update: (t: Thread) => Thread) => void;
   onMarkUnread: () => void;
@@ -462,6 +495,12 @@ function Reader({
   const { toast } = useNav();
   const titleId = React.useId();
   const p = t.patient ? patient(t.patient) : null;
+  // The signed-in clinician is on every thread, and a patient thread names its
+  // patient beside the face, so neither is repeated in the participant line.
+  const others = t.participants.filter(
+    (x) => x !== "E. Lake, LCSW" && !(t.kind === "patient" && x === p?.name),
+  );
+  const relLabel = t.kind !== "patient" ? "About" : t.home === "sent" ? "To" : "From";
   const threadEnd = React.useRef<HTMLDivElement>(null);
   const count = t.messages.length;
   const lastIndex = t.messages.length - 1;
@@ -483,7 +522,7 @@ function Reader({
     toast(
       t.archived
         ? `Moved to ${t.home === "sent" ? "Sent" : "Inbox"}`
-        : "Archived · moved out of Inbox",
+        : `Archived · moved out of ${t.home === "sent" ? "Sent" : "Inbox"}`,
     );
   };
   const toggleFiled = () => {
@@ -513,13 +552,19 @@ function Reader({
       <div className="ms-readHead">
         <button type="button" className="btn ghost sm ms-back" onClick={onBack}>
           <ArrowLeft aria-hidden="true" size={13} strokeWidth={1.8} />
-          Inbox
+          {backLabel}
         </button>
         <div className="ms-titleRow">
           <div className="ms-titleText">
             <h3 id={titleId}>{t.subject}</h3>
             <p className="ms-parts">
-              {KIND_LABEL[t.kind]} · {t.participants.join(", ")}
+              {PARTS_LABEL[t.kind]}
+              {others.map((x) => (
+                <span key={x} className="ms-nb">
+                  {" · "}
+                  {x}
+                </span>
+              ))}
             </p>
           </div>
           <div className="ms-tools" role="toolbar" aria-label="Conversation actions">
@@ -580,7 +625,7 @@ function Reader({
           <div className="ms-relRow">
             {p ? (
               <span className="ms-rel">
-                <span className="ms-relK">Patient</span>
+                <span className="ms-relK">{relLabel}</span>
                 <PatientLink p={p} size={18} />
               </span>
             ) : null}
@@ -596,7 +641,8 @@ function Reader({
 
       <ContextCard t={t} onOffer={offer} />
 
-      <div className="ms-scroll">
+      {/* Focusable so the thread scrolls from the keyboard. */}
+      <div className="ms-scroll" tabIndex={0} role="region" aria-label="Conversation">
         <ol className="ms-thread" aria-label="Messages">
           {t.messages.map((m, i) =>
             m.side === "system" ? (
@@ -669,6 +715,7 @@ export function MessagesScreen() {
   const [kind, setKind] = React.useState<KindFilter>("all");
   const [query, setQuery] = React.useState("");
   const seq = React.useRef(0);
+  const split = React.useRef<HTMLDivElement>(null);
 
   const isUnread = React.useCallback(
     (id: string) => (INITIAL_UNREAD.includes(id) ? !store.read[id] : Boolean(markedUnread[id])),
@@ -683,8 +730,17 @@ export function MessagesScreen() {
     }
   }, [initial.open, patch]);
 
+  // On a phone the thread replaces the list; bring its top into view.
+  const reveal = () => {
+    requestAnimationFrame(() => {
+      const el = split.current;
+      if (el && el.getBoundingClientRect().top < 0) el.scrollIntoView({ block: "start" });
+    });
+  };
+
   const open = (id: string) => {
     setOpenId(id);
+    reveal();
     patch((s) => (s.read[id] ? s : { ...s, read: { ...s.read, [id]: true } }));
     setMarkedUnread((m) => {
       if (!m[id]) return m;
@@ -867,7 +923,7 @@ export function MessagesScreen() {
         }
       />
       <ScreenBody className="ms-body">
-        <div className="ms-split" data-open={current ? "true" : "false"}>
+        <div className="ms-split" ref={split} data-open={current ? "true" : "false"}>
           <div className="ms-list">
             <h3 className="sr-only">Conversations</h3>
             <div className="ms-filters">
@@ -883,6 +939,8 @@ export function MessagesScreen() {
                 onChange={(f) => {
                   setFolder(f);
                   setKind("all");
+                  // Keep the open thread only if the new folder lists it.
+                  if (current && !inFolder(current, f)) setOpenId(null);
                 }}
                 label="Folder"
               />
@@ -895,20 +953,17 @@ export function MessagesScreen() {
               <Reader
                 key={current.id}
                 t={current}
-                onBack={() => setOpenId(null)}
+                backLabel={folders.find((f) => f.value === folder)?.label ?? "Inbox"}
+                onBack={() => {
+                  setOpenId(null);
+                  reveal();
+                }}
                 onUpdate={update}
                 onMarkUnread={() => markUnread(current.id)}
               />
             ) : (
               <div className="ms-none">
-                <EmptyState
-                  title="Select a conversation"
-                  action={
-                    <button type="button" className="btn ghost sm" onClick={() => startCompose()}>
-                      New message
-                    </button>
-                  }
-                >
+                <EmptyState title="Select a conversation">
                   {unreadCount ? `${unreadCount} unread in your inbox.` : "You're all caught up."}
                 </EmptyState>
               </div>

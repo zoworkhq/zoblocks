@@ -119,13 +119,23 @@
   padding: 12px 16px 4px;
 }
 .oxb .appBarTop .railBrand {
+  min-height: 28px;
+  white-space: nowrap;
+  flex: none;
   display: flex;
   align-items: center;
   gap: 9px;
   padding: 0;
   width: auto;
 }
+@media (max-width: 359px) {
+  .oxb .appBarMe {
+    display: none;
+  }
+}
 .oxb .appBarMe {
+  min-width: 0;
+  overflow: hidden;
   font-family: var(--font-mono, ui-monospace, monospace);
   font-size: 10.5px;
   color: var(--site-graphite-soft);
@@ -141,6 +151,21 @@
 }
 .oxb .appBarNav::-webkit-scrollbar {
   display: none;
+}
+.oxb .appBarNav[data-fade-start] {
+  mask-image: linear-gradient(to right, transparent, #000 28px);
+}
+.oxb .appBarNav[data-fade-end] {
+  mask-image: linear-gradient(to left, transparent, #000 28px);
+}
+.oxb .appBarNav[data-fade-start][data-fade-end] {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 28px,
+    #000 calc(100% - 28px),
+    transparent
+  );
 }
 .oxb .appBarNav button {
   flex: none;
@@ -176,17 +201,26 @@
   transform: scaleX(1);
 }
 
-/* ---------- toasts ---------- */
+/* ---------- toasts ----------
+   Fixed to the viewport: a dashboard is taller than a laptop screen, and a
+   toast at the app's foot was announced below the fold. */
 .oxb .toasts {
-  position: absolute;
-  right: 16px;
-  bottom: 16px;
+  position: fixed;
+  inset: auto 16px 16px auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: visible;
+  width: auto;
+  height: auto;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 8px;
+  max-width: min(360px, calc(100vw - 32px));
   pointer-events: none;
-  z-index: 5;
+  z-index: 80;
 }
 .oxb .toast {
   display: inline-flex;
@@ -214,12 +248,18 @@
   }
 }
 .oxb[data-vp="mobile"] .toasts {
-  left: 14px;
-  right: 14px;
+  inset: auto 14px 14px 14px;
   align-items: stretch;
+}
+/* Over a sheet, clear its footer so the toast never covers Save. */
+.oxb .toasts[data-over-sheet] {
+  bottom: 84px;
 }
 
 /* ---------- screen head & body ---------- */
+.oxb .dotSep {
+  word-spacing: 0.22em;
+}
 .oxb .scrHead {
   padding: 18px 20px 16px;
   border-bottom: 1px solid var(--site-rule);
@@ -322,7 +362,8 @@
 }
 .oxb .btn.danger {
   background: var(--crit);
-  color: #fff;
+  /* Paper, not white: white on the dark theme's brighter red is 3.3:1. */
+  color: var(--site-paper);
 }
 @media (hover: hover) {
   .oxb .btn.danger:hover:not([disabled]) {
@@ -399,10 +440,19 @@
   min-width: 0;
   border: 0;
   outline: none;
+  box-shadow: none;
   background: transparent;
   font: inherit;
   font-size: 13px;
   color: var(--site-ink);
+}
+/* The ring belongs to the wrapper; the site's global focus style must not
+   draw a second box on the field inside it. */
+.oxb .search input:focus,
+.oxb .search input:focus-visible {
+  outline: none;
+  box-shadow: none;
+  background: transparent;
 }
 .oxb .search input::-webkit-search-cancel-button {
   display: none;
@@ -637,7 +687,7 @@
 /* ---------- sheet ---------- */
 /* Fixed, said outright: the site's reset leaves a modal dialog absolute, so
    it sat at the top of the document and focusing it scrolled the page there. */
-.oxb dialog.sheet {
+.oxb dialog.nwSheet {
   position: fixed;
   inset: 0 0 0 auto;
   margin: 0;
@@ -653,10 +703,10 @@
   box-shadow: -24px 0 60px -30px rgb(0 0 0 / 0.5);
   overscroll-behavior: contain;
 }
-.oxb dialog.sheet[open] {
+.oxb dialog.nwSheet[open] {
   animation: nw-sheet 0.38s var(--b-ease);
 }
-.oxb dialog.sheet::backdrop {
+.oxb dialog.nwSheet::backdrop {
   background: rgb(4 10 9 / 0.42);
   backdrop-filter: blur(2px);
 }
@@ -667,7 +717,7 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .oxb dialog.sheet[open],
+  .oxb dialog.nwSheet[open],
   .oxb .toast {
     animation: none;
   }
@@ -870,10 +920,26 @@
 .oxb .db-noteRow .ptLink {
   flex: 1;
 }
+.oxb .db-noteRow:last-child {
+  border-bottom: 0;
+}
+/* One width for Open, Remind and Reminded, so the ages line up in a column. */
+.oxb .db-noteRow .btn {
+  min-width: 84px;
+  justify-content: center;
+}
 .oxb .db-noteAge {
   font-family: var(--font-mono, ui-monospace, monospace);
   font-size: 11px;
   color: var(--high-text);
+}
+.oxb .db-noteFresh {
+  color: var(--site-graphite);
+}
+.oxb .db-noteSigned {
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--norm-text);
 }
 .oxb[data-vp="mobile"] .db-legendAll {
   margin-left: 0;
@@ -881,9 +947,39 @@
 
 /* ---------- note ---------- */
 .oxb .nt-saved {
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 11px;
-  color: var(--site-graphite-soft);
+  font-size: 12px;
+  color: var(--site-graphite);
+}
+.oxb .nt-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.oxb .nt-signed {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  min-height: 35px;
+  font-size: 13px;
+  font-weight: 550;
+  color: var(--norm-text);
+}
+.oxb[data-vp="mobile"] .signBar .readMeter {
+  max-width: none;
+  flex-basis: 100%;
+}
+.oxb[data-vp="mobile"] .nt-actions {
+  width: 100%;
+}
+.oxb[data-vp="mobile"] .nt-actions .nt-saved {
+  flex-basis: 100%;
+}
+.oxb[data-vp="mobile"] .nt-actions .btn {
+  flex: 1;
+  justify-content: center;
 }
 .oxb .prov:focus-visible {
   outline: 2px solid var(--site-brand);
@@ -931,6 +1027,14 @@
   background: var(--site-brand);
   vertical-align: -2px;
 }
+/* "Audit" broke to "Audi / t" when the count beside it wrapped. */
+.oxb .srcCard .h b {
+  flex: none;
+}
+.oxb .srcCard .h .mono {
+  font-size: 11px;
+  text-align: right;
+}
 .oxb .cp-suggest {
   justify-content: flex-end;
 }
@@ -962,6 +1066,15 @@
   max-width: 100%;
 }
 
+/* A narrow desktop frame leaves a tile 170px: the footing wraps, never cuts. */
+.oxb .nw .tFoot {
+  flex-wrap: wrap;
+  row-gap: 2px;
+}
+.oxb .nw .tFoot span {
+  overflow: visible;
+}
+
 /* A dated footing breaks between "12" and "Aug" in a 150px card. */
 .oxb .nw .instrFoot span {
   white-space: nowrap;
@@ -971,4 +1084,12 @@
 .oxb .nw .two .lrow .m {
   white-space: normal;
   overflow: visible;
+}
+
+.oxb .sheetBody:focus {
+  outline: none;
+}
+.oxb .sheetBody:focus-visible {
+  outline: 2px solid var(--site-brand);
+  outline-offset: -2px;
 }

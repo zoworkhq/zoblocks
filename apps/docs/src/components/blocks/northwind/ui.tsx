@@ -16,6 +16,29 @@ import { useNav } from "./shell";
 
 /* ------------------------------------------------------------ headings */
 
+/**
+ * Widen the " · " between facts. The site face sets a space at about 3px, so
+ * "68 in care · 4 clinicians" read as one run. The spaces stay in the text,
+ * so screen readers and copy-paste are unchanged; only their width grows.
+ */
+function spaced(node: React.ReactNode): React.ReactNode {
+  if (typeof node === "string") {
+    if (!node.includes(" · ")) return node;
+    return node.split(" · ").map((part, i) => (
+      <React.Fragment key={i}>
+        {i > 0 ? <span className="dotSep"> · </span> : null}
+        {part}
+      </React.Fragment>
+    ));
+  }
+  if (Array.isArray(node))
+    return node.map((n, i) => <React.Fragment key={i}>{spaced(n)}</React.Fragment>);
+  if (React.isValidElement<{ children?: React.ReactNode }>(node) && node.type === React.Fragment) {
+    return spaced(node.props.children);
+  }
+  return node;
+}
+
 /** A screen's title row. `h2`: the page around the block owns the `h1`. */
 export function ScreenHead({
   title,
@@ -33,8 +56,8 @@ export function ScreenHead({
       {crumbs ? <div className="scrCrumbs">{crumbs}</div> : null}
       <div className="scrRow">
         <div className="scrText">
-          <h2>{title}</h2>
-          {sub ? <p>{sub}</p> : null}
+          <h2>{spaced(title)}</h2>
+          {sub ? <p>{spaced(sub)}</p> : null}
         </div>
         {actions ? <div className="scrActions">{actions}</div> : null}
       </div>
@@ -374,6 +397,8 @@ export function Sheet({
 }) {
   const ref = React.useRef<HTMLDialogElement>(null);
   const titleId = React.useId();
+  const closeRef = React.useRef(onClose);
+  closeRef.current = onClose;
 
   React.useEffect(() => {
     const d = ref.current;
@@ -382,12 +407,36 @@ export function Sheet({
     if (!open && d.open) d.close();
   }, [open]);
 
+  // A button that disables itself on click drops focus to the body, and the
+  // key then never reaches the dialog. Catch Escape above the site's handler,
+  // but only when focus has left the sheet; inside it, fields handle it first.
+  React.useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      const d = ref.current;
+      if (e.key !== "Escape" || !d?.open || d.contains(e.target as Node)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      closeRef.current();
+    };
+    window.addEventListener("keydown", onKey, true);
+    return () => window.removeEventListener("keydown", onKey, true);
+  }, [open]);
+
   return (
     <dialog
       ref={ref}
-      className="sheet"
+      className="nwSheet"
       aria-labelledby={titleId}
       onClose={onClose}
+      // The site listens for Escape on the document and swallows it, so the
+      // native cancel never fires. The sheet handles the key itself.
+      onKeyDown={(e) => {
+        if (e.key !== "Escape") return;
+        e.preventDefault();
+        e.stopPropagation();
+        onClose();
+      }}
       onCancel={(e) => {
         e.preventDefault();
         onClose();
@@ -400,14 +449,17 @@ export function Sheet({
         <div className="sheetInner">
           <div className="sheetHead">
             <div style={{ minWidth: 0 }}>
-              <h3 id={titleId}>{title}</h3>
-              {sub ? <p>{sub}</p> : null}
+              <h3 id={titleId}>{spaced(title)}</h3>
+              {sub ? <p>{spaced(sub)}</p> : null}
             </div>
             <button type="button" className="iconBtn" onClick={onClose} aria-label="Close">
               <X aria-hidden="true" size={15} strokeWidth={1.8} />
             </button>
           </div>
-          <div className="sheetBody">{children}</div>
+          {/* Focusable, so a sheet with nothing interactive still scrolls by keyboard. */}
+          <div className="sheetBody" tabIndex={0}>
+            {children}
+          </div>
           {footer ? <div className="sheetFoot">{footer}</div> : null}
         </div>
       ) : null}

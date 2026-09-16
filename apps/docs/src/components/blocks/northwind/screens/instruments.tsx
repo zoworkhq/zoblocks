@@ -31,6 +31,7 @@ import {
   PatientLink,
   ScreenBody,
   ScreenHead,
+  KV,
   Select,
   Sheet,
 } from "../ui";
@@ -483,47 +484,58 @@ function LibraryCard({
   );
 }
 
-function InstrumentSheet({ def, onClose }: { def: Def | null; onClose: () => void }) {
+function InstrumentSheet({
+  def,
+  auto,
+  onClose,
+}: {
+  def: Def | null;
+  auto: boolean;
+  onClose: () => void;
+}) {
   const { store, patch, toast } = useNav();
   const mine = React.useMemo(
     () => PATIENTS.filter((p) => p.clinician === ME).sort((a, b) => a.name.localeCompare(b.name)),
     [],
   );
   const [to, setTo] = React.useState(mine[0]!.id);
-  const sentTo = def ? store.sent[to]?.startsWith(def.code) : false;
+  const sentTo = def ? store.sent[to] === def.code : false;
 
   return (
     <Sheet
       open={def !== null}
       onClose={onClose}
-      title={def ? `${def.code} · ${def.name}` : ""}
-      sub={
-        def
-          ? `${def.items} items · about ${def.minutes} min · ${def.cadence.toLowerCase()}`
-          : undefined
-      }
+      title={def?.code ?? ""}
+      sub={def?.name}
       footer={
         def ? (
-          <div className="in-sendRow">
-            <Select
-              label={`Send ${def.code} to patient`}
-              value={to}
-              onChange={setTo}
-              options={mine.map((p) => ({ value: p.id, label: p.name }))}
-            />
-            <button
-              type="button"
-              className="btn primary"
-              disabled={sentTo}
-              onClick={() => {
-                patch((s) => ({ ...s, sent: { ...s.sent, [to]: def.code } }));
-                toast(`${def.code} sent to ${patient(to).name}`);
-              }}
-            >
-              <Send aria-hidden="true" size={14} strokeWidth={1.7} />
-              {sentTo ? "Sent" : "Send"}
-            </button>
-          </div>
+          <>
+            <p className="in-sendNote" aria-live="polite">
+              {sentTo
+                ? `Sent to ${patient(to).name} today. Choose another patient to send again.`
+                : "Send to someone on your caseload, to complete before their next session."}
+            </p>
+            <div className="in-sendRow">
+              <Select
+                label={`Send ${def.code} to patient`}
+                value={to}
+                onChange={setTo}
+                options={mine.map((p) => ({ value: p.id, label: p.name }))}
+              />
+              <button
+                type="button"
+                className="btn primary"
+                disabled={sentTo}
+                onClick={() => {
+                  patch((s) => ({ ...s, sent: { ...s.sent, [to]: def.code } }));
+                  toast(`${def.code} sent to ${patient(to).name}`);
+                }}
+              >
+                <Send aria-hidden="true" size={14} strokeWidth={1.7} />
+                {sentTo ? "Sent" : "Send"}
+              </button>
+            </div>
+          </>
         ) : null
       }
     >
@@ -531,46 +543,40 @@ function InstrumentSheet({ def, onClose }: { def: Def | null; onClose: () => voi
         <>
           <p className="in-desc">{def.description}</p>
           <section className="sheetSection">
-            <h4>Scoring bands</h4>
-            <div className="dtScroll">
-              <table className="dt in-bandTable">
-                <thead>
-                  <tr>
-                    <th>{def.categorical ? "Result" : "Score"}</th>
-                    <th>Band</th>
-                    <th>Clinical action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {def.bands.map((b) => (
-                    <tr key={b.label}>
-                      <td className="mono">
-                        {def.categorical ? "—" : b.from === b.to ? b.from : `${b.from}–${b.to}`}
-                      </td>
-                      <td>
-                        <Pill sev={b.sev}>{b.label}</Pill>
-                      </td>
-                      <td>{b.action}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <h4>Details</h4>
+            <KV k="Items">
+              {def.items} · about {def.minutes} min
+            </KV>
+            <KV k="Range">{def.categorical ? "Positive or negative" : `${def.min}–${def.max}`}</KV>
+            <KV k="Cadence">{def.cadence}</KV>
+            <KV k="In use">{def.inUse} patients</KV>
+            <KV k="Auto-send before session">{auto ? "On" : "Off"}</KV>
           </section>
           <section className="sheetSection">
-            <h4>Items · paraphrased</h4>
+            <h4>Scoring bands</h4>
+            <ul className={`in-bands${def.categorical ? " cat" : ""}`}>
+              {def.bands.map((b) => (
+                <li key={b.label}>
+                  {def.categorical ? null : (
+                    <span className="in-bandsRange">
+                      {b.from === b.to ? b.from : `${b.from}–${b.to}`}
+                    </span>
+                  )}
+                  <span className="in-bandsText">
+                    <Pill sev={b.sev}>{b.label}</Pill>
+                    <span className="in-bandsAction">{b.action}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+          <section className="sheetSection">
+            <h4>Items, paraphrased</h4>
             <ol className="in-items">
               {def.itemLabels.map((label) => (
                 <li key={label}>{label}</li>
               ))}
             </ol>
-          </section>
-          <section className="sheetSection">
-            <h4>Send to patient</h4>
-            <p className="in-desc">
-              Goes to the patient portal and must be completed before their next session. Your
-              caseload only.
-            </p>
           </section>
         </>
       ) : null}
@@ -693,7 +699,6 @@ function DuePanel({ filter, setFilter }: { filter: DueFilter; setFilter: (f: Due
                     </td>
                     <td>
                       <span className="in-measure">{p.instrument}</span>
-                      {v === null ? <span className="in-sub">intake</span> : null}
                     </td>
                     <td>
                       {b ? (
@@ -865,6 +870,7 @@ export function InstrumentsScreen() {
       </ScreenBody>
       <InstrumentSheet
         def={LIBRARY.find((d) => d.code === open) ?? null}
+        auto={open ? auto[open] : false}
         onClose={() => setOpen(null)}
       />
     </>

@@ -9,7 +9,7 @@
  */
 
 import * as React from "react";
-import { LayoutGrid, List, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import {
   CLINICIANS,
   ME,
@@ -94,6 +94,7 @@ const surnameOf = (row: Row) =>
 export function PatientsScreen() {
   const { go, store, toast } = useNav();
   const uid = React.useId();
+  const listTop = React.useRef<HTMLDivElement>(null);
   const [q, setQRaw] = React.useState("");
   const [filter, setFilterRaw] = React.useState<Filter>("all");
   const [sort, setSortRaw] = React.useState<Sort>("surname");
@@ -195,6 +196,13 @@ export function PatientsScreen() {
     return out;
   }, [shown, sort]);
 
+  // Twenty-four cards push the pager far down; the next page starts at the filters.
+  const turn = (n: number) => {
+    setPage(n);
+    const el = listTop.current;
+    if (el && el.getBoundingClientRect().top < 0) el.scrollIntoView({ block: "start" });
+  };
+
   const clear = () => {
     setQ("");
     setFilter("all");
@@ -260,6 +268,21 @@ export function PatientsScreen() {
               placeholder="Name, MRN or DOB"
             />
           </div>
+          <div className="pd-right">
+            <Select label="Sort by" value={sort} onChange={setSort} options={SORT_OPTIONS} />
+            <Segmented
+              label="Layout"
+              value={view}
+              onChange={setView}
+              options={[
+                { value: "cards", label: "Cards" },
+                { value: "list", label: "List" },
+              ]}
+            />
+          </div>
+        </div>
+
+        <div className="pd-filterRow" ref={listTop}>
           <Chips
             label="Show"
             value={filter}
@@ -271,32 +294,10 @@ export function PatientsScreen() {
               { value: "risk", label: "Open risk", count: count("risk") },
             ]}
           />
-          <div className="pd-right">
-            <Select label="Sort by" value={sort} onChange={setSort} options={SORT_OPTIONS} />
-            <div className="pd-view">
-              <Segmented
-                label="Layout"
-                value={view}
-                onChange={setView}
-                options={[
-                  { value: "cards", label: "Cards" },
-                  { value: "list", label: "List" },
-                ]}
-              />
-              <span className="pd-viewIc" aria-hidden="true">
-                {view === "cards" ? (
-                  <LayoutGrid size={14} strokeWidth={1.7} />
-                ) : (
-                  <List size={14} strokeWidth={1.7} />
-                )}
-              </span>
-            </div>
-          </div>
+          <p className="pd-count" aria-live="polite">
+            Showing <b>{rows.length}</b> of {total}
+          </p>
         </div>
-
-        <p className="pd-count" aria-live="polite">
-          Showing <b className="mono">{rows.length}</b> of <span className="mono">{total}</span>
-        </p>
 
         {rows.length === 0 ? (
           <div className="panel">
@@ -334,7 +335,7 @@ export function PatientsScreen() {
             </div>
             {pages > 1 ? (
               <div className="pd-pager">
-                <Pager page={at} pages={pages} onPage={setPage} total={rows.length} size={PAGE} />
+                <Pager page={at} pages={pages} onPage={turn} total={rows.length} size={PAGE} />
               </div>
             ) : null}
           </section>
@@ -347,7 +348,6 @@ export function PatientsScreen() {
                     <th>Patient</th>
                     <th>Date of birth</th>
                     <th>Program</th>
-                    <th>Clinician</th>
                     <th>Next contact</th>
                     <th>Status</th>
                   </tr>
@@ -375,16 +375,15 @@ export function PatientsScreen() {
                             </span>
                           </button>
                         </td>
-                        <td className="mono">
-                          {dobLabel(row.r.dob)} <span className="pd-dim">· {row.r.age}</span>
-                        </td>
-                        <td className="pd-dim">{row.r.program}</td>
                         <td>
-                          <Clin id={row.r.clinician} />
+                          <Two top={dobLabel(row.r.dob)} sub={`${row.r.age} years`} mono />
                         </td>
-                        <td className="pd-none">Intake not booked</td>
                         <td>
-                          <Status sev="unk">referral · awaiting intake</Status>
+                          <Two top={row.r.program} sub={CLINICIANS[row.r.clinician].short} />
+                        </td>
+                        <td className="pd-none">Not booked</td>
+                        <td>
+                          <Status sev="unk">awaiting intake</Status>
                         </td>
                       </tr>
                     ),
@@ -393,7 +392,7 @@ export function PatientsScreen() {
               </table>
             </div>
             {pages > 1 ? (
-              <Pager page={at} pages={pages} onPage={setPage} total={rows.length} size={PAGE} />
+              <Pager page={at} pages={pages} onPage={turn} total={rows.length} size={PAGE} />
             ) : null}
           </section>
         )}
@@ -405,7 +404,7 @@ export function PatientsScreen() {
         open={openRef !== null}
         onClose={() => setOpenRef(null)}
         title={openRef ? `${openRef.last}, ${openRef.first}` : "Referral"}
-        sub="Referral · awaiting intake"
+        sub={`Awaiting intake, referred ${NOW.day}`}
         footer={
           <>
             <button type="button" className="btn ghost sm" onClick={() => setOpenRef(null)}>
@@ -426,18 +425,24 @@ export function PatientsScreen() {
         }
       >
         {openRef ? (
-          <div>
-            <KV k="MRN">
-              <span className="mono">{openRef.mrn}</span>
-            </KV>
-            <KV k="Date of birth">
-              <span className="mono">{dobLabel(openRef.dob)}</span> · {openRef.age}
-            </KV>
-            <KV k="Program">{openRef.program}</KV>
-            <KV k="Clinician">{CLINICIANS[openRef.clinician].name}</KV>
-            <KV k="Referred">{NOW.day}</KV>
-            <KV k="Reason">{openRef.reason || "Not given"}</KV>
-          </div>
+          <>
+            <section className="sheetSection">
+              <h4>Patient</h4>
+              <KV k="MRN">{openRef.mrn}</KV>
+              <KV k="Date of birth">{dobLabel(openRef.dob)}</KV>
+              <KV k="Age">{openRef.age}</KV>
+            </section>
+            <section className="sheetSection">
+              <h4>Referral</h4>
+              <KV k="Program">{openRef.program}</KV>
+              <KV k="Clinician">{CLINICIANS[openRef.clinician].name}</KV>
+              <KV k="Intake">Not booked</KV>
+            </section>
+            <section className="sheetSection">
+              <h4>Reason</h4>
+              <p className="pd-reason">{openRef.reason || "No reason given."}</p>
+            </section>
+          </>
         ) : null}
       </Sheet>
     </>
@@ -445,6 +450,16 @@ export function PatientsScreen() {
 }
 
 /* --------------------------------------------------------------- pieces */
+
+/** Two facts to a cell, so the list fits a tablet frame unscrolled. */
+function Two({ top, sub, mono }: { top: string; sub: string; mono?: boolean }) {
+  return (
+    <span className="pd-two">
+      <span className={mono ? "mono" : undefined}>{top}</span>
+      <span className="pd-sub">{sub}</span>
+    </span>
+  );
+}
 
 function Clin({ id }: { id: ClinicianId }) {
   return (
@@ -463,8 +478,10 @@ function PatientCard({ p, risk, onOpen }: { p: Patient; risk: boolean; onOpen: (
         <Face name={p.name} src={faceOf(p.name)} size={40} />
         <span className="pd-cardId">
           <span className="pd-name">{p.full}</span>
-          <span className="pd-meta mono">
-            {p.mrn} · {p.age} · {p.pronouns.toLowerCase()}
+          <span className="pd-meta">
+            <span className="mono">{p.mrn}</span>
+            <span>{p.age}</span>
+            <span>{p.pronouns.toLowerCase()}</span>
           </span>
         </span>
       </span>
@@ -476,7 +493,7 @@ function PatientCard({ p, risk, onOpen }: { p: Patient; risk: boolean; onOpen: (
         </span>
         <span className="pd-cardRow">
           <span className="pd-k">Next</span>
-          <span className={hasUpcoming(p) ? "mono pd-v" : "pd-none"}>{nextLabel(p)}</span>
+          <span className={hasUpcoming(p) ? "pd-v" : "pd-none"}>{nextLabel(p)}</span>
         </span>
       </span>
       <span className="pd-cardFoot">
@@ -498,8 +515,9 @@ function ReferralCard({ r, onOpen }: { r: Referral; onOpen: () => void }) {
           <span className="pd-name">
             {r.last}, {r.first}
           </span>
-          <span className="pd-meta mono">
-            {r.mrn} · {r.age}
+          <span className="pd-meta">
+            <span className="mono">{r.mrn}</span>
+            <span>{r.age}</span>
           </span>
         </span>
       </span>
@@ -511,11 +529,12 @@ function ReferralCard({ r, onOpen }: { r: Referral; onOpen: () => void }) {
         </span>
         <span className="pd-cardRow">
           <span className="pd-k">Next</span>
-          <span className="pd-none">Intake not booked</span>
+          <span className="pd-none">Not booked</span>
         </span>
       </span>
       <span className="pd-cardFoot">
-        <Pill sev="low">Referral · awaiting intake</Pill>
+        <Pill sev="low">New referral</Pill>
+        <Status sev="unk">awaiting intake</Status>
       </span>
     </button>
   );
@@ -528,12 +547,11 @@ function PatientRow({ p, risk }: { p: Patient; risk: boolean }) {
       <td>
         <PatientLink p={p} size={24} sub={<span className="mono">{p.mrn}</span>} />
       </td>
-      <td className="mono">
-        {dobLabel(p.dob)} <span className="pd-dim">· {p.age}</span>
-      </td>
-      <td className="pd-dim">{p.program}</td>
       <td>
-        <Clin id={p.clinician} />
+        <Two top={dobLabel(p.dob)} sub={`${p.age} years`} mono />
+      </td>
+      <td>
+        <Two top={p.program} sub={CLINICIANS[p.clinician].short} />
       </td>
       <td className={hasUpcoming(p) ? "mono" : "pd-none"}>{nextLabel(p)}</td>
       <td>
@@ -608,68 +626,74 @@ function ReferralForm({
           reset();
         }}
       >
-        <div className="pd-pair">
+        <section className="sheetSection pd-fields">
+          <h4>Patient</h4>
+          <div className="pd-pair">
+            <label className="field">
+              First name
+              <input
+                type="text"
+                value={first}
+                onChange={(e) => setFirst(e.target.value)}
+                autoComplete="off"
+                required
+              />
+            </label>
+            <label className="field">
+              Last name
+              <input
+                type="text"
+                value={last}
+                onChange={(e) => setLast(e.target.value)}
+                autoComplete="off"
+                required
+              />
+            </label>
+          </div>
           <label className="field">
-            First name
+            Date of birth
             <input
-              type="text"
-              value={first}
-              onChange={(e) => setFirst(e.target.value)}
-              autoComplete="off"
+              type="date"
+              value={dob}
+              max={NOW.iso.slice(0, 10)}
+              onChange={(e) => setDob(e.target.value)}
               required
             />
           </label>
+        </section>
+        <section className="sheetSection pd-fields">
+          <h4>Referral</h4>
+          <div className="field">
+            <span aria-hidden="true">Program</span>
+            <Select
+              label="Program"
+              value={program}
+              onChange={setProgram}
+              options={PROGRAMS.map((v) => ({ value: v, label: v }))}
+            />
+          </div>
+          <div className="field">
+            <span aria-hidden="true">Clinician</span>
+            <Select
+              label="Clinician"
+              value={clinician}
+              onChange={setClinician}
+              options={(Object.keys(CLINICIANS) as ClinicianId[]).map((id) => ({
+                value: id,
+                label: CLINICIANS[id].name,
+              }))}
+            />
+          </div>
           <label className="field">
-            Last name
-            <input
-              type="text"
-              value={last}
-              onChange={(e) => setLast(e.target.value)}
-              autoComplete="off"
-              required
+            Reason
+            <textarea
+              rows={4}
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder="Presenting concern, referrer, urgency"
             />
           </label>
-        </div>
-        <label className="field">
-          Date of birth
-          <input
-            type="date"
-            value={dob}
-            max={NOW.iso.slice(0, 10)}
-            onChange={(e) => setDob(e.target.value)}
-            required
-          />
-        </label>
-        <div className="field">
-          <span aria-hidden="true">Program</span>
-          <Select
-            label="Program"
-            value={program}
-            onChange={setProgram}
-            options={PROGRAMS.map((v) => ({ value: v, label: v }))}
-          />
-        </div>
-        <div className="field">
-          <span aria-hidden="true">Clinician</span>
-          <Select
-            label="Clinician"
-            value={clinician}
-            onChange={setClinician}
-            options={(Object.keys(CLINICIANS) as ClinicianId[]).map((id) => ({
-              value: id,
-              label: CLINICIANS[id].name,
-            }))}
-          />
-        </div>
-        <label className="field">
-          Reason for referral
-          <textarea
-            rows={4}
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            placeholder="Presenting concern, referrer, urgency"
-          />
-        </label>
+        </section>
         {!ready ? <p className="pd-hint">Names and date of birth are required.</p> : null}
       </form>
     </Sheet>

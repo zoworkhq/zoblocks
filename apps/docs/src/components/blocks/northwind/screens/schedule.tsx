@@ -10,12 +10,21 @@
  */
 
 import * as React from "react";
-import { ChevronLeft, ChevronRight, Plus, ShieldAlert, Video } from "lucide-react";
-import { CLINICIANS, PATIENTS, RISKS, dayLabel, reading, type ClinicianId } from "../data";
+import { ChevronLeft, ChevronRight, Clock, Plus, ShieldAlert, Users, Video } from "lucide-react";
+import {
+  CLINICIANS,
+  PATIENTS,
+  RISKS,
+  TRACK,
+  band,
+  dayLabel,
+  latest,
+  reading,
+  type ClinicianId,
+} from "../data";
 import { Pill, Status } from "../../kit";
 import { useNav, stamp } from "../shell";
 import {
-  Chips,
   EmptyState,
   KV,
   PatientLink,
@@ -59,6 +68,17 @@ const HOUR = 64;
 const MIN_VISUAL = 22;
 const THIS_WEEK = mondayOf(0);
 const OKONKWO_RISK = "rk-okonkwo-cssrs";
+/** Block names for lanes too narrow for the word: three lanes, then four. */
+const BLOCK_SUB: Partial<Record<ApptType, string>> = {
+  admin: "Protected time",
+  supervision: "Weekly supervision",
+  group: "8 enrolled · Room 2",
+};
+const BLOCK_ABBR: Partial<Record<ApptType, [string, string]>> = {
+  admin: ["Admin", "Adm"],
+  supervision: ["Sup.", "Sup"],
+  group: ["Group", "Grp"],
+};
 
 const FILTERS: readonly { value: Filter; label: string }[] = [
   { value: "lake", label: "My schedule" },
@@ -131,6 +151,13 @@ function lanes(list: readonly Appt[]): Map<string, { lane: number; of: number }>
 }
 
 function describe(a: Appt, risky: boolean): string {
+  if (!a.patient) {
+    return [
+      a.title,
+      `${hhmm(a.start)} to ${hhmm(a.start + a.minutes)}`,
+      isPast(a) ? "Done" : "Upcoming",
+    ].join(", ");
+  }
   const bits = [
     nameOf(a),
     TYPES[a.type].label,
@@ -170,7 +197,10 @@ function WeekGrid({
 
   return (
     <div className="sc-gridScroll">
-      <div className="sc-grid" style={{ "--sc-hour": `${HOUR}px` } as React.CSSProperties}>
+      <div
+        className={`sc-grid${filter === "all" ? " is-all" : ""}`}
+        style={{ "--sc-hour": `${HOUR}px` } as React.CSSProperties}
+      >
         <div className="sc-gh">
           <span className="sc-gutter" aria-hidden="true" />
           {days.map((d) => {
@@ -235,7 +265,18 @@ function WeekGrid({
             ) : null}
           </div>
           {days.map((d) => {
-            const events = list.filter((a) => a.day === d && shows(filter)(a));
+            const all = list.filter((a) => a.day === d && shows(filter)(a));
+            // A cancelled slot that has been rebooked gives way; the agenda still lists it.
+            const events = all.filter(
+              (a) =>
+                a.status !== "cancelled" ||
+                !all.some(
+                  (b) =>
+                    b.status !== "cancelled" &&
+                    b.start < a.start + a.minutes &&
+                    a.start < b.start + b.minutes,
+                ),
+            );
             const pos = lanes(events);
             return (
               <div
@@ -263,11 +304,18 @@ function WeekGrid({
                       : p.of === 2
                         ? pt.name.split(" ").slice(1).join(" ")
                         : pt.name
-                    : short
-                      ? a.title
-                      : head;
+                    : p.of >= 3
+                      ? BLOCK_ABBR[a.type]![p.of >= 4 ? 1 : 0]
+                      : short && p.of === 1
+                        ? a.title
+                        : head;
                   const live = a.status === "booked" || a.status === "checked-in";
-                  const due = live && !!a.measureDue && !(pt && store.sent[pt.id]);
+                  // In a narrow lane the risk shield outranks the measure dot.
+                  const due =
+                    live &&
+                    !!a.measureDue &&
+                    !(pt && store.sent[pt.id]) &&
+                    (p.of === 1 || (!r && p.of < 3));
                   const struck = a.status === "no-show" || a.status === "cancelled";
                   const cls = [
                     "sc-ev",
@@ -298,7 +346,7 @@ function WeekGrid({
                       }}
                     >
                       <span className="sc-evTop" aria-hidden="true">
-                        {short && p.of < 3 ? (
+                        {short && p.of === 1 ? (
                           <span className="mono sc-evT">{hhmm(a.start)}</span>
                         ) : null}
                         <span className="sc-evName">{name}</span>
@@ -307,7 +355,7 @@ function WeekGrid({
                           <ShieldAlert className="sc-evRisk" size={11} strokeWidth={2.2} />
                         ) : null}
                       </span>
-                      {!short ? (
+                      {!short && p.of < 4 ? (
                         <span className="sc-evMeta mono" aria-hidden="true">
                           {hhmm(a.start)}
                           {p.of === 1 ? ` · ${a.minutes}m` : ""}
@@ -416,16 +464,31 @@ function Agenda({
                 <PatientLink
                   p={p}
                   size={22}
-                  sub={`${TYPES[a.type].label} · ${a.modality}${filter === "all" ? ` · ${clinicianShort(a.clinician)}` : ""}`}
+                  sub={
+                    <>
+                      <span className="sc-long">{TYPES[a.type].label}</span>
+                      <span className="sc-short">{TYPES[a.type].short}</span>
+                      {` · ${a.modality}${filter === "all" ? ` · ${clinicianShort(a.clinician)}` : ""}`}
+                    </>
+                  }
                 />
               ) : (
-                <>
-                  <b className="sc-agTitle">{a.title}</b>
-                  <span>
-                    {TYPES[a.type].label} · {span(a)}
-                    {filter === "all" ? ` · ${clinicianShort(a.clinician)}` : ""}
+                <div className="sc-agBlock">
+                  <span className="sc-agIc" aria-hidden="true">
+                    {a.type === "admin" ? (
+                      <Clock size={12} strokeWidth={1.8} />
+                    ) : (
+                      <Users size={12} strokeWidth={1.8} />
+                    )}
                   </span>
-                </>
+                  <span className="sc-agBlockText">
+                    <b className="sc-agTitle">{a.title}</b>
+                    <span>
+                      {BLOCK_SUB[a.type]}
+                      {filter === "all" ? ` · ${clinicianShort(a.clinician)}` : ""}
+                    </span>
+                  </span>
+                </div>
               )}
             </div>
             <div className="sc-agTags">
@@ -440,7 +503,11 @@ function Agenda({
               ) : a.measureDue && a.status !== "cancelled" && a.status !== "completed" ? (
                 <Pill sev="high">{a.measureDue}</Pill>
               ) : null}
-              <Status sev={STATUS[a.status].sev}>{STATUS[a.status].label}</Status>
+              {p ? (
+                <Status sev={STATUS[a.status].sev}>{STATUS[a.status].label}</Status>
+              ) : (
+                <Status sev={isPast(a) ? "unk" : "low"}>{isPast(a) ? "Done" : "Upcoming"}</Status>
+              )}
             </div>
             <button
               type="button"
@@ -464,11 +531,13 @@ function TodayCard({
   filter,
   onOpen,
   onDay,
+  showingToday,
 }: {
   list: readonly Appt[];
   filter: Filter;
   onOpen: (id: string) => void;
   onDay: (day: number) => void;
+  showingToday: boolean;
 }) {
   const today = list.filter((a) => a.day === 0 && shows(filter)(a));
   const sessions = today.filter((a) => a.patient && a.status !== "cancelled");
@@ -501,13 +570,17 @@ function TodayCard({
         <ul className="sc-mini">
           {shown.map((a) => (
             <li key={a.id}>
-              <button type="button" className="rowBtn sc-miniRow" onClick={() => onOpen(a.id)}>
+              <button
+                type="button"
+                className={`rowBtn sc-miniRow s-${a.status}`}
+                onClick={() => onOpen(a.id)}
+              >
                 <span className="mono sc-miniT">{hhmm(a.start)}</span>
                 <span className={`sc-miniDot ${typeClass(a)}`} aria-hidden="true" />
                 <span className="sc-miniName">{nameOf(a)}</span>
                 <span className="sc-miniSt">
-                  {a.status === "checked-in"
-                    ? "Checked in"
+                  {a.status === "checked-in" || a.status === "no-show" || a.status === "cancelled"
+                    ? STATUS[a.status].label
                     : filter === "all"
                       ? CLINICIANS[a.clinician].initials
                       : a.patient
@@ -521,11 +594,13 @@ function TodayCard({
       ) : (
         <p className="sc-quiet">Nothing left today.</p>
       )}
-      <div className="sc-cardFoot">
-        <button type="button" className="linkBtn" onClick={() => onDay(0)}>
-          {upcoming.length > shown.length ? `All ${today.length} in day view` : "Open day view"}
-        </button>
-      </div>
+      {showingToday ? null : (
+        <div className="sc-cardFoot sc-todayFoot">
+          <button type="button" className="linkBtn" onClick={() => onDay(0)}>
+            {upcoming.length > shown.length ? `All ${today.length} in day view` : "Open day view"}
+          </button>
+        </div>
+      )}
     </section>
   );
 }
@@ -555,7 +630,6 @@ function DueCard({ list, filter }: { list: readonly Appt[]; filter: Filter }) {
     <section className={`card sc-card sc-due${closed ? "" : " is-open"}`} aria-labelledby="sc-due">
       <div className="cardTop">
         <h3 id="sc-due">Due before your next session</h3>
-        {upcoming ? <span className="sc-cardSub mono">next {hhmm(upcoming.start)}</span> : null}
       </div>
       <div className="sc-dueBody">
         <PatientLink p={p} size={28} sub={`${risk.what} · opened ${risk.opened}`} />
@@ -582,6 +656,11 @@ function DueCard({ list, filter }: { list: readonly Appt[]; filter: Filter }) {
           </>
         )}
       </div>
+      {upcoming ? (
+        <div className="sc-cardFoot sc-quiet">
+          Next session {hhmm(upcoming.start)} · {nameOf(upcoming)}
+        </div>
+      ) : null}
     </section>
   );
 }
@@ -656,6 +735,7 @@ function ApptSheet({
   appt,
   list,
   onClose,
+  onOpen,
   onChange,
   onRebook,
   onFollowUp,
@@ -664,6 +744,7 @@ function ApptSheet({
   appt: Appt | null;
   list: readonly Appt[];
   onClose: () => void;
+  onOpen: (id: string) => void;
   onChange: (id: string, patch: Partial<Appt>) => void;
   onRebook: (from: Appt, day: number, start: number) => void;
   onFollowUp: (patientId: string) => void;
@@ -681,26 +762,27 @@ function ApptSheet({
   }
 
   const a = appt;
-  const p = a ? patientOf(a) : null;
-
-  if (!a)
+  if (!a) {
     return (
       <Sheet open={false} onClose={onClose} title="Appointment">
         {null}
       </Sheet>
     );
+  }
 
-  const sub = `${dayName(a.day)} · ${span(a)}`;
+  const p = patientOf(a);
+  const when = `${dayName(a.day)} · ${span(a)}`;
 
   if (!p) {
     const other: ClinicianId | null =
       a.type === "supervision" ? (a.clinician === "lake" ? "osei" : "lake") : null;
+    const [head, tail] = (a.title ?? "").split(" · ");
     return (
       <Sheet
         open
         onClose={onClose}
-        title={a.title}
-        sub={sub}
+        title={head}
+        sub={when}
         footer={
           <>
             {other ? (
@@ -724,12 +806,24 @@ function ApptSheet({
         }
       >
         <div className="sheetSection">
-          <KV k="When">{sub}</KV>
-          <KV k="Type">{TYPES[a.type].label}</KV>
+          <h4>Details</h4>
+          {a.type === "supervision" ? <KV k="With">{CLINICIANS[other!].name}</KV> : null}
+          {a.type === "admin" ? <KV k="Purpose">Notes and letters</KV> : null}
+          {a.type === "group" ? <KV k="Programme">{tail}</KV> : null}
           <KV k="Clinician">{CLINICIANS[a.clinician].name}</KV>
+          <KV k="Length">{a.minutes} min</KV>
           {a.type === "group" ? <KV k="Roster">8 enrolled · Room 2</KV> : null}
-          <KV k="Status">{isPast(a) ? "Done" : "Upcoming"}</KV>
+          <KV k="Status">
+            <Status sev={isPast(a) ? "unk" : "low"}>{isPast(a) ? "Done" : "Upcoming"}</Status>
+          </KV>
         </div>
+        <p className="sc-quiet">
+          {a.type === "admin"
+            ? "Protected time. The booking form never offers it."
+            : a.type === "supervision"
+              ? "Held weekly. Both calendars show it."
+              : "Runs weekly. Members book it through their clinician."}
+        </p>
       </Sheet>
     );
   }
@@ -739,10 +833,13 @@ function ApptSheet({
   const today = a.day === 0;
   const live = a.status === "booked" || a.status === "checked-in";
   const tele = a.modality === "Telehealth";
-  const measureCode = p.instrument;
+  const code = p.instrument;
   const base = Math.max(a.day, 0);
   const moveDays = isWeekend(base) ? [nextWeekday(base)] : [base, nextWeekday(base)];
   const rebooking = a.status === "no-show" || a.status === "cancelled";
+  const score = latest(p);
+  const history = list.filter((x) => x.patient === p.id && x.id !== a.id).slice(0, 5);
+  const track = TRACK[p.track];
 
   const startNote = () => {
     onClose();
@@ -750,226 +847,288 @@ function ApptSheet({
     else go({ screen: "record", patient: p.id, view: "notes" });
   };
 
-  return (
-    <Sheet
-      open
-      onClose={onClose}
-      title={p.name}
-      sub={`${TYPES[a.type].label} · ${sub}`}
-      footer={
-        <>
-          <button type="button" className="btn ghost" onClick={onClose}>
-            Close
+  let footer: React.ReactNode;
+  if (panel === "move") {
+    footer = (
+      <button type="button" className="btn ghost" onClick={() => setPanel("none")}>
+        Back
+      </button>
+    );
+  } else if (panel === "cancel") {
+    footer = (
+      <>
+        <button type="button" className="btn ghost" onClick={() => setPanel("none")}>
+          Keep it
+        </button>
+        <button
+          type="button"
+          className="btn danger sc-dangerBtn"
+          onClick={() => {
+            onChange(a.id, { status: "cancelled", reason });
+            setPanel("none");
+            toast(`Cancelled · ${p.name} ${hhmm(a.start)}`);
+          }}
+        >
+          Cancel appointment
+        </button>
+      </>
+    );
+  } else if (a.status === "booked") {
+    footer = (
+      <>
+        <button
+          type="button"
+          className="btn ghost sc-danger sc-footLead"
+          onClick={() => setPanel("cancel")}
+        >
+          Cancel
+        </button>
+        {today ? (
+          <button
+            type="button"
+            className="btn ghost"
+            onClick={() => {
+              onChange(a.id, { status: "no-show" });
+              toast(`${p.name} marked no-show`);
+            }}
+          >
+            No-show
           </button>
-          {a.status === "completed" ? (
-            <button type="button" className="btn primary" onClick={() => onFollowUp(p.id)}>
-              Book follow-up
-            </button>
-          ) : a.status !== "cancelled" && a.status !== "no-show" ? (
-            <button type="button" className="btn primary" onClick={startNote}>
-              Start note
-            </button>
-          ) : (
-            <button type="button" className="btn primary" onClick={() => setPanel("move")}>
-              Rebook
-            </button>
-          )}
-        </>
-      }
-    >
-      <div className="sheetSection">
-        <PatientLink p={p} size={36} sub={`${p.program} · ${p.full}`} />
-      </div>
-
-      <div className="sheetSection">
-        <h4>Appointment</h4>
-        <KV k="When">{sub}</KV>
-        <KV k="Type">{TYPES[a.type].label}</KV>
-        <KV k="Modality">{a.modality}</KV>
-        <KV k="Clinician">{CLINICIANS[a.clinician].name}</KV>
-        <KV k="Status">
-          <Status sev={STATUS[a.status].sev}>{STATUS[a.status].label}</Status>
-          {a.reason ? <span className="sc-reason"> · {a.reason}</span> : null}
-        </KV>
-        <KV k="Measure">
-          {sent
-            ? `${sent} sent`
-            : a.measureDue && a.status !== "completed"
-              ? a.measureDue
-              : "None due"}
-        </KV>
-        <KV k="Last score">
-          <span className="mono">{reading(p)}</span>
-        </KV>
-        {r ? (
-          <KV k="Risk">
-            <button
-              type="button"
-              className="linkBtn sc-riskLink"
-              onClick={() => go({ screen: "safety", view: r.id })}
-            >
-              {r.what} · due {dueLabel(r)}
-            </button>
-          </KV>
         ) : null}
+        <button type="button" className="btn ghost" onClick={() => setPanel("move")}>
+          Reschedule
+        </button>
+        {today ? (
+          <button
+            type="button"
+            className="btn primary"
+            onClick={() => {
+              onChange(a.id, { status: "checked-in" });
+              toast(`${p.name} checked in · ${stamp(1)}`);
+            }}
+          >
+            Check in
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="btn primary"
+            onClick={() => toast(`Reminder sent to ${p.name}`)}
+          >
+            Send reminder
+          </button>
+        )}
+      </>
+    );
+  } else if (a.status === "checked-in") {
+    footer = (
+      <>
+        <button
+          type="button"
+          className="btn ghost sc-footLead"
+          onClick={() => {
+            onChange(a.id, { status: "booked" });
+            toast(`Check-in undone · ${p.name}`);
+          }}
+        >
+          Undo check-in
+        </button>
+        <button type="button" className="btn primary" onClick={startNote}>
+          Start note
+        </button>
+      </>
+    );
+  } else if (a.status === "completed") {
+    footer = (
+      <>
+        <button type="button" className="btn ghost" onClick={startNote}>
+          Open notes
+        </button>
+        <button type="button" className="btn primary" onClick={() => onFollowUp(p.id)}>
+          Book follow-up
+        </button>
+      </>
+    );
+  } else {
+    footer = (
+      <>
+        {a.status === "no-show" ? (
+          <button
+            type="button"
+            className="btn ghost"
+            onClick={() => toast(`Outreach message sent to ${p.name}`)}
+          >
+            Message patient
+          </button>
+        ) : null}
+        <button type="button" className="btn primary" onClick={() => setPanel("move")}>
+          Rebook
+        </button>
+      </>
+    );
+  }
+
+  return (
+    <Sheet open onClose={onClose} title={TYPES[a.type].label} sub={when} footer={footer}>
+      <div className="sc-ptRow">
+        <PatientLink p={p} size={36} sub={`${p.program} · ${p.pronouns}`} />
+        <Status sev={track.sev}>{track.label[0]!.toUpperCase() + track.label.slice(1)}</Status>
       </div>
 
-      <div className="sheetSection">
-        <h4>Actions</h4>
-        <div className="sc-actions">
-          {a.status === "booked" && today ? (
-            <button
-              type="button"
-              className="btn ghost sm"
-              onClick={() => {
-                onChange(a.id, { status: "checked-in" });
-                toast(`${p.name} checked in · ${stamp(1)}`);
-              }}
-            >
-              Check in
-            </button>
-          ) : null}
-          {a.status === "booked" && !today ? (
-            <button
-              type="button"
-              className="btn ghost sm"
-              onClick={() => toast(`Reminder sent to ${p.name}`)}
-            >
-              Send reminder
-            </button>
-          ) : null}
-          {live && tele ? (
-            <button
-              type="button"
-              className="btn ghost sm"
-              onClick={() => toast(`Link sent to ${p.name}`)}
-            >
-              Send telehealth link
-            </button>
-          ) : null}
-          {live && a.measureDue && !sent ? (
-            <button
-              type="button"
-              className="btn ghost sm"
-              onClick={() => {
-                patch((s) => ({ ...s, sent: { ...s.sent, [p.id]: measureCode } }));
-                toast(`${measureCode} sent to ${p.name}`);
-              }}
-            >
-              Send {measureCode}
-            </button>
-          ) : null}
-          {a.status !== "completed" ? (
-            <button
-              type="button"
-              className="btn ghost sm"
-              aria-expanded={panel === "move"}
-              onClick={() => setPanel(panel === "move" ? "none" : "move")}
-            >
-              {rebooking ? "Rebook" : "Reschedule"}
-            </button>
-          ) : (
-            <button type="button" className="btn ghost sm" onClick={startNote}>
-              Open notes
-            </button>
-          )}
-          {live && today ? (
-            <button
-              type="button"
-              className="btn ghost sm"
-              onClick={() => {
-                onChange(a.id, { status: "no-show" });
-                toast(`${p.name} marked no-show`);
-              }}
-            >
-              Mark no-show
-            </button>
-          ) : null}
-          {live ? (
-            <button
-              type="button"
-              className="btn ghost sm sc-danger"
-              aria-expanded={panel === "cancel"}
-              onClick={() => setPanel(panel === "cancel" ? "none" : "cancel")}
-            >
-              Cancel
-            </button>
-          ) : null}
+      {panel === "move" ? (
+        <div className="sheetSection">
+          <h4>{rebooking ? "Rebook into" : "Move to"}</h4>
+          {moveDays.map((d) => {
+            const slots = freeSlots(
+              list,
+              a.clinician,
+              d,
+              a.minutes,
+              rebooking ? undefined : a.id,
+            ).filter((t) => rebooking || d !== a.day || t !== a.start);
+            return (
+              <div key={d} className="sc-slotDay">
+                <p className="sc-slotLabel">
+                  {dayName(d)}
+                  <span>
+                    {slots.length} free · {a.minutes} min
+                  </span>
+                </p>
+                {slots.length ? (
+                  <div className="sc-slots">
+                    {slots.map((t) => (
+                      <button
+                        key={t}
+                        type="button"
+                        className="chip"
+                        aria-label={`${rebooking ? "Rebook" : "Move"} to ${dayName(d)} ${hhmm(t)}`}
+                        onClick={() => {
+                          setPanel("none");
+                          if (rebooking) onRebook(a, d, t);
+                          else {
+                            onChange(a.id, { day: d, start: t, status: "booked" });
+                            toast(`Moved to ${dayName(d)} ${hhmm(t)}`);
+                          }
+                        }}
+                      >
+                        {hhmm(t)}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="sc-quiet">{CLINICIANS[a.clinician].short} is fully booked.</p>
+                )}
+              </div>
+            );
+          })}
         </div>
-
-        {panel === "move" ? (
-          <div className="sc-inline">
-            {moveDays.map((d) => {
-              const slots = freeSlots(
-                list,
-                a.clinician,
-                d,
-                a.minutes,
-                rebooking ? undefined : a.id,
-              ).slice(0, 10);
-              return (
-                <div key={d} className="sc-slotDay">
-                  <p className="sc-slotLabel">{dayName(d)}</p>
-                  {slots.length ? (
-                    <div className="sc-slots">
-                      {slots.map((t) => (
-                        <button
-                          key={t}
-                          type="button"
-                          className="chip mono"
-                          aria-label={`${rebooking ? "Rebook" : "Move"} to ${dayName(d)} ${hhmm(t)}`}
-                          onClick={() => {
-                            setPanel("none");
-                            if (rebooking) onRebook(a, d, t);
-                            else {
-                              onChange(a.id, { day: d, start: t, status: "booked" });
-                              toast(`Moved to ${dayName(d)} ${hhmm(t)}`);
-                            }
-                          }}
-                        >
-                          {hhmm(t)}
-                        </button>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="sc-quiet">No free slots.</p>
-                  )}
-                </div>
-              );
-            })}
+      ) : panel === "cancel" ? (
+        <div className="sheetSection">
+          <h4>Cancel appointment</h4>
+          <div className="field">
+            <span aria-hidden="true">Reason</span>
+            <Select
+              label="Cancellation reason"
+              value={reason}
+              onChange={setReason}
+              options={CANCEL_REASONS.map((x) => ({ value: x, label: x }))}
+            />
           </div>
-        ) : null}
-
-        {panel === "cancel" ? (
-          <div className="sc-inline">
-            <div className="field">
-              <span aria-hidden="true">Reason</span>
-              <Select
-                label="Cancellation reason"
-                value={reason}
-                onChange={setReason}
-                options={CANCEL_REASONS.map((x) => ({ value: x, label: x }))}
-              />
-            </div>
-            <div className="sc-actions">
-              <button type="button" className="btn ghost sm" onClick={() => setPanel("none")}>
-                Keep appointment
-              </button>
-              <button
-                type="button"
-                className="btn danger sm"
-                onClick={() => {
-                  onChange(a.id, { status: "cancelled", reason });
-                  setPanel("none");
-                  toast(`Cancelled · ${p.name} ${hhmm(a.start)}`);
-                }}
-              >
-                Cancel appointment
-              </button>
-            </div>
+          <p className="sc-quiet sc-note">
+            {p.name} is told by text. The slot goes back into {CLINICIANS[a.clinician].short}’s free
+            time.
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className="sheetSection">
+            <h4>Details</h4>
+            <KV k="Status">
+              <Status sev={STATUS[a.status].sev}>{STATUS[a.status].label}</Status>
+              {a.reason ? <span className="sc-reason"> · {a.reason}</span> : null}
+            </KV>
+            <KV k="Modality">
+              {a.modality}
+              {live && tele ? (
+                <>
+                  {" · "}
+                  <button
+                    type="button"
+                    className="linkBtn sc-rowAct"
+                    onClick={() => toast(`Link sent to ${p.name}`)}
+                  >
+                    Send link
+                  </button>
+                </>
+              ) : null}
+            </KV>
+            <KV k="Clinician">{CLINICIANS[a.clinician].name}</KV>
+            <KV k="Measure">
+              {sent ? (
+                `${sent} sent`
+              ) : live && a.measureDue ? (
+                <>
+                  {a.measureDue}
+                  {" · "}
+                  <button
+                    type="button"
+                    className="linkBtn sc-rowAct"
+                    onClick={() => {
+                      patch((s) => ({ ...s, sent: { ...s.sent, [p.id]: code } }));
+                      toast(`${code} sent to ${p.name}`);
+                    }}
+                  >
+                    Send {code}
+                  </button>
+                </>
+              ) : (
+                "None due"
+              )}
+            </KV>
+            <KV k="Last score">
+              {score === null
+                ? "Awaiting baseline"
+                : `${code} ${score} · ${band(code, score).label}`}
+            </KV>
+            {r ? (
+              <KV k="Risk">
+                <button
+                  type="button"
+                  className="linkBtn sc-riskLink"
+                  onClick={() => go({ screen: "safety", view: r.id })}
+                >
+                  {r.what} · due {dueLabel(r)}
+                </button>
+              </KV>
+            ) : null}
           </div>
-        ) : null}
-      </div>
+
+          <div className="sheetSection">
+            <h4>Other sessions, 03–21 Aug</h4>
+            {history.length ? (
+              <ul className="sc-hist">
+                {history.map((x) => (
+                  <li key={x.id}>
+                    <button
+                      type="button"
+                      className="rowBtn sc-histRow"
+                      onClick={() => onOpen(x.id)}
+                    >
+                      <span className="sc-histWhen">
+                        {dayName(x.day)} · {hhmm(x.start)}
+                      </span>
+                      <span className="sc-histType">{TYPES[x.type].short}</span>
+                      <Status sev={STATUS[x.status].sev}>{STATUS[x.status].label}</Status>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="sc-quiet">None in the book.</p>
+            )}
+          </div>
+        </>
+      )}
     </Sheet>
   );
 }
@@ -1121,7 +1280,7 @@ function NewAppt({
         </div>
         <p className="sc-quiet">
           {slots.length} free {slots.length === 1 ? "slot" : "slots"} for {CLINICIANS[clin].short}{" "}
-          on {dayName(day)}. Last score <span className="mono">{reading(p)}</span>.
+          on {dayName(day)}. Last score {reading(p)}.
         </p>
       </div>
     </Sheet>
@@ -1214,8 +1373,7 @@ export function ScheduleScreen() {
   };
 
   const dayOptions = weekDays.map((d) => ({
-    value: String(d),
-    label: `${dayShort(d)} ${dayName(d).slice(4, 6)}`,
+    day: d,
     count: list.filter(
       (a) => a.day === d && a.patient && a.status !== "cancelled" && shows(filter)(a),
     ).length,
@@ -1317,12 +1475,22 @@ export function ScheduleScreen() {
                 ) : null}
                 <div className={mode === "week" ? "sc-dayOnly" : "sc-dayWrap"}>
                   <div className="sc-dayChips">
-                    <Chips
-                      label="Day"
-                      options={dayOptions}
-                      value={String(day)}
-                      onChange={(v) => setDay(Number(v))}
-                    />
+                    <div className="chips sc-days" role="group" aria-label="Day">
+                      {dayOptions.map((o) => (
+                        <button
+                          key={o.day}
+                          type="button"
+                          className="chip sc-dayChip"
+                          aria-pressed={o.day === day}
+                          aria-label={`${dayName(o.day)}, ${o.count} sessions`}
+                          onClick={() => setDay(o.day)}
+                        >
+                          <span>{dayShort(o.day)}</span>
+                          <span>{dayName(o.day).slice(4, 6)}</span>
+                          <span className="chipCount">{o.count}</span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                   <Agenda
                     day={day}
@@ -1360,7 +1528,13 @@ export function ScheduleScreen() {
           </section>
 
           <aside className="sc-side" aria-label="Today and calendar">
-            <TodayCard list={list} filter={filter} onOpen={setOpenId} onDay={openDay} />
+            <TodayCard
+              list={list}
+              filter={filter}
+              onOpen={setOpenId}
+              onDay={openDay}
+              showingToday={mode === "day" && day === 0}
+            />
             <DueCard list={list} filter={filter} />
             <MonthCard list={list} filter={filter} selected={day} onPick={pickDay} />
           </aside>
@@ -1371,6 +1545,11 @@ export function ScheduleScreen() {
         appt={openAppt}
         list={list}
         onClose={() => setOpenId(null)}
+        onOpen={(id) => {
+          const x = list.find((y) => y.id === id);
+          if (x) reveal(x);
+          setOpenId(id);
+        }}
         onChange={(id, patch) => {
           setList((l) => l.map((a) => (a.id === id ? { ...a, ...patch } : a)));
           // A moved session takes the view with it.

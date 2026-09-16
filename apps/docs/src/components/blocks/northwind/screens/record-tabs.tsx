@@ -18,12 +18,13 @@ import {
   details,
   documents,
   engagement,
-  identity,
   isOkonkwo,
   meds,
   notes,
   openRisk,
   presenting,
+  presentingShort,
+  recentEvents,
   problems,
   response,
   safetyPlan,
@@ -206,7 +207,8 @@ export function OverviewPanel({ ctx }: { ctx: RecordCtx }) {
   const clin = CLINICIANS[p.clinician];
   const risk = openRisk(p, store.resolved);
   const reading = response(p);
-  const events = chronology(p, store.signed).slice(0, 5);
+  const events = recentEvents(p, store.signed);
+  const total = chronology(p, store.signed).length;
   const probs = problems(p);
   const medList = meds(p);
   const eng = engagement(p);
@@ -235,7 +237,7 @@ export function OverviewPanel({ ctx }: { ctx: RecordCtx }) {
         <section className="card" aria-label="Treatment response">
           <div className="cardTop">
             <h4>Treatment response</h4>
-            <Pill sev={reading.sev}>{reading.label}</Pill>
+            {p.scores.length ? <Pill sev={reading.sev}>{reading.label}</Pill> : null}
           </div>
           <div className="chartWrap">{ok ? <TrajectoryOne /> : <Trajectory p={p} />}</div>
           <p className="miniLegend">
@@ -307,10 +309,14 @@ export function OverviewPanel({ ctx }: { ctx: RecordCtx }) {
           </div>
           <p className="miniLegend">
             <span>
-              <b className="rc-ink">This view is partial.</b>{" "}
+              {ok || events.length < total ? (
+                <b className="rc-ink">This view is partial. </b>
+              ) : null}
               {ok
                 ? "Two sources are filtered out and one is withheld. The chronology says so rather than presenting itself as the record."
-                : "Showing the five most recent events. The full timeline is on the Chronology tab."}
+                : events.length < total
+                  ? `Showing ${events.length} of ${total} events. The full timeline is on the Chronology tab.`
+                  : "Every event so far is shown."}
             </span>
           </p>
         </section>
@@ -405,7 +411,7 @@ export function OverviewPanel({ ctx }: { ctx: RecordCtx }) {
                     )}
                   </div>
                 </AccItem>
-                <AccItem sev="low" title="Presenting concerns" summary={p.program}>
+                <AccItem sev="low" title="Presenting concerns" summary={presentingShort(p)}>
                   <p className="accInner">{presenting(p)}</p>
                 </AccItem>
               </>
@@ -454,7 +460,7 @@ export function OverviewPanel({ ctx }: { ctx: RecordCtx }) {
               name: clin.name,
               role:
                 p.clinician === "tash"
-                  ? "Primary clinician and prescriber · Northwind"
+                  ? "Clinician and prescriber · Northwind"
                   : "Primary clinician · Northwind",
               tag: p.clinician === "lake" ? "On call" : "",
             },
@@ -512,7 +518,7 @@ export function OverviewPanel({ ctx }: { ctx: RecordCtx }) {
             <div className="meter">
               <div className="meterTop">
                 <span className="k">Cadence held</span>
-                <span className="v">{p.cadence.toLowerCase()}</span>
+                <span className="v rc-word">{p.cadence.toLowerCase()}</span>
               </div>
               <div className="meterTrk">
                 <i
@@ -617,10 +623,21 @@ export function ChronologyPanel({ ctx }: { ctx: RecordCtx }) {
         )}
         <p className="miniLegend">
           <span>
-            <b className="rc-ink">This view is partial.</b>{" "}
-            {hidden ? `${hidden} sources are filtered out` : "No sources are filtered out"}
-            {isOkonkwo(ctx.p) ? " and one is withheld under 42 CFR Part 2." : "."} The chronology
-            says so rather than presenting itself as the record.
+            {hidden || isOkonkwo(ctx.p) ? (
+              <>
+                <b className="rc-ink">This view is partial.</b>{" "}
+                {[
+                  hidden ? "Three sources are filtered out" : "",
+                  isOkonkwo(ctx.p) ? "one is withheld under 42 CFR Part 2" : "",
+                ]
+                  .filter(Boolean)
+                  .join(" and ")
+                  .replace(/^o/, "O")}
+                . The chronology says so rather than presenting itself as the record.
+              </>
+            ) : (
+              "All four sources are shown."
+            )}
           </span>
         </p>
       </section>
@@ -656,7 +673,7 @@ export function MeasuresPanel({ ctx }: { ctx: RecordCtx }) {
           </button>
         </div>
         {rows.length ? (
-          <div className="dtScroll">
+          <div className="dtScroll" tabIndex={0} role="region" aria-label="Administrations table">
             <table className="dt">
               <thead>
                 <tr>
@@ -678,7 +695,7 @@ export function MeasuresPanel({ ctx }: { ctx: RecordCtx }) {
                     <td>
                       <Status sev={r.sev}>{r.band}</Status>
                     </td>
-                    <td className="mono">{r.change}</td>
+                    <td className={/^[↑↓]/.test(r.change) ? "mono" : undefined}>{r.change}</td>
                   </tr>
                 ))}
               </tbody>
@@ -694,7 +711,7 @@ export function MeasuresPanel({ ctx }: { ctx: RecordCtx }) {
       <section className="card" aria-label="Trajectory">
         <div className="cardTop">
           <h4>Trajectory</h4>
-          <Pill sev={reading.sev}>{reading.label}</Pill>
+          {p.scores.length ? <Pill sev={reading.sev}>{reading.label}</Pill> : null}
         </div>
         <div className="chartWrap">{isOkonkwo(p) ? <TrajectoryOne /> : <Trajectory p={p} />}</div>
       </section>
@@ -729,7 +746,7 @@ export function NotesPanel({ ctx }: { ctx: RecordCtx }) {
             {rows.map((n) => {
               const toNote = n.id === "okonkwo-0812" && n.status === "unsigned";
               return (
-                <li key={n.id} className="rc-item">
+                <li key={n.id} className="rc-item rc-noteItem">
                   <button
                     type="button"
                     className="rowBtn rc-itemMain"
@@ -806,19 +823,17 @@ export function MedicationsPanel({ ctx }: { ctx: RecordCtx }) {
         <div className="cardTop">
           <h4>Medication list</h4>
           <div className="rc-actions">
-            {reconciled ? <Pill sev="norm">Reconciled today</Pill> : null}
-            <button
-              type="button"
-              className="btn ghost sm"
-              disabled={Boolean(reconciled)}
-              onClick={reconcile}
-            >
-              {reconciled ? `Reconciled · ${reconciled}` : "Reconcile"}
-            </button>
+            {reconciled ? (
+              <Pill sev="norm">Reconciled today · {reconciled}</Pill>
+            ) : list.length ? (
+              <button type="button" className="btn ghost sm" onClick={reconcile}>
+                Reconcile
+              </button>
+            ) : null}
           </div>
         </div>
         {list.length ? (
-          <div className="dtScroll">
+          <div className="dtScroll" tabIndex={0} role="region" aria-label="Medication list table">
             <table className="dt">
               <thead>
                 <tr>
@@ -837,7 +852,9 @@ export function MedicationsPanel({ ctx }: { ctx: RecordCtx }) {
                     <td>{m.route}</td>
                     <td className="mono">{m.since}</td>
                     <td>
-                      <Status sev={MED_SEV[m.status]}>{m.status}</Status>
+                      <Status sev={MED_SEV[m.status]}>
+                        {m.until ? `${m.status} ${m.until}` : m.status}
+                      </Status>
                     </td>
                   </tr>
                 ))}
@@ -896,7 +913,7 @@ export function SafetyPanel({ ctx }: { ctx: RecordCtx }) {
             {plan.sections.map((s, i) => (
               <AccItem
                 key={s.title}
-                sev={i === 3 ? "high" : "low"}
+                sev="unk"
                 title={s.title}
                 summary={s.summary}
                 defaultOpen={i === 0}
@@ -940,7 +957,7 @@ export function DocumentsPanel({ ctx }: { ctx: RecordCtx }) {
         </div>
         <ul className="rc-list">
           {documents(p).map((d) => (
-            <li key={d.id} className="rc-item">
+            <li key={d.id} className="rc-item rc-docItem">
               <button
                 type="button"
                 className="rowBtn rc-itemMain"
@@ -949,7 +966,7 @@ export function DocumentsPanel({ ctx }: { ctx: RecordCtx }) {
                 <span className="rc-docIc" aria-hidden="true" />
                 <span className="rc-itemText">
                   <span className="rc-itemTitle">{d.title}</span>
-                  <span className="rc-itemSub">PDF</span>
+                  <span className="rc-itemSub">{d.onFile ? "PDF" : "No file yet"}</span>
                 </span>
                 <Status sev={d.sev}>{d.status}</Status>
               </button>
@@ -980,7 +997,7 @@ export function BillingPanel({ ctx }: { ctx: RecordCtx }) {
           </span>
         </div>
         {rows.length ? (
-          <div className="dtScroll">
+          <div className="dtScroll" tabIndex={0} role="region" aria-label="Claims table">
             <table className="dt">
               <thead>
                 <tr>
@@ -1013,11 +1030,7 @@ export function BillingPanel({ ctx }: { ctx: RecordCtx }) {
         ) : (
           <EmptyState title="No claims yet">The first claim follows the intake visit.</EmptyState>
         )}
-        <p className="miniLegend">
-          {rows.length ? `Last ${rows.length} claims, one per session` : "No sessions billed"} ·{" "}
-          {p.payer} ·{" "}
-          {identity(p).lastSeen === "—" ? "not yet seen" : `last seen ${identity(p).lastSeen}`}
-        </p>
+        <p className="miniLegend">One claim per session, newest first. Billed to {p.payer}.</p>
       </section>
     </div>
   );

@@ -10,6 +10,7 @@
  */
 
 import * as React from "react";
+import { Check } from "lucide-react";
 import { AttnRow, Instrument, Pill } from "../../kit";
 import { stamp, useNav } from "../shell";
 import { ScreenHead } from "../ui";
@@ -62,6 +63,7 @@ export function NoteScreen() {
   const [read, setRead] = React.useState(0);
   const signed = Boolean(store.signed[NOTE_ID]);
   const [draftAt, setDraftAt] = React.useState<string | null>(null);
+  const [signedAt, setSignedAt] = React.useState(stamp());
   const body = React.useRef<HTMLDivElement>(null);
 
   const measure = React.useCallback(() => {
@@ -84,6 +86,7 @@ export function NoteScreen() {
   const onHover = (s: string | null) => setHint(s ?? HINT);
 
   const sign = () => {
+    setSignedAt(stamp());
     patch((s) => ({ ...s, signed: { ...s.signed, [NOTE_ID]: true } }));
     toast(`Note signed · E. Lake · ${stamp()}`);
   };
@@ -105,7 +108,7 @@ export function NoteScreen() {
           </>
         }
         title="Progress note · 12 Aug 2026"
-        sub="R. Okonkwo · Individual therapy, 50 min · CPT 90834"
+        sub="Individual therapy, 50 min · CPT 90834 · E. Lake"
         actions={
           <>
             <button
@@ -132,9 +135,7 @@ export function NoteScreen() {
               <h3 id="nt-note">Session note</h3>
               <p>Every passage records where its text came from</p>
             </div>
-            <Pill sev={signed ? "norm" : "high"}>
-              {signed ? "Signed · E. Lake" : "Unsigned · 20h"}
-            </Pill>
+            <Pill sev={signed ? "norm" : "high"}>{signed ? "Signed" : "Unsigned · 20h"}</Pill>
           </div>
 
           <div className="note" ref={body} onScroll={measure}>
@@ -219,28 +220,44 @@ export function NoteScreen() {
                 <i style={{ width: `${read * 100}%` }} />
               </div>
             </div>
-            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-              {draftAt ? <span className="nt-saved">Draft saved {draftAt}</span> : null}
-              <button
-                type="button"
-                className="btn ghost"
-                disabled={signed}
-                onClick={() => {
-                  setDraftAt(stamp());
-                  toast("Draft saved");
-                }}
-              >
-                Save draft
-              </button>
-              <button
-                type="button"
-                className="btn primary"
-                disabled={!canSign || signed}
-                onClick={sign}
-              >
-                {signed ? "Signed · E. Lake" : canSign ? "Sign note ✓" : "Sign note"}
-              </button>
-            </div>
+            {signed ? (
+              // Signed is a state, not a disabled button: nothing here is waiting.
+              <p className="nt-signed">
+                <Check aria-hidden="true" size={14} strokeWidth={2} />
+                Signed by E. Lake at {signedAt} · locked
+              </p>
+            ) : (
+              <div className="nt-actions">
+                {draftAt ? (
+                  <span className="nt-saved">
+                    Draft saved <span className="mono">{draftAt}</span>
+                  </span>
+                ) : canSign ? null : (
+                  <span className="nt-saved" id="nt-gate">
+                    Read to the end to sign
+                  </span>
+                )}
+                <button
+                  type="button"
+                  className="btn ghost"
+                  onClick={() => {
+                    setDraftAt(stamp());
+                    toast("Draft saved");
+                  }}
+                >
+                  Save draft
+                </button>
+                <button
+                  type="button"
+                  className="btn primary"
+                  disabled={!canSign}
+                  aria-describedby={canSign ? undefined : "nt-gate"}
+                  onClick={sign}
+                >
+                  Sign note
+                </button>
+              </div>
+            )}
           </div>
         </section>
 
@@ -282,7 +299,7 @@ export function NoteScreen() {
             <div className="panelTop">
               <div>
                 <h3 id="nt-sup">Raised for supervision</h3>
-                <p>P. Osei · today 14:00</p>
+                <p>Supervision with P. Osei · today</p>
               </div>
               <button
                 type="button"
@@ -296,14 +313,14 @@ export function NoteScreen() {
               <AttnRow
                 sev="high"
                 text="Flat PHQ-9 against reported functional gain"
-                who="today 14:00"
-                clock="review"
+                who="to discuss"
+                clock="14:00"
               />
               <AttnRow
                 sev="unk"
                 text="Copied-forward sleep line contradicted in session"
                 who="resolved in note"
-                clock="fixed"
+                clock="12 Aug"
               />
             </div>
             <p className="miniLegend">

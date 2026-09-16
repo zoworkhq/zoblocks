@@ -89,7 +89,7 @@ export function BlockGallery({ blocks }: { blocks: readonly BlockDoc[] }) {
             <Link
               href={`/showcase/${block.slug}`}
               onClick={(e) => intercept(e, block)}
-              className="group block overflow-hidden rounded-2xl border border-rule bg-paper-sunk transition-all duration-500 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:border-rule-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+              className="group block h-full overflow-hidden rounded-2xl border border-rule bg-paper-sunk transition-all duration-500 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:border-rule-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
             >
               <div className="flex items-center justify-between gap-3 border-b border-rule px-4 py-3">
                 <span className="numeric text-[0.6875rem] tracking-wide text-brand-deep">
@@ -176,7 +176,7 @@ export function BlockGallery({ blocks }: { blocks: readonly BlockDoc[] }) {
 
           <div className="flex flex-1 justify-center overflow-auto p-5">
             <div
-              className="w-full overflow-hidden rounded-2xl border border-rule bg-paper shadow-[0_18px_40px_-20px_rgba(0,0,0,.5)] transition-[max-width] duration-500 ease-[var(--ease-out-expo)]"
+              className="w-full overflow-clip rounded-2xl border border-rule bg-paper shadow-[0_18px_40px_-20px_rgba(0,0,0,.5)] transition-[max-width] duration-500 ease-[var(--ease-out-expo)]"
               style={{
                 maxWidth: vp === "desktop" ? "1140px" : VIEWPORTS.find((v) => v.id === vp)?.width,
               }}
@@ -208,6 +208,14 @@ const PHONE_WIDTH = 390;
 function BlockThumb({ slug }: { slug: BlockSlug }) {
   const frame = React.useRef<HTMLDivElement>(null);
   const [width, setWidth] = React.useState<number | null>(null);
+  /**
+   * Mounted when the card nears the viewport, or once the page is idle.
+   *
+   * Every thumbnail is a whole application. Hydrating eleven of them at once
+   * held the main thread long enough that the page's reveal script started
+   * late, and content below the fold rendered visible and then faded out.
+   */
+  const [live, setLive] = React.useState(false);
 
   React.useEffect(() => {
     const el = frame.current;
@@ -219,7 +227,26 @@ function BlockThumb({ slug }: { slug: BlockSlug }) {
     return () => observer.disconnect();
   }, []);
 
-  const narrow = width !== null && width < THUMB_NARROW;
+  React.useEffect(() => {
+    const el = frame.current;
+    if (!el || live) return;
+    const near = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) setLive(true);
+      },
+      { rootMargin: "400px 0px" },
+    );
+    near.observe(el);
+    const idle = window.setTimeout(() => setLive(true), 2500);
+    return () => {
+      near.disconnect();
+      window.clearTimeout(idle);
+    };
+  }, [live]);
+
+  // A zero width is a card not laid out yet, not a narrow one: scaling by
+  // zero set the frame's height to Infinity.
+  const narrow = width !== null && width > 0 && width < THUMB_NARROW;
   const scale = narrow ? width / PHONE_WIDTH : THUMB_SCALE;
 
   return (
@@ -241,7 +268,7 @@ function BlockThumb({ slug }: { slug: BlockSlug }) {
             : { transform: `scale(${THUMB_SCALE})`, width: "192.3%", height: "192.3%" }
         }
       >
-        <BlockBody slug={slug} vp={narrow ? "mobile" : "desktop"} />
+        {live && width ? <BlockBody slug={slug} vp={narrow ? "mobile" : "desktop"} /> : null}
       </div>
     </div>
   );

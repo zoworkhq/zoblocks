@@ -15,6 +15,7 @@ import {
   CLINICIANS,
   PATIENTS,
   TRACK,
+  reading,
   type ClinicianId,
   type Patient,
   type Program,
@@ -32,7 +33,7 @@ import {
   TabPanel,
   Tabs,
 } from "../ui";
-import { BarShare, BarTarget, Status, Tile } from "../../kit";
+import { BarShare, BarTarget, Tile } from "../../kit";
 
 /* ---------------------------------------------------------------- model */
 
@@ -228,13 +229,34 @@ function monthly(period: Period) {
   return period === "12m" ? all : all.slice(-6);
 }
 
+/**
+ * The rendered width of a chart box. Charts draw at their real pixel width so
+ * axis text stays 10.5px on a phone instead of shrinking with the viewBox.
+ */
+function useWidth(fallback: number) {
+  const ref = React.useRef<HTMLDivElement>(null);
+  const [width, setWidth] = React.useState(fallback);
+  React.useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([entry]) => {
+      if (entry) setWidth(Math.max(260, Math.round(entry.contentRect.width)));
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  return [ref, width] as const;
+}
+
 function LineChart({ period }: { period: Period }) {
   const data = monthly(period);
   const [active, setActive] = React.useState<number | null>(null);
-  const W = 640;
-  const H = 210;
   const L = 36;
   const R = 18;
+  const [box, avail] = useWidth(640);
+  // Twelve points on a phone would sit closer than a 24px target; scroll instead.
+  const W = Math.max(avail, L + R + (data.length - 1) * 26);
+  const H = W < 480 ? 200 : 230;
   const T = 14;
   const B = 28;
   const lo = 40;
@@ -247,87 +269,93 @@ function LineChart({ period }: { period: Period }) {
   const cur = active === null ? null : data[active]!;
 
   return (
-    <div className="rp-lineBox">
-      <svg
-        className="chart"
-        viewBox={`0 0 ${W} ${H}`}
-        role="img"
-        aria-label={`Share responding by month, ${first.month} to ${last.month}: from ${first.share}% to ${last.share}%.`}
-      >
-        {[40, 50, 60, 70, 80].map((v) => (
-          <g key={v}>
-            <line
-              className={v === 50 ? "refline" : "gridline"}
-              x1={L}
-              x2={W - R}
-              y1={y(v)}
-              y2={y(v)}
-            />
-            <text className="axis rp-axis" x={L - 8} y={y(v) + 3.5} textAnchor="end">
-              {v}%
-            </text>
-          </g>
-        ))}
-        <text className="axis rp-axis" x={W - R} y={y(50) - 5} textAnchor="end">
-          benchmark 50%
-        </text>
-        <path
-          d={`M${x(0)},${y(data[0]!.share)} ${data.map((d, i) => `L${x(i)},${y(d.share)}`).join(" ")} L${x(data.length - 1)},${H - B} L${x(0)},${H - B} Z`}
-          fill="color-mix(in srgb, var(--norm) 10%, transparent)"
-        />
-        <polyline
-          points={pts}
-          fill="none"
-          stroke="var(--norm)"
-          strokeWidth="2.2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        {data.map((d, i) => (
-          <g key={d.month}>
-            <circle
-              cx={x(i)}
-              cy={y(d.share)}
-              r={active === i ? 5 : 3.5}
-              fill={active === i ? "var(--norm)" : "var(--site-paper-sunk)"}
-              stroke="var(--norm)"
-              strokeWidth="2"
-            />
-            <text className="axis rp-axis" x={x(i)} y={H - 8} textAnchor="middle">
-              {d.month}
-            </text>
-          </g>
-        ))}
-      </svg>
-      {data.map((d, i) => (
-        <button
-          key={d.month}
-          type="button"
-          className="rp-pt"
-          style={{ left: `${(x(i) / W) * 100}%`, top: `${(y(d.share) / H) * 100}%` }}
-          aria-label={`${d.month}: ${d.share}% responding, ${d.n} measured`}
-          onMouseEnter={() => setActive(i)}
-          onMouseLeave={() => setActive(null)}
-          onFocus={() => setActive(i)}
-          onBlur={() => setActive(null)}
-          onClick={() => setActive(i)}
-        />
-      ))}
-      {cur && active !== null ? (
-        <div
-          className={`rp-tip${active === 0 ? " start" : active === data.length - 1 ? " end" : ""}`}
-          style={{ left: `${(x(active) / W) * 100}%`, top: `${(y(cur.share) / H) * 100}%` }}
-          aria-hidden="true"
+    <div className="rp-lineScroll" ref={box}>
+      <div className="rp-lineBox" style={{ width: W }}>
+        <svg
+          className="chart"
+          viewBox={`0 0 ${W} ${H}`}
+          role="img"
+          aria-label={`Share responding by month, ${first.month} to ${last.month}: from ${first.share}% to ${last.share}%.`}
         >
-          <b>{cur.month} 2026</b>
-          <span>
-            <span className="mono">{cur.share}%</span> responding
-          </span>
-          <span>
-            <span className="mono">{cur.n}</span> measured
-          </span>
-        </div>
-      ) : null}
+          {[40, 50, 60, 70, 80].map((v) => (
+            <g key={v}>
+              <line
+                className={v === 50 ? "refline" : "gridline"}
+                x1={L}
+                x2={W - R}
+                y1={y(v)}
+                y2={y(v)}
+              />
+              <text className="axis rp-axis" x={L - 8} y={y(v) + 3.5} textAnchor="end">
+                {v}%
+              </text>
+            </g>
+          ))}
+          <text className="axis rp-axis" x={L + 6} y={y(50) + 13}>
+            benchmark 50%
+          </text>
+          <path
+            d={`M${x(0)},${y(data[0]!.share)} ${data.map((d, i) => `L${x(i)},${y(d.share)}`).join(" ")} L${x(data.length - 1)},${H - B} L${x(0)},${H - B} Z`}
+            fill="color-mix(in srgb, var(--norm) 10%, transparent)"
+          />
+          <polyline
+            points={pts}
+            fill="none"
+            stroke="var(--norm)"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          {data.map((d, i) => (
+            <g key={d.month}>
+              <circle
+                cx={x(i)}
+                cy={y(d.share)}
+                r={active === i ? 5 : 3.5}
+                fill={active === i ? "var(--norm)" : "var(--site-paper-sunk)"}
+                stroke="var(--norm)"
+                strokeWidth="2"
+              />
+              {W >= 480 || data.length <= 6 || i % 2 === data.length % 2 ? (
+                <text className="axis rp-axis" x={x(i)} y={H - 8} textAnchor="middle">
+                  {d.month}
+                </text>
+              ) : null}
+            </g>
+          ))}
+        </svg>
+        {data.map((d, i) => (
+          <button
+            key={d.month}
+            type="button"
+            className="rp-pt"
+            style={{ left: `${(x(i) / W) * 100}%`, top: `${(y(d.share) / H) * 100}%` }}
+            aria-label={`${d.month}: ${d.share}% responding, ${d.n} measured`}
+            onMouseEnter={() => setActive(i)}
+            onMouseLeave={() => setActive(null)}
+            onFocus={() => setActive(i)}
+            onBlur={() => setActive(null)}
+            onClick={() => setActive(i)}
+          />
+        ))}
+        {cur && active !== null ? (
+          <div
+            className={`rp-tip${active === 0 ? " start" : active === data.length - 1 ? " end" : ""}`}
+            style={{ left: `${(x(active) / W) * 100}%`, top: `${(y(cur.share) / H) * 100}%` }}
+            aria-hidden="true"
+          >
+            <b>
+              {cur.month} {["Sep", "Oct", "Nov", "Dec"].includes(cur.month) ? 2025 : 2026}
+            </b>
+            <span>
+              <span className="mono">{cur.share}%</span> responding
+            </span>
+            <span>
+              <span className="mono">{cur.n}</span> measured
+            </span>
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 }
@@ -710,7 +738,6 @@ function Access({ period }: { period: Period }) {
                 <tr>
                   <th>Referral</th>
                   <th className="num">Waiting</th>
-                  <th>Program</th>
                   <th className="num">
                     <span className="sr-only">Action</span>
                   </th>
@@ -725,7 +752,7 @@ function Access({ period }: { period: Period }) {
                       <td>
                         <span className="rp-wlName">{w.name}</span>
                         <span className="rp-wlSub">
-                          {w.source} · {w.referred}
+                          {w.program} · {w.source}
                         </span>
                       </td>
                       <td className="num">
@@ -733,7 +760,6 @@ function Access({ period }: { period: Period }) {
                           {w.days}d
                         </span>
                       </td>
-                      <td className="rp-wlProg">{w.program}</td>
                       <td className="num">
                         <button
                           type="button"
@@ -830,12 +856,12 @@ function Engagement({ period }: { period: Period }) {
   const booked = wk.reduce((s, w) => s + w.booked, 0);
   const attended = wk.reduce((s, w) => s + w.attended, 0);
   const mods = modality(period);
-  const W = 520;
+  const [box, W] = useWidth(520);
   const H = 120;
-  const gap = wk.length > 20 ? 2 : 6;
+  const gap = wk.length > 20 ? (W < 480 ? 1 : 2) : 6;
   const bw = (W - gap * (wk.length - 1)) / wk.length;
   const y = (rate: number) => H - ((rate - 0.6) / 0.4) * H;
-  const labelEvery = wk.length > 20 ? 13 : wk.length > 6 ? 3 : 1;
+  const labelEvery = wk.length > 20 ? 13 : wk.length > 6 ? (W < 480 ? 4 : 2) : 1;
 
   return (
     <>
@@ -914,44 +940,43 @@ function Engagement({ period }: { period: Period }) {
           </div>
         </div>
         <div className="chartWrap">
-          <svg
-            className="chart rp-att"
-            viewBox={`0 -4 ${W} ${H + 24}`}
-            role="img"
-            aria-label={`Weekly attendance over ${wk.length} weeks, between ${Math.min(...wk.map((w) => pct(w.attended, w.booked)))}% and ${Math.max(...wk.map((w) => pct(w.attended, w.booked)))}%.`}
-          >
-            <line className="refline" x1="0" x2={W} y1={y(0.85)} y2={y(0.85)} />
-            <text className="axis rp-axis" x={W} y={y(0.85) - 4} textAnchor="end">
-              target 85%
-            </text>
-            {wk.map((w, i) => {
-              const rate = w.attended / w.booked;
-              const bx = i * (bw + gap);
-              return (
-                <g key={w.label}>
-                  <rect
-                    x={bx}
-                    y={y(rate)}
-                    width={bw}
-                    height={H - y(rate)}
-                    rx={Math.min(3, bw / 3)}
-                    fill={
-                      rate >= 0.85
-                        ? "color-mix(in srgb, var(--norm) 70%, transparent)"
-                        : "color-mix(in srgb, var(--high) 70%, transparent)"
-                    }
-                  >
-                    <title>{`Week of ${w.label}: ${w.attended} of ${w.booked} attended`}</title>
-                  </rect>
-                  {i % labelEvery === 0 || i === wk.length - 1 ? (
-                    <text className="axis rp-axis" x={bx + bw / 2} y={H + 16} textAnchor="middle">
-                      {w.label}
-                    </text>
-                  ) : null}
-                </g>
-              );
-            })}
-          </svg>
+          <div ref={box}>
+            <svg
+              className="chart rp-att"
+              viewBox={`0 -4 ${W} ${H + 24}`}
+              role="img"
+              aria-label={`Weekly attendance over ${wk.length} weeks, between ${Math.min(...wk.map((w) => pct(w.attended, w.booked)))}% and ${Math.max(...wk.map((w) => pct(w.attended, w.booked)))}%.`}
+            >
+              <line className="refline" x1="0" x2={W} y1={y(0.85)} y2={y(0.85)} />
+              {wk.map((w, i) => {
+                const rate = w.attended / w.booked;
+                const bx = i * (bw + gap);
+                return (
+                  <g key={w.label}>
+                    <rect
+                      x={bx}
+                      y={y(rate)}
+                      width={bw}
+                      height={H - y(rate)}
+                      rx={Math.min(3, bw / 3)}
+                      fill={
+                        rate >= 0.85
+                          ? "color-mix(in srgb, var(--norm) 70%, transparent)"
+                          : "color-mix(in srgb, var(--high) 70%, transparent)"
+                      }
+                    >
+                      <title>{`Week of ${w.label}: ${w.attended} of ${w.booked} attended`}</title>
+                    </rect>
+                    {i % labelEvery === 0 ? (
+                      <text className="axis rp-axis" x={bx + bw / 2} y={H + 16} textAnchor="middle">
+                        {w.label}
+                      </text>
+                    ) : null}
+                  </g>
+                );
+              })}
+            </svg>
+          </div>
         </div>
         <p className="miniLegend">
           <span className="rp-key">
@@ -962,7 +987,7 @@ function Engagement({ period }: { period: Period }) {
             <i style={{ background: "var(--high)" }} aria-hidden="true" />
             Below 85%
           </span>
-          <span>Axis 60–100%</span>
+          <span>Dashed line: 85% target · axis 60–100%</span>
         </p>
       </section>
     </>
@@ -1009,7 +1034,7 @@ const COLS: readonly { key: SortKey; label: string; num: boolean }[] = [
   { key: "responding", label: "Responding", num: true },
   { key: "notOnTrack", label: "Not on track", num: true },
   { key: "unsigned", label: "Notes >48h", num: true },
-  { key: "sessions", label: "Median sessions", num: true },
+  { key: "sessions", label: "Sessions", num: true },
 ];
 
 function sortRows(rows: ClinRow[], key: SortKey, dir: "ascending" | "descending"): ClinRow[] {
@@ -1038,7 +1063,7 @@ function Clinicians({
   const [open, setOpen] = React.useState<ClinicianId | null>(null);
   const rows = sortRows(clinRows(period), sort.key, sort.dir);
   const sel = open ? clinRows(period).find((r) => r.id === open)! : null;
-  const selEps = open ? EPISODES[period].filter((e) => e.clinician === open) : [];
+  const selActive = open ? ACTIVE.filter((e) => e.clinician === open) : [];
   const selNot = open
     ? PATIENTS.filter((p) => p.clinician === open && p.track === "not-on-track")
     : [];
@@ -1048,7 +1073,7 @@ function Clinicians({
       <div className="panelTop">
         <div>
           <h3 id="rp-cl-h">By clinician</h3>
-          <p>Caseload and notes are as of now; rates cover the period</p>
+          <p>Caseload and notes as of now · rates cover the period · sessions is the median</p>
         </div>
       </div>
       <div className="dtScroll">
@@ -1058,7 +1083,11 @@ function Clinicians({
               {COLS.map((c) => (
                 <th
                   key={c.key}
-                  className={c.num ? "num" : undefined}
+                  className={
+                    [c.num ? "num" : "", c.key === "sessions" ? "rp-colSessions" : ""]
+                      .join(" ")
+                      .trim() || undefined
+                  }
                   {...(sort.key === c.key ? { "aria-sort": sort.dir } : {})}
                 >
                   <button type="button" className="sort" onClick={() => onSort(c.key)}>
@@ -1100,7 +1129,7 @@ function Clinicians({
                     {r.unsigned}
                   </span>
                 </td>
-                <td className="num mono">{r.sessions}</td>
+                <td className="num mono rp-colSessions">{r.sessions}</td>
               </tr>
             ))}
           </tbody>
@@ -1117,7 +1146,9 @@ function Clinicians({
         title={sel?.name ?? ""}
         sub={
           sel
-            ? `${CLINICIANS[sel.id].role} · ${PERIODS.find((p) => p.value === period)!.label.toLowerCase()}`
+            ? `${CLINICIANS[sel.id].role} · rates over ${PERIODS.find((p) => p.value === period)!
+                .label.replace("Last ", "")
+                .toLowerCase()}`
             : undefined
         }
         footer={
@@ -1147,31 +1178,21 @@ function Clinicians({
           <>
             <section className="sheetSection">
               <h4>Summary</h4>
-              <KV k="Active caseload">
-                <span className="mono">{sel.caseload}</span>
-              </KV>
-              <KV k="Measured every session">
-                <span className="mono">{sel.measured}%</span>
-              </KV>
-              <KV k="Responding">
-                <span className="mono">{sel.responding}%</span>
-              </KV>
-              <KV k="Median sessions">
-                <span className="mono">{sel.sessions}</span>
-              </KV>
+              <KV k="Active caseload">{sel.caseload}</KV>
+              <KV k="Measured every session">{sel.measured}%</KV>
+              <KV k="Responding">{sel.responding}%</KV>
+              <KV k="Median sessions">{sel.sessions}</KV>
               <KV k="Notes unsigned over 48h">
-                <span className="mono">
-                  {sel.unsigned}
-                  {sel.unsigned > 0 ? ` · oldest ${UNSIGNED[sel.id].oldest}` : ""}
-                </span>
+                {sel.unsigned}
+                {sel.unsigned > 0 ? ` · oldest ${UNSIGNED[sel.id].oldest}` : ""}
               </KV>
             </section>
             <section className="sheetSection">
-              <h4>By status</h4>
+              <h4>Caseload by status</h4>
               <div className="rp-mix" aria-hidden="true">
                 {(["not-on-track", "slow", "responding", "remission", "baseline"] as const).map(
                   (t) => {
-                    const n = selEps.filter((e) => e.track === t).length;
+                    const n = selActive.filter((e) => e.track === t).length;
                     return n ? (
                       <i
                         key={t}
@@ -1188,7 +1209,7 @@ function Clinicians({
               {(["not-on-track", "slow", "responding", "remission", "baseline"] as const).map(
                 (t) => (
                   <KV key={t} k={TRACK[t].label.replace(/^./, (c) => c.toUpperCase())}>
-                    <span className="mono">{selEps.filter((e) => e.track === t).length}</span>
+                    {selActive.filter((e) => e.track === t).length}
                   </KV>
                 ),
               )}
@@ -1200,12 +1221,14 @@ function Clinicians({
                   {selNot.map((p) => (
                     <li key={p.id}>
                       <PatientLink p={p} sub={`${p.program} · session ${p.sessions}`} />
-                      <Status sev="crit">not on track</Status>
+                      <span className="rp-notScore">{reading(p)}</span>
                     </li>
                   ))}
                 </ul>
               ) : (
-                <p className="rp-none">No patients off track.</p>
+                <p className="rp-none">
+                  Everyone on this caseload is on track or awaiting a baseline.
+                </p>
               )}
             </section>
           </>
@@ -1308,7 +1331,7 @@ export function ReportsScreen() {
               value={period}
               onChange={setPeriod}
             />
-            <button type="button" className="btn ghost" onClick={exportCsv}>
+            <button type="button" className="btn ghost rp-export" onClick={exportCsv}>
               <Download aria-hidden="true" size={14} strokeWidth={1.7} />
               Export CSV
             </button>

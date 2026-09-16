@@ -30,7 +30,6 @@ import {
   Chips,
   ClinicianAvatar,
   EmptyState,
-  KV,
   PatientLink,
   ScreenBody,
   ScreenHead,
@@ -97,7 +96,7 @@ const domId = (id: string) => `sf-item-${id}`;
 export function SafetyScreen() {
   const { route, go, toast, store, patch } = useNav();
 
-  const [added, setAdded] = React.useState<RiskItem[]>([]);
+  const added = store.logged;
   const [owners, setOwners] = React.useState<Record<string, ClinicianId>>({});
   const [attempts, setAttempts] = React.useState<Record<string, string[]>>({});
   const [outcomes, setOutcomes] = React.useState<Record<string, string>>({});
@@ -202,22 +201,25 @@ export function SafetyScreen() {
     const p = patient(pid);
     setScreens((s) => ({ screened: s.screened + 1, positive: s.positive + (positive ? 1 : 0) }));
     if (positive) {
-      setAdded((a) => [
-        ...a,
-        {
-          id: `rk-log-${a.length + 1}-${pid}`,
-          patient: pid,
-          kind: "cssrs",
-          what: "C-SSRS positive",
-          opened: `13 Aug ${NOW.time}`,
-          owner: ME,
-          sev: "crit",
-          left: "24h 00m",
-          usedPct: 0,
-          window: "24h window",
-          minutes: 1440,
-        },
-      ]);
+      patch((st) => ({
+        ...st,
+        logged: [
+          ...st.logged,
+          {
+            id: `rk-log-${st.logged.length + 1}-${pid}`,
+            patient: pid,
+            kind: "cssrs",
+            what: "C-SSRS positive",
+            opened: `13 Aug ${NOW.time}`,
+            owner: ME,
+            sev: "crit",
+            left: "24h 00m",
+            usedPct: 0,
+            window: "24h window",
+            minutes: 1440,
+          },
+        ],
+      }));
       toast(`Follow-up opened · due ${NOW.time} tomorrow`);
     } else {
       toast(`Negative screen recorded · ${p.name}`);
@@ -269,22 +271,18 @@ export function SafetyScreen() {
 
         <div className="sf-cols">
           <div className="sf-main">
-            <div className="toolbar">
-              <Chips
-                label="Filter follow-ups"
-                value={filter}
-                onChange={setFilter}
-                options={[
-                  { value: "open", label: "All open", count: counts.open },
-                  { value: "mine", label: "Mine", count: counts.mine },
-                  { value: "overdue", label: "Overdue", count: counts.overdue },
-                  { value: "due", label: "Due within 24h", count: counts.due },
-                  { value: "closed", label: "Closed today", count: counts.closed },
-                ]}
-              />
-              <span className="grow" />
-              <Select label="Owner" value={owner} onChange={setOwner} options={OWNER_OPTIONS} />
-            </div>
+            <Chips
+              label="Filter follow-ups"
+              value={filter}
+              onChange={setFilter}
+              options={[
+                { value: "open", label: "All open" },
+                { value: "mine", label: "Mine" },
+                { value: "overdue", label: "Overdue" },
+                { value: "due", label: "Due within 24h" },
+                { value: "closed", label: "Closed today" },
+              ]}
+            />
 
             <section className="panel sf-queue" aria-labelledby="sf-queue-title">
               <div className="panelTop">
@@ -293,10 +291,13 @@ export function SafetyScreen() {
                     {filter === "closed" ? "Closed today" : "Follow-up queue"}
                   </h3>
                   <p>
-                    {shown.length} {shown.length === 1 ? "item" : "items"} · ordered by time
-                    remaining, not by severity label
+                    {shown.length} {shown.length === 1 ? "item" : "items"} ·{" "}
+                    {filter === "closed"
+                      ? "contact recorded today"
+                      : "ordered by time remaining, not by severity label"}
                   </p>
                 </div>
+                <Select label="Owner" value={owner} onChange={setOwner} options={OWNER_OPTIONS} />
               </div>
               {shown.length === 0 ? (
                 <div className="sf-emptyWrap">
@@ -317,7 +318,11 @@ export function SafetyScreen() {
                     </EmptyState>
                   ) : (
                     <EmptyState
-                      title="No open follow-ups"
+                      title={
+                        filter === "open" && owner === "all"
+                          ? "No open follow-ups"
+                          : "No follow-ups in this view"
+                      }
                       action={
                         filter !== "open" || owner !== "all" ? (
                           <button
@@ -448,7 +453,7 @@ function QueueItem({
         {closed ? (
           <p className="sf-outcome">
             <Status sev="norm">{outcome ?? "Contact recorded"}</Status>
-            <span className="mono">{closed}</span>
+            <span className="sf-when">{closed}</span>
           </p>
         ) : (
           <div className="sf-win">
@@ -466,10 +471,7 @@ function QueueItem({
 
         {!closed && last ? (
           <p className="sf-attempt">
-            <span className="mono">
-              Attempt {attempts!.length} · {last}
-            </span>{" "}
-            · no answer
+            Attempt {attempts!.length} · <span className="sf-when">{last}</span> · no answer
             {attempts!.length >= 2 ? (
               <span className="sf-attemptHint"> · two attempts, see escalation protocol</span>
             ) : null}
@@ -527,7 +529,10 @@ function QueueItem({
                   <ClinicianAvatar id={c.id} size={20} />
                   <span>
                     {c.short}
-                    <small>{c.role}</small>
+                    <small>
+                      {c.role}
+                      {c.id === r.owner ? " · current owner" : ""}
+                    </small>
                   </span>
                 </button>
               ))}
@@ -580,7 +585,7 @@ function PlansCard() {
                   <i style={{ width: `${pct}%`, background: sevVar(sev) }} />
                 </span>
                 <span className="sf-planSub">
-                  Reviewed {dayLabel(-row.age)} · <span className="mono">{row.age}d</span> ago
+                  Reviewed {dayLabel(-row.age)} · {row.age}d ago
                 </span>
               </button>
             </li>
@@ -615,7 +620,7 @@ function ScreensCard({ screened, positive }: { screened: number; positive: numbe
         <div className="meter">
           <div className="meterTop">
             <span className="k">Positive share</span>
-            <span className="v">{pct}%</span>
+            <span className="v">{pct.toFixed(1)}%</span>
           </div>
           <div className="meterTrk" aria-hidden="true">
             <i style={{ width: `${Math.max(pct, 1.5)}%`, background: sevVar("crit") }} />
@@ -673,9 +678,7 @@ function OnCallCard() {
         <ClinicianAvatar id={c.id} size={32} />
         <span className="sf-oncallText">
           <b>{c.name}</b>
-          <span>
-            {c.role} · <span className="mono">08:00–20:00</span>
-          </span>
+          <span>{c.role} · 08:00–20:00</span>
         </span>
         <button type="button" className="btn ghost sm" onClick={() => toast(`Paged ${c.short}`)}>
           <BellRing aria-hidden="true" size={13} strokeWidth={1.8} />
@@ -704,14 +707,15 @@ function ContactSheet({
   const [means, setMeans] = React.useState(false);
   const [note, setNote] = React.useState("");
   const [next, setNext] = React.useState("tomorrow");
-  const name = React.useId();
+  const uid = React.useId();
 
-  if (!item)
+  if (!item) {
     return (
       <Sheet open={false} onClose={onClose} title="Record contact">
         {null}
       </Sheet>
     );
+  }
   const p = patient(item.patient);
 
   return (
@@ -719,9 +723,10 @@ function ContactSheet({
       open
       onClose={onClose}
       title="Record contact"
-      sub={`${item.what} · ${CLINICIANS[item.owner].short}`}
+      sub={`${item.what} · owner ${CLINICIANS[item.owner].short}`}
       footer={
         <>
+          {!outcome ? <span className="sf-footHint">Choose an outcome to save</span> : null}
           <button type="button" className="btn ghost sm" onClick={onClose}>
             Cancel
           </button>
@@ -736,18 +741,21 @@ function ContactSheet({
         </>
       }
     >
-      <div className="sf-sheetPt">
-        <Face name={p.name} src={faceOf(p.name)} size={40} />
-        <div>
-          <b>{p.full}</b>
-          <span>
-            <span className="mono">{p.mrn}</span> · {p.age} · {p.pronouns}
-          </span>
+      <section className="sheetSection">
+        <h4>Patient</h4>
+        <div className="sf-sheetPt">
+          <Face name={p.name} src={faceOf(p.name)} size={40} />
+          <div>
+            <b>{p.full}</b>
+            <span>
+              MRN {p.mrn} · {p.age} y · {p.pronouns}
+            </span>
+          </div>
           <Status sev={item.sev}>{leftLabel(item)}</Status>
         </div>
-      </div>
+      </section>
 
-      <div className="sheetSection">
+      <section className="sheetSection">
         <h4>Window</h4>
         <div className="sf-win">
           <div className="sf-winTrk">
@@ -757,67 +765,77 @@ function ContactSheet({
             <span>
               {item.usedPct}% of the {item.window} used
             </span>
-            <span>opened {item.opened}</span>
+            <span>Opened {item.opened}</span>
           </div>
         </div>
         {attempts ? (
-          <p className="sf-attempt">
+          <p className="sf-attempt sf-attemptSheet">
             {attempts} unanswered {attempts === 1 ? "attempt" : "attempts"} so far
+            {attempts >= 2 ? " · escalate per protocol if this one fails" : ""}
           </p>
         ) : null}
-      </div>
+      </section>
 
-      <fieldset className="sf-fieldset">
-        <legend>Outcome</legend>
-        {OUTCOMES.map((o) => (
-          <label key={o.value} className="check">
-            <input
-              type="radio"
-              name={name}
-              value={o.value}
-              checked={outcome === o.value}
-              onChange={() => setOutcome(o.value)}
-            />
-            {o.label}
+      <section className="sheetSection">
+        <h4 id={`${uid}-outcome`}>Outcome</h4>
+        <div className="sf-options" role="radiogroup" aria-labelledby={`${uid}-outcome`}>
+          {OUTCOMES.map((o) => (
+            <label key={o.value} className="check">
+              <input
+                type="radio"
+                name={`${uid}-outcome`}
+                value={o.value}
+                checked={outcome === o.value}
+                onChange={() => setOutcome(o.value)}
+              />
+              {o.label}
+            </label>
+          ))}
+        </div>
+      </section>
+
+      <section className="sheetSection">
+        <h4 id={`${uid}-covered`}>Covered on the call</h4>
+        <div className="sf-options" role="group" aria-labelledby={`${uid}-covered`}>
+          <label className="check">
+            <input type="checkbox" checked={plan} onChange={(e) => setPlan(e.target.checked)} />
+            Safety plan reviewed with patient
           </label>
-        ))}
-      </fieldset>
+          <label className="check">
+            <input type="checkbox" checked={means} onChange={(e) => setMeans(e.target.checked)} />
+            Means safety discussed
+          </label>
+        </div>
+      </section>
 
-      <fieldset className="sf-fieldset">
-        <legend>Covered</legend>
-        <label className="check">
-          <input type="checkbox" checked={plan} onChange={(e) => setPlan(e.target.checked)} />
-          Safety plan reviewed with patient
-        </label>
-        <label className="check">
-          <input type="checkbox" checked={means} onChange={(e) => setMeans(e.target.checked)} />
-          Means safety discussed
-        </label>
-      </fieldset>
+      <section className="sheetSection">
+        <h4 id={`${uid}-note`}>Note</h4>
+        <div className="field">
+          <textarea
+            aria-labelledby={`${uid}-note`}
+            rows={4}
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="What was said, and what happens next"
+          />
+        </div>
+      </section>
 
-      <label className="field">
-        Note
-        <textarea
-          rows={4}
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          placeholder="What was said, and what happens next"
-        />
-      </label>
-
-      <div className="field">
-        <span aria-hidden="true">Next contact</span>
-        <Select
-          label="Next contact"
-          value={next}
-          onChange={setNext}
-          options={[
-            { value: "4h", label: `Within 4 hours · by ${stamp(240)}` },
-            { value: "tomorrow", label: `Tomorrow · ${NOW.time}` },
-            { value: "session", label: `Next session · ${p.next}` },
-          ]}
-        />
-      </div>
+      <section className="sheetSection">
+        <h4 aria-hidden="true">Next contact</h4>
+        <div className="sf-fill">
+          <Select
+            label="Next contact"
+            value={next}
+            onChange={setNext}
+            options={[
+              { value: "4h", label: `Within 4 hours · by ${stamp(240)}` },
+              { value: "tomorrow", label: `Tomorrow · ${NOW.time}` },
+              { value: "session", label: `Next session · ${p.next}` },
+            ]}
+          />
+        </div>
+      </section>
     </Sheet>
   );
 }
@@ -836,6 +854,7 @@ function LogSheet({
   const [pid, setPid] = React.useState(initial);
   const [result, setResult] = React.useState<"neg" | "pos">("neg");
   const [notes, setNotes] = React.useState("");
+  const uid = React.useId();
   const options = React.useMemo(
     () =>
       [...PATIENTS]
@@ -849,7 +868,7 @@ function LogSheet({
       open={open}
       onClose={onClose}
       title="Log a C-SSRS screen"
-      sub={`Screener · ${NOW.day} ${NOW.time}`}
+      sub={`${CLINICIANS[ME].name} · ${NOW.day} ${NOW.time}`}
       footer={
         <>
           <button type="button" className="btn ghost sm" onClick={onClose}>
@@ -865,12 +884,15 @@ function LogSheet({
         </>
       }
     >
-      <div className="field">
-        <span aria-hidden="true">Patient</span>
-        <Select label="Patient" value={pid} onChange={setPid} options={options} />
-      </div>
-      <div className="field">
-        <span aria-hidden="true">Result</span>
+      <section className="sheetSection">
+        <h4 aria-hidden="true">Patient</h4>
+        <div className="sf-fill">
+          <Select label="Patient" value={pid} onChange={setPid} options={options} />
+        </div>
+      </section>
+
+      <section className="sheetSection">
+        <h4 aria-hidden="true">Result</h4>
         <Segmented
           label="Result"
           value={result}
@@ -880,23 +902,25 @@ function LogSheet({
             { value: "pos", label: "Positive" },
           ]}
         />
-      </div>
-      {result === "pos" ? (
-        <div className="sf-callout">
-          A positive screen opens a follow-up owned by you, due within 24 hours · by {NOW.time}{" "}
-          tomorrow.
+        <p className={`sf-callout${result === "pos" ? " pos" : ""}`}>
+          {result === "pos"
+            ? `Opens a follow-up owned by you, due by ${NOW.time} tomorrow.`
+            : "Recorded on the patient’s record. No follow-up is opened."}
+        </p>
+      </section>
+
+      <section className="sheetSection">
+        <h4 id={`${uid}-notes`}>Notes</h4>
+        <div className="field">
+          <textarea
+            aria-labelledby={`${uid}-notes`}
+            rows={4}
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Items endorsed, context"
+          />
         </div>
-      ) : null}
-      <label className="field">
-        Notes
-        <textarea
-          rows={4}
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          placeholder="Items endorsed, context"
-        />
-      </label>
-      <KV k="Screened by">{CLINICIANS[ME].name}</KV>
+      </section>
     </Sheet>
   );
 }

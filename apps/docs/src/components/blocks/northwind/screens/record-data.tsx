@@ -200,7 +200,7 @@ export function administrations(p: Patient): Admin[] {
     });
     const cssrs: [number, string, Sev][] = [
       [0, "Negative", "norm"],
-      [-21, "Negative", "norm"],
+      [-22, "Negative", "norm"],
       [-1, "Positive · ideation, no plan", "crit"],
     ];
     cssrs.forEach(([off, label, sev], i) =>
@@ -300,7 +300,7 @@ export function problems(p: Patient): Problem[] {
       ];
     default:
       return [
-        { title: "Major depressive disorder, single episode", code: "F32.1", ...focus },
+        { title: "Major depression, single episode", code: "F32.1", ...focus },
         second("Insomnia", "G47.00"),
       ];
   }
@@ -312,6 +312,8 @@ export interface Med {
   route: string;
   since: string;
   status: "active" | "new" | "stopped";
+  /** Stop date, for discontinued drugs. */
+  until?: string;
   note: string;
 }
 
@@ -340,8 +342,9 @@ export function meds(p: Patient): Med[] {
         drug: "Zolpidem",
         dose: "5 mg",
         route: "Oral",
-        since: "discontinued 05 Aug",
+        since: "10 Mar",
         status: "stopped",
+        until: "05 Aug",
         note: "discontinued 05 Aug",
       },
     ];
@@ -632,11 +635,23 @@ export function chronology(p: Patient, signed: Record<string, true>): Event[] {
   return stable(events);
 }
 
+/** Within a day the reading comes first and the session that produced it last. */
+const SOURCE_RANK: Record<Source, number> = { measures: 0, safety: 1, medications: 2, sessions: 3 };
+
 function stable(events: Event[]): Event[] {
   return events
     .map((e, i) => ({ e, i }))
-    .sort((a, b) => b.e.offset - a.e.offset || a.i - b.i)
+    .sort(
+      (a, b) =>
+        b.e.offset - a.e.offset || SOURCE_RANK[a.e.source] - SOURCE_RANK[b.e.source] || a.i - b.i,
+    )
     .map(({ e }) => e);
+}
+
+/** The five rows the overview shows. Okonkwo's are authored and fixed. */
+export function recentEvents(p: Patient, signed: Record<string, true>): Event[] {
+  if (isOkonkwo(p)) return okonkwoEvents(Boolean(signed["okonkwo-0812"])).slice(0, 5);
+  return chronology(p, signed).slice(0, 5);
 }
 
 /* ---------------------------------------------------------------- notes */
@@ -746,6 +761,8 @@ export interface Doc {
   title: string;
   status: string;
   sev: Sev;
+  /** False when the row stands for a document that does not exist yet. */
+  onFile: boolean;
   meta: [string, string][];
 }
 
@@ -759,6 +776,7 @@ export function documents(p: Patient): Doc[] {
       title: "Consent to treatment",
       status: `Signed ${signedOn}`,
       sev: "norm",
+      onFile: true,
       meta: [
         ["Signed", signedOn],
         ["Method", "E-signature"],
@@ -771,6 +789,7 @@ export function documents(p: Patient): Doc[] {
       title: "Release of information · primary care",
       status: `Signed ${signedOn}`,
       sev: "norm",
+      onFile: true,
       meta: [
         ["Signed", signedOn],
         ["Recipient", "Primary care physician"],
@@ -783,6 +802,7 @@ export function documents(p: Patient): Doc[] {
       title: "Intake assessment",
       status: intake ? `Completed ${intake.date}` : "Not yet completed",
       sev: intake ? "norm" : "unk",
+      onFile: Boolean(intake),
       meta: intake
         ? [
             ["Completed", intake.date],
@@ -798,6 +818,7 @@ export function documents(p: Patient): Doc[] {
       id: "part2",
       title: "42 CFR Part 2 consent",
       status: ok ? "Not on file" : "Not required",
+      onFile: false,
       sev: ok ? "high" : "unk",
       meta: ok
         ? [
@@ -875,13 +896,14 @@ export type DetailKey = "contact" | "insurance" | "emergency" | "pharmacy";
 export function details(
   p: Patient,
   index: number,
-): { key: DetailKey; label: string; short: string; rows: [string, string][] }[] {
+): { key: DetailKey; label: string; short: string; eyebrow: string; rows: [string, string][] }[] {
   const tail = String(100 + ((index * 17) % 90)).slice(-2);
   return [
     {
       key: "contact",
       label: "Contact",
       short: "mobile",
+      eyebrow: "How to reach",
       rows: [
         ["Mobile", `(555) 01${tail}-4${tail}7`],
         ["Preferred", "Text, then call"],
@@ -893,6 +915,7 @@ export function details(
       key: "insurance",
       label: "Insurance",
       short: p.payer === "Self-pay" ? "self-pay" : "verified",
+      eyebrow: "Coverage",
       rows:
         p.payer === "Self-pay"
           ? [
@@ -911,6 +934,7 @@ export function details(
       key: "emergency",
       label: "Emergency contact",
       short: "1 listed",
+      eyebrow: "Listed person",
       rows: [
         ["Relationship", "Sibling"],
         ["Phone", `(555) 01${tail}-9${tail}2`],
@@ -921,6 +945,7 @@ export function details(
       key: "pharmacy",
       label: "Pharmacy",
       short: "Riverside",
+      eyebrow: "Preferred pharmacy",
       rows: [
         ["Name", "Riverside Pharmacy"],
         ["Address", "214 Mill St"],
@@ -941,5 +966,19 @@ export function presenting(p: Patient): string {
       return "Self-referred after a difficult first year of study: low mood, avoidance and poor sleep.";
     default:
       return "Referred by primary care for low mood and sleep disruption over several months.";
+  }
+}
+
+/** The presenting concern in a few words, for a collapsed row. */
+export function presentingShort(p: Patient): string {
+  switch (p.program) {
+    case "Anxiety":
+      return "Persistent worry, tension, poor focus";
+    case "Perinatal":
+      return "Low mood and anxiety since the birth";
+    case "Young adult":
+      return "Low mood, avoidance, poor sleep";
+    default:
+      return "Low mood, poor sleep, several months";
   }
 }

@@ -15,7 +15,7 @@ import { BarShare, BarTarget, RiskRow, SevRail, Status, Tile } from "../../kit";
 import { FunnelPanel, TrajectoryPanel, type TrajectoryFocus } from "../../charts";
 import { CLINICIANS, PATIENTS, RISKS, TRACK, patient, reading, trend } from "../data";
 import { useNav } from "../shell";
-import { KV, PatientLink, Segmented, Sheet } from "../ui";
+import { PatientLink, Segmented, Sheet } from "../ui";
 
 const TABLE = ["okonkwo", "almeida", "whitfield", "delacroix", "ferreira", "nakamura"] as const;
 
@@ -44,12 +44,14 @@ export function DashboardScreen() {
   const offTrack = PATIENTS.filter((p) => p.track === "not-on-track").length;
   const slow = PATIENTS.filter((p) => p.track === "slow").length;
 
-  const screens = RISKS.filter((r) => r.kind === "cssrs" || r.kind === "crisis-call");
+  // Follow-ups logged this session join the fixed queue, in time order.
+  const all = [...RISKS, ...store.logged].sort((a, b) => a.minutes - b.minutes);
+  const screens = all.filter((r) => r.kind === "cssrs" || r.kind === "crisis-call");
   const openScreens = screens.filter((r) => !store.resolved[r.id]);
   const nextScreen = openScreens[0];
 
-  const queue = RISKS.filter((r) => !store.resolved[r.id]).slice(0, 3);
-  const openCount = RISKS.filter((r) => !store.resolved[r.id]).length;
+  const queue = all.filter((r) => !store.resolved[r.id]).slice(0, 3);
+  const openCount = all.filter((r) => !store.resolved[r.id]).length;
 
   return (
     <div className="main">
@@ -84,7 +86,7 @@ export function DashboardScreen() {
           unit="days median wait"
           bar={<BarTarget pct={73} target={47} sev="high" />}
           footLeft="target 7d"
-          footRight="↑3 vs last month"
+          footRight="↑3 vs July"
           onClick={() => go({ screen: "reports", view: "access" })}
         />
         <Tile
@@ -325,7 +327,7 @@ export function DashboardScreen() {
                     disabled={Boolean(reminded[key])}
                     onClick={() => {
                       setReminded((r) => ({ ...r, [key]: true }));
-                      toast(`Reminder sent to ${CLINICIANS[n.clinician].short}`);
+                      toast(`Reminder sent to ${CLINICIANS[n.clinician].short} · ${p.name}`);
                     }}
                   >
                     {reminded[key] ? "Reminded" : "Remind"}
@@ -337,22 +339,31 @@ export function DashboardScreen() {
         </div>
         <div className="sheetSection">
           <h4>Under 48 hours</h4>
-          <KV k="R. Okonkwo · 12 Aug">
+          {/* The same row as above, so the one note still in time reads as one of the set. */}
+          <div className="db-noteRow">
+            <PatientLink
+              p={patient("okonkwo")}
+              size={22}
+              sub={`Session 12 Aug · ${CLINICIANS.lake.short}`}
+            />
             {store.signed["okonkwo-0812"] ? (
-              "Signed"
+              <span className="db-noteAge db-noteSigned">Signed</span>
             ) : (
-              <button
-                type="button"
-                className="linkBtn"
-                onClick={() => {
-                  setNotesOpen(false);
-                  go({ screen: "note", patient: "okonkwo" });
-                }}
-              >
-                Open note · 20h
-              </button>
+              <>
+                <span className="db-noteAge db-noteFresh">20h</span>
+                <button
+                  type="button"
+                  className="btn ghost sm"
+                  onClick={() => {
+                    setNotesOpen(false);
+                    go({ screen: "note", patient: "okonkwo" });
+                  }}
+                >
+                  Open
+                </button>
+              </>
             )}
-          </KV>
+          </div>
         </div>
       </Sheet>
     </div>

@@ -87,6 +87,7 @@ export function RecordScreen() {
   const [accessPending, setAccessPending] = React.useState<string | null>(null);
   const [reason, setReason] = React.useState<Reason>("treatment");
   const [justification, setJustification] = React.useState("");
+  const [consentSent, setConsentSent] = React.useState<string | null>(null);
 
   const close = () => setSheet(null);
 
@@ -203,7 +204,17 @@ export function RecordScreen() {
       </div>
 
       <div className="ptFacts">
-        <Fact k="Episode">{episode(p, index)}</Fact>
+        <Fact k="Episode">
+          {/* Breaks at the separator, never inside "week 9 of 16". */}
+          {episode(p, index)
+            .split(" · ")
+            .map((part, i) => (
+              <React.Fragment key={part}>
+                {i ? " · " : null}
+                <span className="rc-nowrap">{part}</span>
+              </React.Fragment>
+            ))}
+        </Fact>
         <Fact k="Primary clinician">{clin.name}</Fact>
         <Fact k="Modality">
           {p.modality} · {p.cadence.toLowerCase()}
@@ -249,16 +260,23 @@ export function RecordScreen() {
           </>
         }
       >
-        <label className="field">
-          Note
-          <textarea
-            rows={10}
-            value={draftText}
-            placeholder="Subjective, observations, plan…"
-            onChange={(e) => setDraftText(e.target.value)}
-          />
-        </label>
-        <p className="rc-soft">Drafts stay unsigned and visible only to you until signed.</p>
+        <div className="sheetSection">
+          <h4 id="rc-draft-label">Note</h4>
+          <div className="field">
+            <textarea
+              aria-labelledby="rc-draft-label"
+              rows={10}
+              value={draftText}
+              placeholder="Subjective, observations, plan…"
+              onChange={(e) => setDraftText(e.target.value)}
+            />
+          </div>
+          <p className="rc-hint">
+            {draftText.trim()
+              ? "Drafts stay unsigned, and visible only to you, until signed."
+              : "Write the note to save it as a draft."}
+          </p>
+        </div>
       </Sheet>
 
       <Sheet
@@ -273,7 +291,7 @@ export function RecordScreen() {
         {sheet?.kind === "note" ? (
           <>
             <div className="sheetSection">
-              <KV k="Date">{sheet.note.date}</KV>
+              <h4>Details</h4>
               <KV k="Clinician">{sheet.note.clinician}</KV>
               <KV k="Status">
                 {sheet.note.status === "draft"
@@ -295,22 +313,50 @@ export function RecordScreen() {
         open={sheet?.kind === "doc"}
         onClose={close}
         title={sheet?.kind === "doc" ? sheet.doc.title : ""}
-        sub={sheet?.kind === "doc" ? `${p.full} · ${sheet.doc.status}` : undefined}
+        sub={sheet?.kind === "doc" ? (sheet.doc.onFile ? `${p.full} · PDF` : p.full) : undefined}
         footer={
-          <button type="button" className="btn ghost" onClick={close}>
-            Close
-          </button>
+          <>
+            <button type="button" className="btn ghost" onClick={close}>
+              Close
+            </button>
+            {sheet?.kind === "doc" && sheet.doc.id === "part2" && ok ? (
+              <button
+                type="button"
+                className="btn primary"
+                disabled={Boolean(consentSent)}
+                onClick={() => {
+                  setConsentSent(stamp());
+                  toast(`Part 2 consent form sent to ${p.name} · ${stamp()}`);
+                }}
+              >
+                {consentSent ? `Form sent · ${consentSent}` : "Send consent form"}
+              </button>
+            ) : null}
+          </>
         }
       >
         {sheet?.kind === "doc" ? (
           <>
-            <div className="rc-page" aria-hidden="true">
-              <b>{sheet.doc.title}</b>
-              <span>Northwind Health · {p.full}</span>
-              {[92, 84, 96, 70, 88, 60].map((w, i) => (
-                <i key={i} style={{ width: `${w}%` }} />
-              ))}
-            </div>
+            {sheet.doc.onFile ? (
+              <div className="sheetSection">
+                <h4>Preview</h4>
+                <div className="rc-page" aria-hidden="true">
+                  <span>Northwind Health</span>
+                  {[92, 84, 96, 70, 88, 60].map((w, i) => (
+                    <i key={i} style={{ width: `${w}%` }} />
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="rc-noDoc">
+                <b>No document on file</b>
+                <span>
+                  {sheet.doc.id === "part2" && ok
+                    ? "Send the consent form to open the withheld section."
+                    : "Nothing to preview yet."}
+                </span>
+              </div>
+            )}
             <div className="sheetSection">
               <h4>Details</h4>
               {sheet.doc.meta.map(([k, v]) => (
@@ -336,6 +382,7 @@ export function RecordScreen() {
       >
         {detail ? (
           <div className="sheetSection">
+            <h4>{detail.eyebrow}</h4>
             {detail.rows.map(([k, v]) => (
               <KV key={k} k={k}>
                 {v}
@@ -366,23 +413,29 @@ export function RecordScreen() {
           </>
         }
       >
-        <p className="rc-soft">
-          The privacy officer reviews each request. Access is logged against your name and this
-          reason.
-        </p>
-        <div className="field">
-          <span aria-hidden="true">Reason</span>
-          <Select<Reason> label="Reason" value={reason} onChange={setReason} options={REASONS} />
+        <div className="sheetSection">
+          <h4>Reason</h4>
+          <div className="rc-full">
+            <Select<Reason> label="Reason" value={reason} onChange={setReason} options={REASONS} />
+          </div>
         </div>
-        <label className="field">
-          Justification
-          <textarea
-            rows={5}
-            value={justification}
-            placeholder="Why this section is needed for care now"
-            onChange={(e) => setJustification(e.target.value)}
-          />
-        </label>
+        <div className="sheetSection">
+          <h4 id="rc-just-label">Justification</h4>
+          <div className="field">
+            <textarea
+              aria-labelledby="rc-just-label"
+              rows={5}
+              value={justification}
+              placeholder="Why this section is needed for care now"
+              onChange={(e) => setJustification(e.target.value)}
+            />
+          </div>
+          <p className="rc-hint">
+            {justification.trim()
+              ? "The privacy officer reviews each request. Access is logged against your name."
+              : "A justification is required to submit."}
+          </p>
+        </div>
       </Sheet>
     </div>
   );

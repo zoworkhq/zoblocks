@@ -9,7 +9,7 @@
  */
 
 import * as React from "react";
-import { ArrowDown, ArrowUp, Download, MoreHorizontal, Send, X } from "lucide-react";
+import { ArrowDown, ArrowUp, Check, Download, MoreHorizontal, Send, X } from "lucide-react";
 import {
   CLINICIANS,
   INSTRUMENT_MAX,
@@ -283,7 +283,14 @@ function RowMenu({ p }: { p: Patient }) {
                     })
               }
             >
-              {sent ? `Sent ${stamp()}` : `Send ${p.instrument}`}
+              {sent ? (
+                <>
+                  <Check aria-hidden="true" size={13} strokeWidth={2} />
+                  {p.instrument} sent {stamp()}
+                </>
+              ) : (
+                `Send ${p.instrument}`
+              )}
             </button>
             <button
               type="button"
@@ -338,6 +345,7 @@ function PageCheck({
 export function CaseloadScreen() {
   const { route, store, patch, toast } = useNav();
   const titleId = React.useId();
+  const panel = React.useRef<HTMLElement>(null);
   const initial = isView(route.view) ? route.view : undefined;
 
   const [track, setTrackRaw] = React.useState<TrackFilter>(
@@ -368,6 +376,13 @@ export function CaseloadScreen() {
   const setClin = reset(setClinRaw);
   const setProg = reset(setProgRaw);
   const setQ = reset(setQRaw);
+
+  // The pager sits below twelve rows; the next page should start at its top.
+  const turn = (n: number) => {
+    setPage(n);
+    const el = panel.current;
+    if (el && el.getBoundingClientRect().top < 0) el.scrollIntoView({ block: "start" });
+  };
 
   const clearFilters = () => {
     setTrackRaw("all");
@@ -554,7 +569,7 @@ export function CaseloadScreen() {
           />
         </div>
 
-        <section className="panel cl-panel" aria-labelledby={titleId}>
+        <section className="panel cl-panel" aria-labelledby={titleId} ref={panel}>
           <div className="panelTop cl-top">
             <div>
               <h3 id={titleId}>Active caseload</h3>
@@ -696,16 +711,20 @@ export function CaseloadScreen() {
                             </span>
                           </td>
                           <td>
-                            <span className="cl-trend">
-                              <span className="mono">{trend(p)}</span>
-                              <Spark
-                                points={p.scores}
-                                max={INSTRUMENT_MAX[p.instrument]}
-                                sev={t.sev}
-                                width={56}
-                                height={18}
-                              />
-                            </span>
+                            {p.scores.length < 2 ? (
+                              <span className="cl-noTrend">—</span>
+                            ) : (
+                              <span className="cl-trend">
+                                <span className="mono">{trend(p)}</span>
+                                <Spark
+                                  points={p.scores}
+                                  max={INSTRUMENT_MAX[p.instrument]}
+                                  sev={t.sev}
+                                  width={56}
+                                  height={18}
+                                />
+                              </span>
+                            )}
                           </td>
                           <td>
                             <span className="cl-two">
@@ -734,7 +753,9 @@ export function CaseloadScreen() {
                   </tbody>
                 </table>
               </div>
-              <Pager page={at} pages={pages} onPage={setPage} total={rows.length} size={PAGE} />
+              {pages > 1 ? (
+                <Pager page={at} pages={pages} onPage={turn} total={rows.length} size={PAGE} />
+              ) : null}
             </>
           )}
           {filtered ? null : (
@@ -749,7 +770,7 @@ export function CaseloadScreen() {
         open={sheet !== null}
         onClose={() => setSheet(null)}
         title="Send measures"
-        sub={selected.length ? `${sheetRows.length} selected patients` : "Everyone not on track"}
+        sub={`${sheetRows.length} ${selected.length ? "selected" : "not on track"} · sent by text`}
         footer={
           <>
             <button type="button" className="btn ghost sm" onClick={() => setSheet(null)}>
@@ -761,46 +782,51 @@ export function CaseloadScreen() {
               disabled={sheetPicked.size === 0}
               onClick={confirmSend}
             >
-              Send {sheetPicked.size} {sheetPicked.size === 1 ? "measure" : "measures"}
+              {sheetRows.every((p) => store.sent[p.id])
+                ? "All sent"
+                : `Send ${sheetPicked.size} ${sheetPicked.size === 1 ? "measure" : "measures"}`}
             </button>
           </>
         }
       >
-        <p className="cl-sheetNote">
-          Each patient gets their own instrument by text, to complete before their next session.
-        </p>
-        <ul className="cl-sendList">
-          {sheetRows.map((p) => {
-            const done = Boolean(store.sent[p.id]);
-            return (
-              <li key={p.id}>
-                <label className="check cl-sendRow">
-                  <input
-                    type="checkbox"
-                    checked={sheetPicked.has(p.id)}
-                    disabled={done}
-                    onChange={(e) =>
-                      setSheetPicked((s) => {
-                        const n = new Set(s);
-                        if (e.target.checked) n.add(p.id);
-                        else n.delete(p.id);
-                        return n;
-                      })
-                    }
-                  />
-                  <Face name={p.name} src={faceOf(p.name)} size={24} />
-                  <span className="cl-sendName">
-                    <b>{p.name}</b>
-                    <span>{nextLabel(p)}</span>
-                  </span>
-                  <span className="cl-sendInst mono">
-                    {done ? `Sent ${stamp()}` : p.instrument}
-                  </span>
-                </label>
-              </li>
-            );
-          })}
-        </ul>
+        <section className="sheetSection">
+          <h4>Recipients</h4>
+          <ul className="cl-sendList">
+            {sheetRows.map((p) => {
+              const done = Boolean(store.sent[p.id]);
+              return (
+                <li key={p.id}>
+                  <label className="check cl-sendRow">
+                    <input
+                      type="checkbox"
+                      checked={done || sheetPicked.has(p.id)}
+                      disabled={done}
+                      onChange={(e) =>
+                        setSheetPicked((s) => {
+                          const n = new Set(s);
+                          if (e.target.checked) n.add(p.id);
+                          else n.delete(p.id);
+                          return n;
+                        })
+                      }
+                    />
+                    <Face name={p.name} src={faceOf(p.name)} size={24} />
+                    <span className="cl-sendName">
+                      <b>{p.name}</b>
+                      <span>{hasUpcoming(p) ? `Next ${p.next}` : "No contact booked"}</span>
+                    </span>
+                    <span className="cl-sendInst mono">
+                      {done ? `Sent ${stamp()}` : p.instrument}
+                    </span>
+                  </label>
+                </li>
+              );
+            })}
+          </ul>
+          <p className="cl-sheetNote">
+            Each patient gets their own instrument, to complete before their next session.
+          </p>
+        </section>
       </Sheet>
     </>
   );
