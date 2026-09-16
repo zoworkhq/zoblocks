@@ -42,11 +42,10 @@ const PAGES = [
   "/",
   "/components",
   "/install",
-  "/pro",
+  "/premium",
   "/enterprise",
   "/compare",
   "/showcase",
-  "/marketplace",
   ...CATALOG.filter((component) => isDocumented(component.name)).map(
     (component) => `/components/${component.name}`,
   ),

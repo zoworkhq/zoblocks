@@ -23,9 +23,8 @@ const STATIC_ROUTES: ReadonlyArray<{ path: string; priority: number }> = [
   { path: "/components", priority: 0.9 },
   { path: "/install", priority: 0.8 },
   { path: "/showcase", priority: 0.7 },
-  { path: "/pro", priority: 0.7 },
+  { path: "/premium", priority: 0.7 },
   { path: "/compare", priority: 0.6 },
-  { path: "/marketplace", priority: 0.6 },
 ];
 
 /*

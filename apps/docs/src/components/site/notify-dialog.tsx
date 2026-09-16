@@ -67,6 +67,19 @@ export const NOTIFY_PRO: NotifyTopic = {
   source: "pro",
 };
 
+/**
+ * The Premium page's one ask, covering the console and the packs.
+ *
+ * `source` stays `"pro"`: the route allowlists it, and whatever consumes the
+ * webhook already knows that key.
+ */
+export const NOTIFY_PREMIUM: NotifyTopic = {
+  title: "Notify me when Premium launches",
+  blurb: "One message when the console and design packs are available. Nothing else.",
+  ask: "Please let me know when ZoBlocks Premium launches.",
+  source: "pro",
+};
+
 export const NOTIFY_MARKETPLACE: NotifyTopic = {
   title: "Notify me when the shop opens",
   blurb: "One message when packs can be bought. Nothing else.",

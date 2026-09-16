@@ -2,7 +2,7 @@
  * Zowork, as facts.
  *
  * Zowork is a services company that works only in healthcare, and ZoBlocks is
- * something it makes. The home page and `/pro` both state what follows, and
+ * something it makes. The home page and `/premium` both state what follows, and
  * the moment a figure is typed twice it starts drifting on one of them.
  *
  * Every value is from zowork.com, read on 15 September 2026. If one stops
@@ -24,11 +24,11 @@ export interface ZoworkProof {
 }
 
 /*
- * `/pro` only.
+ * `/premium` only.
  *
  * The home page dropped "Built it. Netsmart bought it." on 15 September 2026:
  * Bells.ai is work Zowork did for a client, and the line framed it as a product
- * Zowork owned and sold. The `/pro` desk still carries it. Whether it follows
+ * Zowork owned and sold. The `/premium` desk still carries it. Whether it follows
  * is Rahul's call, and has not been made.
  */
 const EXIT: ZoworkProof = { value: "Bells.ai", label: "Built it. Netsmart bought it." };
@@ -39,7 +39,7 @@ function tenure(now?: Date): ZoworkProof {
   return { value: `${zoworkYears(now)} yrs`, label: "In behavioral health" };
 }
 
-/** `/pro`. Tenure leads: a reader who got that far is asking how long Zowork has lasted. */
+/** `/premium`. Tenure leads: a reader who got that far is asking how long Zowork has lasted. */
 export function zoworkDeskProof(now?: Date): readonly ZoworkProof[] {
   return [tenure(now), EXIT, DOC_TIME, CHURN];
 }

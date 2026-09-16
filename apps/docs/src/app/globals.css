@@ -146,7 +146,7 @@
 
 @import "./pro-soon.css";
 
-/* The marketplace shelf and its animated previews. Scoped under `.zbm`. */
+/* Premium: its contents list and the design packs with their previews. Scoped under `.zbm`. */
 @import "./marketplace.css";
 
 /* ===========================================================================

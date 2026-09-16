@@ -71,23 +71,19 @@ const PAGES: Item[] = [
     keywords: "showcase examples compositions demos dashboard note patient copilot",
   },
   {
-    id: "p-marketplace",
-    label: "Marketplace",
-    group: "Pages",
-    href: "/marketplace",
-    keywords: "packs icons illustration theme fixtures artwork",
-  },
-  {
     /*
-     * No "pricing" keyword. It matched here while /pro was a tier table, and
-     * the page is a holding page now — typing "pricing" opened a screen with no
-     * prices on it, which is a worse answer than no answer.
+     * Marketplace and Pro, merged. Both old names stay as keywords so a
+     * reader who remembers either still finds the page.
+     *
+     * No "pricing" keyword: the page carries no prices, and typing "pricing"
+     * should not open a screen with none on it.
      */
-    id: "p-pro",
-    label: "Pro",
+    id: "p-premium",
+    label: "Premium",
     group: "Pages",
-    href: "/pro",
-    keywords: "console theming publish gate paid enterprise",
+    href: "/premium",
+    keywords:
+      "pro marketplace console theming publish gate paid enterprise packs icons illustration design system figma",
   },
 ];
 

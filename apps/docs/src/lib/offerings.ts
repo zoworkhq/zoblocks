@@ -182,7 +182,7 @@ export const TIERS: Tier[] = [
       "Components install with the ZoBlocks CLI",
     ],
     cta: "See what is coming",
-    href: "/marketplace",
+    href: "/premium#design-packs",
     featured: true,
     note: "Bought in the app when it opens, because a purchase belongs to an organisation rather than a person.",
   },

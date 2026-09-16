@@ -4,6 +4,7 @@ import * as React from "react";
 import { ANCHOR_STEP, RAMP_STEPS, contrastBetween, generateRamp } from "@zoblocks/tokens/validate";
 import { simulateVision, type VisionKind } from "@zoblocks/theme/vision";
 import { Figma, ShoppingBag, SlidersHorizontal, Users } from "lucide-react";
+import { CONSOLE_ALSO, CONSOLE_TILES } from "@/lib/premium";
 import {
   AntDesignMark,
   BootstrapMark,
@@ -251,28 +252,14 @@ const HOSTS = [
  * do not, and giving them a tile each purely for symmetry is what made the
  * first version of this page a wall of equal boxes. They share one tile.
  */
-const ALSO = [
-  {
-    name: "Figma plugin",
-    body: "Variables out, a proposal back. Proposing is not publishing.",
-    Icon: Figma,
-  },
-  {
-    name: "Roles",
-    body: "Thirteen capabilities per role. Publish and rollback are admin only.",
-    Icon: Users,
-  },
-  {
-    name: "Marketplace",
-    body: "Packs and themes, licensed to the organisation, perpetually.",
-    Icon: ShoppingBag,
-  },
-  {
-    name: "Playground",
-    body: "Brand, mode, density and colour vision over real components.",
-    Icon: SlidersHorizontal,
-  },
-];
+const ALSO_ICON = {
+  figma: Figma,
+  roles: Users,
+  playground: SlidersHorizontal,
+  licensing: ShoppingBag,
+} as const;
+
+const ALSO = CONSOLE_ALSO.map((item) => ({ ...item, Icon: ALSO_ICON[item.id] }));
 
 export function ProConsole() {
   const [index, setIndex] = React.useState(0);
@@ -352,7 +339,7 @@ export function ProConsole() {
         <section className="pbentoTile pbentoTile--app" aria-labelledby="pb-app">
           <header className="pbentoHead">
             <h3 id="pb-app" className="pbentoName">
-              Your brand, in the application
+              {CONSOLE_TILES.app}
             </h3>
             <p className="pbentoWhat">
               Brand, mode, density and colour vision, over an interface rather than a swatch board.
@@ -462,7 +449,7 @@ export function ProConsole() {
         <section className="pbentoTile pbentoTile--ramp" aria-labelledby="pb-ramp">
           <header className="pbentoHead">
             <h3 id="pb-ramp" className="pbentoName">
-              One colour in, eleven out
+              {CONSOLE_TILES.ramp}
             </h3>
             <p className="pbentoWhat">Anchored so step 600 is exactly what you gave it.</p>
           </header>
@@ -485,7 +472,7 @@ export function ProConsole() {
         <section className="pbentoTile pbentoTile--gate" aria-labelledby="pb-gate">
           <header className="pbentoHead">
             <h3 id="pb-gate" className="pbentoName">
-              A failing theme cannot go live
+              {CONSOLE_TILES.gate}
             </h3>
             <p className="pbentoWhat">
               Measured on the server. The boundary is at publish, so a failure cannot be clicked
@@ -527,7 +514,7 @@ export function ProConsole() {
         <section className="pbentoTile pbentoTile--deliver" aria-labelledby="pb-deliver">
           <header className="pbentoHead">
             <h3 id="pb-deliver" className="pbentoName">
-              Pinned to a version
+              {CONSOLE_TILES.deliver}
             </h3>
             <p className="pbentoWhat">
               An edit here cannot change a running application until somebody moves the pin.
@@ -551,7 +538,7 @@ export function ProConsole() {
         <section className="pbentoTile pbentoTile--hosts" aria-labelledby="pb-hosts">
           <header className="pbentoHead">
             <h3 id="pb-hosts" className="pbentoName">
-              It speaks your host&rsquo;s language
+              {CONSOLE_TILES.hosts}
             </h3>
             <p className="pbentoWhat">
               The same value under four house styles, and the library imports none of them.
@@ -583,7 +570,7 @@ export function ProConsole() {
         <section className="pbentoTile pbentoTile--also" aria-labelledby="pb-also">
           <header className="pbentoHead">
             <h3 id="pb-also" className="pbentoName">
-              Also in the console
+              Also included
             </h3>
           </header>
           {/* An icon per entry, and two columns rather than four.

@@ -61,7 +61,7 @@ export default async function MarketplaceItemPage({
 }) {
   const { slug } = await params;
   // A pack taken off the shelf sends its old address to the shelf.
-  if (!inCollection(slug)) permanentRedirect("/marketplace");
+  if (!inCollection(slug)) permanentRedirect("/premium#design-packs");
   const item = await findItem(slug);
   if (!item) notFound();
 
@@ -75,11 +75,11 @@ export default async function MarketplaceItemPage({
         <section className="border-b border-rule">
           <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
             <Link
-              href="/marketplace"
+              href="/premium#design-packs"
               className="group inline-flex items-center gap-2 text-sm text-graphite transition-colors hover:text-ink"
             >
               <ArrowLeft aria-hidden="true" className="size-4" />
-              Marketplace
+              Premium
             </Link>
 
             <p className="eyebrow eyebrow-rule mt-8 text-brand-deep" data-reveal>
@@ -141,13 +141,13 @@ export default async function MarketplaceItemPage({
               {/*
                 Was "Compare with Pro", pointing at a holding page with nothing
                 to compare against. The useful second destination from an item
-                is the rest of the shelf.
+                is the rest of the packs, on the Premium page.
               */}
               <Link
-                href="/marketplace"
+                href="/premium#design-packs"
                 className="inline-flex items-center gap-2 rounded-xl border border-rule px-5 py-3.5 text-sm font-medium text-ink transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:border-brand/40"
               >
-                See the whole shelf
+                See all design packs
               </Link>
             </div>
           </div>

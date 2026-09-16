@@ -1,9 +1,10 @@
 /**
- * The Pro page.
+ * The Premium page: the theming console (was `/pro`) and the design packs
+ * (was `/marketplace`), merged on 16 Sep 2026.
  *
- * `/pro` does not sell the console — Pro is out of the first release. It says
- * what the product is, shows it working, and states plainly that it is not
- * available yet.
+ * It does not sell anything — Premium is out of the first release. It says
+ * what the products are, shows them working, and states plainly that they are
+ * not available yet. The packs half is covered in `docs-site.spec.ts`.
  *
  * ## What this file used to test
  *
@@ -50,18 +51,24 @@ async function audit(page: Page) {
   return result.violations;
 }
 
-/** Settle the reveal. Infinite animations never resolve, so they are excluded. */
+/**
+ * Settle every reveal on the page, not only the console's.
+ *
+ * Clicking the picker can scroll, and the design-pack headings below then
+ * start their scroll-reveal fade; axe caught one at half opacity. Infinite
+ * animations never resolve, and a cancelled one rejects, so both are handled.
+ */
 async function settle(page: Page) {
-  await page.locator(".pbentoGrid").evaluate(async (el) => {
-    const running = el
-      .getAnimations({ subtree: true })
+  await page.evaluate(async () => {
+    const running = document
+      .getAnimations()
       .filter((a) => a.effect?.getComputedTiming().iterations !== Infinity)
-      .map((a) => a.finished);
+      .map((a) => a.finished.catch(() => undefined));
     await Promise.all(running);
   });
 }
 
-test.describe("the Pro page @a11y", () => {
+test.describe("the Premium page @a11y", () => {
   /**
    * The status is the heading, and the eyebrow names the product.
    *
@@ -73,25 +80,25 @@ test.describe("the Pro page @a11y", () => {
    * halves so the next person to make the trade has to make it on purpose.
    */
   test("the release status is the page's heading", async ({ page }) => {
-    await page.goto("/pro");
+    await page.goto("/premium");
 
     const h1 = page.getByRole("heading", { level: 1 });
     await expect(h1).toHaveText(/coming soon/i);
     await expect(page.locator("main h1")).toHaveCount(1);
 
     // And the product is named directly above it, not left to the tab title.
-    await expect(page.locator("main .eyebrow").first()).toContainText(/zoblocks pro/i);
+    await expect(page.locator("main .eyebrow").first()).toContainText(/zoblocks premium/i);
   });
 
   test("says what is held and what is not, in text", async ({ page }) => {
-    await page.goto("/pro");
+    await page.goto("/premium");
     const main = page.locator("main");
     await expect(main).toContainText(/not in this release/i);
     await expect(main).toContainText(/available now/i);
   });
 
   test("the bento names every capability it shows", async ({ page }) => {
-    await page.goto("/pro");
+    await page.goto("/premium");
 
     const tiles = page.locator(".pbentoTile");
     await expect(tiles).toHaveCount(6);
@@ -116,7 +123,7 @@ test.describe("the Pro page @a11y", () => {
    * swatches would pass a snapshot and fail this.
    */
   test("the gate's numbers are the gate's numbers", async ({ page }) => {
-    await page.goto("/pro");
+    await page.goto("/premium");
     const measured = await page.evaluate(() => {
       // Written out rather than imported, so the test is not checking the
       // implementation against itself.
@@ -166,7 +173,7 @@ test.describe("the Pro page @a11y", () => {
    * about.
    */
   test("a blocked draft takes no version and repaints nothing", async ({ page }) => {
-    await page.goto("/pro");
+    await page.goto("/premium");
     const picker = page.locator(".pbentoPicker");
 
     await picker.getByRole("button", { name: /^Seafoam/ }).click();
@@ -204,7 +211,7 @@ test.describe("the Pro page @a11y", () => {
    * never followed at all.
    */
   test("the preview takes the page's theme, then takes yours", async ({ page }) => {
-    await page.goto("/pro");
+    await page.goto("/premium");
     const modes = page.getByRole("group", { name: "Mode" });
 
     await page.evaluate(() => document.documentElement.classList.add("dark"));
@@ -240,7 +247,7 @@ test.describe("the Pro page @a11y", () => {
    * contrast in the toggle — as the only one who did not get it.
    */
   test("the page follows the theme rather than a literal", async ({ page }) => {
-    await page.goto("/pro");
+    await page.goto("/premium");
 
     const read = () =>
       page.evaluate(() => {
@@ -314,10 +321,10 @@ test.describe("the Pro page @a11y", () => {
    * quietly ate it" look identical from outside.
    */
   test("the notify dialog opens, validates, and never swallows an address", async ({ page }) => {
-    await page.goto("/pro");
+    await page.goto("/premium");
 
-    await page.getByRole("button", { name: /notify me when it ships/i }).click();
-    const dialog = page.getByRole("dialog", { name: /notify me when pro ships/i });
+    await page.getByRole("button", { name: /notify me at launch/i }).click();
+    const dialog = page.getByRole("dialog", { name: /notify me when premium launches/i });
     await expect(dialog).toBeVisible();
 
     // Focus lands on the field, so a keyboard reader can type immediately.
@@ -344,7 +351,7 @@ test.describe("the Pro page @a11y", () => {
     // Escape closes it and returns focus to the button that opened it.
     await page.keyboard.press("Escape");
     await expect(dialog).toBeHidden();
-    await expect(page.getByRole("button", { name: /notify me when it ships/i })).toBeFocused();
+    await expect(page.getByRole("button", { name: /notify me at launch/i })).toBeFocused();
   });
 
   /**
@@ -370,7 +377,7 @@ test.describe("the Pro page @a11y", () => {
   });
 
   test("every way off the page leads somewhere", async ({ page }) => {
-    await page.goto("/pro");
+    await page.goto("/premium");
     const main = page.locator("main");
 
     /*
@@ -378,7 +385,7 @@ test.describe("the Pro page @a11y", () => {
      * dialog. Its own behaviour is covered above; what this suite cares about
      * is that the page still offers it.
      */
-    await expect(main.getByRole("button", { name: /notify me when it ships/i })).toBeVisible();
+    await expect(main.getByRole("button", { name: /notify me at launch/i })).toBeVisible();
 
     // Two routes to the catalogue: one in the hero, one closing the page.
     const toComponents = main.getByRole("link", { name: /view components|browse components/i });
@@ -395,7 +402,7 @@ test.describe("the Pro page @a11y", () => {
 
   test("does not scroll sideways at 320px", async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 812 });
-    await page.goto("/pro");
+    await page.goto("/premium");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 
     const overflows = await page.evaluate(
@@ -418,7 +425,7 @@ test.describe("the Pro page @a11y", () => {
     ["blocked", "Seafoam"],
   ] as const) {
     test(`has no WCAG 2.2 AA violations, ${state}`, async ({ page }) => {
-      await page.goto("/pro");
+      await page.goto("/premium");
       await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 
       await page
@@ -449,9 +456,9 @@ test.describe("the Pro page @a11y", () => {
  * moving. `reducedMotion` is set on the project rather than in the test, so
  * the preference is in place before first paint.
  */
-test.describe("the Pro tour under reduced motion @motion", () => {
+test.describe("the Premium console under reduced motion @motion", () => {
   test("nothing runs, and nothing is lost", async ({ page }) => {
-    await page.goto("/pro");
+    await page.goto("/premium");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 
     const running = await page.evaluate(() =>

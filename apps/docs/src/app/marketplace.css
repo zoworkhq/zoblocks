@@ -1,7 +1,9 @@
 /* ===========================================================================
- * Marketplace — the five-pack shelf and its previews.
+ * Premium — the page's contents list, part headers, and the design packs
+ * with their animated previews.
  *
- * Scoped under `.zbm`. Markup lives in `components/site/market-scenes.tsx`.
+ * Scoped under `.zbm`. Markup lives in `app/premium/page.tsx`,
+ * `components/site/design-packs.tsx` and `components/site/market-scenes.tsx`.
  *
  * Three rules hold throughout:
  *   - Colour comes from site tokens, so light, dark and high contrast all work.
@@ -50,60 +52,121 @@
 }
 
 /* ---------------------------------------------------------------------------
- * Hero index
+ * Premium: the hero contents list and the two part headers
  * ------------------------------------------------------------------------ */
 
-.zbm-index {
+.zbm-contents {
   display: grid;
-  border-top: 1px solid var(--site-rule);
-}
-
-.zbm-index a {
-  display: grid;
-  grid-template-columns: 2.25rem minmax(0, 1fr) auto;
-  align-items: baseline;
   gap: 0.75rem;
-  padding: 0.875rem 0.25rem;
-  border-bottom: 1px solid var(--site-rule);
-  color: var(--site-ink);
-  transition:
-    padding 300ms var(--m-ease),
-    color 300ms var(--m-ease);
 }
 
-.zbm-index a:hover {
-  padding-left: 0.625rem;
+.zbm-contents-group {
+  padding: 1.125rem 1.25rem 1.25rem;
+  border: 1px solid var(--site-rule);
+  border-radius: 1rem;
+  background: var(--site-paper);
+}
+
+.zbm-contents-head {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  color: var(--site-ink);
+}
+
+.zbm-contents-n {
+  font: 500 0.6875rem/1 var(--font-mono);
   color: var(--site-accent-text);
 }
 
-.zbm-index-n {
-  font: 500 0.6875rem/1 var(--font-mono);
-  color: var(--site-graphite);
-}
-
-.zbm-index-name {
+.zbm-contents-title {
   font-family: var(--font-display);
   font-size: 1.0625rem;
   font-weight: 600;
   letter-spacing: -0.015em;
 }
 
-.zbm-index-kind {
-  font-size: 0.8125rem;
+.zbm-contents-count {
+  min-width: 1.375rem;
+  padding: 0.0625rem 0.375rem;
+  border: 1px solid var(--site-rule);
+  border-radius: 999px;
+  font: 500 0.6875rem/1rem var(--font-mono);
+  text-align: center;
   color: var(--site-graphite);
-  text-align: right;
 }
 
-@media (max-width: 639px) {
-  .zbm-index a {
-    grid-template-columns: 2rem minmax(0, 1fr);
-    row-gap: 0.125rem;
-    padding-block: 0.75rem;
+.zbm-contents-arrow {
+  margin-left: auto;
+  color: var(--site-graphite);
+  transition:
+    translate 300ms var(--m-ease),
+    color 300ms var(--m-ease);
+}
+
+.zbm-contents-head:hover .zbm-contents-title,
+.zbm-contents-head:hover .zbm-contents-arrow {
+  color: var(--site-accent-text);
+}
+
+.zbm-contents-head:hover .zbm-contents-arrow {
+  translate: 0 2px;
+}
+
+.zbm-contents-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.375rem 1.25rem;
+  margin-top: 0.875rem;
+  padding-top: 0.875rem;
+  border-top: 1px solid var(--site-rule);
+}
+
+.zbm-contents-list li {
+  position: relative;
+  padding-left: 0.875rem;
+  font-size: 0.8125rem;
+  line-height: 1.35rem;
+  color: var(--site-graphite);
+}
+
+.zbm-contents-list li::before {
+  content: "";
+  position: absolute;
+  top: 0.5625rem;
+  left: 0;
+  width: 0.3125rem;
+  height: 0.3125rem;
+  border-radius: 50%;
+  background: var(--site-brand);
+}
+
+@media (max-width: 479px) {
+  .zbm-contents-list {
+    grid-template-columns: minmax(0, 1fr);
   }
-  .zbm-index-kind {
-    grid-column: 2;
-    text-align: left;
-  }
+}
+
+.zbm-part {
+  border-bottom: 1px solid var(--site-rule);
+  scroll-margin-top: 3.5rem;
+}
+
+.zbm-part-head {
+  padding-top: clamp(3.5rem, 2rem + 4vw, 5.5rem);
+}
+
+.zbm-part-n {
+  margin-bottom: 0.5rem;
+  font: 500 0.6875rem/1 var(--font-mono);
+  letter-spacing: 0.08em;
+  color: var(--site-accent-text);
+}
+
+/* The band that follows carries its own top rule. */
+#design-packs {
+  padding-bottom: clamp(3.5rem, 2rem + 4vw, 5.5rem);
+  border-bottom: 0;
 }
 
 /* ---------------------------------------------------------------------------
@@ -714,14 +777,15 @@
   font-weight: 500;
   line-height: 1.375rem;
   letter-spacing: -0.01em;
-  white-space: nowrap;
+  text-wrap: balance;
 }
 
 .zbm-sw-scale {
   position: relative;
   display: flex;
-  gap: 24px;
-  width: 236px;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 236px;
   height: 28px;
   margin-top: 0.875rem;
 }
@@ -754,18 +818,19 @@
 .zbm-sw-pick {
   position: absolute;
   top: -4px;
-  left: -4px;
+  /* Step s sits at (width - 28px) * s / 4; the ring is 4px wider each side. */
+  left: calc((100% - 28px) * 0.5 - 4px);
   width: 36px;
   height: 36px;
   border-radius: 50%;
   box-shadow: inset 0 0 0 2px var(--sw-tide);
-  transform: translateX(104px);
 }
 
 .zbm-sw-legend {
   display: flex;
   justify-content: space-between;
-  width: 236px;
+  width: 100%;
+  max-width: 236px;
   margin-top: 0.375rem;
   font-size: 0.6875rem;
   line-height: 1rem;
@@ -1119,16 +1184,19 @@
 
 .zbm-an-canvas {
   position: relative;
-  display: grid;
+  display: flex;
   flex: 1;
-  place-items: center;
+  align-items: center;
+  justify-content: center;
   min-width: 0;
   overflow: hidden;
 }
 
 .zbm-an-fit {
   position: relative;
-  width: 348px;
+  flex: none;
+  /* Never wider than a 320px screen, or the width sweep fails it. */
+  width: 316px;
   height: 72px;
   margin-top: 0.5rem;
 }
@@ -1179,7 +1247,7 @@
 .zbm-an-details {
   top: 39px;
   left: 68px;
-  width: 164px;
+  width: 136px;
   height: 16px;
   font: 0.65625rem/16px var(--font-mono);
   white-space: nowrap;
@@ -1188,7 +1256,7 @@
 
 .zbm-an-flag {
   top: 24px;
-  left: 248px;
+  left: 216px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1270,11 +1338,11 @@
 }
 .zbm-an-size[data-part="2"] {
   top: 61px;
-  left: 150px;
+  left: 120px;
 }
 .zbm-an-size[data-part="3"] {
   top: 54px;
-  left: 290px;
+  left: 258px;
 }
 
 .zbm-an-pin {
@@ -1318,7 +1386,7 @@
 }
 .zbm-an-pin[data-part="2"] {
   top: 88px;
-  left: 204px;
+  left: 186px;
 }
 .zbm-an-pin[data-part="2"]::after {
   bottom: 18px;
@@ -1326,7 +1394,7 @@
 }
 .zbm-an-pin[data-part="3"] {
   top: -34px;
-  left: 290px;
+  left: 258px;
 }
 .zbm-an-pin[data-part="3"]::after {
   top: 18px;
@@ -1400,7 +1468,7 @@
 
 @container (max-width: 400px) {
   .zbm-an-fit {
-    scale: 0.8;
+    zoom: 0.8;
   }
   .zbm-an-crumb > span:not(:last-child) {
     display: none;
@@ -1409,7 +1477,14 @@
 
 @container (max-width: 330px) {
   .zbm-an-fit {
-    scale: 0.72;
+    zoom: 0.72;
+  }
+  /* No room for a path beside the mode switch; the switch is the point. */
+  .zbm-an-crumb {
+    display: none;
+  }
+  .zbm-an-bar {
+    justify-content: center;
   }
 }
 
@@ -1929,18 +2004,18 @@
 @keyframes zbm-sw-pick {
   0%,
   28% {
-    transform: translateX(52px);
+    left: calc((100% - 28px) * 0.25 - 4px);
   }
   36%,
   62% {
-    transform: translateX(104px);
+    left: calc((100% - 28px) * 0.5 - 4px);
   }
   70%,
   92% {
-    transform: translateX(156px);
+    left: calc((100% - 28px) * 0.75 - 4px);
   }
   100% {
-    transform: translateX(52px);
+    left: calc((100% - 28px) * 0.25 - 4px);
   }
 }
 
@@ -2009,13 +2084,13 @@
   71% {
     top: 37px;
     left: 66px;
-    width: 168px;
+    width: 140px;
     height: 20px;
   }
   75%,
   96% {
     top: 22px;
-    left: 246px;
+    left: 214px;
     width: 88px;
     height: 28px;
   }

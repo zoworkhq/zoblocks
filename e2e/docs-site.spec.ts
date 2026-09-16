@@ -111,7 +111,7 @@ test.describe("scrolling @a11y", () => {
   });
 
   test("the removed progress rail is gone from every page", async ({ page }) => {
-    for (const url of [CATALOG, TABS, "/", "/showcase", "/marketplace", "/pro"]) {
+    for (const url of [CATALOG, TABS, "/", "/showcase", "/premium"]) {
       await page.goto(url);
       await expect(page.locator(".scroll-rail")).toHaveCount(0);
     }
@@ -816,7 +816,7 @@ test.describe("site chrome @a11y", () => {
   });
 });
 
-test.describe("the public marketplace @a11y", () => {
+test.describe("the design packs on Premium @a11y", () => {
   /**
    * The catalogue is rendered here and bought in the app.
    *
@@ -833,14 +833,36 @@ test.describe("the public marketplace @a11y", () => {
    */
   test("is reachable from the site chrome", async ({ page }) => {
     await page.goto("/");
-    await page.getByRole("navigation").first().getByRole("link", { name: "Marketplace" }).click();
+    await page.getByRole("navigation").first().getByRole("link", { name: "Premium" }).click();
 
-    await expect(page).toHaveURL(/\/marketplace$/);
+    await expect(page).toHaveURL(/\/premium$/);
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
 
+  /*
+   * Marketplace and Pro merged into Premium on 16 Sep 2026. Both old
+   * addresses are indexed, so they move permanently, and the header offers
+   * neither any more.
+   */
+  test("sends the old Marketplace and Pro addresses to Premium", async ({ page, request }) => {
+    for (const [from, to] of [
+      ["/pro", "/premium"],
+      ["/marketplace", "/premium#design-packs"],
+    ] as const) {
+      const response = await request.get(from, { maxRedirects: 0 });
+      expect(response.status(), from).toBe(308);
+      const location = new URL(response.headers()["location"] ?? "", "http://localhost");
+      expect(location.pathname + location.hash, from).toBe(to);
+    }
+
+    await page.goto("/");
+    const header = page.getByRole("navigation").first();
+    await expect(header.getByRole("link", { name: "Marketplace" })).toHaveCount(0);
+    await expect(header.getByRole("link", { name: "Pro", exact: true })).toHaveCount(0);
+  });
+
   test("lists the packs whether or not the console answers", async ({ page }) => {
-    await page.goto("/marketplace");
+    await page.goto("/premium");
 
     const cards = page.locator("[data-zb-pack]");
     // A floor, not a maybe. The console has never been deployed and the shelf
@@ -872,7 +894,7 @@ test.describe("the public marketplace @a11y", () => {
    * having stopped saying it at all.
    */
   test("says the shop is shut once, not on every card", async ({ page }) => {
-    await page.goto("/marketplace");
+    await page.goto("/premium");
 
     await expect(page.getByText(/Purchasing opens with the ZoBlocks console/)).toBeVisible();
 
@@ -886,7 +908,7 @@ test.describe("the public marketplace @a11y", () => {
   test("refuses every purchase path, and still says what a built pack contains", async ({
     page,
   }) => {
-    await page.goto("/marketplace");
+    await page.goto("/premium");
 
     /*
      * This asserted "Available now" against "In production" until selling was
@@ -900,7 +922,7 @@ test.describe("the public marketplace @a11y", () => {
      * it is named for what it holds.
      */
     await expect(page.getByRole("heading", { level: 1, name: "Coming soon" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Product catalogue" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Design packs" })).toBeVisible();
 
     const cards = page.locator("[data-zb-pack]");
     expect(await cards.count()).toBeGreaterThan(1);
@@ -931,7 +953,7 @@ test.describe("the public marketplace @a11y", () => {
    * tests, where the source can be chosen.
    */
   test("shows what is in a pack rather than only describing it", async ({ page }) => {
-    await page.goto("/marketplace");
+    await page.goto("/premium");
 
     const cards = page.locator("[data-zb-pack]");
     const total = await cards.count();
@@ -941,7 +963,7 @@ test.describe("the public marketplace @a11y", () => {
   });
 
   test("never publishes a clinical review nobody performed", async ({ page }) => {
-    await page.goto("/marketplace");
+    await page.goto("/premium");
     // The seed's reviewer is "SEED DATA — nobody has reviewed this". Neither
     // that nor a plausible substitute may reach a reader.
     await expect(page.getByText(/SEED DATA/i)).toHaveCount(0);
@@ -965,7 +987,7 @@ test.describe("the public marketplace @a11y", () => {
   });
 
   test("an item states what was checked and where it is bought", async ({ page }) => {
-    await page.goto("/marketplace");
+    await page.goto("/premium");
 
     // By address, not by clicking a card: cards do not link while selling
     // is closed. The page is still built and still reachable.

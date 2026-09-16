@@ -69,6 +69,18 @@ const nextConfig: NextConfig = {
     },
   },
 
+  /*
+   * Marketplace and Pro became one page, Premium, on 16 Sep 2026. The old
+   * addresses are indexed and linked from outside, so they move permanently
+   * rather than 404. Pack detail pages keep their `/marketplace/<slug>` URLs.
+   */
+  async redirects() {
+    return [
+      { source: "/pro", destination: "/premium", permanent: true },
+      { source: "/marketplace", destination: "/premium#design-packs", permanent: true },
+    ];
+  },
+
   async headers() {
     return [
       {

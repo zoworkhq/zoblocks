@@ -55,7 +55,8 @@ export function ZoBlocksMark({ className = "h-4 w-7" }: { className?: string }) 
 }
 
 /*
- * Four slots: the catalogue, the blocks, the marketplace and Pro.
+ * Three slots: the catalogue, the blocks and Premium. Premium was two slots,
+ * Marketplace and Pro, until 16 Sep 2026.
  *
  * Install and Compare were promoted here briefly during the content audit,
  * on the argument that they are the two highest-intent pages for a developer
@@ -71,8 +72,7 @@ export function ZoBlocksMark({ className = "h-4 w-7" }: { className?: string }) 
 const NAV = [
   { href: "/components", label: "Components" },
   { href: "/showcase", label: "Blocks" },
-  { href: "/marketplace", label: "Marketplace" },
-  { href: "/pro", label: "Pro" },
+  { href: "/premium", label: "Premium" },
 ];
 
 /**
@@ -251,8 +251,7 @@ const FOOTER_LINKS = [
       { href: "/install", label: "Install" },
       { href: "/compare", label: "Compare" },
       { href: "/showcase", label: "Blocks" },
-      { href: "/marketplace", label: "Marketplace" },
-      { href: "/pro", label: "Pro" },
+      { href: "/premium", label: "Premium" },
     ],
   },
   {
@@ -300,7 +299,7 @@ export function SiteFooter() {
                 `.zwStamp` in `globals.css` for why that silently did nothing.
 
                 It is a chip now, in the same language as the release chip on
-                `/pro`: a hairline border, a mono micro-label, the mark, and an
+                `/premium`: a hairline border, a mono micro-label, the mark, and an
                 arrow that arrives on hover. A studio signing its work rather
                 than a line of body copy. */}
             <a href="https://www.zowork.com/" rel="noopener" className="zwStamp group mt-4">

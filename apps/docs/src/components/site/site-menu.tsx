@@ -27,8 +27,7 @@ const LINKS = [
   { href: "/install", label: "Install" },
   { href: "/compare", label: "Compare" },
   { href: "/showcase", label: "Blocks" },
-  { href: "/marketplace", label: "Marketplace" },
-  { href: "/pro", label: "Pro" },
+  { href: "/premium", label: "Premium" },
 ] as const;
 
 /** `h-16` and `h-13` in `SiteHeader`. */

@@ -474,7 +474,7 @@ function BehaviouralSystem() {
 /* ------------------------------------------------------------------ */
 
 const LAYERS = ["Avatar", "Name", "Details", "Allergy"] as const;
-const SIZES = ["40 × 40", "104 × 20", "164 × 16", "84 × 24"] as const;
+const SIZES = ["40 × 40", "104 × 20", "136 × 16", "84 × 24"] as const;
 const MODES = ["Light", "Dark", "HC"] as const;
 const VARIABLES = [
   { name: "surface", values: ["#FFFFFF", "#151A21", "#FFFFFF"] },
@@ -520,7 +520,7 @@ function FigmaKit() {
             <div className="zbm-an-frame" aria-hidden="true">
               <span className="zbm-an-avatar">MO</span>
               <span className="zbm-an-name">Maya Okafor</span>
-              <span className="zbm-an-details">34 · she/her · MRN 204118</span>
+              <span className="zbm-an-details">34 · she/her · 204118</span>
               <span className="zbm-an-flag">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M12 4 3 19.5h18z" />

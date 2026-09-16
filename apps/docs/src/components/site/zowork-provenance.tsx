@@ -374,7 +374,7 @@ export function ZoworkProvenance() {
             className="zwpWordmark zwpWordmark--cta"
             unoptimized
           />
-          {/* Zowork's own promise, the same line the `/pro` desk carries. */}
+          {/* Zowork's own promise, the same line the `/premium` desk carries. */}
           <p className="zwpCtaReply">
             <i className="zwpDot" aria-hidden="true" />
             Usually replies within a business day

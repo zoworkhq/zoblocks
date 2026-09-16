@@ -1,5 +1,6 @@
 /**
- * `/pro` at every width, in both themes.
+ * `/premium` at every width, in both themes. The console and the design-pack
+ * previews both sit under `.pro`, so the sweep covers both.
  *
  * The page is a bento whose tiles are sized unequally and whose largest one
  * holds a preview of an application. That is a layout with a lot of ways to go
@@ -54,7 +55,7 @@ for (const theme of ["light", "dark"] as const) {
   for (const size of SIZES) {
     test(`${theme} · ${size.name} @a11y`, async ({ page }) => {
       await page.setViewportSize({ width: size.width, height: size.height });
-      await page.goto("/pro");
+      await page.goto("/premium");
       await page.evaluate((t) => {
         document.documentElement.classList.toggle("dark", t === "dark");
       }, theme);
@@ -117,7 +118,9 @@ for (const theme of ["light", "dark"] as const) {
 
       // The four corners get the full audit.
       if (size.width === 320 || size.width === 1440) {
-        await page.locator(".pbentoGrid").evaluate(async (el) => {
+        // Every reveal on the page, not only the console's: the design-pack
+        // headings fade in too, and axe reads a half-faded one as failing.
+        await page.evaluate(async () => {
           /*
            * Finite animations only, and a cancelled one is not a failure.
            *
@@ -126,8 +129,8 @@ for (const theme of ["light", "dark"] as const) {
            * awaiting them bare turns a theme switch into a test failure. An
            * infinite one never resolves at all.
            */
-          const settling = el
-            .getAnimations({ subtree: true })
+          const settling = document
+            .getAnimations()
             .filter((a) => a.effect?.getComputedTiming().iterations !== Infinity)
             .map((a) => a.finished.catch(() => undefined));
           await Promise.all(settling);

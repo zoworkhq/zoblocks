@@ -71,7 +71,7 @@ export function AcquireAction({
   if (component.tier === "pro") {
     return (
       <Link
-        href="/marketplace"
+        href="/premium#design-packs"
         // Above the card's overlay link, so the whole card still opens the
         // component and this one corner does something else.
         className={cn(
@@ -82,7 +82,7 @@ export function AcquireAction({
           className,
         )}
       >
-        Buy in the marketplace
+        Get it with Premium
         <ArrowUpRight aria-hidden="true" className="size-3" />
       </Link>
     );

@@ -10,8 +10,9 @@ import { Stage } from "@/components/pro/stage-map";
 import { StageGate, VisionFilters } from "@/components/pro/stages";
 
 /**
- * NOT RENDERED. `/pro` is the holding page in `page.tsx`; this is the console
- * pitch it replaced, kept whole for when the console ships.
+ * NOT RENDERED. `/pro` redirects to `/premium` (`app/premium/page.tsx`); this
+ * is the console pitch the holding page replaced, kept whole for when the
+ * console ships.
  *
  * It carried three claims that stopped being true while it sat here — a
  * "buyable today" badge over a shelf that is closed, a "Create an organisation"
