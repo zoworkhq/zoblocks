@@ -1,4 +1,6 @@
 node_modules
+# Local agent worktrees: whole checkouts of other branches, never committed here.
+.claude
 .next
 dist
 .turbo

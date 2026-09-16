@@ -18,7 +18,7 @@ reference range, the restricted record, the patient who refused to sign.
 [![Status](https://img.shields.io/badge/status-pre--release-orange.svg)](#status)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-[**Documentation**](https://oxygenui.design) · [**Install guide**](docs/getting-started.md) · [**Architecture**](ARCHITECTURE.md) · [**Engineering standard**](ENGINEERING.md) · [**Decisions**](content/decisions/)
+[**Documentation**](https://zoblocks.design) · [**Install guide**](docs/getting-started.md) · [**Architecture**](ARCHITECTURE.md) · [**Engineering standard**](ENGINEERING.md) · [**Decisions**](content/decisions/)
 
 </div>
 
@@ -292,8 +292,8 @@ zoblocks/
 │  ├─ smoke/             # HTML · React 19 · Vue · Angular · Svelte
 │  └─ smoke-react18/     # React 18, which cannot share a node_modules with 19
 ├─ packages/             # the published packages (see the table above)
-├─ registry/oxygen/      # component source — this is what customers receive
-├─ docs/                 # installing Oxygen UI into an existing React app
+├─ registry/zoblocks/    # component source — this is what customers receive
+├─ docs/                 # installing ZoBlocks into an existing React app
 ├─ content/decisions/    # nine architecture decision records
 ├─ scripts/gen/          # the generator
 ├─ e2e/                  # Playwright: VRT, a11y, reflow, cross-framework

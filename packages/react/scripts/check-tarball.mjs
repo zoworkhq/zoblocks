@@ -17,7 +17,13 @@ const packed = JSON.parse(
 )[0];
 const files = packed.files.map((f) => f.path);
 
-for (const required of ["dist/index.js", "dist/index.d.ts", "dist/styles.css", "README.md", "LICENSE"]) {
+for (const required of [
+  "dist/index.js",
+  "dist/index.d.ts",
+  "dist/styles.css",
+  "README.md",
+  "LICENSE",
+]) {
   if (!files.includes(required)) problems.push(`${required} is missing from the tarball.`);
 }
 
@@ -52,7 +58,10 @@ if (manifest.dependencies?.react || manifest.dependencies?.["react-dom"]) {
 if (!manifest.peerDependencies?.react) problems.push("react is not declared as a peer dependency.");
 
 const published = { ...manifest, ...(manifest.publishConfig ?? {}) };
-for (const [field, value] of [["main", published.main], ["types", published.types]]) {
+for (const [field, value] of [
+  ["main", published.main],
+  ["types", published.types],
+]) {
   if (typeof value === "string" && value.startsWith("./src/")) {
     problems.push(
       `publishConfig did not take effect: ${field} still points at ${value}. ` +

@@ -56,7 +56,10 @@ for (const suite of report.suites ?? []) {
     // status is ever absent.
     const attempts = test.results?.length ?? 0;
     const failedAttempts = (test.results ?? []).filter((r) => r.status === "failed").length;
-    if (test.status === "flaky" || (attempts > 1 && failedAttempts > 0 && test.status !== "unexpected")) {
+    if (
+      test.status === "flaky" ||
+      (attempts > 1 && failedAttempts > 0 && test.status !== "unexpected")
+    ) {
       flaky.push({
         title,
         project: test.projectName ?? "",

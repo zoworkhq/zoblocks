@@ -100,7 +100,7 @@ for (const [subpath, target] of Object.entries(published.exports ?? {})) {
  */
 if (manifest.sideEffects !== true) {
   problems.push(
-    'sideEffects must be true. Each entry point defines a custom element; marking the package side-effect-free lets a bundler drop the import and leaves undefined elements on the page.',
+    "sideEffects must be true. Each entry point defines a custom element; marking the package side-effect-free lets a bundler drop the import and leaves undefined elements on the page.",
   );
 }
 

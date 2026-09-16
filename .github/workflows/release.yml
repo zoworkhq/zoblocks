@@ -143,7 +143,7 @@ jobs:
       # npm attests provenance against the repository that built the tarball,
       # and the registry rejects the attestation when `repository.url` in the
       # manifest names a different repository. Every manifest here declares
-      # zoworkhq/zoblocks while this repository is still zoworkhq/oxygenui, so
+      # zoworkhq/zoblocks while this repository is still zoworkhq/oxygenui, so  (rename-sweep-exempt: actual repo name)
       # asking for provenance unconditionally would fail the publish outright
       # rather than merely skip the attestation.
       #

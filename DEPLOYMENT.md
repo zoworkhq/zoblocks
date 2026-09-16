@@ -116,7 +116,7 @@ registry and the `zoblocks` CLI binary reading as a different product.
 ### Provenance needs the repository names to agree
 
 Every manifest declares `repository.url` as `github.com/zoworkhq/zoblocks`, and
-the repository is still called `zoworkhq/oxygenui`. npm attests provenance
+the repository is still called `zoworkhq/oxygenui`. npm attests provenance <!-- rename-sweep-exempt: the repository's actual name until it is renamed -->
 against the repository that built the tarball and the registry rejects an
 attestation that names a different one, so asking for provenance while the two
 disagree fails the publish rather than skipping the attestation.
@@ -206,7 +206,7 @@ first. In order:
 
 There is no old scope to retire. This step used to say to `npm deprecate` the
 two pre-rename packages named in `.changeset/the-rename.md`; that changeset has
-since been consumed, and `@oxygenui/intl` and `@oxygenui-design/react` both
+since been consumed, and `@oxygenui/intl` and `@oxygenui-design/react` both <!-- rename-sweep-exempt: names the retired packages -->
 return 404 on the registry — the rename happened before anything was ever
 published. `@zoblocks/codemod` still rewrites those imports, which is worth
 keeping for anyone who used the packages from source, but nothing on npm needs
