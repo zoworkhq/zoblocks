@@ -480,36 +480,6 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                   ) : null}
                 </p>
 
-                {/*
-              The design-language switch.
-
-              Here rather than in the site header, because it changes the
-              preview on this page and nothing else — a global control would
-              imply it re-skins the site, and it deliberately does not. Beside
-              the install command because both answer the same question: does
-              this fit the stack we already have.
-            */}
-                {/*
-              On every component page, with no exceptions.
-
-              Signature was excepted at first, on the reasoning that it wraps
-              Ant Design itself so a second framework around it would either
-              fight its own provider or show an antd control inside a Material
-              frame. That was the wrong call: the second half of it is *true
-              and worth showing*. `@zoblocks/signature` declares antd as
-              a peer, so a Material UI shop installing it really does get antd
-              components in their palette, and a demo that hides that is a demo
-              that misleads about what the package costs.
-            */}
-                <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2">
-                  <span className="eyebrow text-graphite-soft">Design language</span>
-                  <LanguageSwitch />
-                  <span className="max-w-[36ch] text-[0.75rem] leading-snug text-graphite-soft">
-                    Renders the preview in that framework&rsquo;s own components and tokens.
-                    Clinical colours never change.
-                  </span>
-                </div>
-
                 <div className="mt-8 max-w-2xl">
                   {/*
                 Two channels, and the command has to match the one this
@@ -570,6 +540,37 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
             <SectionTabs sections={railSections}>
               {/* Preview ------------------------------------------------------ */}
               <section id="preview" className="scroll-mt-24 border-b border-rule bg-paper-sunk/40">
+                {/*
+                  The design-language switch, pinned to the preview it changes.
+
+                  It lived in the page header, beside the install command, and
+                  scrolled away before the reader reached the galleries it
+                  re-skins — so switching meant scrolling back up and losing
+                  the place. Sticky inside this section, under the tab bar: it
+                  stays in reach for as long as the preview is on screen, and
+                  leaves with it, because it changes nothing else on the page.
+
+                  On every component page, with no exceptions — Signature too.
+                  `@zoblocks/signature` declares antd as a peer, so a Material
+                  UI shop installing it really does get antd components in
+                  their palette, and a demo that hides that misleads about what
+                  the package costs.
+                */}
+                <div
+                  data-language-bar=""
+                  className="sticky top-[calc(var(--header-h)+2.8125rem)] z-20 border-b border-rule bg-paper/90 backdrop-blur-md [@media(max-height:500px)]:static"
+                >
+                  <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-1.5 px-5 py-2 max-sm:px-0 sm:px-8">
+                    <span className="eyebrow text-graphite-soft max-sm:hidden">
+                      Design language
+                    </span>
+                    <LanguageSwitch />
+                    <span className="text-[0.75rem] leading-snug text-graphite-soft max-lg:hidden">
+                      Renders the preview in that framework&rsquo;s own components and tokens.
+                      Clinical colours never change.
+                    </span>
+                  </div>
+                </div>
                 {/*
             Switch takes the whole width and shows everything at once rather
             than one card behind a switcher.
