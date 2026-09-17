@@ -553,23 +553,191 @@ body {
 }
 
 /* The phone menu drops from the header rather than scaling up like a dialog. */
+/* "by Zowork" beside the wordmark, in zowork.com's drifting headline gradient.
+   zowork.com's stops are for a dark page; on paper they fall under 4.5:1, so
+   light theme runs the same hues darkened. High contrast gets plain ink. */
+.zw-by-name {
+  --zw-by-gradient: linear-gradient(105deg, #5b47d6, #2563d4 32%, #0a6f86 62%, #0b7358, #5b47d6);
+  background-image: var(--zw-by-gradient);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+.dark .zw-by-name {
+  --zw-by-gradient: linear-gradient(105deg, #b49cff, #7ab1ff 32%, #3de0ff 62%, #a7f3d0, #b49cff);
+}
+[data-zb-theme="high-contrast"] .zw-by-name {
+  background: none;
+  color: var(--color-ink);
+  -webkit-text-fill-color: currentColor;
+}
 @media (prefers-reduced-motion: no-preference) {
-  .site-menu-panel {
-    animation: site-menu-in 260ms var(--ease-out-expo) both;
-  }
-  .site-menu-item {
-    animation: site-menu-in 420ms var(--ease-out-expo) both;
-    animation-delay: calc(60ms + var(--i, 0) * 40ms);
+  .zw-by-name {
+    animation: zw-by-drift 9s ease-in-out infinite;
   }
 }
-@keyframes site-menu-in {
+@keyframes zw-by-drift {
+  50% {
+    background-position: 100% 0;
+  }
+}
+
+/* The phone menu: a floating drawer over a black scrim, lit in one corner by
+   zowork.com's violet-to-cyan gradient. */
+.site-menu-scrim {
+  background: rgb(0 0 0 / 0.35);
+  backdrop-filter: blur(3px);
+}
+.dark .site-menu-scrim {
+  background: rgb(0 0 0 / 0.6);
+}
+.site-menu-aurora {
+  position: absolute;
+  inset: -30% -40% auto auto;
+  width: 22rem;
+  height: 22rem;
+  border-radius: 50%;
+  pointer-events: none;
+  background: conic-gradient(from 200deg, #b49cff, #7ab1ff, #3de0ff, #a7f3d0, #b49cff);
+  filter: blur(70px);
+  opacity: 0.22;
+}
+.dark .site-menu-aurora {
+  opacity: 0.18;
+}
+[data-zb-theme="high-contrast"] .site-menu-aurora {
+  display: none;
+}
+.site-menu-link[aria-current="page"] {
+  background: color-mix(in oklab, var(--color-brand) 12%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--color-brand) 28%, transparent);
+}
+.site-menu-link:not([aria-current="page"]):hover {
+  background: color-mix(in oklab, var(--color-ink) 5%, transparent);
+}
+.site-menu-pulse {
+  background:
+    radial-gradient(
+      120% 90% at 50% 0%,
+      color-mix(in oklab, var(--color-brand) 10%, transparent),
+      transparent 70%
+    ),
+    color-mix(in oklab, var(--color-paper-sunk) 70%, transparent);
+  transition: border-color 0.2s;
+}
+.site-menu-pulse:hover {
+  border-color: var(--color-rule-strong);
+}
+.site-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  gap: 5px;
+}
+.site-menu-grid i {
+  aspect-ratio: 1;
+  border-radius: 5px;
+  background: color-mix(in oklab, var(--color-ink) 7%, transparent);
+}
+/* At rest (and under reduced motion) a few blocks stay lit, so the card is never blank. */
+.site-menu-grid i:nth-child(21),
+.site-menu-grid i:nth-child(23),
+.site-menu-grid i:nth-child(25) {
+  background: color-mix(in oklab, var(--color-brand) 55%, transparent);
+}
+.site-menu-ecg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.site-menu-ecg path {
+  fill: none;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.site-menu-ecg .is-trace {
+  stroke: color-mix(in oklab, var(--color-brand) 30%, transparent);
+  stroke-width: 1.5;
+}
+.site-menu-ecg .is-beat {
+  stroke: var(--color-brand);
+  filter: drop-shadow(0 0 4px color-mix(in oklab, var(--color-brand) 70%, transparent));
+}
+[data-zb-theme="high-contrast"] .site-menu-ecg .is-beat {
+  filter: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .site-menu-grid i {
+    animation: site-menu-ripple 2.8s ease-in-out infinite;
+    animation-delay: var(--d);
+  }
+  .site-menu-ecg .is-beat {
+    stroke-dasharray: 26 100;
+    animation: site-menu-beat 2.8s linear infinite;
+  }
+}
+@keyframes site-menu-ripple {
+  0%,
+  100% {
+    transform: scale(1);
+    background: color-mix(in oklab, var(--color-ink) 7%, transparent);
+  }
+  15% {
+    transform: scale(0.78);
+    background: color-mix(in oklab, var(--color-brand) 75%, transparent);
+  }
+  45% {
+    transform: scale(1);
+    background: color-mix(in oklab, var(--color-ink) 7%, transparent);
+  }
+}
+@keyframes site-menu-beat {
   from {
-    opacity: 0;
-    transform: translateY(-8px);
+    stroke-dashoffset: 26;
   }
   to {
-    opacity: 1;
-    transform: none;
+    stroke-dashoffset: -100;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .site-menu-scrim {
+    animation: site-menu-fade 240ms ease-out both;
+  }
+  .site-menu-panel {
+    animation: site-menu-slide 460ms var(--ease-out-expo) both;
+  }
+  .site-menu-item {
+    animation: site-menu-item-in 520ms var(--ease-out-expo) both;
+    animation-delay: calc(90ms + var(--i, 0) * 45ms);
+  }
+  .site-menu-close {
+    animation: site-menu-spin 520ms var(--ease-out-expo) both;
+  }
+}
+@keyframes site-menu-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes site-menu-slide {
+  from {
+    transform: translateX(calc(100% + 1rem));
+  }
+}
+@keyframes site-menu-item-in {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+@keyframes site-menu-spin {
+  from {
+    transform: rotate(-90deg);
+    opacity: 0;
   }
 }
 

@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { ArrowUpRight, Github } from "lucide-react";
 import { CommandMenu } from "@/components/site/command-menu";
 import { SiteMenu } from "@/components/site/site-menu";
+import { ZOWORK_HREF } from "@/lib/zowork";
 import { ThemeToggle } from "@/components/site/theme-toggle";
 import { cn } from "@/lib/utils";
 
@@ -140,24 +141,33 @@ export function SiteHeader() {
       )}
     >
       <div className="mx-auto flex h-full max-w-6xl items-center justify-between gap-6 px-5 sm:px-8">
-        <Link
-          href="/"
-          // min-h-6 is the WCAG 2.5.8 floor. The wordmark's own line box came
-          // to 23px, one short — and the logo is a standalone navigation
-          // target, not a link inside a sentence, so the Inline exception does
-          // not cover it. It sits in a taller header row, so nothing moves.
-          className="group flex min-h-6 items-center gap-2.5 text-ink"
-          aria-label="ZoBlocks by Zowork, home"
-        >
-          <ZoBlocksMark className="h-4 w-7 transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:rotate-180" />
-          <span className="font-display text-[0.9375rem] font-semibold tracking-tight">
-            ZoBlocks
-          </span>
-          <span className="-ml-1 text-[0.8125rem] whitespace-nowrap text-graphite">by Zowork</span>
+        <div className="flex min-w-0 items-center gap-2.5">
+          <Link
+            href="/"
+            // min-h-6 is the WCAG 2.5.8 floor. The wordmark's own line box came
+            // to 23px, one short — and the logo is a standalone navigation
+            // target, not a link inside a sentence, so the Inline exception does
+            // not cover it. It sits in a taller header row, so nothing moves.
+            className="group flex min-h-6 items-center gap-2.5 text-ink"
+            aria-label="ZoBlocks home"
+          >
+            <ZoBlocksMark className="h-4 w-7 transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:rotate-180" />
+            <span className="font-display text-[0.9375rem] font-semibold tracking-tight">
+              ZoBlocks
+            </span>
+          </Link>
+          {/* A separate link: the wordmark goes home, the maker goes to its site. */}
+          <a
+            href={ZOWORK_HREF}
+            rel="noopener"
+            className="-ml-1 inline-flex min-h-6 items-center text-[0.8125rem] whitespace-nowrap text-graphite"
+          >
+            by&nbsp;<span className="zw-by-name font-semibold">Zowork</span>
+          </a>
           <span className="numeric hidden rounded border border-rule px-1.5 py-0.5 text-[0.625rem] text-graphite-soft sm:inline">
             v0.1.0
           </span>
-        </Link>
+        </div>
 
         <nav aria-label="Main" className="flex items-center gap-1">
           <ul className="mr-1 hidden items-center gap-0.5 md:flex">
