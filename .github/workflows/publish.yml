@@ -1,0 +1,247 @@
+name: Publish to npm
+
+# The only thing in this repository that reaches npm, and nothing triggers it.
+#
+# Publishing used to be a side effect of merging: `release.yml` ran on every
+# push to main and published whenever the commit happened to be a "Version
+# packages" merge. That works right up until the day you want the version PR
+# merged and the release held — and by then the decision has already been made
+# for you, by a merge button.
+#
+#   Actions → Publish to npm → Run workflow
+#
+# The versions it publishes are whatever is in the manifests on the branch you
+# pick, so the normal sequence is unchanged: land a changeset, let CI open the
+# "Version packages" PR, review the bumps, merge it — and then come here.
+#
+# Defaults to a real publish, because that is what the button says. Pick
+# `dry-run` from the Mode dropdown to rehearse: every gate, every tarball, and
+# `changeset publish-plan`, which asks the registry what would actually go out.
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Publish for real, or rehearse everything up to it
+        type: choice
+        default: publish
+        options: [publish, dry-run]
+      npm-tag:
+        description: 'dist-tag to publish under. Blank means "latest".'
+        type: string
+        default: ""
+      skip-checks:
+        description: >-
+          Skip the verification suite. Only when this exact commit is already
+          green on main — the tarball check still runs either way.
+        type: boolean
+        default: false
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  # "The release workflow runs at least what a merge runs" — ENGINEERING.md
+  # §286. It is the same list, not a copy of it: `verify.yml` is where the
+  # gates live, and CI calls exactly the same workflow. That is what makes the
+  # sentence true rather than aspirational, and what stops the two lists
+  # drifting the way they had.
+  #
+  # It is not as slow as it looks. The Turbo cache is keyed on task inputs, so
+  # on a commit CI has already built, typecheck, build and the suites restore
+  # rather than re-run.
+  gates:
+    name: Verify
+    if: ${{ !inputs.skip-checks }}
+    uses: ./.github/workflows/verify.yml
+    permissions:
+      contents: read
+
+  publish:
+    name: Publish
+    needs: [gates]
+    # `always()` so the job is reachable when `gates` was skipped on purpose;
+    # the rest of the condition is what keeps a *failed* gate fatal.
+    if: ${{ always() && (needs.gates.result == 'success' || inputs.skip-checks) }}
+    runs-on: [self-hosted, on-demand] # Must match your runner_extra_labels
+    timeout-minutes: 30
+
+    # No `environment:` here, deliberately. Running this workflow is already a
+    # deliberate act by someone with write access, and an environment that does
+    # not exist yet is one more thing to get wrong on the run where it matters.
+    # Add one — Settings -> Environments -> New environment, then
+    # `environment: npm` on this job — if you want a *second* person to approve
+    # every release; that is the only thing it would buy.
+
+    permissions:
+      contents: write
+      # Required for npm provenance. It is what lets npm attest that the
+      # tarball was built from this repository at this commit — worth having
+      # anywhere, and worth more on a package whose pitch is that you can audit
+      # every line.
+      id-token: write
+
+    # Git hooks are for humans, and `prepare: husky` installs them on every
+    # `pnpm install`. Nothing here is a hand-authored commit.
+    env:
+      HUSKY: 0
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # `changeset publish` creates a git tag per published package, and
+          # tagging needs the tags that already exist.
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup
+        with:
+          registry-url: https://registry.npmjs.org
+
+      # The published artifact is built here rather than taken on trust. A local
+      # rehearsal once found the test suite inside the tarball and dist emitting
+      # extensionless imports that threw in plain Node — neither of which
+      # typecheck or `npm publish --dry-run` noticed.
+      #
+      # `gates` ran on its own runner, so its dist is not here; with a warm
+      # Turbo cache this is a restore rather than a rebuild.
+      - name: Build
+        run: pnpm build
+
+      # Unconditional, including under `skip-checks`. Every publishable package
+      # is packed and the manifest *inside the tarball* inspected — this used to
+      # be a per-package script that existed for five of 27, so the other 22
+      # would have published unchecked, 13 without a README and 9 with imports
+      # that throw in plain Node.
+      - name: Every package is publishable
+        run: node scripts/check-tarball.mjs
+
+      # Trusted publishing (OIDC) needs npm 11.5.1 or later; Node 22 ships npm
+      # 10. Without this the token-less publish fails at authentication.
+      - name: npm new enough for trusted publishing
+        run: npm install -g npm@^11.5.1
+
+      # Worth knowing before you read the next 20 lines: this is currently
+      # inert, and DEPLOYMENT.md explains why at length. `changeset publish`
+      # picks its publish tool by detecting the workspace, gets pnpm, and
+      # `pnpm publish` has no `--provenance` and no OIDC — so nothing reads
+      # NPM_CONFIG_PROVENANCE. It is kept, and kept correct, because the fix
+      # (pack with pnpm, publish the tarball with npm) changes one step and
+      # leaves this one exactly as it is.
+      #
+      # npm attests provenance against the repository that built the tarball,
+      # and the registry rejects the attestation when `repository.url` in the
+      # manifest names a different repository. Every manifest here declares
+      # zoworkhq/zoblocks while this repository is still zoworkhq/oxygenui, so  (rename-sweep-exempt: actual repo name)
+      # asking for provenance unconditionally would fail the publish outright
+      # rather than merely skip the attestation.
+      #
+      # The declared repository is read from a manifest and compared with the
+      # one running the job, so provenance turns itself back on the moment the
+      # repository is renamed — no workflow edit, and no window where a release
+      # silently ships unattested because someone forgot to flip a flag back.
+      - name: Can this run attest provenance?
+        id: provenance
+        run: |
+          set -euo pipefail
+          # Single-quoted so the shell hands the script to node untouched. The
+          # regexes contain $ and \, both of which a double-quoted string would
+          # be free to reinterpret.
+          declared=$(node -e '
+            const { url } = require("./packages/react/package.json").repository;
+            const { pathname } = new URL(url.replace(/^git\+/, ""));
+            process.stdout.write(pathname.replace(/^\//, "").replace(/\.git$/, ""));
+          ')
+          if [ "$declared" = "$GITHUB_REPOSITORY" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::Publishing with provenance."
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Publishing without provenance: manifests declare $declared but this repository is $GITHUB_REPOSITORY. Rename the repository, or update repository.url, to restore attestation."
+          fi
+
+      # A publish needs a credential, and the two ways of holding one fail very
+      # differently. A missing NPM_TOKEN surfaces as a 401 from deep inside
+      # `changeset publish`, after every gate above has already run. Trusted
+      # publishing (OIDC) has no secret at all, so an empty token is not by
+      # itself wrong.
+      #
+      # This cannot tell the two apart, so it warns rather than fails: loud
+      # enough to read in the log, quiet enough not to break the OIDC setup this
+      # repository would rather be using.
+      - name: Note how this run will authenticate to npm
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -n "${NPM_TOKEN:-}" ]; then
+            echo "::notice::Authenticating to npm with the NPM_TOKEN secret."
+          else
+            echo "::warning::No NPM_TOKEN secret is set. A publish will 401 unless npm trusted publishing (OIDC) is configured for every package in the @zoblocks scope."
+          fi
+
+      # The rehearsal. `publish-plan` asks the registry which of the local
+      # versions do not exist yet, which is precisely the set `changeset
+      # publish` would push — so this answers "what would this run ship?"
+      # against the registry rather than against a guess.
+      - name: What would be published
+        if: inputs.mode == 'dry-run'
+        run: |
+          set -euo pipefail
+          pnpm changeset publish-plan
+          {
+            echo "### Dry run"
+            echo "Gates, build and tarball checks all passed. Nothing was published."
+            echo "Re-run with **Mode: publish** to ship the plan above."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # `changeset publish` skips any package whose version is already on the
+      # registry, so a re-run after a partial failure finishes the job rather
+      # than erroring on what already went out.
+      - name: Publish
+        if: inputs.mode == 'publish'
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: ${{ steps.provenance.outputs.enabled }}
+          # Through the environment, never interpolated into the script body.
+          # A workflow_dispatch input is free-form text expanded before the
+          # shell parses the line — in a job holding an npm token, that is a
+          # command-injection sink.
+          NPM_TAG: ${{ inputs.npm-tag }}
+        run: |
+          set -euo pipefail
+          if [ -n "${NPM_TAG:-}" ]; then
+            pnpm changeset publish --tag "$NPM_TAG"
+          else
+            pnpm changeset publish
+          fi
+
+      # `changeset publish` creates the tags locally; pushing them is a separate
+      # thing that can fail on its own (tag protection, a ruleset) *after* the
+      # packages are already on the registry. Failing the job there would say
+      # "release broken" about a release that shipped, so this warns instead —
+      # the recovery is `git push --tags` by hand, not a re-publish.
+      - name: Push the release tags
+        if: inputs.mode == 'publish'
+        run: |
+          set -uo pipefail
+          if git push origin --tags; then
+            echo "::notice::Release tags pushed."
+          else
+            echo "::warning::Packages published, but pushing the git tags failed. Run \`git push origin --tags\` locally."
+          fi
+
+      - name: Summarise
+        if: inputs.mode == 'publish'
+        run: |
+          {
+            echo "### Published"
+            echo "Ref: \`${GITHUB_REF_NAME}\` at \`${GITHUB_SHA}\`"
+            echo "dist-tag: \`${NPM_TAG:-latest}\`"
+            echo "Provenance: \`${{ steps.provenance.outputs.enabled }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+        env:
+          NPM_TAG: ${{ inputs.npm-tag }}

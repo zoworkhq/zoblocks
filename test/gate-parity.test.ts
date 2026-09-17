@@ -20,7 +20,24 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const WORKFLOW = readFileSync(path.join(ROOT, ".github/workflows/ci.yml"), "utf8");
+
+/*
+ * Both halves of the pipeline, concatenated.
+ *
+ * The gate set moved into `verify.yml`, a reusable workflow, when `ci.yml` and
+ * `release.yml` were found running nine of the same gates against the same
+ * commit on two runners. `ci.yml` still holds the deploy and versioning steps,
+ * so reading only one of the two files would leave half the pipeline
+ * unchecked — and reading only `ci.yml`, as this did, would now check almost
+ * nothing at all.
+ *
+ * `publish.yml` is deliberately absent: it calls `verify.yml` rather than
+ * listing gates of its own, which is the whole point of the split. A gate there
+ * would have to be added here first.
+ */
+const WORKFLOW = [".github/workflows/verify.yml", ".github/workflows/ci.yml"]
+  .map((file) => readFileSync(path.join(ROOT, file), "utf8"))
+  .join("\n");
 const VERIFY = readFileSync(path.join(ROOT, "scripts/verify.sh"), "utf8");
 
 /**
@@ -31,9 +48,8 @@ const VERIFY = readFileSync(path.join(ROOT, "scripts/verify.sh"), "utf8");
  * and not mapped below fails the test.
  */
 const NOT_A_GATE = new Set([
-  "Cache mongod binary",
-  "Cache Turbo",
-  "Install",
+  // Checkout, pnpm, Node and the mongod/Turbo caches live in the
+  // `.github/actions/setup` composite now, so they no longer appear here.
   "Resolve the Playwright version",
   "Cache Playwright browsers",
   "Install Playwright browsers",
@@ -50,6 +66,12 @@ const NOT_A_GATE = new Set([
   // attached — `app.zoblocks.design` has no DNS record yet.
   "Verify the console is serving its catalogue",
   "Deploy preview",
+  // Writes the deployment URL into the run summary.
+  "Summarise",
+  // Versioning: it edits manifests and changelogs and opens a pull request.
+  // Nothing about the code is asserted, and publishing is `publish.yml`'s job.
+  "Open or update the Version PR",
+  "Push the Version branch when Actions may not open the PR",
 ]);
 
 /**

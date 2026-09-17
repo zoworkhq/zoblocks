@@ -283,8 +283,9 @@ The authoritative list. All are blocking.
 | Tarball inspection          | `check-tarball.mjs`, every publishable package       |
 | Catalog quality             | `pnpm gen --strict`                                  |
 
-**The release workflow runs at least what a merge runs.** Publishing is the most
-irreversible thing this repository does.
+**The publish workflow runs at least what a merge runs.** Publishing is the most
+irreversible thing this repository does. It is the same list, not a copy of one:
+`verify.yml` holds the gates, and `ci.yml` and `publish.yml` both call it.
 
 ## 17. Review checklist
 

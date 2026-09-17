@@ -1,0 +1,92 @@
+name: Set up the toolchain
+description: >-
+  Checkout is the caller's job; everything after it is here. pnpm, Node from
+  .nvmrc, the caches, and optionally the install — defined once so the eight
+  jobs that need a toolchain cannot drift from one another.
+
+# Why a composite action rather than eight copies: they had already drifted.
+# Only `verify` restored the Turbo cache, so the deploy jobs and the release job
+# rebuilt from cold every time while the cache sat there unread. A copy that is
+# wrong is worse than no copy, and the only durable fix is to have one.
+
+inputs:
+  install:
+    description: Run `pnpm install --frozen-lockfile`.
+    default: "true"
+  turbo-cache:
+    description: Restore and save Turbo's local cache.
+    default: "true"
+  mongo-cache:
+    description: Restore the mongod binary that hq's tests run against.
+    default: "false"
+  registry-url:
+    description: npm registry to write an .npmrc for. Only a publish needs this.
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    # Both paths are consumed by a tool *and* by an actions/cache step below, so
+    # they are written to the environment rather than repeated as literals.
+    #
+    # MONGOMS_DOWNLOAD_DIR: mongodb-memory-server resolves its directory from
+    # the working directory. `pnpm install` runs at the root and `turbo run
+    # test` runs in apps/hq, so the default has them disagree and fetch mongod
+    # twice. One fixed path is also the only thing actions/cache can be pointed
+    # at.
+    #
+    # TURBO_CACHE_DIR: load-bearing and easy to get wrong. By default Turbo does
+    # NOT keep a central cache — it writes per-package `.turbo/` directories,
+    # and for a task with no declared `outputs` it keeps only the task log.
+    # Caching the root `.turbo` therefore captures run summaries and nothing
+    # else: a cache step that is green, fast, and does nothing at all. With this
+    # set, `turbo run build` writes `<hash>.tar.zst` here, and deleting `dist`
+    # then re-running restores it and reports FULL TURBO.
+    - name: Pin the cache locations
+      shell: bash
+      run: |
+        {
+          echo "MONGOMS_DOWNLOAD_DIR=${{ github.workspace }}/.cache/mongodb-binaries"
+          echo "TURBO_CACHE_DIR=${{ github.workspace }}/.turbo/cache"
+        } >> "$GITHUB_ENV"
+
+    - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+
+    - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      with:
+        node-version-file: .nvmrc
+        cache: pnpm
+        registry-url: ${{ inputs.registry-url }}
+
+    # Restored before install so mongodb-memory-server's postinstall finds it,
+    # and so a bad day at the download host cannot fail an otherwise-green build.
+    - name: Cache mongod binary
+      if: inputs.mongo-cache == 'true'
+      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+      with:
+        path: ${{ github.workspace }}/.cache/mongodb-binaries
+        key: mongod-${{ runner.os }}-7.0.24
+
+    # The key is content, not branch. Turbo hashes each task's own inputs, so a
+    # restored cache cannot produce a stale result: changed input, changed hash,
+    # cache miss. The lockfile is in the key because a dependency change
+    # invalidates everything downstream of it, and the SHA makes each run write
+    # a fresh entry rather than fight another run for one. The prefixes are what
+    # actually deliver the hits.
+    #
+    # Deliberately not keyed on branch name alone — that is how a cache entry
+    # for one set of inputs gets served for another.
+    - name: Cache Turbo
+      if: inputs.turbo-cache == 'true'
+      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+      with:
+        path: ${{ github.workspace }}/.turbo/cache
+        key: turbo-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
+        restore-keys: |
+          turbo-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
+          turbo-${{ runner.os }}-
+
+    - name: Install
+      if: inputs.install == 'true'
+      shell: bash
+      run: pnpm install --frozen-lockfile

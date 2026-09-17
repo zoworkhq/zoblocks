@@ -1,0 +1,315 @@
+name: Verify
+
+# The gate set, defined once.
+#
+# It used to exist twice: `ci.yml` ran it on every push and pull request, and
+# `release.yml` ran nine of the same gates again, on the same commit, on a
+# second runner, minutes later. That was not redundancy for safety — it was the
+# same assertions against the same tree, costing a full extra machine per merge
+# and free to drift apart the moment somebody edited one file and not the other.
+#
+# Both callers now `uses:` this workflow, so there is one list. A reusable
+# workflow's jobs run inside the caller's run, so calling it costs a run of its
+# own: what disappeared is the duplicated compute, not the coverage.
+#
+#   ci.yml       every push and pull request, gating the deploys
+#   publish.yml  before anything reaches npm
+#
+# `scripts/verify.sh` runs the same gates on a laptop and
+# `test/gate-parity.test.ts` fails when the two lists disagree — so a gate added
+# here has to be runnable locally too.
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Typecheck, test, build
+    runs-on: [self-hosted, on-demand] # Must match your runner_extra_labels
+    # One job does everything: the cheap scans, install, generate, lint, format,
+    # typecheck, the suites under coverage, every build, the tarball check, the
+    # axe audit, and the browser suite in three engines.
+    #
+    # 25 minutes was set while coverage failed, so no run reached the browser
+    # suite. On 14 Sept the first run that did spent 16 minutes before it
+    # (coverage 490s, axe 154s, typecheck 129s, build 74s) and was killed 521s
+    # into e2e. A timeout reads as a test failure and blocks every deploy.
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # ---------------------------------------------------------------------
+      # Two greps, before anything is installed.
+      #
+      # These were two separate jobs. On GitHub-hosted runners that was nearly
+      # free; on the on-demand EC2 runners this repository moved to, each job is
+      # a machine that has to boot, register and tear down in order to run about
+      # a second of `grep` — two extra instances on every push and every pull
+      # request. Run here, before `pnpm install`, they still fail in well under
+      # a minute, which is the only property that mattered about them being
+      # separate.
+      # ---------------------------------------------------------------------
+
+      # Fixtures must stay synthetic. This catches the obvious mistakes — a real
+      # identifier system, a production hostname — not every possible one. It is
+      # a backstop for review, not a substitute for it.
+      #
+      # The bare acronym "PHI" used to be in this pattern. It matched our own
+      # prose explaining the PHI policy — in the fixtures header, on the
+      # homepage, in component documentation — so the job was red on every
+      # commit and told us nothing. A check that always fails is a check nobody
+      # reads. Patterns here must match DATA, never discussion of data.
+      #
+      # The patterns live in scripts/no-phi.sh so this and `pnpm verify` run
+      # identical code. Inline here, it was a CI-only gate — a developer could
+      # not run it without copying shell out of a YAML file, so nobody did, and
+      # it could only ever fail after a push.
+      - name: Scan for non-synthetic identifiers
+        run: bash scripts/no-phi.sh
+
+      # The project was renamed to ZoBlocks in September 2026, retiring the
+      # previous name entirely. A sweep makes that true once; this keeps it
+      # true. A repository this size regrows a name within a week of
+      # hand-written commits — a copied import, a pasted URL, a comment written
+      # from memory.
+      #
+      # It also fails on a tracked source file that reads as binary, because a
+      # stray NUL byte makes a file invisible to every text tool. That is not
+      # hypothetical: one file escaped the original sweep exactly that way.
+      #
+      # Exemptions and their reasons are in the script, not here, so this and
+      # `pnpm verify` run identical code.
+      - name: Scan for the retired name
+        run: bash scripts/retired-names.sh
+
+      - uses: ./.github/actions/setup
+        with:
+          mongo-cache: "true"
+
+      # Runs before anything else. It validates every component's metadata,
+      # typechecks the source customers receive, and produces every derived
+      # artifact. A registry that does not validate is a broken install for
+      # every customer, and this is the cheapest check we have.
+      #
+      # `--strict` makes a component that does not meet the bar for its declared
+      # stability tier a build failure rather than a warning. It stayed off
+      # because `withStory` was 0 and every component would have failed; stories
+      # now exist for all five, and coverage.json reports withStory: 5.
+      #
+      # This is what makes the standard hold without a human reviewing every
+      # component: a beta component without a story, or a stable one without
+      # limitations or extracted props, cannot merge.
+      - name: Generate and enforce the catalog quality gate
+        run: pnpm gen --strict
+
+      # Some generated artifacts are committed (registry.json, path mappings,
+      # the docs catalog) and some are build output (apps/docs/public/r/*.json,
+      # which .gitignore excludes). `git diff` is the check that covers exactly
+      # the committed ones, without the generator needing to know which is
+      # which. `pnpm gen:check` is the equivalent locally.
+      - name: No stale generated files
+        run: |
+          if ! git diff --exit-code --stat; then
+            echo "::error::Generated files are stale. Run \`pnpm gen\` and commit the result."
+            exit 1
+          fi
+
+      # A high-or-worse advisory in the toolchain fails the build rather than
+      # waiting for a procurement reviewer to run it. (The threshold is `high`,
+      # not `critical` — the comment used to say critical, which understated
+      # what this actually enforces.)
+      - name: Audit dependencies
+        run: pnpm audit --audit-level=high
+
+      # `pnpm lint` carries a --max-warnings ratchet set to the exact count on
+      # the day lint was introduced, so the gate is identical here and on a
+      # developer's machine. Two rules are staged as warnings rather than errors
+      # — logical properties, and reading the clock inside a component —
+      # because the existing catalog violates them, and promoting them straight
+      # to errors would have meant either a large refactor in the same change or
+      # a blanket suppression.
+      #
+      # The number may go down. It may not go up: a new warning fails the build,
+      # so adding one means fixing it, or fixing another to make room. When it
+      # reaches zero, both rules become errors and the flag goes away.
+      #
+      # It also runs actionlint over these workflows, which is the only thing
+      # that reads them statically. It is what caught `language:` passed to
+      # codeql-action (the input is `languages:`, accepted silently and
+      # ignored) and five steps guarding on a `steps.gate` that no step declared.
+      - name: Lint
+        run: pnpm lint
+
+      # Formatting was checkable but never checked, so it drifted to 65 files.
+      # Generated artifacts are excluded in .prettierignore rather than
+      # formatted: Prettier would reformat them, the next `pnpm gen` would
+      # write them back, and the stale-generated-files check above would fail
+      # on a diff nobody made. The generators own their own output shape.
+      - name: Format
+        run: pnpm format:check
+
+      # Covers the registry component source — the exact files copied into a
+      # customer's project. Nothing used to typecheck them: the root config that
+      # includes them was not part of any workspace task, and four components
+      # had unresolvable imports that no job reported.
+      - name: Typecheck
+        run: pnpm typecheck
+
+      # One instrumented run, not two.
+      #
+      # This was `Test` (227s) followed by `Coverage thresholds` (208s), which
+      # executed substantially the same suites twice — 41% of the whole build.
+      # The obvious fix was wrong for a long time and the workflow said so:
+      # eight packages defined `test` without `test:coverage`, so dropping the
+      # first step would have silently stopped running them.
+      #
+      # Those eight now define both, so `test:coverage` is a strict superset.
+      # Verified by comparing per-package suite counts across the two commands
+      # before the step was removed: 20 packages and 2768 tests under each,
+      # with no package present in one and absent from the other.
+      #
+      # Two layers still run, and both must pass:
+      #
+      #   `turbo run test:coverage` — the workspace packages and hq's auth,
+      #                        permissions and server actions, the last against
+      #                        a real mongod rather than a mocked driver: the
+      #                        guarantees there (a unique index deciding a
+      #                        duplicate signup, an atomic claim deciding who is
+      #                        the first admin) live in the database, so a mock
+      #                        would assert the code calls what it calls.
+      #   `vitest run --coverage` — the registry components, rendered in jsdom
+      #                        against the source a customer actually receives.
+      #
+      # Every component asserts the safety claim it exists to make: an
+      # uninterpreted result never reads as normal, a comparator survives, an
+      # unknown code status never defaults to full code, a restricted record
+      # fails closed. Those are the failures that look fine in review.
+      #
+      # Coverage is a gate, not a report. The readiness audit's tier bar puts
+      # `beta` at 90% lines / 85% branches, and a package that declares
+      # thresholds fails its own run when it slips below.
+      - name: Coverage thresholds
+        run: pnpm test:coverage
+
+      - name: Build
+        run: pnpm build
+
+      # Guards against the failure that shipped 0.1.0: a package whose
+      # publishConfig points at ./dist while dist does not contain what it
+      # claims, or contains things it should not. Every publishable package is
+      # inspected — this used to be a per-package script that existed for five
+      # of 27, so the other 22 would have published unchecked, 13 of them
+      # without a README and 9 with imports that throw in plain Node.
+      #
+      # It runs here rather than only before a publish so that it fails on the
+      # pull request, not after the merge that caused it.
+      - name: Every package is publishable
+        run: node scripts/check-tarball.mjs
+
+      # Browser binaries are ~300MB and took 71s to fetch on every single run.
+      # Keyed on the resolved Playwright version rather than the lockfile hash,
+      # so an unrelated dependency bump does not throw the browsers away.
+      - name: Resolve the Playwright version
+        id: pw
+        run: |
+          version=$(node -p "require('@playwright/test/package.json').version")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Playwright $version"
+
+      - name: Cache Playwright browsers
+        id: pw-cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
+
+      # Firefox and WebKit as well as Chromium: the library publishes a WCAG
+      # 2.2 AA claim, and a focus ring or a forced-colours fallback that works
+      # in one engine and not another is exactly the defect that claim hides.
+      #
+      # Two steps, because only one half is cacheable. The browsers live in the
+      # cached directory; `--with-deps` installs OS packages system-wide, which
+      # a cache cannot hold, and which are cheap.
+      - name: Install Playwright browsers
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: pnpm exec playwright install chromium firefox webkit
+
+      - name: Install Playwright system dependencies
+        run: pnpm exec playwright install-deps chromium firefox webkit
+
+      # The server plumbing lives in scripts/verify-a11y.sh so this and
+      # `pnpm verify --ci` run the same code. The site publishes a WCAG 2.2 AA
+      # conformance claim; this is what makes it checkable rather than
+      # aspirational, and its first run found four real violations including a
+      # contrast failure on the footer's own legal limitation statement.
+      - name: Accessibility (WCAG 2.2 AA, both themes)
+        run: bash scripts/verify-a11y.sh
+
+      # Visual regression, plus the accessibility checks that need a real layout
+      # engine: 320px reflow, 200% zoom, forced colours, the focus indicator,
+      # and the reduced-motion still state. jsdom can see none of those.
+      # `e2e:ci` deliberately excludes the @vrt tag.
+      #
+      # Screenshot baselines are platform-specific — the committed set is
+      # darwin, and font rasterisation alone makes them fail on linux. Running
+      # them here would make a new gate red on its first run, which is how a
+      # team learns to ignore a gate. The browser-level accessibility checks
+      # (reflow, zoom, forced colours, focus, reduced motion) are
+      # platform-independent and run here.
+      #
+      # To make VRT blocking in CI, generate linux baselines once inside the
+      # official Playwright container and commit them:
+      #   docker run --rm -v "$PWD:/w" -w /w mcr.microsoft.com/playwright:v1.56.0-jammy \
+      #     sh -c "corepack enable && pnpm i --frozen-lockfile && pnpm build && pnpm e2e:update"
+      # then swap this step for `pnpm e2e`.
+      #
+      # This step also runs the @framework suite: six applications in
+      # apps/smoke and apps/smoke-react18, one per supported framework, each
+      # built by that framework's own compiler and driven through an identical
+      # script in all three engines. Playwright's webServer config builds and
+      # serves them, so no extra step is needed here — and the build itself is
+      # half the test, since Angular and Vue reject bad markup at compile time.
+      # Its first run found the elements broken in React 19, Vue, and Angular.
+      #
+      # `ZOBLOCKS_BASE_URL` is deliberately NOT set here.
+      #
+      # Setting it tells playwright.config.ts to skip starting the docs server,
+      # on the assumption that one is already running — which used to be true by
+      # accident: the accessibility step above started a server with `&` and
+      # never stopped it, and this step inherited it. Moving that step into a
+      # script that cleans up after itself broke the assumption, and every
+      # browser test failed with ERR_CONNECTION_REFUSED.
+      #
+      # Unset, Playwright starts and stops its own server, which is what makes
+      # this step self-contained rather than dependent on a leak two steps
+      # earlier.
+      - name: Browser accessibility and cross-framework smoke
+        run: pnpm e2e:ci
+
+      # A retried-but-passed test leaves no signal anyone reads: the job is
+      # green and the retry is buried in the log. `always()` because a flake is
+      # most worth reporting on the run where something else also failed.
+      - name: Report flaky tests
+        if: always()
+        run: node scripts/flaky.mjs
+
+      - name: Upload the Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14
+
+      # Budgets on the bytes a customer installs. ENGINEERING.md §11.
+      - name: Bundle budgets
+        run: pnpm size
+
+      # The layer rule from ARCHITECTURE.md §2, executable rather than written
+      # down. Also catches cycles and a devDependency reaching shipped source.
+      - name: Architecture rules
+        run: pnpm deps

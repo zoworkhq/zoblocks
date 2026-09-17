@@ -1,0 +1,92 @@
+name: Deploy to Vercel
+description: >-
+  pull, build, deploy — the three commands that were copied verbatim into four
+  jobs, with only the project id and the --prod flag differing between them.
+
+# Deliberately the CLI rather than Vercel's own Git integration. That
+# integration deploys on every push whether or not the checks passed, which for
+# a site publishing WCAG conformance and healthcare component guidance is the
+# wrong default. `needs:` on the calling job makes a green build a precondition,
+# not a parallel opinion.
+#
+# Pinning `vercel@48` in one place is the other reason this exists: it appeared
+# nine times across the workflows, so a CLI bump meant nine edits and any one of
+# them could be missed.
+
+inputs:
+  project-id:
+    description: VERCEL_PROJECT_ID for the target project.
+    required: true
+  token:
+    description: VERCEL_TOKEN. Empty is tolerated only when tolerate-missing-token is true.
+    required: true
+  production:
+    description: Deploy to production rather than a preview.
+    default: "false"
+  tolerate-missing-token:
+    description: >-
+      Report a skip rather than failing when no token is present. Fork pull
+      requests never receive secrets, so that is the normal path for an outside
+      contribution and should not read as a broken build.
+    default: "false"
+
+outputs:
+  url:
+    description: The deployment URL, or empty when the deploy was skipped.
+    value: ${{ steps.deploy.outputs.url }}
+  skipped:
+    description: "true when there was no token and that was tolerated."
+    value: ${{ steps.deploy.outputs.skipped }}
+
+runs:
+  using: composite
+  steps:
+    - id: deploy
+      shell: bash
+      env:
+        VERCEL_PROJECT_ID: ${{ inputs.project-id }}
+        VERCEL_TOKEN: ${{ inputs.token }}
+        PRODUCTION: ${{ inputs.production }}
+        TOLERATE: ${{ inputs.tolerate-missing-token }}
+      run: |
+        set -euo pipefail
+
+        echo "skipped=false" >> "$GITHUB_OUTPUT"
+
+        if [ -z "${VERCEL_TOKEN:-}" ]; then
+          if [ "$TOLERATE" = "true" ]; then
+            echo "skipped=true" >> "$GITHUB_OUTPUT"
+            {
+              echo "### Preview skipped"
+              echo "No \`VERCEL_TOKEN\` in this context — expected on a fork PR. A maintainer preview runs after review."
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::notice::Deployment skipped: no VERCEL_TOKEN (expected on fork PRs)."
+            exit 0
+          fi
+          echo "::error::VERCEL_TOKEN is not set. Add it under Settings → Secrets → Actions."
+          exit 1
+        fi
+
+        # The token is passed with --token on every call. The CLI does not read
+        # VERCEL_TOKEN from the environment for these commands, and relying on
+        # that produced "No existing credentials found" with the secret
+        # correctly set — a failure that reads like a missing secret and is not
+        # one.
+        if [ "$PRODUCTION" = "true" ]; then
+          environment=production
+          prod=--prod
+        else
+          environment=preview
+          prod=""
+        fi
+
+        vercel() { pnpm dlx vercel@48 "$@"; }
+
+        vercel pull --yes --environment="$environment" --token "$VERCEL_TOKEN"
+        # shellcheck disable=SC2086 # $prod is a single flag or nothing; quoting it passes an empty argument.
+        vercel build $prod --token "$VERCEL_TOKEN"
+        # shellcheck disable=SC2086
+        url=$(vercel deploy --prebuilt $prod --token "$VERCEL_TOKEN")
+
+        echo "url=$url" >> "$GITHUB_OUTPUT"
+        echo "Deployed: $url"

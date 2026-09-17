@@ -9,16 +9,30 @@ reported success, and published the wrong code. CI has no checkout to get wrong.
 
 ## What runs when
 
-| Trigger              | Workflow         | Effect                                                  |
-| -------------------- | ---------------- | ------------------------------------------------------- |
-| PR opened or updated | `ci.yml`         | Checks, then a preview deployment                       |
-| Merge to `main`      | `ci.yml`         | Checks, then production deploys for docs and hq         |
-| Merge to `main`      | `release.yml`    | Opens a "Version packages" PR if changesets are pending |
-| Merge the version PR | `release.yml`    | Publishes to npm with provenance                        |
-| Manual               | `hq-indexes.yml` | Applies hq's MongoDB indexes                            |
+| Trigger              | Workflow         | Effect                                                          |
+| -------------------- | ---------------- | --------------------------------------------------------------- |
+| PR opened or updated | `ci.yml`         | Checks, then a preview deployment                               |
+| Merge to `main`      | `ci.yml`         | Checks, then production deploys, then the "Version packages" PR |
+| Merge the version PR | —                | Nothing ships. The bumps land on `main` and wait.               |
+| Manual               | `publish.yml`    | Publishes to npm                                                |
+| Manual               | `hq-indexes.yml` | Applies hq's MongoDB indexes                                    |
 
-Deploy jobs declare `needs: [verify, no-phi]`, so a red build cannot reach
-production. This is the main reason deployment lives here rather than in
+The gate set itself lives in `verify.yml`, a reusable workflow that `ci.yml` and
+`publish.yml` both call. It used to be written out twice — `ci.yml` ran it on
+every push, and `release.yml` ran nine of the same gates again on the same
+commit, on a second runner — which cost a full extra machine per merge and was
+free to drift apart the moment one file was edited and not the other.
+
+**Nothing publishes on a merge.** Merging the version PR lands the bumps and
+stops there; shipping is **Actions → Publish to npm → Run workflow**, on
+purpose. The site can ship many times a day, but an npm release changes what
+every existing consumer resolves to and should happen when someone decided it
+would. Its **Mode** dropdown defaults to `publish`; pick `dry-run` to rehearse
+every gate, pack every tarball and print `changeset publish-plan` without
+shipping.
+
+Every job past the gates declares `needs: [gates]`, so a red build can reach
+neither production nor npm. This is the main reason deployment lives here rather than in
 Vercel's own Git integration — that integration deploys on every push whether or
 not the checks passed, which is the wrong default for a site publishing WCAG
 conformance and healthcare guidance.
@@ -74,7 +88,7 @@ There is no `--provenance` and no OIDC.
 
 Two consequences, both easy to miss because neither fails loudly:
 
-- `NPM_CONFIG_PROVENANCE` is inert. It has been set in `release.yml` since
+- `NPM_CONFIG_PROVENANCE` is inert. It has been set in the publish workflow since
   provenance was introduced, and no release has ever been attested, because the
   tool reading it was never npm.
 - Configuring trusted publishing and deleting `NPM_TOKEN` would break the
@@ -99,7 +113,9 @@ Until one of those lands, CI publishes with `NPM_TOKEN` and ships unattested.
 Before any release: `pnpm build && pnpm release:check`. It packs every
 publishable package with pnpm and fails on a missing README or LICENSE, an entry
 point absent from the tarball, a leftover `workspace:` range, test files, or an
-import Node cannot resolve. CI and the release job run the same script.
+import Node cannot resolve. CI and `publish.yml` run the same script — and
+`publish.yml` runs it even under `skip-checks`, because it is the one assertion
+that is about the artifact rather than about the source.
 
 ### The `@zoblocks` scope is not the `zoworkhq` org
 
@@ -121,7 +137,7 @@ against the repository that built the tarball and the registry rejects an
 attestation that names a different one, so asking for provenance while the two
 disagree fails the publish rather than skipping the attestation.
 
-`release.yml` therefore reads the declared repository, compares it with the one
+`publish.yml` therefore reads the declared repository, compares it with the one
 running the job, and sets `NPM_CONFIG_PROVENANCE` from the result. Releases ship
 unattested with a warning in the log until the repository is renamed, and
 attestation turns itself back on the moment it is — no workflow edit, and no
@@ -194,14 +210,16 @@ first. In order:
    repository secret.
 2. **Version PR.** Either tick _Settings → Actions → General → Allow GitHub
    Actions to create and approve pull requests_, or open the PR by hand from the
-   `changeset-release/main` branch the release job pushes. Check every package
+   `changeset-release/main` branch the version job pushes. Check every package
    reads `0.2.0` (`fhir` included) before merging.
-3. **Merge it.** The release job publishes all 27 packages — with provenance
-   only once the repository rename above has landed.
+3. **Merge it, then publish.** Merging only lands the bumps. Run **Actions →
+   Publish to npm → Run workflow** to ship all 27 packages — with provenance
+   only once the repository rename above has landed. A `dry-run` first tells you
+   exactly which versions the registry does not have yet.
 4. **Check.** `npm view @zoblocks/cli version` and
    `npx @zoblocks/cli@latest add pulse-loader` in an empty project.
 5. **Switch to OIDC.** For each package on npmjs.com, add a trusted publisher:
-   repository `zoworkhq/zoblocks`, workflow `release.yml`. Then delete
+   repository `zoworkhq/zoblocks`, workflow `publish.yml`. Then delete
    `NPM_TOKEN` and revoke the token.
 
 There is no old scope to retire. This step used to say to `npm deprecate` the

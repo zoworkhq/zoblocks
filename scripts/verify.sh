@@ -38,7 +38,7 @@
 # With Turbo's cache warm, the build and test portions are near-instant on an
 # unchanged tree, so the marginal cost of `--ci` is the browser suite alone.
 #
-# If you add a step to .github/workflows/ci.yml, add it here too. A gate that
+# If you add a step to .github/workflows/verify.yml, add it here too. A gate that
 # only exists in CI is a gate you find out about from a red pull request —
 # `test/gate-parity.test.ts` fails when the two lists disagree.
 
@@ -80,7 +80,7 @@ step() {
 
 printf "\n%sVerifying%s %s(the same gates CI runs)%s\n\n" "$BOLD" "$OFF" "$DIM" "$OFF"
 
-# Order mirrors .github/workflows/ci.yml so that whichever gate fails here is
+# Order mirrors .github/workflows/verify.yml so that whichever gate fails here is
 # the one that would have failed there.
 step "generated artifacts"  "pnpm gen"                    pnpm gen:check
 step "lint"                 "pnpm lint:fix"               pnpm lint

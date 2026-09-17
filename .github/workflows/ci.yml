@@ -1,5 +1,18 @@
 name: CI
 
+# What runs when:
+#
+#   push / pull request   →  this workflow: the gate set, then the deploys
+#   merge to main         →  ...then the "Version packages" PR, if changesets
+#                            are pending
+#   a human clicks it     →  publish.yml, which is the only thing that reaches
+#                            npm
+#
+# Three separate workflows used to start on every push — CI, CodeQL and
+# Release — and two of them ran the same nine gates against the same commit.
+# The gate set now lives in `verify.yml` and is called from here and from
+# `publish.yml`, so it is defined once and runs once per commit.
+
 on:
   push:
     branches: [main]
@@ -24,373 +37,29 @@ env:
   VERCEL_ORG_ID: team_ykOxK7PvNXML8d1afzA5dfNP
   VERCEL_PROJECT_ID_DOCS: prj_mdPnSKVCxN5nwG1XZrHDBrBHYOQq
 
-  # Where mongodb-memory-server keeps its mongod, for hq's tests. Set here
-  # rather than left to default because the library resolves the directory from
-  # the working directory: `pnpm install` runs at the root and `turbo run test`
-  # runs in apps/hq, so the default has them disagree and fetch it twice. One
-  # fixed path is also the only thing actions/cache can be pointed at.
-  MONGOMS_DOWNLOAD_DIR: ${{ github.workspace }}/.cache/mongodb-binaries
-
-  # Turbo's cache location, pinned so there is a single directory to restore.
-  #
-  # This is load-bearing and easy to get wrong: by default Turbo does NOT keep
-  # a central cache. It writes per-package `.turbo/` directories, and for a task
-  # with no declared `outputs` it keeps only the task log. Caching the root
-  # `.turbo` therefore captures run summaries and nothing else — a cache step
-  # that is green, fast, and does nothing at all.
-  #
-  # Verified rather than assumed: with this set, `turbo run build` writes
-  # `<hash>.tar.zst` artifacts here, and deleting `dist` then re-running
-  # restores it and reports FULL TURBO.
-  TURBO_CACHE_DIR: ${{ github.workspace }}/.turbo/cache
-
 jobs:
-  verify:
-    name: Typecheck, test, build
-    runs-on: [self-hosted, on-demand] # Must match your runner_extra_labels
-    # This one job does everything: install, generate, lint, format, typecheck,
-    # the suites under coverage, every build, the tarball check, the axe audit,
-    # and the browser suite in three engines.
-    #
-    # 25 minutes was set while coverage failed, so no run reached the browser
-    # suite. On 14 Sept the first run that did spent 16 minutes before it
-    # (coverage 490s, axe 154s, typecheck 129s, build 74s) and was killed 521s
-    # into e2e. A timeout reads as a test failure and blocks every deploy.
-    timeout-minutes: 45
-
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
-
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version-file: .nvmrc
-          cache: pnpm
-
-      # hq's tests run against a real mongod, fetched by mongodb-memory-server's
-      # postinstall. Restored before install so the postinstall finds it, and so
-      # a bad day at the download host cannot fail an otherwise-green build.
-      - name: Cache mongod binary
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
-        with:
-          path: ${{ github.workspace }}/.cache/mongodb-binaries
-          key: mongod-${{ runner.os }}-7.0.24
-
-      # Turbo's local cache, carried between runs.
-      #
-      # `turbo.json` has declared correct `outputs` for build, test and
-      # test:coverage all along, so the task graph was always cacheable — there
-      # was simply nothing persisting it, and every run recomputed typecheck
-      # (123s), test (227s), coverage (208s) and build (74s) from cold,
-      # including for a pull request that changed one markdown file.
-      #
-      # The key is content, not branch. Turbo hashes each task's own inputs, so
-      # a restored cache cannot produce a stale result: changed input, changed
-      # hash, cache miss. The lockfile is in the key because a dependency change
-      # invalidates everything downstream of it, and the SHA makes each run
-      # write a fresh entry rather than fight another run for one. The prefixes
-      # are what actually deliver the hits.
-      #
-      # Deliberately not keyed on branch name alone — that is how a cache entry
-      # for one set of inputs gets served for another.
-      - name: Cache Turbo
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
-        with:
-          path: ${{ github.workspace }}/.turbo/cache
-          key: turbo-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
-          restore-keys: |
-            turbo-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
-            turbo-${{ runner.os }}-
-
-      - name: Install
-        run: pnpm install --frozen-lockfile
-
-      # Runs before anything else. It validates every component's metadata,
-      # typechecks the source customers receive, and produces every derived
-      # artifact. A registry that does not validate is a broken install for
-      # every customer, and this is the cheapest check we have.
-      #
-      # `--strict` additionally fails when a component does not meet the bar for
-      # The catalog quality gate, armed.
-      #
-      # `--strict` makes a component that does not meet the bar for its declared
-      # stability tier a build failure rather than a warning. It stayed off
-      # because `withStory` was 0 and every component would have failed; stories
-      # now exist for all five, and coverage.json reports withStory: 5.
-      #
-      # This is what makes the standard hold without a human reviewing every
-      # component: a beta component without a story, or a stable one without
-      # limitations or extracted props, cannot merge.
-      - name: Generate and enforce the catalog quality gate
-        run: pnpm gen --strict
-
-      # Some generated artifacts are committed (registry.json, path mappings,
-      # the docs catalog) and some are build output (apps/docs/public/r/*.json,
-      # which .gitignore excludes). `git diff` is the check that covers exactly
-      # the committed ones, without the generator needing to know which is
-      # which. `pnpm gen:check` is the equivalent locally.
-      - name: No stale generated files
-        run: |
-          if ! git diff --exit-code --stat; then
-            echo "::error::Generated files are stale. Run \`pnpm gen\` and commit the result."
-            exit 1
-          fi
-
-      # `pnpm lint` carries a --max-warnings ratchet set to the exact count on
-      # the day lint was introduced, so the gate is identical here and on a
-      # developer's machine. Two rules are staged as warnings rather than errors
-      # — logical properties, and reading the clock inside a component —
-      # because the existing catalog violates them, and promoting them straight
-      # to errors would have meant either a large refactor in the same change or
-      # a blanket suppression.
-      #
-      # The number may go down. It may not go up: a new warning fails the build,
-      # so adding one means fixing it, or fixing another to make room. When it
-      # reaches zero, both rules become errors and the flag goes away.
-      # A high-or-worse advisory in the toolchain fails the build rather than
-      # waiting for a procurement reviewer to run it. (The threshold is `high`,
-      # not `critical` — the comment used to say critical, which understated
-      # what this actually enforces.)
-      - name: Audit dependencies
-        run: pnpm audit --audit-level=high
-
-      - name: Lint
-        run: pnpm lint
-
-      # Formatting was checkable but never checked, so it drifted to 65 files.
-      # Generated artifacts are excluded in .prettierignore rather than
-      # formatted: Prettier would reformat them, the next `pnpm gen` would
-      # write them back, and the stale-generated-files check above would fail
-      # on a diff nobody made. The generators own their own output shape.
-      - name: Format
-        run: pnpm format:check
-
-      # Covers the registry component source — the exact files copied into a
-      # customer's project. Nothing used to typecheck them: the root config that
-      # includes them was not part of any workspace task, and four components
-      # had unresolvable imports that no job reported.
-      - name: Typecheck
-        run: pnpm typecheck
-
-      # One instrumented run, not two.
-      #
-      # This was `Test` (227s) followed by `Coverage thresholds` (208s), which
-      # executed substantially the same suites twice — 41% of the whole build.
-      # The obvious fix was wrong for a long time and the workflow said so:
-      # eight packages defined `test` without `test:coverage`, so dropping the
-      # first step would have silently stopped running them.
-      #
-      # Those eight now define both, so `test:coverage` is a strict superset.
-      # Verified by comparing per-package suite counts across the two commands
-      # before the step was removed: 20 packages and 2768 tests under each,
-      # with no package present in one and absent from the other.
-      #
-      # Two layers still run, and both must pass:
-      #
-      #   `turbo run test:coverage` — the workspace packages and hq's auth,
-      #                        permissions and server actions, the last against
-      #                        a real mongod rather than a mocked driver: the
-      #                        guarantees there (a unique index deciding a
-      #                        duplicate signup, an atomic claim deciding who is
-      #                        the first admin) live in the database, so a mock
-      #                        would assert the code calls what it calls.
-      #   `vitest run --coverage` — the registry components, rendered in jsdom
-      #                        against the source a customer actually receives.
-      #
-      # Every component asserts the safety claim it exists to make: an
-      # uninterpreted result never reads as normal, a comparator survives, an
-      # unknown code status never defaults to full code, a restricted record
-      # fails closed. Those are the failures that look fine in review.
-      #
-      # Coverage is a gate, not a report. The readiness audit's tier bar puts
-      # `beta` at 90% lines / 85% branches, and a package that declares
-      # thresholds fails its own run when it slips below.
-      - name: Coverage thresholds
-        run: pnpm test:coverage
-
-      - name: Build
-        run: pnpm build
-
-      # The release job runs this too, but there it fails after the merge that
-      # caused it. Here it fails on the pull request.
-      - name: Every package is publishable
-        run: node scripts/check-tarball.mjs
-
-      # The site claims WCAG 2.2 AA and publishes per-component accessibility
-      # notes. This is what makes that claim checkable rather than aspirational.
-      # Its first run found four real violations, including a contrast failure
-      # on the footer's own legal limitation statement and three in the
-      # clinical status tokens.
-      # Browser binaries are ~300MB and took 71s to fetch on every single run.
-      # Keyed on the resolved Playwright version rather than the lockfile hash,
-      # so an unrelated dependency bump does not throw the browsers away.
-      - name: Resolve the Playwright version
-        id: pw
-        run: |
-          version=$(node -p "require('@playwright/test/package.json').version")
-          echo "version=$version" >> "$GITHUB_OUTPUT"
-          echo "Playwright $version"
-
-      - name: Cache Playwright browsers
-        id: pw-cache
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
-
-      # Firefox and WebKit as well as Chromium: the library publishes a WCAG
-      # 2.2 AA claim, and a focus ring or a forced-colours fallback that works
-      # in one engine and not another is exactly the defect that claim hides.
-      #
-      # Two steps, because only one half is cacheable. The browsers live in the
-      # cached directory; `--with-deps` installs OS packages system-wide, which
-      # a cache cannot hold, and which are cheap.
-      - name: Install Playwright browsers
-        if: steps.pw-cache.outputs.cache-hit != 'true'
-        run: pnpm exec playwright install chromium firefox webkit
-
-      - name: Install Playwright system dependencies
-        run: pnpm exec playwright install-deps chromium firefox webkit
-
-      # The server plumbing lives in scripts/verify-a11y.sh so this and
-      # `pnpm verify --ci` run the same code. The site publishes a WCAG 2.2 AA
-      # conformance claim; this is what makes it checkable rather than
-      # aspirational, and its first run found four real violations including a
-      # contrast failure on the footer's own legal limitation statement.
-      - name: Accessibility (WCAG 2.2 AA, both themes)
-        run: bash scripts/verify-a11y.sh
-
-      # Visual regression, plus the accessibility checks that need a real layout
-      # engine: 320px reflow, 200% zoom, forced colours, the focus indicator,
-      # and the reduced-motion still state. jsdom can see none of those.
-      # `e2e:ci` deliberately excludes the @vrt tag.
-      #
-      # Screenshot baselines are platform-specific — the committed set is
-      # darwin, and font rasterisation alone makes them fail on linux. Running
-      # them here would make a new gate red on its first run, which is how a
-      # team learns to ignore a gate. The browser-level accessibility checks
-      # (reflow, zoom, forced colours, focus, reduced motion) are
-      # platform-independent and run here.
-      #
-      # To make VRT blocking in CI, generate linux baselines once inside the
-      # official Playwright container and commit them:
-      #   docker run --rm -v "$PWD:/w" -w /w mcr.microsoft.com/playwright:v1.56.0-jammy \
-      #     sh -c "corepack enable && pnpm i --frozen-lockfile && pnpm build && pnpm e2e:update"
-      # then swap this step for `pnpm e2e`.
-      #
-      # This step also runs the @framework suite: six applications in
-      # apps/smoke and apps/smoke-react18, one per supported framework, each
-      # built by that framework's own compiler and driven through an identical
-      # script in all three engines. Playwright's webServer config builds and
-      # serves them, so no extra step is needed here — and the build itself is
-      # half the test, since Angular and Vue reject bad markup at compile time.
-      # Its first run found the elements broken in React 19, Vue, and Angular.
-      #
-      # `ZOBLOCKS_BASE_URL` is deliberately NOT set here.
-      #
-      # Setting it tells playwright.config.ts to skip starting the docs server,
-      # on the assumption that one is already running — which used to be true by
-      # accident: the accessibility step above started a server with `&` and
-      # never stopped it, and this step inherited it. Moving that step into a
-      # script that cleans up after itself broke the assumption, and every
-      # browser test failed with ERR_CONNECTION_REFUSED.
-      #
-      # Unset, Playwright starts and stops its own server, which is what makes
-      # this step self-contained rather than dependent on a leak two steps
-      # earlier.
-      - name: Browser accessibility and cross-framework smoke
-        run: pnpm e2e:ci
-
-      # A retried-but-passed test leaves no signal anyone reads: the job is
-      # green and the retry is buried in the log. `always()` because a flake is
-      # most worth reporting on the run where something else also failed.
-      - name: Report flaky tests
-        if: always()
-        run: node scripts/flaky.mjs
-
-      - name: Upload the Playwright report on failure
-        if: failure()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: playwright-report
-          path: playwright-report/
-          retention-days: 14
-
-      # Budgets on the bytes a customer installs. ENGINEERING.md §11.
-      - name: Bundle budgets
-        run: pnpm size
-
-      # The layer rule from ARCHITECTURE.md §2, executable rather than written
-      # down. Also catches cycles and a devDependency reaching shipped source.
-      - name: Architecture rules
-        run: pnpm deps
-
-  no-phi:
-    name: Synthetic data check
-    runs-on: [self-hosted, on-demand] # Must match your runner_extra_labels
-    timeout-minutes: 5
-
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      # Fixtures must stay synthetic. This catches the obvious mistakes — a real
-      # identifier system, a production hostname — not every possible one. It is
-      # a backstop for review, not a substitute for it.
-      #
-      # The bare acronym "PHI" used to be in this pattern. It matched our own
-      # prose explaining the PHI policy — in the fixtures header, on the
-      # homepage, in component documentation — so the job was red on every
-      # commit and told us nothing. A check that always fails is a check nobody
-      # reads. Patterns here must match DATA, never discussion of data.
-      # The patterns live in scripts/no-phi.sh so this and `pnpm verify` run
-      # identical code. Inline here, it was a CI-only gate — a developer could
-      # not run it without copying shell out of a YAML file, so nobody did, and
-      # it could only ever fail after a push.
-      - name: Scan for non-synthetic identifiers
-        run: bash scripts/no-phi.sh
-
-  retired-names:
-    name: Retired name check
-    runs-on: [self-hosted, on-demand] # Must match your runner_extra_labels
-    timeout-minutes: 5
-
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      # The project was renamed to ZoBlocks in September 2026, retiring the
-      # previous name entirely.
-      # A sweep makes that true once; this keeps it true. A repository this size
-      # regrows a name within a week of hand-written commits — a copied import,
-      # a pasted URL, a comment written from memory.
-      #
-      # It also fails on a tracked source file that reads as binary, because a
-      # stray NUL byte makes a file invisible to every text tool. That is not
-      # hypothetical: one file escaped the original sweep exactly that way.
-      #
-      # Exemptions and their reasons are in the script, not here, so this and
-      # `pnpm verify` run identical code.
-      - name: Scan for the retired name
-        run: bash scripts/retired-names.sh
+  # Every gate, in one place, shared with publish.yml. A reusable workflow's
+  # jobs run inside this run — no second entry in the Actions list, and no
+  # second copy of the list to keep in step.
+  gates:
+    name: Verify
+    uses: ./.github/workflows/verify.yml
+    permissions:
+      contents: read
 
   # ---------------------------------------------------------------------------
   # Deployment
   #
-  # Deliberately GitHub Actions rather than Vercel's own Git integration. That
-  # integration deploys on every push whether or not the checks passed — which
-  # for a site publishing WCAG conformance and healthcare component guidance is
-  # the wrong default. `needs:` makes a green build a precondition, not a
-  # parallel opinion.
-  #
-  # It also removes the failure mode this replaced: deploys ran from a laptop
-  # via `vercel --prod`, against whatever branch happened to be checked out.
-  # Production sat three merges stale because the working copy was on a feature
-  # branch. CI has no checkout to get wrong.
+  # `needs: [gates]` is what makes a green build a precondition rather than a
+  # parallel opinion. It also removes the failure mode this replaced: deploys
+  # ran from a laptop via `vercel --prod`, against whatever branch happened to
+  # be checked out, and production sat three merges stale because the working
+  # copy was on a feature branch. CI has no checkout to get wrong.
   # ---------------------------------------------------------------------------
   deploy-docs:
     name: Deploy docs (production)
     runs-on: [self-hosted, on-demand] # Must match your runner_extra_labels
-    needs: [verify, no-phi]
+    needs: [gates]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     timeout-minutes: 15
     environment:
@@ -400,39 +69,45 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
-
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      # Neither the workspace install nor the Turbo cache: `vercel build` does
+      # its own install and its own build, in its own output directory, and
+      # never reads either. Restoring a 200MB cache it will not look at is
+      # latency for nothing.
+      - uses: ./.github/actions/setup
         with:
-          node-version-file: .nvmrc
-          cache: pnpm
+          install: "false"
+          turbo-cache: "false"
 
       - name: Deploy
+        id: deploy
+        uses: ./.github/actions/vercel-deploy
+        with:
+          project-id: ${{ env.VERCEL_PROJECT_ID_DOCS }}
+          token: ${{ secrets.VERCEL_TOKEN }}
+          production: "true"
+
+      # Through the environment, not interpolated into the script body. The URL
+      # comes back from a network call, and `${{ }}` is expanded before the
+      # shell parses the line.
+      - name: Summarise
         env:
-          VERCEL_PROJECT_ID: ${{ env.VERCEL_PROJECT_ID_DOCS }}
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          URL: ${{ steps.deploy.outputs.url }}
         run: |
-          if [ -z "${VERCEL_TOKEN:-}" ]; then
-            echo "::error::VERCEL_TOKEN is not set. Add it under Settings → Secrets → Actions."
-            exit 1
-          fi
-          pnpm dlx vercel@48 pull --yes --environment=production --token "$VERCEL_TOKEN"
-          pnpm dlx vercel@48 build --prod --token "$VERCEL_TOKEN"
-          url=$(pnpm dlx vercel@48 deploy --prebuilt --prod --token "$VERCEL_TOKEN")
-          echo "Deployed: $url"
-          echo "### Docs deployed" >> "$GITHUB_STEP_SUMMARY"
-          echo "$url" >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo "### Docs deployed"
+            echo "$URL"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       # The registry is the contract customers install against. A deploy that
       # returns 200 but serves a stale or malformed registry is a broken
       # install for everyone, and it is exactly what went unnoticed for three
       # merges. Assert the deployed artifact, not just the response code.
-      # Verifies the deployed registry against what this commit actually built,
-      # rather than against a component named here. The previous version fetched
-      # `vitals-panel.json` by name; when that component was removed the gate
-      # kept asking for it, so the next merge to main would have failed on a
-      # component that was deliberately deleted. A gate must not carry its own
-      # expiry date.
+      #
+      # Verified against what this commit actually built, rather than against a
+      # component named here. The previous version fetched `vitals-panel.json`
+      # by name; when that component was removed the gate kept asking for it, so
+      # the next merge to main would have failed on a component that was
+      # deliberately deleted. A gate must not carry its own expiry date.
       - name: Verify the deployed registry
         run: |
           set -euo pipefail
@@ -484,7 +159,7 @@ jobs:
   # is a static error, and it flagged all five the first time it ran.
   deploy-hq:
     name: Deploy hq (production)
-    needs: [verify, no-phi]
+    needs: [gates]
     if: >-
       github.event_name == 'push' && github.ref == 'refs/heads/main' &&
       vars.VERCEL_PROJECT_ID_HQ != ''
@@ -497,31 +172,17 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
-
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      - uses: ./.github/actions/setup
         with:
-          node-version-file: .nvmrc
-          cache: pnpm
+          install: "false"
+          turbo-cache: "false"
 
       - name: Deploy
-        env:
-          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID_HQ }}
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        run: |
-          # The token is passed with --token on every call. The CLI does not
-          # read VERCEL_TOKEN from the environment for these commands, and
-          # relying on that produced "No existing credentials found" with the
-          # secret correctly set — a failure that reads like a missing secret
-          # and is not one.
-          if [ -z "${VERCEL_TOKEN:-}" ]; then
-            echo "::error::VERCEL_TOKEN is not set. Add it under Settings → Secrets → Actions."
-            exit 1
-          fi
-          pnpm dlx vercel@48 pull --yes --environment=production --token "$VERCEL_TOKEN"
-          pnpm dlx vercel@48 build --prod --token "$VERCEL_TOKEN"
-          url=$(pnpm dlx vercel@48 deploy --prebuilt --prod --token "$VERCEL_TOKEN")
-          echo "Deployed: $url"
+        uses: ./.github/actions/vercel-deploy
+        with:
+          project-id: ${{ vars.VERCEL_PROJECT_ID_HQ }}
+          token: ${{ secrets.VERCEL_TOKEN }}
+          production: "true"
 
       # Asserted against the custom domain only when it is actually attached.
       # It was hard-coded, so a successful deploy failed here with curl exit 6 —
@@ -570,7 +231,7 @@ jobs:
   #      deploy succeeds and every request 500s.
   deploy-app:
     name: Deploy app (production)
-    needs: [verify, no-phi]
+    needs: [gates]
     if: >-
       github.event_name == 'push' && github.ref == 'refs/heads/main' &&
       vars.VERCEL_PROJECT_ID_APP != ''
@@ -583,29 +244,17 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
-
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      - uses: ./.github/actions/setup
         with:
-          node-version-file: .nvmrc
-          cache: pnpm
+          install: "false"
+          turbo-cache: "false"
 
       - name: Deploy
-        env:
-          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID_APP }}
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        run: |
-          # --token on every call. The CLI does not read VERCEL_TOKEN from the
-          # environment for these, and relying on it reports "No existing
-          # credentials found" with the secret correctly set.
-          if [ -z "${VERCEL_TOKEN:-}" ]; then
-            echo "::error::VERCEL_TOKEN is not set. Add it under Settings → Secrets → Actions."
-            exit 1
-          fi
-          pnpm dlx vercel@48 pull --yes --environment=production --token "$VERCEL_TOKEN"
-          pnpm dlx vercel@48 build --prod --token "$VERCEL_TOKEN"
-          url=$(pnpm dlx vercel@48 deploy --prebuilt --prod --token "$VERCEL_TOKEN")
-          echo "Deployed: $url"
+        uses: ./.github/actions/vercel-deploy
+        with:
+          project-id: ${{ vars.VERCEL_PROJECT_ID_APP }}
+          token: ${{ secrets.VERCEL_TOKEN }}
+          production: "true"
 
       # The catalogue is the one endpoint the public site depends on, so it is
       # the one worth asserting. Skipped until the domain is attached, for the
@@ -633,7 +282,7 @@ jobs:
   # deploys is a PR that can be looked at rather than imagined.
   deploy-preview:
     name: Deploy docs (preview)
-    needs: [verify, no-phi]
+    needs: [gates]
     if: github.event_name == 'pull_request'
     runs-on: [self-hosted, on-demand] # Must match your runner_extra_labels
     timeout-minutes: 15
@@ -641,29 +290,190 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
-
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      - uses: ./.github/actions/setup
         with:
-          node-version-file: .nvmrc
-          cache: pnpm
+          install: "false"
+          turbo-cache: "false"
 
       - name: Deploy preview
+        id: deploy
+        uses: ./.github/actions/vercel-deploy
+        with:
+          project-id: ${{ env.VERCEL_PROJECT_ID_DOCS }}
+          token: ${{ secrets.VERCEL_TOKEN }}
+          # Fork PRs never receive secrets, so a tokenless run is the normal
+          # path for an outside contribution. Say so plainly instead of
+          # reporting a green "deployed" that deployed nothing.
+          tolerate-missing-token: "true"
+
+      - name: Summarise
+        if: steps.deploy.outputs.skipped != 'true'
         env:
-          VERCEL_PROJECT_ID: ${{ env.VERCEL_PROJECT_ID_DOCS }}
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          URL: ${{ steps.deploy.outputs.url }}
         run: |
-          if [ -z "${VERCEL_TOKEN:-}" ]; then
-            # Fork PRs never receive secrets, so this is the normal path for an
-            # outside contribution. Say so plainly instead of reporting a green
-            # "deployed" that deployed nothing.
-            echo "### Preview skipped" >> "$GITHUB_STEP_SUMMARY"
-            echo "No \`VERCEL_TOKEN\` in this context — expected on a fork PR. A maintainer preview runs after review." >> "$GITHUB_STEP_SUMMARY"
-            echo "::notice::Preview deployment skipped: no VERCEL_TOKEN (expected on fork PRs)."
-            exit 0
+          {
+            echo "### Preview"
+            echo "$URL"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  # ---------------------------------------------------------------------------
+  # Versioning — and only versioning.
+  #
+  # This was `release.yml`, a third workflow that started on every push and
+  # re-ran nine of the gates above before doing anything. It is a job here
+  # instead, for two reasons beyond the duplicated compute: a separate workflow
+  # had no `needs:` on CI, so a commit with red CI could open a version PR and
+  # publish from it; and it was a third entry in the Actions list for every
+  # merge.
+  #
+  # Publishing has moved out entirely, to `publish.yml`, which nothing triggers
+  # automatically. Merging the "Version packages" PR no longer ships anything —
+  # a human clicks Run workflow when they have decided to. The site can ship
+  # many times a day; an npm release changes what every existing consumer
+  # resolves to, and should happen when someone decided it would.
+  # ---------------------------------------------------------------------------
+  version:
+    name: Version packages
+    needs: [gates]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, on-demand] # Must match your runner_extra_labels
+    timeout-minutes: 15
+    # Serialised across runs, and never cancelled: two merges in quick
+    # succession must not race each other to force-push the version branch.
+    concurrency:
+      group: release
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      pull-requests: write
+
+    # Git hooks are for humans.
+    #
+    # `prepare: husky` installs them on every `pnpm install`, including here, so
+    # a commit made by this job runs `lint-staged` and `commitlint` — checks
+    # written for hand-authored commits, re-running work the pipeline has
+    # already done. The Version commit is generated by changesets and its
+    # message is fixed by that convention, so commitlint rejected it outright:
+    #
+    #     subject may not be empty [subject-empty]
+    #     type may not be empty [type-empty]
+    #     husky - commit-msg script failed (code 1)
+    #
+    # HUSKY=0 stops them installing at all. Nothing is lost: every gate those
+    # hooks run is a gate `gates` has already run, against the whole repository
+    # rather than against staged files.
+    env:
+      HUSKY: 0
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      # `changeset version` edits manifests and changelogs; it builds nothing,
+      # so there is no Turbo cache worth restoring.
+      - uses: ./.github/actions/setup
+        with:
+          turbo-cache: "false"
+
+      # `RELEASE_PAT` is optional and exists for one reason: opening the
+      # "Version packages" PR needs a permission the workflow cannot grant
+      # itself. The `pull-requests: write` above is necessary and not
+      # sufficient — a repository switch, Settings -> Actions -> General ->
+      # Workflow permissions -> "Allow GitHub Actions to create and approve
+      # pull requests", overrides it. While that is off, the action versions
+      # every package correctly and then fails on the final call with
+      # "GitHub Actions is not permitted to create or approve pull requests".
+      #
+      # Enabling the switch is the simpler fix and stores no credential. The
+      # PAT is for a repository that keeps the switch off on purpose: a token
+      # belonging to a person rather than to the run.
+      #
+      # No `publish-script`. Without one the action versions and opens the PR
+      # and stops there, which is the whole point of this job now.
+      #
+      # Worth noting for next time: the inputs below were renamed by
+      # changesets/action and it hard-errors on the old spellings rather than
+      # falling back, so this step failed on every merge for a while. The rename
+      # shipped inside the `v2` tag we pin to, so pinning a major is not the
+      # protection it looks like. A digest pin would have held.
+      - name: Open or update the Version PR
+        id: changesets
+        # Allowed to fail so the fallback below can run. The fallback re-fails
+        # the job for anything that is not the PR-permission case.
+        continue-on-error: true
+        uses: changesets/action@198f833dd7d863100ea6e28967bc9a9fdefadb0a # v2 branch head
+        with:
+          version-script: pnpm changeset version
+          commit-message: "Version packages"
+          pr-title: "Version packages"
+          github-token: ${{ secrets.RELEASE_PAT || secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_PAT || secrets.GITHUB_TOKEN }}
+
+      # Opening the pull request is the one thing this job cannot do for
+      # itself when that repository switch is off. Pushing a branch needs only
+      # `contents: write`, which this job has. So the branch is pushed and the
+      # summary carries a one-click link to open the PR from it.
+      - name: Push the Version branch when Actions may not open the PR
+        if: steps.changesets.outcome == 'failure'
+        env:
+          BRANCH: changeset-release/main
+        run: |
+          set -euo pipefail
+
+          # Read from the commit, never from the working tree. `changeset
+          # version` deletes each changeset as it consumes it, and it does that
+          # *before* the call that opens the pull request — so by the time this
+          # step runs the directory is empty whether or not there was anything
+          # to release. Checking the tree reported "no changesets pending" on a
+          # run with sixteen of them, and turned a recoverable state into a red
+          # build carrying a message that pointed at the wrong thing entirely.
+          #
+          # `git ls-tree` reads the immutable commit, so nothing the previous
+          # step did can change the answer.
+          pending=$(git ls-tree -r --name-only "$GITHUB_SHA" -- .changeset \
+            | grep -viE 'config\.json|README\.md' | head -1)
+          if [ -z "$pending" ]; then
+            echo "::error::The versioning step failed and this commit carries no changesets, so it had nothing to version. Read the log above."
+            exit 1
           fi
-          pnpm dlx vercel@48 pull --yes --environment=preview --token "$VERCEL_TOKEN"
-          pnpm dlx vercel@48 build --token "$VERCEL_TOKEN"
-          url=$(pnpm dlx vercel@48 deploy --prebuilt --token "$VERCEL_TOKEN")
-          echo "### Preview" >> "$GITHUB_STEP_SUMMARY"
-          echo "$url" >> "$GITHUB_STEP_SUMMARY"
+
+          # A clean slate. The action may have versioned and committed before
+          # it failed, and running `changeset version` over that would double
+          # every bump.
+          git reset --hard "$GITHUB_SHA"
+          git switch -C "$BRANCH"
+
+          pnpm changeset version
+
+          git add -A
+          # --no-verify as well as HUSKY=0: this commit is machine-generated
+          # from changesets output, and every gate those hooks would run has
+          # already run against the whole repository in `gates`.
+          #
+          # The message is conventional so the history stays readable, and so
+          # this does not depend on hooks being off in order to be valid.
+          git -c user.name="github-actions[bot]" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit --no-verify -m "chore(release): version packages"
+          git push --force origin "$BRANCH"
+
+          compare="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/compare/main...${BRANCH}?expand=1"
+          {
+            echo "### The Version PR is ready to open"
+            echo
+            echo "GitHub Actions is not permitted to open pull requests in this"
+            echo "repository, so the versioned branch has been pushed instead."
+            echo
+            echo "**[Open the Version PR](${compare})** — review the bumps and the"
+            echo "changelogs, then merge it. Merging publishes nothing: run the"
+            echo "**Publish to npm** workflow when you are ready to ship."
+            echo
+            echo "To have it opened automatically in future, either tick *Settings ->"
+            echo "Actions -> General -> Workflow permissions -> Allow GitHub Actions to"
+            echo "create and approve pull requests*, or add a \`RELEASE_PAT\` secret with"
+            echo "\`repo\` scope — this workflow already prefers the PAT when present."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          echo "::notice::Version branch pushed. Open the PR: ${compare}"

@@ -43,7 +43,7 @@ Before pushing, run what CI runs:
 pnpm verify
 ```
 
-That runs the same gates as `.github/workflows/ci.yml`, in the same order, and
+That runs the same gates as `.github/workflows/verify.yml`, in the same order, and
 prints output only for the ones that fail. `pnpm verify --fast` skips the tests
 and the build when you want the quick pass.
 
