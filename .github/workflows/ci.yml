@@ -402,7 +402,7 @@ jobs:
         # Allowed to fail so the fallback below can run. The fallback re-fails
         # the job for anything that is not the PR-permission case.
         continue-on-error: true
-        uses: changesets/action@198f833dd7d863100ea6e28967bc9a9fdefadb0a # v2 branch head
+        uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2 branch head
         with:
           version-script: pnpm changeset version
           commit-message: "Version packages"
