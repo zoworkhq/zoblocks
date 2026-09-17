@@ -190,7 +190,7 @@ export function ZoworkProvenance() {
 
   const years = zoworkYears();
   const tenure = zoworkClientTenure();
-  const [evisit, remarkable, netsmart, change] = ZOWORK_CLIENTS;
+  const [netsmart, evisit, remarkable, change] = ZOWORK_CLIENTS;
 
   const client = (c: ZoworkClient, delay: number, screen: ReactNode) => (
     <ClientTile
@@ -253,8 +253,8 @@ export function ZoworkProvenance() {
         </h2>
         <div className="zwpHeadFoot">
           <p className="zwpLede">
-            Zowork is a services company that works only in healthcare. Its four longest clients
-            have stayed {tenure.min} to {tenure.max} years.
+            Zowork engineers software for healthcare companies. {netsmart.name} has been a client
+            for {clientYears(netsmart)} years.
           </p>
           <ul className="zwpCreds" aria-label="Credentials">
             {CREDENTIALS.map(({ label, held }) => (
@@ -267,7 +267,7 @@ export function ZoworkProvenance() {
         </div>
       </div>
 
-      {client(evisit, 80, <TelehealthCall live={live} />)}
+      {client(netsmart, 80, <EhrSync live={live} />)}
       {client(remarkable, 0, <ScribeNote live={live} />)}
 
       <div
@@ -287,7 +287,7 @@ export function ZoworkProvenance() {
             </defs>
             <text>
               <textPath href="#zwp-orbit-path" textLength="535" lengthAdjust="spacing">
-                {`HEALTHCARE ONLY · SINCE ${ZOWORK_SINCE} · ${ZOWORK_CLIENTS.length} LONG-TERM CLIENTS · ZERO CHURN · HIPAA · SOC 2 ·`}
+                {`HEALTHCARE ENGINEERING · SINCE ${ZOWORK_SINCE} · ${ZOWORK_CLIENTS.length} LONG-TERM CLIENTS · ZERO CHURN · HIPAA · SOC 2 ·`}
               </textPath>
             </text>
           </svg>
@@ -310,7 +310,7 @@ export function ZoworkProvenance() {
         </p>
       </div>
 
-      {client(netsmart, 160, <EhrSync live={live} />)}
+      {client(evisit, 160, <TelehealthCall live={live} />)}
       {client(change, 0, <Curriculum live={live} />)}
 
       <div
@@ -344,7 +344,7 @@ export function ZoworkProvenance() {
         <dl className="zwpMinis">
           <div>
             <dt>{years}+</dt>
-            <dd>years, healthcare only</dd>
+            <dd>years in healthcare</dd>
           </div>
           <div>
             <dt>{ZOWORK_INTEGRATIONS}</dt>
@@ -443,6 +443,7 @@ function ClientTile({
   children: ReactNode;
 }) {
   const years = clientYears(client);
+  const longest = years === zoworkClientTenure().max;
   return (
     <article
       ref={nodeRef}
@@ -455,8 +456,8 @@ function ClientTile({
     >
       <header className="zwpClientHead">
         <h3 className="zwpClientName">{client.name}</h3>
-        {/* "Client" alone: the years sit once, in the footer, beside their bar. */}
-        <span className="zwpChip">Client</span>
+        {/* The years sit once, in the footer, beside their bar. */}
+        <span className="zwpChip">{longest ? "Longest client" : "Client"}</span>
       </header>
       <p className="zwpBuilt">
         Zowork {client.verb} · {client.work}
@@ -469,6 +470,7 @@ function ClientTile({
         <span className="zwpFootLabel">{client.result.label}</span>
         <span className="zwpTenure" style={{ "--zwp-years": years } as CSSProperties}>
           {years} yrs · since {client.since}
+          {longest && " · still shipping"}
           <i aria-hidden="true" />
         </span>
       </p>

@@ -7,9 +7,10 @@
  * on a phone had the logo, a search icon and the footer. This gives them the
  * same six destinations the desktop bar and the footer carry.
  *
- * A sheet over the page rather than a dropdown, for the reasons the command
- * menu is one: the page behind is inert, focus stays inside, and Escape or a
- * tap outside closes it. Its top bar is drawn at the header's own height —
+ * A full-screen sheet rather than a dropdown: the page behind is inert, focus
+ * stays inside, and Close or Escape dismisses it. It was a half-height panel
+ * over a scrim of `ink/40`, and `ink` is near-white in dark theme, so the page
+ * below turned a muddy grey. Covering the screen needs no scrim at all. Its top bar is drawn at the header's own height —
  * 64px at rest, 52px once scrolled — so Close lands exactly where Menu was.
  */
 
@@ -17,10 +18,11 @@ import * as React from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowUpRight, Github, Menu, X } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Github, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { restoreFocus } from "@/components/site/interactions";
 import { ThemeToggle } from "@/components/site/theme-toggle";
+import { ZOWORK_HREF } from "@/lib/zowork";
 
 const LINKS = [
   { href: "/components", label: "Components" },
@@ -133,31 +135,28 @@ export function SiteMenu({ mark }: { mark: React.ReactNode }) {
         createPortal(
           <div className="fixed inset-0 z-50 md:hidden">
             <div
-              aria-hidden="true"
-              onClick={close}
-              className="absolute inset-0 bg-ink/40 backdrop-blur-[2px] motion-safe:animate-[overlay-in_200ms_ease-out]"
-            />
-
-            <div
               ref={panelRef}
               role="dialog"
               aria-modal="true"
               aria-label="Site menu"
-              className="site-menu-panel relative max-h-dvh overflow-y-auto border-b border-rule bg-paper"
+              className="site-menu-panel flex h-dvh flex-col overflow-y-auto bg-paper"
             >
               <div
-                className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-5 sm:px-8"
+                className="mx-auto flex w-full max-w-6xl shrink-0 items-center justify-between gap-6 px-5 sm:px-8"
                 style={{ height: bar }}
               >
                 <Link
                   href="/"
                   onClick={close}
-                  aria-label="ZoBlocks home"
+                  aria-label="ZoBlocks by Zowork, home"
                   className="flex min-h-6 items-center gap-2.5 text-ink"
                 >
                   {mark}
                   <span className="font-display text-[0.9375rem] font-semibold tracking-tight">
                     ZoBlocks
+                  </span>
+                  <span className="-ml-1 text-[0.8125rem] whitespace-nowrap text-graphite">
+                    by Zowork
                   </span>
                   <span className="numeric hidden rounded border border-rule px-1.5 py-0.5 text-[0.625rem] text-graphite-soft sm:inline">
                     v0.1.0
@@ -174,44 +173,81 @@ export function SiteMenu({ mark }: { mark: React.ReactNode }) {
                 </button>
               </div>
 
-              <nav aria-label="Main" className="mx-auto max-w-6xl px-5 pb-5 sm:px-8">
-                <ul className="border-t border-rule">
-                  {LINKS.map((link) => {
+              <nav
+                aria-label="Main"
+                className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:px-8"
+              >
+                <ul className="border-t border-rule pt-2">
+                  {LINKS.map((link, i) => {
                     const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
                     return (
-                      <li key={link.href} className="border-b border-rule">
+                      <li
+                        key={link.href}
+                        className="site-menu-item"
+                        style={{ "--i": i } as React.CSSProperties}
+                      >
                         <Link
                           href={link.href}
                           onClick={close}
                           aria-current={active ? "page" : undefined}
                           className={cn(
-                            "flex min-h-13 items-center justify-between gap-4 font-display text-[1.0625rem] tracking-tight transition-colors duration-200",
+                            "group flex min-h-15 items-center gap-4 font-display text-[1.75rem] leading-none tracking-tight transition-colors duration-200",
                             active
                               ? "font-semibold text-ink"
                               : "font-medium text-graphite hover:text-ink",
                           )}
                         >
-                          {link.label}
-                          {/* The header's measured underline, turned into a tick. */}
-                          {active ? (
-                            <span aria-hidden="true" className="h-px w-5 bg-brand" />
-                          ) : null}
+                          <span
+                            aria-hidden="true"
+                            className={cn(
+                              "numeric w-5 text-[0.6875rem] tracking-normal",
+                              active ? "text-brand" : "text-graphite-soft",
+                            )}
+                          >
+                            {String(i + 1).padStart(2, "0")}
+                          </span>
+                          <span className="flex-1">{link.label}</span>
+                          <ArrowRight
+                            aria-hidden="true"
+                            className={cn(
+                              "size-5 transition-transform duration-300 group-hover:translate-x-1",
+                              active ? "text-brand" : "text-graphite-soft",
+                            )}
+                          />
                         </Link>
                       </li>
                     );
                   })}
                 </ul>
 
-                <div className="mt-4 flex items-center justify-between gap-4">
+                <div className="mt-auto pt-8">
                   <a
-                    href="https://github.com/zoworkhq/zoblocks"
-                    className="inline-flex min-h-10 items-center gap-2 text-sm text-graphite transition-colors duration-200 hover:text-ink"
+                    href={ZOWORK_HREF}
+                    rel="noopener"
+                    className="flex items-center justify-between gap-4 rounded-xl border border-rule bg-paper-sunk/60 px-4 py-3.5 transition-colors duration-200 hover:border-rule-strong"
                   >
-                    <Github aria-hidden="true" className="size-4" />
-                    GitHub
-                    <ArrowUpRight aria-hidden="true" className="size-3" />
+                    <span className="flex flex-col gap-0.5">
+                      <span className="text-[0.6875rem] tracking-wide text-graphite-soft uppercase">
+                        Built by Zowork
+                      </span>
+                      <span className="text-[0.9375rem] font-medium text-ink">
+                        Talk to the team
+                      </span>
+                    </span>
+                    <ArrowUpRight aria-hidden="true" className="size-4 text-graphite" />
                   </a>
-                  <ThemeToggle />
+
+                  <div className="mt-4 flex items-center justify-between gap-4 border-t border-rule pt-4">
+                    <a
+                      href="https://github.com/zoworkhq/zoblocks"
+                      className="inline-flex min-h-10 items-center gap-2 text-sm text-graphite transition-colors duration-200 hover:text-ink"
+                    >
+                      <Github aria-hidden="true" className="size-4" />
+                      GitHub
+                      <ArrowUpRight aria-hidden="true" className="size-3" />
+                    </a>
+                    <ThemeToggle />
+                  </div>
                 </div>
               </nav>
             </div>

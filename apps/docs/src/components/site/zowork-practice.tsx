@@ -4,7 +4,7 @@ import { zoworkMono, zoworkSans } from "@/components/site/zowork-fonts";
 /**
  * Zowork, on the home page.
  *
- * Zowork is a services company that works only in healthcare, and ZoBlocks is
+ * Zowork is a healthcare engineering services company, and ZoBlocks is
  * something it makes. This section says so and sells the services: Zowork at
  * the centre, its four longest clients around it with what Zowork built for
  * each, then what a reader can hire Zowork for.

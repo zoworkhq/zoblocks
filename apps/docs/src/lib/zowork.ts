@@ -1,7 +1,7 @@
 /**
  * Zowork, as facts.
  *
- * Zowork is a services company that works only in healthcare, and ZoBlocks is
+ * Zowork is a healthcare engineering services company, and ZoBlocks is
  * something it makes. The home page and `/premium` both state what follows, and
  * the moment a figure is typed twice it starts drifting on one of them.
  *
@@ -66,10 +66,18 @@ export interface ZoworkClient {
  *
  * Clients, not partners: Zowork is hired by each of them. zowork.com lists all
  * four as still in production, which is what "zero churn" means here. The
- * order is the home page bento's reading order, and a tuple so the bento can
+ * order is the home page bento's reading order — Netsmart, the longest, first — and a tuple so the bento can
  * name each position without an undefined check.
  */
 export const ZOWORK_CLIENTS = [
+  {
+    name: "Netsmart",
+    since: 2017,
+    verb: "builds",
+    work: "Admin & EHR platform",
+    result: { value: "0", label: "incidents, 14-week cutover" },
+    accent: "cyan",
+  },
   {
     name: "eVisit",
     since: 2019,
@@ -85,14 +93,6 @@ export const ZOWORK_CLIENTS = [
     work: "Bells.ai ambient scribe",
     result: { value: "~50%", label: "documentation time back" },
     accent: "mint",
-  },
-  {
-    name: "Netsmart",
-    since: 2017,
-    verb: "builds",
-    work: "Admin & EHR platform",
-    result: { value: "0", label: "incidents, 14-week cutover" },
-    accent: "cyan",
   },
   {
     name: "The Change Companies",

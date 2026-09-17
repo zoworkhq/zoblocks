@@ -147,12 +147,13 @@ export function SiteHeader() {
           // target, not a link inside a sentence, so the Inline exception does
           // not cover it. It sits in a taller header row, so nothing moves.
           className="group flex min-h-6 items-center gap-2.5 text-ink"
-          aria-label="ZoBlocks home"
+          aria-label="ZoBlocks by Zowork, home"
         >
           <ZoBlocksMark className="h-4 w-7 transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:rotate-180" />
           <span className="font-display text-[0.9375rem] font-semibold tracking-tight">
             ZoBlocks
           </span>
+          <span className="-ml-1 text-[0.8125rem] whitespace-nowrap text-graphite">by Zowork</span>
           <span className="numeric hidden rounded border border-rule px-1.5 py-0.5 text-[0.625rem] text-graphite-soft sm:inline">
             v0.1.0
           </span>

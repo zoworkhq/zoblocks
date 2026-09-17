@@ -553,12 +553,13 @@ body {
 }
 
 /* The phone menu drops from the header rather than scaling up like a dialog. */
-.site-menu-panel {
-  box-shadow: 0 24px 48px -24px rgb(8 17 15 / 0.35);
-}
 @media (prefers-reduced-motion: no-preference) {
   .site-menu-panel {
     animation: site-menu-in 260ms var(--ease-out-expo) both;
+  }
+  .site-menu-item {
+    animation: site-menu-in 420ms var(--ease-out-expo) both;
+    animation-delay: calc(60ms + var(--i, 0) * 40ms);
   }
 }
 @keyframes site-menu-in {
