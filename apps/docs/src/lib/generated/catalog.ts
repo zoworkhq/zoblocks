@@ -965,7 +965,7 @@ export const CATALOG: ComponentDoc[] = [
     ],
     "seo": {
       "slug": "allergy-chip",
-      "title": "Allergy Chip — React allergy display component",
+      "title": "Allergy Chip — allergy display component",
       "description": "A React allergy component that separates criticality from reaction severity, and distinguishes no known allergies from an allergy history nobody took.",
       "primaryKeyword": "react allergy component",
       "secondaryKeywords": [
@@ -1697,7 +1697,7 @@ export const CATALOG: ComponentDoc[] = [
     ],
     "seo": {
       "slug": "care-team-presence",
-      "title": "Care Team Presence — React on-call and coverage UI",
+      "title": "Care Team Presence — on-call and coverage UI",
       "description": "React presence for clinical teams: in session, on call, signed out to whom — plus rota coverage with a real gap state and chart co-presence conflicts.",
       "primaryKeyword": "react care team presence",
       "secondaryKeywords": [
@@ -2953,7 +2953,7 @@ export const CATALOG: ComponentDoc[] = [
     ],
     "seo": {
       "slug": "chart-command-palette",
-      "title": "Chart Command Palette — React clinical ⌘K",
+      "title": "Chart Command Palette — clinical ⌘K",
       "description": "React ⌘K for clinical apps: verb-first ranking, relationship scoping that counts rather than names, and an audit for every patient search.",
       "primaryKeyword": "react clinical command palette",
       "secondaryKeywords": [
@@ -3555,7 +3555,7 @@ export const CATALOG: ComponentDoc[] = [
     ],
     "seo": {
       "slug": "chart-context-menu",
-      "title": "Chart Context Menu — React healthcare row actions",
+      "title": "Chart Context Menu — healthcare row actions",
       "description": "A React context menu for clinical apps: it names the record before offering to change it, ranks verbs by consequence, and counts the actions it withholds.",
       "primaryKeyword": "react healthcare context menu",
       "secondaryKeywords": [
@@ -4085,7 +4085,7 @@ export const CATALOG: ComponentDoc[] = [
     ],
     "seo": {
       "slug": "chart-header",
-      "title": "Chart Header — React sticky patient header",
+      "title": "Chart Header — sticky patient header",
       "description": "A React chart header that collapses to a safety strip, makes the encounter an explicit control, and never renders administrative gender beside a dose.",
       "primaryKeyword": "react patient chart header",
       "secondaryKeywords": [
@@ -4956,7 +4956,7 @@ export const CATALOG: ComponentDoc[] = [
     ],
     "seo": {
       "slug": "clinical-status",
-      "title": "Clinical Status — accessible React status chip",
+      "title": "Clinical Status — accessible status chip",
       "description": "A React status chip with nine fixed clinical scales. Every step carries a colour, a shape and a word, so it survives greyscale and high contrast.",
       "primaryKeyword": "react clinical status component",
       "secondaryKeywords": [
@@ -6118,7 +6118,7 @@ export const CATALOG: ComponentDoc[] = [
     ],
     "seo": {
       "slug": "data-grid",
-      "title": "Data Grid — React healthcare worklist with role=\"grid\"",
+      "title": "Data Grid — healthcare worklist with role=\"grid\"",
       "description": "An accessible React data grid for clinical worklists: it states its coverage above the rows and names the model when you sort by a derived column.",
       "primaryKeyword": "react healthcare data grid",
       "secondaryKeywords": [
@@ -8244,7 +8244,7 @@ export const CATALOG: ComponentDoc[] = [
     ],
     "seo": {
       "slug": "date-picker",
-      "title": "Date Picker — accessible React healthcare control",
+      "title": "Date Picker — accessible healthcare control",
       "description": "A React date picker for healthcare: sixteen variants over one value space — fields, calendars, date and time ranges, birth dates, sessions and recurrence.",
       "primaryKeyword": "react healthcare date picker",
       "secondaryKeywords": [
@@ -9236,7 +9236,7 @@ export const CATALOG: ComponentDoc[] = [
     ],
     "seo": {
       "slug": "provenance-chip",
-      "title": "Provenance Chip — React data source component",
+      "title": "Provenance Chip — data source component",
       "description": "A React provenance affix for clinical values: six source classes, AI extraction with its source span, and staleness measured against a per-datum policy.",
       "primaryKeyword": "react data provenance component",
       "secondaryKeywords": [
@@ -10097,7 +10097,7 @@ export const CATALOG: ComponentDoc[] = [
     ],
     "seo": {
       "slug": "recent-patient-stack",
-      "title": "Recent Patient Stack — React multi-chart workspace",
+      "title": "Recent Patient Stack — multi-chart workspace",
       "description": "A React chart switcher for clinicians: a stable per-chart accent, automatic disambiguation of similar names, unsigned-note badges and a graded close.",
       "primaryKeyword": "react multi chart workspace",
       "secondaryKeywords": [
@@ -11060,7 +11060,7 @@ export const CATALOG: ComponentDoc[] = [
     ],
     "seo": {
       "slug": "result-value",
-      "title": "Result Value — React lab result component",
+      "title": "Result Value — lab result component",
       "description": "A React component for a single clinical observation: seven absence reasons, reference ranges, corrected values shown in full, and a FHIR Observation adapter.",
       "primaryKeyword": "react lab result component",
       "secondaryKeywords": [
@@ -11805,7 +11805,7 @@ export const CATALOG: ComponentDoc[] = [
     ],
     "seo": {
       "slug": "risk-indicator",
-      "title": "Risk Indicator — React risk score component",
+      "title": "Risk Indicator — risk score component",
       "description": "A React risk score component that renders its validity window, its top drivers with direction and weight, and a required not-a-diagnosis framing.",
       "primaryKeyword": "react risk score component",
       "secondaryKeywords": [
@@ -13634,7 +13634,7 @@ export const CATALOG: ComponentDoc[] = [
     ],
     "seo": {
       "slug": "trend-indicator",
-      "title": "Trend Indicator — React clinical sparkline",
+      "title": "Trend Indicator — clinical sparkline",
       "description": "A React sparkline for clinical series: breaks where the assay or unit changed, refuses a trend under three points, and takes the valence as a prop.",
       "primaryKeyword": "react clinical sparkline",
       "secondaryKeywords": [

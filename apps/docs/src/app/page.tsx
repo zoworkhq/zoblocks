@@ -22,7 +22,7 @@ import { TelemetryTrace } from "@/components/site/telemetry-trace";
  */
 export const metadata: Metadata = {
   title: {
-    absolute: "ZoBlocks — React healthcare components typed to FHIR",
+    absolute: "ZoBlocks — healthcare components typed to FHIR",
   },
   alternates: { canonical: "/" },
 };

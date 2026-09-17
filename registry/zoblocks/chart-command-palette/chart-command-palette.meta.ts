@@ -296,7 +296,7 @@ outcomeFor(offlineOrder);       // { kind: "blocked", reason: "Offline" }`,
 
   seo: {
     slug: "chart-command-palette",
-    title: "Chart Command Palette — React clinical ⌘K",
+    title: "Chart Command Palette — clinical ⌘K",
     description:
       "React ⌘K for clinical apps: verb-first ranking, relationship scoping that counts rather than names, and an audit for every patient search.",
     primaryKeyword: "react clinical command palette",

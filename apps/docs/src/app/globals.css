@@ -2281,7 +2281,7 @@ html:not(.dark) .instrument-demo [class*="bg-panel"] {
 }
 
 /* ===========================================================================
- * ZOWORK ON THE HOME PAGE — `components/site/zowork-provenance.tsx`
+ * ZOWORK ON THE HOME PAGE — `components/site/zowork-halves.tsx`
  *
  * Zowork's own palette and type, in the reader's theme. It shipped as an
  * always-dark island first and read as a slab dropped into a light page, so it
@@ -2290,7 +2290,7 @@ html:not(.dark) .instrument-demo [class*="bg-panel"] {
  *     tiles, accents darkened until their text clears AA, a black wordmark;
  *   - `.dark .zwp` is zowork.com as published;
  *   - high contrast re-points the same tokens to pure black and white and drops
- *     the washes, glows and wires;
+ *     the washes and glows;
  *   - forced colours keeps the gradient headline from painting transparent.
  * Every colour below reads a `--zwp-*` token, so a theme is one block.
  * ======================================================================== */
@@ -2330,30 +2330,13 @@ html:not(.dark) .instrument-demo [class*="bg-panel"] {
     radial-gradient(55% 48% at 100% 0%, rgb(179 56 10 / 0.05), transparent 70%);
   --zwp-grid: rgb(10 11 18 / 0.025);
   --zwp-warm: linear-gradient(105deg, #c2410c, #d6336c 40%, #7048e8 75%, #c2410c);
-  --zwp-code-key: #036b8e;
-  --zwp-code-value: #047857;
-  --zwp-scan: rgb(3 107 142 / 0.08);
-  /* Washes, glows and wires are how zowork.com lights a dark page. On paper
-     the same amounts read as smudges and stray marks, so light takes them
-     down to a hint and drops the wires. */
+  /* Washes and glows are how zowork.com lights a dark page. On paper the same
+     amounts read as smudges, so light takes them down to a hint. */
   --zwp-wash: 4%;
-  --zwp-spot: 6%;
   --zwp-wash-rest: 0;
   --zwp-hub-wash: 4%;
   --zwp-glow: 26%;
   --zwp-glow-blur: 34px;
-  --zwp-wires: none;
-  /* The call reads as the other screens do on paper — a pale inset, white
-     panes on a hairline — with the speaker marked by a crisp ring. A violet
-     glow on white is a smudge, not a signal. */
-  --zwp-call-bg: #f5f7fa;
-  --zwp-call-pane: #ffffff;
-  --zwp-call-pane-edge: 0 0 0 1px rgb(10 11 18 / 0.06);
-  --zwp-call-pill: #ffffff;
-  --zwp-call-avatar: #efedfb;
-  --zwp-call-avatar-ink: #4c3bc4;
-  --zwp-call-avatar-edge: transparent;
-  --zwp-call-speaking: 0 0 0 2px #ffffff, 0 0 0 4px #5a46d6;
   --zwp-acc: var(--zwp-cyan);
   --zwp-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   --zwp-sans:
@@ -2404,24 +2387,11 @@ html:not(.dark) .instrument-demo [class*="bg-panel"] {
     radial-gradient(55% 48% at 100% 0%, rgb(255 138 107 / 0.06), transparent 70%);
   --zwp-grid: rgb(255 255 255 / 0.022);
   --zwp-warm: linear-gradient(105deg, #ffb4a1, #ff8a6b 40%, #ff667d 70%, #b49cff);
-  --zwp-code-key: #6fe6ff;
-  --zwp-code-value: #a7f3d0;
-  --zwp-scan: rgb(61 224 255 / 0.14);
   --zwp-wash: 12%;
-  --zwp-spot: 13%;
   --zwp-wash-rest: 0.35;
   --zwp-hub-wash: 10%;
   --zwp-glow: 60%;
   --zwp-glow-blur: 70px;
-  --zwp-wires: block;
-  --zwp-call-bg: linear-gradient(160deg, #191c31, #0d0f1c);
-  --zwp-call-pane: radial-gradient(circle at 50% 42%, rgb(139 123 247 / 0.26), rgb(10 11 18 / 0.5));
-  --zwp-call-pill: rgb(10 11 18 / 0.75);
-  --zwp-call-avatar: rgb(255 255 255 / 0.07);
-  --zwp-call-pane-edge: none;
-  --zwp-call-avatar-ink: #f2f3f8;
-  --zwp-call-avatar-edge: rgb(255 255 255 / 0.16);
-  --zwp-call-speaking: 0 0 0 3px rgb(139 123 247 / 0.45), 0 0 26px rgb(139 123 247 / 0.45);
 }
 
 .zwp::before {
@@ -2474,13 +2444,6 @@ html:not(.dark) .instrument-demo [class*="bg-panel"] {
     transform: rotate(360deg);
   }
 }
-@keyframes zwpPing {
-  75%,
-  100% {
-    transform: scale(2.4);
-    opacity: 0;
-  }
-}
 @keyframes zwpHalo {
   0%,
   40%,
@@ -2491,28 +2454,6 @@ html:not(.dark) .instrument-demo [class*="bg-panel"] {
   66% {
     opacity: 0.9;
     transform: scale(1.14);
-  }
-}
-@keyframes zwpBars {
-  0%,
-  100% {
-    height: 20%;
-  }
-  50% {
-    height: 100%;
-  }
-}
-@keyframes zwpCaret {
-  50% {
-    opacity: 0;
-  }
-}
-@keyframes zwpScan {
-  0% {
-    top: -22px;
-  }
-  100% {
-    top: 100%;
   }
 }
 
@@ -2551,92 +2492,28 @@ html:not(.dark) .instrument-demo [class*="bg-panel"] {
   animation: zwpDrift 11s ease-in-out infinite;
 }
 
-.zwpLede,
-.zwpMuted {
-  margin: 0;
-  font-size: 0.96875rem;
-  line-height: 1.55;
-  color: var(--zwp-ink-2);
-}
+/* ---- two halves ---------------------------------------------------------- */
 
-.zwpLede {
-  max-width: 42ch;
-}
-
-.zwpRow {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.625rem;
-  margin: 0;
-}
-
-.zwpBig {
-  font-size: 2.125rem;
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: -0.04em;
-}
-
-.zwpNote {
-  position: relative;
-  margin: 1.25rem 0 0;
-  font-size: 0.8125rem;
-  color: var(--zwp-mute);
-}
-
-/* ---- the bento ----------------------------------------------------------- */
-
-.zwpBento {
+.zwhGrid {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.55fr);
   gap: 0.875rem;
 }
 
-.zwpWires {
-  display: var(--zwp-wires);
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  pointer-events: none;
-}
-
-.zwpWires path {
-  fill: none;
-  stroke: var(--zwp-line-2);
-  stroke-width: 1.2;
-  transition: stroke 0.4s;
-}
-
-.zwpWires path.is-lit {
-  stroke: var(--zwp-acc);
-}
-
-.zwpPulse {
-  fill: var(--zwp-acc);
-  filter: drop-shadow(0 0 6px var(--zwp-acc));
-}
-
 /* Tiles: zowork.com's hover — a wash from the top and a hairline that draws
-   across it — plus a spotlight that follows the cursor. */
+   across it. */
 .zwpTile {
   position: relative;
   z-index: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1.25rem;
   min-width: 0;
-  padding: 1.375rem;
+  padding: 1.75rem;
   overflow: hidden;
   border: 1px solid var(--zwp-line);
   border-radius: 18px;
-  /* Solid, not translucent: the wires run beneath the tiles, and a see-through
-     tile drew them straight across its own text. */
   background: var(--zwp-tile);
   box-shadow: var(--zwp-tile-shadow);
   transition: border-color 0.5s var(--zwp-ease);
@@ -2647,17 +2524,11 @@ html:not(.dark) .instrument-demo [class*="bg-panel"] {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background:
-    radial-gradient(
-      340px circle at var(--zwp-mx, 50%) var(--zwp-my, -40%),
-      color-mix(in oklab, var(--zwp-acc) var(--zwp-spot), transparent),
-      transparent 70%
-    ),
-    radial-gradient(
-      120% 75% at 50% 0%,
-      color-mix(in oklab, var(--zwp-acc) var(--zwp-wash), transparent),
-      transparent 62%
-    );
+  background: radial-gradient(
+    120% 75% at 50% 0%,
+    color-mix(in oklab, var(--zwp-acc) var(--zwp-wash), transparent),
+    transparent 62%
+  );
   opacity: var(--zwp-wash-rest);
   transition: opacity 0.5s;
 }
@@ -2688,33 +2559,207 @@ html:not(.dark) .instrument-demo [class*="bg-panel"] {
   position: relative;
 }
 
-.zwpHead {
-  grid-column: span 8;
+/* ---- left: Zowork -------------------------------------------------------- */
+
+.zwhLeft {
   justify-content: space-between;
-  gap: 1.5rem;
-  padding: 2rem;
-  min-height: 18.75rem;
-}
-.zwpClient {
-  grid-column: span 4;
-  min-height: 21.25rem;
-}
-.zwpHub {
-  grid-column: span 4;
-  align-items: center;
-  justify-content: center;
-  gap: 0.875rem;
-  min-height: 21.25rem;
-}
-.zwpProof,
-.zwpCta {
-  grid-column: span 4;
-}
-.zwpServicesTile {
-  grid-column: span 12;
+  background:
+    radial-gradient(
+      70% 45% at 50% 30%,
+      color-mix(in oklab, var(--zwp-acc) var(--zwp-hub-wash), transparent),
+      transparent 70%
+    ),
+    var(--zwp-tile);
 }
 
-/* ---- head ---------------------------------------------------------------- */
+.zwpHub {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.875rem;
+  padding-top: 0.5rem;
+}
+
+.zwpOrbit {
+  position: relative;
+  width: min(14.375rem, 78%);
+  aspect-ratio: 1;
+}
+
+.zwpOrbit svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  animation: zwpRotate 36s linear infinite;
+}
+
+.zwpOrbit text {
+  font-family: var(--zwp-mono);
+  font-size: 7.4px;
+  letter-spacing: 0.24em;
+  fill: var(--zwp-ink-2);
+}
+
+/* The ring takes the accent of the client on show on the right. */
+.zwpCore {
+  position: absolute;
+  inset: 21%;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: conic-gradient(
+    from var(--zwp-angle),
+    var(--zwp-acc),
+    var(--zwp-violet),
+    var(--zwp-brand),
+    var(--zwp-acc)
+  );
+  box-shadow: 0 0 var(--zwp-glow-blur) -6px
+    color-mix(in oklab, var(--zwp-acc) var(--zwp-glow), transparent);
+  animation: zwpSpin 9s linear infinite;
+  transition: box-shadow 0.8s;
+}
+
+.zwpCore::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: var(--zwp-core-inner);
+}
+
+.zwpCore::after {
+  content: "";
+  position: absolute;
+  inset: -14%;
+  border: 1px solid color-mix(in oklab, var(--zwp-acc) 40%, transparent);
+  border-radius: 50%;
+  animation: zwpHalo 4.6s ease-in-out infinite;
+}
+
+/* Zowork's elephant, as the shape they knock out of their own disc. A mask, so
+   the colour comes from the ground it sits on rather than from a recoloured file. */
+.zwpGlyph {
+  display: block;
+  width: 62%;
+  aspect-ratio: 290 / 304;
+  background: var(--zwp-glyph);
+  mask: url("/brand/zowork-elephant-white.png") center / contain no-repeat;
+}
+
+.zwpCore .zwpGlyph {
+  position: relative;
+  width: 56%;
+}
+
+/* A flex column stretches an image to its full width by default, which smeared
+   this mark once already. `align-self` and `width: auto` close that path. */
+.zwpWordmark {
+  display: block;
+  flex: none;
+  align-self: center;
+  width: auto;
+  max-width: 100%;
+  height: 1.375rem;
+  object-fit: contain;
+  filter: var(--zwp-mark-filter);
+}
+
+.zwpHubLine {
+  margin: 0;
+  font-family: var(--zwp-mono);
+  font-size: 0.65625rem;
+  letter-spacing: 0.18em;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--zwp-mute);
+}
+
+.zwhStats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.zwhStats div {
+  padding: 0.75rem;
+  border: 1px solid var(--zwp-line);
+  border-radius: 12px;
+  background: var(--zwp-inset);
+}
+
+.zwhStats dt {
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.zwhStats dd {
+  margin: 0.125rem 0 0;
+  font-size: 0.75rem;
+  line-height: 1.3;
+  color: var(--zwp-mute);
+}
+
+.zwhActions {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.zwpBtn,
+.zwpOutline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 2.75rem;
+  padding: 0 1.25rem;
+  border-radius: 999px;
+  font-size: 0.90625rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition:
+    transform 0.4s var(--zwp-ease),
+    border-color 0.3s,
+    background 0.3s;
+}
+
+.zwpBtn {
+  background: var(--zwp-ink);
+  color: var(--zwp-on-ink);
+}
+.zwpBtn:hover {
+  transform: translateY(-1px);
+}
+
+.zwpOutline {
+  border: 1px solid var(--zwp-line-2);
+  color: var(--zwp-ink);
+}
+.zwpOutline:hover {
+  border-color: var(--zwp-mute);
+  background: var(--zwp-inset);
+}
+
+.zwpBtnIcon,
+.zwpGhostIcon {
+  width: 0.875rem;
+  height: 0.875rem;
+  transition: transform 0.35s var(--zwp-ease);
+}
+.zwpBtn:hover .zwpBtnIcon {
+  transform: translateX(2px);
+}
+.zwpOutline:hover .zwpGhostIcon {
+  transform: translate(2px, -2px);
+}
+
+/* ---- right: what Zowork does, and for whom ------------------------------- */
 
 .zwpByline {
   display: inline-flex;
@@ -2743,986 +2788,371 @@ html:not(.dark) .instrument-demo [class*="bg-panel"] {
   background: var(--zwp-brand);
 }
 
-/* Zowork's elephant, as the shape they knock out of their own disc. A mask, so
-   the colour comes from the ground it sits on rather than from a recoloured file. */
-.zwpGlyph {
-  display: block;
-  width: 62%;
-  aspect-ratio: 290 / 304;
-  background: var(--zwp-glyph);
-  mask: url("/brand/zowork-elephant-white.png") center / contain no-repeat;
-}
-
-.zwpHeadFoot {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.zwpCreds {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.375rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.zwpCreds li {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  height: 1.75rem;
-  padding: 0 0.6875rem;
-  border: 1px solid var(--zwp-line);
-  border-radius: 999px;
-  background: var(--zwp-inset);
-  font-family: var(--zwp-mono);
-  font-size: 0.65625rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--zwp-ink-2);
-}
-
-.zwpCredIcon {
-  width: 0.6875rem;
-  height: 0.6875rem;
-  color: var(--zwp-mint);
-}
-
-/* ---- the wordmark -------------------------------------------------------- */
-
-/* A flex column stretches an image to its full width by default, which smeared
-   this mark once already. `align-self` and `width: auto` close that path. */
-.zwpWordmark {
-  display: block;
-  flex: none;
-  align-self: flex-start;
-  width: auto;
-  max-width: 100%;
-  height: var(--zwp-wordmark-h, 1.375rem);
-  object-fit: contain;
-  filter: var(--zwp-mark-filter);
-}
-
-.zwpWordmark--hub {
-  --zwp-wordmark-h: 1.375rem;
-  align-self: center;
-}
-.zwpWordmark--cta {
-  --zwp-wordmark-h: 1.625rem;
-}
-
-/* ---- hub ----------------------------------------------------------------- */
-
-.zwpHub {
-  background:
-    radial-gradient(
-      70% 60% at 50% 45%,
-      color-mix(in oklab, var(--zwp-acc) var(--zwp-hub-wash), transparent),
-      transparent 70%
-    ),
-    var(--zwp-tile);
-}
-
-.zwpOrbit {
-  position: relative;
-  width: min(14.375rem, 78%);
-  aspect-ratio: 1;
-}
-
-.zwpOrbit svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  animation: zwpRotate 36s linear infinite;
-}
-
-.zwpOrbit text {
-  font-family: var(--zwp-mono);
-  font-size: 7.4px;
-  letter-spacing: 0.24em;
-  fill: var(--zwp-ink-2);
-}
-
-.zwpCore {
-  position: absolute;
-  inset: 21%;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: conic-gradient(
-    from var(--zwp-angle),
-    var(--zwp-acc),
-    var(--zwp-violet),
-    var(--zwp-brand),
-    var(--zwp-acc)
-  );
-  box-shadow: 0 0 var(--zwp-glow-blur) -6px
-    color-mix(in oklab, var(--zwp-acc) var(--zwp-glow), transparent);
-  animation: zwpSpin 9s linear infinite;
-  transition: box-shadow 0.5s;
-}
-
-.zwpCore::before {
-  content: "";
-  position: absolute;
-  inset: 3px;
-  border-radius: 50%;
-  background: var(--zwp-core-inner);
-}
-
-.zwpCore::after {
-  content: "";
-  position: absolute;
-  inset: -14%;
-  border: 1px solid color-mix(in oklab, var(--zwp-acc) 40%, transparent);
-  border-radius: 50%;
-  animation: zwpHalo 4.6s ease-in-out infinite;
-}
-
-.zwpCore .zwpGlyph {
-  position: relative;
-  width: 56%;
-}
-
-.zwpHubLine {
-  min-height: 1.4em;
-  margin: 0;
-  font-family: var(--zwp-mono);
-  font-size: 0.65625rem;
-  letter-spacing: 0.18em;
-  text-align: center;
-  text-transform: uppercase;
-  color: var(--zwp-mute);
-}
-
-/* ---- client tiles -------------------------------------------------------- */
-
-.zwpClientHead {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-}
-
-.zwpClientName {
-  margin: 0;
-  font-size: 1.125rem;
-  font-weight: 500;
-  letter-spacing: -0.015em;
-}
-
-.zwpChip {
-  display: inline-flex;
-  align-items: center;
-  height: 1.375rem;
-  padding: 0 0.5rem;
-  border: 1px solid color-mix(in oklab, var(--zwp-acc) 35%, transparent);
-  border-radius: 999px;
-  background: color-mix(in oklab, var(--zwp-acc) 9%, transparent);
-  font-family: var(--zwp-mono);
-  font-size: 0.59375rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--zwp-acc);
-}
-
-.zwpBuilt {
-  margin: -0.375rem 0 0;
-  font-family: var(--zwp-mono);
-  font-size: 0.625rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--zwp-mute);
-}
-
-.zwpFoot {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.25rem 0.625rem;
-  margin: auto 0 0;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--zwp-line);
-}
-
-.zwpFootValue {
-  font-size: 1.75rem;
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: -0.04em;
-}
-.zwpFootLabel {
-  font-size: 0.875rem;
-  color: var(--zwp-ink-2);
-}
-
-.zwpTenure {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-left: auto;
-  font-family: var(--zwp-mono);
-  font-size: 0.625rem;
-  white-space: nowrap;
-  color: var(--zwp-mute);
-}
-
-.zwpTenure i {
-  display: block;
-  width: calc(var(--zwp-years) * 7px);
-  height: 4px;
-  border-radius: 2px;
-  background: linear-gradient(
-    90deg,
-    color-mix(in oklab, var(--zwp-acc) 20%, transparent),
-    var(--zwp-acc)
-  );
-}
-
-.zwpDot {
-  position: relative;
-  display: inline-block;
-  flex: none;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--zwp-live);
-}
-
-.zwpDot::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: inherit;
-  animation: zwpPing 2s cubic-bezier(0, 0, 0.2, 1) infinite;
-}
-
-.zwpDot--rec {
-  background: var(--zwp-brand);
-}
-
-/* ---- screen: telehealth call --------------------------------------------- */
-
-.zwpCall {
-  flex: 1 1 auto;
-  min-height: 8.5rem;
-  color: var(--zwp-ink);
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
-  padding: 6px;
-  overflow: hidden;
-  border: 1px solid var(--zwp-line);
-  border-radius: 12px;
-  background: var(--zwp-call-bg);
-}
-
-.zwpCallLive {
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  z-index: 1;
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  height: 22px;
-  padding: 0 9px;
-  translate: -50% 0;
-  border: 1px solid var(--zwp-line);
-  border-radius: 999px;
-  background: var(--zwp-call-pill);
-  font-family: var(--zwp-mono);
-  font-size: 10px;
-  white-space: nowrap;
-}
-
-.zwpCallPane {
-  position: relative;
-  display: grid;
-  place-items: center;
-  border-radius: 10px;
-  background: var(--zwp-call-pane);
-  box-shadow: var(--zwp-call-pane-edge);
-}
-
-.zwpCallAvatar {
-  display: grid;
-  place-items: center;
-  width: 42px;
-  height: 42px;
-  border: 1px solid var(--zwp-call-avatar-edge);
-  border-radius: 50%;
-  background: var(--zwp-call-avatar);
-  color: var(--zwp-call-avatar-ink);
-  font-size: 12.5px;
-  font-weight: 500;
-  transition: box-shadow 0.4s;
-}
-
-.zwpCallPane[data-speaking] .zwpCallAvatar {
-  box-shadow: var(--zwp-call-speaking);
-}
-
-.zwpCallTag {
-  position: absolute;
-  left: 8px;
-  bottom: 6px;
-  font-family: var(--zwp-mono);
-  font-size: 9px;
-  color: var(--zwp-ink-2);
-}
-
-.zwpCallMic {
-  position: absolute;
-  right: 8px;
-  bottom: 7px;
-  display: flex;
-  align-items: flex-end;
-  gap: 2px;
-  height: 12px;
-}
-
-.zwpCallMic i {
-  width: 2px;
-  height: 20%;
-  border-radius: 1px;
-  background: var(--zwp-violet);
-}
-.zwpCallPane[data-speaking] .zwpCallMic i {
-  animation: zwpBars 0.9s ease-in-out infinite;
-}
-.zwpCallPane[data-speaking] .zwpCallMic i:nth-child(2) {
-  animation-delay: -0.12s;
-}
-.zwpCallPane[data-speaking] .zwpCallMic i:nth-child(3) {
-  animation-delay: -0.24s;
-}
-.zwpCallPane[data-speaking] .zwpCallMic i:nth-child(4) {
-  animation-delay: -0.36s;
-}
-
-/* ---- screen: ambient scribe ---------------------------------------------- */
-
-.zwpScribe {
-  display: grid;
-  gap: 9px;
-  font-size: 13px;
-}
-
-.zwpScribeLine {
-  display: grid;
-  grid-template-columns: 62px minmax(0, 1fr);
-  gap: 10px;
-  align-items: start;
-  margin: 0;
-}
-
-.zwpScribeWho {
-  padding-top: 2px;
-  font-family: var(--zwp-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--zwp-mute);
-}
-
-.zwpScribeSaid {
-  min-height: 2.5em;
-}
-.zwpScribeSaid--quiet {
-  min-height: 0;
-  color: var(--zwp-ink-2);
-}
-
-.zwpCaret {
-  display: inline-block;
-  width: 6px;
-  height: 13px;
-  margin-left: 2px;
-  vertical-align: -2px;
-  background: var(--zwp-mint);
-  animation: zwpCaret 1s steps(1) infinite;
-}
-
-.zwpScribeNote {
-  display: grid;
-  gap: 3px;
-  padding: 10px 12px;
-  border: 1px solid color-mix(in oklab, var(--zwp-mint) 32%, transparent);
-  border-radius: 12px;
-  background: color-mix(in oklab, var(--zwp-mint) 7%, transparent);
-  transition:
-    border-color 0.4s,
-    background 0.4s;
-}
-
-.zwpScribeNote:not([data-drafted]) {
-  border-style: dashed;
-  background: transparent;
-}
-
-.zwpSkeleton {
-  display: inline-block;
-  width: 72%;
-  height: 0.7em;
-  vertical-align: middle;
-  border-radius: 4px;
-  background: linear-gradient(90deg, var(--zwp-line), var(--zwp-line-2), var(--zwp-line));
-  background-size: 200% 100%;
-  animation: zwpDrift 1.6s ease-in-out infinite;
-}
-.zwpScribeNote b {
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.zwpScribeNote span {
-  font-family: var(--zwp-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--zwp-mint);
-}
-
-/* ---- screen: EHR sync ---------------------------------------------------- */
-
-.zwpEhr {
-  display: grid;
-  gap: 8px;
-}
-
-.zwpFhir {
-  position: relative;
-  margin: 0;
-  padding: 10px 12px;
-  overflow: hidden;
-  border: 1px solid var(--zwp-line);
-  border-radius: 12px;
-  background: var(--zwp-inset);
-  font-family: var(--zwp-mono);
-  font-size: 11.5px;
-  line-height: 1.7;
-  white-space: pre;
-  color: var(--zwp-ink-2);
-}
-
-.zwpFhir::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 22px;
-  background: linear-gradient(180deg, transparent, var(--zwp-scan), transparent);
-  animation: zwpScan 3.2s ease-in-out infinite;
-}
-
-.zwpFhirKey {
-  color: var(--zwp-code-key);
-}
-.zwpFhirValue {
-  color: var(--zwp-code-value);
-}
-
-.zwpSystems {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 6px;
-}
-
-.zwpSystem {
-  display: grid;
-  gap: 2px;
-  padding: 7px 9px;
-  border: 1px solid var(--zwp-line);
-  border-radius: 10px;
-  font-size: 12.5px;
-}
-
-.zwpSystem em {
-  font-family: var(--zwp-mono);
-  font-size: 9.5px;
-  font-style: normal;
-  color: var(--zwp-mint);
-}
-.zwpSystem em[data-syncing] {
-  color: var(--zwp-mute);
-}
-
-/* ---- screen: curriculum -------------------------------------------------- */
-
-.zwpCourse {
-  display: grid;
-  gap: 10px;
-  padding: 12px;
-  border: 1px solid var(--zwp-line);
-  border-radius: 12px;
-  background: var(--zwp-inset);
-}
-
-.zwpCourseHead {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  font-size: 13px;
-}
-.zwpCourseStep {
-  font-family: var(--zwp-mono);
-  font-size: 10.5px;
-  color: var(--zwp-coral);
-}
-
-.zwpCourseBar {
-  height: 4px;
-  overflow: hidden;
-  border-radius: 2px;
-  background: var(--zwp-line);
-}
-
-.zwpCourseBar i {
-  display: block;
-  height: 100%;
-  border-radius: 2px;
-  background: linear-gradient(
-    90deg,
-    color-mix(in oklab, var(--zwp-coral) 35%, transparent),
-    var(--zwp-coral)
-  );
-  transition: width 0.8s var(--zwp-ease);
-}
-
-.zwpCourseList {
-  display: grid;
-  gap: 6px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.zwpCourseList li {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  font-size: 12.5px;
-  color: var(--zwp-mute);
-  transition: color 0.4s;
-}
-
-.zwpCourseList li::before {
-  content: "";
-  flex: none;
-  width: 14px;
-  height: 14px;
-  border: 1px solid var(--zwp-line-2);
-  border-radius: 50%;
-  transition:
-    background 0.4s,
-    border-color 0.4s,
-    box-shadow 0.4s;
-}
-
-.zwpCourseList li[data-state="done"] {
-  color: var(--zwp-ink-2);
-}
-.zwpCourseList li[data-state="done"]::before {
-  border-color: var(--zwp-coral);
-  background: var(--zwp-coral);
-}
-.zwpCourseList li[data-state="now"] {
-  color: var(--zwp-ink);
-}
-.zwpCourseList li[data-state="now"]::before {
-  border-color: var(--zwp-coral);
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--zwp-coral) 20%, transparent);
-}
-
-/* ---- proof --------------------------------------------------------------- */
-
-.zwpProofLine {
-  display: flex;
-  align-items: baseline;
-  gap: 0.625rem;
-  margin: -0.25rem 0 0.25rem;
-}
-.zwpProofLine span {
-  font-size: 0.9375rem;
-  color: var(--zwp-ink-2);
-}
-
-.zwpMinis {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-  margin: auto 0 0;
-}
-
-.zwpMinis > div {
-  display: grid;
-  gap: 2px;
-  padding: 10px;
-  border: 1px solid var(--zwp-line);
-  border-radius: 12px;
-  background: var(--zwp-inset);
-}
-
-.zwpMinis dt {
-  font-size: 1.25rem;
-  font-weight: 500;
-  letter-spacing: -0.03em;
-}
-.zwpMinis dd {
-  margin: 0;
-  font-size: 0.71875rem;
-  line-height: 1.3;
-  color: var(--zwp-ink-2);
-}
-
-/* ---- call to action ------------------------------------------------------ */
-
-.zwpCta {
-  justify-content: space-between;
-  gap: 1.25rem;
-}
-
-.zwpCtaTop {
-  display: grid;
-  justify-items: start;
-  gap: 0.625rem;
-}
-
-.zwpCtaReply {
-  display: inline-flex;
-  align-items: flex-start;
-  gap: 0.5rem;
-  margin: 0;
-  font-family: var(--zwp-mono);
-  font-size: 0.65625rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--zwp-mute);
-  /* Balanced, so a phone gets two even lines rather than a lone "DAY". */
-  text-wrap: balance;
-}
-
-.zwpCtaReply .zwpDot {
-  margin-top: 0.3125rem;
-}
-
-.zwpCtaLine {
-  max-width: 16ch;
-  margin: 0;
-  font-size: clamp(1.375rem, 2vw, 1.625rem);
-  font-weight: 500;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-  text-wrap: balance;
-}
-.zwpActions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.625rem;
-}
-
-.zwpBtn,
-.zwpGhost {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  height: 2.75rem;
-  border-radius: 999px;
-  font-size: 0.90625rem;
-  font-weight: 500;
-  white-space: nowrap;
-  transition:
-    transform 0.4s var(--zwp-ease),
-    background 0.3s;
-}
-
-.zwpBtn {
-  padding: 0 1.25rem;
-  background: var(--zwp-ink);
-  color: var(--zwp-on-ink);
-}
-.zwpBtn:hover {
-  transform: translateY(-1px);
-}
-.zwpGhost {
-  padding: 0 0.875rem;
-  color: var(--zwp-ink);
-}
-.zwpActions--stack {
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0.5rem;
-}
-.zwpBtn--block {
-  justify-content: center;
-}
-
-.zwpOutline {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  height: 2.75rem;
-  border: 1px solid var(--zwp-line-2);
-  border-radius: 999px;
-  font-size: 0.90625rem;
-  font-weight: 500;
-  color: var(--zwp-ink);
-  transition:
-    border-color 0.3s,
-    background 0.3s;
-}
-
-.zwpOutline:hover {
-  border-color: var(--zwp-mute);
-  background: var(--zwp-inset);
-}
-.zwpOutline:hover .zwpGhostIcon {
-  transform: translate(2px, -2px);
-}
-
-.zwpGhost--small {
-  height: 1.875rem;
-  padding-inline: 0.5rem;
-  font-size: 0.8125rem;
-}
-
-.zwpBtnIcon,
-.zwpGhostIcon {
-  width: 0.875rem;
-  height: 0.875rem;
-  transition: transform 0.35s var(--zwp-ease);
-}
-.zwpBtn:hover .zwpBtnIcon {
-  transform: translateX(2px);
-}
-.zwpGhost:hover .zwpGhostIcon {
-  transform: translate(2px, -2px);
-}
-
-/* ---- services and case studies ------------------------------------------- */
-
-.zwpServicesTile {
-  display: grid;
-  grid-template-columns: minmax(0, 2.4fr) minmax(0, 1fr);
-  gap: 1.125rem 1.375rem;
-}
-
-.zwpServicesMain {
-  display: grid;
-  align-content: start;
-  gap: 0.75rem;
-}
-
-.zwpServices {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.zwpService {
-  display: grid;
-  align-content: start;
-  gap: 6px;
-  padding: 14px;
-  border: 1px solid var(--zwp-line);
-  border-radius: 14px;
-  background: var(--zwp-inset);
-  transition:
-    border-color 0.35s,
-    background 0.35s,
-    transform 0.45s var(--zwp-ease);
-}
-
-.zwpService:hover {
-  border-color: color-mix(in oklab, var(--zwp-acc) 42%, transparent);
-  background: color-mix(in oklab, var(--zwp-acc) 7%, var(--zwp-inset));
-  transform: translateY(-2px);
-}
-
-.zwpServiceIndex {
-  font-family: var(--zwp-mono);
-  font-size: 10px;
-  letter-spacing: 0.14em;
-  color: var(--zwp-acc);
-}
-.zwpServiceName {
-  font-size: 0.9375rem;
-  font-weight: 500;
-  line-height: 1.25;
-  letter-spacing: -0.01em;
-}
-.zwpService ul {
-  display: grid;
-  gap: 3px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.zwpService li {
-  font-size: 0.78125rem;
-  color: var(--zwp-ink-2);
-}
-
-.zwpCasesCol {
-  display: flex;
-  flex-direction: column;
-  gap: 0.375rem;
-  padding-left: 1.375rem;
-  border-left: 1px solid var(--zwp-line);
-}
-
-.zwpCases {
-  display: grid;
-  margin: auto 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.zwpCases li {
-  display: grid;
-  grid-template-columns: 24px minmax(0, 1fr);
-  gap: 8px;
-  padding: 8px 0;
-  border-top: 1px solid var(--zwp-line);
-  font-size: 0.84375rem;
-  color: var(--zwp-mute);
-  transition: color 0.35s;
-}
-
-.zwpCases li[data-active] {
-  color: var(--zwp-ink);
-}
-.zwpCaseIndex {
-  padding-top: 3px;
-  font-family: var(--zwp-mono);
-  font-size: 10px;
-}
-.zwpCaseTitle {
-  display: block;
-}
-
-/* One line, ellipsised: exactly one row shows its tags at a time, so a fixed
-   line height keeps the list — and the tile around it — from jumping. */
-.zwpCaseTags {
-  display: block;
-  max-height: 0;
-  overflow: hidden;
-  opacity: 0;
-  font-size: 0.71875rem;
-  line-height: 1.25rem;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  color: var(--zwp-mint);
-  transition:
-    max-height 0.5s var(--zwp-ease),
-    opacity 0.5s;
-}
-
-.zwpCases li[data-active] .zwpCaseTags {
-  max-height: 1.25rem;
-  opacity: 1;
-}
-
-/* ---- screens fill their tile; the proof tile's client list --------------- */
-
-.zwpScreen {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  min-height: 0;
-}
-
 .zwpDisc .zwpGlyph {
   background: #ffffff;
 }
 
-.zwpStill {
+.zwhServices {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 1.25rem;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.zwpStill li {
+.zwhServices li {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.625rem;
-  padding: 0.5rem 0;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
   border-top: 1px solid var(--zwp-line);
-  font-size: 0.84375rem;
 }
 
-.zwpStillSince {
-  display: inline-flex;
+.zwhServices i {
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-top: 0.375rem;
+  border-radius: 2px;
+  background: var(--zwp-acc);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--zwp-acc) 16%, transparent);
+}
+
+.zwhServices b {
+  display: block;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.zwhServices small {
+  display: block;
+  margin-top: 0.125rem;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--zwp-mute);
+}
+
+/* ---- the client rotation ------------------------------------------------- */
+
+.zwhClients {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.875rem;
+  margin-top: auto;
+  padding: 1.125rem;
+  border: 1px solid color-mix(in oklab, var(--zwp-acc) 30%, var(--zwp-line));
+  border-radius: 14px;
+  background:
+    radial-gradient(
+      90% 120% at 0% 0%,
+      color-mix(in oklab, var(--zwp-acc) 10%, transparent),
+      transparent 65%
+    ),
+    var(--zwp-inset);
+  transition:
+    border-color 0.8s,
+    background 0.8s;
+}
+
+/* Grid children default to their content's width; the flow row would push
+   the card past a phone's edge without these. */
+.zwhClients > *,
+.zwhStage > li {
+  min-width: 0;
+}
+
+.zwhClientsTop {
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0.4375rem;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.zwhControls {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Each segment is a 24px target around a 3px bar (WCAG 2.5.8). */
+.zwhSeg {
+  display: grid;
+  align-items: center;
+  width: 2.25rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.zwhSeg i {
+  position: relative;
+  display: block;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--zwp-line-2);
+}
+
+.zwhSeg i::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--zwp-acc);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.zwhSeg[data-state="done"] i::after,
+.zwhSeg[data-state="on"] i::after {
+  transform: scaleX(1);
+}
+
+.zwhSeg[data-state="on"] i::after {
+  animation: zwhFill var(--zwh-dwell) linear both;
+  animation-play-state: inherit;
+}
+
+.zwhPause {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin-left: 0.25rem;
+  border: 1px solid var(--zwp-line);
+  border-radius: 999px;
+  background: var(--zwp-tile);
+  color: var(--zwp-ink-2);
+  cursor: pointer;
+}
+
+.zwhPause svg {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+/* Every client sits in the same cell; the one on show rises in, the others
+   fall away behind it. */
+.zwhStage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.zwhStage > li {
+  grid-area: 1 / 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.875rem;
+  opacity: 0;
+  transform: translateY(10px);
+  filter: blur(4px);
+  transition:
+    opacity 0.5s var(--zwp-ease),
+    transform 0.6s var(--zwp-ease),
+    filter 0.5s var(--zwp-ease);
+  pointer-events: none;
+}
+
+.zwhStage > li[data-on] {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  pointer-events: auto;
+}
+
+.zwhClientHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.zwhClientName {
+  margin: 0;
+  font-size: clamp(1.375rem, 2.2vw, 1.75rem);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.zwhSince {
   font-family: var(--zwp-mono);
-  font-size: 0.625rem;
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  color: var(--zwp-mute);
+}
+
+.zwhFlow {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-family: var(--zwp-mono);
+  font-size: 0.65625rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--zwp-ink-2);
+}
+
+.zwhFlow > span:not(.zwhPipe) {
+  padding: 0.3125rem 0.5625rem;
+  border: 1px solid var(--zwp-line);
+  border-radius: 8px;
+  background: var(--zwp-tile);
+  white-space: nowrap;
+}
+
+.zwhFlow .zwhWork {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-color: color-mix(in oklab, var(--zwp-acc) 35%, transparent);
+  color: var(--zwp-ink);
+}
+
+.zwhPipe {
+  position: relative;
+  flex: 1;
+  min-width: 1.5rem;
+  height: 2px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: color-mix(in oklab, var(--zwp-acc) 30%, transparent);
+}
+
+.zwhPipe i {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 35%;
+  background: linear-gradient(90deg, transparent, var(--zwp-acc), transparent);
+  animation: zwhFlow 1.8s linear infinite;
+}
+
+.zwhClientFoot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.zwhResult {
+  display: flex;
+  align-items: baseline;
+  gap: 0.625rem;
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--zwp-ink-2);
+}
+
+.zwhResult strong {
+  font-size: 2rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--zwp-acc);
+}
+
+.zwhTenure {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin: 0;
+  font-family: var(--zwp-mono);
+  font-size: 0.6875rem;
   letter-spacing: 0.08em;
   color: var(--zwp-mute);
 }
 
-/* ---- layout at narrower widths ------------------------------------------- */
+.zwhTenure i {
+  position: relative;
+  display: block;
+  width: 4.5rem;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--zwp-line);
+}
 
-@media (max-width: 64rem) {
-  .zwpBento > .zwpTile {
-    grid-column: span 6;
+.zwhTenure i::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--zwp-acc);
+  transform: scaleX(var(--zwh-share, 1));
+  transform-origin: left;
+  transition: transform 0.9s var(--zwp-ease) 0.2s;
+}
+
+.zwhStage > li:not([data-on]) .zwhTenure i::after {
+  transform: scaleX(0);
+}
+
+@keyframes zwhFill {
+  from {
+    transform: scaleX(0);
   }
-  .zwpBento > .zwpHead,
-  .zwpBento > .zwpServicesTile {
-    grid-column: span 12;
+  to {
+    transform: scaleX(1);
   }
-  .zwpServicesTile {
-    grid-template-columns: minmax(0, 1fr);
+}
+@keyframes zwhFlow {
+  from {
+    transform: translateX(-100%);
   }
-  .zwpServices {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .zwpCasesCol {
-    padding: 0.875rem 0 0;
-    border-top: 1px solid var(--zwp-line);
-    border-left: 0;
+  to {
+    transform: translateX(300%);
   }
 }
 
-@media (max-width: 42rem) {
-  .zwpBento > .zwpTile {
-    grid-column: span 12;
-  }
-  .zwpWires {
-    display: none;
-  }
-  .zwpHead {
-    padding: 1.5rem;
-    min-height: 0;
-  }
-  .zwpClient,
-  .zwpHub {
-    min-height: 0;
-  }
-  .zwpServices,
-  .zwpMinis,
-  .zwpSystems {
+/* ---- layout at narrower widths ------------------------------------------- */
+
+@media (max-width: 56rem) {
+  .zwhGrid {
     grid-template-columns: minmax(0, 1fr);
   }
-  .zwpTenure {
-    margin-left: 0;
+  .zwhLeft {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+  }
+  .zwpHub {
+    grid-row: span 2;
+  }
+}
+
+@media (max-width: 40rem) {
+  .zwpTile {
+    padding: 1.25rem;
+  }
+  .zwhLeft {
+    display: flex;
+  }
+  .zwhServices {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .zwhLeft {
+    align-items: stretch;
+  }
+  /* No room for the connector: the row wraps, and the label is never cut. */
+  .zwhPipe {
+    display: none;
+  }
+  .zwhFlow {
+    flex-wrap: wrap;
+    gap: 0.375rem;
+  }
+  .zwhFlow .zwhWork {
+    white-space: normal;
   }
 }
 
@@ -3748,23 +3178,13 @@ html:not(.dark) .instrument-demo [class*="bg-panel"] {
   --zwp-mark-filter: none;
   --zwp-tile-shadow: none;
   --zwp-core-inner: #000000;
-  --zwp-code-key: #ffffff;
-  --zwp-code-value: #ffffff;
-  --zwp-wires: none;
   --zwp-wash-rest: 0;
-  --zwp-call-pill: #000000;
-  --zwp-call-avatar: #000000;
-  --zwp-call-pane-edge: none;
-  --zwp-call-avatar-ink: #ffffff;
-  --zwp-call-avatar-edge: #ffffff;
-  --zwp-call-speaking: 0 0 0 3px #ffffff;
   background: var(--zwp-bg);
 }
 
 [data-zb-theme="high-contrast"] .zwp::before,
 [data-zb-theme="high-contrast"] .zwpTile::before,
-[data-zb-theme="high-contrast"] .zwpFhir::after,
-[data-zb-theme="high-contrast"] .zwpWires {
+[data-zb-theme="high-contrast"] .zwhPipe i {
   display: none;
 }
 
@@ -3775,14 +3195,11 @@ html:not(.dark) .instrument-demo [class*="bg-panel"] {
   animation: none;
 }
 
-[data-zb-theme="high-contrast"] .zwpCall,
-[data-zb-theme="high-contrast"] .zwpCallPane,
-[data-zb-theme="high-contrast"] .zwpHub {
+[data-zb-theme="high-contrast"] .zwhLeft,
+[data-zb-theme="high-contrast"] .zwhClients {
   background: #000000;
 }
 
-[data-zb-theme="high-contrast"] .zwpScribeNote,
-[data-zb-theme="high-contrast"] .zwpChip,
 [data-zb-theme="high-contrast"] .zwpCore {
   background: #000000;
   box-shadow: none;
@@ -3809,9 +3226,9 @@ html:not(.dark) .instrument-demo [class*="bg-panel"] {
   .zwpCore,
   .zwpCore::after,
   .zwpWarm,
-  .zwpCaret,
-  .zwpFhir::after,
-  .zwpDot::after {
+  .zwhPipe i,
+  .zwhStage > li {
     animation: none;
+    transition: none;
   }
 }

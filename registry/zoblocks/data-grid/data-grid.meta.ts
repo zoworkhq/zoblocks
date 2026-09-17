@@ -420,7 +420,7 @@ gridCapacityRefusal(120_000);
 
   seo: {
     slug: "data-grid",
-    title: 'Data Grid — React healthcare worklist with role="grid"',
+    title: 'Data Grid — healthcare worklist with role="grid"',
     description:
       "An accessible React data grid for clinical worklists: it states its coverage above the rows and names the model when you sort by a derived column.",
     primaryKeyword: "react healthcare data grid",

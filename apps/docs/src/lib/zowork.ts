@@ -66,8 +66,8 @@ export interface ZoworkClient {
  *
  * Clients, not partners: Zowork is hired by each of them. zowork.com lists all
  * four as still in production, which is what "zero churn" means here. The
- * order is the home page bento's reading order — Netsmart, the longest, first — and a tuple so the bento can
- * name each position without an undefined check.
+ * order is the home page rotation's order, Netsmart first: it is the longest
+ * and the largest, so it is the one a reader sees before anything moves.
  */
 export const ZOWORK_CLIENTS = [
   {
@@ -119,53 +119,32 @@ export const ZOWORK_INTEGRATIONS = "50+";
 
 export interface ZoworkService {
   name: string;
-  /** Two of the lines zowork.com lists under it. */
-  lines: readonly string[];
+  /** One line, drawn from what zowork.com lists under it. */
+  line: string;
+  accent: ZoworkAccent;
 }
 
 /** What a reader can hire Zowork for — the four services zowork.com sells, in their order. */
 export const ZOWORK_SERVICES: readonly ZoworkService[] = [
   {
     name: "AI-native product engineering",
-    lines: ["End-to-end product development", "Web · mobile · backend · cloud"],
+    line: "Web, mobile, backend and cloud, end to end",
+    accent: "cyan",
   },
   {
     name: "Enterprise integration",
-    lines: ["FHIR · HL7 · Epic · Cerner", "Legacy modernization, incrementally"],
+    line: "FHIR, HL7, Epic and Cerner. Legacy modernised in steps",
+    accent: "violet",
   },
   {
     name: "Embedded engineering pods",
-    lines: ["Senior talent, not benched juniors", "Flexible scale up / scale down"],
+    line: "Senior engineers who scale with the roadmap",
+    accent: "mint",
   },
   {
-    name: "AI governance & adoption",
-    lines: ["Compliance-aware AI (HIPAA · SOC 2)", "Eval pipelines for production AI"],
-  },
-];
-
-export interface ZoworkCaseStudy {
-  title: string;
-  tags: string;
-}
-
-/** zowork.com's healthcare case studies, titled as they publish them. */
-export const ZOWORK_CASE_STUDIES: readonly ZoworkCaseStudy[] = [
-  {
-    title: "Integrated Clinical Intelligence Suite",
-    tags: "Virtual scribe · patient monitoring · risk stratification",
-  },
-  {
-    title: "Transforming Clinical Documentation",
-    tags: "Clinical AI · medical transcription · HIPAA & audit",
-  },
-  {
-    title: "Standardizing Clinical AI Infrastructure",
-    tags: "One generative layer in front of many EHRs",
-  },
-  { title: "A Conversational Clinical Copilot", tags: "Evidence-grounded clinical documentation" },
-  {
-    title: "AI-Powered QA in Healthcare",
-    tags: "100% requirements traceability · 70% faster reviews",
+    name: "AI governance and adoption",
+    line: "HIPAA- and SOC 2-aware AI, with eval pipelines",
+    accent: "coral",
   },
 ];
 

@@ -338,7 +338,7 @@ import { observationPotassiumCritical } from "@zoblocks/fixtures";
 
   seo: {
     slug: "result-value",
-    title: "Result Value — React lab result component",
+    title: "Result Value — lab result component",
     description:
       "A React component for a single clinical observation: seven absence reasons, reference ranges, corrected values shown in full, and a FHIR Observation adapter.",
     primaryKeyword: "react lab result component",

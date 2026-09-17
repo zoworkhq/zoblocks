@@ -390,7 +390,7 @@ actionOutcome(stillChecking);
 
   seo: {
     slug: "chart-context-menu",
-    title: "Chart Context Menu — React healthcare row actions",
+    title: "Chart Context Menu — healthcare row actions",
     description:
       "A React context menu for clinical apps: it names the record before offering to change it, ranks verbs by consequence, and counts the actions it withholds.",
     primaryKeyword: "react healthcare context menu",

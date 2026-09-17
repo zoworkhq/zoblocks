@@ -478,7 +478,7 @@ import { SessionTimeField } from "@/components/zoblocks/date-picker";`,
 
   seo: {
     slug: "date-picker",
-    title: "Date Picker — accessible React healthcare control",
+    title: "Date Picker — accessible healthcare control",
     description:
       "A React date picker for healthcare: sixteen variants over one value space — fields, calendars, date and time ranges, birth dates, sessions and recurrence.",
     primaryKeyword: "react healthcare date picker",

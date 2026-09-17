@@ -1,13 +1,13 @@
-import { ZoworkProvenance } from "@/components/site/zowork-provenance";
+import { ZoworkHalves } from "@/components/site/zowork-halves";
 import { zoworkMono, zoworkSans } from "@/components/site/zowork-fonts";
 
 /**
  * Zowork, on the home page.
  *
  * Zowork is a healthcare engineering services company, and ZoBlocks is
- * something it makes. This section says so and sells the services: Zowork at
- * the centre, its four longest clients around it with what Zowork built for
- * each, then what a reader can hire Zowork for.
+ * something it makes. This section advertises Zowork as a healthcare engineering
+ * partner in two halves: Zowork itself on the left, and on the right what it
+ * does and the clients it does it for, Netsmart first.
  *
  * ## Zowork's palette, in the reader's theme
  *
@@ -18,7 +18,7 @@ import { zoworkMono, zoworkSans } from "@/components/site/zowork-fonts";
  * contrast. All three are token blocks in `globals.css`.
  *
  * This file stays a server component so the fonts load at module scope; the
- * bento and its motion live in `zowork-provenance.tsx`.
+ * layout and its motion live in `zowork-halves.tsx`.
  */
 export function ZoworkPractice() {
   return (
@@ -28,11 +28,7 @@ export function ZoworkPractice() {
       className={`zwp scroll-mt-16 ${zoworkSans.variable} ${zoworkMono.variable}`}
     >
       <div className="relative mx-auto max-w-6xl section-major px-5 sm:px-8">
-        <ZoworkProvenance />
-        {/* Said once, under the bento, the way the Data Grid section says it. */}
-        <p className="zwpNote">
-          Screens inside the client tiles are illustrations, not client data.
-        </p>
+        <ZoworkHalves />
       </div>
     </section>
   );

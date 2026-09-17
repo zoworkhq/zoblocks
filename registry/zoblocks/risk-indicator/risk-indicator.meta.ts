@@ -331,7 +331,7 @@ drivers: [
 
   seo: {
     slug: "risk-indicator",
-    title: "Risk Indicator — React risk score component",
+    title: "Risk Indicator — risk score component",
     description:
       "A React risk score component that renders its validity window, its top drivers with direction and weight, and a required not-a-diagnosis framing.",
     primaryKeyword: "react risk score component",

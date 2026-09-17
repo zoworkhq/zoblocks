@@ -373,7 +373,7 @@ const step = fromInterpretation(code);
 
   seo: {
     slug: "clinical-status",
-    title: "Clinical Status — accessible React status chip",
+    title: "Clinical Status — accessible status chip",
     description:
       "A React status chip with nine fixed clinical scales. Every step carries a colour, a shape and a word, so it survives greyscale and high contrast.",
     primaryKeyword: "react clinical status component",

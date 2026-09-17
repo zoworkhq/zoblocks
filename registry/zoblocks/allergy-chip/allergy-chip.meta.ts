@@ -317,7 +317,7 @@ import "@/styles/zoblocks-allergy.css";
 
   seo: {
     slug: "allergy-chip",
-    title: "Allergy Chip — React allergy display component",
+    title: "Allergy Chip — allergy display component",
     description:
       "A React allergy component that separates criticality from reaction severity, and distinguishes no known allergies from an allergy history nobody took.",
     primaryKeyword: "react allergy component",

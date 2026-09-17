@@ -312,7 +312,7 @@ const ledger = ledgerFrom(records);
 
   seo: {
     slug: "provenance-chip",
-    title: "Provenance Chip — React data source component",
+    title: "Provenance Chip — data source component",
     description:
       "A React provenance affix for clinical values: six source classes, AI extraction with its source span, and staleness measured against a per-datum policy.",
     primaryKeyword: "react data provenance component",

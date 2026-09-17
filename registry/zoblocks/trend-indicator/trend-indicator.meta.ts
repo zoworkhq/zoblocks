@@ -310,7 +310,7 @@ import "@/styles/zoblocks-trend.css";
 
   seo: {
     slug: "trend-indicator",
-    title: "Trend Indicator — React clinical sparkline",
+    title: "Trend Indicator — clinical sparkline",
     description:
       "A React sparkline for clinical series: breaks where the assay or unit changed, refuses a trend under three points, and takes the valence as a prop.",
     primaryKeyword: "react clinical sparkline",

@@ -339,7 +339,7 @@ resolveEncounterContext(three, "enc-closed");
 
   seo: {
     slug: "chart-header",
-    title: "Chart Header — React sticky patient header",
+    title: "Chart Header — sticky patient header",
     description:
       "A React chart header that collapses to a safety strip, makes the encounter an explicit control, and never renders administrative gender beside a dose.",
     primaryKeyword: "react patient chart header",

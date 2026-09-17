@@ -8,7 +8,7 @@ import { SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { InstallCommand, RevealRoot } from "@/components/site/interactions";
 
 export const metadata: Metadata = {
-  title: "Components — React healthcare UI library",
+  title: "Components — healthcare UI library",
   // Derived, like the count in the page body directly below it. This said 27
   // against a catalogue of 30 — and a description is the one string on a page
   // that nobody sees while editing, so it is the one that stays wrong longest.

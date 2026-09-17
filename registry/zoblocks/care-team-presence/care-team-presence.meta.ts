@@ -324,7 +324,7 @@ resolveEscalation({ clinician: marsh, state: "in-group" });
 
   seo: {
     slug: "care-team-presence",
-    title: "Care Team Presence — React on-call and coverage UI",
+    title: "Care Team Presence — on-call and coverage UI",
     description:
       "React presence for clinical teams: in session, on call, signed out to whom — plus rota coverage with a real gap state and chart co-presence conflicts.",
     primaryKeyword: "react care team presence",

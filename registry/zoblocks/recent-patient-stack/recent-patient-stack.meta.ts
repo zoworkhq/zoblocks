@@ -301,7 +301,7 @@ needsReassertion({ id, display }, "10:05");                        // true`,
 
   seo: {
     slug: "recent-patient-stack",
-    title: "Recent Patient Stack — React multi-chart workspace",
+    title: "Recent Patient Stack — multi-chart workspace",
     description:
       "A React chart switcher for clinicians: a stable per-chart accent, automatic disambiguation of similar names, unsigned-note badges and a graded close.",
     primaryKeyword: "react multi chart workspace",
