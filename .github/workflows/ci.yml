@@ -47,7 +47,7 @@ env:
 jobs:
   verify:
     name: Typecheck, test, build
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, on-demand] # Must match your runner_extra_labels
     # This one job does everything: install, generate, lint, format, typecheck,
     # the suites under coverage, every build, the tarball check, the axe audit,
     # and the browser suite in three engines.
@@ -328,7 +328,7 @@ jobs:
 
   no-phi:
     name: Synthetic data check
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, on-demand] # Must match your runner_extra_labels
     timeout-minutes: 5
 
     steps:
@@ -352,7 +352,7 @@ jobs:
 
   retired-names:
     name: Retired name check
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, on-demand] # Must match your runner_extra_labels
     timeout-minutes: 5
 
     steps:
@@ -389,9 +389,9 @@ jobs:
   # ---------------------------------------------------------------------------
   deploy-docs:
     name: Deploy docs (production)
+    runs-on: [self-hosted, on-demand] # Must match your runner_extra_labels
     needs: [verify, no-phi]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
     timeout-minutes: 15
     environment:
       name: production
@@ -488,7 +488,7 @@ jobs:
     if: >-
       github.event_name == 'push' && github.ref == 'refs/heads/main' &&
       vars.VERCEL_PROJECT_ID_HQ != ''
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, on-demand] # Must match your runner_extra_labels
     timeout-minutes: 15
     environment:
       name: production-hq
@@ -574,7 +574,7 @@ jobs:
     if: >-
       github.event_name == 'push' && github.ref == 'refs/heads/main' &&
       vars.VERCEL_PROJECT_ID_APP != ''
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, on-demand] # Must match your runner_extra_labels
     timeout-minutes: 15
     environment:
       name: production-app
@@ -635,7 +635,7 @@ jobs:
     name: Deploy docs (preview)
     needs: [verify, no-phi]
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, on-demand] # Must match your runner_extra_labels
     timeout-minutes: 15
 
     steps:

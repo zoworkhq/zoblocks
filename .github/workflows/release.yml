@@ -47,7 +47,7 @@ permissions:
 jobs:
   release:
     name: Version or publish
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, on-demand] # Must match your runner_extra_labels
     timeout-minutes: 20
 
     steps:
