@@ -15,6 +15,7 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/material": "^9.3.1",
+    "@vercel/analytics": "^2.0.1",
     "@zoblocks/clinical-note-core": "workspace:*",
     "@zoblocks/component-meta": "workspace:*",
     "@zoblocks/copilot-core": "workspace:*",
