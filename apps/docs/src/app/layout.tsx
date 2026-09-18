@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Instrument_Sans, JetBrains_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 // Component tokens first, so the site layer can override deliberately.
 import "@zoblocks/tokens/zoblocks-tokens.css";
@@ -161,6 +163,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to content
         </a>
         <div id="app-root">{children}</div>
+        {/*
+          Vercel Web Analytics and Speed Insights — page views and Core Web
+          Vitals from real visits. No cookies and no visitor identifier, so the
+          site still needs no consent banner. `next dev` logs to the console
+          instead of reporting; preview deployments do report, and the
+          dashboards filter them out by environment.
+        */}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
