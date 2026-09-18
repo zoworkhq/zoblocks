@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Instrument_Sans, JetBrains_Mono } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 // Component tokens first, so the site layer can override deliberately.
 import "@zoblocks/tokens/zoblocks-tokens.css";
@@ -161,6 +162,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to content
         </a>
         <div id="app-root">{children}</div>
+        <SpeedInsights />
       </body>
     </html>
   );
