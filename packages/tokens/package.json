@@ -72,9 +72,9 @@
   "types": "./src/tokens.ts",
   "//publishConfig": "main/types/exports are rewritten to ./dist at publish time. That rewrite is a pnpm feature — publishing with npm ships raw TypeScript, which is exactly what 0.1.0 did.",
   "devDependencies": {
-    "@vitest/coverage-v8": "^4.1.11",
+    "@vitest/coverage-v8": "^5.0.1",
     "@zoblocks/tsconfig": "workspace:*",
     "typescript": "^5.7.2",
-    "vitest": "^4.1.11"
+    "vitest": "^5.0.1"
   }
 }
