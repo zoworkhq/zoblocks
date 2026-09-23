@@ -192,7 +192,24 @@ jobs:
       # Coverage is a gate, not a report. The readiness audit's tier bar puts
       # `beta` at 90% lines / 85% branches, and a package that declares
       # thresholds fails its own run when it slips below.
+      #
+      # Workers are capped at 3, which is what Vitest chose by itself on the
+      # 4-vCPU GitHub-hosted runners this suite passed on for months.
+      #
+      # Uncapped, Vitest starts one fork per core minus one, and Turbo runs ten
+      # packages at once. On the 16-vCPU EC2 runners that is ~150 Node processes,
+      # each with jsdom and V8 coverage loaded. The machine ran out of headroom,
+      # and a fork that could not answer within Vitest's 60s start timeout
+      # failed the run with "Failed to start forks worker ... Timeout waiting for
+      # worker to respond". Every test passed, but the unhandled error still
+      # turned the job red. The file it named (bridge-core's contract.test.ts)
+      # is pure arithmetic and was never the problem.
+      #
+      # Set through the environment rather than in `test:coverage`, so a laptop
+      # keeps its own defaults and `pnpm verify` runs the same command as here.
       - name: Coverage thresholds
+        env:
+          VITEST_MAX_WORKERS: "3"
         run: pnpm test:coverage
 
       - name: Build
