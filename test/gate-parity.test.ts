@@ -133,6 +133,36 @@ describe("local verification covers what CI enforces", () => {
     expect(missing, missing.join("\n")).toEqual([]);
   });
 
+  it("runs the same gates on a draft pull request as `verify --fast`", () => {
+    /*
+     * A draft pull request gets `verify.yml`'s fast tier: every step without
+     * `inputs.tier == 'full'` in its condition. The pre-push hook runs
+     * `verify --fast`. If a static gate is in one list and not the other, a
+     * draft can go green on something that pre-push would have stopped, or the
+     * other way round.
+     *
+     * Compared by command, as above, on both sides of the `--fast` branch.
+     */
+    const verifyYml = readFileSync(path.join(ROOT, ".github/workflows/verify.yml"), "utf8");
+    const chunks = verifyYml.split(/^ {6}- (?=name:|uses:)/m).slice(1);
+    const fastTierCi = chunks
+      .map((chunk) => ({
+        name: /^name:\s+(.+?)\s*$/m.exec(chunk)?.[1],
+        fullOnly: /^\s+if:.*inputs\.tier == 'full'/m.test(chunk),
+      }))
+      .filter((step) => step.name && !step.fullOnly && step.name in GATE_COMMANDS)
+      .map((step) => GATE_COMMANDS[step.name as string]);
+
+    const fastSection = VERIFY.slice(0, VERIFY.indexOf('if [ "$FAST" -eq 0 ]'));
+    const fullOnlySection = VERIFY.slice(VERIFY.indexOf('if [ "$FAST" -eq 0 ]'));
+    const localFast = Object.values(GATE_COMMANDS).filter(
+      (command) => fastSection.includes(command) && !fullOnlySection.includes(command),
+    );
+
+    expect(fastTierCi.length).toBeGreaterThan(5);
+    expect(new Set(fastTierCi)).toEqual(new Set(localFast));
+  });
+
   it("keeps the audit and the synthetic-data scan in the fast tier", () => {
     /*
      * Both are nearly free — the audit took one second in CI and the scan is a

@@ -67,7 +67,7 @@ jobs:
     # `always()` so the job is reachable when `gates` was skipped on purpose;
     # the rest of the condition is what keeps a *failed* gate fatal.
     if: ${{ always() && (needs.gates.result == 'success' || inputs.skip-checks) }}
-    runs-on: [self-hosted, on-demand] # Must match your runner_extra_labels
+    runs-on: ubuntu-latest
     timeout-minutes: 30
 
     # No `environment:` here, deliberately. Running this workflow is already a

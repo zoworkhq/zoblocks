@@ -4,29 +4,45 @@
 # published packages, the registry source, the tokens, and the pipeline that
 # generates the rest. A change to any of those is an API change whether or not
 # it looks like one.
+#
+# Owners are named individually. `zoworkhq` is a personal account, not an
+# organisation, so it cannot have teams. This file used to name
+# `@zoworkhq/zoblocks-maintainers`, and GitHub reported every rule as "Unknown
+# owner" and silently requested no reviews at all. After editing this file,
+# check it with:
+#
+#   gh api repos/zoworkhq/zoblocks/codeowners/errors
+#
+# An empty `errors` list is the only proof that it works. Every owner needs
+# write access to the repository.
+#
+# Approval from any one listed owner satisfies a rule. Nobody can approve their
+# own pull request, so a change by one maintainer is reviewed by the other.
+#
+# The last matching rule wins, so the specific rules below must repeat the full
+# owner list. They exist so that narrowing ownership of one area later is a
+# one-line change that cannot quietly drop the rest.
 
-*                               @zoworkhq/zoblocks-maintainers
+*                               @arnabdas @rahulrajeevan
 
 # Shipped source — always a maintainer review.
-/packages/core/                 @zoworkhq/zoblocks-maintainers
-/packages/react/                @zoworkhq/zoblocks-maintainers
-/packages/loaders/              @zoworkhq/zoblocks-maintainers
-/packages/tokens/               @zoworkhq/zoblocks-maintainers
-/packages/fhir/                 @zoworkhq/zoblocks-maintainers
-/registry/                      @zoworkhq/zoblocks-maintainers
+/packages/                      @arnabdas @rahulrajeevan
+/registry/                      @arnabdas @rahulrajeevan
 
 # The generator decides what the registry, the docs, and the type paths contain.
-/scripts/gen/                   @zoworkhq/zoblocks-maintainers
+/scripts/gen/                   @arnabdas @rahulrajeevan
 
 # Architecture invariants and the contribution standard.
-/ENGINEERING.md                 @zoworkhq/zoblocks-maintainers
-/ARCHITECTURE.md                @zoworkhq/zoblocks-maintainers
-/CONTENT.md                     @zoworkhq/zoblocks-maintainers
-/content/decisions/             @zoworkhq/zoblocks-maintainers
+/ENGINEERING.md                 @arnabdas @rahulrajeevan
+/ARCHITECTURE.md                @arnabdas @rahulrajeevan
+/CONTENT.md                     @arnabdas @rahulrajeevan
+/content/decisions/             @arnabdas @rahulrajeevan
 
-# Supply chain and release. A change here changes what ships and who can ship it.
-/.github/workflows/             @zoworkhq/zoblocks-maintainers
-/.changeset/config.json         @zoworkhq/zoblocks-maintainers
-/package.json                   @zoworkhq/zoblocks-maintainers
-/pnpm-lock.yaml                 @zoworkhq/zoblocks-maintainers
-/SECURITY.md                    @zoworkhq/zoblocks-maintainers
+# Supply chain and release. A change here changes what ships and who can ship
+# it — including this file, which decides who reviews everything else.
+/.github/                       @arnabdas @rahulrajeevan
+/.changeset/config.json         @arnabdas @rahulrajeevan
+/package.json                   @arnabdas @rahulrajeevan
+/pnpm-workspace.yaml            @arnabdas @rahulrajeevan
+/pnpm-lock.yaml                 @arnabdas @rahulrajeevan
+/SECURITY.md                    @arnabdas @rahulrajeevan

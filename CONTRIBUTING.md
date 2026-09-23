@@ -134,6 +134,15 @@ mode" is what someone needs.
 - Screenshots for any visual change, light **and** dark.
 - Keep the branch rebased on `main`.
 
+Every change reaches `main` through a pull request; nothing is pushed to it
+directly. Open the PR as a **draft** while you are still working. CI then runs
+only the static gates (generated artifacts, lint, format, types, dependency
+rules, the audit and the scans), the same set `pnpm verify --fast` runs before
+each push. **Ready for review** starts everything else: tests and coverage, the
+build, the tarball and bundle checks, the accessibility audit, the browser
+suite, and a preview deploy. From then on every push runs the full set. Run
+`pnpm verify --ci` first if you want to find out locally.
+
 A maintainer reviews everything under `packages/`, `registry/`, `scripts/gen/`,
 and `.github/workflows/` — see [CODEOWNERS](.github/CODEOWNERS).
 

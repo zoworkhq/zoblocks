@@ -1,5 +1,10 @@
 name: Test AWS Runner
 
+# The one workflow still aimed at the self-hosted EC2 runners, kept for the day
+# they come back. Manual only: nothing a fork's pull request can trigger. While
+# the repository is public no runner should carry the `on-demand` label, so a
+# run just queues. See "CI runners" in DEPLOYMENT.md.
+
 on:
   workflow_dispatch: # Allows manual trigger from the GitHub UI
 

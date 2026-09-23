@@ -12,7 +12,8 @@ name: Verify
 # workflow's jobs run inside the caller's run, so calling it costs a run of its
 # own: what disappeared is the duplicated compute, not the coverage.
 #
-#   ci.yml       every push and pull request, gating the deploys
+#   ci.yml       every pull request and merge to main, gating the deploys.
+#                Drafts get the fast tier; see `tier` below.
 #   publish.yml  before anything reaches npm
 #
 # `scripts/verify.sh` runs the same gates on a laptop and
@@ -21,14 +22,35 @@ name: Verify
 
 on:
   workflow_call:
+    inputs:
+      # Two tiers, matching `scripts/verify.sh`:
+      #
+      #   fast  the static gates — generated artifacts, lint, format, types,
+      #         dependency rules, the audit and the two scans. Exactly what
+      #         `pnpm verify --fast` and the pre-push hook run. A draft pull
+      #         request gets this: it is still being written, and what it
+      #         needs is quick feedback, not a 40-minute browser suite on every
+      #         push.
+      #   full  everything. A pull request marked ready for review, every
+      #         push to main, and every publish.
+      #
+      # A step outside the fast tier carries `if: inputs.tier == 'full'`, and
+      # `test/gate-parity.test.ts` fails if the fast tier here and `--fast` in
+      # verify.sh disagree.
+      tier:
+        description: "`fast` for the static gates only, `full` for everything."
+        type: string
+        default: full
 
 permissions:
   contents: read
 
 jobs:
   verify:
-    name: Typecheck, test, build
-    runs-on: [self-hosted, on-demand] # Must match your runner_extra_labels
+    # Named per tier so branch protection can require the full run by name. A
+    # green draft run then cannot stand in for it.
+    name: ${{ inputs.tier == 'full' && 'Typecheck, test, build' || 'Static gates (draft)' }}
+    runs-on: ubuntu-latest
     # One job does everything: the cheap scans, install, generate, lint, format,
     # typecheck, the suites under coverage, every build, the tarball check, the
     # axe audit, and the browser suite in three engines.
@@ -45,13 +67,12 @@ jobs:
       # ---------------------------------------------------------------------
       # Two greps, before anything is installed.
       #
-      # These were two separate jobs. On GitHub-hosted runners that was nearly
-      # free; on the on-demand EC2 runners this repository moved to, each job is
-      # a machine that has to boot, register and tear down in order to run about
-      # a second of `grep` — two extra instances on every push and every pull
-      # request. Run here, before `pnpm install`, they still fail in well under
-      # a minute, which is the only property that mattered about them being
-      # separate.
+      # These were two separate jobs. Each job is a machine that has to start
+      # before it runs anything, which on the on-demand EC2 runners this
+      # repository briefly used meant booting an instance for about a second of
+      # `grep` (see "CI runners" in DEPLOYMENT.md). Run here, before `pnpm
+      # install`, they still fail in well under a minute, which is the only
+      # property that mattered about them being separate.
       # ---------------------------------------------------------------------
 
       # Fixtures must stay synthetic. This catches the obvious mistakes — a real
@@ -88,7 +109,8 @@ jobs:
 
       - uses: ./.github/actions/setup
         with:
-          mongo-cache: "true"
+          # Only hq's tests use mongod, and a draft run has no tests.
+          mongo-cache: ${{ inputs.tier == 'full' }}
 
       # Runs before anything else. It validates every component's metadata,
       # typechecks the source customers receive, and produces every derived
@@ -193,11 +215,12 @@ jobs:
       # `beta` at 90% lines / 85% branches, and a package that declares
       # thresholds fails its own run when it slips below.
       #
-      # Workers are capped at 3, which is what Vitest chose by itself on the
-      # 4-vCPU GitHub-hosted runners this suite passed on for months.
+      # Workers are capped at 3. On a 4-vCPU `ubuntu-latest` runner that is what
+      # Vitest picks anyway, so the cap only matters on a bigger machine.
       #
       # Uncapped, Vitest starts one fork per core minus one, and Turbo runs ten
-      # packages at once. On the 16-vCPU EC2 runners that is ~150 Node processes,
+      # packages at once. On the 16-vCPU EC2 runners this repository briefly
+      # used, that was ~150 Node processes,
       # each with jsdom and V8 coverage loaded. The machine ran out of headroom,
       # and a fork that could not answer within Vitest's 60s start timeout
       # failed the run with "Failed to start forks worker ... Timeout waiting for
@@ -208,11 +231,13 @@ jobs:
       # Set through the environment rather than in `test:coverage`, so a laptop
       # keeps its own defaults and `pnpm verify` runs the same command as here.
       - name: Coverage thresholds
+        if: inputs.tier == 'full'
         env:
           VITEST_MAX_WORKERS: "3"
         run: pnpm test:coverage
 
       - name: Build
+        if: inputs.tier == 'full'
         run: pnpm build
 
       # Guards against the failure that shipped 0.1.0: a package whose
@@ -225,12 +250,14 @@ jobs:
       # It runs here rather than only before a publish so that it fails on the
       # pull request, not after the merge that caused it.
       - name: Every package is publishable
+        if: inputs.tier == 'full'
         run: node scripts/check-tarball.mjs
 
       # Browser binaries are ~300MB and took 71s to fetch on every single run.
       # Keyed on the resolved Playwright version rather than the lockfile hash,
       # so an unrelated dependency bump does not throw the browsers away.
       - name: Resolve the Playwright version
+        if: inputs.tier == 'full'
         id: pw
         run: |
           version=$(node -p "require('@playwright/test/package.json').version")
@@ -238,6 +265,7 @@ jobs:
           echo "Playwright $version"
 
       - name: Cache Playwright browsers
+        if: inputs.tier == 'full'
         id: pw-cache
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
@@ -252,10 +280,11 @@ jobs:
       # cached directory; `--with-deps` installs OS packages system-wide, which
       # a cache cannot hold, and which are cheap.
       - name: Install Playwright browsers
-        if: steps.pw-cache.outputs.cache-hit != 'true'
+        if: inputs.tier == 'full' && steps.pw-cache.outputs.cache-hit != 'true'
         run: pnpm exec playwright install chromium firefox webkit
 
       - name: Install Playwright system dependencies
+        if: inputs.tier == 'full'
         run: pnpm exec playwright install-deps chromium firefox webkit
 
       # The server plumbing lives in scripts/verify-a11y.sh so this and
@@ -264,6 +293,7 @@ jobs:
       # aspirational, and its first run found four real violations including a
       # contrast failure on the footer's own legal limitation statement.
       - name: Accessibility (WCAG 2.2 AA, both themes)
+        if: inputs.tier == 'full'
         run: bash scripts/verify-a11y.sh
 
       # Visual regression, plus the accessibility checks that need a real layout
@@ -305,17 +335,18 @@ jobs:
       # this step self-contained rather than dependent on a leak two steps
       # earlier.
       - name: Browser accessibility and cross-framework smoke
+        if: inputs.tier == 'full'
         run: pnpm e2e:ci
 
       # A retried-but-passed test leaves no signal anyone reads: the job is
       # green and the retry is buried in the log. `always()` because a flake is
       # most worth reporting on the run where something else also failed.
       - name: Report flaky tests
-        if: always()
+        if: inputs.tier == 'full' && always()
         run: node scripts/flaky.mjs
 
       - name: Upload the Playwright report on failure
-        if: failure()
+        if: inputs.tier == 'full' && failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: playwright-report
@@ -324,6 +355,7 @@ jobs:
 
       # Budgets on the bytes a customer installs. ENGINEERING.md §11.
       - name: Bundle budgets
+        if: inputs.tier == 'full'
         run: pnpm size
 
       # The layer rule from ARCHITECTURE.md §2, executable rather than written

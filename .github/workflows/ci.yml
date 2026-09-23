@@ -2,8 +2,10 @@ name: CI
 
 # What runs when:
 #
-#   push / pull request   →  this workflow: the gate set, then the deploys
-#   merge to main         →  ...then the "Version packages" PR, if changesets
+#   draft pull request    →  this workflow, static gates only
+#   ready for review      →  this workflow: every gate, then a preview deploy
+#   merge to main         →  this workflow: every gate, then the deploys
+#                            ...then the "Version packages" PR, if changesets
 #                            are pending
 #   a human clicks it     →  publish.yml, which is the only thing that reaches
 #                            npm
@@ -16,8 +18,16 @@ name: CI
 on:
   push:
     branches: [main]
+  # Changes reach main through pull requests only; branch protection refuses
+  # a direct push. The push trigger above is what runs on the merge commit.
+  #
+  # `ready_for_review` is not in the default set of types. Without it, marking
+  # a draft ready would re-run nothing, and the full gates would wait for the
+  # next push. `converted_to_draft` is left out on purpose: it changes no code,
+  # and the next push runs the draft tier anyway.
   pull_request:
     branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -41,9 +51,17 @@ jobs:
   # Every gate, in one place, shared with publish.yml. A reusable workflow's
   # jobs run inside this run — no second entry in the Actions list, and no
   # second copy of the list to keep in step.
+  #
+  # A draft gets the fast tier, the same static gates `pnpm verify --fast` runs
+  # before every push. It takes minutes, and it does not keep a 16-core runner
+  # busy with coverage and three browser engines for work nobody is reviewing
+  # yet. Every other event gets the full set: a ready pull request, the merge
+  # commit on main, and each push to a ready pull request.
   gates:
     name: Verify
     uses: ./.github/workflows/verify.yml
+    with:
+      tier: ${{ github.event.pull_request.draft && 'fast' || 'full' }}
     permissions:
       contents: read
 
@@ -58,7 +76,7 @@ jobs:
   # ---------------------------------------------------------------------------
   deploy-docs:
     name: Deploy docs (production)
-    runs-on: [self-hosted, on-demand] # Must match your runner_extra_labels
+    runs-on: ubuntu-latest
     needs: [gates]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     timeout-minutes: 15
@@ -163,7 +181,7 @@ jobs:
     if: >-
       github.event_name == 'push' && github.ref == 'refs/heads/main' &&
       vars.VERCEL_PROJECT_ID_HQ != ''
-    runs-on: [self-hosted, on-demand] # Must match your runner_extra_labels
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     environment:
       name: production-hq
@@ -235,7 +253,7 @@ jobs:
     if: >-
       github.event_name == 'push' && github.ref == 'refs/heads/main' &&
       vars.VERCEL_PROJECT_ID_APP != ''
-    runs-on: [self-hosted, on-demand] # Must match your runner_extra_labels
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     environment:
       name: production-app
@@ -283,8 +301,10 @@ jobs:
   deploy-preview:
     name: Deploy docs (preview)
     needs: [gates]
-    if: github.event_name == 'pull_request'
-    runs-on: [self-hosted, on-demand] # Must match your runner_extra_labels
+    # Ready pull requests only. A preview is for review, and a draft is not
+    # there yet. It also keeps drafts to the one short job.
+    if: github.event_name == 'pull_request' && !github.event.pull_request.draft
+    runs-on: ubuntu-latest
     timeout-minutes: 15
 
     steps:
@@ -336,7 +356,7 @@ jobs:
     name: Version packages
     needs: [gates]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: [self-hosted, on-demand] # Must match your runner_extra_labels
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     # Serialised across runs, and never cancelled: two merges in quick
     # succession must not race each other to force-push the version branch.

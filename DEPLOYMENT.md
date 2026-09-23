@@ -11,7 +11,8 @@ reported success, and published the wrong code. CI has no checkout to get wrong.
 
 | Trigger              | Workflow         | Effect                                                          |
 | -------------------- | ---------------- | --------------------------------------------------------------- |
-| PR opened or updated | `ci.yml`         | Checks, then a preview deployment                               |
+| Draft PR             | `ci.yml`         | Static checks only (the `pnpm verify --fast` set)               |
+| PR ready for review  | `ci.yml`         | Every check, then a preview deployment                          |
 | Merge to `main`      | `ci.yml`         | Checks, then production deploys, then the "Version packages" PR |
 | Merge the version PR | —                | Nothing ships. The bumps land on `main` and wait.               |
 | Manual               | `publish.yml`    | Publishes to npm                                                |
@@ -36,6 +37,69 @@ neither production nor npm. This is the main reason deployment lives here rather
 Vercel's own Git integration — that integration deploys on every push whether or
 not the checks passed, which is the wrong default for a site publishing WCAG
 conformance and healthcare guidance.
+
+## CI runners
+
+Every job runs on GitHub-hosted `ubuntu-latest`. The repository is public, and
+for a public repository those runners cost nothing: a fresh 4-vCPU, 16 GB VM
+per job, thrown away when the job ends.
+
+From 17 September 2026 the jobs ran on self-hosted AWS EC2 runners. They came
+off again when the repository went public, and **they must stay off while it
+is public**.
+
+### Why not self-hosted, on a public repository
+
+A pull request from a fork runs the workflow files _from that pull request_.
+Anyone can open one, change `runs-on` to our runner label, and run any command
+they like on our EC2 instance: inside our VPC, holding the instance's IAM role
+through the metadata service, and on a machine that may run someone else's job
+next. Approving first-time contributors does not close this; after one
+harmless PR, the next is not held for approval. GitHub's own guidance is not to
+use self-hosted runners with public repositories.
+
+It follows that editing `runs-on` in our workflows is not enough. The runners
+themselves have to be unreachable from this repository:
+
+- **Repository-level runners**: remove them in _Settings → Actions → Runners_,
+  and disable the scale-up webhook so none are launched again.
+- **Organisation-level runners**: put them in a runner group with _Allow public
+  repositories_ turned off (the default), and do not grant this repository
+  access to it.
+
+If CI needs more speed than `ubuntu-latest` gives, use GitHub's larger hosted
+runners (_Organisation settings → Actions → Runners → New GitHub-hosted
+runner_). They are paid, but they are VMs GitHub throws away after each job.
+
+### Moving back to EC2
+
+Only if the repository is private again. Then:
+
+1. **Labels.** Every job becomes
+   `runs-on: [self-hosted, on-demand] # Must match your runner_extra_labels`.
+   `self-hosted` is added by the runner itself, and `on-demand` must match
+   `runner_extra_labels` in the AWS runner module. A job whose labels no runner
+   carries queues forever and never fails. The jobs are `verify` (in
+   `verify.yml`, the one that matters), the four deploy jobs and `version` in
+   `ci.yml`, `publish.yml`, `codeql.yml`, `sbom.yml` and `hq-indexes.yml`.
+   `grep -rn "runs-on" .github/workflows` lists them all.
+2. **actionlint.** Declare each custom label in `.github/actionlint.yaml`. It
+   is already there for `on-demand`; `pnpm lint:actions` fails on any label it
+   does not know.
+3. **Smoke test.** Run _Actions → Test AWS Runner_ (`test-spot-runner.yml`,
+   manual only) first. It prints the host, checks outbound access, and reads
+   the instance type through IMDSv2.
+4. **Worker count.** The coverage step sets `VITEST_MAX_WORKERS: "3"`. Leave it
+   unless the instance is known to have the memory for more. Uncapped on a
+   16-vCPU instance, Vitest and Turbo together started ~150 Node processes, and
+   runs failed with "Failed to start forks worker ... Timeout waiting for
+   worker to respond" even though every test had passed.
+5. **Instance image.** It needs passwordless `sudo apt-get` for `playwright
+install-deps`, plus `git` and `curl`. Node and pnpm are installed per job by
+   `.github/actions/setup` from `.nvmrc`, so the image does not need them.
+6. **Cost per job.** Every job boots an instance, so fewer, larger jobs are
+   cheaper. This is why the two scans live inside `verify` rather than in jobs
+   of their own. Job timeouts include boot time.
 
 ## Secrets and variables
 

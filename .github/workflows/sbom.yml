@@ -17,7 +17,7 @@ permissions:
 jobs:
   sbom:
     name: Generate and attach
-    runs-on: [self-hosted, on-demand] # Must match your runner_extra_labels
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
       contents: write

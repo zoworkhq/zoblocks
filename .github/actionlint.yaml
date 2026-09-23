@@ -3,5 +3,6 @@
 # on every workflow that uses it.
 self-hosted-runner:
   labels:
-    # The AWS spot runners (`runner_extra_labels`), used by test-spot-runner.yml.
+    # The AWS EC2 runners (`runner_extra_labels`). Only test-spot-runner.yml
+    # uses it while the repository is public. See "CI runners" in DEPLOYMENT.md.
     - on-demand

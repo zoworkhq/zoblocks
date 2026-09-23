@@ -30,7 +30,7 @@ permissions:
 jobs:
   indexes:
     name: Apply indexes
-    runs-on: [self-hosted, on-demand] # Must match your runner_extra_labels
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     environment:
       name: production-hq
