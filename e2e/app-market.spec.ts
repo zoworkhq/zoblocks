@@ -76,7 +76,7 @@ test.describe("@app the catalogue", () => {
     await signIn(page);
     await page.goto(`${BASE}/market`);
 
-    await expect(page.getByRole("heading", { name: "Catalogue" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "Marketplace" })).toBeVisible();
 
     const card = page.getByRole("listitem").filter({ hasText: "Empty-state system" });
     await expect(card).toContainText("$290");

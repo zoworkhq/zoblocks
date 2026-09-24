@@ -119,27 +119,24 @@ async function chooseChapter(page: Page, label: string) {
 }
 
 /**
- * Set a gallery control, and confirm it actually took.
+ * Apply a density or a direction to every demo at once.
  *
- * A `.click()` that passes its actionability checks has only been *delivered*;
- * nothing guarantees the handler ran. When a density click was lost, the strip
- * never re-laid-out, and the geometry assertion that followed timed out looking
- * like the indicator had failed to re-measure — which is exactly the bug that
- * test exists to catch, arriving for the wrong reason. It reproduced in WebKit
- * under a full parallel run and never in isolation.
+ * The gallery used to have a control bar for this — theme, density and
+ * direction, one click each — and these tests drove it. The bar was removed
+ * (the note at the top of `tabs-gallery.tsx` says why), and the tests went on
+ * waiting for buttons that no longer existed: a 20-second timeout in all three
+ * engines, on every run, which read like the indicator had broken.
  *
- * These controls report `aria-pressed`, so the click is re-sent until the
- * control says it is selected. Idempotent: a control that is already pressed is
- * never clicked again.
+ * All the bar ever did was write `data-zb-density` or `dir` on the stage, and
+ * the gallery's stylesheet still scopes density to that attribute. So this
+ * writes the attribute directly. React does not see the change, which makes
+ * the test stricter rather than looser: nothing re-renders to tell the
+ * indicator that the triggers changed size, so only its own observers can.
  */
-async function setControl(page: Page, group: string, value: string) {
-  const control = page.getByRole("group", { name: group }).getByRole("button", { name: value });
-
-  await expect(async () => {
-    if ((await control.getAttribute("aria-pressed")) !== "true") await clickClear(control);
-    await expect(control).toHaveAttribute("aria-pressed", "true", { timeout: 2_000 });
-  }).toPass({ timeout: 20_000 });
-
+async function setStage(page: Page, name: "data-zb-density" | "dir", value: string) {
+  await page
+    .locator(".zb-gallery__stage")
+    .evaluate((stage, [attribute, next]) => stage.setAttribute(attribute!, next!), [name, value]);
   await awaitMeasured(page);
 }
 
@@ -193,7 +190,7 @@ test.describe("indicator geometry @a11y", () => {
     const demo = page.locator("#v01");
     const before = await demo.locator(".zb-tabs__thumb").boundingBox();
 
-    await setControl(page, "Density", "patient");
+    await setStage(page, "data-zb-density", "patient");
 
     /*
      * Polled, not slept on.
@@ -217,9 +214,24 @@ test.describe("indicator geometry @a11y", () => {
 
   test("the thumb is placed correctly in RTL", async ({ page }) => {
     await openGallery(page);
-    await setControl(page, "Text direction", "rtl");
+    await setStage(page, "dir", "rtl");
 
+    /*
+     * Then select a tab, so the strip renders in the new direction.
+     *
+     * Flipping `dir` mirrors every offset while resizing nothing, so no
+     * observer fires; the component reads direction when it renders. The
+     * removed control bar got that render for free by being React state. What
+     * this asserts is unchanged: in a mirrored layout, the thumb lands on the
+     * selected trigger rather than on its logical-start twin.
+     */
     const demo = page.locator("#v01");
+    await clickClear(demo.getByRole("tab", { name: "Shared" }));
+    await expect(demo.getByRole("tab", { name: "Shared" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+
     await expect(async () => {
       const thumb = await demo.locator(".zb-tabs__thumb").boundingBox();
       const selected = await demo.locator('[role="tab"][aria-selected="true"]').boundingBox();

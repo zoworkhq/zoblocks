@@ -63,6 +63,15 @@ export function SectionTabs({
   const uid = React.useId();
 
   /*
+   * True once the client has taken over, surfaced as `data-hydrated` purely so
+   * tests can wait for it — the same contract as the signature demo. A tab
+   * clicked before hydration lands on server-rendered markup and does nothing,
+   * and on a contended CI runner a fixed sleep did not cover that gap.
+   */
+  const [hydrated, setHydrated] = React.useState(false);
+  React.useEffect(() => setHydrated(true), []);
+
+  /*
    * Which edges of the strip hide tabs.
    *
    * On a phone eight tabs need about 700px and the strip has 300. The
@@ -208,6 +217,7 @@ export function SectionTabs({
       <nav
         ref={bar}
         aria-label="On this page"
+        data-hydrated={hydrated || undefined}
         /*
           Not sticky on a short screen. A landscape phone is 393px tall, and
           the header plus this bar took 97 of them on every scrolled frame.

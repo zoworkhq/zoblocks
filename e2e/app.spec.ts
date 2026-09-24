@@ -91,6 +91,9 @@ test.describe("@app the theme lifecycle", () => {
     /* --- publish --------------------------------------------------------- */
     await page.goto(`${BASE}/themes/${THEME}`);
     await page.getByRole("button", { name: "Publish" }).click();
+    // Publishing is a two-step control: the first click states the consequence
+    // and arms a "Publish vN" button; only that second click publishes.
+    await page.getByRole("button", { name: /^Publish v\d+$/ }).click();
 
     // Specifically in the toast: this confirmation used to render only inline,
     // in a 22rem column in the page header, where it was easy to miss.
@@ -600,7 +603,7 @@ test.describe("@app getting from a theme to its screens", () => {
       ["Icons", "icons"],
       ["Compare", "compare"],
       ["History", "history"],
-      ["Import / export", "transfer"],
+      ["Import and export", "transfer"],
     ] as const;
 
     // Counted from the list below rather than written twice: the two went out
@@ -713,7 +716,7 @@ test.describe("@app when there is nothing there", () => {
     await expect(page.getByRole("heading", { name: /nothing at this address/i })).toBeVisible();
     // No session is assumed out here, so the only offered destination is one
     // that works whether or not you have an account.
-    await expect(page.getByRole("link", { name: "Go to the app" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Sign in" })).toBeVisible();
   });
 });
 

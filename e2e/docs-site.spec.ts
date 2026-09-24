@@ -132,6 +132,13 @@ test.describe("scrolling @a11y", () => {
 
     const bar = page.locator("nav[aria-label='On this page']");
     await expect(bar).toBeVisible();
+    /*
+     * Hydrated before clicking. The click below is a raw mouse event at a
+     * point, and one that lands on server-rendered markup is simply lost.
+     */
+    await page
+      .locator("nav[aria-label='On this page'][data-hydrated]")
+      .waitFor({ state: "attached" });
     const tabs = bar.getByRole("tab");
     await expect(tabs.first()).toHaveAttribute("aria-selected", "true");
     await expect(tabs.first()).toHaveText("Preview");
@@ -146,17 +153,46 @@ test.describe("scrolling @a11y", () => {
     await page.evaluate(() => window.scrollTo(0, 300));
 
     /*
-     * Measured after Playwright has positioned the element and before it
-     * clicks. `click()` first scrolls its target into view, and for a sticky
-     * bar the engines disagree about where that is — Chromium settled at 3px,
-     * Gecko at 296px — while a real click in a real browser moved nothing.
-     * What this test owes is that *choosing the tab* does not move the page,
-     * so the baseline is taken once the harness has finished moving it.
+     * Let the header finish shrinking, with scroll anchoring off.
+     *
+     * Scrolling past 12px sets `data-scrolled` on the site header a frame
+     * later, and it transitions from 64px to 52px over 500ms. Waiting for that
+     * keeps the tab still under the pointer below.
+     *
+     * Anchoring is off because the engines compensate for that 12px at
+     * different times: Chromium follows the header down frame by frame, and
+     * WebKit held it back and applied it at the next large reflow — the panel
+     * swap — so the tab was charged with a 300 → 288 it did not cause. With
+     * anchoring off the browser adjusts nothing on its own, and any scroll the
+     * page itself makes (a hash jump, `scrollIntoView`, the router) still
+     * shows.
+     */
+    await page.evaluate(() => {
+      document.documentElement.style.overflowAnchor = "none";
+    });
+    const header = page.locator("[data-site-header]");
+    await expect(header).toHaveAttribute("data-scrolled");
+    await header.evaluate((element) =>
+      Promise.all(element.getAnimations().map((animation) => animation.finished)),
+    );
+
+    /*
+     * A mouse click at the tab's coordinates, not `locator.click()`.
+     *
+     * `click()` scrolls its target into view first, and for a sticky bar the
+     * engines disagree about where that is — Chromium to 0 (the bar's static
+     * position is on screen from the top), WebKit to 202, Gecko to 296 —
+     * while a real click on a visible tab moves nothing. That scroll happened
+     * between the baseline and the click, so the harness's own positioning
+     * was reported as the page jumping. Traced under a parallel run: `scrollY`
+     * was already 0 when the click event arrived, and nothing on the page had
+     * called a scroll API. The tab is on screen here, so the pointer can go
+     * straight to it.
      */
     const usage = bar.getByRole("tab", { name: "Usage & props" });
-    await usage.scrollIntoViewIfNeeded();
+    const box = (await usage.boundingBox())!;
     const before = await page.evaluate(() => window.scrollY);
-    await usage.click();
+    await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
     await expect(usage).toHaveAttribute("aria-selected", "true");
 
     /*
