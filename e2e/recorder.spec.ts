@@ -41,9 +41,18 @@ async function scenario(page: Page, label: string) {
  * Not `animations: "disabled"` — there is no animation to disable. The lane
  * moves because data arrives, so the way to freeze it is to stop the data,
  * which is also a decent proof that nothing else is moving it.
+ *
+ * The frames already in flight are cancelled, not just the ones after. Stubbing
+ * alone leaves the loop's pending tick to land, and on a loaded CI runner WebKit
+ * delivers it well after any fixed wait, with a `dt` large enough to push
+ * several buckets at once: the lane then moves between two reads for a reason
+ * that has nothing to do with a clock. Frame ids are sequential per document,
+ * so everything up to a fresh id is everything pending.
  */
 async function silenceTheSource(page: Page) {
   await page.evaluate(() => {
+    const newest = window.requestAnimationFrame(() => {});
+    for (let id = 1; id <= newest; id += 1) window.cancelAnimationFrame(id);
     window.requestAnimationFrame = (() => 0) as unknown as typeof window.requestAnimationFrame;
   });
   await page.waitForTimeout(80);

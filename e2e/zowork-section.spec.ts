@@ -76,12 +76,19 @@ async function advance(page: Page, ms: number, expected: string) {
 /*
  * Somewhere off the card, so a pointer resting there holds nothing. In steps:
  * WebKit drops the `pointerleave` of a single jump made straight after a click.
+ *
+ * Beside the card, measured from its own box, and never by hovering another
+ * element: a hover scrolls its target into view first, and WebKit aligns that
+ * scroll to the nearest edge. Hovering the section title, which sits above the
+ * card, parked the title at the bottom of the viewport and scrolled the card
+ * out of it, so the observer held the rotation and the test read that as the
+ * hold never letting go. `mouse.move` does not scroll.
  */
 async function pointAway(page: Page) {
-  await page.locator("#zwp-title").hover();
-  const box = await page.locator("#zwp-title").boundingBox();
-  if (box) await page.mouse.move(box.x + 4, box.y + 4, { steps: 6 });
-  await page.locator("#zwp-title").evaluate(() => {
+  const card = page.locator(".zwhClients");
+  const box = await card.boundingBox();
+  if (box) await page.mouse.move(Math.max(4, box.x - 24), box.y + box.height / 2, { steps: 6 });
+  await card.evaluate(() => {
     (document.activeElement as HTMLElement | null)?.blur();
   });
 }
