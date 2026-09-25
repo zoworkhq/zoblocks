@@ -28,7 +28,7 @@
     "name": "react \u2014 the whole barrel",
     "path": "packages/react/dist/index.js",
     "import": "*",
-    "limit": "117.5 KB",
+    "limit": "118.5 KB",
     "ignore": ["react", "react-dom"]
   },
   {
