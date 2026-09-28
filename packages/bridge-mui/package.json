@@ -73,13 +73,13 @@
     "@mui/material": "^9.3.1",
     "@testing-library/react": "^16",
     "@types/react": "^19.0.2",
-    "@vitest/coverage-v8": "^4.1.11",
+    "@vitest/coverage-v8": "^5.0.1",
     "@zoblocks/bridge-antd": "workspace:*",
     "@zoblocks/tsconfig": "workspace:*",
     "jsdom": "^30",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "typescript": "^5.7.2",
-    "vitest": "^4.1.11"
+    "vitest": "^5.0.1"
   }
 }

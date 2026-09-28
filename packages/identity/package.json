@@ -76,7 +76,7 @@
     "@testing-library/user-event": "^14",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
-    "@vitest/coverage-v8": "^4.1.11",
+    "@vitest/coverage-v8": "^5.0.1",
     "@zoblocks/fhir": "workspace:*",
     "@zoblocks/tsconfig": "workspace:*",
     "axe-core": "^4.13.0",
@@ -84,6 +84,6 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "typescript": "^5.7.2",
-    "vitest": "^4.1.11"
+    "vitest": "^5.0.1"
   }
 }
