@@ -13,6 +13,7 @@
  * editorial work rather than something derivable from a type.
  */
 export const PLAYGROUND_COMPONENTS: ReadonlySet<string> = new Set([
+  "accordion",
   "tabs",
   "signature",
   "switch",

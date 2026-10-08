@@ -22,6 +22,7 @@ import { HelixLoader } from "@/registry/zoblocks/helix-loader/helix-loader";
 import { InfusionLoader } from "@/registry/zoblocks/infusion-loader/infusion-loader";
 import * as TabsDemo from "../tabs-demos";
 import * as SwitchDemo from "../switch-demos";
+import * as AccordionDemo from "../accordion-demos";
 
 /* ------------------------------------------------------------------ */
 /* Stand-ins for the host application                                  */
@@ -253,6 +254,21 @@ export const EXAMPLE_PREVIEWS: Readonly<
     severity: () => <TabsDemo.ChartHeader />,
     "every-variant": () => <TabsDemo.EveryVariant />,
     "theme-density": () => <TabsDemo.ThemeDensityMatrix />,
+  },
+
+  accordion: {
+    "record-while-closed": () => <AccordionDemo.RecordWhileClosed />,
+    pinned: () => <AccordionDemo.PinnedCrisisStep />,
+    "single-open": () => <AccordionDemo.SingleOpen />,
+    advisory: () => <AccordionDemo.AdvisoryGate />,
+    reason: () => <AccordionDemo.ReasonGate />,
+    consent: () => <AccordionDemo.ConsentGate />,
+    "consent-refused": () => <AccordionDemo.ConsentRefused />,
+    withheld: () => <AccordionDemo.Withheld />,
+    nested: () => <AccordionDemo.Nested />,
+    variants: () => <AccordionDemo.Variants />,
+    density: () => <AccordionDemo.Density />,
+    disclosure: () => <AccordionDemo.SingleDisclosure />,
   },
 
   switch: {
