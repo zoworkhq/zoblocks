@@ -23,6 +23,7 @@ import { InfusionLoader } from "@/registry/zoblocks/infusion-loader/infusion-loa
 import * as TabsDemo from "../tabs-demos";
 import * as SwitchDemo from "../switch-demos";
 import * as AccordionDemo from "../accordion-demos";
+import * as StatusDemo from "../clinical-status-demos";
 
 /* ------------------------------------------------------------------ */
 /* Stand-ins for the host application                                  */
@@ -269,6 +270,17 @@ export const EXAMPLE_PREVIEWS: Readonly<
     variants: () => <AccordionDemo.Variants />,
     density: () => <AccordionDemo.Density />,
     disclosure: () => <AccordionDemo.SingleDisclosure />,
+  },
+
+  "clinical-status": {
+    "criticality-from-fhir": () => <StatusDemo.CriticalityFromFhir />,
+    "restricted-is-not-absent": () => <StatusDemo.RestrictedIsNotAbsent />,
+    "nine-scales": () => <StatusDemo.NineScales />,
+    "hue-removed": () => <StatusDemo.HueRemoved />,
+    "three-shapes": () => <StatusDemo.ThreeShapes />,
+    "grid-affix": () => <StatusDemo.GridAffix />,
+    "patient-register": () => <StatusDemo.PatientRegister />,
+    "both-registers": () => <StatusDemo.BothRegisters />,
   },
 
   switch: {
