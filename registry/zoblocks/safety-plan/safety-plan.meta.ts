@@ -18,6 +18,7 @@ export default defineComponentMeta({
     "A safety plan is written collaboratively in a room and read alone, often on a phone, often at the worst hour of someone's week. That reading context is the whole design. The crisis step holds the phone numbers, so it renders open and its trigger reports itself disabled — a person in crisis does not scroll, does not scan, and should not have to make a correct decision about a chevron to reach a number. The step order is the intervention rather than a layout: the escalation from what someone can do alone to who they call is the clinical content, so nothing here sorts or filters. And a step nobody has filled in says so instead of vanishing, because a five-step plan numbered one to five claims the sixth was never part of the instrument.",
 
   categories: ["Disclosure", "Clinical"],
+  aliases: ["crisis plan", "stanley-brown safety plan"],
   fhir: [],
 
   states: [

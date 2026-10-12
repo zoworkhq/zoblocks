@@ -59,7 +59,10 @@ export default tseslint.config(
       "content/archive/**",
       // Generated. Lint the generator, not its output.
       "apps/docs/src/lib/generated/**",
+      "packages/cli/src/generated/**",
       "apps/docs/public/**",
+      // Agent-eval runs (scripts/ai-evals): whole generated apps, each with its own config.
+      ".ai-evals/**",
       // Written by Next on every build.
       "apps/docs/next-env.d.ts",
       "apps/hq/next-env.d.ts",
@@ -197,6 +200,20 @@ export default tseslint.config(
   // -------------------------------------------------------------------------
   {
     files: ["packages/cli/**/*.ts", "packages/cli/**/*.mjs"],
+    rules: { "@zoblocks/no-forbidden-capability": "off" },
+  },
+
+  // -------------------------------------------------------------------------
+  // The MCP server is a Node binary and an HTTP handler, not component source.
+  //
+  // Same reasoning as the CLI above, and a narrower claim (ADR 0017): it
+  // fetches exactly one thing, the catalog manifest, and the rule also misreads
+  // the SDK handler's own `.fetch(request)` method as a network call. Off by
+  // name; `packages/mcp/test/capabilities.test.ts` asserts the claim directly —
+  // one fetch, no environment, no file writes.
+  // -------------------------------------------------------------------------
+  {
+    files: ["packages/mcp/**/*.ts", "packages/mcp/**/*.mjs"],
     rules: { "@zoblocks/no-forbidden-capability": "off" },
   },
 

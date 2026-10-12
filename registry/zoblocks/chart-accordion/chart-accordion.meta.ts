@@ -18,6 +18,7 @@ export default defineComponentMeta({
     "Accordion will happily let a product build a header that says nothing, and at fourteen sections that produces a chart nobody reads. This component closes that gap by composing the summary itself from a small, closed vocabulary. The type does the enforcing: passing severity without status is a build error, because a coloured rail with no words beside it is a signal that forced-colors mode discards, monochrome printing discards, and roughly one in twelve men cannot resolve. The expand-all control is here rather than on the primitive because expanding a whole record is a chart-shaped action — it is what makes the record searchable and printable in one press — and it has to know not to touch a withheld section.",
 
   categories: ["Disclosure", "Clinical"],
+  aliases: ["chart sections", "collapsible chart", "record sections"],
   fhir: [],
 
   states: [

@@ -8,6 +8,7 @@
 
 import { parseArgs } from "node:util";
 import { add, init, list, type CommandContext } from "./commands.js";
+import { mcpInit, skillAdd } from "./agent-commands.js";
 import { ConfigError } from "./config.js";
 import { RegistryError } from "./registry.js";
 import { RegistryFormatError } from "./schema.js";
@@ -18,6 +19,8 @@ Usage
   zoblocks init                      Create zoblocks.json
   zoblocks add <component...>        Add components and their dependencies
   zoblocks list                      List the public catalog
+  zoblocks mcp init --client <agent> Connect a coding agent to the ZoBlocks MCP server
+  zoblocks skill add                 Add the ZoBlocks coding skill for AI agents
 
 Specifiers
   vitals-panel                     A component from the public catalog
@@ -30,7 +33,10 @@ Options
   --dry-run        Show what would be written, write nothing
   --no-deps        Do not touch package.json or the lockfile
   --yes            Let this run your package manager for npm dependencies
-  --force          init only: overwrite an existing zoblocks.json
+  --force          init: overwrite zoblocks.json; mcp init: replace an existing entry
+  --client <agent> mcp init: claude, codex, cursor, vscode, roo, gemini,
+                   windsurf, cline or copilot
+  --local          mcp init: run the server locally (npx) instead of the hosted one
   --version        Print the version
   --help           Print this
 
@@ -70,6 +76,8 @@ export async function run(options: RunOptions): Promise<number> {
         "no-deps": { type: "boolean", default: false },
         yes: { type: "boolean", short: "y", default: false },
         force: { type: "boolean", default: false },
+        client: { type: "string" },
+        local: { type: "boolean", default: false },
         version: { type: "boolean", short: "v", default: false },
         help: { type: "boolean", short: "h", default: false },
       },
@@ -119,6 +127,35 @@ export async function run(options: RunOptions): Promise<number> {
 
       case "list":
         return await list(context);
+
+      /*
+       * Two-word commands, so each reads as what it does to which thing and
+       * leaves room beside it: `mcp init` today, `mcp remove` if it is ever
+       * asked for.
+       */
+      case "mcp":
+        if (rest[0] !== "init") {
+          err(
+            `Unknown command "mcp ${rest[0] ?? ""}". Did you mean: zoblocks mcp init --client <agent>`,
+          );
+          return 1;
+        }
+        return await mcpInit(context, {
+          ...(values.client ? { client: values.client as string } : {}),
+          local: values.local as boolean,
+          force: values.force as boolean,
+          dryRun: values["dry-run"] as boolean,
+        });
+
+      case "skill":
+        if (rest[0] !== "add") {
+          err(`Unknown command "skill ${rest[0] ?? ""}". Did you mean: zoblocks skill add`);
+          return 1;
+        }
+        return await skillAdd(context, {
+          overwrite: values.overwrite as boolean,
+          dryRun: values["dry-run"] as boolean,
+        });
 
       default:
         err(`Unknown command "${command}".`);

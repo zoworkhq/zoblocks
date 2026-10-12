@@ -23,7 +23,7 @@ import {
   toCommand,
   type Command,
   type PackageManager,
-} from "@/lib/package-managers";
+} from "@zoblocks/component-meta";
 import { CopyButton } from "./code-block";
 
 const STORAGE_KEY = "zoblocks-package-manager";

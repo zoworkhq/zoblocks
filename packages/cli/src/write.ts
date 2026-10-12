@@ -8,8 +8,8 @@
  * can disagree with the thing it is previewing.
  */
 
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { existsSync, lstatSync, realpathSync, type Stats } from "node:fs";
+import { mkdir, open, readFile, writeFile, type FileHandle } from "node:fs/promises";
+import { constants, existsSync, lstatSync, realpathSync, type Stats } from "node:fs";
 import path from "node:path";
 import { resolveTarget, type ZoBlocksConfig } from "./config.js";
 import { assertSafeTarget, type RegistryItem } from "./schema.js";
@@ -92,6 +92,105 @@ export async function planInstall(
   }
 
   return { files, dependencies };
+}
+
+/**
+ * The guard every CLI writer puts in front of `writeFile`: the target is
+ * inside the project both as a string and on disk, and is not itself a link.
+ * `add` checks the string first with its own message; `mcp init` and `skill
+ * add` call this alone.
+ */
+export function assertInsideProject(
+  absolute: string,
+  cwd: string,
+  relative: string,
+  label: string,
+) {
+  if (!path.resolve(absolute).startsWith(path.resolve(cwd) + path.sep)) {
+    throw new Error(
+      `${label}: "${relative}" resolves outside the project and will not be written.`,
+    );
+  }
+  assertOnDiskInside(absolute, cwd, relative, label);
+}
+
+/** Refuses a symlink at the file itself where the platform can (not Windows). */
+const NO_FOLLOW = constants.O_NOFOLLOW ?? 0;
+
+/**
+ * Read a file, decide what it should contain, and write that — through one
+ * file descriptor, so the file that was read is the file that is written.
+ *
+ * `mcp init` and `skill add` both decide from what is already there (an entry
+ * to merge, a file the developer changed). Reading by name and writing by
+ * name leaves a window in which the file can be swapped (CodeQL
+ * js/file-system-race, CWE-367). Here an existing file is opened once,
+ * read-write, and rewritten in place; a new one is created with O_EXCL, so a
+ * file that appears in between is an error rather than something overwritten.
+ *
+ * `decide` gets the current contents (undefined: no file) and returns the
+ * result to report and, when the file should change, its new contents.
+ */
+export async function editFile<T>(
+  absolute: string,
+  relative: string,
+  decide: (current: string | undefined) => { result: T; content?: string },
+): Promise<T> {
+  const handle = await openExisting(absolute, relative);
+  try {
+    const current = handle ? await handle.readFile("utf8") : undefined;
+    const { result, content } = decide(current);
+    if (content === undefined) return result;
+
+    if (handle) {
+      await handle.truncate(0);
+      await handle.write(content, 0, "utf8");
+      return result;
+    }
+
+    await mkdir(path.dirname(absolute), { recursive: true });
+    let created: FileHandle;
+    try {
+      created = await open(
+        absolute,
+        constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | NO_FOLLOW,
+        0o644,
+      );
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === "EEXIST") {
+        throw new Error(
+          `"${relative}" appeared while it was being written. Run the command again.`,
+          {
+            cause: error,
+          },
+        );
+      }
+      throw error;
+    }
+    try {
+      await created.write(content, 0, "utf8");
+    } finally {
+      await created.close();
+    }
+    return result;
+  } finally {
+    await handle?.close();
+  }
+}
+
+async function openExisting(absolute: string, relative: string): Promise<FileHandle | undefined> {
+  try {
+    return await open(absolute, constants.O_RDWR | NO_FOLLOW);
+  } catch (error) {
+    const code = (error as NodeJS.ErrnoException).code;
+    if (code === "ENOENT") return undefined;
+    if (code === "ELOOP") {
+      throw new Error(`"${relative}" is a symlink and will not be written through.`, {
+        cause: error,
+      });
+    }
+    throw error;
+  }
 }
 
 /**

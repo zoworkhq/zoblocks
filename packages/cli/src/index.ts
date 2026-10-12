@@ -50,3 +50,14 @@ export {
   type PackageManager,
 } from "./pm.js";
 export { HOMEPAGE, PUBLIC_REGISTRY_INDEX } from "./constants.js";
+export {
+  CLIENTS,
+  LOCAL_COMMAND,
+  REMOTE_URL,
+  SERVER_NAME,
+  configSnippet,
+  findClient,
+  type Client,
+  type Transport,
+} from "./agents.js";
+export { SKILL_DIRS, mcpInit, skillAdd } from "./agent-commands.js";

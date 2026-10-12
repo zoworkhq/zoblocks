@@ -18,6 +18,7 @@ export default defineComponentMeta({
     "Every voice recorder on the web animates on a timer. An OS mute, a Bluetooth profile switch and a swapped device all deliver digital silence on schedule, and a timer cannot tell that from a quiet room. This one draws only what the analyser reports, then names which of the thirteen faults it is.",
 
   categories: ["Media", "Clinical"],
+  aliases: ["audio recorder", "voice recorder", "dictation", "ambient capture"],
   fhir: [],
 
   states: [

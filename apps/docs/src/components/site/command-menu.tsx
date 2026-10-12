@@ -59,6 +59,14 @@ const PAGES: Item[] = [
       "install setup getting started documentation guide new project next vite tailwind cli init add antd ant design mui material vue angular svelte html npm pnpm yarn bun troubleshooting",
   },
   {
+    id: "p-docs-ai",
+    label: "Docs: MCP Server for AI coding agents",
+    group: "Pages",
+    href: "/docs/ai",
+    keywords:
+      "ai agent mcp skill claude code codex cursor vscode copilot windsurf cline roo gemini llm assistant",
+  },
+  {
     id: "p-compare",
     label: "Compare",
     group: "Pages",

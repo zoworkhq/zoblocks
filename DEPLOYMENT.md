@@ -127,7 +127,7 @@ Two limits decide how the first release has to work. Trusted publishing
 authenticates with an OIDC token that only a CI runner can mint, so it cannot
 publish from a laptop at all; and it is configured per package under Packages →
 the package → Settings → Trusted publishing, which requires the package to
-already exist. All 27 of ours are new, so OIDC cannot perform their first
+already exist. All 28 of ours are new, so OIDC cannot perform their first
 publish however it is set up. A granular access token with _Bypass two-factor
 authentication_ is the only way to bootstrap them.
 
@@ -138,9 +138,9 @@ is removed in January 2027**. The trigger was Mini Shai-Hulud, where a single
 stolen token pushed 639 malicious versions across 323 packages in 22 minutes.
 
 So the token is a one-time bootstrap, not the steady state. Configure trusted
-publishing on all 27 packages as soon as the first release lands, then revoke
+publishing on all 28 packages as soon as the first release lands, then revoke
 it. Leaving the migration until the deadline means doing it under time pressure
-across 27 packages at once.
+across 28 packages at once.
 
 ### pnpm cannot do OIDC or provenance, and changesets picks pnpm
 
@@ -174,10 +174,13 @@ upstream issue.
 
 Until one of those lands, CI publishes with `NPM_TOKEN` and ships unattested.
 
-Before any release: `pnpm build && pnpm release:check`. It packs every
-publishable package with pnpm and fails on a missing README or LICENSE, an entry
-point absent from the tarball, a leftover `workspace:` range, test files, or an
-import Node cannot resolve. CI and `publish.yml` run the same script — and
+Before any release: `pnpm gen && pnpm build && pnpm release:check`. It packs
+every publishable package with pnpm and fails on a missing README or LICENSE, an
+entry point absent from the tarball, a leftover `workspace:` range, test files,
+or an import Node cannot resolve. `gen` comes first because `@zoblocks/mcp`
+bundles the generated catalog manifest; its own `scripts/check-tarball.mjs`
+fails a bundled catalog that does not match the one `gen` just wrote, and its
+build is never cached (`turbo.json`) so a cache hit cannot restore a stale one. CI and `publish.yml` run the same script — and
 `publish.yml` runs it even under `skip-checks`, because it is the one assertion
 that is about the artifact rather than about the source.
 
@@ -222,7 +225,7 @@ then `changeset publish`.
    and writes the CHANGELOG entries. Do it before publishing, not after: the
    changes those changesets describe are already in the code, so publishing
    first ships them under a version whose changelog does not mention them.
-3. **Prove the permission on one package.** `pnpm build`, then
+3. **Prove the permission on one package.** `pnpm gen && pnpm build`, then
    `cd packages/intl && pnpm publish --access public --no-git-checks`.
 
    pnpm, never npm — `publishConfig` here rewrites `main`, `types` and
@@ -234,15 +237,15 @@ then `changeset publish`.
 
    `intl` is one of six packages carrying a `prepublishOnly` guard that refuses
    npm outright; the other 21 would publish a broken tarball without complaint.
-   `pnpm release` is safe for all 27 whatever the guard says — `changeset
+   `pnpm release` is safe for all 28 whatever the guard says — `changeset
 publish` detects the workspace and shells out to `pnpm publish` — so the gap
    only bites a hand-run `npm publish`, which is to say this step.
 
-   This release creates 27 packages that do not yet exist, and creating a
+   This release creates 28 packages that do not yet exist, and creating a
    package is a different permission from publishing a new version of one. An
    account with developer rather than admin rights on the org is exactly where
    that distinction bites, and `changeset publish` walks the packages one at a
-   time: a permission error partway leaves some of the 27 on npm and the rest
+   time: a permission error partway leaves some of the 28 on npm and the rest
    not. A published version cannot be replaced, and an unpublished name is
    blocked for 24 hours, so an aborted run is genuinely awkward to redo.
 
@@ -257,7 +260,7 @@ publish` detects the workspace and shells out to `pnpm publish` — so the gap
    `npx @zoblocks/cli@latest add pulse-loader` in an empty directory.
 
 If the account has 2FA set to "authorization and writes", `changeset publish`
-will prompt for an OTP once per package — 27 times. Either set 2FA to
+will prompt for an OTP once per package — 28 times. Either set 2FA to
 "authorization only" for the duration, or publish with a granular access token,
 which is exempt.
 
@@ -277,7 +280,7 @@ first. In order:
    `changeset-release/main` branch the version job pushes. Check every package
    reads `0.2.0` (`fhir` included) before merging.
 3. **Merge it, then publish.** Merging only lands the bumps. Run **Actions →
-   Publish to npm → Run workflow** to ship all 27 packages — with provenance
+   Publish to npm → Run workflow** to ship all 28 packages — with provenance
    only once the repository rename above has landed. A `dry-run` first tells you
    exactly which versions the registry does not have yet.
 4. **Check.** `npm view @zoblocks/cli version` and
@@ -367,7 +370,9 @@ the thing that would actually be broken:
 - **docs** — fetches the deployed registry and fails unless it references
   `@zoblocks/fhir` _and_ the dependency is version-pinned. A stale or
   malformed registry is a broken install for every customer, and it is precisely
-  what went unnoticed for three merges.
+  what went unnoticed for three merges. It then runs
+  `scripts/check-agent-endpoints.mjs` against what coding agents read — see
+  [Coding agents](#coding-agents-the-mcp-server-and-skill).
 - **hq** — requests `/tasks` signed out and fails unless it redirects. A wrong
   Root Directory would serve the marketing site from `hq.zoblocks.design`, and
   that redirect is what distinguishes them.
@@ -375,6 +380,99 @@ the thing that would actually be broken:
 The release job inspects the tarball before publishing: entry points present,
 README and LICENSE present, no test files, no extensionless relative imports in
 `dist`. Each of those is a defect that actually shipped in `0.1.0`.
+
+## Coding agents: the MCP server and skill
+
+ADR 0017. Three things are served by the docs site and one is on npm:
+
+| What                | Where                              | Made by                    | Read by                          |
+| ------------------- | ---------------------------------- | -------------------------- | -------------------------------- |
+| Catalog manifest    | `zoblocks.design/ai/manifest.json` | `pnpm gen`, at build       | `@zoblocks/mcp` on start         |
+| Skill bundle        | `zoblocks.design/ai/skill.json`    | `pnpm gen`, from `skills/` | anything that wants it whole     |
+| Remote MCP endpoint | `zoblocks.design/mcp`              | `apps/docs/src/app/mcp`    | agents `mcp init` set up         |
+| Local MCP server    | `npx -y @zoblocks/mcp`             | `packages/mcp`, via npm    | agents `mcp init --local` set up |
+
+### Release order
+
+The site first, then npm. `zoblocks mcp init` writes the `/mcp` URL into an
+agent's config, and `@zoblocks/mcp` fetches the manifest, so a release that
+ships ahead of the deploy points agents at URLs that do not answer yet.
+`zoblocks skill add` is not in this: it writes the skill bundled in the CLI
+(`packages/cli/src/generated/skill.ts`, from `pnpm gen`) and never fetches,
+so the skill reaches users with a CLI release.
+
+1. Merge to `main`. The docs deploy runs `check-agent-endpoints.mjs` against
+   production: the manifest is in the schema this commit's server reads and
+   lists every component `registry.json` ships, the served skill bundle is
+   well-formed, and `/mcp` answers a handshake, lists the seven tools as
+   read-only, finds `switch` for "toggle", and refuses a foreign Origin.
+2. Merge the Version PR.
+3. **Publish to npm.** `publish.yml` runs the same check before it publishes,
+   and stops if the site is not serving those URLs. `pnpm release:check-site`
+   runs it from a laptop.
+4. Update the MCP Registry listing (below).
+
+### `@zoblocks/mcp` is the 28th package
+
+It is new, so everything under [npm publishing](#npm-publishing) about the
+first release applies to it: the bootstrap token publishes it once, then
+configure trusted publishing for it like the others. If the other 27 are
+already out when it ships, it is the only one the token needs to create.
+
+### What reaches agents without a release
+
+The catalog. A component change goes `pnpm gen` → merge → deploy, and the
+remote endpoint serves it at once; the local server fetches the live manifest
+on every start and only falls back to the snapshot bundled in its tarball when
+offline or unreachable. `/ai/*` is cached for an hour at the edge, like `/r/*`.
+
+A new npm version of `@zoblocks/mcp` is needed only when the server itself
+changes — a tool, its input, the instructions — or the schema does.
+
+### Changing the manifest schema
+
+`schemaVersion` in the manifest, and `SUPPORTED_SCHEMA_VERSION` in
+`packages/mcp/src/manifest.ts`, change only for a change an existing server
+would misread: a field removed, renamed or given a new meaning. Adding a field
+is not one — the server's schema is loose and ignores what it does not know.
+
+A server that meets a newer schema logs that it is out of date, names the
+upgrade, and serves its bundled snapshot rather than failing. So a schema bump
+is safe for users who have not updated, but they get a frozen catalog until
+they do. Bump both together, release `@zoblocks/mcp` in the same release, and
+the post-deploy check will fail any deploy where the two disagree.
+
+### The MCP Registry listing
+
+`packages/mcp/server.json` lists the package and the remote endpoint in the
+official [MCP Registry](https://registry.modelcontextprotocol.io). It is named
+`design.zoblocks/mcp` — a namespace proven by owning `zoblocks.design`, not by
+the GitHub org, whose repository name does not match the manifests yet (see
+above). The registry checks that `mcpName` in the _published_ `package.json`
+equals that name, so the listing can only go up after the npm publish.
+
+`pnpm version-packages` (and the Version PR) keeps its version in step with the
+package; `test/mcp-registry.test.ts` fails if they drift.
+
+Listing is manual, from a laptop, and public — decide before doing it:
+
+```bash
+mcp-publisher login dns --domain zoblocks.design --private-key <hex>
+cd packages/mcp && mcp-publisher publish
+```
+
+The first time, generate an Ed25519 key pair and add the TXT record
+`v=MCPv1; k=ed25519; p=<public key>` at the apex of `zoblocks.design`. The
+private key is a credential: keep it in a password manager, not the repository.
+Re-run `publish` after each `@zoblocks/mcp` release.
+
+### Before a release
+
+`pnpm ai-evals` (from your own terminal — it runs Claude Code headless) grades
+an agent on five prompts against the tools and skill, and `pnpm ai-evals
+--baseline` without them. Run both after changing the skill, the server's
+instructions or tool descriptions, and compare. It needs a built
+`@zoblocks/mcp`, and is not part of CI: it spends model tokens.
 
 ## Indexes
 

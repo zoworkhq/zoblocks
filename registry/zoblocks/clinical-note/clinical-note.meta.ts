@@ -22,6 +22,7 @@ export default defineComponentMeta({
     "A rich text editor is a solved problem and competes with a hundred free ones. The parts that are hard are knowing which passages were copied forward from a note about a different admission, proving a clinician actually read the text a model drafted before signing it, and producing bytes that hash the same way twice so a signature over them means something. A 2022 analysis of over 100 million notes found 50.1% of note text duplicated from prior documentation on the same patient; copy-and-paste has been implicated in roughly a third of errors in ambulatory patient-safety analyses; and CMS's July 2025 signature guidance treats an AI scribe exactly as it treats a human one, which makes the review gate the only thing standing between a clinician and words they never read. Note bloat, copy-paste error and AI attribution are one missing data structure seen three times. This component stores it.",
 
   categories: ["Clinical", "Documentation"],
+  aliases: ["note editor", "progress note", "soap note", "documentation editor"],
   fhir: [
     { name: "Composition", url: "https://hl7.org/fhir/R4/composition.html" },
     { name: "DocumentReference", url: "https://hl7.org/fhir/R4/documentreference.html" },

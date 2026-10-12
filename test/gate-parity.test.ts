@@ -60,6 +60,9 @@ const NOT_A_GATE = new Set([
   // Deployment jobs: they run after the gates, and act rather than assert.
   "Deploy",
   "Verify the deployed registry",
+  // The live /ai/* files and /mcp endpoint coding agents read (ADR 0017).
+  // Locally it is `pnpm release:check-site`, pointed at a running docs server.
+  "Verify the deployed agent endpoints",
   "Verify hq is serving hq",
   // Same shape as hq's: it asserts a deployment, which is the one thing a
   // local run has no equivalent of. It also self-skips until the domain is

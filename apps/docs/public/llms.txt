@@ -184,6 +184,11 @@ Rules that matter when generating code with these components:
   states: Complete plan, Crisis step pinned open, Unfinished step, Empty plan, Clinician editing view, nothing pinned
   status: beta
 
+## For coding agents
+
+- MCP server (read-only): https://zoblocks.design/mcp — or `npx -y @zoblocks/mcp`
+- Setup per agent: https://zoblocks.design/docs/ai
+
 ## Machine-readable catalog
 
 - Index: https://zoblocks.design/r/index.json

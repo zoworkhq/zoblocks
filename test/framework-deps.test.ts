@@ -20,6 +20,7 @@ import { execSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import ts from "typescript";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -54,23 +55,30 @@ function importers(pkg: string, framework: string): string[] {
     .split("\n")
     .filter(Boolean);
 
-  const spec = framework.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const statement = new RegExp(
-    `^\\s*(?:import|export)\\b[^;]*?from\\s+["']${spec}(?:/[^"']*)?["']|` +
-      `^\\s*import\\s+["']${spec}(?:/[^"']*)?["']|` +
-      `\\bimport\\(\\s*["']${spec}(?:/[^"']*)?["']\\s*\\)`,
-    "m",
-  );
-
   return files
-    .filter((f) => statement.test(stripComments(readFileSync(f, "utf8"))))
+    .filter((f) => importSpecifiers(readFileSync(f, "utf8")).some((s) => isFramework(s, framework)))
     .map((f) => path.relative(dir, f))
     .sort();
 }
 
-/** Block and line comments removed, so prose about a specifier is not an import. */
-function stripComments(source: string): string {
-  return source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+/**
+ * The module specifiers a file really imports — static, dynamic and re-exports
+ * — from TypeScript's own pre-processor.
+ *
+ * It was a line-anchored regex over comment-stripped text, which held until a
+ * package started carrying code as data: `@zoblocks/component-meta`'s
+ * integration.ts keeps the /docs page's setup snippets in template literals,
+ * `import { ConfigProvider } from "antd"` among them, and the regex read that
+ * as the package importing antd. Blanking template literals first did not
+ * survive either — the same file puts backticks inside ordinary strings, and
+ * a regex cannot tell which quote it is inside. A tokenizer can.
+ */
+function importSpecifiers(source: string): string[] {
+  return ts.preProcessFile(source, true, true).importedFiles.map((f) => f.fileName);
+}
+
+function isFramework(specifier: string, framework: string): boolean {
+  return specifier === framework || specifier.startsWith(`${framework}/`);
 }
 
 /** Every workspace package, so a new one cannot quietly opt out of this test. */

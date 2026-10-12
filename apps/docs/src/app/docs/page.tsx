@@ -1,7 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { distributionState } from "@zoblocks/component-meta";
+import {
+  ALIAS_SETUP,
+  FIRST_COMPONENT_USAGE,
+  GLOBAL_STYLESHEET,
+  SERVER_COMPONENTS,
+  WEB_COMPONENTS,
+  distributionState,
+} from "@zoblocks/component-meta";
 import { CATALOG } from "@/lib/catalog";
 import { SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { RevealRoot } from "@/components/site/interactions";
@@ -24,7 +31,7 @@ import {
  * Written to be short. Each instruction appears once — a new project is
  * "create the app, then follow the existing-app steps", not a second copy of
  * them — and every command is described once and rendered for the reader's
- * package manager (`@/lib/package-managers`).
+ * package manager (`package-managers.ts` in `@zoblocks/component-meta`).
  *
  * Every path on this page was run before it was written, on 28 Sep 2026: a
  * fresh Next.js 16 and Vite 8 app, each with npm, pnpm, Yarn 1 and Bun; `init`
@@ -81,29 +88,10 @@ const SETUP = [
   },
 ];
 
-/*
- * Both built in a fresh Next.js 16 App Router app on 28 Sep 2026. ResultValue
- * has no "use client" of its own — it is pure presentation — so it renders on
- * the server as-is; given `onOpenReport` from a Server Component the build
- * fails ("Event handlers cannot be passed to Client Component props"), and the
- * wrapper below is the fix.
- */
-const SERVER_PAGE = `import { ResultValue, fromObservation } from "@/components/zoblocks/result-value";
-
-export default async function Page() {
-  const observation = await getObservation(); // your FHIR Observation
-
-  // Works. No "use client" needed on the page.
-  return <ResultValue value={fromObservation(observation)} now={new Date().toISOString()} />;
-}`;
-
-const CLIENT_ROW = `"use client";
-
-import { ResultValue, type ResultValueData } from "@/components/zoblocks/result-value";
-
-export function ResultRow({ value, now }: { value: ResultValueData; now: string }) {
-  return <ResultValue value={value} now={now} onOpenReport={(v) => openReport(v.id)} />;
-}`;
+// The Server Components example — see `SERVER_COMPONENTS` in
+// @zoblocks/component-meta for what was built to establish it.
+const SERVER_PAGE = SERVER_COMPONENTS.page.code;
+const CLIENT_ROW = SERVER_COMPONENTS.clientWrapper.code;
 
 const REQUIREMENTS = [
   { name: "Node.js", version: "20.11+", note: "What the CLI runs on." },
@@ -117,91 +105,25 @@ const REQUIREMENTS = [
 /* Snippets                                                           */
 /* ------------------------------------------------------------------ */
 
-const VITE_CONFIG = `import path from "node:path";
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import tailwindcss from "@tailwindcss/vite";
+/*
+ * Every snippet on this page is read from `@zoblocks/component-meta`
+ * (integration.ts), the same objects `pnpm gen` writes into the agent manifest
+ * (ADR 0017), so this page and a coding agent cannot be told different things.
+ */
+const NEXT_TSCONFIG = ALIAS_SETUP.next[0]!.code;
+const VITE_CONFIG = ALIAS_SETUP.vite[0]!.code;
+const VITE_TSCONFIG = ALIAS_SETUP.vite[1]!.code;
 
-export default defineConfig({
-  plugins: [react(), tailwindcss()],
-  resolve: { alias: { "@": path.resolve(__dirname, "./src") } },
-});`;
+const NEXT_CSS = GLOBAL_STYLESHEET["next-app"].code;
+const PAGES_CSS = GLOBAL_STYLESHEET["next-pages"].code;
+const VITE_CSS = GLOBAL_STYLESHEET.vite.code;
 
-const VITE_TSCONFIG = `{
-  "compilerOptions": {
-    "paths": { "@/*": ["./src/*"] }
-    // …keep the options already here
-  }
-}`;
+const USAGE = FIRST_COMPONENT_USAGE;
 
-const NEXT_TSCONFIG = `{
-  "compilerOptions": {
-    "paths": { "@/*": ["./src/*"] }
-  }
-}`;
-
-const NEXT_CSS = `@import "tailwindcss";
-
-/* ZoBlocks */
-@import "../styles/zoblocks-tokens.css";
-@import "../styles/zoblocks-loader.css";
-@source "../components/zoblocks";`;
-
-/* The Pages Router's stylesheet sits in styles/, beside the ones `add` writes. */
-const PAGES_CSS = `@import "tailwindcss";
-
-/* ZoBlocks */
-@import "./zoblocks-tokens.css";
-@import "./zoblocks-loader.css";
-@source "../components/zoblocks";`;
-
-const VITE_CSS = `@import "tailwindcss";
-
-/* ZoBlocks */
-@import "./styles/zoblocks-tokens.css";
-@import "./styles/zoblocks-loader.css";
-@source "./components/zoblocks";`;
-
-const USAGE = `import { PulseLoader } from "@/components/zoblocks/pulse-loader";
-
-export default function Page() {
-  return <PulseLoader label="Loading your records" showLabel />;
-}`;
-
-const VUE = `// main.ts
-import "@zoblocks/loaders/pulse";
-
-// vite.config.ts — tell Vue these tags are web components
-vue({ template: { compilerOptions: { isCustomElement: (tag) => tag.startsWith("zb-") } } })
-
-<!-- any .vue template -->
-<zb-pulse-loader label="Loading your records"></zb-pulse-loader>`;
-
-const ANGULAR = `// main.ts
-import "@zoblocks/loaders/pulse";
-
-// the component that uses it
-import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
-
-@Component({
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  template: \`<zb-pulse-loader label="Loading your records"></zb-pulse-loader>\`,
-})`;
-
-const SVELTE = `<script>
-  import "@zoblocks/loaders/pulse";
-</script>
-
-<zb-pulse-loader label="Loading your records"></zb-pulse-loader>`;
-
-const HTML = `<!-- index.html, served by Vite or any bundler -->
-<script type="module">
-  import "@zoblocks/loaders/pulse";
-  import "@zoblocks/elements/switch";
-</script>
-
-<zb-pulse-loader label="Loading your records"></zb-pulse-loader>
-<zb-switch label="Contact precautions" value="unknown"></zb-switch>`;
+const VUE = WEB_COMPONENTS.frameworks.vue.code;
+const ANGULAR = WEB_COMPONENTS.frameworks.angular.code;
+const SVELTE = WEB_COMPONENTS.frameworks.svelte.code;
+const HTML = WEB_COMPONENTS.frameworks.html.code;
 
 /* ------------------------------------------------------------------ */
 /* Data                                                               */
@@ -367,7 +289,7 @@ export default function DocsPage() {
           lede="Add it to a React app in five steps, match Ant Design or Material UI, or use the loaders from Vue, Angular, Svelte and plain HTML."
         />
 
-        <DocsShell toc={TOC}>
+        <DocsShell current="/docs" toc={TOC}>
           {/* ------------------------------------------------ overview */}
           <DocSection id="overview" title="Overview">
             <ul className="max-w-2xl space-y-3 text-sm leading-relaxed text-graphite">
@@ -400,6 +322,13 @@ export default function DocsPage() {
             <p className="mt-4 text-sm leading-relaxed text-graphite">
               No component imports a Node built-in, so nothing needs a polyfill or a server runtime.
               Pick your package manager on any command below; the whole page follows.
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-graphite">
+              Using an AI coding agent?{" "}
+              <Link href="/docs/ai" className={link}>
+                Connect it to ZoBlocks
+              </Link>{" "}
+              so it uses the real components instead of guessing.
             </p>
           </DocSection>
 
@@ -698,7 +627,7 @@ export default function DocsPage() {
             }
           >
             <div className="space-y-4">
-              <PmCommand commands={[{ add: "@zoblocks/loaders @zoblocks/elements" }]} />
+              <PmCommand commands={[{ add: WEB_COMPONENTS.packages }]} />
               <DocTabs
                 label="Framework"
                 tabs={[

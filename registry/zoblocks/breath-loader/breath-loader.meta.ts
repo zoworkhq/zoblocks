@@ -18,6 +18,7 @@ export default defineComponentMeta({
     "A spinner's tempo tells a reader the system is working hard; breathing tells them they can wait. On a patient-facing screen — a results page, a portal sign-in, a check-in kiosk — the second is almost always what the product means to say. It is also the one loader in the set with no clinical symbol at all, which is what makes it safe across specialties: nothing here reads as cardiac, oncological, or obstetric to someone who is about to receive news. That neutrality is a feature, not an absence of one.",
 
   categories: ["Loaders", "Feedback"],
+  aliases: ["spinner", "loading indicator", "patient-facing loader"],
   fhir: [],
 
   states: [

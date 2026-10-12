@@ -108,6 +108,14 @@ jobs:
       #
       # `gates` ran on its own runner, so its dist is not here; with a warm
       # Turbo cache this is a restore rather than a rebuild.
+      #
+      # `pnpm gen` first, for the same reason: the gates' generated files are on
+      # their runner too, and @zoblocks/mcp bundles one of them — the catalog
+      # manifest — into its tarball. Without it the build stops; its own
+      # check-tarball.mjs fails a bundled catalog that does not match.
+      - name: Generate
+        run: pnpm gen
+
       - name: Build
         run: pnpm build
 
@@ -118,6 +126,15 @@ jobs:
       # that throw in plain Node.
       - name: Every package is publishable
         run: node scripts/check-tarball.mjs
+
+      # The release order, enforced. `zoblocks mcp init` writes
+      # https://zoblocks.design/mcp into an agent's config and `@zoblocks/mcp`
+      # fetches /ai/manifest.json — so the site serving them has to be live, and reading the schema this
+      # commit's server reads, before the packages that point at them ship.
+      # Unconditional like the tarball check: it is about the release, not the
+      # source. Deploy the docs from main first; DEPLOYMENT.md has the order.
+      - name: The site agents read from is live
+        run: node scripts/check-agent-endpoints.mjs --base https://zoblocks.design
 
       # Trusted publishing (OIDC) needs npm 11.5.1 or later; Node 22 ships npm
       # 10. Without this the token-less publish fails at authentication.

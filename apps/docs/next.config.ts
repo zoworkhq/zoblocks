@@ -66,6 +66,10 @@ const nextConfig: NextConfig = {
       "@zoblocks/clinical-note-core": "../../packages/clinical-note-core/dist/index.js",
       "@zoblocks/identity": "../../packages/identity/dist/index.js",
       "@zoblocks/identity-core": "../../packages/identity-core/dist/index.js",
+      // The remote MCP endpoint (src/app/mcp/route.ts, ADR 0017).
+      "@zoblocks/mcp": "../../packages/mcp/dist/index.js",
+      // Agent config shapes for /docs/ai — the ones `zoblocks mcp init` writes.
+      "@zoblocks/cli/agents": "../../packages/cli/dist/agents.js",
     },
   },
 
@@ -91,6 +95,19 @@ const nextConfig: NextConfig = {
       {
         // Registry JSON is fetched by the ZoBlocks CLI from any origin.
         source: "/r/:path*",
+        headers: [
+          { key: "Access-Control-Allow-Origin", value: "*" },
+          {
+            key: "Cache-Control",
+            value: "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400",
+          },
+        ],
+      },
+      {
+        // The catalog manifest and skill bundle coding agents read (ADR 0017),
+        // fetched by @zoblocks/mcp and the CLI from anywhere. Cached like the
+        // registry: an hour at the edge, so a deploy reaches agents within one.
+        source: "/ai/:path*",
         headers: [
           { key: "Access-Control-Allow-Origin", value: "*" },
           {

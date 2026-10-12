@@ -15,6 +15,7 @@
   },
   "scripts": {
     "a11y": "tsx scripts/a11y.ts",
+    "ai-evals": "tsx scripts/ai-evals/run.ts",
     "build": "turbo run build",
     "changeset": "changeset",
     "conformance": "tsx scripts/conformance.ts",
@@ -39,8 +40,9 @@
     "publint": "pnpm -r --filter \"./packages/*\" --filter \"!@zoblocks/component-meta\" --filter \"!@zoblocks/eslint-plugin\" --filter \"!@zoblocks/figma-plugin\" --filter \"!@zoblocks/fixtures\" --filter \"!@zoblocks/tsconfig\" exec publint --strict",
     "registry:build": "tsx scripts/gen/index.ts",
     "registry:check": "tsx scripts/gen/index.ts --check",
-    "release": "turbo run build && node scripts/check-tarball.mjs && changeset publish",
+    "release": "pnpm gen && turbo run build && node scripts/check-tarball.mjs && changeset publish",
     "release:check": "node scripts/check-tarball.mjs",
+    "release:check-site": "node scripts/check-agent-endpoints.mjs",
     "size": "size-limit",
     "test": "turbo run test && pnpm test:registry",
     "test:coverage": "turbo run test:coverage && vitest run --coverage",
@@ -48,7 +50,7 @@
     "test:watch": "vitest",
     "typecheck": "tsc -p tsconfig.json --noEmit && turbo run typecheck",
     "verify": "bash scripts/verify.sh",
-    "version-packages": "changeset version"
+    "version-packages": "changeset version && node scripts/sync-mcp-server-json.mjs"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",

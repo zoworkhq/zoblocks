@@ -18,6 +18,7 @@ export default defineComponentMeta({
     "The most specific loader in the set, and deliberately so. Sequencing, pathology, and diagnostics screens are waiting on analysis rather than on a person, and a cardiac mark says the wrong thing there — as does a generic ring, which says nothing at all. Depth is faked with scale and opacity rather than a 3D transform because a rotateY helix renders differently across browsers and costs a layer per dot; eighteen phase-offset dots on one keyframe read as a rotation and cost nothing.",
 
   categories: ["Loaders", "Feedback"],
+  aliases: ["spinner", "loading indicator", "lab loader"],
   fhir: [],
 
   states: ["Indeterminate", "Delayed (not yet shown)", "Slow wait", "Reduced motion"],

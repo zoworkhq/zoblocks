@@ -16,7 +16,8 @@
 import { readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
-import { ITEM_SCHEMA_URL, REGISTRY_SCHEMA_URL } from "@zoblocks/cli";
+// The schema module alone, not the CLI's index — see emit/schema.ts.
+import { ITEM_SCHEMA_URL, REGISTRY_SCHEMA_URL } from "../../../packages/cli/src/schema";
 import { HOMEPAGE, REGISTRY_NAME, ROOT, SUPPORT_ITEM_NAMES, paths } from "../config";
 import type { LoadedComponent } from "../load";
 import type { Emitter } from "../write";
@@ -528,6 +529,32 @@ interface BuildableItem {
   dependencies: string[];
   registryDependencies: string[];
   files: Array<{ path: string; type: string; target?: string }>;
+}
+
+/** One published registry item, without file contents: what installs, and where. */
+export interface RegistryGraphItem {
+  name: string;
+  dependencies: string[];
+  registryDependencies: string[];
+  targets: string[];
+}
+
+/**
+ * The published registry as a graph — the same items, with the same two
+ * exclusions, that `emitRegistry` writes, but only the names, dependencies and
+ * install targets. The agent manifest reads this to say which stylesheets an
+ * install writes, so that answer cannot drift from what the CLI does.
+ */
+export function registryGraph(components: LoadedComponent[]): RegistryGraphItem[] {
+  const publicComponents = components.filter(
+    (c) => c.meta.tier === "free" && c.meta.distribution !== "package",
+  );
+  return [...SUPPORT_ITEMS, ...publicComponents.map(toBuildable)].map((item) => ({
+    name: item.name,
+    dependencies: item.dependencies,
+    registryDependencies: item.registryDependencies,
+    targets: item.files.map((f) => f.target ?? "").filter(Boolean),
+  }));
 }
 
 /**

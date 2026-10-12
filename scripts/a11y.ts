@@ -42,6 +42,7 @@ const PAGES = [
   "/",
   "/components",
   "/docs",
+  "/docs/ai",
   "/premium",
   "/enterprise",
   "/compare",

@@ -12,7 +12,9 @@
  */
 
 import path from "node:path";
-import { FILE_KINDS } from "@zoblocks/cli";
+// The schema module alone: the CLI's index imports its generated skill, which
+// this generator writes, so importing it would need its own output to run.
+import { FILE_KINDS } from "../../../packages/cli/src/schema";
 import { HOMEPAGE, paths } from "../config";
 import type { Emitter } from "../write";
 

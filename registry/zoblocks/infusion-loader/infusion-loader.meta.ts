@@ -18,6 +18,7 @@ export default defineComponentMeta({
     "Named for the one device in a hospital that displays a percentage and means it. The two modes are deliberately different animations rather than one animation with a value bolted on: a determinate bar that also drifts tells a reader a measurement is moving when it is not, and on an import, a batch upload, or a records transfer, movement is exactly the fact being watched. It is the only loader here that should ever carry a number, and only when the application genuinely knows it — a fabricated percentage parked at ninety is worse than a loader that never claimed to know.",
 
   categories: ["Loaders", "Feedback"],
+  aliases: ["progress bar", "determinate loader", "upload progress", "loading indicator"],
   fhir: [],
 
   states: [

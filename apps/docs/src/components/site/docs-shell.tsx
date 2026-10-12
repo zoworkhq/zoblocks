@@ -11,12 +11,115 @@
  * only client code on the page is the copy buttons and the switches.
  */
 
-import { Check, Info } from "lucide-react";
+import Link from "next/link";
+import { BookOpen, Bot, Check, Info, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface TocEntry {
   id: string;
   label: string;
+}
+
+/**
+ * The docs pages, listed above "On this page" on every one of them.
+ *
+ * Two pages, and the second was only reachable from a sentence at the end of
+ * the first one's overview. A developer looking for the MCP server had to
+ * know to read that far; now it is the second thing in the rail, and the
+ * first thing above the content on a phone.
+ */
+export const DOC_PAGES = [
+  { href: "/docs", label: "Getting started", icon: BookOpen },
+  { href: "/docs/ai", label: "MCP Server", icon: Bot, badge: "New" },
+] as const satisfies ReadonlyArray<{
+  href: string;
+  label: string;
+  icon: LucideIcon;
+  badge?: string;
+}>;
+
+export type DocPath = (typeof DOC_PAGES)[number]["href"];
+
+function PageBadge({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="rounded-full bg-brand/10 px-1.5 py-px font-mono text-[0.625rem] font-medium tracking-wide text-brand-deep uppercase">
+      {children}
+    </span>
+  );
+}
+
+/** The rail's list of pages: the current one carries the brand tick, like the header. */
+function DocPagesRail({ current }: { current: DocPath }) {
+  return (
+    <nav aria-label="Docs">
+      <p className="axis-label">Docs</p>
+      <ul className="mt-3 space-y-0.5 border-l border-rule">
+        {DOC_PAGES.map((page) => {
+          const active = page.href === current;
+          const Icon = page.icon;
+          return (
+            <li key={page.href}>
+              <Link
+                href={page.href}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "-ml-px flex items-center gap-2 border-l py-1.5 pl-3 text-[0.8125rem] transition-colors duration-200",
+                  active
+                    ? "border-brand font-medium text-ink"
+                    : "border-transparent text-graphite hover:border-rule-strong hover:text-ink",
+                )}
+              >
+                <Icon
+                  aria-hidden="true"
+                  className={cn("size-3.5 shrink-0", active ? "text-brand-deep" : "text-graphite")}
+                />
+                <span>{page.label}</span>
+                {"badge" in page ? <PageBadge>{page.badge}</PageBadge> : null}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+  );
+}
+
+/**
+ * The same pages on a phone, where the rail is hidden. A two-way switch above
+ * the content rather than a menu: there are two pages, and both stay visible.
+ */
+function DocPagesSwitch({ current }: { current: DocPath }) {
+  return (
+    <nav aria-label="Docs" className="lg:hidden">
+      <ul className="grid grid-cols-2 gap-1 rounded-xl border border-rule bg-paper-sunk/60 p-1">
+        {DOC_PAGES.map((page) => {
+          const active = page.href === current;
+          const Icon = page.icon;
+          return (
+            <li key={page.href}>
+              <Link
+                href={page.href}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "flex min-h-11 items-center justify-center gap-1.5 rounded-lg px-2 text-[0.8125rem] whitespace-nowrap transition-colors duration-200 sm:gap-2 sm:px-3 sm:text-sm",
+                  active
+                    ? "bg-paper font-medium text-ink shadow-sm ring-1 ring-brand/40"
+                    : "text-graphite hover:text-ink",
+                )}
+              >
+                <Icon
+                  aria-hidden="true"
+                  className={cn("size-4 shrink-0", active ? "text-brand-deep" : "text-graphite")}
+                />
+                <span>{page.label}</span>
+                {"badge" in page ? <PageBadge>{page.badge}</PageBadge> : null}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -61,9 +164,12 @@ export function DocsHero({
 // ---------------------------------------------------------------------------
 
 export function DocsShell({
+  current,
   toc,
   children,
 }: {
+  /** Which docs page this is, for the page list's current state. */
+  current: DocPath;
   toc: readonly TocEntry[];
   children: React.ReactNode;
 }) {
@@ -71,8 +177,10 @@ export function DocsShell({
     <div className="mx-auto max-w-6xl px-5 sm:px-8">
       <div className="grid gap-10 py-10 lg:grid-cols-[12.5rem_minmax(0,1fr)] lg:gap-14 lg:py-14">
         {/* Hidden on a phone, where it would sit above the content it indexes
-            and push it a screen down. */}
-        <aside className="hidden lg:sticky lg:top-24 lg:block lg:self-start">
+            and push it a screen down. The page list moves above the content
+            there instead (DocPagesSwitch). */}
+        <aside className="hidden space-y-8 lg:sticky lg:top-24 lg:block lg:self-start">
+          <DocPagesRail current={current} />
           <nav aria-label="On this page">
             <p className="axis-label">On this page</p>
             <ul className="mt-3 space-y-0.5 border-l border-rule">
@@ -90,7 +198,10 @@ export function DocsShell({
           </nav>
         </aside>
 
-        <div className="min-w-0">{children}</div>
+        <div className="min-w-0">
+          <DocPagesSwitch current={current} />
+          <div className="mt-8 lg:mt-0">{children}</div>
+        </div>
       </div>
     </div>
   );
@@ -215,4 +326,13 @@ export function Callout({
 /** Inline code in prose. The size every page on the site already uses. */
 export function C({ children }: { children: React.ReactNode }) {
   return <code className="font-mono text-[0.8125rem] text-ink">{children}</code>;
+}
+
+/**
+ * Text from `@zoblocks/component-meta`'s integration data, where code is
+ * marked with backticks so the agent manifest can carry the same string.
+ * Each backticked span renders as `C`; everything else is left as it is.
+ */
+export function Prose({ text }: { text: string }) {
+  return <>{text.split("`").map((part, i) => (i % 2 === 1 ? <C key={i}>{part}</C> : part))}</>;
 }

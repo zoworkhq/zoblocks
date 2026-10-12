@@ -1,0 +1,74 @@
+{
+  "name": "@zoblocks/mcp",
+  "version": "0.0.0",
+  "//mcpName": "The MCP Registry reads this from the published tarball to prove @zoblocks/mcp belongs to the server.json named design.zoblocks/mcp. Must equal its name.",
+  "mcpName": "design.zoblocks/mcp",
+  "description": "A read-only MCP server that lets coding agents look up ZoBlocks components, their props and examples, and the setup for each framework and UI style — so they use the library instead of guessing at it.",
+  "license": "MIT",
+  "homepage": "https://zoblocks.design",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zoworkhq/zoblocks.git",
+    "directory": "packages/mcp"
+  },
+  "keywords": [
+    "zoblocks",
+    "mcp",
+    "model-context-protocol",
+    "ai",
+    "coding-agent",
+    "healthcare",
+    "fhir"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "bin": {
+    "zoblocks-mcp": "./bin/zoblocks-mcp.mjs"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src",
+    "bin",
+    "!src/**/*.test.ts"
+  ],
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "//dependencies": "Three packages, chosen in ADR 0017: the server half of the official MCP SDK, its core, and zod. Pinned exactly. The SDK's 1.x package was rejected for its seventeen (Express, Hono, jose and the rest, for transports and OAuth a read-only catalog server never uses).",
+  "dependencies": {
+    "@modelcontextprotocol/server": "2.2.0",
+    "zod": "4.6.5"
+  },
+  "publishConfig": {
+    "access": "public",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./package.json": "./package.json"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node scripts/snapshot.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/client": "2.2.0",
+    "@types/node": "^22.10.2",
+    "@vitest/coverage-v8": "^4.1.11",
+    "@zoblocks/tsconfig": "workspace:*",
+    "typescript": "^5.7.2",
+    "vitest": "^4.1.11"
+  }
+}

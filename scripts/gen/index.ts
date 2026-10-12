@@ -10,6 +10,8 @@
  *   apps/docs/src/lib/generated/catalog.ts      the docs catalog
  *   apps/docs/src/app/generated-sources.css     Tailwind source globs
  *   apps/docs/public/llms.txt                   agent-readable catalog
+ *   apps/docs/public/ai/manifest.json           what the MCP server serves (ADR 0017)
+ *   skills/zoblocks/references/*.md             the coding skill's reference files
  *   apps/docs/public/r/coverage.json            the quality gate's evidence
  *
  *   pnpm gen             write
@@ -21,10 +23,11 @@
  */
 
 import { emitAgentManifest } from "./emit/agents";
+import { emitAiManifest } from "./emit/ai-manifest";
 import { buildCatalog, emitCatalog } from "./emit/catalog";
 import { buildCoverage, emitCoverage } from "./emit/coverage";
 import { emitReactPackage, ensureReactPackageDirs } from "./emit/react-package";
-import { emitRegistry } from "./emit/registry";
+import { emitRegistry, registryGraph } from "./emit/registry";
 import { emitSchemas } from "./emit/schema";
 import {
   buildSurface,
@@ -187,9 +190,11 @@ async function main() {
 
   await emitSurface(surface, tokenSource, emitter);
 
-  await emitCatalog(buildCatalog(components, props), emitter);
+  const catalog = buildCatalog(components, props);
+  await emitCatalog(catalog, emitter);
   await emitTailwindSources(registryComponents, emitter);
   await emitAgentManifest(components, emitter);
+  await emitAiManifest(catalog, registryGraph(components), emitter);
 
   const coverage = buildCoverage(components, props);
   await emitCoverage(coverage, emitter);

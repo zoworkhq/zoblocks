@@ -241,6 +241,22 @@ neither, and going the other way a framework would apply ours to a form
 validation message. See
 [ADR 0012](content/decisions/0012-token-surface-is-a-contract.md).
 
+### AI coding agents
+
+ZoBlocks has a read-only [MCP](https://modelcontextprotocol.io) server and a
+coding skill, so an agent uses the real components and props instead of
+inventing them (there is no ZoBlocks Button):
+
+```bash
+npx @zoblocks/cli mcp init --client <agent>
+npx @zoblocks/cli skill add
+```
+
+Claude Code, Codex, Cursor, VS Code, GitHub Copilot, Windsurf, Cline, Roo Code
+and Gemini CLI — setup for each at
+[zoblocks.design/docs/ai](https://zoblocks.design/docs/ai). See
+[ADR 0017](content/decisions/0017-coding-agents-read-the-catalog.md).
+
 ---
 
 ## Quality is a gate, not a goal

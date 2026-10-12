@@ -8,10 +8,29 @@
  * costs one emitter.
  */
 
-import { distributionState, installCommandFor } from "@zoblocks/component-meta";
+import { CODING_RULES, distributionState, installCommandFor } from "@zoblocks/component-meta";
 import { HOMEPAGE, paths } from "../config";
 import type { LoadedComponent } from "../load";
 import type { Emitter } from "../write";
+
+/**
+ * A markdown bullet, wrapped greedily at 80 columns with a two-space hang.
+ * The rules are stored one sentence per line in `@zoblocks/component-meta`;
+ * this puts them back in the shape the file has always had.
+ */
+export function bullet(text: string, width = 80): string {
+  const lines: string[] = [];
+  let line = "-";
+  for (const word of text.split(/\s+/)) {
+    if (line.length + 1 + word.length > width && line.trim() !== "-") {
+      lines.push(line);
+      line = " ";
+    }
+    line += ` ${word}`;
+  }
+  lines.push(line);
+  return lines.join("\n");
+}
 
 export async function emitAgentManifest(
   components: LoadedComponent[],
@@ -85,16 +104,14 @@ remain the implementing team's responsibility.
 
 Rules that matter when generating code with these components:
 
-- A missing value renders as explicitly missing. Never substitute an empty
-  string or a dash.
-- An uninterpreted result reads "Not interpreted", never "Normal".
-- Status is never conveyed by colour alone; every severity carries an icon and a
-  text label.
-- Never build a Tailwind class name from a variable. Tailwind resolves classes
-  by scanning source text, so a template literal produces no CSS and the
-  severity styling silently disappears.
+${CODING_RULES.map((rule) => bullet(rule)).join("\n")}
 
 ${sections.join("\n\n")}
+
+## For coding agents
+
+- MCP server (read-only): ${HOMEPAGE}/mcp — or \`npx -y @zoblocks/mcp\`
+- Setup per agent: ${HOMEPAGE}/docs/ai
 
 ## Machine-readable catalog
 

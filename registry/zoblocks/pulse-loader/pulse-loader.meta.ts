@@ -18,6 +18,7 @@ export default defineComponentMeta({
     "A page loader is the first thing a clinician or a patient sees, it plays while the system is at its most fragile, and it is judged in the first three hundred milliseconds. This one is built from measured cardiac timing rather than from a spinner's tempo: sixty beats a minute is a resting sinus rhythm, the beat scales by seven percent so it is noticed peripherally and never tracked, and the heart draws in once rather than once per loop so the animation has no seam. Every colour is a semantic token and the whole thing is SVG and CSS, which means it renders before any JavaScript bundle has loaded — the one requirement a page loader has that a component loader does not.",
 
   categories: ["Loaders", "Feedback"],
+  aliases: ["spinner", "loading indicator", "page loader", "heartbeat loader"],
   fhir: [],
 
   states: [

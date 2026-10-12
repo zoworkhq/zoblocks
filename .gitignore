@@ -17,6 +17,8 @@ build/
 # `pnpm gen`. The manifest (registry.json) and the other generated artifacts
 # ARE committed, and CI fails if they are stale.
 apps/docs/public/r/*.json
+# The agent manifest (ADR 0017) inlines the whole catalog for the same reason.
+apps/docs/public/ai/*.json
 
 # env & secrets — never commit
 .env
@@ -26,6 +28,8 @@ apps/docs/public/r/*.json
 *.key
 
 # test output
+# Agent evaluation runs and reports (scripts/ai-evals): whole apps per run.
+.ai-evals/
 coverage/
 playwright-report/
 test-results/

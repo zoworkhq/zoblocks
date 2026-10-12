@@ -158,6 +158,15 @@ jobs:
             console.log("Registry verified: " + (served.items ?? []).length + " items served");
           '
 
+      # What coding agents read: the catalog manifest `@zoblocks/mcp` fetches,
+      # the skill bundle served at /ai/skill.json, and the /mcp endpoint
+      # `zoblocks mcp init` configures. A handshake, the seven read-only tools, a real
+      # answer, and a 403 for a foreign Origin — against this deploy, checked
+      # against this checkout's registry and schema version. Plain Node: this
+      # job installs nothing.
+      - name: Verify the deployed agent endpoints
+        run: node scripts/check-agent-endpoints.mjs --base https://zoblocks.design
+
   # hq is a separate Vercel project. The job self-skips until VERCEL_PROJECT_ID_HQ
   # exists as a repository variable, so this workflow is committable before the
   # project is created rather than red until someone gets to it.
@@ -424,7 +433,9 @@ jobs:
         continue-on-error: true
         uses: changesets/action@198f833dd7d863100ea6e28967bc9a9fdefadb0a # v2 branch head
         with:
-          version-script: pnpm changeset version
+          # Not bare `changeset version`: the MCP Registry listing
+          # (packages/mcp/server.json) carries the version too.
+          version-script: pnpm version-packages
           commit-message: "Version packages"
           pr-title: "Version packages"
           github-token: ${{ secrets.RELEASE_PAT || secrets.GITHUB_TOKEN }}

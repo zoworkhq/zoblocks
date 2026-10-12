@@ -8,7 +8,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { PACKAGE_MANAGERS, toCommand } from "@/lib/package-managers";
+import { PACKAGE_MANAGERS, toCommand } from "@zoblocks/component-meta";
 
 describe("toCommand", () => {
   it("runs the CLI with each manager's runner — npx for Yarn, which has no dlx in v1", () => {

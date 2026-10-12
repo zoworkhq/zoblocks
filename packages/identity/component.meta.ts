@@ -52,6 +52,7 @@ export default defineComponentMeta({
     "A patient banner is the most PHI-dense component in a healthcare product and the one nobody designs. It is pinned to the top of every screen, read hundreds of times a shift, and it is the last thing standing between a clinician and someone else's chart. Adelman et al. (JAMIA 2013, 901,776 ordering sessions) found a dismissible 'check the patient' alert cut wrong-patient orders with an odds ratio of 0.84, while making the clinician re-enter the patient's initials cut them with an odds ratio of 0.60 — so a banner that is only read is worth a sixth of one that is answered, and both require the header to know what action is about to happen. Everything else follows from treating identity as a resolved value rather than a bag of booleans: absence of a photograph is five different facts, 'Inactive' is four unrelated ones, and two patients sharing a surname on a ward list is a problem a component can see and an application never will.",
 
   categories: ["Clinical", "Patterns"],
+  aliases: ["patient banner", "avatar", "patient chip", "patient header"],
   fhir: [{ name: "Patient", url: "https://hl7.org/fhir/R4/patient.html" }],
 
   states: [

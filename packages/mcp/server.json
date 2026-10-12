@@ -1,0 +1,29 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "design.zoblocks/mcp",
+  "title": "ZoBlocks",
+  "description": "Read-only lookup of ZoBlocks healthcare React components: real props, examples and setup.",
+  "websiteUrl": "https://zoblocks.design/docs/ai",
+  "repository": {
+    "url": "https://github.com/zoworkhq/zoblocks",
+    "source": "github",
+    "subfolder": "packages/mcp"
+  },
+  "version": "0.0.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@zoblocks/mcp",
+      "version": "0.0.0",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://zoblocks.design/mcp"
+    }
+  ]
+}

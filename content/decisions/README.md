@@ -26,6 +26,7 @@ Format: **Context** (the forces, stated honestly) → **Decision** (what we do)
 | [0014](0014-customer-themes-may-override-two-more-tiers.md)  | A customer theme may override semantic and component tokens, never clinical ones | accepted |
 | [0015](0015-the-direction-of-truth-for-design-tool-sync.md)  | The direction of truth for design-tool sync                                      | accepted |
 | [0016](0016-the-installer-is-ours.md)                        | The installer is ours                                                            | accepted |
+| [0017](0017-coding-agents-read-the-catalog.md)               | Coding agents read the catalog through a read-only MCP server                    | accepted |
 
 See [ARCHITECTURE.md](../../ARCHITECTURE.md) for how these fit together.
 

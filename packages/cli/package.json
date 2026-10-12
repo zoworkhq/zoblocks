@@ -26,6 +26,7 @@
   },
   "exports": {
     ".": "./src/index.ts",
+    "./agents": "./src/agents.ts",
     "./package.json": "./package.json"
   },
   "files": [
@@ -46,6 +47,10 @@
       ".": {
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
+      },
+      "./agents": {
+        "types": "./dist/agents.d.ts",
+        "default": "./dist/agents.js"
       },
       "./package.json": "./package.json"
     }

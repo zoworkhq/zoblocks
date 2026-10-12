@@ -18,6 +18,7 @@ export default defineComponentMeta({
     "The clinical default, and the loader to reach for when a beating heart would be the wrong thing to put in front of someone. It carries no symbol, only the artifact a clinician already reads all day: P wave, QRS complex, T wave, in those proportions rather than the decorative zig-zag that generic ECG graphics use. Because it never scales, it is also the only cardiac loader that survives at twenty pixels — so it is what Pulse Loader renders when it is asked to be small, and what belongs beside a button label or in a table row.",
 
   categories: ["Loaders", "Feedback"],
+  aliases: ["spinner", "loading indicator", "inline loader"],
   fhir: [],
 
   states: ["Indeterminate", "Delayed (not yet shown)", "Slow wait", "Reduced motion", "Inline"],

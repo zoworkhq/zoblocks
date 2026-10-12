@@ -557,6 +557,12 @@ export const CATALOG: ComponentDoc[] = [
       "tailwind-merge"
     ],
     "install": "npx @zoblocks/cli add accordion",
+    "aliases": [
+      "collapse",
+      "collapsible sections",
+      "disclosure",
+      "expander"
+    ],
     "relationships": {
       "builtWith": [],
       "usedIn": [
@@ -1289,7 +1295,12 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @zoblocks/cli add breath-loader"
+    "install": "npx @zoblocks/cli add breath-loader",
+    "aliases": [
+      "spinner",
+      "loading indicator",
+      "patient-facing loader"
+    ]
   },
   {
     "name": "care-team-presence",
@@ -2176,6 +2187,12 @@ export const CATALOG: ComponentDoc[] = [
       "tailwind-merge"
     ],
     "install": "npx @zoblocks/cli add care-timeline",
+    "aliases": [
+      "patient timeline",
+      "care history",
+      "encounter history",
+      "chronology"
+    ],
     "relationships": {
       "builtWith": [
         "timeline"
@@ -2550,6 +2567,11 @@ export const CATALOG: ComponentDoc[] = [
       "tailwind-merge"
     ],
     "install": "npx @zoblocks/cli add chart-accordion",
+    "aliases": [
+      "chart sections",
+      "collapsible chart",
+      "record sections"
+    ],
     "relationships": {
       "builtWith": [
         "accordion"
@@ -4461,7 +4483,13 @@ export const CATALOG: ComponentDoc[] = [
       "prosemirror-history",
       "prosemirror-commands"
     ],
-    "install": "npx @zoblocks/cli add clinical-note"
+    "install": "npx @zoblocks/cli add clinical-note",
+    "aliases": [
+      "note editor",
+      "progress note",
+      "soap note",
+      "documentation editor"
+    ]
   },
   {
     "name": "clinical-status",
@@ -5392,7 +5420,12 @@ export const CATALOG: ComponentDoc[] = [
       "@zoblocks/copilot-core",
       "@zoblocks/copilot-react"
     ],
-    "install": "npx @zoblocks/cli add copilot"
+    "install": "npx @zoblocks/cli add copilot",
+    "aliases": [
+      "ai assistant",
+      "clinical assistant",
+      "chat assistant"
+    ]
   },
   {
     "name": "data-grid",
@@ -8548,7 +8581,12 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @zoblocks/cli add helix-loader"
+    "install": "npx @zoblocks/cli add helix-loader",
+    "aliases": [
+      "spinner",
+      "loading indicator",
+      "lab loader"
+    ]
   },
   {
     "name": "infusion-loader",
@@ -8831,7 +8869,13 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @zoblocks/cli add infusion-loader"
+    "install": "npx @zoblocks/cli add infusion-loader",
+    "aliases": [
+      "progress bar",
+      "determinate loader",
+      "upload progress",
+      "loading indicator"
+    ]
   },
   {
     "name": "provenance-chip",
@@ -9680,6 +9724,12 @@ export const CATALOG: ComponentDoc[] = [
       "tailwind-merge"
     ],
     "install": "npx @zoblocks/cli add pulse-loader",
+    "aliases": [
+      "spinner",
+      "loading indicator",
+      "page loader",
+      "heartbeat loader"
+    ],
     "relationships": {
       "builtWith": [
         "rhythm-loader"
@@ -10665,7 +10715,13 @@ export const CATALOG: ComponentDoc[] = [
       "tailwind-merge",
       "@zoblocks/recorder-core"
     ],
-    "install": "npx @zoblocks/cli add recorder"
+    "install": "npx @zoblocks/cli add recorder",
+    "aliases": [
+      "audio recorder",
+      "voice recorder",
+      "dictation",
+      "ambient capture"
+    ]
   },
   {
     "name": "result-value",
@@ -11390,6 +11446,11 @@ export const CATALOG: ComponentDoc[] = [
       "tailwind-merge"
     ],
     "install": "npx @zoblocks/cli add rhythm-loader",
+    "aliases": [
+      "spinner",
+      "loading indicator",
+      "inline loader"
+    ],
     "relationships": {
       "builtWith": [],
       "usedIn": [
@@ -11999,6 +12060,10 @@ export const CATALOG: ComponentDoc[] = [
       "tailwind-merge"
     ],
     "install": "npx @zoblocks/cli add safety-plan",
+    "aliases": [
+      "crisis plan",
+      "stanley-brown safety plan"
+    ],
     "relationships": {
       "builtWith": [
         "accordion"
@@ -12985,7 +13050,13 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @zoblocks/cli add switch"
+    "install": "npx @zoblocks/cli add switch",
+    "aliases": [
+      "toggle",
+      "toggle switch",
+      "on off switch",
+      "three-state switch"
+    ]
   },
   {
     "name": "timeline",
@@ -13260,6 +13331,11 @@ export const CATALOG: ComponentDoc[] = [
       "tailwind-merge"
     ],
     "install": "npx @zoblocks/cli add timeline",
+    "aliases": [
+      "history",
+      "activity feed",
+      "event list"
+    ],
     "relationships": {
       "builtWith": [],
       "usedIn": [
@@ -13932,7 +14008,13 @@ export const CATALOG: ComponentDoc[] = [
     "dependencies": [
       "@zoblocks/identity-core"
     ],
-    "install": "pnpm add @zoblocks/identity"
+    "install": "pnpm add @zoblocks/identity",
+    "aliases": [
+      "patient banner",
+      "avatar",
+      "patient chip",
+      "patient header"
+    ]
   },
   {
     "name": "signature",

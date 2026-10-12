@@ -81,6 +81,21 @@ export const paths = {
   docsCatalog: path.join(ROOT, "apps", "docs", "src", "lib", "generated", "catalog.ts"),
   tailwindSources: path.join(ROOT, "apps", "docs", "src", "app", "generated-sources.css"),
   llmsTxt: path.join(ROOT, "apps", "docs", "public", "llms.txt"),
+  /**
+   * What coding agents read (ADR 0017): the catalog as JSON for the MCP server,
+   * served from the docs site, and the skill's reference files, committed so
+   * the skill folder is complete wherever it is copied.
+   */
+  aiManifest: path.join(ROOT, "apps", "docs", "public", "ai", "manifest.json"),
+  skillReferences: path.join(ROOT, "skills", "zoblocks", "references"),
+  /** The skill as one JSON document, served for anything that wants it whole. */
+  skillBundle: path.join(ROOT, "apps", "docs", "public", "ai", "skill.json"),
+  /**
+   * The same files as a module inside the CLI, which `zoblocks skill add`
+   * writes from. Bundled rather than fetched: a CLI that writes what a URL
+   * serves is a CLI whose output anyone who controls the URL controls.
+   */
+  cliSkill: path.join(ROOT, "packages", "cli", "src", "generated", "skill.ts"),
   coverage: path.join(ROOT, "apps", "docs", "public", "r", "coverage.json"),
   /** The npm React channel, generated from the registry source. */
   reactPackage: path.join(ROOT, "packages", "react"),

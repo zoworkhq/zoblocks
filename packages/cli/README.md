@@ -21,11 +21,13 @@ the same source, so they cannot behave differently.
 
 ## Commands
 
-| Command                  | What it does                                 |
-| ------------------------ | -------------------------------------------- |
-| `zoblocks init`          | Write `zoblocks.json`                        |
-| `zoblocks add <name...>` | Add components and everything they depend on |
-| `zoblocks list`          | List the public catalog                      |
+| Command                              | What it does                                      |
+| ------------------------------------ | ------------------------------------------------- |
+| `zoblocks init`                      | Write `zoblocks.json`                             |
+| `zoblocks add <name...>`             | Add components and everything they depend on      |
+| `zoblocks list`                      | List the public catalog                           |
+| `zoblocks mcp init --client <agent>` | Connect a coding agent to the ZoBlocks MCP server |
+| `zoblocks skill add`                 | Add the ZoBlocks coding skill for AI agents       |
 
 ### Specifiers
 
@@ -54,6 +56,35 @@ Without `--yes` the npm dependencies are printed as a command you can paste
 rather than installed. An interactive prompt would need a TTY this cannot count
 on — it runs in CI, in agent harnesses, and inside other people's install
 scripts, and a prompt hangs in two of those three.
+
+## Coding agents
+
+`zoblocks mcp init --client <agent>` writes the ZoBlocks MCP server into the
+agent's project config, in that agent's own format:
+
+| `--client` | Agent                               | File written                                    |
+| ---------- | ----------------------------------- | ----------------------------------------------- |
+| `claude`   | Claude Code                         | `.mcp.json`                                     |
+| `codex`    | OpenAI Codex                        | `.codex/config.toml` (trusted projects only)    |
+| `cursor`   | Cursor                              | `.cursor/mcp.json`                              |
+| `vscode`   | VS Code (GitHub Copilot agent mode) | `.vscode/mcp.json`                              |
+| `roo`      | Roo Code                            | `.roo/mcp.json`                                 |
+| `gemini`   | Gemini CLI                          | `.gemini/settings.json`                         |
+| `windsurf` | Windsurf (Devin Desktop)            | printed — its settings live in your home folder |
+| `cline`    | Cline                               | printed — its settings live in the extension    |
+| `copilot`  | GitHub Copilot cloud agent          | printed — set in the repository's settings      |
+
+It points at the hosted server, `https://zoblocks.design/mcp`; `--local` runs
+it on your machine with `npx -y @zoblocks/mcp` instead. Other servers in the
+file are kept. An existing `zoblocks` entry with different settings is left
+alone unless you pass `--force`, and a file with comments is never rewritten —
+the entry is printed for you to add.
+
+`zoblocks skill add` writes the ZoBlocks coding skill to `.agents/skills/zoblocks`
+and `.claude/skills/zoblocks`, which between them every agent above reads. The
+skill ships inside this package, so nothing is downloaded and it works offline;
+run the latest CLI for the latest skill. A file you have changed is skipped
+unless you pass `--overwrite`.
 
 ## `zoblocks.json`
 

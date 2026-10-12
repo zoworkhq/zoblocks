@@ -31,6 +31,16 @@
       "cache": false,
       "persistent": true
     },
+    // Never cached. The build bundles apps/docs/public/ai/manifest.json — a
+    // generated, gitignored file outside the package — so the default hash
+    // cannot see a catalog change, and a cache hit would restore a dist whose
+    // bundled catalog is stale. That snapshot is what `--offline` and every
+    // unreachable-network start serve. tsc on this package takes a second.
+    "@zoblocks/mcp#build": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "outputs": ["dist/**"]
+    },
     "typecheck": {
       "dependsOn": ["^build"]
     },

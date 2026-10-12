@@ -33,6 +33,7 @@ export default defineComponentMeta({
     "The floating dock and the streaming text are two weeks of work and compete with a hundred free widgets. The parts that are hard are deciding what the model may see, proving where an answer came from, keeping chart text from being read as instructions, and knowing whether the thing makes clinicians better or worse. Those are what a digital-health team cannot build in a sprint, and they are what this component is. The design target is not a better answer — it is verification that costs less than acceptance, because automation bias is an effort asymmetry rather than a character flaw, and incorrect decision support has been measured making clinicians worse than no decision support at all.",
 
   categories: ["Patterns", "AI"],
+  aliases: ["ai assistant", "clinical assistant", "chat assistant"],
   fhir: [
     { name: "AuditEvent", url: "https://hl7.org/fhir/R4/auditevent.html" },
     { name: "Provenance", url: "https://hl7.org/fhir/R4/provenance.html" },
