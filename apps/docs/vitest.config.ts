@@ -17,7 +17,16 @@ const root = path.dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
   plugins: [react()],
   resolve: {
-    alias: { "@": path.join(root, "src") },
+    /*
+     * Mirrors the tsconfig paths the registry components need: they import
+     * each other and their shared core by the paths the CLI writes in a
+     * consumer's project. More specific entries first — Vite takes the first
+     * alias that matches.
+     */
+    alias: [
+      { find: /^@\/registry\/(.*)$/, replacement: path.join(root, "../../registry/$1") },
+      { find: "@", replacement: path.join(root, "src") },
+    ],
   },
   test: {
     environment: "jsdom",

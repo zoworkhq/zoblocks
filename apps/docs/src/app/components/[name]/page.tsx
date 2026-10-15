@@ -3,7 +3,7 @@ import path from "node:path";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowUpRight, CircleAlert } from "lucide-react";
+import { CircleAlert } from "lucide-react";
 import type { Alternative, ComponentDoc, FrameworkRelation } from "@zoblocks/component-meta";
 import { CATALOG, STATUS_LABEL, getComponent } from "@/lib/catalog";
 import { SiteFooter, SiteHeader } from "@/components/site/chrome";
@@ -13,15 +13,19 @@ import { TabsGallery } from "@/components/site/tabs-gallery";
 import { CopilotGallery } from "@/components/site/copilot-gallery";
 import { SwitchGallery } from "@/components/site/switch-gallery";
 import { DatePickerGallery } from "@/components/site/date-picker-gallery";
-import { InstallCommand, RevealRoot } from "@/components/site/interactions";
-import { CodeBlock } from "@/components/site/code-block";
+import { RevealRoot } from "@/components/site/interactions";
 import { LanguageSwitch } from "@/components/site/language-switch";
 import { HostStage } from "@/components/site/host-stage";
-import { SectionTabs, type RailSection } from "@/components/site/section-tabs";
 import { Playground } from "@/components/site/playground";
 import { hasPlayground } from "@/components/site/playground-registry";
 import { isReady, readyRank } from "@/lib/readiness";
 import { ComponentNav, type NavItem } from "@/components/site/component-nav";
+import { CodeBlock, PlatformLinks } from "@/components/site/docs/code-block";
+import { DocSection, DocSubsection } from "@/components/site/docs/doc-section";
+import { ExampleBlock } from "@/components/site/docs/example-block";
+import { InstallPill } from "@/components/site/docs/install-pill";
+import { OnThisPage, type TocEntry } from "@/components/site/docs/on-this-page";
+import { demoLinks } from "@/components/site/docs/sandbox";
 
 export function generateStaticParams() {
   return CATALOG.filter((component) => isReady(component.name)).map((component) => ({
@@ -268,16 +272,6 @@ function frameworkNote(component: ComponentDoc): string {
   );
 }
 
-/**
- * Previews that need more width than the prose column.
- *
- * Switch shows forty controls at once. Data Grid is a five-column worklist with
- * a 15.5rem state rail beside it, which at 6xl left the table about 840px —
- * two hundred less than the same grid gets on the home page, and the reason its
- * columns read as cramped there and comfortable here.
- */
-const WIDE_PREVIEW = new Set(["switch", "data-grid"]);
-
 export default async function ComponentPage({ params }: { params: Promise<{ name: string }> }) {
   const { name } = await params;
   const component = getComponent(name);
@@ -359,20 +353,70 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
     domain?.terminology.length,
   );
 
-  const railSections: RailSection[] = [
-    { id: "preview", label: "Preview" },
-    { id: "why", label: "Why it exists" },
-    ...(playable ? [{ id: "playground", label: "Playground" }] : []),
-    ...(variants.length ? [{ id: "variants", label: "Variants" }] : []),
-    ...(component.usage ? [{ id: "usage", label: "Usage & props" }] : []),
-    ...(examples.length ? [{ id: "examples", label: "Examples" }] : []),
-    ...(hasClinical ? [{ id: "clinical", label: "Clinical" }] : []),
-    ...(a11yChecks.length ? [{ id: "conformance", label: "Conformance" }] : []),
-    ...(source ? [{ id: "source", label: "Source" }] : []),
-    ...(related.length || alternatives.length || builtWith.length || usedIn.length
-      ? [{ id: "related", label: "Related" }]
+  /*
+   * The page's sections, in reading order, each present only when it has
+   * something in it. The "On this page" list is built from this same array,
+   * so an entry can never point at a section that did not render — the bug the
+   * old tab bar had with Related on Tabs.
+   */
+  const hostedDemo = demoLinks(component.name, component.title);
+  const isPackage = component.distribution === "package";
+  const installLine = isPackage
+    ? `pnpm add ${component.packageName}`
+    : `npx @zoblocks/cli add ${component.name}`;
+  const importName =
+    component.technicalName ?? component.exports[0]?.name ?? component.title.replace(/\s+/g, "");
+  const importFrom = isPackage
+    ? (component.packageName ?? `@/components/zoblocks/${component.name}`)
+    : `@/components/zoblocks/${component.name}`;
+  const hasGallery = ["tabs", "date-picker", "copilot", "switch"].includes(component.name);
+  /*
+   * Examples that declare a group are listed under it, in declaration order of
+   * the first example in each group. "On this page" then lists the groups
+   * rather than every example, which on Tabs would be twenty-three entries.
+   */
+  const grouped = examples.some((example) => example.group);
+  const exampleGroups = grouped
+    ? [...new Set(examples.map((example) => example.group ?? "More"))].map((group) => ({
+        group,
+        id: `examples-${group.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
+        items: examples.filter((example) => (example.group ?? "More") === group),
+      }))
+    : [];
+  const hasRelated =
+    related.length > 0 || alternatives.length > 0 || builtWith.length > 0 || usedIn.length > 0;
+  const hasA11y = component.accessibility.length > 0 || a11yChecks.length > 0;
+
+  const toc: TocEntry[] = [
+    { id: "overview", label: "Overview" },
+    { id: "playground", label: playable ? "Playground" : "Preview" },
+    ...(examples.length
+      ? [
+          { id: "examples", label: "Examples" },
+          ...(grouped
+            ? exampleGroups.map((g) => ({ id: g.id, label: g.group, depth: 1 as const }))
+            : examples.map((example) => ({
+                id: `ex-${example.id}`,
+                label: example.title,
+                depth: 1 as const,
+              }))),
+        ]
       : []),
+    ...(hasGallery ? [{ id: "gallery", label: "Gallery" }] : []),
+    ...(variants.length ? [{ id: "variants", label: "Variants" }] : []),
+    { id: "installation", label: "Installation" },
+    ...(component.usage ? [{ id: "usage", label: "Usage" }] : []),
+    ...(apiTables.length ? [{ id: "api", label: "API" }] : []),
+    ...(hasA11y ? [{ id: "accessibility", label: "Accessibility" }] : []),
+    ...(hasClinical ? [{ id: "clinical", label: "Clinical" }] : []),
+    ...(source ? [{ id: "source", label: "Source" }] : []),
+    ...(hasRelated ? [{ id: "related", label: "Related" }] : []),
   ];
+
+  const position = navItems.findIndex((item) => item.name === component.name);
+  const previous = position > 0 ? navItems[position - 1] : undefined;
+  const next = position >= 0 ? navItems[position + 1] : undefined;
+  const why = leadOf(component.rationale);
 
   return (
     <RevealRoot>
@@ -392,362 +436,148 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
         />
 
         {/*
-          Two columns from `lg`: the component list, then the page.
-
-          The outer measure is wider than the site's 6xl because the pane is
-          added beside the content rather than taken out of it — at 1440px
-          the content column still lands within a few pixels of 6xl. Every
-          section keeps its own `mx-auto max-w-6xl` container and simply
-          centres inside the narrower column; the two wide previews fill it.
-        */}
-        {/*
-          The sections below repeat this gutter from `sm` up, where the page
-          has room for both. Under `sm` they drop theirs: two 20px gutters left
-          a 375px phone 295px of content, and the previews inside lost the most.
+          Two columns from `lg`: the component list, then the page. The list
+          and the site header are shared with the rest of the site and are not
+          part of this layout's business.
         */}
         <div className="mx-auto grid max-w-[92rem] px-5 sm:px-8 lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-x-10">
           <ComponentNav items={navItems} soon={navSoon} current={component.name} />
 
-          <div className="min-w-0">
-            {/* Header ------------------------------------------------------- */}
-            <section className="border-b border-rule">
-              <div className="mx-auto max-w-6xl section-minor px-5 max-sm:px-0 sm:px-8">
-                <Link
-                  href="/components"
-                  className="inline-flex items-center gap-1.5 text-sm text-graphite transition-colors hover:text-ink"
+          {/*
+            The document, then "On this page" beside it from `xl`. One scroll:
+            every section is in the page at once, so it can be read end to end,
+            searched with the browser and printed whole.
+          */}
+          <div className="flex min-w-0 justify-center gap-14 pb-24 pt-9 lg:pt-11">
+            <article className="flex min-w-0 max-w-[800px] flex-1 flex-col">
+              {/* Overview ---------------------------------------------------- */}
+              <section
+                id="overview"
+                data-toc="overview"
+                aria-labelledby="overview-title"
+                className="flex flex-col gap-[18px] pb-10"
+              >
+                <nav
+                  aria-label="Breadcrumb"
+                  className="flex flex-wrap gap-1.5 text-[13px] text-graphite"
                 >
-                  <ArrowLeft aria-hidden="true" className="size-3.5" />
-                  All components
-                </Link>
+                  <Link href="/components" className="text-graphite no-underline hover:text-ink">
+                    Components
+                  </Link>
+                  <span aria-hidden="true" className="text-graphite-soft">
+                    /
+                  </span>
+                  <span>{component.categories.join(" · ")}</span>
+                </nav>
 
-                <div className="mt-6 flex flex-wrap items-center gap-3">
-                  <h1 className="display-lg text-balance">{component.title}</h1>
-                  <span className="rounded-full border border-brand/30 bg-brand/8 px-2.5 py-1 font-mono text-[0.6875rem] uppercase tracking-wider text-brand-deep">
+                <div className="flex flex-wrap items-center gap-3">
+                  <h1
+                    id="overview-title"
+                    className="m-0 text-[32px] font-semibold leading-[1.1] tracking-[-0.03em] text-ink sm:text-[40px]"
+                  >
+                    {component.title}
+                  </h1>
+                  <span className="rounded-full bg-brand/8 px-2 py-0.5 font-mono text-[11.5px] font-medium text-brand-deep">
                     {STATUS_LABEL[component.status]}
                   </span>
                 </div>
 
-                <p className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-graphite">
-                  {/* Primitives take no FHIR resource. Rendering the link anyway
-                  leaves an anchor with no text and no destination, which is
-                  both an empty affordance and an axe violation. */}
-                  {/* Every resource, not just the first. A component that reads
-                  three of them said so in its metadata and showed one. */}
-                  {component.fhir.map((resource) => (
-                    <a
-                      key={resource.url}
-                      href={resource.url}
-                      className="numeric inline-flex items-center gap-1 text-brand-deep transition-colors hover:text-ink"
-                    >
-                      {resource.name}
-                      <ArrowUpRight aria-hidden="true" className="size-3" />
-                    </a>
-                  ))}
-                  <span className="text-graphite-soft">{component.categories.join(" · ")}</span>
+                <p className="m-0 max-w-[640px] text-pretty text-[17px] leading-relaxed text-graphite">
+                  {component.summary}
                 </p>
 
-                {/*
-              The summary goes here; the rationale goes below the preview.
-
-              Three of the four people who open this page are looking rather
-              than reading, and the fourth quotes a passage that works as well
-              under a demo as over one. Leading with the rationale put the
-              component 962px down the page — past the fold on every laptop —
-              so a client in a demo call met a paragraph instead of the product.
-              The prose is not cut; it is moved and given a lead line.
-            */}
-                <p className="lede mt-6 max-w-3xl text-pretty">{component.summary}</p>
-
-                {/* Facts a reader scans for before deciding to read anything. */}
-                <p className="numeric mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.6875rem] uppercase tracking-wide text-graphite-soft">
-                  <span>{component.states.length} states</span>
-                  <span aria-hidden="true">·</span>
-                  <span>{component.props.length} props</span>
-                  {weight ? (
-                    <>
-                      <span aria-hidden="true">·</span>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                  {/* Every resource, not just the first. Primitives take none,
+                      and render no empty anchor in its place. */}
+                  {component.fhir.length > 0 ? (
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className="text-xs text-graphite-soft">FHIR R4</span>
+                      {component.fhir.map((resource) => (
+                        <a
+                          key={resource.url}
+                          href={resource.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="rounded-[5px] border border-rule px-[7px] py-0.5 font-mono text-[11.5px] text-ink no-underline transition-colors hover:border-rule-strong"
+                        >
+                          {resource.name}
+                        </a>
+                      ))}
+                    </div>
+                  ) : null}
+                  {/* Facts a reader scans for before deciding to read anything. */}
+                  <div className="flex flex-wrap gap-x-3.5 gap-y-1 font-mono text-xs text-graphite">
+                    <span>{component.states.length} states</span>
+                    <span>{component.props.length} props</span>
+                    {weight ? (
                       <span
                         title={`Gzipped source copied by \`zoblocks add\`: ${weight.files} files across this component and ${weight.shared} shared registry modules. A ceiling, not a bundle delta.`}
                       >
                         {(weight.gzip / 1024).toFixed(1)} KB installed
                       </span>
-                    </>
-                  ) : null}
-                  {component.since ? (
-                    <>
-                      <span aria-hidden="true">·</span>
-                      <span>since {component.since}</span>
-                    </>
-                  ) : null}
-                </p>
+                    ) : null}
+                    {component.since ? <span>since {component.since}</span> : null}
+                  </div>
+                </div>
 
-                <div className="mt-8 max-w-2xl">
-                  {/*
-                Two channels, and the command has to match the one this
-                component actually uses. A package component shown an
-                `zoblocks add` line sends the reader to a registry item that does
-                not exist — which is worse than no install instructions.
-              */}
-                  {component.distribution === "package" ? (
-                    <InstallCommand
-                      command={`pnpm add ${component.packageName}`}
-                      note={
-                        <>
-                          {/*
-                        Read from the component's own metadata rather than a
-                        conditional on its name. The reason differs per package
-                        and stating the wrong one is worse than stating none —
-                        a reader told Tabs wraps Ant Design adds a dependency it
-                        does not need. A hardcoded `name === "signature"` was
-                        right for exactly as long as there were two of these.
-                      */}
-                          {frameworkNote(component)} Import its stylesheet too:{" "}
-                          <code className="font-mono text-[0.6875rem] text-ink">
-                            {`import "${component.packageName}/styles.css"`}
-                          </code>
-                          .
-                        </>
-                      }
-                    />
+                <div className="mt-1 flex flex-wrap items-center gap-2.5">
+                  <InstallPill command={installLine} />
+                  {source ? (
+                    <a
+                      href="#source"
+                      className="flex h-[38px] items-center rounded-[9px] px-3 text-[13px] text-graphite no-underline transition-colors hover:bg-paper-sunk hover:text-ink"
+                    >
+                      View source
+                    </a>
+                  ) : null}
+                  {isPackage ? (
+                    <a
+                      href={`https://www.npmjs.com/package/${component.packageName}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex h-[38px] items-center rounded-[9px] px-3 text-[13px] text-graphite no-underline transition-colors hover:bg-paper-sunk hover:text-ink"
+                    >
+                      npm ↗
+                    </a>
                   ) : (
-                    <InstallCommand
-                      command={`npx @zoblocks/cli add ${component.name}`}
-                      note={
-                        <>
-                          First install? Run{" "}
-                          <code className="font-mono text-[0.6875rem] text-ink">zoblocks init</code>{" "}
-                          once to say where your{" "}
-                          <code className="font-mono text-[0.6875rem] text-ink">@/</code> alias
-                          points. The source is copied into your repository, along with anything it
-                          depends on.
-                        </>
-                      }
-                    />
+                    <a
+                      href={`/r/${component.name}.json`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex h-[38px] items-center rounded-[9px] px-3 text-[13px] text-graphite no-underline transition-colors hover:bg-paper-sunk hover:text-ink"
+                    >
+                      Registry JSON ↗
+                    </a>
                   )}
                 </div>
-              </div>
-            </section>
 
-            {/*
-
-              Tabs, not anchors. One section shows at a time and nothing
-
-              scrolls when a tab is chosen; every section still renders on the
-
-              server and stays in the document, hidden. See `SectionTabs`.
-
-            */}
-
-            <SectionTabs sections={railSections}>
-              {/* Preview ------------------------------------------------------ */}
-              <section id="preview" className="scroll-mt-24 border-b border-rule bg-paper-sunk/40">
                 {/*
-                  The design-language switch, pinned to the preview it changes.
-
-                  It lived in the page header, beside the install command, and
-                  scrolled away before the reader reached the galleries it
-                  re-skins — so switching meant scrolling back up and losing
-                  the place. Sticky inside this section, under the tab bar: it
-                  stays in reach for as long as the preview is on screen, and
-                  leaves with it, because it changes nothing else on the page.
-
-                  On every component page, with no exceptions — Signature too.
-                  `@zoblocks/signature` declares antd as a peer, so a Material
-                  UI shop installing it really does get antd components in
-                  their palette, and a demo that hides that misleads about what
-                  the package costs.
+                  Why it exists. The first sentence of every rationale is the
+                  claim a reader quotes, so it leads; the rest is the evidence.
                 */}
-                <div
-                  data-language-bar=""
-                  className="sticky top-[calc(var(--header-h)+2.8125rem)] z-20 border-b border-rule bg-paper/90 backdrop-blur-md [@media(max-height:500px)]:static"
-                >
-                  <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-1.5 px-5 py-2 max-sm:px-0 sm:px-8">
-                    <span className="eyebrow text-graphite-soft max-sm:hidden">
-                      Design language
-                    </span>
-                    <LanguageSwitch />
-                    <span className="text-[0.75rem] leading-snug text-graphite-soft max-lg:hidden">
-                      Renders the preview in that framework&rsquo;s own components and tokens.
-                      Clinical colours never change.
-                    </span>
-                  </div>
-                </div>
-                {/*
-            Switch takes the whole width and shows everything at once rather
-            than one card behind a switcher.
-
-            The scenario switcher is the right shape for a component whose
-            states are alternatives — a loader is spinning or it is not. It is
-            the wrong shape for one whose argument is that three axes are
-            independent and seven commit phases are seven different recoveries:
-            those are a *set*, and a set shown one card at a time reads as a
-            list of unrelated screenshots. The absence reasons in particular
-            only make their point side by side, where the word changes and the
-            colour does not.
-          */}
-                <div
-                  className={`mx-auto section-minor px-5 max-sm:px-0 sm:px-8 ${
-                    WIDE_PREVIEW.has(component.name) ? "max-w-[92rem]" : "max-w-6xl"
-                  }`}
-                >
-                  <SectionHeading
-                    eyebrow="Preview"
-                    title={
-                      component.name === "switch"
-                        ? "Every state, phase and surface — live, on the page."
-                        : "Every state, switchable."
-                    }
-                  />
-                  <div className="mt-8" data-reveal>
-                    {component.name === "switch" ? (
-                      /*
-                  The gallery replaces the shared preview here, so it has to
-                  mount the host itself — otherwise the one page whose subject
-                  is a primitive would be the one page the language switch did
-                  nothing on. No chrome band: forty switches already answer
-                  every question a row of buttons would.
-                */
-                      <HostStage className="flex w-full min-w-0 flex-col">
-                        <SwitchGallery />
-                      </HostStage>
-                    ) : (
-                      <ComponentPreview name={component.name} states={component.states} />
-                    )}
-                  </div>
-
-                  {/*
-              The declared states are rendered by the preview itself, which is
-              the only place that knows whether it had scenarios to show. Two
-              lists of the same eighteen strings, one under the other, was the
-              shape this page had before.
-            */}
-                </div>
-
-                {/*
-            Tabs earns a gallery rather than a single preview: the claim it
-            makes is that eleven skins and four semantic modes share one
-            keyboard model, and a claim about sameness cannot be shown with
-            one example.
-
-            It also earns its own container. The prose column is 6xl, and a tab
-            strip is not prose: at that width the grid gives each demo ~340px,
-            which is narrower than the strips themselves — so the workhorse
-            variants rendered permanently overflowed, showing nudge arrows and a
-            clipped last label as if that were the design rather than the demo
-            being too small to hold it.
-          */}
-
-                {component.name === "tabs" && (
-                  <div className="mx-auto max-w-[92rem] px-5 pb-[clamp(2.75rem,5vw,4.5rem)] sm:px-8">
-                    <div data-reveal>
-                      <SectionHeading
-                        eyebrow="Gallery"
-                        title="Every variant, mode and state — live."
-                      />
-                      <div className="mt-8">
-                        <HostStage className="flex w-full min-w-0 flex-col">
-                          <TabsGallery />
-                        </HostStage>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/*
-            The date control earns a gallery for Tabs' reason, doubled. Its
-            claim is that fourteen presentations share one value space, one
-            keyboard model and one accessibility contract — and a claim about
-            sameness cannot be made with one example. Several of the variants
-            are also compositions rather than controls: a scheduler and a
-            series review are wider than the prose column, and squeezed into
-            it they render permanently scrolled, which demonstrates overflow
-            rather than scheduling.
-          */}
-                {component.name === "date-picker" && (
-                  <div className="mx-auto max-w-[92rem] px-5 pb-[clamp(2.75rem,5vw,4.5rem)] sm:px-8">
-                    <div data-reveal>
-                      {/* Derived from the component being rendered, not typed — this
-                    heading sits directly above the gallery that would falsify
-                    it. */}
-                      <SectionHeading
-                        eyebrow="Gallery"
-                        title={`${component.variants?.length ?? 0} variants, one contract — live.`}
-                      />
-                      <div className="mt-8">
-                        <HostStage className="flex w-full min-w-0 flex-col">
-                          <DatePickerGallery />
-                        </HostStage>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/*
-            Copilot earns one for the opposite reason to Tabs. Tabs needs a
-            gallery because one strip cannot show that eleven skins share a
-            keyboard model. Copilot needs one because the scenario switcher
-            above shows a chat surface, and a chat surface is the least
-            interesting thing in the package — the mode contract, the pipeline
-            order, the fence and the crisis classifier are the product, and
-            none of them is visible in a screenshot of a text field.
-          */}
-                {component.name === "copilot" && (
-                  <div className="mx-auto max-w-[92rem] px-5 pb-[clamp(2.75rem,5vw,4.5rem)] sm:px-8">
-                    <div data-reveal>
-                      <SectionHeading
-                        eyebrow="Under the surface"
-                        title="The part that is not a chat box."
-                      />
-                      <div className="mt-8">
-                        <HostStage className="flex w-full min-w-0 flex-col">
-                          <CopilotGallery />
-                        </HostStage>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </section>
-
-              {/* Why it exists ------------------------------------------------ */}
-              {/*
-          The rationale, under the thing it is describing.
-
-          It keeps every word it had at the top of the page. What it gains is a
-          lead line: the first sentence is lifted to display size because it is
-          the sentence a reader quotes, and the remainder reads as argument
-          rather than as a wall. `leadOf` splits on the first sentence boundary
-          and falls back to the whole string when there is no clean one.
-        */}
-              <section id="why" className="scroll-mt-24 border-b border-rule">
-                <div className="mx-auto max-w-6xl section-minor px-5 max-sm:px-0 sm:px-8">
-                  <SectionHeading
-                    eyebrow="Why it exists"
-                    title={leadOf(component.rationale).lead}
-                  />
-                  {leadOf(component.rationale).rest ? (
-                    <p
-                      className="mt-6 max-w-3xl text-pretty text-[1.0625rem] leading-relaxed text-graphite"
-                      data-reveal
-                    >
-                      {leadOf(component.rationale).rest}
+                <div className="mt-4 flex flex-col gap-2.5 border-l-2 border-rule pl-4">
+                  <p className="m-0 text-xs font-medium text-graphite-soft">Why it exists</p>
+                  <p className="m-0 max-w-[640px] text-pretty text-[15.5px] font-medium leading-relaxed text-ink">
+                    {why.lead}
+                  </p>
+                  {why.rest ? (
+                    <p className="m-0 max-w-[640px] text-pretty text-[14.5px] leading-relaxed text-graphite">
+                      {why.rest}
                     </p>
                   ) : null}
-
-                  {/* Which elements the component reads, and what it does with them.
-                Visible text rather than a `title` tooltip: this is the detail an
-                integrator checks their own feed against, and a tooltip is
-                unreachable by keyboard, invisible on touch, and unsearchable. */}
+                  {/* Which elements the component reads, and what it does with
+                      them — visible text, because this is what an integrator
+                      checks their own feed against. */}
                   {component.fhir.some((resource) => resource.note) ? (
-                    <dl
-                      className="mt-8 max-w-3xl space-y-2 border-l-2 border-rule pl-4 text-sm"
-                      data-reveal
-                    >
+                    <dl className="m-0 mt-1 space-y-1.5 text-sm">
                       {component.fhir
                         .filter((resource) => resource.note)
                         .map((resource) => (
                           <div key={resource.url} className="flex flex-wrap gap-x-2">
-                            <dt className="numeric font-medium text-ink">{resource.name}</dt>
-                            <dd className="flex-1 text-graphite">{resource.note}</dd>
+                            <dt className="font-mono text-[12.5px] font-medium text-ink">
+                              {resource.name}
+                            </dt>
+                            <dd className="m-0 flex-1 text-graphite">{resource.note}</dd>
                           </div>
                         ))}
                     </dl>
@@ -755,461 +585,490 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                 </div>
               </section>
 
-              {/* Playground --------------------------------------------------- */}
-              {playable && (
-                <section id="playground" className="scroll-mt-24 border-b border-rule">
-                  <div className="mx-auto max-w-6xl section-minor px-5 max-sm:px-0 sm:px-8">
-                    <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-                      <SectionHeading
-                        eyebrow="Playground"
-                        title="Change a prop, watch it change."
-                      />
-                      <p className="numeric shrink-0 text-xs text-graphite-soft">
-                        {controls.length} PROPS / LIVE
-                      </p>
-                    </div>
-                    {/* The knobs come from the same metadata the props table does,
-                  and the generator checks every option against the prop's real
-                  type — so a control here cannot offer a value the component
-                  would reject. */}
-                    <div className="mt-8" data-reveal>
-                      <HostStage className="flex w-full min-w-0 flex-col">
-                        <Playground name={component.name} controls={controls} />
-                      </HostStage>
-                    </div>
-                  </div>
-                </section>
-              )}
-
-              {/* Variants ----------------------------------------------------- */}
-              {variants.length > 0 && (
-                <section id="variants" className="scroll-mt-24 border-b border-rule">
-                  <div className="mx-auto max-w-6xl section-minor px-5 max-sm:px-0 sm:px-8">
-                    <SectionHeading
-                      eyebrow="Variants"
-                      title="One component, and what each skin is for."
-                    />
-                    <p className="mt-3 max-w-2xl text-sm text-graphite" data-reveal>
-                      Every variant is the same accessibility contract and the same keyboard model.
-                      Pick by what the surface needs, not by what the code would be easier to write.
-                    </p>
-
-                    <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                      {variants.map((variant, index) => (
-                        <div
-                          key={variant.id}
-                          data-reveal
-                          style={{ "--reveal-delay": `${index * 40}ms` } as React.CSSProperties}
-                          className="surface-2 rounded-2xl p-5"
-                        >
-                          <h3 className="font-display text-base font-semibold tracking-tight">
-                            {variant.label}
-                          </h3>
-                          <p className="mt-2 text-sm leading-relaxed text-graphite">
-                            {variant.description}
-                          </p>
-                          {Object.keys(variant.args ?? {}).length > 0 && (
-                            <p className="mt-3 font-mono text-[0.7rem] leading-relaxed text-graphite-soft">
-                              {Object.entries(variant.args ?? {})
-                                .map(([key, value]) => `${key}=${JSON.stringify(value)}`)
-                                .join("  ")}
-                            </p>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </section>
-              )}
-
-              {/* Usage & props ------------------------------------------------ */}
-              {component.usage && (
-                <section id="usage" className="scroll-mt-24 border-b border-rule">
-                  <div className="mx-auto max-w-6xl section-minor px-5 max-sm:px-0 sm:px-8">
-                    <SectionHeading eyebrow="Usage" title="Props are the FHIR resource." />
-
-                    {/*
-                The sample and its dependencies share the top row; the API takes
-                the full width underneath.
-
-                Beside a 1.1fr column the description track measured 271px —
-                about 43 characters — so every sentence wrapped to three or four
-                lines and an 18-prop component ran to 1753px next to half a page
-                of nothing. The height was the measure, not the number of props.
-                The sample was clipping its own import path in the same column
-                (580px of code in 501px of box), which full width also fixes.
+              {/* Playground / Preview -------------------------------------- */}
+              {/*
+                The design-language switch sits with the live stage it re-skins,
+                and nowhere else: it changes nothing else on the page.
               */}
-                    <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,14rem)] lg:items-start">
-                      <div data-reveal className="min-w-0">
-                        <CodeBlock
-                          title="Usage"
-                          what="usage example"
-                          language="tsx"
-                          code={component.usage}
-                        />
-                      </div>
-
-                      <div data-reveal style={{ "--reveal-delay": "80ms" } as React.CSSProperties}>
-                        <h3 className="font-display text-sm font-semibold uppercase tracking-wide text-graphite">
-                          Dependencies
-                        </h3>
-                        <ul className="mt-3 flex flex-wrap gap-2">
-                          {component.dependencies.map((dep) => (
-                            <li
-                              key={dep}
-                              className="numeric rounded-lg border border-rule bg-paper-sunk px-2.5 py-1 text-xs text-graphite"
-                            >
-                              {dep}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-
-                    <div
-                      data-reveal
-                      style={{ "--reveal-delay": "120ms" } as React.CSSProperties}
-                      className="mt-10 space-y-8"
-                    >
-                      {/*
-                    One table per exported component, not one for the first.
-
-                    The catalog has always carried `exports`; the page rendered
-                    only `props`, which is the primary export's. For most
-                    components those are the same list. For the ones whose
-                    surface is several components — Switch and its field and
-                    list, the note and its gate, the date control and its
-                    fourteen parts — everything after the first was extracted,
-                    written to the catalog, and never shown to anybody. The date
-                    control made it impossible to ignore: its dispatch is a
-                    union, so the intersection the checker can see is three
-                    props and the whole API was missing from its own page.
-                  */}
-                      {apiTables.map(({ name, props: exportProps }, tableIndex) => (
-                        <div key={name}>
-                          {apiTables.length > 1 && (
-                            <h3 className="mb-3 flex flex-wrap items-baseline gap-x-2 font-display text-sm font-semibold tracking-tight">
-                              <code className="numeric text-brand-deep">{name}</code>
-                              <span className="text-xs font-normal text-graphite-soft">
-                                {exportProps.length} {exportProps.length === 1 ? "prop" : "props"}
-                                {tableIndex === 0 && component.exports.length > 1
-                                  ? " · the front door"
-                                  : ""}
-                              </span>
-                            </h3>
-                          )}
-                          <PropsTable props={exportProps} label={name} />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </section>
-              )}
-
-              {/* Examples ----------------------------------------------------- */}
-              {examples.length > 0 && (
-                <section
-                  id="examples"
-                  className="scroll-mt-24 border-b border-rule bg-paper-sunk/40"
-                >
-                  <div className="mx-auto max-w-6xl section-minor px-5 max-sm:px-0 sm:px-8">
-                    <SectionHeading eyebrow="Examples" title="The cases worth copying." />
-                    {/*
-                Under the heading rather than beside it.
-
-                These are identifiers, not a caption: seven of them set in mono
-                are wider than the heading they were sharing a row with, and
-                `shrink-0` on a flex row meant the heading gave up its width
-                instead — "The cases worth copying." broke to one word a line.
-                They also keep their camel case now, because uppercasing
-                `observationPotassiumCritical` is what made it unreadable.
-              */}
-                    {(component.fixtures ?? []).length > 0 && (
-                      <p className="mt-4 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-xs text-graphite-soft">
-                        <span className="numeric uppercase tracking-wide">Data</span>
-                        {(component.fixtures ?? []).map((fixture) => (
-                          <code key={fixture} className="font-mono tracking-normal">
-                            {fixture}
-                          </code>
-                        ))}
-                      </p>
-                    )}
-
-                    <div className="mt-8 space-y-8">
-                      {examples.map((example, index) => (
-                        <article
-                          key={example.id}
-                          data-reveal
-                          style={{ "--reveal-delay": `${index * 60}ms` } as React.CSSProperties}
-                        >
-                          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                            <h3 className="font-display text-lg font-semibold tracking-tight">
-                              {example.title}
-                            </h3>
-                            {/* No `uppercase` here. These are identifiers a reader
-                          types, and the camel case is the only thing making
-                          `observationPotassiumCritical` legible — uppercasing it
-                          produces OBSERVATIONPOTASSIUMCRITICAL, which is a wall. */}
-                            {example.fixture && (
-                              <code className="font-mono text-[0.6875rem] tracking-normal text-graphite-soft">
-                                {example.fixture}
-                              </code>
-                            )}
-                          </div>
-                          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-graphite">
-                            {example.description}
-                          </p>
-                          <CodeBlock
-                            title={example.title}
-                            what={`example: ${example.title}`}
-                            language="tsx"
-                            code={example.code}
-                            size="sm"
-                            className="mt-4"
-                          />
-                        </article>
-                      ))}
-                    </div>
-                  </div>
-                </section>
-              )}
-
-              {/* Clinical ----------------------------------------------------- */}
-              {hasClinical && domain && (
-                <section id="clinical" className="scroll-mt-24 border-b border-rule">
-                  <div className="mx-auto max-w-6xl section-minor px-5 max-sm:px-0 sm:px-8">
-                    <SectionHeading eyebrow="Clinical" title="Where it sits in the record." />
-
-                    {domain.clinicalContext && (
-                      <p
-                        className="mt-3 max-w-3xl text-sm leading-relaxed text-graphite"
-                        data-reveal
-                      >
-                        {domain.clinicalContext}
-                      </p>
-                    )}
-
-                    <dl className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" data-reveal>
-                      <Fact label="Industries" values={domain.industries} />
-                      <Fact label="Workflows" values={domain.workflows} />
-                      <Fact label="Terminology" values={domain.terminology} />
-                      <Fact label="Permissions" values={domain.permissions} />
-                      {typeof domain.auditable === "boolean" && (
-                        <Fact
-                          label="Audit"
-                          values={[domain.auditable ? "Emits AuditEvent" : "Emits no AuditEvent"]}
-                        />
-                      )}
-                    </dl>
-
-                    {domain.phi && (
-                      <div className="limitation-panel mt-8 self-start" data-reveal>
-                        <div className="limitation-panel__header">
-                          <div className="flex min-w-0 items-center gap-3">
-                            <span className="limitation-panel__signal" aria-hidden="true">
-                              <CircleAlert className="size-4" />
-                            </span>
-                            <div>
-                              <p className="limitation-panel__kicker numeric text-[0.625rem] text-graphite-soft">
-                                Protected health information
-                              </p>
-                              <h3 className="mt-1 font-display text-base font-semibold tracking-tight">
-                                {domain.phi.handles ? "Handles PHI" : "Handles no PHI"}
-                              </h3>
-                            </div>
-                          </div>
-                        </div>
-                        <p className="px-5 pb-5 text-sm leading-relaxed text-graphite">
-                          {domain.phi.notes}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </section>
-              )}
-
-              {/* Conformance -------------------------------------------------- */}
-              {a11yChecks.length > 0 && (
-                <section
-                  id="conformance"
-                  className="scroll-mt-24 border-b border-rule bg-paper-sunk/40"
-                >
-                  <div className="mx-auto max-w-6xl section-minor px-5 max-sm:px-0 sm:px-8">
-                    <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-                      <SectionHeading
-                        eyebrow="Conformance"
-                        title="Every claim, and the test behind it."
-                      />
-                      <p className="numeric shrink-0 text-xs text-graphite-soft">
-                        WCAG 2.2 AA / {a11yChecks.filter((c) => c.status === "pass").length} OF{" "}
-                        {a11yChecks.length} PASS
-                      </p>
-                    </div>
-
-                    {/* A claim with no evidence is prose, and prose in an
-                  accessibility panel is how a library ends up asserting
-                  conformance it has never measured. The schema requires the
-                  evidence column; this renders it. */}
-                    {/* Focusable and named: on a phone the 44rem table scrolls
-                        sideways, and a scrolling region has to be reachable
-                        by keyboard (axe `scrollable-region-focusable`). */}
-                    <div
-                      className="scroll-thin mt-8 overflow-x-auto"
-                      data-reveal
-                      tabIndex={0}
-                      role="region"
-                      aria-label="Accessibility checks"
-                    >
-                      <table className="w-full min-w-[44rem] border-collapse text-left text-sm">
-                        <thead>
-                          <tr className="border-b border-rule">
-                            <Th>Criterion</Th>
-                            <Th>Status</Th>
-                            <Th>How</Th>
-                            <Th>Evidence</Th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {a11yChecks.map((check) => (
-                            <tr
-                              key={`${check.wcag}-${check.name}`}
-                              className="border-b border-rule/60"
-                            >
-                              <td className="py-3 pr-4 align-top">
-                                <span className="numeric text-xs text-graphite-soft">
-                                  {check.wcag}
-                                </span>
-                                <span className="mt-0.5 block font-medium">{check.name}</span>
-                              </td>
-                              <td className="py-3 pr-4 align-top">
-                                <span
-                                  className="numeric text-[0.625rem] uppercase tracking-wide"
-                                  data-zb-check={check.status}
-                                >
-                                  {check.status === "not-applicable" ? "n/a" : check.status}
-                                </span>
-                              </td>
-                              <td className="max-w-md py-3 pr-4 align-top leading-relaxed text-graphite">
-                                {check.how}
-                              </td>
-                              <td className="py-3 align-top font-mono text-[0.7rem] text-graphite-soft">
-                                {check.evidence ?? "—"}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </section>
-              )}
-
-              {/* Source ------------------------------------------------------- */}
-              {source && (
-                <section id="source" className="scroll-mt-24 border-b border-rule bg-paper-sunk/40">
-                  <div className="mx-auto max-w-6xl section-minor px-5 max-sm:px-0 sm:px-8">
-                    <SectionHeading
-                      eyebrow="Source"
-                      title="Exactly what lands in your repository."
+              <DocSection
+                id="playground"
+                title={playable ? "Playground" : "Preview"}
+                first
+                lead={
+                  playable
+                    ? "Change a prop and watch the component and its code change with it."
+                    : "Every declared state, live. Pick one from the list to see it."
+                }
+              >
+                <div data-language-bar="" className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                  <span className="text-xs font-medium text-graphite-soft">Design language</span>
+                  <LanguageSwitch />
+                </div>
+                {playable ? (
+                  <HostStage className="flex w-full min-w-0 flex-col">
+                    <Playground
+                      name={component.name}
+                      controls={controls}
+                      importName={importName}
+                      importFrom={importFrom}
+                      links={hostedDemo}
                     />
-                    <p className="mt-3 max-w-2xl text-sm text-graphite" data-reveal>
-                      Read directly from the published registry, so this can never drift from what
-                      the CLI installs.
-                    </p>
-                    <details className="mt-6 group" data-reveal>
-                      <summary className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-rule bg-paper px-4 py-2 text-sm text-graphite transition-colors hover:border-rule-strong hover:text-ink">
-                        <span className="group-open:hidden">Show source</span>
-                        <span className="hidden group-open:inline">Hide source</span>
-                        <span className="numeric text-xs text-graphite-soft">
-                          {source.split("\n").length} lines
+                  </HostStage>
+                ) : (
+                  <div className="overflow-hidden rounded-xl border border-rule bg-paper">
+                    <div className="zb-stage p-4 sm:p-6">
+                      <ComponentPreview name={component.name} states={component.states} />
+                    </div>
+                    {hostedDemo.length > 0 ? (
+                      <div className="flex h-11 items-center justify-between gap-2 border-t border-rule bg-paper-sunk pl-3.5 pr-1.5">
+                        <span className="min-w-0 truncate text-xs text-graphite">
+                          Run it yourself
                         </span>
-                      </summary>
-                      <CodeBlock
-                        title="Source"
-                        what={`${component.title} source`}
-                        language="tsx"
-                        code={source}
-                        size="sm"
-                        maxHeight="32rem"
-                        className="mt-4"
-                      />
-                    </details>
+                        <div className="flex flex-none items-center gap-0.5">
+                          <PlatformLinks links={hostedDemo} />
+                        </div>
+                      </div>
+                    ) : null}
                   </div>
-                </section>
+                )}
+              </DocSection>
+
+              {/* Examples -------------------------------------------------- */}
+              {examples.length > 0 && (
+                <DocSection
+                  id="examples"
+                  title="Examples"
+                  lead={
+                    hostedDemo.length
+                      ? "The cases worth copying. Open any of them in a sandbox to run the component with its dependencies installed."
+                      : "The cases worth copying."
+                  }
+                >
+                  {(component.fixtures ?? []).length > 0 && (
+                    <p className="m-0 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-xs text-graphite-soft">
+                      <span>Data</span>
+                      {/* Camel case kept: these are identifiers a reader types. */}
+                      {(component.fixtures ?? []).map((fixture) => (
+                        <code key={fixture} className="font-mono">
+                          {fixture}
+                        </code>
+                      ))}
+                    </p>
+                  )}
+                  {grouped ? (
+                    <div className="mt-4 flex flex-col gap-14">
+                      {exampleGroups.map((g) => (
+                        <div key={g.id} className="flex flex-col gap-10">
+                          <h3
+                            id={g.id}
+                            data-toc={g.id}
+                            className="m-0 border-b border-rule pb-2 text-[19px] font-semibold tracking-[-0.015em] text-ink"
+                          >
+                            {g.group}
+                          </h3>
+                          {g.items.map((example) => (
+                            <ExampleBlock
+                              key={example.id}
+                              component={component.name}
+                              id={example.id}
+                              title={example.title}
+                              description={example.description}
+                              code={example.code}
+                              fixture={example.fixture}
+                              links={hostedDemo}
+                              level={4}
+                            />
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="mt-4 flex flex-col gap-10">
+                      {examples.map((example) => (
+                        <ExampleBlock
+                          key={example.id}
+                          component={component.name}
+                          id={example.id}
+                          title={example.title}
+                          description={example.description}
+                          code={example.code}
+                          fixture={example.fixture}
+                          links={hostedDemo}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </DocSection>
               )}
 
-              {/* Related ------------------------------------------------------ */}
-              {(related.length > 0 ||
-                alternatives.length > 0 ||
-                builtWith.length > 0 ||
-                usedIn.length > 0) && (
-                <section id="related" className="scroll-mt-24">
-                  <div className="mx-auto max-w-6xl section-minor px-5 max-sm:px-0 sm:px-8">
-                    <SectionHeading eyebrow="Related" title="Pairs well with." />
+              {/* Gallery --------------------------------------------------- */}
+              {/*
+                Tabs, the date control and Switch each make a claim about
+                sameness — many skins, one contract — and a claim about sameness
+                cannot be shown with one example. Copilot's gallery shows the
+                part that is not a chat box.
+              */}
+              {hasGallery && (
+                <DocSection
+                  id="gallery"
+                  title="Gallery"
+                  lead={
+                    component.name === "date-picker"
+                      ? `${component.variants?.length ?? 0} variants, one contract — live.`
+                      : component.name === "copilot"
+                        ? "The part that is not a chat box."
+                        : component.name === "switch"
+                          ? "Every state, phase and surface — live, on the page."
+                          : "Every variant, mode and state — live."
+                  }
+                >
+                  <HostStage className="flex w-full min-w-0 flex-col">
+                    {component.name === "tabs" && <TabsGallery />}
+                    {component.name === "date-picker" && <DatePickerGallery />}
+                    {component.name === "copilot" && <CopilotGallery />}
+                    {component.name === "switch" && <SwitchGallery />}
+                  </HostStage>
+                </DocSection>
+              )}
 
-                    {/* "Use X instead when Y" is the single strongest trust signal a
-                  component page carries: a library that will send you
-                  elsewhere is one you can believe when it does not. */}
-                    {alternatives.length > 0 && (
-                      <ul className="mt-6 space-y-2" data-reveal>
-                        {alternatives.map((alternative: Alternative) => {
-                          const found = getComponent(alternative.ref);
-                          const target = found && isReady(found.name) ? found : undefined;
-                          return (
-                            <li
-                              key={alternative.ref}
-                              className="text-sm leading-relaxed text-graphite"
-                            >
-                              Use{" "}
-                              {target ? (
-                                <Link
-                                  href={`/components/${target.name}`}
-                                  className="font-medium text-ink underline decoration-rule-strong underline-offset-4 hover:decoration-brand"
-                                >
-                                  {target.title}
-                                </Link>
-                              ) : (
-                                <span className="font-medium text-ink">{alternative.ref}</span>
-                              )}{" "}
-                              instead when {alternative.when}.
-                            </li>
-                          );
-                        })}
+              {/* Variants -------------------------------------------------- */}
+              {variants.length > 0 && (
+                <DocSection
+                  id="variants"
+                  title="Variants"
+                  lead="Every variant is the same accessibility contract and the same keyboard model. Pick by what the surface needs."
+                >
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {variants.map((variant) => (
+                      <div
+                        key={variant.id}
+                        className="rounded-[10px] border border-rule bg-paper px-4 py-3.5"
+                      >
+                        <h3 className="m-0 text-[14.5px] font-semibold text-ink">
+                          {variant.label}
+                        </h3>
+                        <p className="m-0 mt-1 text-[13.5px] leading-relaxed text-graphite">
+                          {variant.description}
+                        </p>
+                        {Object.keys(variant.args ?? {}).length > 0 && (
+                          <p className="m-0 mt-2 font-mono text-[11.5px] leading-relaxed text-graphite-soft">
+                            {Object.entries(variant.args ?? {})
+                              .map(([key, value]) => `${key}=${JSON.stringify(value)}`)
+                              .join("  ")}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </DocSection>
+              )}
+
+              {/* Installation ---------------------------------------------- */}
+              <DocSection id="installation" title="Installation">
+                <CodeBlock code={installLine} lang="sh" file="Terminal" numbered={false} />
+                <p className="m-0 max-w-[640px] text-pretty text-sm text-graphite">
+                  {isPackage ? (
+                    <>
+                      {frameworkNote(component)} Import its stylesheet too:{" "}
+                      <InlineCode>{`import "${component.packageName}/styles.css"`}</InlineCode>.
+                    </>
+                  ) : (
+                    <>
+                      First install? Run <InlineCode>zoblocks init</InlineCode> once to say where
+                      your <InlineCode>@/</InlineCode> alias points. The source is copied into your
+                      repository, along with anything it depends on.
+                    </>
+                  )}
+                </p>
+                {component.dependencies.length > 0 ? (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-xs text-graphite-soft">Dependencies</span>
+                    {component.dependencies.map((dep) => (
+                      <code
+                        key={dep}
+                        className="rounded-[5px] border border-rule px-[7px] py-0.5 font-mono text-[11.5px] text-graphite"
+                      >
+                        {dep}
+                      </code>
+                    ))}
+                  </div>
+                ) : null}
+              </DocSection>
+
+              {/* Usage ----------------------------------------------------- */}
+              {component.usage && (
+                <DocSection id="usage" title="Usage" lead="Props are the FHIR resource.">
+                  <CodeBlock code={component.usage} file="usage.tsx" />
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Guidance title="Use it when" items={component.guidance.use} />
+                    <Guidance title="Avoid it when" items={component.guidance.avoid} />
+                  </div>
+                </DocSection>
+              )}
+
+              {/* API ------------------------------------------------------- */}
+              {/*
+                One table per exported component, not one for the first. The
+                date control's dispatch is a union, so the intersection the
+                checker can see is three props — everything after the primary
+                export is where most of its API lives.
+              */}
+              {apiTables.length > 0 && (
+                <DocSection
+                  id="api"
+                  title="API"
+                  lead="Every prop is typed. Props not listed are forwarded to the root element."
+                  className="gap-7"
+                >
+                  {apiTables.map(({ name, props: exportProps }, tableIndex) => (
+                    <div key={name} className="flex flex-col gap-3">
+                      <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+                        <h3 className="m-0 font-mono text-[15px] font-semibold text-ink">{name}</h3>
+                        <span className="text-[13px] text-graphite">
+                          {exportProps.length} {exportProps.length === 1 ? "prop" : "props"}
+                          {tableIndex === 0 && component.exports.length > 1
+                            ? " · the front door"
+                            : ""}
+                        </span>
+                      </div>
+                      <PropsTable props={exportProps} label={name} />
+                    </div>
+                  ))}
+                </DocSection>
+              )}
+
+              {/* Accessibility --------------------------------------------- */}
+              {hasA11y && (
+                <DocSection id="accessibility" title="Accessibility" className="gap-6">
+                  {component.accessibility.length > 0 && (
+                    <DocSubsection title="Screen readers and semantics">
+                      <ul className="m-0 flex flex-col gap-2 pl-[18px] text-sm text-graphite">
+                        {component.accessibility.map((note) => (
+                          <li key={note.label} className="text-pretty pl-1">
+                            <span className="font-medium text-ink">{note.label}.</span>{" "}
+                            {note.detail}
+                          </li>
+                        ))}
                       </ul>
-                    )}
+                    </DocSubsection>
+                  )}
 
-                    <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {/* A claim with no evidence is prose. The schema requires the
+                      evidence column; this renders it. */}
+                  {a11yChecks.length > 0 && (
+                    <DocSubsection
+                      title={`Conformance · WCAG 2.2 AA · ${a11yChecks.filter((c) => c.status === "pass").length} of ${a11yChecks.length} pass`}
+                    >
+                      {/* Focusable and named: on a phone the table scrolls
+                          sideways, and a scrolling region has to be reachable
+                          by keyboard (axe `scrollable-region-focusable`). */}
+                      <div
+                        className="scroll-thin overflow-x-auto rounded-[10px] border border-rule"
+                        tabIndex={0}
+                        role="region"
+                        aria-label="Accessibility checks"
+                      >
+                        <table className="w-full min-w-[40rem] border-collapse text-left text-sm">
+                          <thead className="bg-paper-sunk">
+                            <tr>
+                              <Th>Criterion</Th>
+                              <Th>Status</Th>
+                              <Th>How</Th>
+                              <Th>Evidence</Th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {a11yChecks.map((check) => (
+                              <tr
+                                key={`${check.wcag}-${check.name}`}
+                                className="border-t border-rule"
+                              >
+                                <td className="px-4 py-3 align-top">
+                                  <span className="font-mono text-xs text-graphite-soft">
+                                    {check.wcag}
+                                  </span>
+                                  <span className="mt-0.5 block font-medium text-ink">
+                                    {check.name}
+                                  </span>
+                                </td>
+                                <td className="px-4 py-3 align-top">
+                                  <span
+                                    className="font-mono text-[11px] uppercase tracking-wide"
+                                    data-zb-check={check.status}
+                                  >
+                                    {check.status === "not-applicable" ? "n/a" : check.status}
+                                  </span>
+                                </td>
+                                <td className="max-w-md px-4 py-3 align-top leading-relaxed text-graphite">
+                                  {check.how}
+                                </td>
+                                <td className="px-4 py-3 align-top font-mono text-[11px] text-graphite-soft">
+                                  {check.evidence ?? "—"}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </DocSubsection>
+                  )}
+                </DocSection>
+              )}
+
+              {/* Clinical -------------------------------------------------- */}
+              {hasClinical && domain && (
+                <DocSection id="clinical" title="Clinical" lead={domain.clinicalContext}>
+                  <dl className="m-0 grid gap-5 sm:grid-cols-2">
+                    <Fact label="Industries" values={domain.industries} />
+                    <Fact label="Workflows" values={domain.workflows} />
+                    <Fact label="Terminology" values={domain.terminology} />
+                    <Fact label="Permissions" values={domain.permissions} />
+                    {typeof domain.auditable === "boolean" && (
+                      <Fact
+                        label="Audit"
+                        values={[domain.auditable ? "Emits AuditEvent" : "Emits no AuditEvent"]}
+                      />
+                    )}
+                  </dl>
+
+                  {domain.phi && (
+                    <div className="limitation-panel mt-2 self-start">
+                      <div className="limitation-panel__header">
+                        <div className="flex min-w-0 items-center gap-3">
+                          <span className="limitation-panel__signal" aria-hidden="true">
+                            <CircleAlert className="size-4" />
+                          </span>
+                          <div>
+                            <p className="limitation-panel__kicker numeric text-[0.625rem] text-graphite-soft">
+                              Protected health information
+                            </p>
+                            <h3 className="mt-1 font-display text-base font-semibold tracking-tight">
+                              {domain.phi.handles ? "Handles PHI" : "Handles no PHI"}
+                            </h3>
+                          </div>
+                        </div>
+                      </div>
+                      <p className="px-5 pb-5 text-sm leading-relaxed text-graphite">
+                        {domain.phi.notes}
+                      </p>
+                    </div>
+                  )}
+                </DocSection>
+              )}
+
+              {/* Source ---------------------------------------------------- */}
+              {source && (
+                <DocSection
+                  id="source"
+                  title="Source"
+                  lead="Exactly what lands in your repository, read from the published registry so it can never drift from what the CLI installs."
+                >
+                  <details className="group">
+                    <summary className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-rule bg-paper px-3.5 py-2 text-[13px] text-graphite transition-colors hover:border-rule-strong hover:text-ink">
+                      <span className="group-open:hidden">Show source</span>
+                      <span className="hidden group-open:inline">Hide source</span>
+                      <span className="font-mono text-xs text-graphite-soft">
+                        {source.split("\n").length} lines
+                      </span>
+                    </summary>
+                    <CodeBlock
+                      code={source}
+                      file={`${component.name}.tsx`}
+                      className="mt-4"
+                      bodyClassName="max-h-[32rem]"
+                    />
+                  </details>
+                </DocSection>
+              )}
+
+              {/* Related --------------------------------------------------- */}
+              {hasRelated && (
+                <DocSection id="related" title="Related" className="pb-12">
+                  {/* "Use X instead when Y" is the strongest trust signal a
+                      component page carries. */}
+                  {alternatives.length > 0 && (
+                    <ul className="m-0 flex list-none flex-col gap-2 p-0">
+                      {alternatives.map((alternative: Alternative) => {
+                        const found = getComponent(alternative.ref);
+                        const target = found && isReady(found.name) ? found : undefined;
+                        return (
+                          <li
+                            key={alternative.ref}
+                            className="text-sm leading-relaxed text-graphite"
+                          >
+                            Use{" "}
+                            {target ? (
+                              <Link
+                                href={`/components/${target.name}`}
+                                className="font-medium text-ink underline decoration-rule-strong underline-offset-4 hover:decoration-brand"
+                              >
+                                {target.title}
+                              </Link>
+                            ) : (
+                              <span className="font-medium text-ink">{alternative.ref}</span>
+                            )}{" "}
+                            instead when {alternative.when}.
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+
+                  {related.length > 0 && (
+                    <div className="grid gap-3 sm:grid-cols-3">
                       {related.map((item) => (
                         <Link
                           key={item!.name}
                           href={`/components/${item!.name}`}
-                          data-reveal
-                          className="group surface-2 lift rounded-2xl p-5 hover:border-brand/45"
+                          className="flex flex-col gap-1 rounded-[10px] border border-rule bg-paper px-4 py-3.5 no-underline transition-colors hover:border-rule-strong hover:bg-paper-sunk"
                         >
-                          <h3 className="font-display text-base font-semibold tracking-tight">
-                            {item!.title}
-                          </h3>
-                          <p className="numeric mt-1 text-xs text-brand-deep">{item!.resource}</p>
-                          <p className="mt-2 text-sm leading-relaxed text-graphite">
+                          <span className="text-sm font-medium text-ink">{item!.title}</span>
+                          <span className="line-clamp-3 text-pretty text-[13px] text-graphite">
                             {item!.summary}
-                          </p>
+                          </span>
                         </Link>
                       ))}
                     </div>
+                  )}
 
-                    {/* Derived from what each component depends on, never declared.
-                  `usedIn` in particular is a fact no component can know about
-                  itself, and a hand-maintained one is wrong within a month. */}
-                    {(builtWith.length > 0 || usedIn.length > 0) && (
-                      <dl className="mt-10 grid gap-6 sm:grid-cols-2" data-reveal>
-                        <ComponentLinks label="Built with" names={builtWith} />
-                        <ComponentLinks label="Used in" names={usedIn} />
-                      </dl>
-                    )}
-                  </div>
-                </section>
+                  {/* Derived from what each component depends on, never declared. */}
+                  {(builtWith.length > 0 || usedIn.length > 0) && (
+                    <dl className="m-0 mt-2 grid gap-5 sm:grid-cols-2">
+                      <ComponentLinks label="Built with" names={builtWith} />
+                      <ComponentLinks label="Used in" names={usedIn} />
+                    </dl>
+                  )}
+                </DocSection>
               )}
-            </SectionTabs>
+
+              {/* Pagination ------------------------------------------------ */}
+              <nav aria-label="Pagination" className="grid grid-cols-2 gap-3 pt-4">
+                {previous ? (
+                  <Link
+                    href={`/components/${previous.name}`}
+                    className="flex flex-col gap-0.5 rounded-[10px] border border-rule px-4 py-3.5 no-underline transition-colors hover:border-rule-strong"
+                  >
+                    <span className="text-xs text-graphite-soft">← Previous</span>
+                    <span className="text-[14.5px] font-medium text-ink">{previous.title}</span>
+                  </Link>
+                ) : (
+                  <span />
+                )}
+                {next ? (
+                  <Link
+                    href={`/components/${next.name}`}
+                    className="flex flex-col items-end gap-0.5 rounded-[10px] border border-rule px-4 py-3.5 text-right no-underline transition-colors hover:border-rule-strong"
+                  >
+                    <span className="text-xs text-graphite-soft">Next →</span>
+                    <span className="text-[14.5px] font-medium text-ink">{next.title}</span>
+                  </Link>
+                ) : (
+                  <span />
+                )}
+              </nav>
+            </article>
+
+            <OnThisPage entries={toc} />
           </div>
         </div>
       </main>
@@ -1221,15 +1080,26 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
 
 /* -------------------------------------------------------------------------- */
 
-function SectionHeading({ eyebrow, title }: { eyebrow: string; title: string }) {
+function InlineCode({ children }: { children: React.ReactNode }) {
   return (
-    <div className="max-w-3xl">
-      <p className="eyebrow text-graphite" data-reveal>
-        {eyebrow}
-      </p>
-      <h2 className="display-sm mt-3 text-balance" data-reveal>
-        {title}
-      </h2>
+    <code className="rounded px-[5px] py-px font-mono text-[12.5px] text-ink [background:var(--color-paper-sunk)]">
+      {children}
+    </code>
+  );
+}
+
+function Guidance({ title, items }: { title: string; items: readonly string[] }) {
+  if (!items.length) return null;
+  return (
+    <div className="rounded-[10px] border border-rule px-4 py-3.5">
+      <h3 className="m-0 text-[14px] font-semibold text-ink">{title}</h3>
+      <ul className="m-0 mt-2 flex flex-col gap-1.5 pl-[18px] text-[13.5px] leading-relaxed text-graphite">
+        {items.map((item) => (
+          <li key={item} className="text-pretty">
+            {item}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -1286,10 +1156,7 @@ function Fact({ label, values }: { label: string; values: readonly string[] }) {
 
 function Th({ children }: { children: React.ReactNode }) {
   return (
-    <th
-      scope="col"
-      className="px-4 py-2.5 text-left text-[0.6875rem] font-semibold uppercase tracking-wide text-graphite-soft"
-    >
+    <th scope="col" className="px-4 py-2.5 text-left text-xs font-medium text-graphite-soft">
       {children}
     </th>
   );
