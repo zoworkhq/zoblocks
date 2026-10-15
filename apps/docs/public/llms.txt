@@ -67,9 +67,8 @@ Rules that matter when generating code with these components:
 
 ## Clinical
 
-- Allergy Chip: The chip that refuses to conflate how bad the last reaction was with how bad the next one could be.
+- [Allergy Chip](https://zoblocks.design/components/allergy-chip): The chip that refuses to conflate how bad the last reaction was with how bad the next one could be.
   install: npx @zoblocks/cli add allergy-chip
-  docs: no page yet — this component installs from the registry today
   fhir: AllergyIntolerance
   states: High criticality, mild past reaction, Low criticality, same manifestation, Intolerance, not an allergy, Refuted after a rechallenge, Entered in error, Unconfirmed — reported at intake, Unable to assess, No reaction recorded, Substance class expansion, Contraindication, No known allergies — asserted, Allergy status not recorded, An assertion with no author degrades, Compact, in a banner, Interactive — opens the history
   status: stable
