@@ -27,7 +27,7 @@ import { ArrowRight } from "lucide-react";
 import { CATALOG } from "@/lib/catalog";
 import { LoaderShowcase } from "@/components/site/loader-showcase";
 import { SignatureDrawing } from "@/components/site/signature-showcase";
-import { LiveSwitch } from "@/components/site/switch-gallery";
+import { LiveSwitch } from "@/components/site/switch-demos";
 import { Tabs } from "@zoblocks/tabs";
 import { Calendar } from "@/registry/zoblocks/date-picker/date-picker";
 import { plainDate } from "@/lib/zoblocks-datetime";

@@ -30,6 +30,10 @@ export default defineConfig({
         replacement: path.join(root, "../../registry/zoblocks/lib/loader.tsx"),
       },
       {
+        find: /^@\/lib\/zoblocks-switch$/,
+        replacement: path.join(root, "../../registry/zoblocks/lib/switch.tsx"),
+      },
+      {
         find: /^@\/components\/zoblocks\/([a-z-]+-loader)$/,
         replacement: path.join(root, "../../registry/zoblocks/$1/$1.tsx"),
       },
