@@ -73,7 +73,11 @@ function settings(control: Control): unknown[] {
 
 /** What the reader is left looking at. */
 function outcome(container: HTMLElement): "component" | "explained" | "blank" {
-  if (container.querySelector("[data-zb-tab], [data-zb-signature], [role='radiogroup'], nav")) {
+  if (
+    container.querySelector(
+      "[data-zb-tab], [data-zb-signature], [data-zb-loader], [role='radiogroup'], nav",
+    )
+  ) {
     return "component";
   }
   const status = container.querySelector("[role='status']");

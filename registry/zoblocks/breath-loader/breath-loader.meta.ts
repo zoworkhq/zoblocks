@@ -69,6 +69,85 @@ export default defineComponentMeta({
   dependencies: ["clsx", "tailwind-merge"],
   registryDependencies: ["utils", "tokens", "loader-core"],
 
+  controls: [
+    {
+      prop: "size",
+      control: "segmented",
+      label: "size",
+      options: ["sm", "md", "lg", "xl"],
+      defaultValue: "xl",
+    },
+    {
+      prop: "speed",
+      control: "slider",
+      label: "speed",
+      min: 0.5,
+      max: 2,
+      step: 0.25,
+      defaultValue: 1,
+    },
+    {
+      prop: "motion",
+      control: "segmented",
+      label: "motion",
+      options: ["auto", "reduced", "full"],
+      defaultValue: "auto",
+    },
+    { prop: "showLabel", control: "switch", label: "showLabel", defaultValue: true },
+    { prop: "label", control: "text", label: "label", defaultValue: "Loading your information" },
+  ],
+
+  examples: [
+    {
+      id: "patient-facing",
+      title: "A calm wait for patient-facing screens",
+      description:
+        "Fifteen breaths a minute, with no heart in it. The right default where a beating heart would read as glib: intake, behavioural health, bereavement.",
+      code: `import { BreathLoader } from "@/components/zoblocks/breath-loader";
+
+export default function Example() {
+  return (
+    <BreathLoader
+      showLabel
+      label="Loading your information"
+      hint="This usually takes a few seconds."
+    />
+  );
+}`,
+    },
+    {
+      id: "brand-mark",
+      title: "Your mark in the core",
+      description:
+        "children replaces the core with a mark of your own. It sits inside the hidden art, so a logo never becomes a second announcement.",
+      code: `import { BreathLoader } from "@/components/zoblocks/breath-loader";
+
+export default function Example() {
+  return (
+    <BreathLoader size="xl" showLabel label="Signing you in">
+      <ClinicLogo width={28} height={28} />
+    </BreathLoader>
+  );
+}`,
+    },
+    {
+      id: "over-a-form",
+      title: "Over a form while it submits",
+      description:
+        "Overlay with a scrim keeps the form visible but out of reach while it saves. The label is shown by default in overlay mode.",
+      code: `import { BreathLoader } from "@/components/zoblocks/breath-loader";
+
+export default function Example() {
+  return (
+    <form style={{ position: "relative" }} aria-busy="true">
+      <IntakeFields />
+      <BreathLoader mode="overlay" label="Saving your answers" />
+    </form>
+  );
+}`,
+    },
+  ],
+
   usage: `import { BreathLoader } from "@/components/zoblocks/breath-loader";
 
 // Patient-facing page wait

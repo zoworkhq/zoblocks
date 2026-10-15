@@ -12,7 +12,15 @@
  * a sensible set of items or a sensible value looks like, and that is
  * editorial work rather than something derivable from a type.
  */
-export const PLAYGROUND_COMPONENTS: ReadonlySet<string> = new Set(["tabs", "signature"]);
+export const PLAYGROUND_COMPONENTS: ReadonlySet<string> = new Set([
+  "tabs",
+  "signature",
+  "pulse-loader",
+  "rhythm-loader",
+  "breath-loader",
+  "helix-loader",
+  "infusion-loader",
+]);
 
 export function hasPlayground(name: string): boolean {
   return PLAYGROUND_COMPONENTS.has(name);

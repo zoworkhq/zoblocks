@@ -1289,7 +1289,73 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @zoblocks/cli add breath-loader"
+    "install": "npx @zoblocks/cli add breath-loader",
+    "controls": [
+      {
+        "prop": "size",
+        "control": "segmented",
+        "label": "size",
+        "options": [
+          "sm",
+          "md",
+          "lg",
+          "xl"
+        ],
+        "defaultValue": "xl"
+      },
+      {
+        "prop": "speed",
+        "control": "slider",
+        "label": "speed",
+        "min": 0.5,
+        "max": 2,
+        "step": 0.25,
+        "defaultValue": 1
+      },
+      {
+        "prop": "motion",
+        "control": "segmented",
+        "label": "motion",
+        "options": [
+          "auto",
+          "reduced",
+          "full"
+        ],
+        "defaultValue": "auto"
+      },
+      {
+        "prop": "showLabel",
+        "control": "switch",
+        "label": "showLabel",
+        "defaultValue": true
+      },
+      {
+        "prop": "label",
+        "control": "text",
+        "label": "label",
+        "defaultValue": "Loading your information"
+      }
+    ],
+    "examples": [
+      {
+        "id": "patient-facing",
+        "title": "A calm wait for patient-facing screens",
+        "description": "Fifteen breaths a minute, with no heart in it. The right default where a beating heart would read as glib: intake, behavioural health, bereavement.",
+        "code": "import { BreathLoader } from \"@/components/zoblocks/breath-loader\";\n\nexport default function Example() {\n  return (\n    <BreathLoader\n      showLabel\n      label=\"Loading your information\"\n      hint=\"This usually takes a few seconds.\"\n    />\n  );\n}"
+      },
+      {
+        "id": "brand-mark",
+        "title": "Your mark in the core",
+        "description": "children replaces the core with a mark of your own. It sits inside the hidden art, so a logo never becomes a second announcement.",
+        "code": "import { BreathLoader } from \"@/components/zoblocks/breath-loader\";\n\nexport default function Example() {\n  return (\n    <BreathLoader size=\"xl\" showLabel label=\"Signing you in\">\n      <ClinicLogo width={28} height={28} />\n    </BreathLoader>\n  );\n}"
+      },
+      {
+        "id": "over-a-form",
+        "title": "Over a form while it submits",
+        "description": "Overlay with a scrim keeps the form visible but out of reach while it saves. The label is shown by default in overlay mode.",
+        "code": "import { BreathLoader } from \"@/components/zoblocks/breath-loader\";\n\nexport default function Example() {\n  return (\n    <form style={{ position: \"relative\" }} aria-busy=\"true\">\n      <IntakeFields />\n      <BreathLoader mode=\"overlay\" label=\"Saving your answers\" />\n    </form>\n  );\n}"
+      }
+    ]
   },
   {
     "name": "care-team-presence",
@@ -8548,7 +8614,73 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @zoblocks/cli add helix-loader"
+    "install": "npx @zoblocks/cli add helix-loader",
+    "controls": [
+      {
+        "prop": "size",
+        "control": "segmented",
+        "label": "size",
+        "options": [
+          "sm",
+          "md",
+          "lg",
+          "xl"
+        ],
+        "defaultValue": "xl"
+      },
+      {
+        "prop": "speed",
+        "control": "slider",
+        "label": "speed",
+        "min": 0.5,
+        "max": 2,
+        "step": 0.25,
+        "defaultValue": 1
+      },
+      {
+        "prop": "motion",
+        "control": "segmented",
+        "label": "motion",
+        "options": [
+          "auto",
+          "reduced",
+          "full"
+        ],
+        "defaultValue": "auto"
+      },
+      {
+        "prop": "showLabel",
+        "control": "switch",
+        "label": "showLabel",
+        "defaultValue": true
+      },
+      {
+        "prop": "label",
+        "control": "text",
+        "label": "label",
+        "defaultValue": "Running the panel"
+      }
+    ],
+    "examples": [
+      {
+        "id": "lab-panel",
+        "title": "While a panel runs",
+        "description": "The helix belongs to the lab: a result is being computed, not fetched. Say what is running and how long it usually takes.",
+        "code": "import { HelixLoader } from \"@/components/zoblocks/helix-loader\";\n\nexport default function Example() {\n  return (\n    <HelixLoader\n      showLabel\n      label=\"Running the panel\"\n      hint=\"Results usually arrive within a minute.\"\n    />\n  );\n}"
+      },
+      {
+        "id": "slow-with-a-way-out",
+        "title": "A slow wait with a way out",
+        "description": "slowAfter swaps the hint for a plain statement of the stall. slowHint replaces the wording and actions gives the reader something to do about it.",
+        "code": "import { HelixLoader } from \"@/components/zoblocks/helix-loader\";\n\nexport default function Example() {\n  return (\n    <HelixLoader\n      showLabel\n      label=\"Running the panel\"\n      slowAfter={3000}\n      slowHint=\"The analyser is slower than usual. You can leave this page; the result will be filed.\"\n      actions={<button type=\"button\">Leave this page</button>}\n    />\n  );\n}"
+      },
+      {
+        "id": "sizes",
+        "title": "Four sizes",
+        "description": "Named steps for the common cases; a number sets the art width in pixels for anything else.",
+        "code": "import { HelixLoader } from \"@/components/zoblocks/helix-loader\";\n\nexport default function Example() {\n  return (\n    <div style={{ display: \"flex\", alignItems: \"center\", gap: 32 }}>\n      <HelixLoader size=\"sm\" label=\"Running\" />\n      <HelixLoader size=\"md\" label=\"Running\" />\n      <HelixLoader size=\"lg\" label=\"Running\" />\n      <HelixLoader size=\"xl\" label=\"Running\" />\n    </div>\n  );\n}"
+      }
+    ]
   },
   {
     "name": "infusion-loader",
@@ -8831,7 +8963,82 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @zoblocks/cli add infusion-loader"
+    "install": "npx @zoblocks/cli add infusion-loader",
+    "controls": [
+      {
+        "prop": "size",
+        "control": "segmented",
+        "label": "size",
+        "options": [
+          "sm",
+          "md",
+          "lg",
+          "xl"
+        ],
+        "defaultValue": "xl"
+      },
+      {
+        "prop": "progress",
+        "control": "slider",
+        "label": "progress",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "defaultValue": 62
+      },
+      {
+        "prop": "speed",
+        "control": "slider",
+        "label": "speed",
+        "min": 0.5,
+        "max": 2,
+        "step": 0.25,
+        "defaultValue": 1
+      },
+      {
+        "prop": "motion",
+        "control": "segmented",
+        "label": "motion",
+        "options": [
+          "auto",
+          "reduced",
+          "full"
+        ],
+        "defaultValue": "auto"
+      },
+      {
+        "prop": "showLabel",
+        "control": "switch",
+        "label": "showLabel",
+        "defaultValue": true
+      },
+      {
+        "prop": "label",
+        "control": "text",
+        "label": "label",
+        "defaultValue": "Importing records"
+      }
+    ],
+    "examples": [
+      {
+        "id": "known-progress",
+        "title": "Known progress",
+        "description": "A number from 0 to 100 makes the loader determinate: role=progressbar with a value, rather than a status that is re-announced.",
+        "code": "import { InfusionLoader } from \"@/components/zoblocks/infusion-loader\";\n\nexport default function Example() {\n  return <InfusionLoader showLabel label=\"Importing records\" progress={62} />;\n}"
+      },
+      {
+        "id": "live-import",
+        "title": "Progress from your import",
+        "description": "The application owns progress; the loader only renders it. Feed it the real count, and drop progress when the total is not known yet.",
+        "code": "import { useEffect, useState } from \"react\";\nimport { InfusionLoader } from \"@/components/zoblocks/infusion-loader\";\n\nexport default function Example() {\n  const [done, setDone] = useState(0);\n  const total = 240;\n\n  useEffect(() => {\n    const id = setInterval(() => setDone((n) => (n >= total ? 0 : n + 12)), 400);\n    return () => clearInterval(id);\n  }, []);\n\n  return (\n    <InfusionLoader\n      showLabel\n      label={`Importing ${done} of ${total} records`}\n      progress={(done / total) * 100}\n    />\n  );\n}"
+      },
+      {
+        "id": "before-the-total",
+        "title": "Before the total is known",
+        "description": "Without progress the line runs indeterminate. Switch to a number as soon as one exists, rather than inventing one.",
+        "code": "import { InfusionLoader } from \"@/components/zoblocks/infusion-loader\";\n\nexport default function Example() {\n  return <InfusionLoader showLabel label=\"Preparing the export\" />;\n}"
+      }
+    ]
   },
   {
     "name": "provenance-chip",
@@ -9680,6 +9887,81 @@ export const CATALOG: ComponentDoc[] = [
       "tailwind-merge"
     ],
     "install": "npx @zoblocks/cli add pulse-loader",
+    "controls": [
+      {
+        "prop": "size",
+        "control": "segmented",
+        "label": "size",
+        "options": [
+          "sm",
+          "md",
+          "lg",
+          "xl"
+        ],
+        "defaultValue": "xl"
+      },
+      {
+        "prop": "bpm",
+        "control": "slider",
+        "label": "bpm",
+        "min": 40,
+        "max": 100,
+        "step": 5,
+        "defaultValue": 60
+      },
+      {
+        "prop": "speed",
+        "control": "slider",
+        "label": "speed",
+        "min": 0.5,
+        "max": 2,
+        "step": 0.25,
+        "defaultValue": 1
+      },
+      {
+        "prop": "motion",
+        "control": "segmented",
+        "label": "motion",
+        "options": [
+          "auto",
+          "reduced",
+          "full"
+        ],
+        "defaultValue": "auto"
+      },
+      {
+        "prop": "showLabel",
+        "control": "switch",
+        "label": "showLabel",
+        "defaultValue": true
+      },
+      {
+        "prop": "label",
+        "control": "text",
+        "label": "label",
+        "defaultValue": "Loading your records"
+      }
+    ],
+    "examples": [
+      {
+        "id": "region-overlay",
+        "title": "Over a region, never flashing",
+        "description": "Overlay covers its positioned ancestor, not the page. With delay a response that lands inside 200ms never shows the loader at all, and minDuration keeps one that did appear from blinking out.",
+        "code": "import { PulseLoader } from \"@/components/zoblocks/pulse-loader\";\n\nexport default function Example() {\n  return (\n    <section style={{ position: \"relative\", minHeight: 220 }}>\n      <ResultsTable />\n      <PulseLoader mode=\"overlay\" label=\"Loading results\" delay={200} minDuration={400} />\n    </section>\n  );\n}"
+      },
+      {
+        "id": "slow-wait",
+        "title": "A wait that admits it stalled",
+        "description": "After slowAfter the hint changes to a plain statement that the wait is long, and actions gives the reader a way out. onSlow fires once, so the stall can be reported as well as shown.",
+        "code": "import { PulseLoader } from \"@/components/zoblocks/pulse-loader\";\n\nexport default function Example() {\n  return (\n    <PulseLoader\n      showLabel\n      label=\"Loading your records\"\n      slowAfter={3000}\n      onSlow={() => reportSlowWait(\"records\")}\n      actions={<button type=\"button\">Go back</button>}\n    />\n  );\n}"
+      },
+      {
+        "id": "below-forty",
+        "title": "Below 40px it becomes the rhythm line",
+        "description": "The heart's detail collapses under 40px, so the loader renders Rhythm Loader instead rather than a smudge. Same props, same announcement.",
+        "code": "import { PulseLoader } from \"@/components/zoblocks/pulse-loader\";\n\nexport default function Example() {\n  return (\n    <div style={{ display: \"flex\", alignItems: \"center\", gap: 32 }}>\n      <PulseLoader size=\"sm\" label=\"Loading\" />\n      <PulseLoader size=\"md\" label=\"Loading\" />\n      <PulseLoader size=\"lg\" label=\"Loading\" />\n      <PulseLoader size=\"xl\" label=\"Loading\" />\n    </div>\n  );\n}"
+      }
+    ],
     "relationships": {
       "builtWith": [
         "rhythm-loader"
@@ -11390,6 +11672,81 @@ export const CATALOG: ComponentDoc[] = [
       "tailwind-merge"
     ],
     "install": "npx @zoblocks/cli add rhythm-loader",
+    "controls": [
+      {
+        "prop": "size",
+        "control": "segmented",
+        "label": "size",
+        "options": [
+          "sm",
+          "md",
+          "lg",
+          "xl"
+        ],
+        "defaultValue": "lg"
+      },
+      {
+        "prop": "bpm",
+        "control": "slider",
+        "label": "bpm",
+        "min": 40,
+        "max": 100,
+        "step": 5,
+        "defaultValue": 60
+      },
+      {
+        "prop": "speed",
+        "control": "slider",
+        "label": "speed",
+        "min": 0.5,
+        "max": 2,
+        "step": 0.25,
+        "defaultValue": 1
+      },
+      {
+        "prop": "motion",
+        "control": "segmented",
+        "label": "motion",
+        "options": [
+          "auto",
+          "reduced",
+          "full"
+        ],
+        "defaultValue": "auto"
+      },
+      {
+        "prop": "showLabel",
+        "control": "switch",
+        "label": "showLabel",
+        "defaultValue": true
+      },
+      {
+        "prop": "label",
+        "control": "text",
+        "label": "label",
+        "defaultValue": "Loading results"
+      }
+    ],
+    "examples": [
+      {
+        "id": "in-a-button",
+        "title": "Inside a button",
+        "description": "At sm the strip fits a line of text. The button keeps its own label and sets aria-busy; the loader's label stays visually hidden so the wait is announced once.",
+        "code": "import { RhythmLoader } from \"@/components/zoblocks/rhythm-loader\";\n\nexport default function Example() {\n  return (\n    <button type=\"button\" aria-busy=\"true\" disabled>\n      <RhythmLoader size=\"sm\" label=\"Saving the note\" />\n      Saving\n    </button>\n  );\n}"
+      },
+      {
+        "id": "cadence",
+        "title": "Cadence is a prop, and clamped",
+        "description": "bpm runs from 40 to 100 and anything outside is clamped, so the fastest sweep stays well under the three-flash limit. The rate is decorative: it is never a patient's.",
+        "code": "import { RhythmLoader } from \"@/components/zoblocks/rhythm-loader\";\n\nexport default function Example() {\n  return (\n    <div style={{ display: \"flex\", gap: 40 }}>\n      <RhythmLoader bpm={40} showLabel label=\"40 bpm\" />\n      <RhythmLoader bpm={60} showLabel label=\"60 bpm\" />\n      <RhythmLoader bpm={100} showLabel label=\"100 bpm\" />\n    </div>\n  );\n}"
+      },
+      {
+        "id": "reduced-motion",
+        "title": "Reduced motion is a designed state",
+        "description": "The default follows the operating system. Reduced draws the full strip and breathes it in opacity; nothing travels. Full opts out of the preference and should be rare.",
+        "code": "import { RhythmLoader } from \"@/components/zoblocks/rhythm-loader\";\n\nexport default function Example() {\n  return (\n    <div style={{ display: \"flex\", gap: 40 }}>\n      <RhythmLoader motion=\"full\" showLabel label=\"Full motion\" />\n      <RhythmLoader motion=\"reduced\" showLabel label=\"Reduced motion\" />\n    </div>\n  );\n}"
+      }
+    ],
     "relationships": {
       "builtWith": [],
       "usedIn": [

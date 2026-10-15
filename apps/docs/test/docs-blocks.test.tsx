@@ -66,3 +66,32 @@ describe("CodeBlock", () => {
     expect(container.querySelectorAll("[aria-hidden='true'].select-none")).toHaveLength(0);
   });
 });
+
+describe("example previews", () => {
+  it("only preview examples that exist in the catalogue", async () => {
+    const { EXAMPLE_PREVIEWS } = await import("@/components/site/docs/example-registry");
+    const { CATALOG } = await import("@/lib/generated/catalog");
+    for (const [name, previews] of Object.entries(EXAMPLE_PREVIEWS)) {
+      const ids = (CATALOG.find((c) => c.name === name)?.examples ?? []).map((e) => e.id);
+      for (const id of Object.keys(previews)) {
+        expect(ids, `${name} has no example "${id}"`).toContain(id);
+      }
+    }
+  });
+
+  it("previews every loader example", async () => {
+    const { EXAMPLE_PREVIEWS } = await import("@/components/site/docs/example-registry");
+    const { CATALOG } = await import("@/lib/generated/catalog");
+    for (const name of [
+      "pulse-loader",
+      "rhythm-loader",
+      "breath-loader",
+      "helix-loader",
+      "infusion-loader",
+    ]) {
+      const ids = (CATALOG.find((c) => c.name === name)?.examples ?? []).map((e) => e.id);
+      expect(ids.length).toBeGreaterThanOrEqual(3);
+      expect(Object.keys(EXAMPLE_PREVIEWS[name] ?? {}).sort()).toEqual([...ids].sort());
+    }
+  });
+});
