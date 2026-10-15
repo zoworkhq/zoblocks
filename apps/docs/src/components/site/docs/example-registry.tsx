@@ -20,6 +20,7 @@ import { RhythmLoader } from "@/registry/zoblocks/rhythm-loader/rhythm-loader";
 import { BreathLoader } from "@/registry/zoblocks/breath-loader/breath-loader";
 import { HelixLoader } from "@/registry/zoblocks/helix-loader/helix-loader";
 import { InfusionLoader } from "@/registry/zoblocks/infusion-loader/infusion-loader";
+import * as TabsDemo from "../tabs-demos";
 
 /* ------------------------------------------------------------------ */
 /* Stand-ins for the host application                                  */
@@ -225,6 +226,32 @@ export const EXAMPLE_PREVIEWS: Readonly<
         <HelixLoader size="xl" label="Running" />
       </Row>
     ),
+  },
+
+  tabs: {
+    "chart-sections": () => <TabsDemo.ChartSections />,
+    "restricted-section": () => <TabsDemo.RestrictedSection />,
+    segmented: () => <TabsDemo.Flagship />,
+    "segmented-rich": () => <TabsDemo.RichSegmented />,
+    underline: () => <TabsDemo.Underline />,
+    "pill-filters": () => <TabsDemo.PillFilters />,
+    "enclosed-editable": () => <TabsDemo.Editable />,
+    rail: () => <TabsDemo.Rail />,
+    ghost: () => <TabsDemo.GhostTabs />,
+    command: () => <TabsDemo.CommandBar />,
+    stepper: () => <TabsDemo.Stepper />,
+    card: () => <TabsDemo.CardChoice />,
+    stat: () => <TabsDemo.StatTiles />,
+    "segmented-filter": () => <TabsDemo.DensityFilter />,
+    "nav-links": () => <TabsDemo.NavTabs />,
+    "overflow-scroll": () => <TabsDemo.OverflowDemo strategy="scroll" />,
+    "overflow-menu": () => <TabsDemo.OverflowDemo strategy="menu" />,
+    "overflow-collapse": () => <TabsDemo.OverflowDemo strategy="collapse" />,
+    "unsaved-guard": () => <TabsDemo.GuardDemo />,
+    "restricted-stale": () => <TabsDemo.RestrictedDemo />,
+    severity: () => <TabsDemo.ChartHeader />,
+    "every-variant": () => <TabsDemo.EveryVariant />,
+    "theme-density": () => <TabsDemo.ThemeDensityMatrix />,
   },
 
   "infusion-loader": {

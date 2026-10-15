@@ -15682,6 +15682,7 @@ export const CATALOG: ComponentDoc[] = [
         "title": "Chart sections",
         "description": "The common case: a view switch over a patient chart, with a critical count on Labs that reaches the accessible name as a word.",
         "fixture": "patientRoutine",
+        "group": "Clinical",
         "code": "import { Tabs } from \"@zoblocks/tabs\";\nimport { allergyList, medicationList, observationPanel } from \"@zoblocks/fixtures\";\nimport \"@zoblocks/tabs/styles.css\";\n\nconst critical = observationPanel.filter(isCritical);\n\n<Tabs\n  as=\"tabs\"\n  aria-label=\"Chart sections\"\n  defaultValue=\"summary\"\n  items={[\n    { value: \"summary\", label: \"Summary\", children: <Summary /> },\n    {\n      value: \"labs\",\n      label: \"Labs\",\n      // Counted from the data, never typed in. A tone is a claim about the\n      // patient, so it has to come from the same place the panel does.\n      count: critical.length,\n      tone: critical.length ? \"critical\" : \"neutral\",\n      children: <Labs observations={observationPanel} />,\n    },\n    { value: \"meds\", label: \"Medications\", count: medicationList.length, children: <Meds /> },\n    { value: \"allergies\", label: \"Allergies\", count: allergyList.length, children: <Allergies /> },\n  ]}\n/>;"
       },
       {
@@ -15689,13 +15690,155 @@ export const CATALOG: ComponentDoc[] = [
         "title": "A section that is restricted, not absent",
         "description": "A disabled tab requires a reason. Omitting the section entirely would tell the clinician it does not exist; greying it silently tells them nothing.",
         "fixture": "patientRestricted",
+        "group": "Clinical",
         "code": "import { patientRestricted } from \"@zoblocks/fixtures\";\n\n<Tabs\n  as=\"tabs\"\n  aria-label=\"Chart sections\"\n  defaultValue=\"summary\"\n  items={[\n    { value: \"summary\", label: \"Summary\", children: <Summary /> },\n    {\n      value: \"bh\",\n      label: \"Behavioural health\",\n      disabled: true,\n      // Mandatory. aria-disabled, never the disabled attribute — a keyboard\n      // user has to be able to reach it to find out why they cannot open it.\n      disabledReason:\n        \"Restricted. Opening it records an access event and notifies the record owner.\",\n    },\n  ]}\n/>;"
+      },
+      {
+        "id": "segmented",
+        "title": "Segmented",
+        "description": "The control the whole system started from. The thumb is one transformed element, so it moves position and width together and never repaints the track. Click either half, or focus it and press ← / →.",
+        "group": "Variants",
+        "code": "import { Tabs } from \"@zoblocks/tabs\";\n\nexport default function Example() {\n  return (\n    <Tabs\n      as=\"tabs\"\n      variant=\"segmented\"\n      fill=\"equal\"\n      aria-label=\"Document scope\"\n      defaultValue=\"personal\"\n      items={[\n        { value: \"personal\", label: \"Personal\", children: <p>14 documents only you can see.</p> },\n        { value: \"shared\", label: \"Shared\", children: <p>6 documents shared with your care team.</p> },\n      ]}\n    />\n  );\n}"
+      },
+      {
+        "id": "segmented-rich",
+        "title": "Segmented with icons, counts and tone",
+        "description": "The count reads as a number, not a label: “Needs action, 3 abnormal”. Archive is aria-disabled rather than disabled, so a keyboard user can find it and learn why it is unavailable.",
+        "group": "Variants",
+        "code": "<Tabs\n  as=\"tabs\"\n  variant=\"segmented\"\n  aria-label=\"Inbox filter\"\n  defaultValue=\"all\"\n  items={[\n    { value: \"all\", label: \"All\", icon: <MailIcon />, count: 128, children: <Inbox filter=\"all\" /> },\n    { value: \"unread\", label: \"Unread\", icon: <BellIcon />, count: 12, children: <Inbox filter=\"unread\" /> },\n    {\n      value: \"action\",\n      label: \"Needs action\",\n      icon: <ShieldIcon />,\n      count: 3,\n      tone: \"high\",\n      children: <Inbox filter=\"action\" />,\n    },\n    {\n      value: \"archive\",\n      label: \"Archive\",\n      icon: <DocIcon />,\n      disabled: true,\n      disabledReason: \"Archive is disabled for this mailbox\",\n    },\n  ]}\n/>"
+      },
+      {
+        "id": "underline",
+        "title": "Underline",
+        "description": "The workhorse: more than four items, labels of unequal length, panels that are whole screens. The rail is an inset shadow rather than a border, so the 2px indicator overlaps it exactly at any zoom.",
+        "group": "Variants",
+        "code": "<Tabs\n  as=\"tabs\"\n  variant=\"underline\"\n  aria-label=\"Order\"\n  defaultValue=\"summary\"\n  items={[\n    { value: \"summary\", label: \"Summary\", children: <OrderSummary /> },\n    { value: \"lines\", label: \"Line items\", count: 24, children: <LineItems /> },\n    { value: \"ship\", label: \"Shipments\", count: 3, children: <Shipments /> },\n    { value: \"returns\", label: \"Returns\", count: 1, tone: \"high\", children: <Returns /> },\n    { value: \"invoices\", label: \"Invoices\", children: <Invoices /> },\n    { value: \"audit\", label: \"Audit log\", children: <AuditLog /> },\n  ]}\n/>"
+      },
+      {
+        "id": "pill-filters",
+        "title": "Pill filters",
+        "description": "Pills are the only variant allowed to wrap, and only as a radiogroup — once a tablist wraps, “the next tab” stops being a direction. There is no indicator, because a line break leaves no path for one to travel along.",
+        "group": "Variants",
+        "code": "<Tabs\n  as=\"radiogroup\"\n  variant=\"pill\"\n  overflow=\"wrap\"\n  aria-label=\"Filter documents by type\"\n  defaultValue=\"all\"\n  items={[\n    { value: \"all\", label: \"Everything\", count: 241 },\n    { value: \"referrals\", label: \"Referrals\", icon: <DocIcon />, count: 38 },\n    { value: \"labs\", label: \"Lab reports\", icon: <FlaskIcon />, count: 96 },\n    { value: \"imaging\", label: \"Imaging\", icon: <ImageIcon />, count: 22 },\n    { value: \"consent\", label: \"Consent forms\", icon: <ShieldIcon />, count: 14 },\n    { value: \"letters\", label: \"Correspondence\", icon: <MailIcon />, count: 71 },\n  ]}\n/>"
+      },
+      {
+        "id": "enclosed-editable",
+        "title": "Enclosed, with add and close",
+        "description": "The × is aria-hidden and the keyboard path is Delete on the tab, because a control inside role=tab is invalid ARIA. After a close, focus moves to the neighbour — never to <body>.",
+        "group": "Variants",
+        "code": "import { useState } from \"react\";\nimport { Tabs } from \"@zoblocks/tabs\";\n\nexport default function Example() {\n  const [items, setItems] = useState([\n    { value: \"note\", label: \"Progress note\", icon: <NoteIcon />, dot: \"dirty\", closable: true },\n    { value: \"cmp\", label: \"CMP 2026-08-14\", icon: <FlaskIcon />, closable: true },\n    { value: \"ct\", label: \"CT abdomen\", icon: <ImageIcon />, closable: true },\n  ]);\n  const [value, setValue] = useState(\"note\");\n\n  return (\n    <Tabs\n      as=\"tabs\"\n      variant=\"enclosed\"\n      aria-label=\"Open documents\"\n      value={value}\n      onChange={setValue}\n      items={items.map((item) => ({ ...item, children: <Document id={item.value} /> }))}\n      editable={{\n        onClose: (target) => {\n          const index = items.findIndex((item) => item.value === target);\n          const rest = items.filter((item) => item.value !== target);\n          setItems(rest);\n          // Next, else previous: the rule the APG pattern leaves out.\n          if (value === target) setValue((rest[index] ?? rest[rest.length - 1])?.value ?? \"\");\n        },\n        onAdd: () => {\n          const next = \"new-\" + Date.now();\n          setItems((current) => [...current, { value: next, label: \"Untitled\", closable: true }]);\n          setValue(next);\n        },\n      }}\n    />\n  );\n}"
+      },
+      {
+        "id": "rail",
+        "title": "Rail",
+        "description": "Vertical means ↑ / ↓, not ← / →. Setting aria-orientation without rebinding the keys would lie to the screen reader, so both come from one prop.",
+        "group": "Variants",
+        "code": "<Tabs\n  as=\"tabs\"\n  variant=\"rail\"\n  orientation=\"vertical\"\n  aria-label=\"Settings\"\n  defaultValue=\"profile\"\n  items={[\n    { value: \"profile\", label: \"Profile\", icon: <UsersIcon />, children: <Profile /> },\n    { value: \"notifications\", label: \"Notifications\", icon: <BellIcon />, count: 4, children: <Notifications /> },\n    { value: \"security\", label: \"Security\", icon: <LockIcon />, children: <Security /> },\n    { value: \"members\", label: \"Members\", icon: <UsersIcon />, count: 32, children: <Members /> },\n    {\n      value: \"api\",\n      label: \"API keys\",\n      icon: <CogIcon />,\n      disabled: true,\n      disabledReason: \"Not enabled for this workspace\",\n    },\n  ]}\n/>"
+      },
+      {
+        "id": "ghost",
+        "title": "Ghost",
+        "description": "No track, no rail, no indicator element — so no measurement pass and no ResizeObserver. For dense toolbars and popovers, where a second bordered box would compete with the one already there.",
+        "group": "Variants",
+        "code": "<Tabs\n  as=\"tabs\"\n  variant=\"ghost\"\n  aria-label=\"Preview mode\"\n  defaultValue=\"rendered\"\n  items={[\n    { value: \"rendered\", label: \"Rendered\", children: <Rendered /> },\n    { value: \"source\", label: \"Source\", children: <Source /> },\n    { value: \"diff\", label: \"Diff\", children: <Diff /> },\n  ]}\n/>"
+      },
+      {
+        "id": "command",
+        "title": "Command",
+        "description": "Two radiogroups, not one toolbar: layout and density are independent values, and merging them would lose the “checked, 1 of 4” that tells a screen-reader user the current view. Every icon carries a textLabel.",
+        "group": "Variants",
+        "code": "<div style={{ display: \"flex\", gap: 12 }}>\n  <Tabs\n    as=\"radiogroup\"\n    variant=\"command\"\n    aria-label=\"Layout\"\n    defaultValue=\"list\"\n    items={[\n      { value: \"list\", label: <ListIcon />, textLabel: \"List view\" },\n      { value: \"grid\", label: <GridIcon />, textLabel: \"Grid view\" },\n      { value: \"board\", label: <BoardIcon />, textLabel: \"Board view\" },\n      { value: \"calendar\", label: <CalendarIcon />, textLabel: \"Calendar view\" },\n    ]}\n  />\n  <Tabs\n    as=\"radiogroup\"\n    variant=\"command\"\n    size=\"sm\"\n    aria-label=\"Density\"\n    defaultValue=\"compact\"\n    items={[\n      { value: \"comfy\", label: \"Comfy\" },\n      { value: \"compact\", label: \"Compact\" },\n    ]}\n  />\n</div>"
+      },
+      {
+        "id": "stepper",
+        "title": "Stepper",
+        "description": "Backwards is free, forwards is earned. Completed steps stay reachable — locking them forces a restart to fix a typo. Review is locked, focusable, and says why.",
+        "group": "Variants",
+        "code": "<Tabs\n  as=\"steps\"\n  variant=\"stepper\"\n  aria-label=\"Patient intake\"\n  defaultValue=\"consent\"\n  items={[\n    { value: \"identity\", label: \"Identity\", state: \"done\", children: <Identity /> },\n    { value: \"insurance\", label: \"Insurance\", state: \"done\", children: <Insurance /> },\n    { value: \"consent\", label: \"Consent\", state: \"current\", children: <Consent /> },\n    {\n      value: \"review\",\n      label: \"Review\",\n      state: \"locked\",\n      disabled: true,\n      disabledReason: \"Complete the consent step first\",\n    },\n  ]}\n/>"
+      },
+      {
+        "id": "card",
+        "title": "Card",
+        "description": "When choosing wrong has a consequence the label cannot carry, the option needs a sentence, and a sentence does not fit in a pill. Same accessibility tree as the filters, three times the surface.",
+        "group": "Variants",
+        "code": "<Tabs\n  as=\"radiogroup\"\n  variant=\"card\"\n  aria-label=\"How should this result be released?\"\n  defaultValue=\"immediate\"\n  items={[\n    {\n      value: \"immediate\",\n      textLabel: \"Immediate\",\n      label: <Option title=\"Immediate\" body=\"Visible in the patient portal as soon as it is verified.\" />,\n    },\n    {\n      value: \"reviewed\",\n      textLabel: \"After review\",\n      label: <Option title=\"After review\" body=\"Held until a clinician marks it reviewed. Median delay 6 h.\" />,\n    },\n    {\n      value: \"scheduled\",\n      textLabel: \"Scheduled\",\n      label: <Option title=\"Scheduled\" body=\"Released at a fixed time you choose, review or not.\" />,\n    },\n  ]}\n/>"
+      },
+      {
+        "id": "stat",
+        "title": "Stat",
+        "description": "Arrow and colour disagree on purpose: “No-show rate ▲” is bad and “Median wait ▼” is good, so direction alone cannot carry meaning. The accessible name says better or worse in words.",
+        "group": "Variants",
+        "code": "<Tabs\n  as=\"tabs\"\n  variant=\"stat\"\n  aria-label=\"Metric\"\n  defaultValue=\"appts\"\n  items={[\n    {\n      value: \"appts\",\n      textLabel: \"Appointments, 1,284, better than last week\",\n      label: <Stat name=\"Appointments\" value=\"1,284\" delta=\"▲ 6.2 % vs last week\" good />,\n      children: <Trend metric=\"appts\" />,\n    },\n    {\n      value: \"noshow\",\n      textLabel: \"No-show rate, 7.4 %, worse than last week\",\n      label: <Stat name=\"No-show rate\" value=\"7.4 %\" delta=\"▲ 1.1 pt vs last week\" />,\n      children: <Trend metric=\"noshow\" />,\n    },\n    {\n      value: \"wait\",\n      textLabel: \"Median wait, 12 m, better than last week\",\n      label: <Stat name=\"Median wait\" value=\"12 m\" delta=\"▼ 3 m vs last week\" good />,\n      children: <Trend metric=\"wait\" />,\n    },\n    {\n      value: \"portal\",\n      textLabel: \"Portal messages, 612, worse than last week\",\n      label: <Stat name=\"Portal messages\" value=\"612\" delta=\"▲ 18 % vs last week\" />,\n      children: <Trend metric=\"portal\" />,\n    },\n  ]}\n/>"
       },
       {
         "id": "segmented-filter",
         "title": "A segmented control is a form value",
         "description": "Not every tab strip is a view switch. A filter is a form control and belongs in a Form.Item, which is what `as=\"radiogroup\"` declares.",
+        "group": "Semantic modes",
         "code": "import { Form } from \"antd\";\n\n<Form.Item name=\"density\" label=\"Density\">\n  <Tabs\n    as=\"radiogroup\"\n    variant=\"segmented\"\n    items={[\n      { value: \"compact\", label: \"Compact\" },\n      { value: \"default\", label: \"Default\" },\n      { value: \"comfortable\", label: \"Comfortable\" },\n    ]}\n  />\n</Form.Item>;"
+      },
+      {
+        "id": "nav-links",
+        "title": "Navigation with real links",
+        "description": "as=\"nav\" renders a <nav> of real anchors: announced as “Overview, link, current page”, no arrow-key hijack, and cmd-click opens a new tab. Hover one and the browser shows the URL.",
+        "group": "Semantic modes",
+        "code": "<Tabs\n  as=\"nav\"\n  variant=\"underline\"\n  aria-label=\"Project\"\n  value={currentSection}\n  items={[\n    { value: \"overview\", label: \"Overview\", href: \"/project\" },\n    { value: \"issues\", label: \"Issues\", href: \"/project/issues\", count: 31 },\n    { value: \"pulls\", label: \"Pull requests\", href: \"/project/pulls\", count: 7 },\n    { value: \"actions\", label: \"Actions\", href: \"/project/actions\" },\n    { value: \"insights\", label: \"Insights\", href: \"/project/insights\" },\n  ]}\n/>"
+      },
+      {
+        "id": "overflow-scroll",
+        "title": "Scroll",
+        "description": "The default. Fade masks, nudge buttons and scroll-snap. The nudges are tabindex=-1: arrow keys already move selection and scroll follows, so two more tab stops would do nothing for a keyboard user.",
+        "group": "Overflow",
+        "code": "<Tabs\n  as=\"tabs\"\n  variant=\"underline\"\n  overflow=\"scroll\"\n  aria-label=\"Chart section\"\n  defaultValue=\"summary\"\n  items={chartSections}\n/>"
+      },
+      {
+        "id": "overflow-menu",
+        "title": "Priority-plus menu",
+        "description": "Widths are measured once and cached. Tabs that no longer fit move into a real role=menu, and the selected tab is pinned so it can never be the one that disappears. Resize the window to watch it.",
+        "group": "Overflow",
+        "code": "<Tabs\n  as=\"tabs\"\n  variant=\"underline\"\n  overflow=\"menu\"\n  aria-label=\"Chart section\"\n  defaultValue=\"summary\"\n  items={chartSections}\n/>"
+      },
+      {
+        "id": "overflow-collapse",
+        "title": "Collapse to a select",
+        "description": "Below a container width the strip becomes a native <select>, the one picker that already works on every phone. Driven by the container, not the viewport: tabs in a 380px drawer need it on a 1440px monitor too.",
+        "group": "Overflow",
+        "code": "<div style={{ maxWidth: 320 }}>\n  <Tabs\n    as=\"tabs\"\n    variant=\"underline\"\n    overflow=\"collapse\"\n    aria-label=\"Chart section\"\n    defaultValue=\"summary\"\n    items={chartSections}\n  />\n</div>"
+      },
+      {
+        "id": "unsaved-guard",
+        "title": "Unsaved-changes guard",
+        "description": "onBeforeChange may return a promise, because vetoing usually means asking a person. While it is pending the strip is inert and aria-busy. Cancel, and focus returns to where you were.",
+        "group": "States",
+        "code": "<Tabs\n  as=\"tabs\"\n  variant=\"segmented\"\n  aria-label=\"Note editor\"\n  defaultValue=\"compose\"\n  onBeforeChange={() => (isDirty ? confirmLeave() : true)}\n  items={[\n    { value: \"compose\", label: \"Compose\", dot: isDirty ? \"dirty\" : undefined, children: <Compose /> },\n    { value: \"preview\", label: \"Preview\", children: <Preview /> },\n    { value: \"history\", label: \"History\", children: <History /> },\n  ]}\n/>\n\n// Resolves when the clinician answers the dialog.\nfunction confirmLeave(): Promise<boolean> {\n  return openDialog({\n    title: \"This note has unsigned changes\",\n    confirm: \"Switch, keep draft\",\n    cancel: \"Stay and sign\",\n  });\n}"
+      },
+      {
+        "id": "restricted-stale",
+        "title": "Restricted and stale",
+        "description": "Hiding a restricted section teaches clinicians the record is complete when it is not. Vitals is stale rather than missing: a clinician reading cached observations needs to know they are cached.",
+        "group": "States",
+        "code": "<Tabs\n  as=\"tabs\"\n  variant=\"rail\"\n  orientation=\"vertical\"\n  aria-label=\"Sections\"\n  defaultValue=\"summary\"\n  items={[\n    { value: \"summary\", label: \"Summary\", icon: <DocIcon />, children: <Summary /> },\n    {\n      value: \"bh\",\n      label: \"Behavioural health\",\n      icon: <LockIcon />,\n      disabled: true,\n      disabledReason:\n        \"Restricted. Opening it records an access event against your account and notifies the record owner.\",\n    },\n    { value: \"meds\", label: \"Medications\", icon: <PillIcon />, children: <Meds /> },\n    { value: \"vitals\", label: \"Vitals\", icon: <HeartIcon />, availability: \"stale\", children: <Vitals /> },\n  ]}\n/>"
+      },
+      {
+        "id": "severity",
+        "title": "Severity in the strip",
+        "description": "A clinician scanning five tabs must see where the problem is without opening each. The red 2 carries a border and a hidden “2 critical”, and the panel repeats it as text. Tabs are never reordered by severity — position is memory.",
+        "group": "States",
+        "code": "<Tabs\n  as=\"tabs\"\n  variant=\"underline\"\n  aria-label=\"Chart sections\"\n  defaultValue=\"summary\"\n  items={[\n    { value: \"summary\", label: \"Summary\", icon: <DocIcon />, children: <Summary /> },\n    { value: \"vitals\", label: \"Vitals\", icon: <HeartIcon />, children: <Vitals /> },\n    {\n      value: \"labs\",\n      label: \"Labs\",\n      icon: <FlaskIcon />,\n      count: criticalResults.length,\n      tone: \"critical\",\n      children: <Labs />,\n    },\n    { value: \"meds\", label: \"Medications\", icon: <PillIcon />, count: 9, children: <Meds /> },\n    { value: \"notes\", label: \"Notes\", icon: <NoteIcon />, children: <Notes /> },\n  ]}\n/>"
+      },
+      {
+        "id": "every-variant",
+        "title": "Every variant, one tree",
+        "description": "The same items in all eleven skins. Tab into any of them and the keyboard model is identical, because the skin is CSS and the mode is the accessibility tree.",
+        "group": "States",
+        "code": "const VARIANTS = [\n  \"segmented\", \"underline\", \"pill\", \"enclosed\", \"rail\", \"ghost\",\n  \"stepper\", \"command\", \"card\", \"stat\", \"unstyled\",\n] as const;\n\nVARIANTS.map((variant) => (\n  <Tabs\n    key={variant}\n    as=\"tabs\"\n    variant={variant}\n    aria-label={variant + \" example\"}\n    defaultValue=\"a\"\n    items={[\n      { value: \"a\", label: \"Personal\" },\n      { value: \"b\", label: \"Shared\" },\n      { value: \"c\", label: \"Archived\" },\n    ]}\n  />\n));"
+      },
+      {
+        "id": "theme-density",
+        "title": "Nine combinations at once",
+        "description": "Light, dark and high contrast against patient, standard and clinical density. The theme and density are attributes on any ancestor; nothing in the component changes. All nine side by side is how a token bug gets caught.",
+        "group": "Theme and density",
+        "code": "{[\"light\", \"dark\", \"high-contrast\"].map((theme) =>\n  [\"patient\", \"standard\", \"clinical\"].map((density) => (\n    <div key={theme + density} data-zb-theme={theme} data-zb-density={density}>\n      <Tabs\n        as=\"radiogroup\"\n        variant=\"segmented\"\n        aria-label=\"Scope\"\n        defaultValue=\"personal\"\n        items={[\n          { value: \"personal\", label: \"Personal\" },\n          { value: \"shared\", label: \"Shared\" },\n        ]}\n      />\n      <Tabs\n        as=\"tabs\"\n        variant=\"underline\"\n        aria-label=\"Results\"\n        defaultValue=\"labs\"\n        items={[\n          { value: \"labs\", label: \"Labs\", count: 2, tone: \"critical\" },\n          { value: \"meds\", label: \"Meds\", count: 9 },\n        ]}\n      />\n    </div>\n  )),\n)}"
       }
     ],
     "fixtures": [

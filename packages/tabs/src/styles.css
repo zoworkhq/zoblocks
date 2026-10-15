@@ -838,6 +838,17 @@
 .zb-tabs__bar[data-zb-scrollable] > .zb-tabs__list {
   flex: 1 1 auto;
 }
+/*
+ * The menu strategy measures the list for the room it has, so the list has to
+ * take that room rather than shrink to the tabs still showing. Sized to its
+ * content, every refit read a narrower list than the last, parked one more
+ * tab, and settled on the selected tab alone beside "More 10".
+ */
+.zb-tabs[data-zb-overflow="menu"]:not([data-zb-orientation="vertical"])
+  .zb-tabs__bar
+  > .zb-tabs__list {
+  flex: 1 1 auto;
+}
 .zb-tabs:not([data-zb-orientation="vertical"]) .zb-tabs__bar[data-zb-scrollable] > .zb-tabs__list {
   overflow-x: auto;
   overflow-y: clip;

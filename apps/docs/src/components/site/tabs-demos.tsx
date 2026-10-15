@@ -1,24 +1,17 @@
 "use client";
 
 /**
- * The tab gallery — every demo from the component brief, live.
+ * The Tabs demos, live — the previews behind the examples on the Tabs page.
  *
- * A gallery of screenshots can show eleven skins. Only this can show that all
- * eleven produce the same accessibility tree, that the indicator survives a
- * density change, and that a restricted tab is present-and-explained rather
- * than missing. So everything here is the real package: click it, arrow
- * through it, flip it to RTL, and read the announced names in a screen reader.
- *
- * There was a control bar over this — theme, density and direction, one click
- * each, applied to every demo at once. It is gone. The "Theme × density"
- * chapter still renders every combination at once, so that claim is still
- * checkable here; direction is not, and that is a real loss of evidence rather
- * than a tidy-up.
+ * Every one is the real package: click it, arrow through it, read the
+ * announced names in a screen reader. They used to sit in a chaptered gallery
+ * of their own; each is now the preview of a documented example, beside the
+ * code that produces it, which is where a reader comparing the two needs it.
  */
 
 import * as React from "react";
-import { DemoNote } from "@/components/site/demo-note";
 import { Tabs, type TabVariant } from "@zoblocks/tabs";
+import { allergyList, medicationList, observationPanel } from "@zoblocks/fixtures";
 import { cn } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ */
@@ -150,54 +143,12 @@ function Panel({ title, children }: { title: string; children?: React.ReactNode 
   );
 }
 
-interface DemoProps {
-  id: string;
-  name: string;
-  api: string;
-  tags?: string[];
-  note: React.ReactNode;
-  children: React.ReactNode;
-  /** Stretches the stage for a vertical or wide composition. */
-  wide?: boolean;
-}
-
-/**
- * One framed demo.
- *
- * The frame states the API being demonstrated, because a gallery where you
- * cannot tell which prop produced which pixels teaches nothing.
- *
- * Deliberately not a `data-reveal` target. These figures mount when a reader
- * presses a chapter button rather than when they scroll, so a scroll animation
- * would fire on every switch — and a gallery is for comparing, which means the
- * next chapter has to be there the instant it is asked for.
- */
-function Demo({ id, name, api, tags, note, children, wide }: DemoProps) {
-  return (
-    <figure id={id} className="zb-demo scroll-mt-28">
-      <figcaption className="zb-demo__head">
-        <span className="zb-demo__id">{id.toUpperCase()}</span>
-        <span className="zb-demo__name">{name}</span>
-        <code className="zb-demo__api">{api}</code>
-        <span className="grow" />
-        {tags?.map((tag) => (
-          <span key={tag} className="zb-demo__tag">
-            {tag}
-          </span>
-        ))}
-      </figcaption>
-      <div className={cn("zb-demo__stage", wide && "zb-demo__stage--wide")}>{children}</div>
-      <DemoNote>{note}</DemoNote>
-    </figure>
-  );
-}
-
 /* ------------------------------------------------------------------ */
 /* Individual demos                                                     */
 /* ------------------------------------------------------------------ */
 
 /** The control from the original screenshot, rebuilt. */
-function Flagship() {
+export function Flagship() {
   return (
     <div className="mx-auto w-full max-w-[520px]">
       <Tabs
@@ -223,7 +174,7 @@ function Flagship() {
   );
 }
 
-function RichSegmented() {
+export function RichSegmented() {
   return (
     <Tabs
       as="tabs"
@@ -265,7 +216,7 @@ function RichSegmented() {
   );
 }
 
-function Underline() {
+export function Underline() {
   return (
     <Tabs
       as="tabs"
@@ -305,7 +256,7 @@ function Underline() {
 }
 
 /** The chart header: the composition tabs are most often part of. */
-function ChartHeader() {
+export function ChartHeader() {
   return (
     <div className="zb-chart">
       <div className="zb-chart__head">
@@ -375,7 +326,7 @@ function ChartHeader() {
   );
 }
 
-function PillFilters() {
+export function PillFilters() {
   return (
     <Tabs
       as="radiogroup"
@@ -396,7 +347,7 @@ function PillFilters() {
 }
 
 /** Editable tabs, with real add and close. */
-function Editable() {
+export function Editable() {
   const [items, setItems] = React.useState([
     {
       value: "note",
@@ -466,7 +417,7 @@ function Editable() {
   );
 }
 
-function Rail({ collapsed }: { collapsed?: boolean }) {
+export function Rail({ collapsed }: { collapsed?: boolean }) {
   return (
     <Tabs
       as="tabs"
@@ -518,7 +469,7 @@ function Rail({ collapsed }: { collapsed?: boolean }) {
   );
 }
 
-function CommandBar() {
+export function CommandBar() {
   return (
     <div className="flex flex-wrap items-center gap-3">
       <Tabs
@@ -548,7 +499,7 @@ function CommandBar() {
   );
 }
 
-function Stepper() {
+export function Stepper() {
   return (
     <Tabs
       as="steps"
@@ -590,7 +541,7 @@ function Stepper() {
   );
 }
 
-function CardChoice() {
+export function CardChoice() {
   return (
     <Tabs
       as="radiogroup"
@@ -654,7 +605,7 @@ function Spark({ seed }: { seed: number }) {
   );
 }
 
-function StatTiles() {
+export function StatTiles() {
   const stats = [
     {
       value: "appts",
@@ -703,7 +654,7 @@ function StatTiles() {
   );
 }
 
-function GhostTabs() {
+export function GhostTabs() {
   return (
     <Tabs
       as="tabs"
@@ -735,7 +686,7 @@ function GhostTabs() {
   );
 }
 
-function NavTabs() {
+export function NavTabs() {
   return (
     <Tabs
       as="nav"
@@ -743,11 +694,11 @@ function NavTabs() {
       aria-label="Project"
       defaultValue="overview"
       items={[
-        { value: "overview", label: "Overview", href: "#nav-demo" },
-        { value: "issues", label: "Issues", href: "#nav-demo", count: 31 },
-        { value: "pulls", label: "Pull requests", href: "#nav-demo", count: 7 },
-        { value: "actions", label: "Actions", href: "#nav-demo" },
-        { value: "insights", label: "Insights", href: "#nav-demo" },
+        { value: "overview", label: "Overview", href: "#ex-nav-links" },
+        { value: "issues", label: "Issues", href: "#ex-nav-links", count: 31 },
+        { value: "pulls", label: "Pull requests", href: "#ex-nav-links", count: 7 },
+        { value: "actions", label: "Actions", href: "#ex-nav-links" },
+        { value: "insights", label: "Insights", href: "#ex-nav-links" },
       ]}
     />
   );
@@ -791,7 +742,7 @@ function longItems(tone = true) {
  * bound: it is the strategy for the narrowest case, and it needs to be past the
  * point where a menu would still have fitted.
  */
-function OverflowDemo({ strategy }: { strategy: "scroll" | "menu" | "collapse" }) {
+export function OverflowDemo({ strategy }: { strategy: "scroll" | "menu" | "collapse" }) {
   return (
     <div className={cn("w-full", strategy === "collapse" ? "max-w-[320px]" : "max-w-[26rem]")}>
       <Tabs
@@ -807,7 +758,7 @@ function OverflowDemo({ strategy }: { strategy: "scroll" | "menu" | "collapse" }
 }
 
 /** The guard: switching away from an unsaved note is a request, not a fact. */
-function GuardDemo() {
+export function GuardDemo() {
   const [dirty, setDirty] = React.useState(true);
   const [asking, setAsking] = React.useState<null | ((allowed: boolean) => void)>(null);
   const [log, setLog] = React.useState<string[]>([
@@ -884,7 +835,7 @@ function GuardDemo() {
   );
 }
 
-function RestrictedDemo() {
+export function RestrictedDemo() {
   return (
     <Tabs
       as="tabs"
@@ -990,379 +941,122 @@ const VARIANTS: TabVariant[] = [
   "unstyled",
 ];
 
-type Chapter = "gallery" | "modes" | "overflow" | "states" | "matrix";
-
-const CHAPTERS: Array<{ id: Chapter; label: string; blurb: string }> = [
-  {
-    id: "gallery",
-    label: "Variants",
-    blurb: "Eleven skins. Every one is the same accessibility tree.",
-  },
-  {
-    id: "modes",
-    label: "Semantic modes",
-    blurb: "Identical pixels, four different DOMs. Inspect them.",
-  },
-  {
-    id: "overflow",
-    label: "Overflow",
-    blurb: "Eleven tabs, and five ways to survive a narrow container.",
-  },
-  {
-    id: "states",
-    label: "States",
-    blurb: "Restricted, stale, unsaved — the states a chart actually reaches.",
-  },
-  {
-    id: "matrix",
-    label: "Theme × density",
-    blurb: "Nine combinations at once, which is how a token bug is caught.",
-  },
-];
-
-export function TabsGallery() {
-  const [chapter, setChapter] = React.useState<Chapter>("gallery");
-  const [theme, setTheme] = React.useState<"light" | "dark" | "hc">("light");
-
-  /*
-   * The demo theme starts at whatever the site is showing, and keeps following
-   * it until the reader picks one here.
-   *
-   * It used to be hardcoded to "light". The demo scopes set their own literal
-   * `--zb-*` values — that is the point of them, and why the matrix can show
-   * three themes at once — so on the dark site every stage rendered as a white
-   * slab. Nothing was broken, but a page whose argument is "the tokens carry
-   * the theme" opening on eleven light-mode panels in a dark page argues the
-   * opposite.
-   *
-   * `hc` is only ever a deliberate choice, so it is never selected here — the
-   * site has no high-contrast mode to follow.
-   */
-
-  React.useEffect(() => {
-    const root = document.documentElement;
-    const sync = () => setTheme(root.classList.contains("dark") ? "dark" : "light");
-    sync();
-    // The site theme is a class on <html>, written by the toggle and by the
-    // pre-paint script. Observing it covers both, and the OS-level flip that
-    // reaches neither.
-    const observer = new MutationObserver(sync);
-    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
-    return () => observer.disconnect();
-  }, []);
-
-  const active = CHAPTERS.find((item) => item.id === chapter) ?? CHAPTERS[0]!;
-
+/** The same three items in every skin: one keyboard model, eleven looks. */
+export function EveryVariant() {
   return (
-    <div className="zb-gallery">
-      {/* Control bar — the three axes nobody checks by hand, one click each. */}
-      {/* Chapter navigation — itself a tablist, built from the component. */}
-      <div className="zb-gallery__chapters">
-        <Tabs
-          as="radiogroup"
-          variant="segmented"
-          aria-label="Gallery chapter"
-          value={chapter}
-          onChange={(next) => setChapter(next as Chapter)}
-          items={CHAPTERS.map((item) => ({ value: item.id, label: item.label }))}
-        />
-        <p className="zb-gallery__blurb">{active.blurb}</p>
-      </div>
-
-      <div className="zb-gallery__stage" data-zb-theme={theme === "hc" ? "high-contrast" : theme}>
-        {chapter === "gallery" ? (
-          <div className="zb-gallery__grid">
-            <Demo
-              id="v01"
-              name="Segmented"
-              api='variant="segmented" fill="equal"'
-              tags={["tablist"]}
-              note="The control this whole system started from. The thumb is one transformed element, so it interpolates position and width together and never repaints the track. Click either half, or focus it and press ← / →."
-            >
-              <Flagship />
-            </Demo>
-
-            <Demo
-              id="v02"
-              name="Segmented · rich triggers"
-              api="icon + count + tone"
-              tags={["counts", "aria-disabled"]}
-              note="The count reads as a number, not a label: “Needs action, 3 abnormal”. Archive is aria-disabled rather than disabled, so a keyboard user can discover it exists and is unavailable."
-            >
-              <RichSegmented />
-            </Demo>
-
-            <Demo
-              id="v03"
-              name="Underline"
-              api='variant="underline"'
-              tags={["6+ items"]}
-              note="The workhorse: more than four items, labels of unequal length, panels that are whole screens. The rail is an inset shadow rather than a border, so the 2 px indicator can sit at bottom:0 and overlap it exactly at any zoom."
-              // Six labels of unequal length need a row of their own. In a
-              // column they render permanently scrolled, which demonstrates the
-              // overflow behaviour in the chapter about variants.
-              wide
-            >
-              <Underline />
-            </Demo>
-
-            <Demo
-              id="v04"
-              name="Pill filters"
-              api='as="radiogroup" overflow="wrap"'
-              tags={["radiogroup", "wraps"]}
-              note="Pills are the only variant allowed to wrap, and only as a radiogroup — once a tablist wraps, “the next tab” stops being a direction. There is no indicator: with a line break there is no continuous path for one to travel along."
-            >
-              <PillFilters />
-            </Demo>
-
-            <Demo
-              id="v05"
-              name="Enclosed · editable"
-              api="editable={{ onClose, onAdd }}"
-              tags={["closable", "addable"]}
-              note="The × is aria-hidden and the keyboard path is Delete on the tab, because an interactive control inside role=tab is invalid ARIA. After a close, focus moves to the neighbour deterministically — never to <body>."
-              // Each tab carries an icon, a dirty dot and a close control, so a
-              // strip of them is wider than its labels suggest — and a demo
-              // about closing tabs has to show more than one.
-              wide
-            >
-              <Editable />
-            </Demo>
-
-            <Demo
-              id="v06"
-              name="Rail"
-              api='variant="rail" orientation="vertical"'
-              tags={["aria-orientation"]}
-              note="Vertical means ↑ / ↓, not ← / →. Setting aria-orientation without rebinding the keys is a lie to the screen reader, so both come from one prop."
-              wide
-            >
-              <Rail />
-            </Demo>
-
-            <Demo
-              id="v07"
-              name="Ghost"
-              api='variant="ghost"'
-              note="No track, no rail, no indicator element — so no measurement pass and no ResizeObserver. For dense toolbars and popovers, where a second bordered box would compete with the container that already has one."
-            >
-              <GhostTabs />
-            </Demo>
-
-            <Demo
-              id="v08"
-              name="Command"
-              api='variant="command" as="radiogroup"'
-              tags={["icon-only"]}
-              note="Two radiogroups, not one toolbar: layout and density are independent values, and merging them would lose the “checked, 1 of 4” that tells a screen-reader user what the current view is. Every icon carries a textLabel."
-            >
-              <CommandBar />
-            </Demo>
-
-            <Demo
-              id="v09"
-              name="Stepper"
-              api='as="steps" variant="stepper"'
-              tags={["gated"]}
-              note="Backwards is free, forwards is earned. Completed steps stay reachable — locking them is the classic wizard mistake, and it forces a restart to fix a typo. Try Review: it is locked, focusable, and says why."
-            >
-              <Stepper />
-            </Demo>
-
-            <Demo
-              id="v10"
-              name="Card"
-              api='variant="card" as="radiogroup"'
-              note="When choosing wrong has a consequence the label cannot carry, the option needs a sentence — and a sentence does not fit in a pill. Same accessibility tree as the filters above, three times the surface area."
-              wide
-            >
-              <CardChoice />
-            </Demo>
-
-            <Demo
-              id="v11"
-              name="Stat"
-              api='variant="stat"'
-              tags={["analytics"]}
-              note="Arrow direction and colour disagree on purpose: “No-show rate ▲” is bad and “Median wait ▼” is good, so direction alone cannot carry meaning. The accessible name says better or worse in words."
-              wide
-            >
-              <StatTiles />
-            </Demo>
-          </div>
-        ) : null}
-
-        {chapter === "modes" ? (
-          <div className="zb-gallery__grid">
-            <Demo
-              id="m1"
-              name='as="tabs"'
-              api='role="tablist" + buttons'
-              tags={["owns panels"]}
-              note="Announced as “Summary, tab, selected, 1 of 6”. → moves selection, Tab exits to the panel. This is the only mode that owns panels."
-            >
-              <Underline />
-            </Demo>
-
-            <Demo
-              id="m2"
-              name='as="nav"'
-              api="<nav> + real anchors"
-              tags={["links"]}
-              note="Announced as “Overview, link, current page”. No arrow-key hijack, and cmd-click and middle-click work — because these are real anchors. Hover one and the browser shows the URL: that is the tell."
-            >
-              <div id="nav-demo">
-                <NavTabs />
-              </div>
-            </Demo>
-
-            <Demo
-              id="m3"
-              name='as="radiogroup"'
-              api='role="radiogroup" + radios'
-              tags={["form value"]}
-              note="Announced as “Filter documents by type, Everything, radio button, checked, 1 of 6”. It owns no panels, emits a form value, and validates like a field."
-            >
-              <PillFilters />
-            </Demo>
-
-            <Demo
-              id="m4"
-              name='as="steps"'
-              api="tablist + gate"
-              tags={["ordered"]}
-              note="The tree is a tablist; the difference is that selection is a request. Forward moves into a locked step are refused and audited, and the refusal says why rather than silently doing nothing."
-            >
-              <Stepper />
-            </Demo>
-          </div>
-        ) : null}
-
-        {chapter === "overflow" ? (
-          <div className="zb-gallery__grid">
-            <Demo
-              id="o1"
-              name="Scroll"
-              api='overflow="scroll"'
-              tags={["default"]}
-              note="Fade masks, nudge buttons and scroll-snap. The nudges are tabindex=-1 on purpose: arrow keys already move selection and scroll follows, so putting them in the tab order adds two stops that do nothing for a keyboard user."
-              wide
-            >
-              <OverflowDemo strategy="scroll" />
-            </Demo>
-
-            <Demo
-              id="o2"
-              name="Priority-plus menu"
-              api='overflow="menu"'
-              tags={["measured"]}
-              note="Widths are measured once with everything visible and cached. Resize the window: tabs that no longer fit move into a real role=menu, and the selected tab is pinned so it can never be the one that disappears."
-              wide
-            >
-              <OverflowDemo strategy="menu" />
-            </Demo>
-
-            <Demo
-              id="o3"
-              name="Collapse"
-              api='overflow="collapse"'
-              tags={["container query"]}
-              note="Below a container width the whole strip becomes a native <select> — the only picker that already works on every phone. Driven by the container, never the viewport: tabs in a 380 px drawer on a 1440 px monitor need the same treatment."
-            >
-              <OverflowDemo strategy="collapse" />
-            </Demo>
-
-            <Demo
-              id="o4"
-              name="Wrap"
-              api='overflow="wrap"'
-              tags={["radiogroup only"]}
-              note="Legal for a pill radiogroup and refused on a tablist — the component throws rather than rendering a two-row tablist whose arrow keys have no correct answer."
-            >
-              <PillFilters />
-            </Demo>
-          </div>
-        ) : null}
-
-        {chapter === "states" ? (
-          <div className="zb-gallery__grid">
-            <Demo
-              id="s1"
-              name="Unsaved-changes guard"
-              api="onBeforeChange"
-              tags={["interactive", "async"]}
-              note="onBeforeChange may return a promise, because vetoing usually means asking a human. While it is pending the strip is inert and aria-busy — the one case where an unresponsive tab strip is correct. Cancel and focus returns to where you were."
-              wide
-            >
-              <GuardDemo />
-            </Demo>
-
-            <Demo
-              id="s2"
-              name="Restricted and stale"
-              api="disabledReason · availability"
-              tags={["break-the-glass"]}
-              note="Hiding a restricted section teaches clinicians the record is incomplete, which is worse than telling them it exists and is gated. Vitals is stale rather than missing — a clinician reading cached observations needs to know they are cached."
-              wide
-            >
-              <RestrictedDemo />
-            </Demo>
-
-            <Demo
-              id="s3"
-              name="Severity in the strip"
-              api="count + tone"
-              tags={["colour ≠ signal"]}
-              note="A clinician scanning five tabs must be able to tell where the problem is without opening each. The red 2 carries a border, a hidden “2 critical”, and the panel repeats it as text. What the component refuses to do is reorder tabs by severity — position is memory."
-              wide
-            >
-              <ChartHeader />
-            </Demo>
-
-            <Demo
-              id="s4"
-              name="Every variant, one tree"
-              api="variant × 11"
-              note="The same items in all eleven skins. Tab into any of them and the keyboard model is identical, because the skin is CSS and the mode is the accessibility tree."
-              wide
-            >
-              <div className="zb-variants">
-                {VARIANTS.map((variant) => (
-                  <div key={variant} className="zb-variants__row">
-                    <code>{variant}</code>
-                    <Tabs
-                      as="tabs"
-                      variant={variant}
-                      aria-label={`${variant} example`}
-                      defaultValue="a"
-                      items={[
-                        { value: "a", label: "Personal" },
-                        { value: "b", label: "Shared" },
-                        { value: "c", label: "Archived" },
-                      ]}
-                    />
-                  </div>
-                ))}
-              </div>
-            </Demo>
-          </div>
-        ) : null}
-
-        {chapter === "matrix" ? (
-          <div className="zb-matrix">
-            {THEMES.map(([themeKey]) =>
-              DENSITIES.map((densityKey) => (
-                <MatrixCell
-                  key={`${themeKey}-${densityKey}`}
-                  theme={themeKey}
-                  density={densityKey}
-                />
-              )),
-            )}
-          </div>
-        ) : null}
-      </div>
+    <div className="zb-variants w-full">
+      {VARIANTS.map((variant) => (
+        <div key={variant} className="zb-variants__row">
+          <code>{variant}</code>
+          <Tabs
+            as="tabs"
+            variant={variant}
+            aria-label={`${variant} example`}
+            defaultValue="a"
+            items={[
+              { value: "a", label: "Personal" },
+              { value: "b", label: "Shared" },
+              { value: "c", label: "Archived" },
+            ]}
+          />
+        </div>
+      ))}
     </div>
+  );
+}
+
+/** Three themes by three densities, all at once — how a token bug is caught. */
+export function ThemeDensityMatrix() {
+  return (
+    <div className="zb-matrix w-full">
+      {THEMES.map(([theme]) =>
+        DENSITIES.map((density) => (
+          <MatrixCell key={`${theme}-${density}`} theme={theme} density={density} />
+        )),
+      )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* The clinical examples                                                */
+/* ------------------------------------------------------------------ */
+
+/** The chart's sections, with counts read from the fixtures rather than typed. */
+export function ChartSections() {
+  return (
+    <Tabs
+      as="tabs"
+      aria-label="Chart sections"
+      defaultValue="summary"
+      items={[
+        {
+          value: "summary",
+          label: "Summary",
+          children: <Panel title="Summary">Problems, allergies, recent encounters.</Panel>,
+        },
+        {
+          value: "labs",
+          label: "Labs",
+          count: observationPanel.length,
+          tone: "critical",
+          children: (
+            <Panel title="Labs">{observationPanel.length} results in the latest panel.</Panel>
+          ),
+        },
+        {
+          value: "meds",
+          label: "Medications",
+          count: medicationList.length,
+          children: <Panel title="Medications">{medicationList.length} active.</Panel>,
+        },
+        {
+          value: "allergies",
+          label: "Allergies",
+          count: allergyList.length,
+          children: <Panel title="Allergies">{allergyList.length} recorded.</Panel>,
+        },
+      ]}
+    />
+  );
+}
+
+export function RestrictedSection() {
+  return (
+    <Tabs
+      as="tabs"
+      aria-label="Chart sections"
+      defaultValue="summary"
+      items={[
+        {
+          value: "summary",
+          label: "Summary",
+          children: <Panel title="Summary">Problems, allergies, recent encounters.</Panel>,
+        },
+        {
+          value: "bh",
+          label: "Behavioural health",
+          disabled: true,
+          disabledReason:
+            "Restricted. Opening it records an access event and notifies the record owner.",
+        },
+      ]}
+    />
+  );
+}
+
+export function DensityFilter() {
+  return (
+    <Tabs
+      as="radiogroup"
+      variant="segmented"
+      aria-label="Density"
+      defaultValue="default"
+      items={[
+        { value: "compact", label: "Compact" },
+        { value: "default", label: "Default" },
+        { value: "comfortable", label: "Comfortable" },
+      ]}
+    />
   );
 }
