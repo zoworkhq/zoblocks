@@ -89,9 +89,8 @@ Rules that matter when generating code with these components:
   docs: no page yet — this component installs from the registry today
   states: Closed, with summaries, Expanded, Severity across the scale, Consent gate, Withheld section, Section that failed to load, No sections
   status: beta
-- Chart Command Palette: A command palette that understands clinical verbs, scopes every search to a treatment relationship, and audits the searches it refuses.
+- [Chart Command Palette](https://zoblocks.design/components/chart-command-palette): A command palette that understands clinical verbs, scopes every search to a treatment relationship, and audits the searches it refuses.
   install: npx @zoblocks/cli add chart-command-palette
-  docs: no page yet — this component installs from the registry today
   fhir: Patient, Task
   states: Empty, before anything is typed, Actions ranked above records, A verb waiting for its argument, A significant action, first Enter, An action that cannot run, Out-of-scope patients, counted, Break-glass unavailable to this role, Nothing matches, Grouped results, Keyboard navigation, Frequency weighting, Every match named, with no scope
   status: stable
