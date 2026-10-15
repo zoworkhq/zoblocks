@@ -178,9 +178,8 @@ Rules that matter when generating code with these components:
 
 ## Block
 
-- Safety Plan: The six steps of the Stanley-Brown Safety Planning Intervention, in order, with the crisis step rendered open and uncloseable.
+- [Safety Plan](https://zoblocks.design/components/safety-plan): The six steps of the Stanley-Brown Safety Planning Intervention, in order, with the crisis step rendered open and uncloseable.
   install: npx @zoblocks/cli add safety-plan
-  docs: no page yet — this component installs from the registry today
   states: Complete plan, Crisis step pinned open, Unfinished step, Empty plan, Clinician editing view, nothing pinned
   status: beta
 
