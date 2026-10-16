@@ -34,6 +34,8 @@ import { CHART_ITEMS } from "./accordion-demos";
 import { ClinicalStatus } from "@/registry/zoblocks/clinical-status/clinical-status";
 import { SCALES, type ScaleName } from "@/lib/zoblocks-clinical-status";
 import { BUPRENORPHINE, MenuRow, PLAYGROUND_ACTIONS } from "./chart-context-menu-demos";
+import { DatePickerPlayground, datePickerPlaygroundAttrs } from "./date-picker-demos";
+import type { DatePickerVariant } from "@/registry/zoblocks/date-picker/date-picker";
 import { PLAYGROUND_COMPONENTS } from "./playground-registry";
 import { useSiteTheme } from "./use-site-theme";
 import { useAntdBrandTokens } from "./language-antd-theme";
@@ -143,6 +145,14 @@ function chartFor(mode: string, fixture: string): TabsItemProps[] {
 }
 
 const RENDERERS: Record<string, (props: Props) => React.ReactNode> = {
+  /*
+   * One knob, sixteen surfaces. Each variant gets the fixtures its examples
+   * use, because most of the family is data-shaped — a slot grid with no set
+   * is an empty box, and that is not what a reader came to see.
+   */
+  "date-picker": (props) => (
+    <DatePickerPlayground variant={props.variant as DatePickerVariant | undefined} />
+  ),
   /*
    * One order carrying the whole ladder — routine, recorded, clinical,
    * disclosive and a withheld verb — so every knob and all three events have
@@ -310,7 +320,9 @@ function normalise(name: string, props: Props): Props {
  * the snippet a reader copies is one that renders — an Accordion with no
  * items is a valid call that draws nothing.
  */
-const FIXED_ATTRS: Record<string, readonly string[]> = {
+const FIXED_ATTRS: Record<string, readonly string[] | ((props: Props) => readonly string[])> = {
+  // Per variant: what a slot grid needs is not what a birth date needs.
+  "date-picker": datePickerPlaygroundAttrs,
   accordion: ["items={chartSections}", 'defaultActiveKey={["risk"]}'],
   "chart-context-menu": [
     "subject={order}",
@@ -319,6 +331,13 @@ const FIXED_ATTRS: Record<string, readonly string[]> = {
     "now={serverTime}",
   ],
 };
+
+function resolveFixed(
+  fixed: readonly string[] | ((props: Props) => readonly string[]) | undefined,
+  props: Props,
+): readonly string[] | undefined {
+  return typeof fixed === "function" ? fixed(props) : fixed;
+}
 
 /**
  * Children the renderer supplies, written into the code for the same reason:
@@ -653,7 +672,7 @@ export function Playground({
     controls,
     props,
     arrayProps: ARRAY_PROPS[name],
-    fixedAttrs: FIXED_ATTRS[name],
+    fixedAttrs: resolveFixed(FIXED_ATTRS[name], props),
     fixedChildren: FIXED_CHILDREN[name],
   });
 

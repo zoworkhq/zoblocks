@@ -32,6 +32,8 @@ import {
   TimeSlotGrid,
   relativeDateOptions,
   timeGrid,
+  DatePicker,
+  type DatePickerProps,
   type DatePickerVariant,
 } from "@/registry/zoblocks/date-picker/date-picker";
 import {
@@ -1242,3 +1244,185 @@ export const Group = staged(GroupDemo, true);
 export const Dst = staged(DstDemo, true);
 export const Family = staged(TargetDemo, true);
 export const ThemeDensity = staged(MatrixDemo, true);
+
+/* ------------------------------------------------------------------ */
+/* Playground                                                         */
+/* ------------------------------------------------------------------ */
+
+/**
+ * What each variant needs to show something real, passed through the one
+ * front door. Most of the family takes data — a slot grid with no set is an
+ * empty box — so the playground supplies the fixtures the examples use, and
+ * the generated code names them (see `datePickerPlaygroundAttrs`).
+ */
+const VARIANT_PROPS: Partial<Record<DatePickerVariant, Record<string, unknown>>> = {
+  picker: {
+    label: "Appointment date",
+    now: TODAY,
+    unavailable: clinicClosed,
+    load: dayLoad,
+    calendarHints: true,
+  },
+  field: { label: "Date of service", now: TODAY, showRelative: true },
+  calendar: {
+    now: TODAY,
+    defaultMonth: { y: 2026, m: 8 },
+    unavailable: clinicClosed,
+    load: dayLoad,
+    hints: true,
+  },
+  range: {
+    now: TODAY,
+    months: 2,
+    weekStart: 1,
+    defaultMonth: { y: 2026, m: 9 },
+    unavailable: clinicClosed,
+    presets: RANGE_PRESETS,
+    showCustomPreset: true,
+    hints: true,
+    commit: "explicit",
+  },
+  multiple: { now: TODAY, maxDates: 4, defaultMonth: { y: 2026, m: 9 }, hints: true },
+  "date-range": {
+    label: "Authorisation window",
+    now: TODAY,
+    months: 2,
+    weekStart: 1,
+    showSpan: true,
+    presets: RANGE_PRESETS,
+  },
+  "birth-date": { now: TODAY, calendarHints: true, calendarCommit: "explicit" },
+  time: { label: "Discharge time" },
+  session: {
+    label: "Individual therapy",
+    defaultValue: sessionFrom(plainTime(9, 0), 53),
+    durationPresets: BEHAVIORAL_HEALTH_DURATIONS,
+  },
+  "time-range": { label: "Time range", stepMinutes: 30 },
+  slots: { label: "Available times — Thu 27 Aug", set: AVAILABILITY, now: NOW },
+  recurrence: {
+    label: "Repeats",
+    startDate: plainDate(2026, 9, 1),
+    timeLabel: "2:00 – 2:50 PM",
+    defaultValue: { ...(THERAPY_CADENCES[0]?.rule ?? { freq: "WEEKLY" }), count: 16 },
+    showRRule: true,
+  },
+  group: {
+    name: "DBT Skills — Emotion Regulation",
+    rule: { freq: "WEEKLY", interval: 1, byWeekday: [2], count: 26 },
+    startDate: plainDate(2026, 9, 1),
+    timeLabel: "5:30 – 7:00 PM",
+    sessionMinutes: 90,
+    facilitators: ["M. Reyes, LCSW", "J. Bhatt, LPC"],
+    room: { name: "Group Room 2", capacity: 12 },
+    capacity: 12,
+    enrolled: 9,
+  },
+  readout: { as: "time", value: SIGNED, now: TODAY, showZone: true },
+};
+
+/** The same, as the attributes the generated code writes. */
+const VARIANT_ATTRS: Record<DatePickerVariant, readonly string[]> = {
+  picker: [
+    'label="Appointment date"',
+    "now={today}",
+    "unavailable={clinicClosed}",
+    "load={openSlotCount}",
+    "calendarHints",
+  ],
+  field: ['label="Date of service"', "now={today}", "showRelative"],
+  calendar: ["now={today}", "unavailable={clinicClosed}", "load={openSlotCount}", "hints"],
+  range: [
+    "now={today}",
+    "months={2}",
+    "weekStart={1}",
+    "presets={dateRangePresets(today)}",
+    "showCustomPreset",
+    'commit="explicit"',
+  ],
+  multiple: ["now={today}", "maxDates={4}", "hints"],
+  "date-range": [
+    'label="Authorisation window"',
+    "now={today}",
+    "months={2}",
+    "showSpan",
+    "presets={dateRangePresets(today)}",
+  ],
+  "birth-date": ["now={today}", "calendarHints"],
+  time: ['label="Discharge time"'],
+  session: [
+    'label="Individual therapy"',
+    "defaultValue={sessionFrom(plainTime(9, 0), 53)}",
+    "durationPresets={BEHAVIORAL_HEALTH_DURATIONS}",
+  ],
+  "time-range": ['label="Time range"', "stepMinutes={30}"],
+  slots: ['label="Available times"', "set={availability}", "now={now}", "onSelect={hold}"],
+  scheduler: [
+    'label="Book an appointment"',
+    "providers={providers}",
+    "actorId={providerId}",
+    "onActorChange={setProviderId}",
+    "date={date}",
+    "onDateChange={setDate}",
+    "dayLoads={dayLoads}",
+    "availability={availability}",
+    "now={now}",
+    "durationMinutes={50}",
+    "onSelect={hold}",
+  ],
+  recurrence: [
+    'label="Repeats"',
+    "startDate={plainDate(2026, 9, 1)}",
+    'defaultValue={{ freq: "WEEKLY", count: 16 }}',
+    "showRRule",
+  ],
+  series: [
+    'label="Weekly therapy — 16 sessions"',
+    'rule={{ freq: "WEEKLY", interval: 1, count: 16 }}',
+    "startDate={plainDate(2026, 9, 1)}",
+    "verdicts={conflicts}",
+    "resolved={resolved}",
+    "onResolve={resolve}",
+  ],
+  group: [
+    'name="DBT Skills — Emotion Regulation"',
+    'rule={{ freq: "WEEKLY", interval: 1, byWeekday: [2], count: 26 }}',
+    "startDate={plainDate(2026, 9, 1)}",
+    'room={{ name: "Group Room 2", capacity: 12 }}',
+    "capacity={12}",
+    "enrolled={9}",
+  ],
+  readout: ['as="time"', "value={signedAt}", "now={today}", "showZone"],
+};
+
+/** Attributes for the generated code, after the `variant` the knob writes. */
+export function datePickerPlaygroundAttrs(props: Record<string, unknown>): readonly string[] {
+  const variant = (props.variant as DatePickerVariant | undefined) ?? "picker";
+  return VARIANT_ATTRS[variant] ?? [];
+}
+
+/** One variant through the front door, with what it needs to show something. */
+export function DatePickerPlayground({ variant = "picker" }: { variant?: DatePickerVariant }) {
+  // These two hold selection state a static prop set cannot: the scheduler's
+  // provider and day, the series' resolved conflicts.
+  if (variant === "scheduler") {
+    return (
+      <Stage wide>
+        <SchedulerDemo />
+      </Stage>
+    );
+  }
+  if (variant === "series") {
+    return (
+      <Stage wide>
+        <SeriesDemo />
+      </Stage>
+    );
+  }
+  const props = { variant, ...VARIANT_PROPS[variant] } as DatePickerProps;
+  return (
+    <Stage wide>
+      <DatePicker key={variant} {...props} />
+    </Stage>
+  );
+}
