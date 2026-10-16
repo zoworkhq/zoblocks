@@ -5156,6 +5156,7 @@ export const CATALOG: ComponentDoc[] = [
         "title": "Criticality, mapped rather than guessed",
         "description": "The interpretation code decides the step. HH and LL are the panic values and the only ones that reach critical; H and L are simply outside the range, and conflating the two is how an alert list becomes noise nobody reads.",
         "fixture": "observationPotassiumCritical",
+        "group": "From the record",
         "code": "import { ClinicalStatus, fromInterpretation } from \"@/components/zoblocks/clinical-status\";\nimport { observationPotassiumCritical } from \"@zoblocks/fixtures\";\n\nconst code = observationPotassiumCritical.interpretation?.[0]?.coding?.[0]?.code;\nconst step = fromInterpretation(code);\n\n// null rather than a guess when the code is unrecognised: a visible gap beats\n// a plausible lie.\n{step && <ClinicalStatus scale=\"criticality\" step={step} qualifier=\"resulted 41 minutes ago\" />}"
       },
       {
@@ -5163,13 +5164,36 @@ export const CATALOG: ComponentDoc[] = [
         "title": "Restricted is a state, not a gap",
         "description": "Part 2 is its own step rather than a flavour of restricted, because 42 CFR Part 2 is a different legal regime from HIPAA minimum-necessary with a different re-disclosure rule. Rendering them the same teaches staff that they are the same.",
         "fixture": "patientRestricted",
+        "group": "From the record",
         "code": "<ClinicalStatus scale=\"access\" step=\"part-2\" />\n\n// The chip describes how protected a record is without disclosing any of it,\n// which is what lets it appear on a screen the reader is not cleared for."
+      },
+      {
+        "id": "nine-scales",
+        "title": "Nine scales, one vocabulary",
+        "description": "No free text anywhere. Amber means the same thing in the lab module and the vitals module because there is only one place it is defined. Each step pairs a tone with a drawn glyph and a word.",
+        "group": "Vocabulary",
+        "code": "import { ClinicalStatus } from \"@/components/zoblocks/clinical-status\";\nimport { SCALES, SCALE_NAMES } from \"@/lib/zoblocks-clinical-status\";\n\nexport default function Example() {\n  return SCALE_NAMES.map((scale) => (\n    <section key={scale}>\n      <h3>{SCALES[scale].label}</h3>\n      {SCALES[scale].steps.map((step) => (\n        <ClinicalStatus key={step.id} scale={scale} step={step.id} />\n      ))}\n    </section>\n  ));\n}"
+      },
+      {
+        "id": "hue-removed",
+        "title": "Hue removed",
+        "description": "The same six chips, desaturated — a monochrome display, a ward printer, or a clinician with a red-green deficiency. Shape and word both survive; nothing is lost but the pleasantness.",
+        "group": "Vocabulary",
+        "code": "<div style={{ filter: \"grayscale(1)\" }}>\n  <ClinicalStatus scale=\"criticality\" step=\"critical\" />\n  <ClinicalStatus scale=\"criticality\" step=\"high\" />\n  <ClinicalStatus scale=\"criticality\" step=\"normal\" />\n  <ClinicalStatus scale=\"criticality\" step=\"not-assessed\" />\n  <ClinicalStatus scale=\"access\" step=\"restricted\" />\n  <ClinicalStatus scale=\"result-status\" step=\"preliminary\" />\n</div>"
+      },
+      {
+        "id": "three-shapes",
+        "title": "One datum, three shapes",
+        "description": "The chip carries all three channels and is the only one safe on its own. The dot drops the visible word and needs the legend beside it. The affix is for tables past about forty rows.",
+        "group": "Presentations",
+        "code": "import { ClinicalStatus, StatusLegend } from \"@/components/zoblocks/clinical-status\";\n\n<ClinicalStatus scale=\"criticality\" step=\"critical\" />\n<ClinicalStatus scale=\"criticality\" step=\"critical\" density=\"compact\" />\n<ClinicalStatus scale=\"criticality\" step=\"critical\" shape=\"dot\" />\n<ClinicalStatus scale=\"criticality\" step=\"critical\" shape=\"affix\" />\n\n<StatusLegend scale=\"criticality\" />"
       },
       {
         "id": "grid-affix",
         "title": "Forty rows, and no field of pills",
         "description": "At forty rows, forty chips is a colour field with a table behind it. The affix keeps the tone as a 3px rule at the row's leading edge and the meaning as a short word, and the row stays readable.",
         "fixture": "observationPreliminary",
+        "group": "Presentations",
         "code": "<td>\n  <ClinicalStatus\n    scale=\"result-status\"\n    step=\"preliminary\"\n    shape=\"affix\"\n    density=\"compact\"\n  />\n</td>"
       },
       {
@@ -5177,7 +5201,15 @@ export const CATALOG: ComponentDoc[] = [
         "title": "The same step, in the other register",
         "description": "\"Entered in error\" is an internal state. A portal that ships it has not translated anything — it has published a system word to the person the record is about.",
         "fixture": "observationCorrected",
+        "group": "Registers",
         "code": "<ClinicalStatus scale=\"result-status\" step=\"entered-in-error\" audience=\"patient\" />\n// renders \"Recorded by mistake\""
+      },
+      {
+        "id": "both-registers",
+        "title": "Both registers, side by side",
+        "description": "The register is a prop, and both sides of every step are required by the type, so a scale cannot ship with a clinician word and no patient word.",
+        "group": "Registers",
+        "code": "{([\"clinician\", \"patient\"] as const).map((audience) => (\n  <div key={audience}>\n    <ClinicalStatus scale=\"result-status\" step=\"entered-in-error\" audience={audience} />\n    <ClinicalStatus scale=\"result-status\" step=\"preliminary\" audience={audience} />\n    <ClinicalStatus scale=\"data-quality\" step=\"self-reported\" audience={audience} />\n    <ClinicalStatus scale=\"access\" step=\"part-2\" audience={audience} />\n    <ClinicalStatus scale=\"criticality\" step=\"critical\" audience={audience} />\n  </div>\n))}"
       }
     ],
     "fixtures": [
