@@ -79,7 +79,7 @@ describe("example previews", () => {
     }
   });
 
-  it("previews every loader, Tabs and Switch example", async () => {
+  it("previews every loader, Tabs, Switch and Accordion example", async () => {
     const { EXAMPLE_PREVIEWS } = await import("@/components/site/docs/example-registry");
     const { CATALOG } = await import("@/lib/generated/catalog");
     for (const name of [
@@ -90,6 +90,7 @@ describe("example previews", () => {
       "infusion-loader",
       "tabs",
       "switch",
+      "accordion",
     ]) {
       const ids = (CATALOG.find((c) => c.name === name)?.examples ?? []).map((e) => e.id);
       expect(ids.length).toBeGreaterThanOrEqual(3);

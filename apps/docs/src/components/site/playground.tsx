@@ -29,6 +29,8 @@ import { BreathLoader } from "@/registry/zoblocks/breath-loader/breath-loader";
 import { HelixLoader } from "@/registry/zoblocks/helix-loader/helix-loader";
 import { InfusionLoader } from "@/registry/zoblocks/infusion-loader/infusion-loader";
 import { Switch, type SwitchProps } from "@/registry/zoblocks/switch/switch";
+import { Accordion } from "@/registry/zoblocks/accordion/accordion";
+import { CHART_ITEMS } from "./accordion-demos";
 import { PLAYGROUND_COMPONENTS } from "./playground-registry";
 import { useSiteTheme } from "./use-site-theme";
 import { useAntdBrandTokens } from "./language-antd-theme";
@@ -138,6 +140,11 @@ function chartFor(mode: string, fixture: string): TabsItemProps[] {
 }
 
 const RENDERERS: Record<string, (props: Props) => React.ReactNode> = {
+  accordion: (props) => (
+    <div className="mx-auto w-full max-w-xl">
+      <Accordion items={CHART_ITEMS} defaultActiveKey={["risk"]} {...props} />
+    </div>
+  ),
   /*
    * Switch writes through onCommit, so the playground shows the whole
    * request: pending for a moment, then committed. `key` remounts it when the
@@ -234,6 +241,15 @@ const RENDERERS: Record<string, (props: Props) => React.ReactNode> = {
  * the knob's string (see `signature` above); the generated code has to say the
  * same thing, or a reader copies `methods="draw"` into a prop that maps.
  */
+/**
+ * Props the renderer supplies that no knob controls, written into the code so
+ * the snippet a reader copies is one that renders — an Accordion with no
+ * items is a valid call that draws nothing.
+ */
+const FIXED_ATTRS: Record<string, readonly string[]> = {
+  accordion: ["items={chartSections}", 'defaultActiveKey={["risk"]}'],
+};
+
 const ARRAY_PROPS: Record<string, readonly string[]> = {
   signature: ["methods", "outcomes"],
 };
@@ -458,15 +474,17 @@ export function playgroundSource({
   controls,
   props,
   arrayProps = [],
+  fixedAttrs = [],
 }: {
   importName: string;
   importFrom: string;
   controls: readonly Control[];
   props: Props;
   arrayProps?: readonly string[];
+  fixedAttrs?: readonly string[];
 }): string {
   const fixtures: string[] = [];
-  const attrs: string[] = [];
+  const attrs: string[] = [...fixedAttrs];
   for (const control of controls) {
     if (control.control === "event") continue;
     const value = props[control.prop];
@@ -554,6 +572,7 @@ export function Playground({
     controls,
     props,
     arrayProps: ARRAY_PROPS[name],
+    fixedAttrs: FIXED_ATTRS[name],
   });
 
   return (
