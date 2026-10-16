@@ -33,6 +33,7 @@ import { Accordion } from "@/registry/zoblocks/accordion/accordion";
 import { CHART_ITEMS } from "./accordion-demos";
 import { ClinicalStatus } from "@/registry/zoblocks/clinical-status/clinical-status";
 import { SCALES, type ScaleName } from "@/lib/zoblocks-clinical-status";
+import { BUPRENORPHINE, MenuRow, PLAYGROUND_ACTIONS } from "./chart-context-menu-demos";
 import { PLAYGROUND_COMPONENTS } from "./playground-registry";
 import { useSiteTheme } from "./use-site-theme";
 import { useAntdBrandTokens } from "./language-antd-theme";
@@ -142,6 +143,25 @@ function chartFor(mode: string, fixture: string): TabsItemProps[] {
 }
 
 const RENDERERS: Record<string, (props: Props) => React.ReactNode> = {
+  /*
+   * One order carrying the whole ladder — routine, recorded, clinical,
+   * disclosive and a withheld verb — so every knob and all three events have
+   * something to act on. The reader summons it; nothing opens on its own.
+   */
+  "chart-context-menu": (props) => (
+    <div className="mx-auto grid w-full max-w-md gap-2">
+      <MenuRow
+        subject={BUPRENORPHINE}
+        actions={PLAYGROUND_ACTIONS}
+        policy={{ role: "a registered nurse", breakGlass: true }}
+        aside="08:00"
+        {...props}
+      />
+      <p className="m-0 text-center text-xs text-graphite">
+        Right-click the row, or focus it and press Shift+F10.
+      </p>
+    </div>
+  ),
   "clinical-status": (props) => (
     <Centered>
       <ClinicalStatus
@@ -292,6 +312,21 @@ function normalise(name: string, props: Props): Props {
  */
 const FIXED_ATTRS: Record<string, readonly string[]> = {
   accordion: ["items={chartSections}", 'defaultActiveKey={["risk"]}'],
+  "chart-context-menu": [
+    "subject={order}",
+    "actions={orderActions}",
+    'policy={{ role: "a registered nurse", breakGlass: true }}',
+    "now={serverTime}",
+  ],
+};
+
+/**
+ * Children the renderer supplies, written into the code for the same reason:
+ * ChartContextMenu takes its trigger as a render function, and a call without
+ * one does not type-check.
+ */
+const FIXED_CHILDREN: Record<string, string> = {
+  "chart-context-menu": "{(trigger) => <tr {...trigger}>{cells}</tr>}",
 };
 
 const ARRAY_PROPS: Record<string, readonly string[]> = {
@@ -519,6 +554,7 @@ export function playgroundSource({
   props,
   arrayProps = [],
   fixedAttrs = [],
+  fixedChildren,
 }: {
   importName: string;
   importFrom: string;
@@ -526,6 +562,7 @@ export function playgroundSource({
   props: Props;
   arrayProps?: readonly string[];
   fixedAttrs?: readonly string[];
+  fixedChildren?: string;
 }): string {
   const fixtures: string[] = [];
   const attrs: string[] = [...fixedAttrs];
@@ -543,7 +580,7 @@ export function playgroundSource({
     `import { ${importName} } from "${importFrom}";`,
     ...(fixtures.length ? [`import { ${fixtures.join(", ")} } from "@zoblocks/fixtures";`] : []),
   ].join("\n");
-  return `${imports}\n\nexport default function Example() {\n  return (\n    ${jsxElement(importName, attrs, "    ")}\n  );\n}`;
+  return `${imports}\n\nexport default function Example() {\n  return (\n    ${jsxElement(importName, attrs, "    ", fixedChildren)}\n  );\n}`;
 }
 
 /* ------------------------------------------------------------------ */
@@ -617,6 +654,7 @@ export function Playground({
     props,
     arrayProps: ARRAY_PROPS[name],
     fixedAttrs: FIXED_ATTRS[name],
+    fixedChildren: FIXED_CHILDREN[name],
   });
 
   return (
