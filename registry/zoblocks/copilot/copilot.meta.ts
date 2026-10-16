@@ -114,6 +114,68 @@ export default defineComponentMeta({
   dependencies: ["clsx", "tailwind-merge", "@zoblocks/copilot-core", "@zoblocks/copilot-react"],
   registryDependencies: ["utils", "tokens"],
 
+  examples: [
+    {
+      id: "reference-lookup",
+      title: "Reference lookup without chart context",
+      description:
+        "Start with Look up mode. Its read contract is empty, so this example does not pass a patient subject or chart-context resolver.",
+      code: `import { Copilot } from "@/components/zoblocks/copilot";
+import { lookUp } from "@zoblocks/copilot-core";
+
+// ourEndpoint implements CopilotProvider and targets your server endpoint.
+<Copilot provider={ourEndpoint} modes={[lookUp]} />`,
+    },
+    {
+      id: "scoped-chart-assistance",
+      title: "Prepare from a synthetic chart",
+      description:
+        "Use a synthetic patient reference with Prepare mode. The host resolver must return only resources allowed by the mode and report any records withheld from the result.",
+      fixture: "patientRoutine",
+      code: `import { Copilot } from "@/components/zoblocks/copilot";
+import { prepare } from "@zoblocks/copilot-core";
+
+// resolver implements CopilotContextResolver and enforces host access policy.
+<Copilot
+  provider={phiPermittedEndpoint}
+  modes={[prepare]}
+  subject={{
+    reference: "Patient/syn-patient-routine",
+    display: "Amara Okonkwo",
+  }}
+  context={resolver}
+  actor={{ display: "Dr Example", reference: "Practitioner/syn-pr-1" }}
+  onAudit={(event) => auditSink.write(event)}
+/>`,
+    },
+    {
+      id: "flagged-result-review",
+      title: "Review a flagged synthetic result",
+      description:
+        "Exercise the chart-context path with a synthetic critical potassium observation. This example demonstrates review and verification workflows; it does not prescribe a clinical response.",
+      fixture: "observationPotassiumCritical",
+      code: `import { Copilot } from "@/components/zoblocks/copilot";
+import { prepare } from "@zoblocks/copilot-core";
+
+// The host resolver supplies the synthetic observation only when permitted.
+<Copilot
+  provider={phiPermittedEndpoint}
+  modes={[prepare]}
+  subject={{ reference: "Patient/syn-patient-routine" }}
+  context={resolver}
+  onAudit={(event) => auditSink.write(event)}
+  suppressed={isAdministeringMedication || isSigningOrders}
+/>`,
+    },
+  ],
+
+  fixtures: [
+    "patientRoutine",
+    "observationHeartRate",
+    "observationPotassiumCritical",
+    "patientRestricted",
+  ],
+
   usage: `import { Copilot } from "@/components/zoblocks/copilot";
 import { lookUp, prepare } from "@zoblocks/copilot-core";
 
