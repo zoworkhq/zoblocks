@@ -5,7 +5,7 @@
   "description": "zoblocks.design — marketing site, component catalog, and registry host.",
   "scripts": {
     "build": "next build",
-    "dev": "next dev --turbopack --port ${PORT:-6001}",
+    "dev": "next dev --turbopack --port 6001",
     "lint": "next lint",
     "start": "next start --port 6001",
     "test": "vitest run",

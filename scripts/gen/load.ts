@@ -175,7 +175,7 @@ export async function loadComponents(): Promise<LoadedComponent[]> {
       meta: parsed.data,
       dir,
       sourceFile,
-      sourcePath: path.relative(ROOT, sourceFile),
+      sourcePath: path.relative(ROOT, sourceFile).split(path.sep).join("/"),
       // One and the same for a registry component: the file is the API.
       propsFile: sourceFile,
       extraPropsFiles,

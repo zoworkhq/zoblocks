@@ -577,6 +577,18 @@ function CopilotDemo({ events, delayMs = 90 }: { events: CopilotEvent[]; delayMs
     <Copilot
       provider={provider}
       modes={[lookUp, prepare]}
+      shortcuts={[
+        {
+          id: "prep",
+          label: "Prep",
+          question: "Prepare me for this encounter.",
+        },
+        {
+          id: "questions",
+          label: "Questions",
+          question: "What should I ask about?",
+        },
+      ]}
       anchor="inline"
       locale="en-GB"
       actor={{ display: "Dr Amara Okafor", credential: "MD", reference: "Practitioner/7" }}
