@@ -32,11 +32,11 @@ import { SignatureDrawing, StrokeAnatomy } from "@/components/site/signature-sho
 import { cn } from "@/lib/utils";
 
 /** Fixed, because the component takes the clock as a prop and never reads it. */
-const NOW = "2026-08-16T14:36:02.000Z";
+export const NOW = "2026-08-16T14:36:02.000Z";
 
-const RECORDED_BY = { name: "A. Okafor", credential: "RN" } as const;
-const SUBJECT = { display: "Randall, Josh", reference: "Patient/4471902" } as const;
-const ATTESTATION =
+export const RECORDED_BY = { name: "A. Okafor", credential: "RN" } as const;
+export const SUBJECT = { display: "Randall, Josh", reference: "Patient/4471902" } as const;
+export const ATTESTATION =
   "I have read the information about this procedure, I have had the chance to ask questions, and I agree to go ahead.";
 
 type Scenario = "consent" | "outcomes" | "locked" | "pending" | "revoked";
@@ -70,7 +70,7 @@ const SCENARIOS: Array<{ id: Scenario; label: string; note: string }> = [
 ];
 
 /** Narrowed, because `revoked` carries the original signature specifically. */
-const SIGNED_EXAMPLE: SignedValue = {
+export const SIGNED_EXAMPLE: SignedValue = {
   outcome: "signed",
   method: "type",
   ink: {
@@ -101,7 +101,7 @@ const SIGNED_EXAMPLE: SignedValue = {
 };
 
 /** Signed by the patient, still waiting on the clinician who has to countersign. */
-const PENDING_EXAMPLE: SignatureValue = {
+export const PENDING_EXAMPLE: SignatureValue = {
   outcome: "pending",
   awaiting: "clinician",
   since: NOW,
@@ -111,7 +111,7 @@ const PENDING_EXAMPLE: SignatureValue = {
 };
 
 /** Consent given, then withdrawn. The original is kept, struck through. */
-const REVOKED_EXAMPLE: SignatureValue = {
+export const REVOKED_EXAMPLE: SignatureValue = {
   outcome: "revoked",
   original: SIGNED_EXAMPLE,
   revokedBy: { name: "Josh Randall" },
