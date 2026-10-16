@@ -699,8 +699,13 @@ export function Playground({
             dark page — a white card with near-black text, in the one place on
             the page a reader goes to see what the component looks like.
           */}
+          {/*
+            Scrolls rather than spills. A component wider than the stage — a
+            two-month range panel with its preset rail — otherwise drew over
+            the props panel beside it, where neither could be used.
+          */}
           <div
-            className="zb-stage flex min-h-[360px] min-w-0 flex-1 items-center justify-center px-7 py-11"
+            className="zb-stage scroll-thin flex min-h-[360px] min-w-0 flex-1 items-center justify-center overflow-x-auto px-7 py-11"
             style={dark ? { colorScheme: "dark" } : undefined}
           >
             <div className="w-full min-w-0">
