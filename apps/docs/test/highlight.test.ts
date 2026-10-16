@@ -73,6 +73,13 @@ describe("jsx", () => {
     );
     expect(long.split("\n")).toHaveLength(4);
   });
+
+  it("wraps children in an opening and closing tag", () => {
+    expect(jsxElement("Menu", ["subject={order}"], "", "{(trigger) => <tr {...trigger} />}")).toBe(
+      "<Menu\n  subject={order}\n>\n  {(trigger) => <tr {...trigger} />}\n</Menu>",
+    );
+    expect(jsxElement("Menu", [], "  ", "{body}")).toBe("<Menu>\n    {body}\n  </Menu>");
+  });
 });
 
 describe("hosted demos", () => {

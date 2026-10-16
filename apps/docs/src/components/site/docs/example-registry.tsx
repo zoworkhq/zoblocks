@@ -24,6 +24,7 @@ import * as TabsDemo from "../tabs-demos";
 import * as SwitchDemo from "../switch-demos";
 import * as AccordionDemo from "../accordion-demos";
 import * as StatusDemo from "../clinical-status-demos";
+import * as MenuDemo from "../chart-context-menu-demos";
 
 /* ------------------------------------------------------------------ */
 /* Stand-ins for the host application                                  */
@@ -270,6 +271,20 @@ export const EXAMPLE_PREVIEWS: Readonly<
     variants: () => <AccordionDemo.Variants />,
     density: () => <AccordionDemo.Density />,
     disclosure: () => <AccordionDemo.SingleDisclosure />,
+  },
+
+  "chart-context-menu": {
+    subject: () => <MenuDemo.SubjectHeader />,
+    masked: () => <MenuDemo.MaskedSubject />,
+    bulk: () => <MenuDemo.BulkSelection />,
+    tiers: () => <MenuDemo.ConsequenceTiers />,
+    disclosure: () => <MenuDemo.DisclosureRecordDemo />,
+    unavailable: () => <MenuDemo.UnavailableInPlace />,
+    withheld: () => <MenuDemo.WithheldCounted />,
+    pending: () => <MenuDemo.PendingInPlace />,
+    empty: () => <MenuDemo.TwoEmpties />,
+    "view-state": () => <MenuDemo.ViewState />,
+    submenu: () => <MenuDemo.SubmenuBeside />,
   },
 
   "clinical-status": {

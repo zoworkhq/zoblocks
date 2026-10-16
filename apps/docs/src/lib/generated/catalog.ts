@@ -3749,37 +3749,88 @@ export const CATALOG: ComponentDoc[] = [
       {
         "id": "subject",
         "title": "The subject header is the safe landing",
-        "description": "The header names the record, so the first thing under the pointer is never a verb — the wrong-patient check and the accidental click-through, closed by one decision. No prop removes it.",
+        "description": "The header names the record, so the first thing under the pointer is never a verb — the wrong-patient check and the accidental click-through, closed by one decision. It also names the menu for a screen reader. No prop removes it.",
         "fixture": "patientRoutine",
-        "code": "describeSubject({ resource: \"MedicationRequest\", id: \"m1\",\n                  label: \"Lisinopril 10 mg\", detail: \"Oral · daily\" });\n// → { who: \"Lisinopril 10 mg\", what: \"Oral · daily\", masked: false, bulk: 1 }\n\ndescribeSubject({ ...subject, masked: true });\n// → { who: \"Restricted record\", what: \"Medication\", masked: true, bulk: 1 }"
+        "group": "What it is about",
+        "code": "import { ChartContextMenu } from \"@/components/zoblocks/chart-context-menu\";\n\nexport default function MedicationRow({ order, now }) {\n  return (\n    <ChartContextMenu\n      subject={{\n        resource: \"MedicationRequest\",\n        id: order.id,\n        label: \"Lisinopril 10 mg\",\n        detail: \"Oral · daily · started 4 Mar 2026\",\n      }}\n      actions={[\n        { id: \"open\", label: \"Open order\", tier: \"routine\", shortcut: \"↵\" },\n        { id: \"copy\", label: \"Copy as text\", tier: \"routine\", shortcut: \"⌘C\" },\n        { id: \"history\", label: \"Administration history\", tier: \"routine\" },\n        {\n          id: \"mar\",\n          label: \"Add a note to the MAR\",\n          tier: \"documented\",\n          applies: [\"MedicationRequest\"],\n          records: \"Writes a note on the medication record. Nursing sees it at the next round.\",\n        },\n      ]}\n      now={now}\n      onRun={(action) => dispatch(action.id, order)}\n    >\n      {(trigger) => <tr {...trigger}>{cells}</tr>}\n    </ChartContextMenu>\n  );\n}"
+      },
+      {
+        "id": "masked",
+        "title": "A masked row makes a masked header",
+        "description": "The row hides whose note this is, so the menu does too. It reads “Restricted record” and never resolves the name, even though the subject carries it. The menu may say less than its trigger; it may never say more.",
+        "fixture": "patientRestricted",
+        "group": "What it is about",
+        "code": "<ChartContextMenu\n  subject={{\n    resource: \"DocumentReference\",\n    id: note.id,\n    label: \"Group therapy note — Nwosu, C.\",\n    detail: \"Signed by R. Adeyemi, LPC\",\n    masked: true,\n  }}\n  actions={noteActions}\n  policy={{ role: \"a registered nurse\", breakGlass: true }}\n  now={now}\n>\n  {(trigger) => <tr {...trigger}>{maskedCells}</tr>}\n</ChartContextMenu>"
+      },
+      {
+        "id": "bulk",
+        "title": "A selection is counted, never listed",
+        "description": "Twelve orders selected reads as twelve orders, not twelve names in a floating layer. Copy is marked bulk-safe and runs for all of them; Discontinue is not, and says so in place rather than vanishing.",
+        "fixture": "patientRoutine",
+        "group": "What it is about",
+        "code": "<ChartContextMenu\n  subject={{\n    ...firstOrder,\n    plural: \"orders\",\n    bulkDetail: \"Morning round\",\n    also: otherOrders.map((order) => ({ resource: \"MedicationRequest\", id: order.id })),\n  }}\n  actions={[\n    { id: \"copy\", label: \"Copy as text\", tier: \"routine\", bulk: \"allowed\" },\n    { id: \"dc\", label: \"Discontinue\", tier: \"clinical\", applies: [\"MedicationRequest\"],\n      confirm: \"The next scheduled dose is 14:00 today. Discontinuing stops it.\" },\n  ]}\n  now={now}\n>\n  {(trigger) => <tr {...trigger}>{selectionCells}</tr>}\n</ChartContextMenu>"
       },
       {
         "id": "tiers",
         "title": "Consequence is a rank, not a boolean",
-        "description": "Routine runs on the click. Recorded runs and says what it wrote. Clinical takes a second step. A disclosure takes a reason. The resolver lays the bands out in that order, so a discontinue is never adjacent to a copy.",
+        "description": "Routine runs on the click. Recorded runs and says what it writes before you choose it. Clinical takes a second step, drawn under its row, with the verb on the button and Keep beside it. The bands sort by consequence, so a discontinue is never adjacent to a copy.",
         "fixture": "patientRoutine",
-        "code": "actionOutcome(discontinue);\n// → { kind: \"confirm\", prompt: \"The next dose is 14:00 today…\", verb: \"Discontinue\" }\n\nactionOutcome(discontinue, { confirming: \"dc\" });   // → { kind: \"run\" }\nactionOutcome(preliminary);\n// → { kind: \"blocked\", reason: \"Preliminary results are not released\" }"
-      },
-      {
-        "id": "withheld",
-        "title": "Withheld is counted, never hidden",
-        "description": "Policy removes the verb and leaves a number in its place, as a row inside the menu. The same rule the palette applies to patients it may not name.",
-        "fixture": "patientRestricted",
-        "code": "resolveMenu(subject, actions, { permitted: [\"open\", \"copy\"] }).withheld;  // → 3\n\ndescribeHiddenActions(3, { role: \"a registered nurse\", breakGlass: true });\n// → \"3 further actions on this record, hidden for a registered nurse — break-glass required\""
+        "group": "Consequence",
+        "code": "const actions = [\n  { id: \"copy\", label: \"Copy as text\", tier: \"routine\" },\n  {\n    id: \"mar\",\n    label: \"Add a note to the MAR\",\n    tier: \"documented\",\n    applies: [\"MedicationRequest\"],\n    records: \"Writes a note on the medication record. Nursing sees it at the next round.\",\n  },\n  {\n    id: \"dc\",\n    label: \"Discontinue\",\n    tier: \"clinical\",\n    applies: [\"MedicationRequest\"],\n    confirm: \"The next scheduled dose is 14:00 today. Discontinuing stops it.\",\n    confirmVerb: \"Discontinue\",\n  },\n];\n\n<ChartContextMenu subject={order} actions={actions} now={now} onRun={run}>\n  {(trigger) => <tr {...trigger}>{cells}</tr>}\n</ChartContextMenu>"
       },
       {
         "id": "disclosure",
         "title": "The record is made when the reasons are offered",
-        "description": "The record is written when the list is drawn, again when a reason is chosen, and again as \"abandoned\" if the reader closes instead. In a privacy review the abandoned ones are the interesting ones. The label never appears in it.",
+        "description": "A disclosive action takes a reason first. The record is produced when the list is drawn, again when a reason is chosen, and again as \"abandoned\" if the reader backs out — in a privacy review the abandoned ones are the interesting ones. The label never appears in it.",
         "fixture": "patientRestricted",
-        "code": "disclosureRecord(revealPart2, subject, { now, outcome: \"offered\" });\n// → { at: now, action: \"part2\", subject: { resource, id },\n//     subjectNamed: false, masked: false, reason: null,\n//     outcome: \"offered\", breakGlass: true }"
+        "group": "Consequence",
+        "code": "<ChartContextMenu\n  subject={buprenorphineOrder}\n  actions={[\n    {\n      id: \"part2\",\n      label: \"Reveal Part 2 program notes\",\n      tier: \"disclosive\",\n      applies: [\"MedicationRequest\"],\n      reasons: [\n        \"Treatment of this patient\",\n        \"Medical emergency (42 CFR §2.51)\",\n        \"Written patient consent on file\",\n      ],\n    },\n  ]}\n  policy={{ role: \"a registered nurse\", breakGlass: true }}\n  now={serverTime}\n  onDisclose={(record) => audit.write(\"disclosure\", record)}\n>\n  {(trigger) => <tr {...trigger}>{cells}</tr>}\n</ChartContextMenu>"
+      },
+      {
+        "id": "unavailable",
+        "title": "Unavailable, with the reason in place",
+        "description": "A verb this person cannot run right now stays in the menu, reachable by keyboard, with the reason as text rather than a tooltip. Choosing it tells the host through onBlocked — repeated blocks are a permissions problem worth seeing.",
+        "fixture": "patientRoutine",
+        "group": "Availability",
+        "code": "{\n  id: \"renew\",\n  label: \"Renew for 90 days\",\n  tier: \"clinical\",\n  applies: [\"MedicationRequest\"],\n  confirm: \"Issues a new order in your name.\",\n  availability: {\n    status: \"unavailable\",\n    reason: \"Prescriber role required — you are signed in as a registered nurse\",\n  },\n}"
+      },
+      {
+        "id": "withheld",
+        "title": "Withheld is counted, never hidden",
+        "description": "Policy removes the verb and leaves a number in its place, as a row inside the menu. The count teaches the reader something exists; silence would teach them it does not.",
+        "fixture": "patientRestricted",
+        "group": "Availability",
+        "code": "<ChartContextMenu\n  subject={order}\n  actions={medicationActions}\n  policy={{\n    role: \"a registered nurse\",\n    permitted: [\"open\", \"copy\", \"history\", \"mar\"],\n    breakGlass: true,\n  }}\n  now={now}\n>\n  {(trigger) => <tr {...trigger}>{cells}</tr>}\n</ChartContextMenu>"
       },
       {
         "id": "pending",
         "title": "A menu that never moves under the cursor",
-        "description": "A check still running renders at the row's final height, in its final position — never appended when the answer lands. Appending would move rows under a pointer already in flight. The arrows skip it too.",
+        "description": "A check still running renders at the row's final height, in its final position, and the arrows skip it. When the answer lands the row changes in place — never appended, because appending moves a destructive verb under a pointer already in flight.",
         "fixture": "patientRoutine",
-        "code": "nextIndex(rows, 0, 1);        // skips the row whose status is \"pending\"\nactionOutcome(stillChecking);\n// → { kind: \"blocked\", reason: \"Still checking whether this can run\" }"
+        "group": "Availability",
+        "code": "const actions = [\n  openOrder,\n  { ...copyAsText, availability: canCopy ?? { status: \"pending\" } },\n  history,\n];\n\n<ChartContextMenu subject={order} actions={actions} now={now}>\n  {(trigger) => <tr {...trigger}>{cells}</tr>}\n</ChartContextMenu>"
+      },
+      {
+        "id": "empty",
+        "title": "Two empties, two sentences",
+        "description": "A record that supports nothing and a record whose every verb is withheld from you are different facts, so they read differently: “This record supports no actions” against “No action on this record is available to you”, with the count of what is hidden.",
+        "fixture": "patientRoutine",
+        "group": "Availability",
+        "code": "<ChartContextMenu subject={order} actions={[]} now={now}>\n  {(trigger) => <tr {...trigger}>{cells}</tr>}\n</ChartContextMenu>\n\n<ChartContextMenu\n  subject={order}\n  actions={medicationActions}\n  policy={{ role: \"a scheduling clerk\", permitted: [], breakGlass: false }}\n  now={now}\n>\n  {(trigger) => <tr {...trigger}>{cells}</tr>}\n</ChartContextMenu>"
+      },
+      {
+        "id": "view-state",
+        "title": "Toggles are view state, always routine",
+        "description": "Checkbox and radio rows change what the reader sees, not the record, so they report through onToggle rather than onRun and the validator refuses them above tier=“routine”. Pinning a column and discontinuing a drug must never look like the same kind of act.",
+        "group": "Structure",
+        "code": "<ChartContextMenu\n  subject={{ resource: \"Encounter\", id: \"col-vitals\", label: \"Vitals column\" }}\n  actions={[\n    { id: \"pin\", label: \"Pin this column\", tier: \"routine\", kind: \"checkbox\", checked: pinned },\n    { id: \"abn\", label: \"Abnormal values only\", tier: \"routine\", kind: \"checkbox\", checked: abnormal },\n    { id: \"comfortable\", label: \"Comfortable\", tier: \"routine\", kind: \"radio\",\n      radioGroup: \"density\", group: \"Density\", checked: density === \"comfortable\" },\n    { id: \"compact\", label: \"Compact\", tier: \"routine\", kind: \"radio\",\n      radioGroup: \"density\", group: \"Density\", checked: density === \"compact\" },\n  ]}\n  onToggle={(action, checked) => setView(action.id, checked)}\n>\n  {(trigger) => <th {...trigger}>Vitals</th>}\n</ChartContextMenu>"
+      },
+      {
+        "id": "submenu",
+        "title": "A submenu opens beside its row",
+        "description": "Routine actions only, with a short hover intent and no preview of the record's value — a floating layer showing PHI is a disclosure surface during a screen-share. The child flips to the other side when its row is in a corner.",
+        "group": "Structure",
+        "code": "{\n  id: \"trend\",\n  label: \"Trend\",\n  tier: \"routine\",\n  submenu: [\n    { id: \"t7\", label: \"Last 7 days\", tier: \"routine\" },\n    { id: \"t30\", label: \"Last 30 days\", tier: \"routine\" },\n    { id: \"t365\", label: \"Last year\", tier: \"routine\" },\n  ],\n}"
       }
     ],
     "fixtures": [

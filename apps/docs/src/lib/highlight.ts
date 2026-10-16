@@ -103,9 +103,23 @@ export function showLineNumbers(source: string, numbered = true): boolean {
 
 /**
  * A JSX element as a reader would write it: on one line when it fits, one
- * attribute a line when it does not.
+ * attribute a line when it does not. With `children`, an opening and closing
+ * tag around them, on lines of their own.
  */
-export function jsxElement(name: string, attrs: readonly string[], indent = ""): string {
+export function jsxElement(
+  name: string,
+  attrs: readonly string[],
+  indent = "",
+  children?: string,
+): string {
+  if (children !== undefined) {
+    // An element with a body always breaks: the body goes on its own line.
+    const open =
+      attrs.length === 0
+        ? `<${name}>`
+        : `<${name}\n${attrs.map((a) => `${indent}  ${a}`).join("\n")}\n${indent}>`;
+    return `${open}\n${indent}  ${children}\n${indent}</${name}>`;
+  }
   const one = `<${name}${attrs.map((a) => ` ${a}`).join("")} />`;
   if (one.length + indent.length <= 64 || attrs.length === 0) return one;
   return `<${name}\n${attrs.map((a) => `${indent}  ${a}`).join("\n")}\n${indent}/>`;
