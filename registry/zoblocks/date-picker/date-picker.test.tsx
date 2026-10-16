@@ -3568,6 +3568,34 @@ describe("the date range field", () => {
       end: plainDate(2026, 7, 31),
     });
   });
+
+  it("shows a range picked from the calendar in both halves", () => {
+    // The pick reached the host and the span badge, and both typed halves
+    // stayed empty: the field treated its own write as an echo to ignore.
+    const { container } = render(
+      <DateRangeField
+        label="Window"
+        now={TODAY}
+        showSpan
+        presets={dateRangePresets(TODAY, { weekStart: 1 })}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Choose from calendar" }));
+    const panel = screen.getByRole("dialog", { name: "Window" });
+    fireEvent.click(within(panel).getByRole("button", { name: "Last month" }));
+    fireEvent.click(within(panel).getByRole("button", { name: "Done" }));
+
+    const segments = [...container.querySelectorAll('[role="spinbutton"]')];
+    expect(segments.map((s) => s.getAttribute("aria-valuenow"))).toEqual([
+      "7",
+      "1",
+      "2026",
+      "7",
+      "31",
+      "2026",
+    ]);
+    expect(container.querySelector(".zb-dt-range__span")?.textContent).toBe("31 days");
+  });
 });
 
 /* ------------------------------------------------------------------ */
@@ -3681,6 +3709,27 @@ describe("the time range field", () => {
       .filter((o) => o.getAttribute("aria-disabled") === "true");
     expect(blocked.length).toBe(8);
     expect(blocked[0]!.getAttribute("aria-label")).toMatch(/unavailable, before the start time/);
+  });
+
+  it("shows a range picked from the columns in both halves", () => {
+    // The pick reached the host and both typed halves stayed empty: the field
+    // treated its own write as an echo to ignore.
+    const { container } = render(<TimeRangeField label="Time range" stepMinutes={60} />);
+    fireEvent.click(screen.getByRole("button", { name: "Choose from a list of times" }));
+    const panel = screen.getByRole("dialog", { name: "Time range" });
+    const [starts, ends] = within(panel).getAllByRole("listbox");
+    fireEvent.click(within(starts!).getByRole("option", { name: "9:00 AM" }));
+    fireEvent.click(within(ends!).getByRole("option", { name: /^11:00 AM/ }));
+    fireEvent.click(within(panel).getByRole("button", { name: "Done" }));
+
+    const halves = [...container.querySelectorAll(".zb-dt-field")].map((field) =>
+      [...field.querySelectorAll('[role="spinbutton"]')].map((s) =>
+        s.getAttribute("aria-valuetext"),
+      ),
+    );
+    expect(halves[0]).not.toContain(null);
+    expect(halves[0]!.join(" ")).toMatch(/9.*00.*AM/);
+    expect(halves[1]!.join(" ")).toMatch(/11.*00.*AM/);
   });
 
   it("keeps one tabstop per column", () => {

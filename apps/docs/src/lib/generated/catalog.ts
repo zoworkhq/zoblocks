@@ -8534,23 +8534,209 @@ export const CATALOG: ComponentDoc[] = [
       {
         "id": "four-jobs",
         "title": "Four jobs, four variants",
-        "description": "The organising idea, in four lines. Recall is a value the user already holds; choose is one only the system knows; construct is a structure with derived members; witness is an assertion about the past. Each wants a different primary control, and picking the wrong one is how a date field becomes something staff route around.",
+        "description": "The organising idea. Recall is a value the user already holds; choose is one only the system knows; construct is a structure with derived members; witness is an assertion about the past. Each wants a different primary control, and picking the wrong one is how a date field becomes something staff route around.",
         "fixture": "patientRoutine",
-        "code": "<DatePicker variant=\"field\"      label=\"Date of service\" now={today} showRelative />\n<DatePicker variant=\"slots\"      set={availability} now={now} onSelect={hold} />\n<DatePicker variant=\"session\"    durationPresets={org.presets} />\n<DatePicker variant=\"readout\"    value={signedAt} showZone viewerZone={me.zone} />"
+        "group": "Fields",
+        "code": "<DatePicker variant=\"field\"   label=\"Date of service\" now={today} showRelative />\n<DatePicker variant=\"slots\"   label=\"Available times\" set={availability} now={now} />\n<DatePicker variant=\"session\" label=\"Individual therapy\" durationPresets={BEHAVIORAL_HEALTH_DURATIONS} />\n<DatePicker variant=\"readout\" as=\"time\" value={signedAt} now={today} showZone />"
+      },
+      {
+        "id": "picker",
+        "title": "Picker: a field with a calendar behind it",
+        "description": "Type 09022026 without opening anything; press the button and the grid opens on September, with closed days struck and the open-slot count under each numeral. Escape closes and keeps what was typed. The rail is the host's: `relativeDateOptions(now)`, passed in, because “Next Monday” is a scheduling convention, not a component default.",
+        "group": "Fields",
+        "code": "<DateField\n  label=\"Appointment date\"\n  showCalendar\n  now={today}\n  value={value}\n  onChange={setValue}\n  unavailable={clinicClosed}   // returns the reason, or null\n  load={openSlotCount}\n  calendarShortcuts={relativeDateOptions(today)}\n  calendarShowCustom\n  calendarHints\n  calendarCommit=\"explicit\"\n/>"
+      },
+      {
+        "id": "field",
+        "title": "Field: three segments, one tab stop",
+        "description": "The variant most healthcare fields actually want. A segment advances itself the moment no further digit could be valid — 9 in the month jumps on, 1 waits for a possible 12 — which is what makes eight keystrokes enough. With a `name`, it posts ISO into a plain HTML form.",
+        "group": "Fields",
+        "code": "<DateField label=\"Date of service\" now={today} showRelative />\n\n<DateField\n  label=\"Referral received\"\n  now={today}\n  name=\"referral_date\"          // posts 2026-08-21\n  defaultValue={plainDate(2026, 8, 21)}\n  showRelative\n/>"
+      },
+      {
+        "id": "tiers",
+        "title": "Three tiers, three behaviours",
+        "description": "There is no correct default for the future. A date of birth may never be in it: blocked, announced assertively, aria-invalid. A documentation date in the future is suspicious, not impossible: a polite warning, not invalid. A retrospective service date is ordinary — blocking it is what teaches staff to date notes to today.",
+        "group": "Fields",
+        "code": "<DateField label=\"Date of birth\" now={today} futurePolicy=\"block\" />\n<DateField label=\"Session documented\" now={today} futurePolicy=\"warn\" />\n<DateField label=\"Date of service\" now={today} showRelative />"
+      },
+      {
+        "id": "birth-date",
+        "title": "Birth date, read back as an age",
+        "description": "A transposed year is invisible in 07/18/1968 and screaming in “58 years old”. Under two years it reads in months and under four weeks in days, because a paediatric chart that says “0 years old” has discarded the number a weight-based dose is calculated from. The calendar, when it opens, opens on the year.",
+        "fixture": "patientRoutine",
+        "group": "Fields",
+        "code": "<BirthDateField now={today} defaultValue={plainDate(1986, 7, 18)} calendarHints />\n<BirthDateField now={today} defaultValue={plainDate(2026, 4, 20)} />  // 4 months\n<BirthDateField now={today} defaultValue={plainDate(2026, 8, 9)} />   // 17 days"
+      },
+      {
+        "id": "birth-date-partial",
+        "title": "Partial and absent birth dates",
+        "description": "FHIR permits YYYY and YYYY-MM for Patient.birthDate, because homeless services, unaccompanied minors and forensic intake produce them. Coercing “born around 1962” to 1 January invents a fact. Absence carries its reason, so “not recorded” and “nobody asked” stay different.",
+        "group": "Fields",
+        "code": "<BirthDateField\n  now={today}\n  allowEstimated\n  allowAbsent\n  precision=\"year\"\n  value={{ kind: \"partial-date\", y: 1962 }}\n/>\n\n<BirthDateField\n  now={today}\n  allowAbsent\n  absentReason=\"asked-declined\"\n  value={{ kind: \"absent\", reason: \"asked-declined\" }}\n/>"
+      },
+      {
+        "id": "time",
+        "title": "Time that refuses to guess",
+        "description": "Type a bare 9 into the first field: the meridiem stays empty, the value stays incomplete, and the field asks — rather than silently turning a 9 PM discharge into a 9 AM one. Presets are an interval, not a menu. The third is 24-hour with seconds, for an observation timestamp.",
+        "group": "Fields",
+        "code": "<TimeField label=\"Discharge time\" />\n<TimeField label=\"Time given\" presets={timeGrid(8 * 60, 10 * 60, 20)} />\n<TimeField label=\"Observation\" hour24 showSecond />"
+      },
+      {
+        "id": "readout",
+        "title": "Readout: the instant, then the reading aid",
+        "description": "“3 days after service” is a reading aid; the timestamp is the record. Anything a signature depends on prints its stored instant and IANA zone, and a second zone only when the reader's differs. Absent and restricted are explained rather than blank, because a blank cell reads as “nothing happened”.",
+        "group": "Fields",
+        "code": "<ClinicalDateTime as=\"time\" value={signedAt} now={today} showRelative showZone />\n<ClinicalDateTime as=\"time\" value={signedAt} now={today} viewerZone=\"America/Los_Angeles\" showZone />\n<ClinicalDateTime value={{ kind: \"absent\", reason: \"asked-declined\" }} />\n<ClinicalDateTime value={serviceDate} restricted />"
       },
       {
         "id": "antd-migration",
-        "title": "One changed import",
-        "description": "The props match antd's, so the migration is the import line and a conversion at the value boundary. That is ADR 0010's promise, and this is the component that tests it hardest — because antd actually has this one.",
+        "title": "Coming from antd",
+        "description": "Not yet one changed import line, and the differences are named rather than hidden: antd's disabledDate is `unavailable` and returns the reason instead of a boolean, because the reason is spoken and shown; the value is a plain `ZbDate`, not a Dayjs, so a birth date is never midnight UTC. There is no picker, showTime, allowClear or status yet.",
         "fixture": "appointmentBooked",
-        "code": "- import { DatePicker } from \"antd\";\n+ import { DatePicker } from \"@zoblocks/react\";\n\n  <DatePicker\n    disabledDate={closed}\n    allowClear\n    status={hasError ? \"error\" : undefined}\n-   value={dayjsValue}\n+   value={zbDate}          // { kind: \"date\", y, m, d }\n  />"
+        "group": "Fields",
+        "code": "- import { DatePicker } from \"antd\";\n+ import { DatePicker } from \"@zoblocks/react\";\n\n  <DatePicker\n-   disabledDate={(day) => isClosed(day)}\n+   unavailable={(date) => (isClosed(date) ? \"Clinic closed\" : null)}\n-   value={dayjsValue}\n+   value={zbDate}               // { kind: \"date\", y, m, d }\n+   now={today}\n  />"
+      },
+      {
+        "id": "anatomy",
+        "title": "Why the panel is shaped like this",
+        "description": "The panel never moves; the explanation does. Each note is measured off the real DOM — the accessible name it quotes is the one the cell carries, the target size is what it measures in your browser now. Every note is a real button, so paused or through a screen reader this reads as six labelled paragraphs. It never starts under reduced motion.",
+        "group": "Calendars",
+        "code": "<Calendar\n  mode=\"range\"\n  months={2}\n  weekStart={1}\n  commit=\"explicit\"\n  hints\n  presets={dateRangePresets(today)}\n  showCustomPreset\n  now={today}\n  defaultRange={{ start: plainDate(2026, 8, 17), end: plainDate(2026, 9, 11) }}\n/>"
+      },
+      {
+        "id": "calendar",
+        "title": "One tab stop, every cell named",
+        "description": "Tab to the grid and move with the arrows; PageUp/PageDown change month, with Shift the year — which the legend exists to tell you. Exactly one cell is reachable by Tab, and every cell is named as its whole date plus its state: “Wednesday, 26 August 2026, 8 times available”, not “26”.",
+        "group": "Calendars",
+        "code": "<Calendar\n  now={today}\n  defaultValue={today}\n  load={openSlotCount}\n  unavailable={clinicClosed}\n  shortcuts={relativeDateOptions(today)}\n  showCustomPreset\n  hints\n  commit=\"explicit\"\n/>"
+      },
+      {
+        "id": "multiple",
+        "title": "Several dates that are not a range",
+        "description": "The make-up sessions after a missed fortnight. Clicking a selected date removes it — a remove control inside a 32px cell would fall under the 24px target floor. The cap is refused silently at the boundary: a fifth click that does nothing teaches better than a dialog.",
+        "group": "Calendars",
+        "code": "<Calendar mode=\"multiple\" maxDates={4} now={today} unavailable={clinicClosed} hints />"
+      },
+      {
+        "id": "range",
+        "title": "A range in two clicks, never a drag",
+        "description": "There is no drag path anywhere (WCAG 2.2 SC 2.5.7). The second click completes the range in either direction: clicking the later date first has told you both ends, and swapping them is right.",
+        "group": "Calendars",
+        "code": "<Calendar\n  mode=\"range\"\n  months={2}\n  weekStart={1}\n  now={today}\n  unavailable={clinicClosed}\n  presets={dateRangePresets(today, { weekStart: 1 })}\n  showCustomPreset\n  hints\n  commit=\"explicit\"\n/>"
+      },
+      {
+        "id": "range-panel",
+        "title": "Two months, one set of controls",
+        "description": "Most ranges cross a month boundary, so the panel shows two contiguous months paged together — previous on the first, next on the last, so no two buttons announce the same name. The rail is data from `dateRangePresets(now)`, and nothing reaches the host until Done.",
+        "group": "Calendars",
+        "code": "<Calendar\n  mode=\"range\"\n  months={2}\n  commit=\"explicit\"\n  hints\n  weekStart={1}\n  presets={dateRangePresets(today, { weekStart: 1 })}\n  showCustomPreset\n  now={today}\n  defaultRange={{ start: plainDate(2026, 8, 17), end: plainDate(2026, 9, 17) }}\n/>"
+      },
+      {
+        "id": "date-range",
+        "title": "Range field: both ends typed",
+        "description": "One shell, two typed halves. The day count is inclusive — the 1st to the 7th is seven days of care — and it is the field's own proof-read: a transposed month is invisible in 03/07 – 07/07 and unmissable as “123 days”. An end before its start is an error, not a silent swap.",
+        "group": "Calendars",
+        "code": "<DateRangeField\n  label=\"Authorisation window\"\n  now={today}\n  weekStart={1}\n  months={2}\n  showSpan\n  hints\n  presets={dateRangePresets(today, { weekStart: 1 })}\n  showCustomPreset\n  maxSpanDays={90}\n  value={range}\n  onChange={setRange}\n/>"
+      },
+      {
+        "id": "session",
+        "title": "Three values, two degrees of freedom",
+        "description": "Press a duration chip and the end moves, marked Derived. Type an end and the duration recomputes — and the Held badge moves with it. Move the start: hold the duration and the session slides; hold the end and it stretches. Which one you got is shown, rather than discovered on a real appointment.",
+        "group": "Sessions",
+        "code": "<SessionTimeField\n  label=\"Individual therapy\"\n  defaultValue={sessionFrom(plainTime(9, 0), 53)}\n  durationPresets={BEHAVIORAL_HEALTH_DURATIONS}\n  bands={org.thresholds}\n/>"
+      },
+      {
+        "id": "overnight",
+        "title": "Overnight, and the guard",
+        "description": "11:30 PM to 7:30 AM is a crisis-line shift, not a typo, so the day boundary is stated as a labelled next-day marker rather than refused. The guard catches the absurd one — a start past a held end — and offers the likely correction: somebody typed 2:00 meaning the afternoon.",
+        "group": "Sessions",
+        "code": "<SessionTimeField\n  label=\"Crisis line shift\"\n  maxMinutes={720}\n  allowOvernight\n  nextDateLabel=\"Aug 27\"\n  defaultValue={withSessionEnd(sessionFrom(plainTime(23, 30), 0), plainTime(7, 30), {\n    allowOvernight: true,\n  })}\n/>"
+      },
+      {
+        "id": "bands",
+        "title": "Bands are the host's",
+        "description": "The band under the duration comes from the host's array; the component ships it empty. A fifty-three-minute session is a fact about a payer contract, and a library asserting a billing code from a duration would be clinical decision support, which ADR 0009 prohibits.",
+        "group": "Sessions",
+        "code": "const thresholds = [\n  { minMinutes: 0, maxMinutes: 15, code: null, label: \"Not billable\" },\n  { minMinutes: 16, maxMinutes: 52, code: \"SHORT\", label: \"Standard session\" },\n  { minMinutes: 53, maxMinutes: 999, code: \"LONG\", label: \"Extended session\" },\n];\n\n<SessionTimeField\n  label=\"Documentation time\"\n  defaultValue={sessionFrom(plainTime(15, 0), 12)}\n  durationPresets={BEHAVIORAL_HEALTH_DURATIONS}\n  bands={thresholds}\n/>"
+      },
+      {
+        "id": "time-range",
+        "title": "Time range: two columns, filtered",
+        "description": "Every time that cannot be an end — before the start, shorter than the minimum, longer than the maximum — is struck and says why. The length badge is the proof-read. A night shift is accepted, and its next-day crossing is said in words.",
+        "group": "Sessions",
+        "code": "<TimeRangeField\n  label=\"Time range\"\n  stepMinutes={60}\n  minDurationMinutes={30}\n  maxDurationMinutes={480}\n  value={range}\n  onChange={setRange}\n/>\n\n<TimeRangeField label=\"Night shift\" stepMinutes={30} allowOvernight />"
+      },
+      {
+        "id": "slots",
+        "title": "Availability with an age",
+        "description": "“As of 3 minutes ago”, with a refresh, because a grid that looks live and is four minutes stale is how two receptionists book the same 2 PM. Four unavailable states, each saying why. A hold is not a booking: it counts down and comes back. Nothing here fetches or books.",
+        "group": "Booking",
+        "code": "<TimeSlotGrid\n  label=\"Available times — Thu 27 Aug\"\n  set={availability}            // { asOf, staleAfterSeconds, slots, exhausted }\n  now={now}\n  value={slotId}\n  onSelect={(slot) => hold(slot.id)}\n  onRefresh={refetch}\n/>"
+      },
+      {
+        "id": "exhausted",
+        "title": "Exhausted, not empty",
+        "description": "“No times available” and “we have not looked yet” are different facts. `exhausted` says the search completed and found nothing, which licenses the next sentence: another day, another provider, the waitlist.",
+        "group": "Booking",
+        "code": "<TimeSlotGrid\n  label=\"Available times — Fri 28 Aug\"\n  set={{ asOf: now, slots: [], exhausted: true }}\n  now={now}\n/>"
+      },
+      {
+        "id": "scheduler",
+        "title": "Provider, day and time on one surface",
+        "description": "Change the provider and the day strip recolours by open-slot count before you pick a date. Buffers belong to the interval: a 50-minute session with a 10-minute turnaround occupies 60 minutes. The provider's zone is named only where it differs from yours, and nothing chosen is called a booking.",
+        "group": "Booking",
+        "code": "<AppointmentScheduler\n  label=\"Book an appointment\"\n  providers={providers}\n  actorId={providerId}\n  onActorChange={setProviderId}\n  date={date}\n  onDateChange={setDate}\n  dayLoads={dayLoads}\n  availability={availability}\n  now={now}\n  durationMinutes={50}\n  buffers={{ before: 0, after: 10 }}\n  value={slotId}\n  onSelect={(choice) => hold(choice.slot.id)}\n  viewerZone=\"America/New_York\"\n/>"
+      },
+      {
+        "id": "recurrence",
+        "title": "The rule in words, before anything exists",
+        "description": "“Every week on Tuesday at 2:00 PM, 16 times, ending 15 December”, with the first occurrences listed. A rule you cannot read before you commit is how a patient gets fifty-two appointments. The RRULE emitted is real RFC 5545 with its EXDATE.",
+        "group": "Series",
+        "code": "<RecurrenceField\n  label=\"Repeats\"\n  startDate={plainDate(2026, 9, 1)}\n  timeLabel=\"2:00 – 2:50 PM\"\n  defaultValue={{ freq: \"WEEKLY\", byWeekday: [2], count: 16 }}\n  countOptions={[4, 6, 8, 12, 16, 24]}\n  showRRule\n/>"
+      },
+      {
+        "id": "recurrence-refused",
+        "title": "Refusal, in full",
+        "description": "A rule outside the implemented subset is refused loudly, read-only, with the original string intact and the unsupported parts named — because a partial RRULE parser does not error, it expands to the wrong dates and gets booked.",
+        "group": "Series",
+        "code": "<RecurrenceField\n  label=\"Repeats\"\n  startDate={plainDate(2026, 9, 1)}\n  unsupported={{\n    source: \"FREQ=YEARLY;BYMONTH=3;BYDAY=2SU;BYHOUR=14\",\n    parts: [\"FREQ=YEARLY\", \"BYMONTH\", \"BYHOUR\"],\n  }}\n  showRRule\n/>"
+      },
+      {
+        "id": "series",
+        "title": "Collisions resolved before anything is written",
+        "description": "Sixteen weekly sessions, three colliding with things the host knows: leave, a closure, a room clash with no alternative. Each row offers the nearest working date, or says it has none. Nothing is written until every collision is resolved or accepted.",
+        "group": "Series",
+        "code": "<RecurringSeriesScheduler\n  label=\"Weekly therapy — 16 sessions\"\n  rule={{ freq: \"WEEKLY\", interval: 1, count: 16 }}\n  startDate={plainDate(2026, 9, 1)}\n  timeLabel=\"2:00 – 2:50 PM\"\n  verdicts={conflicts}          // { date, reason, alternative? }[]\n  resolved={resolved}\n  onResolve={resolve}\n  onUnresolve={unresolve}\n  onResolveAll={resolveAll}\n/>"
       },
       {
         "id": "series-arithmetic",
-        "title": "26 dates, 2 closures, 24 sessions",
-        "description": "The arithmetic is the feature. A group scheduler that prints the naive occurrence count has told the billing team a number that will not match reality, and told nine enrolled patients they are attending two sessions that will not happen. The closures are written into the rule as EXDATE, so the count survives export.",
+        "title": "26 weeks, 3 closures, 23 sessions",
+        "description": "The arithmetic is the feature. A group scheduler that prints the naive count has told billing a number that will not match, and told nine patients about sessions that will not happen. Room, facilitators and enrolment are checked together, and the closures are listed with their reasons and written into the rule as EXDATE.",
         "fixture": "encounterRoutine",
-        "code": "<DatePicker\n  variant=\"group\"\n  name=\"DBT Skills Group\"\n  rule={{ freq: \"WEEKLY\", byWeekday: [2, 4], until: plainDate(2026, 11, 30) }}\n  startDate={plainDate(2026, 9, 1)}\n  exclusions={[\n    { date: plainDate(2026, 11, 24), reason: \"Facility closure — annual training\" },\n    { date: plainDate(2026, 11, 26), reason: \"Thanksgiving\" },\n  ]}\n  room={{ name: \"Group Room B\", capacity: 14 }}\n  capacity={12}\n  enrolled={9}\n/>"
+        "group": "Series",
+        "code": "<GroupSeriesScheduler\n  name=\"DBT Skills — Emotion Regulation\"\n  rule={{ freq: \"WEEKLY\", interval: 1, byWeekday: [2], count: 26 }}\n  startDate={plainDate(2026, 9, 1)}\n  timeLabel=\"5:30 – 7:00 PM\"\n  sessionMinutes={90}\n  facilitators={[\"M. Reyes, LCSW\", \"J. Bhatt, LPC\"]}\n  room={{ name: \"Group Room 2\", capacity: 12 }}\n  capacity={12}\n  enrolled={9}\n  exclusions={[\n    { date: plainDate(2026, 11, 24), reason: \"Thanksgiving week — programme closed\" },\n    { date: plainDate(2026, 12, 22), reason: \"Winter break\" },\n    { date: plainDate(2026, 12, 29), reason: \"Winter break\" },\n  ]}\n  showRRule\n/>"
+      },
+      {
+        "id": "dst",
+        "title": "Daylight saving, classified",
+        "description": "2:30 AM on 8 March in New York does not exist; 1:30 AM on 1 November happens twice; Lord Howe shifts by thirty minutes; Kathmandu is +5:45 — why every offset here is minutes. The component does not decide what to do about any of it; this is what a host decides with.",
+        "group": "Rules it keeps",
+        "code": "import { classifyLocalTime, plainDate, plainTime } from \"@/lib/zoblocks-datetime\";\n\nclassifyLocalTime(\"America/New_York\", plainDate(2026, 3, 8), plainTime(2, 30));\n// → { kind: \"nonexistent\", skippedMinutes: 60 }\nclassifyLocalTime(\"America/New_York\", plainDate(2026, 11, 1), plainTime(1, 30));\n// → { kind: \"ambiguous\", earlierOffset: -240, laterOffset: -300 }"
+      },
+      {
+        "id": "family",
+        "title": "Density and direction, across the family",
+        "description": "The compact variants side by side. Clinical density tightens the ink and never the target: nothing interactive goes under 24px (WCAG 2.2 SC 2.5.8), segments included. `dir=“ltr”` stays pinned on the field, because inheriting RTL renders 26/08/2026 as 2026/08/26 — plausible, and wrong.",
+        "group": "Rules it keeps",
+        "code": "<div data-zb-density=\"clinical\" dir=\"rtl\">\n  <DatePicker variant=\"picker\" label=\"Picker\" now={today} />\n  <DatePicker variant=\"field\" label=\"Field\" now={today} />\n  <DatePicker variant=\"birth-date\" now={today} />\n  <DatePicker variant=\"time\" label=\"Time\" />\n  <DatePicker variant=\"session\" label=\"Session\" />\n  <DatePicker variant=\"readout\" as=\"time\" value={signedAt} now={today} showZone />\n</div>"
+      },
+      {
+        "id": "theme-density",
+        "title": "Every theme against every density",
+        "description": "Light, dark and high contrast against patient, standard and clinical density — nine combinations at once, which is how a token bug is caught, and where the 24px floor at clinical density can be measured.",
+        "group": "Rules it keeps",
+        "code": "{[\"light\", \"dark\", \"high-contrast\"].map((theme) =>\n  [\"patient\", \"standard\", \"clinical\"].map((density) => (\n    <div key={theme + density} data-zb-theme={theme} data-zb-density={density}>\n      <Calendar now={today} defaultValue={today} unavailable={clinicClosed} />\n    </div>\n  )),\n)}"
       }
     ],
     "fixtures": [
