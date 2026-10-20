@@ -10,11 +10,11 @@ export default defineComponentMeta({
   layer: "clinical",
 
   summary:
-    "A multi-chart workspace that makes the active patient unmistakable, because the alternative is eleven identical browser tabs.",
+    "See all open patient charts at a glance, tell similar names apart, and spot unfinished work before switching or closing a chart.",
 
-  tagline: "A multi-chart workspace where the active patient is unmistakable.",
+  tagline: "A safer, clearer way to switch between open patient charts.",
   description:
-    "Each open chart gets a hue derived from its id, so it is the same colour in every session. Two charts whose names look alike both grow an identifier. Per-chart badges carry the unfinished work, closing is graded rather than binary, and returning after fifteen minutes away re-asserts who the chart belongs to.",
+    "Recent Patient Stack shows open charts as a keyboard-accessible tab list. Each chart keeps a stable visual accent, similar names receive identifiers, and outstanding work is visible before a chart is opened. The host application remains responsible for chart state, identity confirmation, and saving or discarding work.",
   rationale:
     'Clinicians work several charts at once and the tooling pretends they do not. The state of the art is a dropdown of names, or worse, eleven browser tabs whose titles truncate to "Chart — Riverside…". Wrong-patient documentation survives every amount of staff training because it is not a training problem: it is two charts that look identical, one keyboard shortcut, and an interruption. A stack does three things a dropdown cannot — it makes the set visible without being opened, it gives each chart a persistent visual identity, and it carries per-chart state. The identity has to be derived from the chart rather than handed out in arrival order, or a clinician who has learned "Okonkwo is the green one" has learned something that will be false tomorrow.',
 
@@ -96,19 +96,30 @@ export default defineComponentMeta({
   dependencies: ["clsx", "tailwind-merge"],
   registryDependencies: ["utils", "tokens", "workspace-core"],
 
-  usage: `import { RecentPatientStack } from "@/components/zoblocks/recent-patient-stack";
+  usage: `import { useState } from "react";
+import { RecentPatientStack } from "@/components/zoblocks/recent-patient-stack";
 import "@/styles/zoblocks-workspace.css";
 
-<RecentPatientStack
-  charts={open}
-  activeId={activeId}
-  now={serverTime}
-  onActivate={(chart, { reassert }) =>
-    reassert ? confirmIdentity(chart) : switchTo(chart)
-  }
-  onClose={closeChart}
-  onReorder={setOrder}
-/>`,
+function WorkspaceChartSwitcher() {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <RecentPatientStack
+      charts={syntheticOpenCharts}
+      activeId="chart-okonkwo"
+      now="2026-10-20T10:30:00.000Z"
+      expanded={expanded}
+      onExpandedChange={setExpanded}
+      onActivate={(chart, { reassert }) => {
+        if (reassert) confirmIdentity(chart);
+        else switchToChart(chart);
+      }}
+      onPin={(chart, pinned) => updatePinnedChart(chart.id, pinned)}
+      onClose={(chart) => requestCloseChart(chart)}
+      onReorder={(charts) => saveChartOrder(charts)}
+    />
+  );
+}`,
 
   guidance: {
     use: [
@@ -157,7 +168,7 @@ import "@/styles/zoblocks-workspace.css";
     phi: {
       handles: true,
       notes:
-        "Every open patient's name is on screen at once, persistently, including during a screen share. The small-screen behaviour narrows that deliberately.",
+        "All examples and fixture references use invented demo identities and reserved example identifiers only. Never put real patient information in fixtures, stories, screenshots, issues, or analytics. In production, the host owns authorization, data access, retention, and the safe handling of any real patient information.",
     },
     auditable: false,
     permissions: ["patient.read"],
@@ -181,8 +192,11 @@ import "@/styles/zoblocks-workspace.css";
 
   controls: [
     { prop: "expanded", control: "switch", label: "Expanded", defaultValue: false },
+    { prop: "onExpandedChange", control: "event", label: "onExpandedChange" },
     { prop: "onActivate", control: "event", label: "onActivate" },
+    { prop: "onPin", control: "event", label: "onPin" },
     { prop: "onClose", control: "event", label: "onClose" },
+    { prop: "onReorder", control: "event", label: "onReorder" },
   ],
 
   a11yChecks: [
@@ -244,6 +258,7 @@ import "@/styles/zoblocks-workspace.css";
     },
   ],
 
+  // These shared fixtures are explicitly synthetic; do not replace them with live records.
   fixtures: ["patientRoutine", "patientRestricted", "patients"],
 
   examples: [
@@ -277,6 +292,27 @@ chartAccent("chart-okonkwo-2"); // → a different slot, deterministically`,
       code: `canClose(clean);     // { kind: "close" }
 canClose(withNote);  // { kind: "confirm", reason: "… Close and lose the draft?" }
 canClose(withOrder); // { kind: "refuse",  reason: "… Sign it or discard it first." }`,
+    },
+    {
+      id: "workspace-integration",
+      title: "Keep the stack connected to workspace state",
+      description:
+        "A workspace owns the open-chart list and active chart. The stack reports activation, pinning, closing, reordering, and expansion through callbacks; the host updates its own state and runs any required identity or close-confirmation flow. This example uses invented chart IDs and synthetic fixture data only.",
+      fixture: "patients",
+      code: `<RecentPatientStack
+  charts={syntheticOpenCharts}
+  activeId="chart-okonkwo"
+  now="2026-10-20T10:30:00.000Z"
+  expanded={expanded}
+  onExpandedChange={setExpanded}
+  onActivate={(chart, { reassert }) => {
+    if (reassert) confirmIdentity(chart);
+    else switchToChart(chart);
+  }}
+  onPin={(chart, pinned) => updatePinnedChart(chart.id, pinned)}
+  onClose={requestCloseChart}
+  onReorder={saveChartOrder}
+/>`,
     },
     {
       id: "return",

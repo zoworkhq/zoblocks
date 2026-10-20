@@ -128,9 +128,8 @@ Rules that matter when generating code with these components:
   fhir: Provenance
   states: Clinic — measured in the room, Home device, with its caveats, Patient-reported — the instrument, External, with the exchange named, AI-extracted, unconfirmed, AI-extracted, confirmed by a clinician, Amended — the original retained, Stale against a per-datum policy, Observed long before it was recorded, Glyph only, in a dense grid, Chain reachable, Span reachable, No ledger entry — renders nothing
   status: stable
-- Recent Patient Stack: A multi-chart workspace that makes the active patient unmistakable, because the alternative is eleven identical browser tabs.
+- [Recent Patient Stack](https://zoblocks.design/components/recent-patient-stack): A multi-chart workspace that makes the active patient unmistakable, because the alternative is eleven identical browser tabs.
   install: npx @zoblocks/cli add recent-patient-stack
-  docs: no page yet — this component installs from the registry today
   fhir: Patient, Task
   states: Four charts, one active, A pinned chart, An unsigned note, A draft order, Two charts with similar names, Closing a clean chart, Closing one with an unsigned note, Closing one with a draft order, Returning after fifteen minutes, Expanded panel, Keyboard reordering, Roving focus across the stack, One chart, Notes owed across the caseload
   status: stable

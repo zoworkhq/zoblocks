@@ -212,6 +212,7 @@ export const DOCUMENTED_ORDER: readonly string[] = [
   "data-grid",
   "care-timeline",
   "copilot",
+  "recent-patient-stack",
 ];
 
 const DOCUMENTED = new Set(DOCUMENTED_ORDER);

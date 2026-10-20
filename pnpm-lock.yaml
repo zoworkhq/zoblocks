@@ -23,6 +23,7 @@ overrides:
   prosemirror-view@<1.42.3: '>=1.42.3'
   sharp@<0.35.5: '>=0.35.5'
   shell-quote@>=1.8.4 <1.11.0: '>=1.11.0'
+  follow-redirects@>=1.16.0 <1.16.1: '>=1.16.1'
 
 importers:
 
@@ -3701,8 +3702,8 @@ packages:
     resolution: {integrity: sha512-kWWXztvZ5SBQV+eRgKFeh8q5sLuZY2+8WUIzlxWVTg+oGwY14qylx1KbKzHd8P6ZYkAg0xyIDU9JMHhyJMZ1jw==}
     engines: {node: '>=10'}
 
-  chromedriver@155.0.0:
-    resolution: {integrity: sha512-db0fFnj6q4a0dqsTnkVqinnP4HrZdRIPpfYxTAEsoMCcA5dIN/Ximzx4+RLjudjBZNYGwUjY7PnqcF/6KuUd0w==}
+  chromedriver@155.0.2:
+    resolution: {integrity: sha512-IcQx0Q/VnGkMot7fAGQf8h9N1b4+KiHJleDGt97ECNP2jIXc5/FM1/kNpmBckO5pNKP5z0BceZIEJ37iIB1Fog==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -4133,8 +4134,8 @@ packages:
   flatted@3.4.4:
     resolution: {integrity: sha512-5+ybhBZANEJxaH3X5evAFatUxLfEHSr7n6kYJ+1Qd0mUqr4eu9gIf6GDbWHf8RJijHrjjO8G+la14SlL2SeS1Q==}
 
-  follow-redirects@1.16.0:
-    resolution: {integrity: sha512-y5rN/uOsadFT/JfYwhxRS5R7Qce+g3zG97+JrtFZlC9klX/W5hD7iiLzScI4nZqUS7DNUdhPgw4xI8W2LuXlUw==}
+  follow-redirects@1.16.1:
+    resolution: {integrity: sha512-FNvFGzoMLWmE6Yj9spb/zjd7yiNCHiAW9/Tg9CXrQ8wuu32HtlJOwWO11OJafl5FfY3DxTdQ0vj42zU1kvv5jg==}
     engines: {node: '>=4.0'}
     peerDependencies:
       debug: '*'
@@ -5896,7 +5897,7 @@ snapshots:
     dependencies:
       '@axe-core/webdriverjs': 4.12.1(selenium-webdriver@4.44.0)
       axe-core: 4.12.1
-      chromedriver: 155.0.0
+      chromedriver: 155.0.2
       colors: 1.4.0
       commander: 9.5.0
       dotenv: 17.4.2
@@ -7907,7 +7908,7 @@ snapshots:
 
   axios@1.20.0:
     dependencies:
-      follow-redirects: 1.16.0(debug@4.4.3)
+      follow-redirects: 1.16.1(debug@4.4.3)
       form-data: 4.0.6
       https-proxy-agent: 5.0.1
       proxy-from-env: 2.1.0
@@ -8012,7 +8013,7 @@ snapshots:
 
   char-regex@1.0.2: {}
 
-  chromedriver@155.0.0:
+  chromedriver@155.0.2:
     dependencies:
       '@testim/chrome-version': 1.1.4
       adm-zip: 0.6.1
@@ -8476,7 +8477,7 @@ snapshots:
 
   flatted@3.4.4: {}
 
-  follow-redirects@1.16.0(debug@4.4.3):
+  follow-redirects@1.16.1(debug@4.4.3):
     optionalDependencies:
       debug: 4.4.3
 
@@ -9016,7 +9017,7 @@ snapshots:
       camelcase: 6.3.0
       debug: 4.4.3
       find-cache-dir: 3.3.2
-      follow-redirects: 1.16.0(debug@4.4.3)
+      follow-redirects: 1.16.1(debug@4.4.3)
       https-proxy-agent: 7.0.6
       mongodb: 6.21.0(socks@2.8.10)
       new-find-package-json: 2.0.0

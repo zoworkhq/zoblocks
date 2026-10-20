@@ -18,6 +18,7 @@
  *       now={serverTime}
  *       onActivate={switchChart}
  *       onClose={closeChart}
+ *       onExpandedChange={setExpanded}
  *     />
  *
  * A stack does three things a dropdown cannot: it makes the set visible
