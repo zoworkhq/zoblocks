@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Instrument_Sans, JetBrains_Mono } from "next/font/google";
+import localFont from "next/font/local";
 
 // Component tokens first, so the app layer overrides deliberately rather
 // than by accident. The app renders real ZoBlocks components in its preview
@@ -28,19 +28,26 @@ import { THEME_BOOT_SCRIPT } from "@/lib/theme";
  * first version of this app used Inter, which is a fine interface face and is
  * not this product's face.
  */
-const instrumentSans = Instrument_Sans({
-  subsets: ["latin"],
+/*
+ * Self-hosted rather than next/font/google. The Google loader fetches the
+ * stylesheet at build time, and Turbopack fails on the response Google now
+ * serves ("next/font/google queries have exactly one entry") — so a cold build
+ * broke on a network reply, in CI and nowhere else. These are the latin
+ * variable files Google serves, committed with their OFL licences beside them.
+ */
+const instrumentSans = localFont({
+  src: "./fonts/instrument-sans-latin-wght.woff2",
   display: "swap",
   variable: "--font-instrument-sans",
-  weight: ["400", "500", "600", "700"],
+  weight: "400 700",
 });
 
 /** Tokens, hex values, contrast ratios, versions, file paths. */
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
+const jetbrainsMono = localFont({
+  src: "./fonts/jetbrains-mono-latin-wght.woff2",
   display: "swap",
   variable: "--font-jetbrains-mono",
-  weight: ["400", "500", "600"],
+  weight: "400 600",
 });
 
 export const metadata: Metadata = {
