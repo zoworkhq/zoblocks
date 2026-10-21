@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import localFont from "next/font/local";
 
 // Component tokens first, so the app layer can override deliberately.
 import "@zoblocks/tokens/zoblocks-tokens.css";
@@ -12,11 +12,18 @@ import "./globals.css";
  * at 13px, has real tabular numerals for dates and counts, and its tight
  * default tracking is what makes dense rows readable rather than cramped.
  */
-const inter = Inter({
-  subsets: ["latin"],
+/*
+ * Self-hosted rather than next/font/google. The Google loader fetches the
+ * stylesheet at build time, and Turbopack fails on the response Google now
+ * serves ("next/font/google queries have exactly one entry") — so a cold build
+ * broke on a network reply, in CI and nowhere else. These are the latin
+ * variable files Google serves, committed with their OFL licences beside them.
+ */
+const inter = localFont({
+  src: "./fonts/inter-latin-wght.woff2",
   display: "swap",
   variable: "--font-inter",
-  weight: ["400", "500", "600", "700"],
+  weight: "400 700",
 });
 
 export const metadata: Metadata = {
