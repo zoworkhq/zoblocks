@@ -5,14 +5,18 @@
    syntax palette, scoped to `.zb-code` so it cannot reach anything but code:
    it colours tokens a reader scans for and is not part of the design system. */
 
+/* Every light token clears 4.5:1 (WCAG AA) on the code surface, #eef3f1, and
+   on the high-contrast theme's #f2f2f2. Comments and numbers were the two
+   below it — 3.5:1 and 4.48:1 — so they are darker here than looks necessary:
+   a comment is still prose someone has to read. */
 .zb-code {
   --tk-kw: oklch(0.48 0.15 300);
   --tk-str: oklch(0.5 0.12 150);
   --tk-tag: oklch(0.52 0.15 25);
   --tk-attr: oklch(0.5 0.13 250);
-  --tk-num: oklch(0.55 0.13 60);
+  --tk-num: oklch(0.53 0.13 60);
   --tk-fn: oklch(0.5 0.12 220);
-  --tk-com: oklch(0.6 0.01 255);
+  --tk-com: oklch(0.525 0.01 255);
   --tk-p: oklch(0.5 0.01 255);
   --tk-t: var(--color-ink);
   --tk-type: oklch(0.5 0.1 190);
