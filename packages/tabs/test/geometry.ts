@@ -19,6 +19,11 @@ export interface StubSizes {
   tabWidth: number;
   tabHeight?: number;
   gap?: number;
+  /**
+   * Inline size of the bar around the list — the container the collapse
+   * decision reads. Defaults to `clientWidth`: a list that fills its bar.
+   */
+  containerWidth?: number;
 }
 
 const patched = new Set<HTMLElement>();
@@ -30,7 +35,14 @@ const patched = new Set<HTMLElement>();
  * cannot leak into the next.
  */
 export function stubGeometry(list: HTMLElement, sizes: StubSizes): () => void {
-  const { clientWidth, scrollWidth, tabWidth, tabHeight = 32, gap = 0 } = sizes;
+  const {
+    clientWidth,
+    scrollWidth,
+    tabWidth,
+    tabHeight = 32,
+    gap = 0,
+    containerWidth = clientWidth,
+  } = sizes;
 
   const define = (element: HTMLElement, props: Record<string, number>) => {
     for (const [key, value] of Object.entries(props)) {
@@ -40,6 +52,9 @@ export function stubGeometry(list: HTMLElement, sizes: StubSizes): () => void {
   };
 
   define(list, { clientWidth, scrollWidth, offsetWidth: clientWidth, offsetHeight: tabHeight });
+  if (list.parentElement) {
+    define(list.parentElement, { clientWidth: containerWidth, offsetWidth: containerWidth });
+  }
 
   const tabs = Array.from(list.querySelectorAll<HTMLElement>("[data-zb-tab]"));
   tabs.forEach((tab, index) => {

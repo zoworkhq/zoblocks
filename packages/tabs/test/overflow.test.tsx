@@ -225,6 +225,85 @@ describe('overflow="collapse"', () => {
     expect(onChange).toHaveBeenCalledWith("t3", { via: "menu" });
   });
 
+  it("stays collapsed while the hidden list measures zero", async () => {
+    // A hidden element reports a zero box. Read as "not narrow", that brought
+    // the strip back, which measured narrow and collapsed again — every other
+    // frame, for as long as the page was open.
+    render(
+      <Tabs
+        as="tabs"
+        aria-label="Chart section"
+        defaultValue="t0"
+        items={many}
+        overflow="collapse"
+      />,
+    );
+    const list = screen.getByRole("tablist", { hidden: true });
+    restore = stubGeometry(list, { clientWidth: 320, scrollWidth: 800, tabWidth: 100 });
+    await settle();
+    await screen.findByRole("combobox");
+
+    restore();
+    restore = stubGeometry(list, {
+      clientWidth: 0,
+      scrollWidth: 0,
+      tabWidth: 0,
+      containerWidth: 320,
+    });
+    await settle();
+    await settle();
+    expect(screen.getByRole("combobox")).toBeInTheDocument();
+  });
+
+  it("comes back when the container widens", async () => {
+    render(
+      <Tabs
+        as="tabs"
+        aria-label="Chart section"
+        defaultValue="t0"
+        items={many}
+        overflow="collapse"
+      />,
+    );
+    const list = screen.getByRole("tablist", { hidden: true });
+    restore = stubGeometry(list, { clientWidth: 320, scrollWidth: 800, tabWidth: 100 });
+    await settle();
+    await screen.findByRole("combobox");
+
+    restore();
+    restore = stubGeometry(list, {
+      clientWidth: 0,
+      scrollWidth: 0,
+      tabWidth: 0,
+      containerWidth: 1200,
+    });
+    await settle();
+    await waitFor(() => expect(screen.queryByRole("combobox")).not.toBeInTheDocument());
+    expect(screen.getByRole("tablist")).toBeInTheDocument();
+  });
+
+  it("does not collapse a short strip in a wide container", async () => {
+    // The list is only as wide as its tabs; the container is what counts.
+    render(
+      <Tabs
+        as="tabs"
+        aria-label="Chart"
+        defaultValue="t0"
+        items={many.slice(0, 3)}
+        overflow="collapse"
+      />,
+    );
+    const list = screen.getByRole("tablist");
+    restore = stubGeometry(list, {
+      clientWidth: 300,
+      scrollWidth: 300,
+      tabWidth: 100,
+      containerWidth: 1200,
+    });
+    await settle();
+    expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
+  });
+
   it("stays a tablist in a wide container", async () => {
     render(
       <Tabs as="tabs" aria-label="Chart" defaultValue="t0" items={many} overflow="collapse" />,
