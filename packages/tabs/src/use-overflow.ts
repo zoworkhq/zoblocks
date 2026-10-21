@@ -77,7 +77,16 @@ export function useOverflow({
     if (!list) return;
 
     if (strategy === "collapse") {
-      setCollapsed(shouldCollapse(list.clientWidth, count));
+      /*
+       * The bar, not the list. Collapsing hides the list, and a hidden list
+       * measures zero — which reads as "not narrow", so the strip came back,
+       * measured narrow, and collapsed again, every other frame. The list is
+       * also only as wide as its tabs, so three short ones in a wide container
+       * read as narrow. The bar fills the container in both states, which is
+       * the width this decision is about.
+       */
+      const container = list.parentElement ?? list;
+      setCollapsed(shouldCollapse(container.clientWidth, count));
       return;
     }
     if (strategy !== "menu") return;
@@ -178,8 +187,11 @@ export function useOverflow({
     if (!list || typeof ResizeObserver === "undefined") return;
     const observer = new ResizeObserver(refresh);
     observer.observe(list);
+    // A collapsed list is hidden and never resizes again, so widening the
+    // container would leave the picker in place for good. Watch the bar too.
+    if (strategy === "collapse" && list.parentElement) observer.observe(list.parentElement);
     return () => observer.disconnect();
-  }, [listRef, refresh]);
+  }, [listRef, refresh, strategy]);
 
   React.useEffect(() => {
     if (strategy !== "menu") return;
