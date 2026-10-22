@@ -95,6 +95,17 @@
 /* ---- stage ------------------------------------------------------- */
 .zb-gallery__stage {
   border-radius: 1rem;
+  /*
+   * The demos set in the site's own face, not the platform's.
+   *
+   * The components default to `system-ui`, which is San Francisco on a Mac and
+   * a far wider face on Linux. The gallery's widths are tuned — a variant demo
+   * must not render already scrolled, an overflow demo must — and a tuning that
+   * holds on one OS and not another is not a tuning: the underline strip fitted
+   * here and overflowed by 68px in CI. Instrument Sans is self-hosted, so every
+   * engine on every platform lays these demos out the same.
+   */
+  --zb-font-sans: var(--font-sans);
 }
 .zb-gallery__grid {
   display: grid;
