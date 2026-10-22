@@ -308,6 +308,7 @@ import "@/styles/zoblocks-clinical-status.css";
   examples: [
     {
       id: "criticality-from-fhir",
+      group: "From the record",
       title: "Criticality, mapped rather than guessed",
       description:
         "The interpretation code decides the step. HH and LL are the panic values and the only ones that reach critical; H and L are simply outside the range, and conflating the two is how an alert list becomes noise nobody reads.",
@@ -324,6 +325,7 @@ const step = fromInterpretation(code);
     },
     {
       id: "restricted-is-not-absent",
+      group: "From the record",
       title: "Restricted is a state, not a gap",
       description:
         "Part 2 is its own step rather than a flavour of restricted, because 42 CFR Part 2 is a different legal regime from HIPAA minimum-necessary with a different re-disclosure rule. Rendering them the same teaches staff that they are the same.",
@@ -334,7 +336,58 @@ const step = fromInterpretation(code);
 // which is what lets it appear on a screen the reader is not cleared for.`,
     },
     {
+      id: "nine-scales",
+      group: "Vocabulary",
+      title: "Nine scales, one vocabulary",
+      description:
+        "No free text anywhere. Amber means the same thing in the lab module and the vitals module because there is only one place it is defined. Each step pairs a tone with a drawn glyph and a word.",
+      code: `import { ClinicalStatus } from "@/components/zoblocks/clinical-status";
+import { SCALES, SCALE_NAMES } from "@/lib/zoblocks-clinical-status";
+
+export default function Example() {
+  return SCALE_NAMES.map((scale) => (
+    <section key={scale}>
+      <h3>{SCALES[scale].label}</h3>
+      {SCALES[scale].steps.map((step) => (
+        <ClinicalStatus key={step.id} scale={scale} step={step.id} />
+      ))}
+    </section>
+  ));
+}`,
+    },
+    {
+      id: "hue-removed",
+      group: "Vocabulary",
+      title: "Hue removed",
+      description:
+        "The same six chips, desaturated — a monochrome display, a ward printer, or a clinician with a red-green deficiency. Shape and word both survive; nothing is lost but the pleasantness.",
+      code: `<div style={{ filter: "grayscale(1)" }}>
+  <ClinicalStatus scale="criticality" step="critical" />
+  <ClinicalStatus scale="criticality" step="high" />
+  <ClinicalStatus scale="criticality" step="normal" />
+  <ClinicalStatus scale="criticality" step="not-assessed" />
+  <ClinicalStatus scale="access" step="restricted" />
+  <ClinicalStatus scale="result-status" step="preliminary" />
+</div>`,
+    },
+    {
+      id: "three-shapes",
+      group: "Presentations",
+      title: "One datum, three shapes",
+      description:
+        "The chip carries all three channels and is the only one safe on its own. The dot drops the visible word and needs the legend beside it. The affix is for tables past about forty rows.",
+      code: `import { ClinicalStatus, StatusLegend } from "@/components/zoblocks/clinical-status";
+
+<ClinicalStatus scale="criticality" step="critical" />
+<ClinicalStatus scale="criticality" step="critical" density="compact" />
+<ClinicalStatus scale="criticality" step="critical" shape="dot" />
+<ClinicalStatus scale="criticality" step="critical" shape="affix" />
+
+<StatusLegend scale="criticality" />`,
+    },
+    {
       id: "grid-affix",
+      group: "Presentations",
       title: "Forty rows, and no field of pills",
       description:
         "At forty rows, forty chips is a colour field with a table behind it. The affix keeps the tone as a 3px rule at the row's leading edge and the meaning as a short word, and the row stays readable.",
@@ -350,12 +403,29 @@ const step = fromInterpretation(code);
     },
     {
       id: "patient-register",
+      group: "Registers",
       title: "The same step, in the other register",
       description:
         '"Entered in error" is an internal state. A portal that ships it has not translated anything — it has published a system word to the person the record is about.',
       fixture: "observationCorrected",
       code: `<ClinicalStatus scale="result-status" step="entered-in-error" audience="patient" />
 // renders "Recorded by mistake"`,
+    },
+    {
+      id: "both-registers",
+      group: "Registers",
+      title: "Both registers, side by side",
+      description:
+        "The register is a prop, and both sides of every step are required by the type, so a scale cannot ship with a clinician word and no patient word.",
+      code: `{(["clinician", "patient"] as const).map((audience) => (
+  <div key={audience}>
+    <ClinicalStatus scale="result-status" step="entered-in-error" audience={audience} />
+    <ClinicalStatus scale="result-status" step="preliminary" audience={audience} />
+    <ClinicalStatus scale="data-quality" step="self-reported" audience={audience} />
+    <ClinicalStatus scale="access" step="part-2" audience={audience} />
+    <ClinicalStatus scale="criticality" step="critical" audience={audience} />
+  </div>
+))}`,
     },
   ],
 

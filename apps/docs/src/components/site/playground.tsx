@@ -31,6 +31,8 @@ import { InfusionLoader } from "@/registry/zoblocks/infusion-loader/infusion-loa
 import { Switch, type SwitchProps } from "@/registry/zoblocks/switch/switch";
 import { Accordion } from "@/registry/zoblocks/accordion/accordion";
 import { CHART_ITEMS } from "./accordion-demos";
+import { ClinicalStatus } from "@/registry/zoblocks/clinical-status/clinical-status";
+import { SCALES, type ScaleName } from "@/lib/zoblocks-clinical-status";
 import { PLAYGROUND_COMPONENTS } from "./playground-registry";
 import { useSiteTheme } from "./use-site-theme";
 import { useAntdBrandTokens } from "./language-antd-theme";
@@ -140,6 +142,15 @@ function chartFor(mode: string, fixture: string): TabsItemProps[] {
 }
 
 const RENDERERS: Record<string, (props: Props) => React.ReactNode> = {
+  "clinical-status": (props) => (
+    <Centered>
+      <ClinicalStatus
+        {...(props as { scale: ScaleName; step: string })}
+        scale={(props.scale as ScaleName | undefined) ?? "criticality"}
+        step={String(props.step ?? "critical")}
+      />
+    </Centered>
+  ),
   accordion: (props) => (
     <div className="mx-auto w-full max-w-xl">
       <Accordion items={CHART_ITEMS} defaultActiveKey={["risk"]} {...props} />
@@ -241,6 +252,39 @@ const RENDERERS: Record<string, (props: Props) => React.ReactNode> = {
  * the knob's string (see `signature` above); the generated code has to say the
  * same thing, or a reader copies `methods="draw"` into a prop that maps.
  */
+/**
+ * Knobs whose options depend on another knob.
+ *
+ * A Clinical Status step only exists within its scale — "critical" is a
+ * criticality step and means nothing on the access scale — so the step knob
+ * lists the chosen scale's steps rather than taking free text the component
+ * would refuse.
+ */
+const DYNAMIC_OPTIONS: Record<string, Record<string, (props: Props) => string[]>> = {
+  "clinical-status": {
+    step: (props) =>
+      (SCALES[(props.scale as ScaleName | undefined) ?? "criticality"]?.steps ?? []).map(
+        (step) => step.id,
+      ),
+  },
+};
+
+/**
+ * Brings a props object back to one the component accepts, after any knob
+ * changes. Changing the scale keeps the step when it exists there and falls
+ * back to the scale's first step when it does not.
+ */
+function normalise(name: string, props: Props): Props {
+  const dynamic = DYNAMIC_OPTIONS[name];
+  if (!dynamic) return props;
+  const next = { ...props };
+  for (const [prop, optionsFor] of Object.entries(dynamic)) {
+    const options = optionsFor(next);
+    if (options.length && !options.includes(String(next[prop]))) next[prop] = options[0];
+  }
+  return next;
+}
+
 /**
  * Props the renderer supplies that no knob controls, written into the code so
  * the snippet a reader copies is one that renders — an Accordion with no
@@ -541,8 +585,8 @@ export function Playground({
     for (const control of knobs) {
       if (control.defaultValue !== undefined) props[control.prop] = control.defaultValue;
     }
-    return props;
-  }, [knobs]);
+    return normalise(name, props);
+  }, [knobs, name]);
 
   const [props, setProps] = React.useState<Props>(initial);
   const [log, setLog] = React.useState<string[]>([]);
@@ -636,21 +680,27 @@ export function Playground({
             <span className="sticky top-0 z-10 -mb-2 bg-paper pb-2 pt-[18px] text-xs font-medium text-graphite-soft">
               Props
             </span>
-            {knobs.map((control) => (
-              <Knob
-                key={control.prop}
-                control={control}
-                value={props[control.prop]}
-                onChange={(next) =>
-                  setProps((previous) => {
-                    const updated = { ...previous };
-                    if (next === undefined) delete updated[control.prop];
-                    else updated[control.prop] = next;
-                    return updated;
-                  })
-                }
-              />
-            ))}
+            {knobs.map((control) => {
+              const optionsFor = DYNAMIC_OPTIONS[name]?.[control.prop];
+              const resolved: Control = optionsFor
+                ? { ...control, control: "select", options: optionsFor(props) }
+                : control;
+              return (
+                <Knob
+                  key={control.prop}
+                  control={resolved}
+                  value={props[control.prop]}
+                  onChange={(next) =>
+                    setProps((previous) => {
+                      const updated = { ...previous };
+                      if (next === undefined) delete updated[control.prop];
+                      else updated[control.prop] = next;
+                      return normalise(name, updated);
+                    })
+                  }
+                />
+              );
+            })}
 
             {events.length > 0 && (
               <div className="flex flex-col gap-1">
