@@ -36,7 +36,7 @@ const PAGE = "/components/tabs";
  * had not appeared yet. Each looked like a different bug.
  */
 async function awaitMeasured(page: Page) {
-  const strips = page.locator(".zb-gallery [data-zb-list]");
+  const strips = page.locator("#examples [data-zb-list]");
   const count = await strips.count();
   for (let i = 0; i < count; i++) {
     await strips.nth(i).evaluate((element) => {
@@ -68,18 +68,29 @@ async function awaitMeasured(page: Page) {
   }
 }
 
-async function openGallery(page: Page) {
+/**
+ * The Tabs page's live examples, and one demo's preview within them.
+ *
+ * These were a chaptered gallery, one chapter on screen at a time. The page
+ * now lists every demo as an example with a live preview, so nothing has to
+ * be chosen first, and each demo is addressed by its example id. The preview
+ * panel rather than the whole example block: the block has its own
+ * Preview/Code tabs, and a selected-tab query over the block would find those.
+ */
+async function openExamples(page: Page) {
   await page.goto(PAGE);
-  const gallery = page.locator(".zb-gallery");
-  await gallery.scrollIntoViewIfNeeded();
-  await expect(gallery).toBeVisible();
+  const examples = page.locator("#examples");
+  await examples.scrollIntoViewIfNeeded();
+  await expect(examples).toBeVisible();
 
   // The reveal is an IntersectionObserver fade; a screenshot taken through it
   // differs every run.
   await page.waitForTimeout(400);
   await awaitMeasured(page);
-  return gallery;
+  return examples;
 }
+
+const preview = (page: Page, example: string) => page.locator(`#ex-${example}-panel-preview`);
 
 /**
  * Click something in the gallery, out from under the site header.
@@ -112,31 +123,26 @@ async function clickClear(target: Locator) {
   await target.click();
 }
 
-async function chooseChapter(page: Page, label: string) {
-  await clickClear(page.locator(".zb-gallery__chapters").getByRole("radio", { name: label }));
-  await page.waitForTimeout(250);
-  await awaitMeasured(page);
-}
-
 /**
- * Apply a density or a direction to every demo at once.
+ * Apply a density or a direction to one demo.
  *
- * The gallery used to have a control bar for this — theme, density and
- * direction, one click each — and these tests drove it. The bar was removed
- * (the note at the top of `tabs-gallery.tsx` says why), and the tests went on
- * waiting for buttons that no longer existed: a 20-second timeout in all three
- * engines, on every run, which read like the indicator had broken.
- *
- * All the bar ever did was write `data-zb-density` or `dir` on the stage, and
- * the gallery's stylesheet still scopes density to that attribute. So this
- * writes the attribute directly. React does not see the change, which makes
- * the test stricter rather than looser: nothing re-renders to tell the
- * indicator that the triggers changed size, so only its own observers can.
+ * The gallery's control bar used to write `data-zb-density` or `dir` on its
+ * stage; the tokens scope both to that attribute on any ancestor, so writing
+ * it on the demo's preview panel does the same. React does not see the
+ * change, which makes the test stricter rather than looser: nothing
+ * re-renders to tell the indicator that the triggers changed size, so only
+ * its own observers can.
  */
-async function setStage(page: Page, name: "data-zb-density" | "dir", value: string) {
-  await page
-    .locator(".zb-gallery__stage")
-    .evaluate((stage, [attribute, next]) => stage.setAttribute(attribute!, next!), [name, value]);
+async function setStage(
+  page: Page,
+  example: string,
+  name: "data-zb-density" | "dir",
+  value: string,
+) {
+  await preview(page, example).evaluate(
+    (stage, [attribute, next]) => stage.setAttribute(attribute!, next!),
+    [name, value],
+  );
   await awaitMeasured(page);
 }
 
@@ -146,8 +152,8 @@ async function setStage(page: Page, name: "data-zb-density" | "dir", value: stri
 
 test.describe("indicator geometry @a11y", () => {
   test("the thumb lands on the selected tab", async ({ page }) => {
-    await openGallery(page);
-    const demo = page.locator("#v01");
+    await openExamples(page);
+    const demo = preview(page, "segmented");
     const thumb = demo.locator(".zb-tabs__thumb");
     const selected = demo.locator('[role="tab"][aria-selected="true"]');
 
@@ -161,8 +167,8 @@ test.describe("indicator geometry @a11y", () => {
   });
 
   test("the thumb follows a click", async ({ page }) => {
-    await openGallery(page);
-    const demo = page.locator("#v01");
+    await openExamples(page);
+    const demo = preview(page, "segmented");
     await clickClear(demo.getByRole("tab", { name: "Shared" }));
 
     // The indicator animates to its new home over 180ms. Polled rather than
@@ -177,8 +183,8 @@ test.describe("indicator geometry @a11y", () => {
   });
 
   test("the underline sits on the rail, not floating above it", async ({ page }) => {
-    await openGallery(page);
-    const demo = page.locator("#v03");
+    await openExamples(page);
+    const demo = preview(page, "underline");
     const line = await demo.locator(".zb-tabs__line").boundingBox();
     const list = await demo.locator('[role="tablist"]').boundingBox();
     // The indicator's bottom edge should coincide with the list's.
@@ -186,11 +192,11 @@ test.describe("indicator geometry @a11y", () => {
   });
 
   test("the thumb re-measures when density changes", async ({ page }) => {
-    await openGallery(page);
-    const demo = page.locator("#v01");
+    await openExamples(page);
+    const demo = preview(page, "segmented");
     const before = await demo.locator(".zb-tabs__thumb").boundingBox();
 
-    await setStage(page, "data-zb-density", "patient");
+    await setStage(page, "segmented", "data-zb-density", "patient");
 
     /*
      * Polled, not slept on.
@@ -213,8 +219,8 @@ test.describe("indicator geometry @a11y", () => {
   });
 
   test("the thumb is placed correctly in RTL", async ({ page }) => {
-    await openGallery(page);
-    await setStage(page, "dir", "rtl");
+    await openExamples(page);
+    await setStage(page, "segmented", "dir", "rtl");
 
     /*
      * Then select a tab, so the strip renders in the new direction.
@@ -225,7 +231,7 @@ test.describe("indicator geometry @a11y", () => {
      * this asserts is unchanged: in a mirrored layout, the thumb lands on the
      * selected trigger rather than on its logical-start twin.
      */
-    const demo = page.locator("#v01");
+    const demo = preview(page, "segmented");
     await clickClear(demo.getByRole("tab", { name: "Shared" }));
     await expect(demo.getByRole("tab", { name: "Shared" })).toHaveAttribute(
       "aria-selected",
@@ -248,30 +254,27 @@ test.describe("indicator geometry @a11y", () => {
 
 test.describe("overflow @a11y", () => {
   test("a narrow container collapses the strip to a native picker", async ({ page }) => {
-    await openGallery(page);
-    await chooseChapter(page, "Overflow");
-    const demo = page.locator("#o3");
+    await openExamples(page);
+    const demo = preview(page, "overflow-collapse");
     // Driven by the container, not the viewport — the demo is deliberately
     // constrained rather than the window being resized.
     await expect(demo.getByRole("combobox")).toBeVisible();
   });
 
   test("the scroll strip reports its edges and moves", async ({ page }) => {
-    await openGallery(page);
-    await chooseChapter(page, "Overflow");
-    const bar = page.locator("#o1 .zb-tabs__bar");
+    await openExamples(page);
+    const bar = preview(page, "overflow-scroll").locator(".zb-tabs__bar");
     await expect(bar).toHaveAttribute("data-zb-start", "true");
 
-    const list = page.locator("#o1 .zb-tabs__list");
+    const list = preview(page, "overflow-scroll").locator(".zb-tabs__list");
     await list.evaluate((element) => element.scrollBy({ left: 240 }));
     await page.waitForTimeout(300);
     await expect(bar).toHaveAttribute("data-zb-start", "false");
   });
 
   test("the priority-plus menu keeps the selected tab visible", async ({ page }) => {
-    await openGallery(page);
-    await chooseChapter(page, "Overflow");
-    const demo = page.locator("#o2");
+    await openExamples(page);
+    const demo = preview(page, "overflow-menu");
 
     /*
      * Opened from the keyboard rather than with a pointer, and not only
@@ -321,8 +324,8 @@ test.describe("overflow @a11y", () => {
 
 test.describe("keyboard @a11y", () => {
   test("arrow keys move selection and the focus ring is visible", async ({ page }) => {
-    await openGallery(page);
-    const demo = page.locator("#v01");
+    await openExamples(page);
+    const demo = preview(page, "segmented");
     await demo.getByRole("tab", { name: "Personal" }).focus();
     await page.keyboard.press("ArrowRight");
 
@@ -336,8 +339,8 @@ test.describe("keyboard @a11y", () => {
   });
 
   test("Tab enters the strip once and then leaves it", async ({ page }) => {
-    await openGallery(page);
-    const demo = page.locator("#v01");
+    await openExamples(page);
+    const demo = preview(page, "segmented");
     await demo.getByRole("tab", { name: "Personal" }).focus();
     await page.keyboard.press("Tab");
     await expect(demo.getByRole("tab", { name: "Shared" })).not.toBeFocused();
@@ -350,9 +353,8 @@ test.describe("keyboard @a11y", () => {
 
 test.describe("visual @vrt", () => {
   test("the nine-cell theme x density matrix", async ({ page }) => {
-    await openGallery(page);
-    await chooseChapter(page, "Theme × density");
-    const matrix = page.locator(".zb-matrix");
+    await openExamples(page);
+    const matrix = preview(page, "theme-density").locator(".zb-matrix");
     await expect(matrix).toBeVisible();
     await page.waitForTimeout(400);
     /*
@@ -365,9 +367,8 @@ test.describe("visual @vrt", () => {
   });
 
   test("every variant, one strip each", async ({ page }) => {
-    await openGallery(page);
-    await chooseChapter(page, "States");
-    const variants = page.locator("#s4 .zb-variants");
+    await openExamples(page);
+    const variants = preview(page, "every-variant").locator(".zb-variants");
     await expect(variants).toBeVisible();
     await page.waitForTimeout(400);
     await expect(variants).toHaveScreenshot("tabs-variants.png");
@@ -379,9 +380,9 @@ test.describe("visual @vrt", () => {
 /* ==================================================================== */
 
 test.describe("reflow @reflow", () => {
-  test("the gallery does not scroll horizontally at 320px", async ({ page }) => {
+  test("the examples do not scroll horizontally at 320px", async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 720 });
-    await openGallery(page);
+    await openExamples(page);
 
     const overflows = await page.evaluate(
       () => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
@@ -392,8 +393,8 @@ test.describe("reflow @reflow", () => {
 
   test("a tab strip stays operable at 320px", async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 720 });
-    await openGallery(page);
-    const demo = page.locator("#v01");
+    await openExamples(page);
+    const demo = preview(page, "segmented");
     await clickClear(demo.getByRole("tab", { name: "Shared" }));
     await expect(demo.getByRole("tab", { name: "Shared" })).toHaveAttribute(
       "aria-selected",

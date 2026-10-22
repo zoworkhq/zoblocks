@@ -410,15 +410,37 @@ test.describe("the catalog @a11y", () => {
 /* The tab gallery                                                      */
 /* ==================================================================== */
 
-test.describe("the tab gallery @a11y", () => {
-  async function openGallery(page: Page) {
+test.describe("the tab examples @a11y", () => {
+  /*
+   * These were a chaptered gallery; the page now lists every demo as a live
+   * example, so each is addressed by its example's preview panel and nothing
+   * has to be chosen first.
+   */
+  async function openExamples(page: Page) {
     await page.goto(TABS);
-    const gallery = page.locator(".zb-gallery");
-    await gallery.scrollIntoViewIfNeeded();
-    await expect(gallery).toBeVisible();
+    const examples = page.locator("#examples");
+    await examples.scrollIntoViewIfNeeded();
+    await expect(examples).toBeVisible();
     await settle(page);
-    return gallery;
+    return examples;
   }
+
+  const preview = (page: Page, example: string) => page.locator(`#ex-${example}-panel-preview`);
+
+  /** The Variants group: one example per visual variant, as the gallery chapter was. */
+  const VARIANTS = [
+    "segmented",
+    "segmented-rich",
+    "underline",
+    "pill-filters",
+    "enclosed-editable",
+    "rail",
+    "ghost",
+    "command",
+    "stepper",
+    "card",
+    "stat",
+  ];
 
   /*
    * An icon-only trigger passes its glyph as the label, which is the supported
@@ -427,9 +449,9 @@ test.describe("the tab gallery @a11y", () => {
    * roughly eighty and filled the bar.
    */
   test("icon-only triggers render their glyph at text size", async ({ page }) => {
-    await openGallery(page);
+    await openExamples(page);
 
-    const command = page.locator("#v08");
+    const command = preview(page, "command");
     await expect(command).toBeVisible();
 
     const glyphs = await command.evaluate((demo) =>
@@ -452,8 +474,8 @@ test.describe("the tab gallery @a11y", () => {
   });
 
   test("the strip stays a normal height with icon-only triggers", async ({ page }) => {
-    await openGallery(page);
-    const strip = page.locator("#v08 .zb-tabs__list").first();
+    await openExamples(page);
+    const strip = preview(page, "command").locator(".zb-tabs__list").first();
     const box = (await strip.boundingBox())!;
     // It was ~140px tall when the glyphs were unconstrained.
     expect(box.height).toBeLessThan(72);
@@ -466,19 +488,18 @@ test.describe("the tab gallery @a11y", () => {
    * variants.
    */
   test("no variant demo renders its strip already scrolled", async ({ page }) => {
-    await openGallery(page);
+    await openExamples(page);
 
-    const overflowing = await page.evaluate(() =>
-      [...document.querySelectorAll(".zb-gallery__grid .zb-demo")]
-        .map((demo) => {
-          const list = demo.querySelector(".zb-tabs__list");
-          if (!list) return null;
-          return {
-            id: demo.id,
-            over: list.scrollWidth - list.clientWidth,
-          };
-        })
-        .filter((entry): entry is { id: string; over: number } => !!entry && entry.over > 2),
+    const overflowing = await page.evaluate(
+      (ids) =>
+        ids
+          .map((id) => {
+            const list = document.querySelector(`#ex-${id}-panel-preview .zb-tabs__list`);
+            if (!list) return null;
+            return { id, over: list.scrollWidth - list.clientWidth };
+          })
+          .filter((entry): entry is { id: string; over: number } => !!entry && entry.over > 2),
+      VARIANTS,
     );
 
     expect(overflowing).toEqual([]);
@@ -489,15 +510,10 @@ test.describe("the tab gallery @a11y", () => {
    * gave the Overflow chapter so much room that nothing overflowed, so five
    * strategies were all shown doing nothing on the page that explains them.
    */
-  test("the overflow chapter still overflows", async ({ page }) => {
-    await openGallery(page);
-    await page
-      .locator(".zb-gallery__chapters")
-      .getByRole("radio", { name: "Overflow" })
-      .click({ force: true });
-    await settle(page);
+  test("the overflow examples still overflow", async ({ page }) => {
+    await openExamples(page);
 
-    const scroll = page.locator("#o1");
+    const scroll = preview(page, "overflow-scroll");
     await expect(scroll.locator(".zb-tabs__bar")).toHaveAttribute("data-zb-end", "false");
 
     const over = await scroll
@@ -510,19 +526,29 @@ test.describe("the tab gallery @a11y", () => {
     page,
   }) => {
     await page.emulateMedia({ colorScheme: "dark" });
-    await openGallery(page);
+    await openExamples(page);
 
-    // A page-wide dark theme with eleven light-mode panels inside it argues
-    // against the thing the gallery exists to demonstrate.
-    //
-    // The attribute is the product's own `data-zb-theme`, not a docs-only
-    // stand-in. The galleries used to carry `data-zb-demo-theme` with three
-    // hand-written palettes behind it, which themed the stage and nothing
-    // inside it: component tokens are substituted where they are declared, so
-    // every field and popover kept the root's light values. Setting the real
-    // attribute means the demos are themed by the shipped mechanism, and a
-    // token that stops following a theme breaks here rather than quietly.
-    await expect(page.locator(".zb-gallery__stage")).toHaveAttribute("data-zb-theme", "dark");
+    // A page-wide dark theme with light-mode demos inside it argues against
+    // the thing the examples exist to show. The demos carry no theme of their
+    // own: they read the component tokens, which follow the site's `.dark`.
+    // So the check is the result — a tab's text resolves light on the dark
+    // page — rather than an attribute that could be set and ignored.
+    await expect(page.locator("html")).toHaveClass(/\bdark\b/);
+    const luminance = await preview(page, "segmented")
+      .locator('[role="tab"]')
+      .first()
+      .evaluate((tab) => {
+        const [r, g, b] = getComputedStyle(tab)
+          .color.match(/[\d.]+/g)!
+          .slice(0, 3)
+          .map(Number);
+        const f = (v: number) => {
+          const c = v / 255;
+          return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+        };
+        return 0.2126 * f(r!) + 0.7152 * f(g!) + 0.0722 * f(b!);
+      });
+    expect(luminance).toBeGreaterThan(0.3);
   });
 });
 
