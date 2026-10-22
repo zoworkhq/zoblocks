@@ -35,22 +35,20 @@ async function openTimeline(page: Page) {
 }
 
 /**
- * Switch the preview to a named scenario.
+ * Open the live preview of one example.
  *
- * The page shows one scenario at a time, so a test that only visits the page
- * asserts against whichever one happens to be first. An earlier version of the
- * two tests below guarded with `test.skip` when their fixture was absent — and
- * skipped on every run, which is the failure this repository's Playwright
- * config already carries a paragraph about. Selecting is the fix; there is
- * nothing to skip.
+ * Every state has its own example on the page, each in a panel with a stable
+ * id, so a test names the one it is about rather than asserting against
+ * whichever timeline happens to be first.
  */
-async function selectScenario(page: Page, label: RegExp) {
+async function openExample(page: Page, id: string) {
   await page.goto(PAGE);
   await page.waitForLoadState("networkidle");
-  await page.getByRole("tab", { name: label }).click();
-  const timeline = page.locator("[data-zb-care-timeline]").first();
+  const panel = page.locator(`#ex-${id}-panel-preview`);
+  await panel.scrollIntoViewIfNeeded();
+  const timeline = panel.locator("[data-zb-care-timeline]").first();
   await expect(timeline).toBeVisible();
-  return timeline;
+  return panel;
 }
 
 test.describe("@a11y care timeline", () => {
@@ -65,8 +63,8 @@ test.describe("@a11y care timeline", () => {
   test("a failed source interrupts rather than sitting in grey", async ({ page }) => {
     // The repeat-CT case. If this ever becomes a quiet footnote, the component
     // has stopped doing the one thing it was built for.
-    await selectScenario(page, /source that could not be reached/);
-    const timeline = page.locator("[data-zb-care-timeline][data-zb-degraded]").first();
+    const panel = await openExample(page, "source-down");
+    const timeline = panel.locator("[data-zb-care-timeline][data-zb-degraded]").first();
     await expect(timeline.getByRole("alert")).toBeVisible();
   });
 
@@ -113,8 +111,8 @@ test.describe("@a11y register layout", () => {
     // The split is a media query, so jsdom can assert the markup and only a
     // browser can assert the layout. Both matter: two columns rendered on top
     // of each other is the bug this breakpoint exists to prevent.
-    await selectScenario(page, /Clinical on one side/);
-    const columns = page.locator(".zb-care-timeline__columns").first();
+    const panel = await openExample(page, "register");
+    const columns = panel.locator(".zb-care-timeline__columns").first();
     await expect(columns).toBeVisible();
 
     await page.setViewportSize({ width: 1280, height: 900 });
@@ -130,8 +128,8 @@ test.describe("@a11y register layout", () => {
 
 test.describe("@a11y jump control", () => {
   test("moves focus to the period it jumped to", async ({ page }) => {
-    await selectScenario(page, /Clinical on one side/);
-    const jump = page.locator("select.zb-care-timeline__jump").first();
+    const panel = await openExample(page, "register");
+    const jump = panel.locator("select.zb-care-timeline__jump").first();
     await expect(jump).toBeVisible();
 
     const values = await jump
