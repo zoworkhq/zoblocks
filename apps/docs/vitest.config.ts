@@ -38,6 +38,10 @@ export default defineConfig({
         replacement: path.join(root, "../../registry/zoblocks/lib/accordion-core.tsx"),
       },
       {
+        find: /^@\/lib\/zoblocks-menu$/,
+        replacement: path.join(root, "../../registry/zoblocks/lib/menu.ts"),
+      },
+      {
         find: /^@\/lib\/zoblocks-switch$/,
         replacement: path.join(root, "../../registry/zoblocks/lib/switch.tsx"),
       },
