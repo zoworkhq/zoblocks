@@ -448,7 +448,20 @@
 /* Availability                                                        */
 /* ------------------------------------------------------------------ */
 
-.zb-switch[data-zb-disabled="true"] {
+/*
+ * Disabled fades the control, not the words.
+ *
+ * The whole switch used to drop to 45% opacity, label and state word included:
+ * "Enabled" on a disabled, checked switch measured 2:1 in light and 3.3:1 in
+ * dark. WCAG exempts an inactive control's own text, but the label and the
+ * state word sit beside the control rather than inside it, and the person who
+ * needs to read "Enabled" on a switch they cannot change is the same person
+ * who needs it at full contrast. The faded track and the not-allowed cursor
+ * already say "unavailable"; the words go on saying what the setting is.
+ */
+.zb-switch[data-zb-disabled="true"] .zb-switch__control,
+.zb-switch[data-zb-disabled="true"] .zb-switch__chip,
+.zb-switch[data-zb-disabled="true"] .zb-switch__segments {
   opacity: 0.45;
 }
 .zb-switch[data-zb-disabled="true"] .zb-switch__control,
