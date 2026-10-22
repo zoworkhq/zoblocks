@@ -734,7 +734,9 @@ test.describe("site chrome @a11y", () => {
       await page.goto("/components/accordion");
       await settle(page);
 
-      const panel = page.locator(".instrument-demo").first();
+      // The Accordion page's live preview is its playground stage now; the
+      // rule is the same one — the stage follows the page, never dark on light.
+      const panel = page.locator("#playground .zb-stage").first();
       await expect(panel).toBeVisible();
 
       const contrast = await panel.evaluate((element) => {
