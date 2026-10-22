@@ -165,9 +165,8 @@ Rules that matter when generating code with these components:
 
 ## Pattern
 
-- Copilot: A floating clinical copilot: a dock above the chart that takes a question and opens into a sourced, auditable thread.
+- [Copilot](https://zoblocks.design/components/copilot): A floating clinical copilot: a dock above the chart that takes a question and opens into a sourced, auditable thread.
   install: npx @zoblocks/cli add copilot
-  docs: no page yet — this component installs from the registry today
   fhir: AuditEvent, Provenance, QuestionnaireResponse
   states: Rest, Mode tray, Shortcuts, Dictating, Streaming, Grounded answer, General-knowledge answer, Sources open, Refused, Crisis, Error, Suppressed
   status: experimental
