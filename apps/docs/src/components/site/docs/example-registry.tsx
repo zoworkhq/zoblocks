@@ -21,6 +21,7 @@ import { BreathLoader } from "@/registry/zoblocks/breath-loader/breath-loader";
 import { HelixLoader } from "@/registry/zoblocks/helix-loader/helix-loader";
 import { InfusionLoader } from "@/registry/zoblocks/infusion-loader/infusion-loader";
 import * as TabsDemo from "../tabs-demos";
+import * as SwitchDemo from "../switch-demos";
 
 /* ------------------------------------------------------------------ */
 /* Stand-ins for the host application                                  */
@@ -252,6 +253,28 @@ export const EXAMPLE_PREVIEWS: Readonly<
     severity: () => <TabsDemo.ChartHeader />,
     "every-variant": () => <TabsDemo.EveryVariant />,
     "theme-density": () => <TabsDemo.ThemeDensityMatrix />,
+  },
+
+  switch: {
+    "anatomy-matrix": () => <SwitchDemo.AnatomyMatrix />,
+    "without-colour": () => <SwitchDemo.WithoutColour />,
+    "labeled-track": () => <SwitchDemo.LabeledTrack />,
+    "write-and-fail": () => <SwitchDemo.WriteAndFail />,
+    "every-phase": () => <SwitchDemo.PhaseStepper />,
+    "offline-and-overtaken": () => <SwitchDemo.SharedRecordSwitches />,
+    "time-boxed": () => <SwitchDemo.TimeBoxedSwitch />,
+    deferred: () => <SwitchDemo.DeferredInForm />,
+    absence: () => <SwitchDemo.AbsenceReasons />,
+    tones: () => <SwitchDemo.Tones />,
+    locked: () => <SwitchDemo.LockedWithReason />,
+    confirm: () => <SwitchDemo.Confirmations />,
+    impact: () => <SwitchDemo.ImpactAndProvenance />,
+    panel: () => <SwitchDemo.IsolationPanel />,
+    appearances: () => <SwitchDemo.Appearances />,
+    sizes: () => <SwitchDemo.FlowsheetToPhone />,
+    "antd-surface": () => <SwitchDemo.AntdSurface />,
+    restyled: () => <SwitchDemo.Restyled />,
+    rtl: () => <SwitchDemo.RightToLeft />,
   },
 
   "infusion-loader": {

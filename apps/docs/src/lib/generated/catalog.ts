@@ -13342,7 +13342,262 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @zoblocks/cli add switch"
+    "install": "npx @zoblocks/cli add switch",
+    "controls": [
+      {
+        "prop": "size",
+        "control": "segmented",
+        "label": "size",
+        "options": [
+          "micro",
+          "small",
+          "default",
+          "large"
+        ],
+        "defaultValue": "large"
+      },
+      {
+        "prop": "appearance",
+        "control": "select",
+        "label": "appearance",
+        "options": [
+          "switch",
+          "labeled",
+          "segmented",
+          "chip",
+          "row"
+        ],
+        "defaultValue": "switch"
+      },
+      {
+        "prop": "tone",
+        "control": "segmented",
+        "label": "tone",
+        "options": [
+          "affirmative",
+          "neutral",
+          "caution",
+          "critical"
+        ],
+        "defaultValue": "caution"
+      },
+      {
+        "prop": "stateLabels",
+        "control": "select",
+        "label": "stateLabels",
+        "options": [
+          "on-off",
+          "yes-no",
+          "active-inactive",
+          "in-effect",
+          "allowed-blocked",
+          "given-declined",
+          "enabled-disabled"
+        ],
+        "defaultValue": "in-effect"
+      },
+      {
+        "prop": "labelPlacement",
+        "control": "segmented",
+        "label": "labelPlacement",
+        "options": [
+          "start",
+          "end"
+        ],
+        "defaultValue": "end"
+      },
+      {
+        "prop": "commit",
+        "control": "segmented",
+        "label": "commit",
+        "options": [
+          "instant",
+          "deferred"
+        ],
+        "defaultValue": "instant"
+      },
+      {
+        "prop": "audience",
+        "control": "segmented",
+        "label": "audience",
+        "options": [
+          "clinician",
+          "patient"
+        ],
+        "defaultValue": "clinician"
+      },
+      {
+        "prop": "showState",
+        "control": "switch",
+        "label": "showState",
+        "defaultValue": true
+      },
+      {
+        "prop": "loading",
+        "control": "switch",
+        "label": "loading",
+        "defaultValue": false
+      },
+      {
+        "prop": "readOnly",
+        "control": "switch",
+        "label": "readOnly",
+        "defaultValue": false
+      },
+      {
+        "prop": "disabled",
+        "control": "switch",
+        "label": "disabled",
+        "defaultValue": false
+      },
+      {
+        "prop": "label",
+        "control": "text",
+        "label": "label",
+        "defaultValue": "Contact precautions"
+      },
+      {
+        "prop": "description",
+        "control": "text",
+        "label": "description",
+        "defaultValue": "Gown and gloves on entry."
+      }
+    ],
+    "examples": [
+      {
+        "id": "anatomy-matrix",
+        "title": "Size, value and availability, independent",
+        "description": "The specimen sheet this component started from. Read-only is a dashed border and a filled thumb — a different object, not a weaker one, because dimming reads as “inactive”, which is a value rather than an availability.",
+        "group": "Anatomy",
+        "code": "import { Switch } from \"@/components/zoblocks/switch\";\n\nconst ROWS = [\n  {},\n  { appearance: \"labeled\", stateLabels: \"active-inactive\" },\n  { readOnly: true },\n  { disabled: true },\n] as const;\n\nexport default function Example() {\n  return ROWS.map((row, i) => (\n    <div key={i} style={{ display: \"flex\", gap: 24 }}>\n      <Switch label=\"Label\" size=\"large\" checked={false} showState={false} {...row} />\n      <Switch label=\"Label\" size=\"large\" checked showState={false} {...row} />\n      <Switch label=\"Label\" checked={false} showState={false} {...row} />\n      <Switch label=\"Label\" checked showState={false} {...row} />\n    </div>\n  ));\n}"
+      },
+      {
+        "id": "without-colour",
+        "title": "State without colour",
+        "description": "On-track and off-track sit within about 1.2:1 of each other in relative luminance, so in monochrome and forced colours the fill carries nothing. Thumb position, thumb glyph and the state word each have to be enough alone.",
+        "group": "Anatomy",
+        "code": "<div style={{ display: \"flex\", gap: 32, filter: \"grayscale(1)\" }}>\n  <Switch label=\"Off\" checked={false} />\n  <Switch label=\"On\" checked />\n  <Switch label=\"Advance directive\" checked=\"unknown\" absentReason=\"not-collected\" />\n  <Switch label=\"Contact precautions\" checked readOnly />\n</div>"
+      },
+      {
+        "id": "labeled-track",
+        "title": "A labelled track that holds its width",
+        "description": "“Active” and “Inactive” are laid into the same grid cell, so the track is sized by the longer word and the thumb travel is constant. A switch that resizes as it toggles makes a whole table row jump.",
+        "group": "Anatomy",
+        "code": "<Switch\n  label=\"Interpreter required\"\n  appearance=\"labeled\"\n  stateLabels=\"active-inactive\"\n  size=\"large\"\n  defaultChecked\n/>"
+      },
+      {
+        "id": "write-and-fail",
+        "title": "The write, and the write that fails",
+        "description": "A switch is a request, not a change. Pass onCommit a promise: the first control saves; the second fails every other attempt, and animates back to the value the record actually holds and says so.",
+        "group": "The write",
+        "code": "import { useState } from \"react\";\nimport { Switch } from \"@/components/zoblocks/switch\";\n\nexport default function Example() {\n  const [precautions, setPrecautions] = useState(false);\n  return (\n    <Switch\n      label=\"Contact precautions\"\n      stateLabels=\"in-effect\"\n      tone=\"caution\"\n      size=\"large\"\n      checked={precautions}\n      onCommit={async (next) => {\n        // Throwing reverts the switch and announces what the record holds.\n        await api.setPrecautions({ encounter, contact: next });\n        setPrecautions(next);\n      }}\n    />\n  );\n}"
+      },
+      {
+        "id": "every-phase",
+        "title": "Every phase, by hand",
+        "description": "The escape hatch for a caller that already owns a state machine — a mutation library, a websocket, an offline queue. Supplying phase takes the internal machine out of the loop and renders exactly what it would have.",
+        "group": "The write",
+        "code": "<Switch\n  label=\"Contact precautions\"\n  description=\"Gown and gloves on entry.\"\n  stateLabels=\"in-effect\"\n  tone=\"caution\"\n  size=\"large\"\n  checked\n  phase={mutation.phase} // \"idle\" | \"pending\" | \"committed\" | \"reverted\" | \"blocked\" | \"queued\" | \"stale\"\n  error={mutation.phase === \"reverted\" ? \"Could not reach the record.\" : undefined}\n/>"
+      },
+      {
+        "id": "offline-and-overtaken",
+        "title": "Offline, and overtaken",
+        "description": "Queued is not pending: nothing has been sent, and the user may still change their mind. A conflict offers both readings and pre-selects neither, because each clinician had a reason.",
+        "group": "The write",
+        "code": "<Switch\n  label=\"Falls risk\"\n  stateLabels=\"in-effect\"\n  size=\"large\"\n  checked={fallsRisk}\n  online={isOnline}\n  onCommit={setFallsRisk}\n/>\n\n<Switch\n  label=\"Contact precautions\"\n  stateLabels=\"in-effect\"\n  tone=\"caution\"\n  size=\"large\"\n  checked={mine}\n  serverValue={theirs} // somebody else's write, if it landed under yours\n  onCommit={setMine}\n  onResolveConflict={(keep) => keep === \"theirs\" && setMine(theirs)}\n/>"
+      },
+      {
+        "id": "time-boxed",
+        "title": "An on that is not forever",
+        "description": "Turn it on and watch the window close — then note the switch is still on. It reports the lapse and waits, because a client clock deciding to lift a clinical flag is a defect.",
+        "group": "The write",
+        "code": "<Switch\n  label=\"Nil by mouth\"\n  description=\"Set for theatre. Shows on the bed board, the diet list and the handover.\"\n  stateLabels=\"in-effect\"\n  tone=\"caution\"\n  size=\"large\"\n  checked={npo}\n  now={serverTime}\n  until=\"2026-08-16T13:00:12.000Z\"\n  untilWarnMs={6000}\n  onCommit={setNpo}\n  onExpire={() => reviewNpo(patient)}\n/>"
+      },
+      {
+        "id": "deferred",
+        "title": "A switch inside a form",
+        "description": "A switch means applied now. When it is not — a form that commits on submit — it has to say so. Toggle these and an unsaved marker appears rather than a write.",
+        "group": "The write",
+        "code": "<form onSubmit={save}>\n  <Switch\n    label=\"Text me when my results are ready\"\n    description=\"Saved when you submit the form.\"\n    stateLabels=\"enabled-disabled\"\n    commit=\"deferred\"\n    size=\"large\"\n    defaultChecked={false}\n  />\n  <Switch\n    label=\"Share my records with my GP\"\n    stateLabels=\"given-declined\"\n    commit=\"deferred\"\n    size=\"large\"\n    defaultChecked={false}\n  />\n</form>"
+      },
+      {
+        "id": "absence",
+        "title": "Off, and never asked",
+        "description": "Four switches in the same visual state saying four different things — the word changes, not the colour. “Declined” is a recorded clinical act, not an absence.",
+        "group": "What it means",
+        "code": "<Switch label=\"Advance directive\" checked=\"unknown\" absentReason=\"not-collected\" stateLabels=\"yes-no\" />\n<Switch label=\"Interpreter needed\" checked=\"unknown\" absentReason=\"declined\" stateLabels=\"yes-no\" />\n<Switch label=\"Substance use screen\" checked=\"unknown\" absentReason=\"masked\" readOnly stateLabels=\"yes-no\" />\n<Switch label=\"MRSA screen\" checked=\"unknown\" absentReason=\"pending\" stateLabels=\"yes-no\" />"
+      },
+      {
+        "id": "tones",
+        "title": "When on is the dangerous state",
+        "description": "Half the switches in a clinical system are suppressions. All four are on; only the middle two are situations anyone needs to know about, and the colour, glyph and state word all say so.",
+        "group": "What it means",
+        "code": "<Switch label=\"Allergy interaction checking\" stateLabels=\"enabled-disabled\" checked />\n<Switch label=\"Suppress duplicate-therapy alerts\" tone=\"caution\" stateLabels=\"in-effect\" checked />\n<Switch label=\"Bypass allergy check for this order\" tone=\"critical\" stateLabels=\"allowed-blocked\" checked />\n<Switch label=\"Show archived encounters\" tone=\"neutral\" checked />"
+      },
+      {
+        "id": "locked",
+        "title": "Locked, and why",
+        "description": "Disabled takes a control out of the tab order, so a screen-reader user never learns it exists. Read-only keeps it reachable and says what is holding it. Only the last is genuinely disabled.",
+        "group": "What it means",
+        "code": "<Switch\n  label=\"Contact precautions\"\n  stateLabels=\"in-effect\"\n  checked\n  readOnly\n  lockedReason=\"Encounter signed 14:32 by Dr Okafor.\"\n/>\n<Switch\n  label=\"Change diet order\"\n  stateLabels=\"allowed-blocked\"\n  checked={false}\n  readOnly\n  lockedReason=\"Your role cannot change this.\"\n/>\n<Switch label=\"Notify by SMS\" stateLabels=\"enabled-disabled\" checked disabled />"
+      },
+      {
+        "id": "confirm",
+        "title": "Friction matched to consequence",
+        "description": "Chosen by what the toggle costs if nobody meant it. Hold is a timed input, so activate any of these from the keyboard and the dialog opens instead — holding is never the only path.",
+        "group": "What it means",
+        "code": "<Switch label=\"Suspend fall-risk alarm\" stateLabels=\"in-effect\" tone=\"critical\" confirm=\"hold\" onCommit={save} />\n\n<Switch\n  label=\"Discharge to home\"\n  stateLabels=\"active-inactive\"\n  confirm=\"dialog\"\n  confirmCopy={{\n    subject: \"Ada Lovelace\",\n    consequence: \"Closes the encounter and releases the bed. This cannot be undone.\",\n  }}\n  onCommit={save}\n/>\n\n<Switch label=\"Bypass allergy check for this order\" tone=\"critical\" confirm=\"attest\" onCommit={save} />\n\n<Switch\n  label=\"Release restraint order\"\n  tone=\"critical\"\n  confirm=\"countersign\"\n  countersign={{\n    role: \"registered-nurse\",\n    notSameAs: \"s.mehta\",\n    requestedBy: \"S. Mehta, RN\",\n    verify: () => auth.collectSecondIdentity(),\n  }}\n  onCommit={save}\n/>"
+      },
+      {
+        "id": "impact",
+        "title": "The consequence, before the click",
+        "description": "A switch whose consequences reach other people carries them where they inform the decision, not in a dialog after it — and says who last moved it, the first question anyone asks of a shared record.",
+        "group": "What it means",
+        "code": "<Switch\n  label=\"Add to the deteriorating-patient list\"\n  stateLabels=\"in-effect\"\n  tone=\"caution\"\n  size=\"large\"\n  impact={[\n    \"page the outreach team on call now\",\n    \"add a banner to the bed board, visible to visitors\",\n    \"set hourly observations for 24 hours\",\n  ]}\n  provenance={{ by: \"J. Adeyemi\", at: \"2026-08-16T06:40:00.000Z\", via: \"ward round\" }}\n  onCommit={save}\n/>"
+      },
+      {
+        "id": "panel",
+        "title": "A real panel",
+        "description": "Four rows, four different situations, none rendered as an ordinary off. The count reports “not asked” apart from off, because folding it in is the failure this component exists to prevent.",
+        "group": "What it means",
+        "code": "import { SwitchField, SwitchList } from \"@/components/zoblocks/switch\";\n\n<SwitchList\n  title=\"Isolation precautions\"\n  counts={{ on: 2, total: 4, unknown: 1 }}\n  provenance={{ by: \"S. Mehta\", at: \"2026-08-16T14:07:00.000Z\" }}\n>\n  <SwitchField label=\"Contact\" description=\"Gown and gloves on entry.\" stateLabels=\"in-effect\" tone=\"caution\" checked />\n  <SwitchField label=\"Droplet\" description=\"Surgical mask within two metres.\" stateLabels=\"in-effect\" tone=\"caution\" checked />\n  <SwitchField\n    label=\"Airborne\"\n    description=\"Negative-pressure room and N95.\"\n    stateLabels=\"in-effect\"\n    checked={false}\n    readOnly\n    lockedReason=\"No negative-pressure room available on this unit.\"\n  />\n  <SwitchField\n    label=\"Enteric\"\n    description=\"Dedicated commode; soap and water, not alcohol gel.\"\n    stateLabels=\"in-effect\"\n    checked=\"unknown\"\n    absentReason=\"not-collected\"\n  />\n</SwitchList>"
+      },
+      {
+        "id": "appearances",
+        "title": "One value, five renderings",
+        "description": "The same state model behind every one. Segmented is the only appearance that changes the ARIA role: two labelled cells that both look pressable are a radiogroup.",
+        "group": "Surfaces",
+        "code": "<Switch label=\"Interpreter required\" stateLabels=\"yes-no\" checked />\n<Switch label=\"Interpreter required\" appearance=\"labeled\" stateLabels=\"active-inactive\" checked />\n<Switch label=\"Interpreter required\" appearance=\"segmented\" stateLabels=\"yes-no\" checked />\n<Switch label=\"My patients\" appearance=\"chip\" checked />\n<Switch\n  label=\"Text me when my results are ready\"\n  description=\"To the mobile ending 4471. Standard rates apply.\"\n  appearance=\"row\"\n  audience=\"patient\"\n  checked\n/>"
+      },
+      {
+        "id": "sizes",
+        "title": "From a flowsheet row to a phone",
+        "description": "The pill shrinks; the target does not. Micro switches are 26×14px and still present a target at or above the 24px floor, because the hit area follows the density profile rather than the pill.",
+        "group": "Surfaces",
+        "code": "<td>\n  <Switch size=\"micro\" tone=\"caution\" checked={row.npo} showState={false} aria-label={\"Nil by mouth — \" + row.name} />\n</td>\n\n<Switch\n  label=\"Share my records with my GP\"\n  description=\"Your GP surgery can see your hospital notes. You can change this at any time.\"\n  appearance=\"row\"\n  audience=\"patient\"\n  checked\n/>"
+      },
+      {
+        "id": "antd-surface",
+        "title": "The Ant Design surface, unchanged",
+        "description": "Prop names, shapes and defaults match Ant Design's Switch, so a form migrates by changing an import. The one divergence is loading: it renders as pending and never disables, so focus is kept.",
+        "group": "Surfaces",
+        "code": "<Switch label=\"Interpreter required\" checkedChildren=\"Active\" unCheckedChildren=\"Inactive\" defaultChecked />\n<Switch label=\"Saving your preference\" loading checked />\n<Switch label=\"small\" size=\"small\" defaultChecked showState={false} />\n<Switch label=\"default\" defaultChecked showState={false} />\n<Switch label=\"large\" size=\"large\" defaultChecked showState={false} />"
+      },
+      {
+        "id": "restyled",
+        "title": "Restyled without a fork",
+        "description": "Tokens first, props second, slots last. All three are one component and one state model; only token values differ, so a brand restyles the control without editing its source.",
+        "group": "Surfaces",
+        "code": "<Switch label=\"Default tokens\" stateLabels=\"in-effect\" size=\"large\" checked />\n\n<div\n  style={{\n    \"--zb-switch-radius\": \"0.25rem\",\n    \"--zb-switch-track-on-bg\": \"#4338ca\",\n    \"--zb-switch-track-w\": \"64px\",\n  }}\n>\n  <Switch label=\"Squared, wider, another brand\" stateLabels=\"in-effect\" size=\"large\" checked />\n</div>\n\n<Switch\n  label=\"A custom thumb, through slots\"\n  stateLabels=\"in-effect\"\n  size=\"large\"\n  checked\n  slots={{ thumb: ({ value }) => (value === true ? \"✓\" : \"\") }}\n/>"
+      },
+      {
+        "id": "rtl",
+        "title": "Right to left",
+        "description": "The thumb travels on inset-inline-start and labelPlacement is start or end rather than left or right, so nothing is mirrored by hand. The last block sets dir=rtl on itself.",
+        "group": "Surfaces",
+        "code": "<Switch label=\"Label at the end (default)\" stateLabels=\"yes-no\" checked />\n<Switch label=\"Label at the start\" stateLabels=\"yes-no\" labelPlacement=\"start\" checked />\n\n<div dir=\"rtl\">\n  <Switch label=\"مترجم مطلوب\" stateLabels=\"yes-no\" checked />\n</div>"
+      }
+    ]
   },
   {
     "name": "timeline",

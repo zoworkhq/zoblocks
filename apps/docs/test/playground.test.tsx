@@ -75,7 +75,7 @@ function settings(control: Control): unknown[] {
 function outcome(container: HTMLElement): "component" | "explained" | "blank" {
   if (
     container.querySelector(
-      "[data-zb-tab], [data-zb-signature], [data-zb-loader], [role='radiogroup'], nav",
+      "[data-zb-tab], [data-zb-signature], [data-zb-loader], [role='switch'], [role='radiogroup'], nav",
     )
   ) {
     return "component";

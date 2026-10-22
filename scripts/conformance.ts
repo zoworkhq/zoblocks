@@ -18,6 +18,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import path from "node:path";
 import { CATALOG } from "../apps/docs/src/lib/generated/catalog";
+import { PLAYGROUND_COMPONENTS } from "../apps/docs/src/components/site/playground-registry";
 import type { ComponentDoc } from "@zoblocks/component-meta";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
@@ -275,10 +276,10 @@ const CHECKS: Check[] = [
     test: (c) => (inbound.get(c.name) ?? 0) >= 2,
   },
   /*
-   * Resolved the same three ways `test/docs-coverage.test.ts` resolves it: a
-   * scenario list, a name special-cased inside ComponentPreview, or a gallery
-   * the detail page mounts directly. Two checks disagreeing about what counts
-   * as a preview would make one of them noise.
+   * Resolved the same four ways `test/docs-coverage.test.ts` resolves it: a
+   * scenario list, a name special-cased inside ComponentPreview, a gallery
+   * the detail page mounts directly, or a playground. Two checks disagreeing
+   * about what counts as a preview would make one of them noise.
    *
    * The keys are sometimes quoted and sometimes not — `identity:` is a valid
    * identifier and `"clinical-note":` is not — so both forms are matched.
@@ -290,7 +291,8 @@ const CHECKS: Check[] = [
     test: (c) =>
       hasKey(previewSource, c.name, "[") ||
       previewSource.includes(`name === "${c.name}"`) ||
-      detailPage.includes(`component.name === "${c.name}"`),
+      detailPage.includes(`component.name === "${c.name}"`) ||
+      PLAYGROUND_COMPONENTS.has(c.name),
   },
   {
     id: "card art",

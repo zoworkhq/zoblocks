@@ -28,6 +28,7 @@ import { RhythmLoader } from "@/registry/zoblocks/rhythm-loader/rhythm-loader";
 import { BreathLoader } from "@/registry/zoblocks/breath-loader/breath-loader";
 import { HelixLoader } from "@/registry/zoblocks/helix-loader/helix-loader";
 import { InfusionLoader } from "@/registry/zoblocks/infusion-loader/infusion-loader";
+import { Switch, type SwitchProps } from "@/registry/zoblocks/switch/switch";
 import { PLAYGROUND_COMPONENTS } from "./playground-registry";
 import { useSiteTheme } from "./use-site-theme";
 import { useAntdBrandTokens } from "./language-antd-theme";
@@ -40,6 +41,23 @@ type Props = Record<string, unknown>;
 /* ------------------------------------------------------------------ */
 /* Renderers                                                           */
 /* ------------------------------------------------------------------ */
+
+function PlaygroundSwitch(props: Partial<SwitchProps>) {
+  const [checked, setChecked] = React.useState<SwitchProps["checked"]>(true);
+  return (
+    <Centered>
+      <Switch
+        key={`${props.appearance ?? ""}-${props.commit ?? ""}`}
+        {...props}
+        checked={checked}
+        onCommit={async (next) => {
+          await new Promise((resolve) => setTimeout(resolve, 600));
+          setChecked(next);
+        }}
+      />
+    </Centered>
+  );
+}
 
 /** A loader is a mark, not a layout: it sits in the middle of the stage. */
 function Centered({ children }: { children: React.ReactNode }) {
@@ -120,6 +138,13 @@ function chartFor(mode: string, fixture: string): TabsItemProps[] {
 }
 
 const RENDERERS: Record<string, (props: Props) => React.ReactNode> = {
+  /*
+   * Switch writes through onCommit, so the playground shows the whole
+   * request: pending for a moment, then committed. `key` remounts it when the
+   * appearance or commit mode changes, because those choose a different
+   * control rather than restyling the same one.
+   */
+  switch: (props) => <PlaygroundSwitch {...(props as Partial<SwitchProps>)} />,
   /*
    * The loaders take their knobs as they are. `mode` is not one of them:
    * `page` covers the viewport, which in a playground covers the page the

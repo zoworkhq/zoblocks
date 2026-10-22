@@ -15,6 +15,7 @@
 export const PLAYGROUND_COMPONENTS: ReadonlySet<string> = new Set([
   "tabs",
   "signature",
+  "switch",
   "pulse-loader",
   "rhythm-loader",
   "breath-loader",
