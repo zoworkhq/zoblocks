@@ -28,6 +28,7 @@ import * as MenuDemo from "../chart-context-menu-demos";
 import * as SignatureDemo from "../signature-demos";
 import * as DateDemo from "../date-picker-demos";
 import * as GridDemo from "../data-grid-demos";
+import * as TimelineDemo from "../care-timeline-demos";
 
 /* ------------------------------------------------------------------ */
 /* Stand-ins for the host application                                  */
@@ -305,6 +306,28 @@ export const EXAMPLE_PREVIEWS: Readonly<
     loading: () => <GridDemo.LoadingMore />,
     "host-framed": () => <GridDemo.HostFramed />,
     export: () => <GridDemo.ExportSurface />,
+  },
+
+  "care-timeline": {
+    chart: () => <TimelineDemo.WholeChart />,
+    "source-down": () => <TimelineDemo.SourceDown />,
+    gap: () => <TimelineDemo.StatedGap />,
+    filtered: () => <TimelineDemo.Filtered />,
+    empty: () => <TimelineDemo.ThreeEmpties />,
+    card: () => <TimelineDemo.DashboardCard />,
+    planned: () => <TimelineDemo.PlannedAboveNow />,
+    lapsed: () => <TimelineDemo.Lapsed />,
+    cancelled: () => <TimelineDemo.CancelledAndNotDone />,
+    amended: () => <TimelineDemo.Amended />,
+    "in-error": () => <TimelineDemo.EnteredInError />,
+    restricted: () => <TimelineDemo.Restricted />,
+    consent: () => <TimelineDemo.ConsentGated />,
+    thread: () => <TimelineDemo.Thread />,
+    cluster: () => <TimelineDemo.Clustered />,
+    "new-since": () => <TimelineDemo.NewSinceReviewed />,
+    imprecise: () => <TimelineDemo.ImpreciseDate />,
+    register: () => <TimelineDemo.ByRegister />,
+    patient: () => <TimelineDemo.PatientFacing />,
   },
 
   "date-picker": {

@@ -2409,6 +2409,205 @@ export const CATALOG: ComponentDoc[] = [
       "tailwind-merge"
     ],
     "install": "npx @zoblocks/cli add care-timeline",
+    "controls": [
+      {
+        "prop": "layout",
+        "control": "select",
+        "label": "Layout",
+        "options": [
+          "default",
+          "card",
+          "compact",
+          "register"
+        ],
+        "defaultValue": "default"
+      },
+      {
+        "prop": "group",
+        "control": "select",
+        "label": "Group by",
+        "options": [
+          "auto",
+          "month",
+          "quarter",
+          "year",
+          "none"
+        ],
+        "defaultValue": "auto"
+      },
+      {
+        "prop": "audience",
+        "control": "segmented",
+        "label": "Audience",
+        "options": [
+          "clinician",
+          "patient"
+        ],
+        "defaultValue": "clinician"
+      },
+      {
+        "prop": "filters",
+        "control": "switch",
+        "label": "Register filter",
+        "defaultValue": false
+      },
+      {
+        "prop": "jump",
+        "control": "switch",
+        "label": "Jump control",
+        "defaultValue": false
+      },
+      {
+        "prop": "onSelect",
+        "control": "event",
+        "label": "onSelect"
+      },
+      {
+        "prop": "onLoadOlder",
+        "control": "event",
+        "label": "onLoadOlder"
+      },
+      {
+        "prop": "onRegistersChange",
+        "control": "event",
+        "label": "onRegistersChange"
+      }
+    ],
+    "examples": [
+      {
+        "id": "chart",
+        "title": "Newest first, and the footer says of what",
+        "description": "Fourteen months, two source systems, one of them down, grouped by month. Read the footer first: the window, the order, the counts and which sources answered. It is a required prop, and it prints.",
+        "group": "What it is a view of",
+        "code": "<CareTimeline\n  aria-label=\"Care timeline for Ada Lovelace\"\n  events={events}\n  now={serverTime}\n  coverage={{\n    window: { from: \"2025-07-01\" },\n    order: \"newest-first\",\n    total: 43,\n    hidden: [{ reason: \"access\", count: 2 }],\n    sources: [\n      { id: \"ehr\", label: \"Northside EHR\", status: \"ok\" },\n      { id: \"hie\", label: \"Northside Regional Exchange\", status: \"unavailable\" },\n    ],\n  }}\n  onLoadOlder={() => fetchOlder()}\n/>"
+      },
+      {
+        "id": "source-down",
+        "title": "A source that could not be reached",
+        "description": "The repeat-CT case, caught. An unavailable source is a role=\"alert\" banner above the list, not a grey footnote under it, because the reader is about to turn an absence into a clinical fact.",
+        "group": "What it is a view of",
+        "code": "<CareTimeline\n  {...props}\n  coverage={{\n    ...coverage,\n    sources: [\n      { id: \"ehr\", label: \"Northside EHR\", status: \"ok\" },\n      {\n        id: \"hie\",\n        label: \"Northside Regional Exchange\",\n        status: \"unavailable\",\n        detail: \"Timed out after 8s.\",\n      },\n    ],\n  }}\n/>"
+      },
+      {
+        "id": "gap",
+        "title": "A stated gap in coverage",
+        "description": "Every source answered and the caller still knows of a hole, so it says so: the rail goes dashed across the missing weeks and a sentence names why. Gaps are declared, never inferred — eleven quiet weeks are not evidence of anything.",
+        "group": "What it is a view of",
+        "code": "<CareTimeline\n  {...props}\n  coverage={{\n    ...coverage,\n    gaps: [\n      { from: \"2026-04-03\", to: \"2026-06-21\", reason: \"the clinic changed record systems\" },\n    ],\n  }}\n/>"
+      },
+      {
+        "id": "filtered",
+        "title": "Filtered, with the hidden count stated",
+        "description": "One register on, and the count it hides is said beside the list rather than inside a popover that is usually off screen. Toggle a register and the line below shows what the host was told.",
+        "group": "What it is a view of",
+        "code": "<CareTimeline\n  {...props}\n  filters\n  defaultRegisters={[\"clinical\"]}\n  onRegistersChange={(registers) => save(registers)}\n/>"
+      },
+      {
+        "id": "empty",
+        "title": "No record · none in this window · none you may see",
+        "description": "Three different facts with three different next actions. Rendering them as one empty card is the ambiguity that produces a repeat scan.",
+        "group": "What it is a view of",
+        "code": "// Nothing anywhere\n<CareTimeline {...props} events={[]} coverage={{ order: \"newest-first\", sources }} />\n\n// Nothing in the window that was searched\n<CareTimeline\n  {...props}\n  events={[]}\n  coverage={{ order: \"newest-first\", window: { from: \"2025-01-01\", to: \"2025-12-31\" }, sources }}\n/>\n\n// Records exist, and none are yours to read\n<CareTimeline\n  {...props}\n  events={[]}\n  coverage={{ order: \"newest-first\", hidden: [{ reason: \"access\", count: 3 }], sources }}\n/>"
+      },
+      {
+        "id": "card",
+        "title": "The dashboard card",
+        "description": "Five entries beside other cards — the shape most patient timelines ship as. The difference is one line: five of 43, newest first, one of two sources reached. Without it, five of forty-three reads as a complete account.",
+        "group": "What it is a view of",
+        "code": "<CareTimeline {...props} layout=\"card\" limit={5} />"
+      },
+      {
+        "id": "planned",
+        "title": "Planned, above the now marker",
+        "description": "A future event sits above a now marker, and now is the caller's server time rather than the browser clock — a clinic laptop with the wrong date should not move an appointment into the past.",
+        "group": "Planned and happened",
+        "code": "<CareTimeline\n  {...props}\n  now={serverTime}\n  events={[\n    {\n      id: \"appt-endo\",\n      kind: \"appointment\",\n      occurred: \"2026-09-02T09:30:00+05:30\",\n      status: \"planned\",\n      title: \"Endocrinology review\",\n    },\n    ...events,\n  ]}\n/>"
+      },
+      {
+        "id": "lapsed",
+        "title": "Lapsed — planned, and nothing recorded against it",
+        "description": "A planned screening whose date has passed with no encounter against it. It says exactly that — not missed, not a no-show, which are conclusions the record cannot support.",
+        "group": "Planned and happened",
+        "code": "{\n  id: \"appt-retinal\",\n  kind: \"appointment\",\n  occurred: \"2026-08-05T11:00:00+05:30\",\n  status: \"planned\", // and now is after it\n  title: \"Diabetic retinal screening\",\n}"
+      },
+      {
+        "id": "cancelled",
+        "title": "Cancelled is not did-not-connect",
+        "description": "Somebody decided, and somebody tried and failed: two different facts that must not share a chip. Actor and recipient are separate fields, so the reminder cannot end up addressed to the caller.",
+        "group": "Planned and happened",
+        "code": "[\n  {\n    id: \"call-followup\",\n    kind: \"call\",\n    status: \"not-done\",\n    title: \"Follow-up call\",\n    actor: { name: \"Priya Menon\", role: \"Front desk\" },\n    recipient: { name: \"The patient\" },\n  },\n  {\n    id: \"appt-cancelled\",\n    kind: \"appointment\",\n    status: \"cancelled\",\n    title: \"Podiatry review\",\n    detail: \"Cancelled by the clinic.\",\n  },\n]"
+      },
+      {
+        "id": "amended",
+        "title": "Amended, with what changed",
+        "description": "An amendment chip with no delta tells the reader something changed and withholds the one thing they need. The revision carries what it was, when and why.",
+        "group": "Corrections and access",
+        "code": "{\n  id: \"lab-hba1c\",\n  kind: \"laboratory\",\n  status: \"amended\",\n  title: \"HbA1c — 8.9%\",\n  revision: { at: \"2026-08-15T16:20:00+05:30\", was: \"9.4%\", reason: \"result value corrected\" },\n}"
+      },
+      {
+        "id": "in-error",
+        "title": "Entered in error, retained and struck",
+        "description": "Kept and marked rather than filtered out of the query — the one behaviour the record's own rules forbid. A strike, a chip and a sentence, so it survives a monochrome print.",
+        "group": "Corrections and access",
+        "code": "{\n  id: \"enc-ed\",\n  kind: \"encounter\",\n  status: \"in-error\",\n  title: \"Emergency department attendance\",\n  revision: {\n    at: \"2026-07-31\",\n    by: { name: \"Dr A Rahman\" },\n    reason: \"recorded against this patient in error\",\n  },\n}"
+      },
+      {
+        "id": "restricted",
+        "title": "Restricted — it exists and you may not read it",
+        "description": "It says something is here without saying what. Dropping it would misrepresent the record to a reader with no way to know.",
+        "group": "Corrections and access",
+        "code": "{\n  id: \"doc-outside\",\n  kind: \"document\",\n  occurred: \"2026-06-22\",\n  title: \"Discharge summary\", // never rendered\n  access: { kind: \"withheld\", reason: \"Kept separately by its author.\" },\n}"
+      },
+      {
+        "id": "consent",
+        "title": "Consent-gated",
+        "description": "A Part 2 note the reader may open, once they record why. The date and the fact of a record are shown; the title waits behind the reason.",
+        "group": "Corrections and access",
+        "code": "{\n  id: \"note-psych\",\n  kind: \"note\",\n  occurred: \"2026-07-14\",\n  title: \"Psychotherapy progress note\",\n  access: { kind: \"consent\", policy: \"42 CFR Part 2\", state: \"granted\" },\n}"
+      },
+      {
+        "id": "thread",
+        "title": "A thread with its own steps",
+        "description": "Sent, returned and reviewed happened on different days. Flattening them into one line loses the only question anyone asks of an intake form: has anybody read it?",
+        "group": "Reading",
+        "code": "{\n  id: \"q-history\",\n  kind: \"questionnaire\",\n  title: \"Pre-visit medical history\",\n  steps: [\n    { label: \"Sent to the patient\", at: \"2026-08-11T09:00:00+05:30\", state: \"done\" },\n    { label: \"Returned by the patient\", at: \"2026-08-11T21:34:00+05:30\", state: \"done\" },\n    { label: \"Not yet reviewed\", state: \"open\" },\n  ],\n}"
+      },
+      {
+        "id": "cluster",
+        "title": "A cluster, and a critical event kept out of one",
+        "description": "Four routine observations in three days fold into one disclosure. The critical potassium beside them stays on the rail — nothing a reader would act on is ever collapsed.",
+        "group": "Reading",
+        "code": "<CareTimeline {...props} cluster={{ kinds: [\"observation\"], within: \"P3D\", min: 3 }} />"
+      },
+      {
+        "id": "new-since",
+        "title": "New since last reviewed",
+        "description": "A divider at the reader's last review splits the group into two named lists, so a rotor lands on it. A note recorded six days after the visit is marked late rather than slipping in below the line.",
+        "group": "Reading",
+        "code": "<CareTimeline {...props} seenThrough={lastReviewedAt} lateEntryAfter=\"P2D\" />"
+      },
+      {
+        "id": "imprecise",
+        "title": "An imprecise date, kept imprecise",
+        "description": "A FHIR 2019 means 2019. Widening it to 1 January invents a precision nobody recorded. A stamp with an offset renders in the record's zone, not the reader's.",
+        "group": "Reading",
+        "code": "<CareTimeline\n  {...props}\n  group=\"none\"\n  events={[\n    { id: \"cond-gdm\", kind: \"condition\", occurred: \"2019\", title: \"Gestational diabetes\" },\n    ...events,\n  ]}\n/>"
+      },
+      {
+        "id": "register",
+        "title": "Clinical on one side, everything else on the other",
+        "description": "Sides alternate on a fact — which register an event is in — rather than to fill space. Under 768px it collapses to one column and the register survives as the kind label. Jump moves between periods and never changes what is shown.",
+        "group": "Reading",
+        "code": "<CareTimeline {...props} layout=\"register\" group=\"month\" jump />"
+      },
+      {
+        "id": "patient",
+        "title": "Patient-facing, with a result not yet reviewed",
+        "description": "A different catalogue, not a softer tone: Visit and Test result rather than Encounter and Laboratory. A result can reach the patient before anyone has looked at it, so the portal has to be able to say so.",
+        "group": "Reading",
+        "code": "<CareTimeline {...props} audience=\"patient\" aria-label=\"Your care timeline\" />"
+      }
+    ],
     "relationships": {
       "builtWith": [
         "timeline"
