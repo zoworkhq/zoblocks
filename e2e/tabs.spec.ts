@@ -90,7 +90,7 @@ async function openExamples(page: Page) {
   return examples;
 }
 
-const demo = (page: Page, example: string) => page.locator(`#ex-${example}-panel-preview`);
+const preview = (page: Page, example: string) => page.locator(`#ex-${example}-panel-preview`);
 
 /**
  * Click something in the gallery, out from under the site header.
@@ -139,7 +139,7 @@ async function setStage(
   name: "data-zb-density" | "dir",
   value: string,
 ) {
-  await demo(page, example).evaluate(
+  await preview(page, example).evaluate(
     (stage, [attribute, next]) => stage.setAttribute(attribute!, next!),
     [name, value],
   );
@@ -153,7 +153,7 @@ async function setStage(
 test.describe("indicator geometry @a11y", () => {
   test("the thumb lands on the selected tab", async ({ page }) => {
     await openExamples(page);
-    const demo = demo(page, "segmented");
+    const demo = preview(page, "segmented");
     const thumb = demo.locator(".zb-tabs__thumb");
     const selected = demo.locator('[role="tab"][aria-selected="true"]');
 
@@ -168,7 +168,7 @@ test.describe("indicator geometry @a11y", () => {
 
   test("the thumb follows a click", async ({ page }) => {
     await openExamples(page);
-    const demo = demo(page, "segmented");
+    const demo = preview(page, "segmented");
     await clickClear(demo.getByRole("tab", { name: "Shared" }));
 
     // The indicator animates to its new home over 180ms. Polled rather than
@@ -184,7 +184,7 @@ test.describe("indicator geometry @a11y", () => {
 
   test("the underline sits on the rail, not floating above it", async ({ page }) => {
     await openExamples(page);
-    const demo = demo(page, "underline");
+    const demo = preview(page, "underline");
     const line = await demo.locator(".zb-tabs__line").boundingBox();
     const list = await demo.locator('[role="tablist"]').boundingBox();
     // The indicator's bottom edge should coincide with the list's.
@@ -193,7 +193,7 @@ test.describe("indicator geometry @a11y", () => {
 
   test("the thumb re-measures when density changes", async ({ page }) => {
     await openExamples(page);
-    const demo = demo(page, "segmented");
+    const demo = preview(page, "segmented");
     const before = await demo.locator(".zb-tabs__thumb").boundingBox();
 
     await setStage(page, "segmented", "data-zb-density", "patient");
@@ -231,7 +231,7 @@ test.describe("indicator geometry @a11y", () => {
      * this asserts is unchanged: in a mirrored layout, the thumb lands on the
      * selected trigger rather than on its logical-start twin.
      */
-    const demo = demo(page, "segmented");
+    const demo = preview(page, "segmented");
     await clickClear(demo.getByRole("tab", { name: "Shared" }));
     await expect(demo.getByRole("tab", { name: "Shared" })).toHaveAttribute(
       "aria-selected",
@@ -255,7 +255,7 @@ test.describe("indicator geometry @a11y", () => {
 test.describe("overflow @a11y", () => {
   test("a narrow container collapses the strip to a native picker", async ({ page }) => {
     await openExamples(page);
-    const demo = demo(page, "overflow-collapse");
+    const demo = preview(page, "overflow-collapse");
     // Driven by the container, not the viewport — the demo is deliberately
     // constrained rather than the window being resized.
     await expect(demo.getByRole("combobox")).toBeVisible();
@@ -263,10 +263,10 @@ test.describe("overflow @a11y", () => {
 
   test("the scroll strip reports its edges and moves", async ({ page }) => {
     await openExamples(page);
-    const bar = demo(page, "overflow-scroll").locator(".zb-tabs__bar");
+    const bar = preview(page, "overflow-scroll").locator(".zb-tabs__bar");
     await expect(bar).toHaveAttribute("data-zb-start", "true");
 
-    const list = demo(page, "overflow-scroll").locator(".zb-tabs__list");
+    const list = preview(page, "overflow-scroll").locator(".zb-tabs__list");
     await list.evaluate((element) => element.scrollBy({ left: 240 }));
     await page.waitForTimeout(300);
     await expect(bar).toHaveAttribute("data-zb-start", "false");
@@ -274,7 +274,7 @@ test.describe("overflow @a11y", () => {
 
   test("the priority-plus menu keeps the selected tab visible", async ({ page }) => {
     await openExamples(page);
-    const demo = demo(page, "overflow-menu");
+    const demo = preview(page, "overflow-menu");
 
     /*
      * Opened from the keyboard rather than with a pointer, and not only
@@ -325,7 +325,7 @@ test.describe("overflow @a11y", () => {
 test.describe("keyboard @a11y", () => {
   test("arrow keys move selection and the focus ring is visible", async ({ page }) => {
     await openExamples(page);
-    const demo = demo(page, "segmented");
+    const demo = preview(page, "segmented");
     await demo.getByRole("tab", { name: "Personal" }).focus();
     await page.keyboard.press("ArrowRight");
 
@@ -340,7 +340,7 @@ test.describe("keyboard @a11y", () => {
 
   test("Tab enters the strip once and then leaves it", async ({ page }) => {
     await openExamples(page);
-    const demo = demo(page, "segmented");
+    const demo = preview(page, "segmented");
     await demo.getByRole("tab", { name: "Personal" }).focus();
     await page.keyboard.press("Tab");
     await expect(demo.getByRole("tab", { name: "Shared" })).not.toBeFocused();
@@ -354,7 +354,7 @@ test.describe("keyboard @a11y", () => {
 test.describe("visual @vrt", () => {
   test("the nine-cell theme x density matrix", async ({ page }) => {
     await openExamples(page);
-    const matrix = demo(page, "theme-density").locator(".zb-matrix");
+    const matrix = preview(page, "theme-density").locator(".zb-matrix");
     await expect(matrix).toBeVisible();
     await page.waitForTimeout(400);
     /*
@@ -368,7 +368,7 @@ test.describe("visual @vrt", () => {
 
   test("every variant, one strip each", async ({ page }) => {
     await openExamples(page);
-    const variants = demo(page, "every-variant").locator(".zb-variants");
+    const variants = preview(page, "every-variant").locator(".zb-variants");
     await expect(variants).toBeVisible();
     await page.waitForTimeout(400);
     await expect(variants).toHaveScreenshot("tabs-variants.png");
@@ -394,7 +394,7 @@ test.describe("reflow @reflow", () => {
   test("a tab strip stays operable at 320px", async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 720 });
     await openExamples(page);
-    const demo = demo(page, "segmented");
+    const demo = preview(page, "segmented");
     await clickClear(demo.getByRole("tab", { name: "Shared" }));
     await expect(demo.getByRole("tab", { name: "Shared" })).toHaveAttribute(
       "aria-selected",
