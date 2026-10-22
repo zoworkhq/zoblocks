@@ -14,6 +14,7 @@ import { CopilotGallery } from "@/components/site/copilot-gallery";
 import { SwitchGallery } from "@/components/site/switch-gallery";
 import { DatePickerGallery } from "@/components/site/date-picker-gallery";
 import { RevealRoot } from "@/components/site/interactions";
+import { SignatureDemo } from "@/components/site/signature-demo";
 import { LanguageSwitch } from "@/components/site/language-switch";
 import { HostStage } from "@/components/site/host-stage";
 import { Playground } from "@/components/site/playground";
@@ -387,9 +388,18 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
     related.length > 0 || alternatives.length > 0 || builtWith.length > 0 || usedIn.length > 0;
   const hasA11y = component.accessibility.length > 0 || a11yChecks.length > 0;
 
+  /*
+   * Signature keeps its full live demo beside the playground. The playground
+   * shows props; the demo shows what no prop can — the stroke replay, the
+   * value the form actually receives, and the states a signature reaches
+   * after it is captured (locked, awaiting, withdrawn).
+   */
+  const hasLiveDemo = component.name === "signature";
+
   const toc: TocEntry[] = [
     { id: "overview", label: "Overview" },
     { id: "playground", label: playable ? "Playground" : "Preview" },
+    ...(hasLiveDemo ? [{ id: "live-demo", label: "Live demo" }] : []),
     ...(examples.length
       ? [
           { id: "examples", label: "Examples" },
@@ -632,6 +642,17 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                   </div>
                 )}
               </DocSection>
+
+              {/* Live demo ------------------------------------------------- */}
+              {hasLiveDemo && (
+                <DocSection
+                  id="live-demo"
+                  title="Live demo"
+                  lead="The real component and the value it records: sign, decline, or step through a locked, awaiting and withdrawn signature."
+                >
+                  <SignatureDemo />
+                </DocSection>
+              )}
 
               {/* Examples -------------------------------------------------- */}
               {examples.length > 0 && (

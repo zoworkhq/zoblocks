@@ -55,6 +55,11 @@ async function settle(page: Page) {
   });
 }
 
+/*
+ * The live demo, and every query that could also match the playground goes
+ * through it. The page is one document now, so the playground's Signature is
+ * on screen too, and a page-wide "Add signature" would match both.
+ */
 const demo = (page: Page) => page.locator(".instrument-demo").first();
 
 /**
@@ -136,13 +141,13 @@ test.describe("the live demo", () => {
     // the section is empty and every assertion below this one still needs to
     // fail, so the antd class is asserted rather than our own markup.
     await expect(demo(page).locator(".ant-form-item")).toBeVisible();
-    await expect(page.getByRole("button", { name: /add signature/i })).toBeVisible();
+    await expect(demo(page).getByRole("button", { name: /add signature/i })).toBeVisible();
 
     // The scenarios are the demo's whole argument, one per state the component
     // claims to hold. A missing tab means the "can't sign" case — the reason
     // this component exists — is not being shown to anyone evaluating it.
     for (const label of ["Consent", "Can't sign", "Locked", "Awaiting", "Withdrawn"]) {
-      await expect(page.getByRole("tab", { name: label })).toBeVisible();
+      await expect(demo(page).getByRole("tab", { name: label })).toBeVisible();
     }
 
     expect(failures, `app errors on ${PAGE}:\n${failures.join("\n")}`).toEqual([]);
@@ -151,7 +156,10 @@ test.describe("the live demo", () => {
   test("@framework the modal offers all three capture methods", async ({ page }) => {
     await page.goto(PAGE);
     await settle(page);
-    const dialog = await openDialog(page, page.getByRole("button", { name: /add signature/i }));
+    const dialog = await openDialog(
+      page,
+      demo(page).getByRole("button", { name: /add signature/i }),
+    );
 
     for (const method of ["Draw", "Type", "Upload"]) {
       await expect(dialog.getByRole("tab", { name: method })).toBeVisible();
@@ -171,8 +179,11 @@ test.describe("the live demo", () => {
     await page.goto(PAGE);
     await settle(page);
 
-    await page.getByRole("tab", { name: "Can't sign" }).click();
-    const dialog = await openDialog(page, page.getByRole("button", { name: /add signature/i }));
+    await demo(page).getByRole("tab", { name: "Can't sign" }).click();
+    const dialog = await openDialog(
+      page,
+      demo(page).getByRole("button", { name: /add signature/i }),
+    );
 
     // The outcome sheet replaces the signing modal rather than stacking on it,
     // so the same idempotent press applies: retry until its heading is up.
@@ -238,7 +249,7 @@ test.describe("accessibility in a real layout engine", () => {
     await page.goto(PAGE);
     await settle(page);
 
-    const trigger = page.getByRole("button", { name: /add signature/i });
+    const trigger = demo(page).getByRole("button", { name: /add signature/i });
     await trigger.scrollIntoViewIfNeeded();
 
     // Walk in from the top of the document rather than focusing the button
@@ -307,7 +318,7 @@ test.describe("accessibility in a real layout engine", () => {
     // to pass 1.4.10 on the page and fail it the moment the dialog opens.
     await page.goto(PAGE);
     await settle(page);
-    await openDialog(page, page.getByRole("button", { name: /add signature/i }));
+    await openDialog(page, demo(page).getByRole("button", { name: /add signature/i }));
 
     const overflows = await page.evaluate(
       () => document.documentElement.scrollWidth > window.innerWidth + 1,
@@ -319,7 +330,10 @@ test.describe("accessibility in a real layout engine", () => {
     await page.emulateMedia({ forcedColors: "active" });
     await page.goto(PAGE);
     await settle(page);
-    const dialog = await openDialog(page, page.getByRole("button", { name: /add signature/i }));
+    const dialog = await openDialog(
+      page,
+      demo(page).getByRole("button", { name: /add signature/i }),
+    );
 
     // The reason the pad is SVG rather than canvas: forced colours discards
     // every custom colour, and a script-painted bitmap has nothing to fall
@@ -437,7 +451,7 @@ test.describe("visual regression", () => {
 
     const live = demo(page).locator(".ant-form").first();
     for (const scenario of ["Consent", "Can't sign", "Locked", "Awaiting", "Withdrawn"]) {
-      await page.getByRole("tab", { name: scenario }).click();
+      await demo(page).getByRole("tab", { name: scenario }).click();
       const slug = scenario.toLowerCase().replace(/[^a-z]+/g, "-");
       await expect(live).toHaveScreenshot(`signature-${slug}.png`);
     }
@@ -457,7 +471,10 @@ test.describe("visual regression", () => {
   test("@vrt the signing dialog is visually stable", async ({ page }) => {
     await page.goto(PAGE);
     await settle(page);
-    const dialog = await openDialog(page, page.getByRole("button", { name: /add signature/i }));
+    const dialog = await openDialog(
+      page,
+      demo(page).getByRole("button", { name: /add signature/i }),
+    );
     await expect(dialog).toHaveScreenshot("signature-dialog.png");
   });
 });
