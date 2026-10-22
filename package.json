@@ -123,7 +123,12 @@
       "@vue/server-renderer@<3.5.42": ">=3.5.42",
       "prosemirror-view@<1.42.3": ">=1.42.3",
       "sharp@<0.35.5": ">=0.35.5",
-      "shell-quote@>=1.8.4 <1.11.0": ">=1.11.0"
+      "shell-quote@>=1.8.4 <1.11.0": ">=1.11.0",
+      "follow-redirects@>=1.16.0 <1.16.1": ">=1.16.1",
+      "vite@>=8.2.0 <=8.2.3": ">=8.2.4",
+      "launch-editor@<=2.14.1": ">=2.14.2",
+      "@vitest/mocker@>=2.1.0-beta.7 <4.1.12": ">=4.1.12",
+      "@vitest/mocker@>=4.1.11 <4.1.12": ">=4.1.12"
     },
     "//auditConfig": "Advisories with no patched release, ignored by GHSA so a new advisory on the same package still fails CI. GHSA-vfj7-8cjw-p6xm (braces <=3.0.3, no fix published): reached only through the dev-only @next/eslint-plugin-next > fast-glob > micromatch, which expands this repo's own lint globs, never untrusted patterns. Remove once braces ships a fix or the plugin drops fast-glob 3.",
     "auditConfig": {
