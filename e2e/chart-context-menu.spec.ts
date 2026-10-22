@@ -31,6 +31,17 @@ import { expect, test, type Page } from "@playwright/test";
 
 const PAGE = "/components/chart-context-menu";
 
+/*
+ * A row in one of the page's live examples.
+ *
+ * The specs used to take rows by position in the single preview — medication,
+ * then a result, then a restricted note. The page now leads with the
+ * playground and lists the examples after it, so positional rows land on the
+ * wrong subjects; each is addressed by the example that shows it instead.
+ */
+const exampleRow = (page: Page, example: string) =>
+  page.locator(`#ex-${example}-panel-preview [data-zb-menu]`).first();
+
 /**
  * Put a row at a chosen fraction of the viewport and summon its menu there.
  *
@@ -141,8 +152,7 @@ test.describe("@a11y the subject survives a real layout engine", () => {
   });
 
   test("names the popup, and a masked row keeps its name back", async ({ page }) => {
-    const rows = page.locator("[data-zb-menu]");
-    await rows.first().click({ button: "right" });
+    await exampleRow(page, "subject").click({ button: "right" });
 
     const menu = page.locator(".zb-menu");
     await expect(menu).toBeVisible();
@@ -158,7 +168,7 @@ test.describe("@a11y the subject survives a real layout engine", () => {
 
     // The third row is a 42 CFR Part 2 note rendered masked. The menu may say
     // less than its trigger; it may never say more.
-    await rows.nth(2).click({ button: "right" });
+    await exampleRow(page, "masked").click({ button: "right" });
     await expect(menu.locator(".zb-menu__subject")).toContainText("Restricted record");
     await expect(menu).not.toContainText("Nwosu");
   });
@@ -228,7 +238,7 @@ test.describe("@a11y a submenu is a menu, not a chevron", () => {
 
   test("opens beside its row and runs a child", async ({ page }) => {
     // The result row: "Trend" is the only submenu on the page.
-    await page.locator("[data-zb-menu]").nth(1).click({ button: "right" });
+    await exampleRow(page, "submenu").click({ button: "right" });
 
     const parent = page.locator(".zb-menu").first();
     const trigger = parent.getByRole("menuitem", { name: /Trend/ });
@@ -262,7 +272,7 @@ test.describe("@a11y a submenu is a menu, not a chevron", () => {
   test("opens on hover after an intent delay, and survives the gap between menus", async ({
     page,
   }) => {
-    await page.locator("[data-zb-menu]").nth(1).click({ button: "right" });
+    await exampleRow(page, "submenu").click({ button: "right" });
     const parent = page.locator(".zb-menu").first();
     const trigger = parent.getByRole("menuitem", { name: /Trend/ });
 
@@ -283,7 +293,7 @@ test.describe("@a11y a submenu is a menu, not a chevron", () => {
   });
 
   test("ArrowRight opens it, ArrowLeft gives the row back", async ({ page }) => {
-    const row = page.locator("[data-zb-menu]").nth(1);
+    const row = exampleRow(page, "submenu");
     await row.focus();
     await page.keyboard.press("Shift+F10");
     await expect(page.locator(".zb-menu").first()).toBeVisible();
