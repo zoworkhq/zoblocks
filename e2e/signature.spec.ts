@@ -208,12 +208,12 @@ test.describe("the live demo", () => {
 
     // The point of the component: the form now holds a fact rather than a null,
     // and the demo says out loud that the fact is not consent.
-    await expect(page.getByText(/answered, not consent/i)).toBeVisible();
-    await expect(page.getByText('"outcome": "declined"')).toBeVisible();
+    await expect(demo(page).getByText(/answered, not consent/i)).toBeVisible();
+    await expect(demo(page).getByText('"outcome": "declined"')).toBeVisible();
 
     // recordedBy is required on every unsigned outcome — an unattributable
     // refusal is the record the value type exists to prevent.
-    await expect(page.getByText(/"recordedBy"/)).toBeVisible();
+    await expect(demo(page).getByText(/"recordedBy"/)).toBeVisible();
   });
 });
 
@@ -300,7 +300,7 @@ test.describe("accessibility in a real layout engine", () => {
     await page.keyboard.press("Enter");
     await expect(dialog).toBeHidden();
 
-    await expect(page.getByText(/consent given/i)).toBeVisible();
+    await expect(demo(page).getByText(/consent given/i)).toBeVisible();
   });
 
   test("@reflow the signature page does not scroll sideways at 320px", async ({ page }) => {
