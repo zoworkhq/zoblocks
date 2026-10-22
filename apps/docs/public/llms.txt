@@ -73,9 +73,8 @@ Rules that matter when generating code with these components:
   fhir: AllergyIntolerance
   states: High criticality, mild past reaction, Low criticality, same manifestation, Intolerance, not an allergy, Refuted after a rechallenge, Entered in error, Unconfirmed — reported at intake, Unable to assess, No reaction recorded, Substance class expansion, Contraindication, No known allergies — asserted, Allergy status not recorded, An assertion with no author degrades, Compact, in a banner, Interactive — opens the history
   status: stable
-- Care Team Presence: Presence with clinical semantics: in session, on call, signed out to whom — and who else is in this chart right now.
+- [Care Team Presence](https://zoblocks.design/components/care-team-presence): Presence with clinical semantics: in session, on call, signed out to whom — and who else is in this chart right now.
   install: npx @zoblocks/cli add care-team-presence
-  docs: no page yet — this component installs from the registry today
   fhir: CareTeam
   states: Available, In session — do not disturb, In group — eight patients, not one, On crisis line, On call, Signed out, with the cover named, Off shift, nobody covering, Presence degraded, with its age, Presence unknown, Assigned therapist, Compact — avatar only, Coverage resolved, Coverage gap, Someone else is documenting, Someone else is signing, Four in the chart, viewing only
   status: stable
