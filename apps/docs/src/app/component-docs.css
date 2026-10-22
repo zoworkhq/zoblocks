@@ -1,0 +1,84 @@
+/* Component documentation blocks: the playground and example frames, their
+   code surfaces and the dotted stage a live demo sits on.
+
+   Everything here is built from the site's own tokens. The one addition is the
+   syntax palette, scoped to `.zb-code` so it cannot reach anything but code:
+   it colours tokens a reader scans for and is not part of the design system. */
+
+/* Every light token clears 4.5:1 (WCAG AA) on the code surface, #eef3f1, and
+   on the high-contrast theme's #f2f2f2. Comments and numbers were the two
+   below it — 3.5:1 and 4.48:1 — so they are darker here than looks necessary:
+   a comment is still prose someone has to read. */
+.zb-code {
+  --tk-kw: oklch(0.48 0.15 300);
+  --tk-str: oklch(0.5 0.12 150);
+  --tk-tag: oklch(0.52 0.15 25);
+  --tk-attr: oklch(0.5 0.13 250);
+  --tk-num: oklch(0.53 0.13 60);
+  --tk-fn: oklch(0.5 0.12 220);
+  --tk-com: oklch(0.525 0.01 255);
+  --tk-p: oklch(0.5 0.01 255);
+  --tk-t: var(--color-ink);
+  --tk-type: oklch(0.5 0.1 190);
+}
+
+.dark .zb-code {
+  --tk-kw: oklch(0.78 0.12 300);
+  --tk-str: oklch(0.8 0.11 150);
+  --tk-tag: oklch(0.78 0.12 25);
+  --tk-attr: oklch(0.8 0.1 250);
+  --tk-num: oklch(0.82 0.11 70);
+  --tk-fn: oklch(0.8 0.1 220);
+  --tk-com: oklch(0.6 0.01 255);
+  --tk-p: oklch(0.66 0.01 255);
+  --tk-type: oklch(0.8 0.09 190);
+}
+
+.zb-code .tk-kw {
+  color: var(--tk-kw);
+}
+.zb-code .tk-str {
+  color: var(--tk-str);
+}
+.zb-code .tk-tag {
+  color: var(--tk-tag);
+}
+.zb-code .tk-attr {
+  color: var(--tk-attr);
+}
+.zb-code .tk-num {
+  color: var(--tk-num);
+}
+.zb-code .tk-fn {
+  color: var(--tk-fn);
+}
+.zb-code .tk-com {
+  color: var(--tk-com);
+}
+.zb-code .tk-p {
+  color: var(--tk-p);
+}
+.zb-code .tk-t {
+  color: var(--tk-t);
+}
+.zb-code .tk-type {
+  color: var(--tk-type);
+}
+
+/* Prop types in the API table borrow the attribute colour. */
+.zb-type {
+  color: oklch(0.5 0.13 250);
+}
+.dark .zb-type {
+  color: oklch(0.8 0.1 250);
+}
+
+/* The surface a live demo sits on: plain white, so the component is seen on
+   the background it will most often be placed on. Dark mode keeps the page's
+   own paper rather than a white slab. */
+.zb-stage {
+  background-color: #fff;
+}
+.dark .zb-stage {
+  background-color: var(--color-paper);
+}

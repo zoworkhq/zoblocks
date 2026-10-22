@@ -26,6 +26,9 @@ import { Signature, signatureRequired, type SignatureProps } from "@zoblocks/sig
 import { PLAYGROUND_COMPONENTS } from "./playground-registry";
 import { useSiteTheme } from "./use-site-theme";
 import { useAntdBrandTokens } from "./language-antd-theme";
+import { jsxAttr, jsxElement } from "@/lib/highlight";
+import { CodeLines, CopyButton, PlatformLinks } from "./docs/code-block";
+import type { DemoLink } from "./docs/sandbox";
 
 type Props = Record<string, unknown>;
 
@@ -161,6 +164,15 @@ const RENDERERS: Record<string, (props: Props) => React.ReactNode> = {
   },
 };
 
+/**
+ * Array props behind single-choice knobs, per component. The renderer wraps
+ * the knob's string (see `signature` above); the generated code has to say the
+ * same thing, or a reader copies `methods="draw"` into a prop that maps.
+ */
+const ARRAY_PROPS: Record<string, readonly string[]> = {
+  signature: ["methods", "outcomes"],
+};
+
 /* ------------------------------------------------------------------ */
 /* Containment                                                         */
 /* ------------------------------------------------------------------ */
@@ -219,9 +231,18 @@ class PlaygroundBoundary extends React.Component<
 /* Widgets                                                             */
 /* ------------------------------------------------------------------ */
 
+const LABEL = "font-mono text-xs text-ink";
+
 const FIELD =
-  "min-h-6 w-full rounded-lg border border-rule bg-paper px-2 py-1 text-sm text-ink " +
+  "h-8 w-full rounded-lg border border-rule bg-paper px-2 font-mono text-[11.5px] text-ink " +
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand";
+
+/**
+ * A segmented row in the 240px panel holds about 26 characters of mono labels.
+ * Past that the labels truncate to "radi…", which names nothing, so the knob
+ * falls back to a select.
+ */
+const SEGMENT_CHARS = 26;
 
 function Knob({
   control,
@@ -234,44 +255,57 @@ function Knob({
 }) {
   const id = `knob-${control.prop}`;
   const label = control.label ?? control.prop;
+  const options = control.options ?? [];
 
   if (control.control === "switch") {
+    const on = Boolean(value);
     return (
-      <label className="flex min-h-6 items-center gap-2 text-sm text-graphite" htmlFor={id}>
-        <input
-          id={id}
-          type="checkbox"
-          className="size-4 accent-[var(--color-brand)]"
-          checked={Boolean(value)}
-          onChange={(event) => onChange(event.target.checked)}
-        />
-        {label}
-      </label>
+      <button
+        type="button"
+        role="switch"
+        id={id}
+        aria-checked={on}
+        onClick={() => onChange(!on)}
+        className="flex w-full items-center justify-between gap-2.5 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+      >
+        <span className={LABEL}>{label}</span>
+        <span
+          aria-hidden="true"
+          className={`relative h-4 w-7 flex-none rounded-full transition-colors ${on ? "bg-brand" : "bg-rule-strong"}`}
+        >
+          <span
+            className={`absolute top-0.5 size-3 rounded-full bg-white transition-[left] ${on ? "left-3.5" : "left-0.5"}`}
+          />
+        </span>
+      </button>
     );
   }
 
-  if (control.control === "segmented") {
+  const fits = options.join("").length + options.length * 2 <= SEGMENT_CHARS;
+  const segmented =
+    options.length > 0 && fits && ["segmented", "select", "fixture"].includes(control.control);
+
+  if (segmented) {
     return (
-      <fieldset className="min-w-0">
-        <legend className="numeric text-[0.625rem] uppercase tracking-wide text-graphite-soft">
-          {label}
-        </legend>
-        {/* Radios rather than buttons: this is a single choice from a fixed
-            set, which is what a radiogroup already announces correctly. */}
-        <div className="mt-1 flex flex-wrap gap-1">
-          {(control.options ?? []).map((option) => (
+      <fieldset className="m-0 flex min-w-0 flex-col gap-[7px] border-0 p-0">
+        <legend className={`${LABEL} mb-[7px] p-0`}>{label}</legend>
+        {/* Native radios, visually hidden: a single choice from a fixed set is
+            what a radio group already announces and drives by arrow key. */}
+        <div className="flex rounded-lg border border-rule bg-paper-sunk p-0.5">
+          {options.map((option) => (
             <label
               key={option}
-              className="flex min-h-6 cursor-pointer items-center gap-1.5 rounded-lg border border-rule px-2 py-0.5 text-xs text-graphite has-[:checked]:border-brand/50 has-[:checked]:text-ink"
+              title={option}
+              className="flex h-[26px] min-w-0 flex-1 cursor-pointer items-center justify-center truncate rounded-md px-1.5 font-mono text-[11.5px] text-graphite transition-colors has-[:checked]:bg-paper has-[:checked]:text-ink has-[:checked]:shadow-[0_0_0_1px_var(--color-rule),0_1px_2px_rgb(0_0_0/0.06)] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-brand"
             >
               <input
                 type="radio"
                 name={id}
-                className="size-3 accent-[var(--color-brand)]"
+                className="sr-only"
                 checked={value === option}
                 onChange={() => onChange(option)}
               />
-              {option}
+              <span className="truncate">{option}</span>
             </label>
           ))}
         </div>
@@ -279,23 +313,20 @@ function Knob({
     );
   }
 
-  if (control.control === "select" || control.control === "fixture") {
+  if (["segmented", "select", "fixture"].includes(control.control)) {
     return (
-      <div className="min-w-0">
-        <label
-          htmlFor={id}
-          className="numeric block text-[0.625rem] uppercase tracking-wide text-graphite-soft"
-        >
+      <div className="flex min-w-0 flex-col gap-[7px]">
+        <label htmlFor={id} className={LABEL}>
           {label}
         </label>
         <select
           id={id}
-          className={`mt-1 ${FIELD}`}
+          className={FIELD}
           value={String(value ?? "")}
           onChange={(event) => onChange(event.target.value || undefined)}
         >
           <option value="">— unset —</option>
-          {(control.options ?? []).map((option) => (
+          {options.map((option) => (
             <option key={option} value={option}>
               {option}
             </option>
@@ -307,17 +338,15 @@ function Knob({
 
   if (control.control === "slider") {
     return (
-      <div className="min-w-0">
-        <label
-          htmlFor={id}
-          className="numeric block text-[0.625rem] uppercase tracking-wide text-graphite-soft"
-        >
-          {label} <span className="text-ink">{String(value ?? control.min ?? 0)}</span>
+      <div className="flex min-w-0 flex-col gap-[7px]">
+        <label htmlFor={id} className={`${LABEL} flex justify-between`}>
+          <span>{label}</span>
+          <span className="text-graphite">{String(value ?? control.min ?? 0)}</span>
         </label>
         <input
           id={id}
           type="range"
-          className="mt-1 w-full accent-[var(--color-brand)]"
+          className="w-full accent-[var(--color-brand)]"
           min={control.min ?? 0}
           max={control.max ?? 100}
           step={control.step ?? 1}
@@ -331,17 +360,14 @@ function Knob({
   if (control.control === "event") return null;
 
   return (
-    <div className="min-w-0">
-      <label
-        htmlFor={id}
-        className="numeric block text-[0.625rem] uppercase tracking-wide text-graphite-soft"
-      >
+    <div className="flex min-w-0 flex-col gap-[7px]">
+      <label htmlFor={id} className={LABEL}>
         {label}
       </label>
       <input
         id={id}
         type="text"
-        className={`mt-1 ${FIELD}`}
+        className={FIELD}
         value={String(value ?? "")}
         onChange={(event) => onChange(event.target.value || undefined)}
       />
@@ -350,8 +376,66 @@ function Knob({
 }
 
 /* ------------------------------------------------------------------ */
+/* Code                                                                */
+/* ------------------------------------------------------------------ */
 
-export function Playground({ name, controls }: { name: string; controls: readonly Control[] }) {
+/**
+ * The source for what the stage is showing.
+ *
+ * Built from the same props object the renderer receives, so the code and the
+ * component cannot disagree. A fixture knob names a dataset rather than a
+ * value, so it is written as an identifier and imported from the fixtures
+ * package — which is where a reader would get it.
+ */
+export function playgroundSource({
+  importName,
+  importFrom,
+  controls,
+  props,
+  arrayProps = [],
+}: {
+  importName: string;
+  importFrom: string;
+  controls: readonly Control[];
+  props: Props;
+  arrayProps?: readonly string[];
+}): string {
+  const fixtures: string[] = [];
+  const attrs: string[] = [];
+  for (const control of controls) {
+    if (control.control === "event") continue;
+    const value = props[control.prop];
+    const isFixture = control.control === "fixture" && typeof value === "string";
+    if (isFixture) fixtures.push(value as string);
+    const wrapped =
+      arrayProps.includes(control.prop) && typeof value === "string" ? [value] : value;
+    const attr = jsxAttr(control.prop, wrapped, isFixture);
+    if (attr) attrs.push(attr);
+  }
+  const imports = [
+    `import { ${importName} } from "${importFrom}";`,
+    ...(fixtures.length ? [`import { ${fixtures.join(", ")} } from "@zoblocks/fixtures";`] : []),
+  ].join("\n");
+  return `${imports}\n\nexport default function Example() {\n  return (\n    ${jsxElement(importName, attrs, "    ")}\n  );\n}`;
+}
+
+/* ------------------------------------------------------------------ */
+
+export function Playground({
+  name,
+  controls,
+  importName,
+  importFrom,
+  links = [],
+}: {
+  name: string;
+  controls: readonly Control[];
+  /** The React export the code imports. Defaults to the component name in PascalCase. */
+  importName?: string;
+  /** Where the code imports it from. Defaults to the registry path. */
+  importFrom?: string;
+  links?: readonly DemoLink[];
+}) {
   if (process.env.NODE_ENV !== "production") {
     // The server decides whether to render this section from
     // PLAYGROUND_COMPONENTS; the renderers live here. Two lists is one more
@@ -397,96 +481,123 @@ export function Playground({ name, controls }: { name: string; controls: readonl
     };
   }
 
-  return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_16rem]">
-      {/*
-        antd is themed by an algorithm in React, not by inherited CSS, so
-        without this the playground renders antd's light palette inside a dark
-        page — a white card with near-black text, in the one place on the page
-        a reader goes to see what the component actually looks like.
-      */}
-      <div
-        className="surface-2 min-w-0 rounded-2xl p-6"
-        style={dark ? { colorScheme: "dark" } : undefined}
-      >
-        {/*
-          The accent follows the design language.
+  const exportName =
+    importName ?? name.replace(/(^|-)([a-z])/g, (_, __, letter: string) => letter.toUpperCase());
+  const source = playgroundSource({
+    importName: exportName,
+    importFrom: importFrom ?? `@/components/zoblocks/${name}`,
+    controls,
+    props,
+    arrayProps: ARRAY_PROPS[name],
+  });
 
-          It was pinned to ZoBlocks's, for a good reason at the time: with only
-          the algorithm set this rendered antd's #1677ff with white on it —
-          4.10:1, an AA failure. Under "Ant Design" that failure is now shown
-          rather than corrected, because a reader comparing frameworks should
-          see what antd actually ships.
-        */}
-        <ConfigProvider
-          theme={{
-            algorithm: dark ? theme.darkAlgorithm : theme.defaultAlgorithm,
-            token: brand,
+  return (
+    <div className="flex flex-col gap-3.5">
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={() => {
+            setProps(initial);
+            setLog([]);
           }}
+          className="rounded-md text-[13px] text-graphite transition-colors hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
         >
-          <PlaygroundBoundary resetKey={JSON.stringify(props)}>
-            {render(withHandlers)}
-          </PlaygroundBoundary>
-        </ConfigProvider>
+          Reset
+        </button>
       </div>
 
-      <div className="min-w-0">
-        <div className="flex items-baseline justify-between gap-3">
-          <p className="numeric text-[0.625rem] uppercase tracking-wide text-graphite-soft">
-            Props
-          </p>
-          <button
-            type="button"
-            onClick={() => {
-              setProps(initial);
-              setLog([]);
-            }}
-            className="min-h-6 rounded-lg border border-rule px-2 text-xs text-graphite transition-colors hover:border-rule-strong hover:text-ink"
+      <div className="@container overflow-hidden rounded-xl border border-rule bg-paper">
+        <div className="flex flex-col @min-[680px]:flex-row">
+          {/*
+            antd is themed by an algorithm in React, not by inherited CSS, so
+            without this the playground renders antd's light palette inside a
+            dark page — a white card with near-black text, in the one place on
+            the page a reader goes to see what the component looks like.
+          */}
+          <div
+            className="zb-stage flex min-h-[360px] min-w-0 flex-1 items-center justify-center px-7 py-11"
+            style={dark ? { colorScheme: "dark" } : undefined}
           >
-            Reset
-          </button>
-        </div>
-
-        <div className="mt-3 space-y-4">
-          {knobs.map((control) => (
-            <Knob
-              key={control.prop}
-              control={control}
-              value={props[control.prop]}
-              onChange={(next) =>
-                setProps((previous) => {
-                  const updated = { ...previous };
-                  if (next === undefined) delete updated[control.prop];
-                  else updated[control.prop] = next;
-                  return updated;
-                })
-              }
-            />
-          ))}
-        </div>
-
-        {events.length > 0 && (
-          <div className="mt-5">
-            <p className="numeric text-[0.625rem] uppercase tracking-wide text-graphite-soft">
-              Events
-            </p>
-            {/* Polite, because an event log that interrupts is worse than one
-                nobody hears — the component under test is the thing being
-                driven, and its own announcements come first. */}
-            <ul
-              aria-live="polite"
-              className="mt-1 space-y-0.5 font-mono text-[0.6875rem] text-graphite"
-            >
-              {log.length === 0 ? (
-                <li className="text-graphite-soft">
-                  {events.map((e) => e.prop).join(", ")} — nothing yet
-                </li>
-              ) : (
-                log.map((entry, index) => <li key={`${entry}-${index}`}>{entry}</li>)
-              )}
-            </ul>
+            <div className="w-full min-w-0">
+              {/*
+                The accent follows the design language. Under "Ant Design" an
+                AA failure in antd's own blue is shown rather than corrected,
+                because a reader comparing frameworks should see what antd ships.
+              */}
+              <ConfigProvider
+                theme={{
+                  algorithm: dark ? theme.darkAlgorithm : theme.defaultAlgorithm,
+                  token: brand,
+                }}
+              >
+                <PlaygroundBoundary resetKey={JSON.stringify(props)}>
+                  {render(withHandlers)}
+                </PlaygroundBoundary>
+              </ConfigProvider>
+            </div>
           </div>
-        )}
+
+          {/*
+            The panel is as tall as the stage's minimum and scrolls past it, so
+            a component with a dozen props does not stretch the stage into a
+            tall empty column. Focusable and named, because a region that
+            scrolls has to be reachable by keyboard.
+          */}
+          <div
+            role="region"
+            aria-label="Props"
+            tabIndex={0}
+            className="scroll-thin flex max-h-[360px] w-full flex-none flex-col gap-4 overflow-y-auto border-t border-rule bg-paper px-[18px] pb-[18px] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand @min-[680px]:w-60 @min-[680px]:border-l @min-[680px]:border-t-0"
+          >
+            <span className="sticky top-0 z-10 -mb-2 bg-paper pb-2 pt-[18px] text-xs font-medium text-graphite-soft">
+              Props
+            </span>
+            {knobs.map((control) => (
+              <Knob
+                key={control.prop}
+                control={control}
+                value={props[control.prop]}
+                onChange={(next) =>
+                  setProps((previous) => {
+                    const updated = { ...previous };
+                    if (next === undefined) delete updated[control.prop];
+                    else updated[control.prop] = next;
+                    return updated;
+                  })
+                }
+              />
+            ))}
+
+            {events.length > 0 && (
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-medium text-graphite-soft">Events</span>
+                {/* Polite, because an event log that interrupts is worse than
+                    one nobody hears — the component under test comes first. */}
+                <ul
+                  aria-live="polite"
+                  className="m-0 list-none space-y-0.5 p-0 font-mono text-[11px] text-graphite"
+                >
+                  {log.length === 0 ? (
+                    <li className="text-graphite-soft">
+                      {events.map((e) => e.prop).join(", ")} — nothing yet
+                    </li>
+                  ) : (
+                    log.map((entry, index) => <li key={`${entry}-${index}`}>{entry}</li>)
+                  )}
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="flex h-11 items-center justify-between gap-2 border-t border-rule bg-paper-sunk pl-3.5 pr-1.5">
+          <span className="min-w-0 truncate font-mono text-xs text-graphite">Playground.tsx</span>
+          <div className="flex flex-none items-center gap-0.5">
+            <CopyButton text={source} what="playground code" />
+            <PlatformLinks links={links} />
+          </div>
+        </div>
+        <CodeLines code={source} label="Playground code" />
       </div>
     </div>
   );

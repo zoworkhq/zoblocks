@@ -297,6 +297,13 @@ export const exampleSchema = z.object({
   description: nonEmpty("example description"),
   /** Named dataset from @zoblocks/fixtures. Lorem ipsum is a build error. */
   fixture: z.string().optional(),
+  /**
+   * A heading the docs page files this example under, such as "Variants" or
+   * "Overflow". Examples sharing a group are listed together, in the order
+   * they are declared; a component whose examples have no group shows a
+   * plain list.
+   */
+  group: z.string().optional(),
   code: nonEmpty("example code"),
 });
 

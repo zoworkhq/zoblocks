@@ -17,14 +17,11 @@ const PAGE_SIZE = 10;
  * Below `PAGE_SIZE` the controls do not render at all. A search box over eight
  * props is furniture, and an empty pager reads as a broken one.
  *
- * A stacked list, not a table. It was a four-column table and it was clipping:
- * table layout gives a column the width its content asks for, and `variant` on
- * DatePicker asks for eleven string literals — about 300 characters. The type
- * column took the row and "What it does" was squeezed to roughly one character
- * per line. No column width fixes that, because the problem is that a
- * TypeScript union and a sentence do not belong side by side. So the name keeps
- * its own column and stays scannable, and the type and the description each get
- * the full remaining width, stacked.
+ * A grid, not a table. Table layout gives a column the width its content asks
+ * for, and `variant` on DatePicker asks for eleven string literals — about 300
+ * characters — which squeezed the description to one character a line. Grid
+ * tracks with `minmax(0, …)` hold their share and wrap the union inside it, and
+ * below 620px of article the four columns stack.
  */
 export function PropsTable({ props, label }: { props: readonly PropDoc[]; label: string }) {
   const [query, setQuery] = React.useState("");
@@ -94,54 +91,67 @@ export function PropsTable({ props, label }: { props: readonly PropDoc[]; label:
         </div>
       ) : null}
 
-      <dl className="divide-y divide-rule overflow-hidden rounded-2xl border border-rule bg-paper">
-        {rows.map((prop) => (
-          <div
-            key={prop.name}
-            className="grid gap-x-8 gap-y-1.5 px-5 py-3 sm:grid-cols-[minmax(8rem,12rem)_minmax(0,1fr)]"
-          >
-            {/* `min-w-0` on both tracks: without it a long union expands the
-                grid track instead of wrapping inside it, which is the same bug
-                the table had, one layout system later. */}
-            <dt className="min-w-0">
-              <span className="numeric break-words text-xs font-medium text-ink">{prop.name}</span>
-              {prop.required ? (
-                <span className="numeric ml-1.5 text-[0.5625rem] uppercase tracking-wider text-critical">
-                  req
-                </span>
-              ) : null}
-              {prop.default ? (
-                <span className="numeric mt-1 block text-[0.6875rem] text-graphite-soft">
-                  = {prop.default}
-                </span>
-              ) : null}
-            </dt>
-
-            <dd className="min-w-0">
-              <p className="numeric break-words text-xs leading-relaxed text-brand-deep">
-                {prop.type}
-              </p>
+      {/*
+        Four columns when the article is wide enough, stacked below 620px.
+        Every track is `minmax(0, …)` and every cell breaks words, so a long
+        union wraps inside its column instead of widening it — the failure the
+        old four-column table had, where `variant` on DatePicker squeezed the
+        description to one character a line.
+      */}
+      <div className="@container overflow-hidden rounded-[10px] border border-rule bg-paper">
+        <div
+          aria-hidden="true"
+          className="hidden gap-4 bg-paper-sunk px-4 py-2.5 text-xs font-medium text-graphite-soft @min-[620px]:grid @min-[620px]:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)_minmax(0,0.7fr)_minmax(0,1.7fr)]"
+        >
+          <span>Prop</span>
+          <span>Type</span>
+          <span>Default</span>
+          <span>Description</span>
+        </div>
+        <dl className="m-0 divide-y divide-rule border-rule @min-[620px]:border-t">
+          {rows.map((prop) => (
+            <div
+              key={prop.name}
+              className="grid gap-1.5 px-4 py-3.5 @min-[620px]:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)_minmax(0,0.7fr)_minmax(0,1.7fr)] @min-[620px]:gap-4"
+            >
+              <dt className="flex min-w-0 flex-col gap-0.5">
+                <code className="break-words font-mono text-[12.5px] font-medium text-ink">
+                  {prop.name}
+                </code>
+                {prop.required ? (
+                  <span className="text-[11.5px] text-critical">required</span>
+                ) : null}
+              </dt>
+              <dd className="m-0 min-w-0">
+                <code className="zb-type break-words font-mono text-xs">{prop.type}</code>
+              </dd>
+              <dd className="m-0 flex min-w-0 gap-1.5">
+                <span className="text-xs text-graphite-soft @min-[620px]:hidden">Default</span>
+                <code className="break-words font-mono text-xs text-graphite">
+                  {prop.default || "—"}
+                </code>
+              </dd>
               {/*
                 An undocumented public prop is stated as one rather than left
                 blank — a blank reads as "nothing to say about this".
               */}
-              <p className="mt-1.5 max-w-[92ch] text-xs leading-relaxed text-graphite">
+              <dd className="m-0 min-w-0 text-pretty text-[13.5px] leading-relaxed text-graphite">
                 {prop.description ? (
                   prop.description
                 ) : (
                   <span className="italic text-graphite-soft">Not yet documented.</span>
                 )}
-              </p>
-            </dd>
-          </div>
-        ))}
+              </dd>
+            </div>
+          ))}
 
-        {rows.length === 0 ? (
-          <p className="px-5 py-8 text-center text-xs text-graphite-soft">
-            No prop matches “{query}”.
-          </p>
-        ) : null}
-      </dl>
+          {rows.length === 0 ? (
+            <p className="px-5 py-8 text-center text-xs text-graphite-soft">
+              No prop matches “{query}”.
+            </p>
+          ) : null}
+        </dl>
+      </div>
 
       {paged && pageCount > 1 ? (
         <div className="mt-3 flex items-center justify-between gap-4">
