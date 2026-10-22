@@ -225,8 +225,9 @@ interface DemoProps {
  * The frame states the API being demonstrated, because a gallery where you
  * cannot tell which prop produced which pixels teaches nothing.
  *
- * Deliberately not a `data-reveal` target — see `tabs-gallery.tsx`. These
- * mount on a chapter press rather than on scroll.
+ * Deliberately not a `data-reveal` target. These mount on a chapter press
+ * rather than on scroll, so a scroll animation would fire on every switch —
+ * and a gallery is for comparing, so the next chapter has to be there at once.
  */
 function Demo({ id, name, api, tags, note, children, wide }: DemoProps) {
   return (

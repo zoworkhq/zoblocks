@@ -9,7 +9,6 @@ import { CATALOG, STATUS_LABEL, getComponent } from "@/lib/catalog";
 import { SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { PropsTable } from "@/components/site/props-table";
 import { ComponentPreview } from "@/components/site/component-preview";
-import { TabsGallery } from "@/components/site/tabs-gallery";
 import { CopilotGallery } from "@/components/site/copilot-gallery";
 import { SwitchGallery } from "@/components/site/switch-gallery";
 import { DatePickerGallery } from "@/components/site/date-picker-gallery";
@@ -370,7 +369,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
   const importFrom = isPackage
     ? (component.packageName ?? `@/components/zoblocks/${component.name}`)
     : `@/components/zoblocks/${component.name}`;
-  const hasGallery = ["tabs", "date-picker", "copilot", "switch"].includes(component.name);
+  const hasGallery = ["date-picker", "copilot", "switch"].includes(component.name);
   /*
    * Examples that declare a group are listed under it, in declaration order of
    * the first example in each group. "On this page" then lists the groups
@@ -724,7 +723,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
 
               {/* Gallery --------------------------------------------------- */}
               {/*
-                Tabs, the date control and Switch each make a claim about
+                The date control and Switch each make a claim about
                 sameness — many skins, one contract — and a claim about sameness
                 cannot be shown with one example. Copilot's gallery shows the
                 part that is not a chat box.
@@ -738,13 +737,10 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                       ? `${component.variants?.length ?? 0} variants, one contract — live.`
                       : component.name === "copilot"
                         ? "The part that is not a chat box."
-                        : component.name === "switch"
-                          ? "Every state, phase and surface — live, on the page."
-                          : "Every variant, mode and state — live."
+                        : "Every state, phase and surface — live, on the page."
                   }
                 >
                   <HostStage className="flex w-full min-w-0 flex-col">
-                    {component.name === "tabs" && <TabsGallery />}
                     {component.name === "date-picker" && <DatePickerGallery />}
                     {component.name === "copilot" && <CopilotGallery />}
                     {component.name === "switch" && <SwitchGallery />}
