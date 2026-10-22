@@ -23,6 +23,11 @@ import { allergyList, medicationList, observationPanel } from "@zoblocks/fixture
 import { Tabs, type TabsItemProps, type TabsProps } from "@zoblocks/tabs";
 import { ConfigProvider, Form, theme } from "antd";
 import { Signature, signatureRequired, type SignatureProps } from "@zoblocks/signature";
+import { PulseLoader } from "@/registry/zoblocks/pulse-loader/pulse-loader";
+import { RhythmLoader } from "@/registry/zoblocks/rhythm-loader/rhythm-loader";
+import { BreathLoader } from "@/registry/zoblocks/breath-loader/breath-loader";
+import { HelixLoader } from "@/registry/zoblocks/helix-loader/helix-loader";
+import { InfusionLoader } from "@/registry/zoblocks/infusion-loader/infusion-loader";
 import { PLAYGROUND_COMPONENTS } from "./playground-registry";
 import { useSiteTheme } from "./use-site-theme";
 import { useAntdBrandTokens } from "./language-antd-theme";
@@ -35,6 +40,11 @@ type Props = Record<string, unknown>;
 /* ------------------------------------------------------------------ */
 /* Renderers                                                           */
 /* ------------------------------------------------------------------ */
+
+/** A loader is a mark, not a layout: it sits in the middle of the stage. */
+function Centered({ children }: { children: React.ReactNode }) {
+  return <div className="flex justify-center">{children}</div>;
+}
 
 function Filler({ children }: { children: React.ReactNode }) {
   return <p className="px-1 py-4 text-sm text-graphite">{children} panel.</p>;
@@ -110,6 +120,36 @@ function chartFor(mode: string, fixture: string): TabsItemProps[] {
 }
 
 const RENDERERS: Record<string, (props: Props) => React.ReactNode> = {
+  /*
+   * The loaders take their knobs as they are. `mode` is not one of them:
+   * `page` covers the viewport, which in a playground covers the page the
+   * reader is using to turn it off. Overlay is shown as an example instead.
+   */
+  "pulse-loader": (props) => (
+    <Centered>
+      <PulseLoader {...props} />
+    </Centered>
+  ),
+  "rhythm-loader": (props) => (
+    <Centered>
+      <RhythmLoader {...props} />
+    </Centered>
+  ),
+  "breath-loader": (props) => (
+    <Centered>
+      <BreathLoader {...props} />
+    </Centered>
+  ),
+  "helix-loader": (props) => (
+    <Centered>
+      <HelixLoader {...props} />
+    </Centered>
+  ),
+  "infusion-loader": (props) => (
+    <Centered>
+      <InfusionLoader {...props} />
+    </Centered>
+  ),
   tabs: (props) => {
     const { items, ...rest } = props as { items?: string } & Partial<TabsProps>;
     const mode = rest.as ?? "tabs";

@@ -63,6 +63,91 @@ export default defineComponentMeta({
   dependencies: ["clsx", "tailwind-merge"],
   registryDependencies: ["utils", "tokens", "loader-core"],
 
+  controls: [
+    {
+      prop: "size",
+      control: "segmented",
+      label: "size",
+      options: ["sm", "md", "lg", "xl"],
+      defaultValue: "xl",
+    },
+    {
+      prop: "speed",
+      control: "slider",
+      label: "speed",
+      min: 0.5,
+      max: 2,
+      step: 0.25,
+      defaultValue: 1,
+    },
+    {
+      prop: "motion",
+      control: "segmented",
+      label: "motion",
+      options: ["auto", "reduced", "full"],
+      defaultValue: "auto",
+    },
+    { prop: "showLabel", control: "switch", label: "showLabel", defaultValue: true },
+    { prop: "label", control: "text", label: "label", defaultValue: "Running the panel" },
+  ],
+
+  examples: [
+    {
+      id: "lab-panel",
+      title: "While a panel runs",
+      description:
+        "The helix belongs to the lab: a result is being computed, not fetched. Say what is running and how long it usually takes.",
+      code: `import { HelixLoader } from "@/components/zoblocks/helix-loader";
+
+export default function Example() {
+  return (
+    <HelixLoader
+      showLabel
+      label="Running the panel"
+      hint="Results usually arrive within a minute."
+    />
+  );
+}`,
+    },
+    {
+      id: "slow-with-a-way-out",
+      title: "A slow wait with a way out",
+      description:
+        "slowAfter swaps the hint for a plain statement of the stall. slowHint replaces the wording and actions gives the reader something to do about it.",
+      code: `import { HelixLoader } from "@/components/zoblocks/helix-loader";
+
+export default function Example() {
+  return (
+    <HelixLoader
+      showLabel
+      label="Running the panel"
+      slowAfter={3000}
+      slowHint="The analyser is slower than usual. You can leave this page; the result will be filed."
+      actions={<button type="button">Leave this page</button>}
+    />
+  );
+}`,
+    },
+    {
+      id: "sizes",
+      title: "Four sizes",
+      description:
+        "Named steps for the common cases; a number sets the art width in pixels for anything else.",
+      code: `import { HelixLoader } from "@/components/zoblocks/helix-loader";
+
+export default function Example() {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 32 }}>
+      <HelixLoader size="sm" label="Running" />
+      <HelixLoader size="md" label="Running" />
+      <HelixLoader size="lg" label="Running" />
+      <HelixLoader size="xl" label="Running" />
+    </div>
+  );
+}`,
+    },
+  ],
+
   usage: `import { HelixLoader } from "@/components/zoblocks/helix-loader";
 
 <HelixLoader mode="overlay" label="Running the panel" delay={200} />`,

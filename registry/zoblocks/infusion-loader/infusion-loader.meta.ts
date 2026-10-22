@@ -69,6 +69,94 @@ export default defineComponentMeta({
   dependencies: ["clsx", "tailwind-merge"],
   registryDependencies: ["utils", "tokens", "loader-core"],
 
+  controls: [
+    {
+      prop: "size",
+      control: "segmented",
+      label: "size",
+      options: ["sm", "md", "lg", "xl"],
+      defaultValue: "xl",
+    },
+    {
+      prop: "progress",
+      control: "slider",
+      label: "progress",
+      min: 0,
+      max: 100,
+      step: 1,
+      defaultValue: 62,
+    },
+    {
+      prop: "speed",
+      control: "slider",
+      label: "speed",
+      min: 0.5,
+      max: 2,
+      step: 0.25,
+      defaultValue: 1,
+    },
+    {
+      prop: "motion",
+      control: "segmented",
+      label: "motion",
+      options: ["auto", "reduced", "full"],
+      defaultValue: "auto",
+    },
+    { prop: "showLabel", control: "switch", label: "showLabel", defaultValue: true },
+    { prop: "label", control: "text", label: "label", defaultValue: "Importing records" },
+  ],
+
+  examples: [
+    {
+      id: "known-progress",
+      title: "Known progress",
+      description:
+        "A number from 0 to 100 makes the loader determinate: role=progressbar with a value, rather than a status that is re-announced.",
+      code: `import { InfusionLoader } from "@/components/zoblocks/infusion-loader";
+
+export default function Example() {
+  return <InfusionLoader showLabel label="Importing records" progress={62} />;
+}`,
+    },
+    {
+      id: "live-import",
+      title: "Progress from your import",
+      description:
+        "The application owns progress; the loader only renders it. Feed it the real count, and drop progress when the total is not known yet.",
+      code: `import { useEffect, useState } from "react";
+import { InfusionLoader } from "@/components/zoblocks/infusion-loader";
+
+export default function Example() {
+  const [done, setDone] = useState(0);
+  const total = 240;
+
+  useEffect(() => {
+    const id = setInterval(() => setDone((n) => (n >= total ? 0 : n + 12)), 400);
+    return () => clearInterval(id);
+  }, []);
+
+  return (
+    <InfusionLoader
+      showLabel
+      label={\`Importing \${done} of \${total} records\`}
+      progress={(done / total) * 100}
+    />
+  );
+}`,
+    },
+    {
+      id: "before-the-total",
+      title: "Before the total is known",
+      description:
+        "Without progress the line runs indeterminate. Switch to a number as soon as one exists, rather than inventing one.",
+      code: `import { InfusionLoader } from "@/components/zoblocks/infusion-loader";
+
+export default function Example() {
+  return <InfusionLoader showLabel label="Preparing the export" />;
+}`,
+    },
+  ],
+
   usage: `import { InfusionLoader } from "@/components/zoblocks/infusion-loader";
 
 // Determinate: the application knows how much is left

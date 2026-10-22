@@ -25,6 +25,14 @@ export default defineConfig({
      */
     alias: [
       { find: /^@\/registry\/(.*)$/, replacement: path.join(root, "../../registry/$1") },
+      {
+        find: /^@\/lib\/zoblocks-loader$/,
+        replacement: path.join(root, "../../registry/zoblocks/lib/loader.tsx"),
+      },
+      {
+        find: /^@\/components\/zoblocks\/([a-z-]+-loader)$/,
+        replacement: path.join(root, "../../registry/zoblocks/$1/$1.tsx"),
+      },
       { find: "@", replacement: path.join(root, "src") },
     ],
   },

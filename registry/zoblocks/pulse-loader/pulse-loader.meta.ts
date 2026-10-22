@@ -74,6 +74,91 @@ export default defineComponentMeta({
   dependencies: ["clsx", "tailwind-merge"],
   registryDependencies: ["utils", "tokens", "loader-core", "rhythm-loader"],
 
+  controls: [
+    {
+      prop: "size",
+      control: "segmented",
+      label: "size",
+      options: ["sm", "md", "lg", "xl"],
+      defaultValue: "xl",
+    },
+    { prop: "bpm", control: "slider", label: "bpm", min: 40, max: 100, step: 5, defaultValue: 60 },
+    {
+      prop: "speed",
+      control: "slider",
+      label: "speed",
+      min: 0.5,
+      max: 2,
+      step: 0.25,
+      defaultValue: 1,
+    },
+    {
+      prop: "motion",
+      control: "segmented",
+      label: "motion",
+      options: ["auto", "reduced", "full"],
+      defaultValue: "auto",
+    },
+    { prop: "showLabel", control: "switch", label: "showLabel", defaultValue: true },
+    { prop: "label", control: "text", label: "label", defaultValue: "Loading your records" },
+  ],
+
+  examples: [
+    {
+      id: "region-overlay",
+      title: "Over a region, never flashing",
+      description:
+        "Overlay covers its positioned ancestor, not the page. With delay a response that lands inside 200ms never shows the loader at all, and minDuration keeps one that did appear from blinking out.",
+      code: `import { PulseLoader } from "@/components/zoblocks/pulse-loader";
+
+export default function Example() {
+  return (
+    <section style={{ position: "relative", minHeight: 220 }}>
+      <ResultsTable />
+      <PulseLoader mode="overlay" label="Loading results" delay={200} minDuration={400} />
+    </section>
+  );
+}`,
+    },
+    {
+      id: "slow-wait",
+      title: "A wait that admits it stalled",
+      description:
+        "After slowAfter the hint changes to a plain statement that the wait is long, and actions gives the reader a way out. onSlow fires once, so the stall can be reported as well as shown.",
+      code: `import { PulseLoader } from "@/components/zoblocks/pulse-loader";
+
+export default function Example() {
+  return (
+    <PulseLoader
+      showLabel
+      label="Loading your records"
+      slowAfter={3000}
+      onSlow={() => reportSlowWait("records")}
+      actions={<button type="button">Go back</button>}
+    />
+  );
+}`,
+    },
+    {
+      id: "below-forty",
+      title: "Below 40px it becomes the rhythm line",
+      description:
+        "The heart's detail collapses under 40px, so the loader renders Rhythm Loader instead rather than a smudge. Same props, same announcement.",
+      code: `import { PulseLoader } from "@/components/zoblocks/pulse-loader";
+
+export default function Example() {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 32 }}>
+      <PulseLoader size="sm" label="Loading" />
+      <PulseLoader size="md" label="Loading" />
+      <PulseLoader size="lg" label="Loading" />
+      <PulseLoader size="xl" label="Loading" />
+    </div>
+  );
+}`,
+    },
+  ],
+
   usage: `import { PageLoader, PulseLoader } from "@/components/zoblocks/pulse-loader";
 
 // Full-page wait, e.g. Next.js app/loading.tsx
