@@ -26,6 +26,7 @@ import * as AccordionDemo from "../accordion-demos";
 import * as StatusDemo from "../clinical-status-demos";
 import * as MenuDemo from "../chart-context-menu-demos";
 import * as SignatureDemo from "../signature-demos";
+import * as DateDemo from "../date-picker-demos";
 
 /* ------------------------------------------------------------------ */
 /* Stand-ins for the host application                                  */
@@ -286,6 +287,38 @@ export const EXAMPLE_PREVIEWS: Readonly<
     empty: () => <MenuDemo.TwoEmpties />,
     "view-state": () => <MenuDemo.ViewState />,
     submenu: () => <MenuDemo.SubmenuBeside />,
+  },
+
+  "date-picker": {
+    "four-jobs": () => <DateDemo.FourJobs />,
+    picker: () => <DateDemo.Picker />,
+    field: () => <DateDemo.Field />,
+    tiers: () => <DateDemo.Tiers />,
+    "birth-date": () => <DateDemo.BirthDate />,
+    "birth-date-partial": () => <DateDemo.BirthDatePartial />,
+    time: () => <DateDemo.Time />,
+    readout: () => <DateDemo.Readout />,
+    "antd-migration": () => <DateDemo.FromAntd />,
+    anatomy: () => <DateDemo.Anatomy />,
+    calendar: () => <DateDemo.MonthCalendar />,
+    multiple: () => <DateDemo.Multiple />,
+    range: () => <DateDemo.Range />,
+    "range-panel": () => <DateDemo.RangePanel />,
+    "date-range": () => <DateDemo.RangeField />,
+    session: () => <DateDemo.Session />,
+    overnight: () => <DateDemo.SessionEdges />,
+    bands: () => <DateDemo.Bands />,
+    "time-range": () => <DateDemo.TimeRange />,
+    slots: () => <DateDemo.Slots />,
+    exhausted: () => <DateDemo.SlotsExhausted />,
+    scheduler: () => <DateDemo.Scheduler />,
+    recurrence: () => <DateDemo.Recurrence />,
+    "recurrence-refused": () => <DateDemo.RecurrenceRefused />,
+    series: () => <DateDemo.Series />,
+    "series-arithmetic": () => <DateDemo.Group />,
+    dst: () => <DateDemo.Dst />,
+    family: () => <DateDemo.Family />,
+    "theme-density": () => <DateDemo.ThemeDensity />,
   },
 
   signature: {

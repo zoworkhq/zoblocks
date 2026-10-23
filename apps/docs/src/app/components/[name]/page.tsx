@@ -10,7 +10,6 @@ import { SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { PropsTable } from "@/components/site/props-table";
 import { ComponentPreview } from "@/components/site/component-preview";
 import { CopilotGallery } from "@/components/site/copilot-gallery";
-import { DatePickerGallery } from "@/components/site/date-picker-gallery";
 import { RevealRoot } from "@/components/site/interactions";
 import { SignatureDemo } from "@/components/site/signature-demo";
 import { LanguageSwitch } from "@/components/site/language-switch";
@@ -368,7 +367,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
   const importFrom = isPackage
     ? (component.packageName ?? `@/components/zoblocks/${component.name}`)
     : `@/components/zoblocks/${component.name}`;
-  const hasGallery = ["date-picker", "copilot"].includes(component.name);
+  const hasGallery = ["copilot"].includes(component.name);
   /*
    * Examples that declare a group are listed under it, in declaration order of
    * the first example in each group. "On this page" then lists the groups
@@ -721,24 +720,10 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
               )}
 
               {/* Gallery --------------------------------------------------- */}
-              {/*
-                The date control makes a claim about sameness — many variants,
-                one contract — and a claim about sameness cannot be shown with
-                one example. Copilot's gallery shows the part that is not a
-                chat box.
-              */}
+              {/* Copilot's gallery shows the part that is not a chat box. */}
               {hasGallery && (
-                <DocSection
-                  id="gallery"
-                  title="Gallery"
-                  lead={
-                    component.name === "date-picker"
-                      ? `${component.variants?.length ?? 0} variants, one contract — live.`
-                      : "The part that is not a chat box."
-                  }
-                >
+                <DocSection id="gallery" title="Gallery" lead="The part that is not a chat box.">
                   <HostStage className="flex w-full min-w-0 flex-col">
-                    {component.name === "date-picker" && <DatePickerGallery />}
                     {component.name === "copilot" && <CopilotGallery />}
                   </HostStage>
                 </DocSection>

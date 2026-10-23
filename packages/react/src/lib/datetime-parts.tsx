@@ -1530,6 +1530,12 @@ export const DateRangeField = React.forwardRef<HTMLDivElement, DateRangeFieldPro
                 months={months}
                 range={range}
                 onRangeChange={(next) => {
+                  // A pick is not typing, so the halves show it here. `write`
+                  // marks the value as this field's own, which stands down the
+                  // sync that would otherwise redraw them — so without this the
+                  // range changed and both halves stayed empty.
+                  setStartSegments(dateToSegments(next.start));
+                  setEndSegments(dateToSegments(next.end));
                   write(next);
                   if (commit === "explicit") dismiss();
                 }}
@@ -2274,9 +2280,21 @@ export const TimeRangeField = React.forwardRef<HTMLDivElement, TimeRangeFieldPro
       [reasonForEnd, startMinutes],
     );
 
+    /*
+     * A pick from the columns is not typing, so the halves show it here.
+     * `write` marks the value as this field's own, which stands down the sync
+     * that would otherwise redraw them — so without this the range changed
+     * and both halves stayed as they were.
+     */
+    const writePicked = (next: ZbTimeRange) => {
+      setStartSegments(timeToSegments(next.start, hour24));
+      setEndSegments(timeToSegments(next.end, hour24));
+      write(next);
+    };
+
     const setPanelRange = (next: ZbTimeRange) => {
       if (commit === "explicit") setDraft(next);
-      else write(next);
+      else writePicked(next);
     };
 
     const duration = timeRangeMinutes(range, { allowOvernight });
@@ -2466,7 +2484,7 @@ export const TimeRangeField = React.forwardRef<HTMLDivElement, TimeRangeFieldPro
                         className="zb-dt-cal__action zb-dt-cal__action--primary"
                         disabled={!draft.start || !draft.end}
                         onClick={() => {
-                          write(draft);
+                          writePicked(draft);
                           dismiss();
                         }}
                       >

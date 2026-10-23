@@ -75,7 +75,7 @@ function settings(control: Control): unknown[] {
 function outcome(container: HTMLElement): "component" | "explained" | "blank" {
   if (
     container.querySelector(
-      "[data-zb-tab], [data-zb-signature], [data-zb-loader], [data-zb-accordion], .zb-cs, [data-zb-menu], [role='switch'], [role='radiogroup'], nav",
+      "[data-zb-tab], [data-zb-signature], [data-zb-loader], [data-zb-accordion], .zb-cs, [data-zb-menu], [class^='zb-dt'], [class*=' zb-dt'], [role='switch'], [role='radiogroup'], nav",
     )
   ) {
     return "component";
@@ -162,8 +162,19 @@ describe.each(components.map((c) => [c.name, c] as const))("%s playground", (nam
     }
   }
 
-  it("has a pair space worth walking", () => {
-    expect(pairs.length).toBeGreaterThan(20);
+  /*
+   * A one-knob playground has no pairs: its whole setting space is its
+   * singles, so that is what the size and majority checks walk. Date Picker
+   * is the case — its front door is a union, and the one prop every member
+   * shares is the `variant` that chooses between them.
+   */
+  const space =
+    controls.length > 1
+      ? pairs
+      : singles.map(([label, prop, value]) => [label, { [prop]: value }] as const);
+
+  it("has a setting space worth walking", () => {
+    expect(space.length).toBeGreaterThan(controls.length > 1 ? 20 : 8);
   });
 
   // Tallied by the walk below rather than re-rendered: the majority check
@@ -171,7 +182,7 @@ describe.each(components.map((c) => [c.name, c] as const))("%s playground", (nam
   // timeout for no extra coverage.
   const tally = { component: 0, explained: 0, blank: 0 };
 
-  it.each(pairs)("survives %s", async (label, applied) => {
+  it.each(space)("survives %s", async (label, applied) => {
     const result = await renderWith(name, controls, applied);
     tally[result] += 1;
     expect(result, `${name} left a blank panel with ${label}`).not.toBe("blank");
@@ -185,12 +196,12 @@ describe.each(components.map((c) => [c.name, c] as const))("%s playground", (nam
    * cannot actually assemble, and the fix is the renderer rather than a
    * bigger net.
    */
-  it("shows the component for the overwhelming majority of the pair space", () => {
+  it("shows the component for the overwhelming majority of the setting space", () => {
     const walked = tally.component + tally.explained + tally.blank;
-    expect(walked, "the pair walk did not run before this check").toBe(pairs.length);
+    expect(walked, "the walk did not run before this check").toBe(space.length);
     expect(
       tally.component / walked,
-      `${name}: only ${tally.component}/${walked} pairs render the component (${tally.explained} explained)`,
+      `${name}: only ${tally.component}/${walked} settings render the component (${tally.explained} explained)`,
     ).toBeGreaterThan(0.9);
   });
 });
