@@ -251,8 +251,13 @@ function Row({ label, children }: { label: React.ReactNode; children: React.Reac
 /**
  * Status with a text label, never colour alone.
  *
- * The `·` glyph is aria-hidden decoration; the state itself is always the
+ * The `●` glyph is aria-hidden decoration; the state itself is always the
  * adjacent text, which is what survives forced colors and colour blindness.
+ *
+ * Only the glyph takes the tone. The words used to as well, and antd's
+ * warning and error hues are signal colours, not text colours — #faad14 on
+ * white is 1.9:1 and #ff4d4f is 3.3:1, so the one part of the status that
+ * carries the meaning was the part a low-vision reader could not read.
  */
 function StatusText({
   tone,
@@ -269,8 +274,10 @@ function StatusText({
   }[tone];
 
   return (
-    <span style={{ color, fontWeight: 500 }}>
-      <span aria-hidden="true">● </span>
+    <span style={{ fontWeight: 500 }}>
+      <span style={{ color }} aria-hidden="true">
+        ●{" "}
+      </span>
       {children}
     </span>
   );
