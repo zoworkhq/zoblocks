@@ -21,7 +21,7 @@
   line-height: 1;
   white-space: nowrap;
   vertical-align: middle;
-  color: var(--zb-text-subtle, var(--zb-text-muted, #64748b));
+  color: var(--zb-prov-text, var(--zb-text-subtle, var(--zb-text-muted, #64748b)));
 }
 
 /*
@@ -257,4 +257,9 @@ button.zb-prov:focus-visible,
     color: #000;
     border: 1px solid #000;
   }
+}
+
+/* Improve provenance text contrast in the light theme. */
+html:not(.dark):not([data-zb-theme="high-contrast"]) .zb-prov {
+  --zb-prov-text: #5b6678;
 }
