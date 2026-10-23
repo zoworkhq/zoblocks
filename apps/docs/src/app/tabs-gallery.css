@@ -834,12 +834,6 @@
   color: var(--color-graphite);
 }
 
-/* Dimmed until it is the one being pointed at, so the column reads as one
-   active note rather than six competing paragraphs. */
-.zb-dt-tour__note:not(.zb-dt-tour__note--on) .zb-dt-tour__body {
-  opacity: 0.72;
-}
-
 .zb-dt-tour__halo {
   position: absolute;
   inset-block-start: 0;
