@@ -29,10 +29,18 @@ async function settle(page: Page) {
   await expect(page.locator("[data-zb-recorder]").first()).toBeVisible();
 }
 
-/** Select one of the state-browser scenarios by its rail label. */
-async function scenario(page: Page, label: string) {
-  await page.getByRole("tab", { name: label }).click();
-  await page.waitForTimeout(120);
+/**
+ * The live preview of one example.
+ *
+ * Every state is its own example on the page, in a panel with a stable id, and
+ * several of them carry the same signal switch and the same art. A lookup that
+ * is not scoped to its panel reaches whichever copy comes first.
+ */
+async function example(page: Page, id: string) {
+  const panel = page.locator(`#ex-${id}-panel-preview`);
+  await panel.scrollIntoViewIfNeeded();
+  await expect(panel.locator("[data-zb-recorder]").first()).toBeVisible();
+  return panel;
 }
 
 /**
@@ -62,9 +70,9 @@ test.describe("visual regression", () => {
   test("@vrt the playback art is visually stable", async ({ page }) => {
     await page.goto(RECORDER);
     await settle(page);
-    await scenario(page, "Who spoke when");
+    const panel = await example(page, "duet");
 
-    const art = page.locator('[data-zb-recorder="duet"]').first();
+    const art = panel.locator('[data-zb-recorder="duet"]').first();
     await expect(art).toBeVisible();
     // Peaks in, pixels out: no clock anywhere in this art, so the frame is a
     // property of the data rather than of when the shot was taken.
@@ -74,16 +82,16 @@ test.describe("visual regression", () => {
   test("@vrt the marker lane keeps a struck span visible", async ({ page }) => {
     await page.goto(RECORDER);
     await settle(page);
-    await scenario(page, "Who spoke when");
-    await expect(page.locator(".zb-rec-markbar")).toHaveScreenshot("recorder-markers.png");
+    const panel = await example(page, "duet");
+    await expect(panel.locator(".zb-rec-markbar")).toHaveScreenshot("recorder-markers.png");
   });
 
   test("@vrt the disposition strip is visually stable", async ({ page }) => {
     await page.goto(RECORDER);
     await settle(page);
-    await scenario(page, "Where the recording is");
+    const panel = await example(page, "disposition");
     // No waveform and no transport, so nothing here has a clock either.
-    const strip = page.locator('[data-zb-recorder="disposition"]').first();
+    const strip = panel.locator('[data-zb-recorder="disposition"]').first();
     await expect(strip).toBeVisible();
     await expect(strip).toHaveScreenshot("recorder-disposition-held.png");
   });
@@ -91,8 +99,8 @@ test.describe("visual regression", () => {
   test("@vrt the transcript art is visually stable", async ({ page }) => {
     await page.goto(RECORDER);
     await settle(page);
-    await scenario(page, "Live transcript");
-    const art = page.locator('[data-zb-recorder="stream"]').first();
+    const panel = await example(page, "transcript");
+    const art = panel.locator('[data-zb-recorder="stream"]').first();
     await expect(art).toHaveScreenshot("recorder-stream.png");
   });
 });
@@ -101,9 +109,9 @@ test.describe("the art is a function of the signal", () => {
   test("@a11y the lane stops when the frames stop", async ({ page }) => {
     await page.goto(RECORDER);
     await settle(page);
-    await scenario(page, "Capturing");
+    const panel = await example(page, "recording");
 
-    const lane = page.locator(".zb-rec-lane").first();
+    const lane = panel.locator(".zb-rec-lane").first();
     const read = () =>
       lane.evaluate((el) =>
         [...el.children].map((b) => (b as HTMLElement).style.getPropertyValue("--_h")).join(","),
@@ -123,19 +131,17 @@ test.describe("the art is a function of the signal", () => {
   test("@a11y unplugging the device names the fault and holds the audio", async ({ page }) => {
     await page.goto(RECORDER);
     await settle(page);
-    // The state browser only shows the selected scenario, so the switch has to
-    // be brought on screen before it can be pressed.
-    await scenario(page, "Capturing");
+    const panel = await example(page, "recording");
 
-    await page.getByRole("button", { name: "Device unplugged" }).click();
+    await panel.getByRole("button", { name: "Device unplugged" }).click();
     await page.waitForTimeout(200);
 
-    const alert = page.getByRole("alert").first();
+    const alert = panel.getByRole("alert").first();
     await expect(alert).toContainText("disconnected");
     // The distinction that keeps a pipeline from throwing away the expensive
     // artefact because the cheap one broke.
     await expect(alert).toContainText("not lost");
-    await expect(page.locator("[data-zb-recorder]").first()).toHaveAttribute(
+    await expect(panel.locator("[data-zb-recorder]").first()).toHaveAttribute(
       "data-fault",
       "critical",
     );
