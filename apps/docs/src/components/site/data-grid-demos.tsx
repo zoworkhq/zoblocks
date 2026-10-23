@@ -234,8 +234,17 @@ export function ExportSurface() {
     <div className="grid w-full min-w-0 gap-3">
       <Grid rows={rows} coverage={{ shown: 2, total: 312, noun: "clients" }} />
       <div className="grid gap-1">
-        <span className="text-xs font-medium text-ink">toGridDelimited(rows, columns)</span>
-        <pre className="scroll-thin m-0 max-h-48 overflow-auto rounded-lg border border-rule bg-paper-sunk p-3 font-mono text-[0.6875rem] leading-relaxed text-ink">
+        <span id="grid-export-label" className="text-xs font-medium text-ink">
+          toGridDelimited(rows, columns)
+        </span>
+        {/* It scrolls, so it takes focus: a keyboard has no other way to read
+            the lines past the fold. */}
+        <pre
+          role="region"
+          aria-labelledby="grid-export-label"
+          tabIndex={0}
+          className="scroll-thin m-0 max-h-48 overflow-auto rounded-lg border border-rule bg-paper-sunk p-3 font-mono text-[0.6875rem] leading-relaxed text-ink"
+        >
           {csv}
         </pre>
       </div>
