@@ -46,6 +46,14 @@ export default defineConfig({
         replacement: path.join(root, "../../registry/zoblocks/lib/grid.ts"),
       },
       {
+        find: /^@\/lib\/timeline-(core|fhir)$/,
+        replacement: path.join(root, "../../registry/zoblocks/lib/timeline-$1.ts"),
+      },
+      {
+        find: /^@\/components\/zoblocks\/timeline$/,
+        replacement: path.join(root, "../../registry/zoblocks/timeline/timeline.tsx"),
+      },
+      {
         find: /^@\/lib\/zoblocks-menu$/,
         replacement: path.join(root, "../../registry/zoblocks/lib/menu.ts"),
       },

@@ -17,6 +17,7 @@ export const PLAYGROUND_COMPONENTS: ReadonlySet<string> = new Set([
   "chart-context-menu",
   "date-picker",
   "data-grid",
+  "care-timeline",
   "clinical-status",
   "tabs",
   "signature",

@@ -110,6 +110,341 @@ export default defineComponentMeta({
     "chart-context-menu",
   ],
 
+  controls: [
+    {
+      prop: "layout",
+      control: "select",
+      label: "Layout",
+      options: ["default", "card", "compact", "register"],
+      defaultValue: "default",
+    },
+    {
+      prop: "group",
+      control: "select",
+      label: "Group by",
+      options: ["auto", "month", "quarter", "year", "none"],
+      defaultValue: "auto",
+    },
+    {
+      prop: "audience",
+      control: "segmented",
+      label: "Audience",
+      options: ["clinician", "patient"],
+      defaultValue: "clinician",
+    },
+    { prop: "filters", control: "switch", label: "Register filter", defaultValue: false },
+    { prop: "jump", control: "switch", label: "Jump control", defaultValue: false },
+    { prop: "onSelect", control: "event", label: "onSelect" },
+    { prop: "onLoadOlder", control: "event", label: "onLoadOlder" },
+    { prop: "onRegistersChange", control: "event", label: "onRegistersChange" },
+  ],
+
+  examples: [
+    /* ---------------------------------------------------------------- */
+    /* What it is a view of                                              */
+    /* ---------------------------------------------------------------- */
+    {
+      id: "chart",
+      group: "What it is a view of",
+      title: "Newest first, and the footer says of what",
+      description:
+        "Fourteen months, two source systems, one of them down, grouped by month. Read the footer first: the window, the order, the counts and which sources answered. It is a required prop, and it prints.",
+      code: `<CareTimeline
+  aria-label="Care timeline for Ada Lovelace"
+  events={events}
+  now={serverTime}
+  coverage={{
+    window: { from: "2025-07-01" },
+    order: "newest-first",
+    total: 43,
+    hidden: [{ reason: "access", count: 2 }],
+    sources: [
+      { id: "ehr", label: "Northside EHR", status: "ok" },
+      { id: "hie", label: "Northside Regional Exchange", status: "unavailable" },
+    ],
+  }}
+  onLoadOlder={() => fetchOlder()}
+/>`,
+    },
+    {
+      id: "source-down",
+      group: "What it is a view of",
+      title: "A source that could not be reached",
+      description:
+        'The repeat-CT case, caught. An unavailable source is a role="alert" banner above the list, not a grey footnote under it, because the reader is about to turn an absence into a clinical fact.',
+      code: `<CareTimeline
+  {...props}
+  coverage={{
+    ...coverage,
+    sources: [
+      { id: "ehr", label: "Northside EHR", status: "ok" },
+      {
+        id: "hie",
+        label: "Northside Regional Exchange",
+        status: "unavailable",
+        detail: "Timed out after 8s.",
+      },
+    ],
+  }}
+/>`,
+    },
+    {
+      id: "gap",
+      group: "What it is a view of",
+      title: "A stated gap in coverage",
+      description:
+        "Every source answered and the caller still knows of a hole, so it says so: the rail goes dashed across the missing weeks and a sentence names why. Gaps are declared, never inferred — eleven quiet weeks are not evidence of anything.",
+      code: `<CareTimeline
+  {...props}
+  coverage={{
+    ...coverage,
+    gaps: [
+      { from: "2026-04-03", to: "2026-06-21", reason: "the clinic changed record systems" },
+    ],
+  }}
+/>`,
+    },
+    {
+      id: "filtered",
+      group: "What it is a view of",
+      title: "Filtered, with the hidden count stated",
+      description:
+        "One register on, and the count it hides is said beside the list rather than inside a popover that is usually off screen. Toggle a register and the line below shows what the host was told.",
+      code: `<CareTimeline
+  {...props}
+  filters
+  defaultRegisters={["clinical"]}
+  onRegistersChange={(registers) => save(registers)}
+/>`,
+    },
+    {
+      id: "empty",
+      group: "What it is a view of",
+      title: "No record · none in this window · none you may see",
+      description:
+        "Three different facts with three different next actions. Rendering them as one empty card is the ambiguity that produces a repeat scan.",
+      code: `// Nothing anywhere
+<CareTimeline {...props} events={[]} coverage={{ order: "newest-first", sources }} />
+
+// Nothing in the window that was searched
+<CareTimeline
+  {...props}
+  events={[]}
+  coverage={{ order: "newest-first", window: { from: "2025-01-01", to: "2025-12-31" }, sources }}
+/>
+
+// Records exist, and none are yours to read
+<CareTimeline
+  {...props}
+  events={[]}
+  coverage={{ order: "newest-first", hidden: [{ reason: "access", count: 3 }], sources }}
+/>`,
+    },
+    {
+      id: "card",
+      group: "What it is a view of",
+      title: "The dashboard card",
+      description:
+        "Five entries beside other cards — the shape most patient timelines ship as. The difference is one line: five of 43, newest first, one of two sources reached. Without it, five of forty-three reads as a complete account.",
+      code: `<CareTimeline {...props} layout="card" limit={5} />`,
+    },
+
+    /* ---------------------------------------------------------------- */
+    /* Planned and happened                                              */
+    /* ---------------------------------------------------------------- */
+    {
+      id: "planned",
+      group: "Planned and happened",
+      title: "Planned, above the now marker",
+      description:
+        "A future event sits above a now marker, and now is the caller's server time rather than the browser clock — a clinic laptop with the wrong date should not move an appointment into the past.",
+      code: `<CareTimeline
+  {...props}
+  now={serverTime}
+  events={[
+    {
+      id: "appt-endo",
+      kind: "appointment",
+      occurred: "2026-09-02T09:30:00+05:30",
+      status: "planned",
+      title: "Endocrinology review",
+    },
+    ...events,
+  ]}
+/>`,
+    },
+    {
+      id: "lapsed",
+      group: "Planned and happened",
+      title: "Lapsed — planned, and nothing recorded against it",
+      description:
+        "A planned screening whose date has passed with no encounter against it. It says exactly that — not missed, not a no-show, which are conclusions the record cannot support.",
+      code: `{
+  id: "appt-retinal",
+  kind: "appointment",
+  occurred: "2026-08-05T11:00:00+05:30",
+  status: "planned", // and now is after it
+  title: "Diabetic retinal screening",
+}`,
+    },
+    {
+      id: "cancelled",
+      group: "Planned and happened",
+      title: "Cancelled is not did-not-connect",
+      description:
+        "Somebody decided, and somebody tried and failed: two different facts that must not share a chip. Actor and recipient are separate fields, so the reminder cannot end up addressed to the caller.",
+      code: `[
+  {
+    id: "call-followup",
+    kind: "call",
+    status: "not-done",
+    title: "Follow-up call",
+    actor: { name: "Priya Menon", role: "Front desk" },
+    recipient: { name: "The patient" },
+  },
+  {
+    id: "appt-cancelled",
+    kind: "appointment",
+    status: "cancelled",
+    title: "Podiatry review",
+    detail: "Cancelled by the clinic.",
+  },
+]`,
+    },
+
+    /* ---------------------------------------------------------------- */
+    /* Corrections and access                                            */
+    /* ---------------------------------------------------------------- */
+    {
+      id: "amended",
+      group: "Corrections and access",
+      title: "Amended, with what changed",
+      description:
+        "An amendment chip with no delta tells the reader something changed and withholds the one thing they need. The revision carries what it was, when and why.",
+      code: `{
+  id: "lab-hba1c",
+  kind: "laboratory",
+  status: "amended",
+  title: "HbA1c — 8.9%",
+  revision: { at: "2026-08-15T16:20:00+05:30", was: "9.4%", reason: "result value corrected" },
+}`,
+    },
+    {
+      id: "in-error",
+      group: "Corrections and access",
+      title: "Entered in error, retained and struck",
+      description:
+        "Kept and marked rather than filtered out of the query — the one behaviour the record's own rules forbid. A strike, a chip and a sentence, so it survives a monochrome print.",
+      code: `{
+  id: "enc-ed",
+  kind: "encounter",
+  status: "in-error",
+  title: "Emergency department attendance",
+  revision: {
+    at: "2026-07-31",
+    by: { name: "Dr A Rahman" },
+    reason: "recorded against this patient in error",
+  },
+}`,
+    },
+    {
+      id: "restricted",
+      group: "Corrections and access",
+      title: "Restricted — it exists and you may not read it",
+      description:
+        "It says something is here without saying what. Dropping it would misrepresent the record to a reader with no way to know.",
+      code: `{
+  id: "doc-outside",
+  kind: "document",
+  occurred: "2026-06-22",
+  title: "Discharge summary", // never rendered
+  access: { kind: "withheld", reason: "Kept separately by its author." },
+}`,
+    },
+    {
+      id: "consent",
+      group: "Corrections and access",
+      title: "Consent-gated",
+      description:
+        "A Part 2 note the reader may open, once they record why. The date and the fact of a record are shown; the title waits behind the reason.",
+      code: `{
+  id: "note-psych",
+  kind: "note",
+  occurred: "2026-07-14",
+  title: "Psychotherapy progress note",
+  access: { kind: "consent", policy: "42 CFR Part 2", state: "granted" },
+}`,
+    },
+
+    /* ---------------------------------------------------------------- */
+    /* Reading                                                           */
+    /* ---------------------------------------------------------------- */
+    {
+      id: "thread",
+      group: "Reading",
+      title: "A thread with its own steps",
+      description:
+        "Sent, returned and reviewed happened on different days. Flattening them into one line loses the only question anyone asks of an intake form: has anybody read it?",
+      code: `{
+  id: "q-history",
+  kind: "questionnaire",
+  title: "Pre-visit medical history",
+  steps: [
+    { label: "Sent to the patient", at: "2026-08-11T09:00:00+05:30", state: "done" },
+    { label: "Returned by the patient", at: "2026-08-11T21:34:00+05:30", state: "done" },
+    { label: "Not yet reviewed", state: "open" },
+  ],
+}`,
+    },
+    {
+      id: "cluster",
+      group: "Reading",
+      title: "A cluster, and a critical event kept out of one",
+      description:
+        "Four routine observations in three days fold into one disclosure. The critical potassium beside them stays on the rail — nothing a reader would act on is ever collapsed.",
+      code: `<CareTimeline {...props} cluster={{ kinds: ["observation"], within: "P3D", min: 3 }} />`,
+    },
+    {
+      id: "new-since",
+      group: "Reading",
+      title: "New since last reviewed",
+      description:
+        "A divider at the reader's last review splits the group into two named lists, so a rotor lands on it. A note recorded six days after the visit is marked late rather than slipping in below the line.",
+      code: `<CareTimeline {...props} seenThrough={lastReviewedAt} lateEntryAfter="P2D" />`,
+    },
+    {
+      id: "imprecise",
+      group: "Reading",
+      title: "An imprecise date, kept imprecise",
+      description:
+        "A FHIR 2019 means 2019. Widening it to 1 January invents a precision nobody recorded. A stamp with an offset renders in the record's zone, not the reader's.",
+      code: `<CareTimeline
+  {...props}
+  group="none"
+  events={[
+    { id: "cond-gdm", kind: "condition", occurred: "2019", title: "Gestational diabetes" },
+    ...events,
+  ]}
+/>`,
+    },
+    {
+      id: "register",
+      group: "Reading",
+      title: "Clinical on one side, everything else on the other",
+      description:
+        "Sides alternate on a fact — which register an event is in — rather than to fill space. Under 768px it collapses to one column and the register survives as the kind label. Jump moves between periods and never changes what is shown.",
+      code: `<CareTimeline {...props} layout="register" group="month" jump />`,
+    },
+    {
+      id: "patient",
+      group: "Reading",
+      title: "Patient-facing, with a result not yet reviewed",
+      description:
+        "A different catalogue, not a softer tone: Visit and Test result rather than Encounter and Laboratory. A result can reach the patient before anyone has looked at it, so the portal has to be able to say so.",
+      code: `<CareTimeline {...props} audience="patient" aria-label="Your care timeline" />`,
+    },
+  ],
+
   dependencies: ["clsx", "tailwind-merge"],
   registryDependencies: ["utils", "tokens", "timeline-core", "timeline-fhir", "timeline"],
 
