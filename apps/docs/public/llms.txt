@@ -134,9 +134,8 @@ Rules that matter when generating code with these components:
   fhir: Patient, Task
   states: Four charts, one active, A pinned chart, An unsigned note, A draft order, Two charts with similar names, Closing a clean chart, Closing one with an unsigned note, Closing one with a draft order, Returning after fifteen minutes, Expanded panel, Keyboard reordering, Roving focus across the stack, One chart, Notes owed across the caseload
   status: stable
-- Result Value: A single observation rendered so that the four ways a number can lie to you are all impossible.
+- [Result Value](https://zoblocks.design/components/result-value): A single observation rendered so that the four ways a number can lie to you are all impossible.
   install: npx @zoblocks/cli add result-value
-  docs: no page yet — this component installs from the registry today
   fhir: Observation
   states: Final, in range, Critical, with a delta, Preliminary — not verified by the laboratory, Corrected — the superseded value is shown, No reference range for this patient, A range that needs its qualification, Delta suppressed — the method changed, Patient-reported, Extracted by a model, Absent — never ordered, Absent — awaiting a result, Absent — cancelled, Absent — specimen problem, Absent — patient declined, Absent — restricted, and a value exists, Absent — no value and no reason, Compact, in a grid, Interactive — opens the report
   status: stable
