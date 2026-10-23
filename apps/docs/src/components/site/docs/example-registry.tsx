@@ -29,6 +29,7 @@ import * as SignatureDemo from "../signature-demos";
 import * as DateDemo from "../date-picker-demos";
 import * as GridDemo from "../data-grid-demos";
 import * as TimelineDemo from "../care-timeline-demos";
+import * as RecDemo from "../recorder-demos";
 
 /* ------------------------------------------------------------------ */
 /* Stand-ins for the host application                                  */
@@ -306,6 +307,23 @@ export const EXAMPLE_PREVIEWS: Readonly<
     loading: () => <GridDemo.LoadingMore />,
     "host-framed": () => <GridDemo.HostFramed />,
     export: () => <GridDemo.ExportSurface />,
+  },
+
+  recorder: {
+    recording: () => <RecDemo.Capturing />,
+    console: () => <RecDemo.EncounterSurface />,
+    "single-control": () => <RecDemo.SingleControl />,
+    dictation: () => <RecDemo.InlineDictation />,
+    muted: () => <RecDemo.MicrophoneMuted />,
+    "device-lost": () => <RecDemo.DeviceLost />,
+    "wrong-device": () => <RecDemo.WrongDevice />,
+    "no-consent": () => <RecDemo.AwaitingConsent />,
+    held: () => <RecDemo.HeldNotSent />,
+    disposition: () => <RecDemo.WhereItIs />,
+    duet: () => <RecDemo.WhoSpokeWhen />,
+    "duet-no-speakers": () => <RecDemo.WithoutDiarisation />,
+    transcript: () => <RecDemo.LiveTranscript />,
+    stalled: () => <RecDemo.TranscriptStalled />,
   },
 
   "care-timeline": {

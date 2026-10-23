@@ -37,6 +37,7 @@ import { BUPRENORPHINE, MenuRow, PLAYGROUND_ACTIONS } from "./chart-context-menu
 import { DatePickerPlayground, datePickerPlaygroundAttrs } from "./date-picker-demos";
 import { DataGridPlayground } from "./data-grid-demos";
 import { CareTimelinePlayground } from "./care-timeline-demos";
+import { RecorderPlayground, recorderPlaygroundAttrs } from "./recorder-demos";
 import type { DatePickerVariant } from "@/registry/zoblocks/date-picker/date-picker";
 import { PLAYGROUND_COMPONENTS } from "./playground-registry";
 import { useSiteTheme } from "./use-site-theme";
@@ -158,6 +159,11 @@ const RENDERERS: Record<string, (props: Props) => React.ReactNode> = {
    * every knob has something to act on. Scrolls in its own region.
    */
   "care-timeline": (props) => <CareTimelinePlayground {...props} />,
+  /*
+   * Each art with the input it reads — the demo microphone, a finished take,
+   * or a transcript — so switching art never lands on an empty pane.
+   */
+  recorder: (props) => <RecorderPlayground {...props} />,
   /*
    * One knob, sixteen surfaces. Each variant gets the fixtures its examples
    * use, because most of the family is data-shaped — a slot grid with no set
@@ -336,6 +342,8 @@ function normalise(name: string, props: Props): Props {
 const FIXED_ATTRS: Record<string, readonly string[] | ((props: Props) => readonly string[])> = {
   // Per variant: what a slot grid needs is not what a birth date needs.
   "date-picker": datePickerPlaygroundAttrs,
+  // Per art: duet reads a take, stream a transcript, the rest a microphone.
+  recorder: recorderPlaygroundAttrs,
   "care-timeline": [
     'aria-label="Care timeline for Ada Lovelace"',
     "events={events}",
