@@ -79,7 +79,7 @@ describe("example previews", () => {
     }
   });
 
-  it("previews every loader, Tabs, Switch, Accordion, Clinical Status, Chart Context Menu, Signature and Date Picker example", async () => {
+  it("previews every loader, Tabs, Switch, Accordion, Clinical Status, Chart Context Menu, Signature, Date Picker and Data Grid example", async () => {
     const { EXAMPLE_PREVIEWS } = await import("@/components/site/docs/example-registry");
     const { CATALOG } = await import("@/lib/generated/catalog");
     for (const name of [
@@ -95,6 +95,7 @@ describe("example previews", () => {
       "chart-context-menu",
       "signature",
       "date-picker",
+      "data-grid",
     ]) {
       const ids = (CATALOG.find((c) => c.name === name)?.examples ?? []).map((e) => e.id);
       expect(ids.length).toBeGreaterThanOrEqual(3);

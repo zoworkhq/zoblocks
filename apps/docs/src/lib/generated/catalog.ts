@@ -6301,6 +6301,18 @@ export const CATALOG: ComponentDoc[] = [
         "defaultValue": 1
       },
       {
+        "prop": "masthead",
+        "control": "switch",
+        "label": "Masthead",
+        "defaultValue": true
+      },
+      {
+        "prop": "footer",
+        "control": "switch",
+        "label": "Footer",
+        "defaultValue": true
+      },
+      {
         "prop": "onSortChange",
         "control": "event",
         "label": "onSortChange"
@@ -6388,44 +6400,107 @@ export const CATALOG: ComponentDoc[] = [
       {
         "id": "coverage",
         "title": "Coverage is arithmetic, not a footer note",
-        "description": "The claim goes above the rows it is about. Rendering the page size as the total is the one failure this type exists to prevent.",
+        "description": "The claim goes above the rows it is about: 6 of 312, and the predicate that produced them. Rendering the page size as the total is the one failure this type exists to prevent — and aria-rowcount says 313, so a screen reader hears the same number.",
         "fixture": "caseloadPhq9",
-        "code": "describeGridCoverage({ shown: 6, total: 312, noun: \"clients on this caseload\" });\n// → \"6 of 312 clients on this caseload.\"\n\ndescribeGridCoverage({ shown: 6, total: \"unknown\", noun: \"clients\" });\n// → \"6 clients shown. The source did not say how many match.\"\n\ngridUnseenCount({ shown: 6, total: 312 });     // → 306\ngridUnseenCount({ shown: 6, total: \"unknown\" }); // → null"
+        "group": "Coverage",
+        "code": "<DataGrid\n  caption=\"Clients on this team's caseload with a raised PHQ-9 or a recent risk screen\"\n  title=\"Caseload · adult outpatient\"\n  columns={columns}\n  rows={rows}\n  rowKey={(row) => row.mrn}\n  coverage={{\n    shown: rows.length,\n    total: 312,\n    noun: \"clients on this team's caseload\",\n    predicate: \"PHQ-9 of 10 or more, or a risk screen in the last 14 days.\",\n  }}\n/>"
       },
       {
-        "id": "absence",
-        "title": "An absence sorts last, in both directions",
-        "description": "A PHQ-9 the client has not completed is not a PHQ-9 of zero. Four “Awaiting” rows above a score of 7 tells a reader the caseload is doing better than it is.",
-        "fixture": "caseloadPhq9",
-        "code": "const phq9 = { key: \"phq9\", header: \"PHQ-9\", kind: \"measure\",\n               value: (r) => r.phq9 };\n\nsortGridRows(rows, phq9, \"ascending\").map((r) => r.phq9);\n// → [7, 11, 18, 22, { absent: \"awaiting\" }, { absent: \"restricted\" }]\n\nsortGridRows(rows, phq9, \"descending\").map((r) => r.phq9);\n// → [22, 18, 11, 7, { absent: \"awaiting\" }, { absent: \"restricted\" }]"
+        "id": "unknown-total",
+        "title": "A total the source will not give",
+        "description": "Bundle.total is optional in FHIR, so “the server did not say” is the common case, not an edge. The grid says so in words and sets aria-rowcount to -1 rather than inventing a denominator.",
+        "fixture": "unknownTotal",
+        "group": "Coverage",
+        "code": "<DataGrid\n  {...props}\n  coverage={{ shown: rows.length, total: \"unknown\", noun: \"clients\" }}\n/>\n// → \"6 clients shown. The source did not say how many match.\""
       },
       {
-        "id": "derived",
-        "title": "Sorting by a model is ranking a prediction",
-        "description": "The derivation travels with the column, so the footnote is generated rather than remembered. Sorting by it promotes the footnote to a statement under the table.",
-        "fixture": "caseloadPhq9",
-        "code": "describeGridDerivation({\n  model: \"disengagement\",\n  version: \"v1.8\",\n  validatedOn: \"9,140 outpatient episodes\",\n  population: \"adults, English-language intake only\",\n});\n// → \"disengagement v1.8, validated on 9,140 outpatient episodes,\n//    adults, English-language intake only.\""
+        "id": "everything",
+        "title": "Everything, with nothing hidden",
+        "description": "When every match is on screen the grid says that too — “All 6 referrals” — because silence would leave the reader to guess whether there is more.",
+        "group": "Coverage",
+        "code": "<DataGrid {...props} coverage={{ shown: 6, total: 6, noun: \"referrals\" }} />"
       },
       {
-        "id": "arrivals",
-        "title": "Results arrive; nothing moves",
-        "description": "The grid counts what has landed and holds it. Merging is the reader's decision, taken with a hand on the pointer.",
-        "fixture": "caseloadPhq9",
-        "code": "describeGridArrivals(3, \"11:47\");\n// → \"3 results arrived at 11:47 — nothing moved.\"\n\n<DataGrid arrivals={held} arrivalsAt=\"11:47\" onAdmitArrivals={admit} … />\n// The rows prop never changes until admit() is called."
-      },
-      {
-        "id": "export",
-        "title": "An export is an attack surface",
-        "description": "A patient's preferred name is free text from a registration desk. Nothing turns this off, because the person who opens the file rarely chose the column.",
-        "fixture": "caseloadPhq9",
-        "code": "neutraliseGridCell(\"=cmd|' /C calc'!A0\");   // → \"'=cmd|' /C calc'!A0\"\nneutraliseGridCell(\"＝HYPERLINK(...)\");      // → \"'＝HYPERLINK(...)\"  full-width too\nneutraliseGridCell(\"Ade-Smith\");             // → \"Ade-Smith\"        unchanged\n\ntoGridDelimited(rows, columns, { coverage });\n// Row 1 is the coverage sentence, because an export outlives its screen."
+        "id": "empty",
+        "title": "The predicate matched nobody",
+        "description": "Zero rows is an answer, stated as one — “No clients match.” — with the column headers still drawn, so the reader can see what was being looked for.",
+        "group": "Coverage",
+        "code": "<DataGrid {...props} rows={[]} coverage={{ shown: 0, total: 0, noun: \"clients\" }} />"
       },
       {
         "id": "refusal",
         "title": "A refusal, not a nine-second paint",
-        "description": "Twenty thousand is measured, not chosen. It is where a forty-column model on a shared 4 GB ward workstation stops being usable at handover.",
+        "description": "Above the ceiling the grid refuses rather than degrading, and says what to do instead. Twenty thousand is the measured default — where a forty-column model on a shared ward workstation stops being usable; the example sets 4 to show it.",
         "fixture": "unknownTotal",
-        "code": "gridCapacityRefusal(18_000);   // → null\ngridCapacityRefusal(120_000);\n// → \"120,000 rows is past what this renders on a ward workstation\n//    (the ceiling is 20,000). Narrow the query or move paging to the\n//    server — the grid will not pretend to hold them.\""
+        "group": "Coverage",
+        "code": "<DataGrid\n  {...props}\n  ceiling={4}            // default 20,000\n  coverage={{ shown: 6, total: 1438, noun: \"patients\" }}\n/>"
+      },
+      {
+        "id": "absence",
+        "title": "An absence sorts last, in both directions",
+        "description": "Awaiting, restricted, not recorded, declined, not known — five absences, each in words with its reason in the foot. A PHQ-9 the client has not completed is not a PHQ-9 of zero, so absences sort after every value whichever way the column runs.",
+        "fixture": "caseloadPhq9",
+        "group": "What a cell says",
+        "code": "const phq9 = {\n  key: \"phq9\",\n  header: \"PHQ-9\",\n  kind: \"measure\",\n  value: (row) => row.phq9,    // a number, or { absent: \"awaiting\" | \"restricted\" | … }\n};\n\n<DataGrid {...props} columns={[name, phq9, …]} defaultSort={{ key: \"phq9\", direction: \"ascending\" }} />"
+      },
+      {
+        "id": "derived",
+        "title": "Sorting by a model is ranking a prediction",
+        "description": "The derivation travels with the column, so the footnote is generated rather than remembered. Sorting by it promotes the footnote to a statement under the table: “Sorted by a prediction — see note 1.”",
+        "fixture": "caseloadPhq9",
+        "group": "What a cell says",
+        "code": "const risk = {\n  key: \"risk\",\n  header: \"Disengagement\",\n  kind: \"number\",\n  value: (row) => row.risk,\n  derived: {\n    model: \"disengagement\",\n    version: \"v1.8\",\n    validatedOn: \"9,140 outpatient episodes\",\n    population: \"adults, English-language intake only\",\n  },\n};\n\n<DataGrid {...props} defaultSort={{ key: \"risk\", direction: \"descending\" }} />"
+      },
+      {
+        "id": "arrivals",
+        "title": "Results arrive; nothing moves",
+        "description": "The grid counts what has landed and holds it: “3 results arrived at 11:47 — nothing moved.” Merging is the reader's decision, taken when they ask, because a row that jumps under a pointer is a row somebody acts on by mistake.",
+        "fixture": "caseloadPhq9",
+        "group": "What a cell says",
+        "code": "<DataGrid\n  {...props}\n  rows={rows}\n  arrivals={held}\n  arrivalsAt=\"11:47\"\n  onAdmitArrivals={(arrived) => setRows(merge(rows, arrived))}\n/>\n// rows never changes until the reader asks."
+      },
+      {
+        "id": "reading",
+        "title": "The row the reader is on",
+        "description": "A real grid with two-dimensional navigation. Click a cell and use the arrows: the foot re-states who the row is about — “Row 2 of 312 — Adeyemi, R., MRN 4471902” — at the point of action, where a wrong-patient error happens.",
+        "group": "Reading and acting",
+        "code": "<DataGrid\n  {...props}\n  identify={(row) => ({ primary: row.name, secondary: `MRN ${row.mrn}` })}\n  onRowActivate={(row) => openChart(row.mrn)}\n/>"
+      },
+      {
+        "id": "selected",
+        "title": "Selected, with the verbs that reach them",
+        "description": "Selection is controlled, and only exists when there is something to do with it: omit selectedKeys and there is no checkbox column at all. The bulk bar names how many rows it will act on.",
+        "group": "Reading and acting",
+        "code": "<DataGrid\n  {...props}\n  selectedKeys={selected}\n  onSelectionChange={setSelected}\n  bulkActions={(rows) => (\n    <>\n      <button type=\"button\">Assign clinician</button>\n      <button type=\"button\">Schedule contact · {rows.length}</button>\n    </>\n  )}\n/>"
+      },
+      {
+        "id": "pinned",
+        "title": "Pinned identity, scrolled sideways",
+        "description": "Scroll the grid to the right: the client's name stays. A measure that has scrolled away from the name it belongs to is a number about nobody.",
+        "group": "Reading and acting",
+        "code": "<DataGrid {...props} columns={wideColumns} pinnedColumns={1} maxHeight=\"18rem\" />"
+      },
+      {
+        "id": "loading",
+        "title": "Loading more, and the end of what is known",
+        "description": "Scroll to the bottom: the grid asks, the host appends, and when there is no more it says so instead of waiting forever. It follows FHIR's link.next rather than a pager, because “page 4 of 7” cannot be built against a server that will not give a total.",
+        "group": "Reading and acting",
+        "code": "<DataGrid\n  {...props}\n  rows={loaded}\n  coverage={{ shown: loaded.length, total: \"unknown\", noun: \"clients\" }}\n  maxHeight=\"16rem\"\n  onReachEnd={fetchNext}        // follow Bundle.link.next\n  loadingMore={fetching}\n  exhausted={!nextLink}\n/>"
+      },
+      {
+        "id": "host-framed",
+        "title": "Framed by the host, not by itself",
+        "description": "Inside an application screen that already names the list and its filters, the masthead and foot are the same claim twice. Turn them off; the caption still names the grid for a screen reader, and `describeGridCoverage(coverage)` is the one line the host places instead.",
+        "group": "Framing and export",
+        "code": "<DataGrid {...props} masthead={false} footer={false} />"
+      },
+      {
+        "id": "export",
+        "title": "An export is an attack surface",
+        "description": "A preferred name is free text from a registration desk. Every cell that would start a formula is neutralised — full-width lookalikes too — and row 1 of the file is the coverage sentence, because an export outlives its screen. Nothing turns this off.",
+        "fixture": "caseloadPhq9",
+        "group": "Framing and export",
+        "code": "import { toGridDelimited } from \"@/lib/zoblocks-grid\";\n\nconst csv = toGridDelimited(rows, columns, { coverage });\n// Row 1: \"6 of 312 clients on this team's caseload. PHQ-9 of 10 or more, …\"\n// '=HYPERLINK(…)  ← the leading quote keeps a spreadsheet from running it"
       }
     ],
     "fixtures": [

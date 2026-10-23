@@ -27,6 +27,7 @@ import * as StatusDemo from "../clinical-status-demos";
 import * as MenuDemo from "../chart-context-menu-demos";
 import * as SignatureDemo from "../signature-demos";
 import * as DateDemo from "../date-picker-demos";
+import * as GridDemo from "../data-grid-demos";
 
 /* ------------------------------------------------------------------ */
 /* Stand-ins for the host application                                  */
@@ -287,6 +288,23 @@ export const EXAMPLE_PREVIEWS: Readonly<
     empty: () => <MenuDemo.TwoEmpties />,
     "view-state": () => <MenuDemo.ViewState />,
     submenu: () => <MenuDemo.SubmenuBeside />,
+  },
+
+  "data-grid": {
+    coverage: () => <GridDemo.CoverageAbove />,
+    "unknown-total": () => <GridDemo.UnknownTotal />,
+    everything: () => <GridDemo.Everything />,
+    empty: () => <GridDemo.MatchedNobody />,
+    refusal: () => <GridDemo.Refused />,
+    absence: () => <GridDemo.AbsenceSortsLast />,
+    derived: () => <GridDemo.SortedByDerived />,
+    arrivals: () => <GridDemo.HeldArrivals />,
+    reading: () => <GridDemo.RowReaderIsOn />,
+    selected: () => <GridDemo.Selection />,
+    pinned: () => <GridDemo.PinnedIdentity />,
+    loading: () => <GridDemo.LoadingMore />,
+    "host-framed": () => <GridDemo.HostFramed />,
+    export: () => <GridDemo.ExportSurface />,
   },
 
   "date-picker": {

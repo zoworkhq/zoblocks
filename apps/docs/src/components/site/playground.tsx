@@ -35,6 +35,7 @@ import { ClinicalStatus } from "@/registry/zoblocks/clinical-status/clinical-sta
 import { SCALES, type ScaleName } from "@/lib/zoblocks-clinical-status";
 import { BUPRENORPHINE, MenuRow, PLAYGROUND_ACTIONS } from "./chart-context-menu-demos";
 import { DatePickerPlayground, datePickerPlaygroundAttrs } from "./date-picker-demos";
+import { DataGridPlayground } from "./data-grid-demos";
 import type { DatePickerVariant } from "@/registry/zoblocks/date-picker/date-picker";
 import { PLAYGROUND_COMPONENTS } from "./playground-registry";
 import { useSiteTheme } from "./use-site-theme";
@@ -145,6 +146,12 @@ function chartFor(mode: string, fixture: string): TabsItemProps[] {
 }
 
 const RENDERERS: Record<string, (props: Props) => React.ReactNode> = {
+  /*
+   * The worklist with every interaction live — sort, selection, held
+   * arrivals — so each event knob has something to fire on, and wide columns
+   * so pinning has something to scroll past.
+   */
+  "data-grid": (props) => <DataGridPlayground {...props} />,
   /*
    * One knob, sixteen surfaces. Each variant gets the fixtures its examples
    * use, because most of the family is data-shaped — a slot grid with no set
@@ -323,6 +330,13 @@ function normalise(name: string, props: Props): Props {
 const FIXED_ATTRS: Record<string, readonly string[] | ((props: Props) => readonly string[])> = {
   // Per variant: what a slot grid needs is not what a birth date needs.
   "date-picker": datePickerPlaygroundAttrs,
+  "data-grid": [
+    'caption="Clients on this team\'s caseload"',
+    "columns={columns}",
+    "rows={rows}",
+    "rowKey={(row) => row.mrn}",
+    "coverage={coverage}",
+  ],
   accordion: ["items={chartSections}", 'defaultActiveKey={["risk"]}'],
   "chart-context-menu": [
     "subject={order}",

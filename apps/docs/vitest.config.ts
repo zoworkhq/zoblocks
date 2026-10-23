@@ -42,6 +42,10 @@ export default defineConfig({
         replacement: path.join(root, "../../registry/zoblocks/lib/$1"),
       },
       {
+        find: /^@\/lib\/zoblocks-grid$/,
+        replacement: path.join(root, "../../registry/zoblocks/lib/grid.ts"),
+      },
+      {
         find: /^@\/lib\/zoblocks-menu$/,
         replacement: path.join(root, "../../registry/zoblocks/lib/menu.ts"),
       },
