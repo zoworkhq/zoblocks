@@ -1418,10 +1418,12 @@
   outline-offset: 1px;
 }
 
+/* Set apart by the numeric face and size alone. It was also faded to 0.75,
+   which put an 11px code at 4.0:1 — below text contrast at the size that
+   most needs it. */
 .zb-dt-chip__code {
   font-family: var(--zb-font-numeric, var(--zb-font-mono, monospace));
   font-size: var(--zb-text-2xs, 0.6875rem);
-  opacity: 0.75;
 }
 
 /* ------------------------------------------------------------------ */
@@ -1891,12 +1893,24 @@
 }
 
 /*
- * Stale is a designed state. The slots stay visible and dimmed with an
- * explicit age, because clearing the grid on a refresh throws away a
- * selection the user was in the middle of making.
+ * Stale is a designed state. The slots stay visible with an explicit age,
+ * because clearing the grid on a refresh throws away a selection the user
+ * was in the middle of making.
+ *
+ * Marked, not faded. This was `opacity: 0.55` over the whole list, which
+ * took every time and heading below text contrast — 2.6:1 on white — while
+ * the buttons stayed bookable. The age line above says what is wrong; the
+ * dashed frame and dashed slot edges say which times it applies to, and
+ * both survive forced colours and print, which a fade does not.
  */
 .zb-dt-slots--stale {
-  opacity: 0.55;
+  padding: 0.5rem;
+  border: 1px dashed var(--zb-border-strong, #64748b);
+  border-radius: var(--zb-radius, 0.5rem);
+}
+
+.zb-dt-slots--stale .zb-dt-slot {
+  border-style: dashed;
 }
 
 /* ---- recurrence ----------------------------------------------------- */
