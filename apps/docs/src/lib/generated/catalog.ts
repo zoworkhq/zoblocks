@@ -15416,23 +15416,61 @@ export const CATALOG: ComponentDoc[] = [
       {
         "id": "consent-in-a-form",
         "title": "Consent inside an antd Form",
-        "description": "The common case. `signatureRequired()` treats a decline as a valid answer — a rule demanding outcome === \"signed\" would make refusal impossible to submit.",
+        "description": "The common case. Submit it empty and the field says so; decline and the form submits, because `signatureRequired()` treats a decline as a valid answer — a rule demanding outcome === \"signed\" would make refusal impossible to submit.",
         "fixture": "patientRoutine",
-        "code": "import { Form } from \"antd\";\nimport { Signature, signatureRequired } from \"@zoblocks/signature\";\nimport \"@zoblocks/signature/styles.css\";\n\n<Form.Item name=\"consent\" rules={[signatureRequired()]}>\n  <Signature\n    now={serverTime}\n    meaning=\"consent\"\n    attestation=\"I agree to the treatment described above.\"\n  />\n</Form.Item>;"
+        "group": "Capture",
+        "code": "import { Button, Form } from \"antd\";\nimport { Signature, signatureRequired } from \"@zoblocks/signature\";\nimport \"@zoblocks/signature/styles.css\";\n\n<Form layout=\"vertical\" onFinish={save}>\n  <Form.Item name=\"consent\" label=\"Patient signature\" rules={[signatureRequired()]}>\n    <Signature\n      now={serverTime}\n      meaning=\"consent\"\n      attestation=\"I agree to go ahead with the procedure.\"\n      subject={{ display: \"Randall, Josh\", reference: \"Patient/4471902\" }}\n      recordedBy={{ name: \"A. Okafor\", credential: \"RN\" }}\n      outcomes={[\"declined\", \"unable\"]}\n    />\n  </Form.Item>\n  <Button type=\"primary\" htmlType=\"submit\">Submit</Button>\n</Form>"
+      },
+      {
+        "id": "keyboard",
+        "title": "Signed with the keyboard alone",
+        "description": "Drawing is a path-dependent input, and WCAG 2.1.1 (Level A) requires the function behind it — recording assent — to work from a keyboard. The typed path is that mechanism, not a fallback. Tab in, type a name, confirm.",
+        "group": "Capture",
+        "code": "<Signature\n  now={serverTime}\n  meaning=\"consent\"\n  attestation=\"I agree to go ahead with the procedure.\"\n  methods={[\"type\"]}\n/>"
       },
       {
         "id": "refusal",
         "title": "The patient who refused to sign",
-        "description": "Seven outcomes, not two. A refusal and an unopened form are different clinical facts, and the union makes it impossible to record them the same way.",
+        "description": "Seven outcomes, not two. A refusal and an unopened form are different clinical facts, and the value is a union that makes it impossible to record them the same way. Unable and verbal both require a witness — the type says so, and so does the option text.",
         "fixture": "consentDeclined",
-        "code": "// The value is a discriminated union, so this compiles only if every\n// outcome is handled — including the three that are not \"signed\".\nswitch (value.outcome) {\n  case \"signed\":   return file(value.image, value.signedAt);\n  case \"declined\": return recordRefusal(value.reason, value.recordedAt);\n  case \"unable\":   return recordUnable(value.reason, value.witness); // witness is required\n  case \"verbal\":   return recordVerbal(value.witness);\n  case \"on-paper\": return awaitScan();\n  case \"pending\":  return null;\n  case \"revoked\":  return revoke(value.revokedAt);\n}"
+        "group": "When there is no signature",
+        "code": "<Signature\n  now={serverTime}\n  meaning=\"consent\"\n  attestation=\"I agree to go ahead with the procedure.\"\n  outcomes={[\"declined\", \"unable\", \"verbal\", \"on-paper\"]}\n  onChange={(value) => {\n    // A discriminated union: this compiles only if every outcome is handled,\n    // including the ones that are not \"signed\".\n    switch (value.outcome) {\n      case \"signed\":   return file(value.ink, value.recordedAt);\n      case \"declined\": return recordRefusal(value.reason, value.recordedAt);\n      case \"unable\":   return recordUnable(value.reason, value.witness);\n      case \"verbal\":   return recordVerbal(value.witness);\n      case \"on-paper\": return awaitScan();\n      case \"pending\":  return null;\n      case \"revoked\":  return revoke(value.revokedAt);\n    }\n  }}\n/>"
+      },
+      {
+        "id": "locked",
+        "title": "A submitted form stays legible",
+        "description": "Read-only, printable, and plain about what it is: the manifest states that a PNG of a mark is not a cryptographic signature — the row every other library omits.",
+        "group": "After signing",
+        "code": "<Signature now={serverTime} value={storedSignature} disabled />"
+      },
+      {
+        "id": "pending",
+        "title": "Awaiting countersignature",
+        "description": "Signed by the patient, waiting on the clinician. A form that is neither empty nor complete is the state a boolean cannot hold, and it is the normal case for anything that needs a countersignature.",
+        "group": "After signing",
+        "code": "<Signature\n  now={serverTime}\n  disabled\n  value={{\n    outcome: \"pending\",\n    awaiting: \"clinician\",\n    since: patientSignedAt,\n    soFar: [patientSignature],\n    recordedAt: patientSignedAt,\n    recordedBy: { name: \"A. Okafor\", credential: \"RN\" },\n  }}\n/>"
+      },
+      {
+        "id": "revoked",
+        "title": "Consent withdrawn, the original kept",
+        "description": "The original is struck through, not deleted. Consent given and later withdrawn is a different fact from consent never given, and both belong in the record.",
+        "group": "After signing",
+        "code": "<Signature\n  now={serverTime}\n  disabled\n  value={{\n    outcome: \"revoked\",\n    original: storedSignature,\n    revokedBy: { name: \"Josh Randall\" },\n    revokedAt: withdrawnAt,\n    reason: \"Changed their mind after speaking with their daughter.\",\n    recordedAt: withdrawnAt,\n    recordedBy: { name: \"A. Okafor\", credential: \"RN\" },\n  }}\n/>"
       },
       {
         "id": "provenance-bundle",
         "title": "What it emits, and why it is not a Consent",
-        "description": "Consent carries no signature element in R4 or R5 — only Provenance.signature does. The component emits a transaction Bundle so the two land together or not at all.",
+        "description": "Consent carries no signature element in R4 or R5 — only Provenance.signature does. So the component emits a transaction Bundle: the Consent and the Provenance that signs it, posted together or not at all.",
         "fixture": "provenanceConsent",
-        "code": "import { toFhirBundle } from \"@zoblocks/signature\";\nimport { patientRoutine } from \"@zoblocks/fixtures\";\n\n// A transaction Bundle: the Consent and the Provenance that signs it, posted\n// together or not at all. Emitting the Consent alone would store an agreement\n// with nothing proving anyone made it.\nconst bundle = toFhirBundle(value, {\n  release: \"R4\",\n  subject: {\n    display: \"Amara Okonkwo\",\n    reference: `Patient/${patientRoutine.id}`,\n  },\n});\n\n// bundle.entry[0] → POST Consent\n// bundle.entry[1] → POST Provenance, carrying Provenance.signature\n\n// The signer travels on the value, not in these options: who signed is part of\n// what was captured, and re-supplying it here would let the two disagree."
+        "group": "The record",
+        "code": "import { toFhirBundle } from \"@zoblocks/signature\";\n\nconst bundle = toFhirBundle(value, {\n  release: \"R4\",\n  subject: { display: \"Randall, Josh\", reference: \"Patient/4471902\" },\n});\n\n// bundle.entry[0] → POST Consent\n// bundle.entry[1] → POST Provenance, carrying Provenance.signature\n//\n// The signer travels on the value, not in these options: who signed is part\n// of what was captured, and re-supplying it here would let the two disagree."
+      },
+      {
+        "id": "ink-in-any-theme",
+        "title": "Stored ink, legible in any theme",
+        "description": "The ink is kept as strokes and drawn as SVG in currentColor, so a signature captured in light mode is still legible on a dark screen years later. A bitmap freezes the colour of the day it was taken.",
+        "group": "The record",
+        "code": "import { SignatureInk } from \"@zoblocks/signature\";\n\n// value.ink is what Signature captured; the colour comes from the surface.\n<div style={{ color: \"var(--zb-text)\" }}>\n  <SignatureInk ink={value.ink} label=\"Josh Randall's signature\" height={56} />\n</div>"
       }
     ],
     "fixtures": [

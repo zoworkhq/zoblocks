@@ -25,6 +25,7 @@ import * as SwitchDemo from "../switch-demos";
 import * as AccordionDemo from "../accordion-demos";
 import * as StatusDemo from "../clinical-status-demos";
 import * as MenuDemo from "../chart-context-menu-demos";
+import * as SignatureDemo from "../signature-demos";
 
 /* ------------------------------------------------------------------ */
 /* Stand-ins for the host application                                  */
@@ -285,6 +286,17 @@ export const EXAMPLE_PREVIEWS: Readonly<
     empty: () => <MenuDemo.TwoEmpties />,
     "view-state": () => <MenuDemo.ViewState />,
     submenu: () => <MenuDemo.SubmenuBeside />,
+  },
+
+  signature: {
+    "consent-in-a-form": () => <SignatureDemo.ConsentInAForm />,
+    keyboard: () => <SignatureDemo.KeyboardOnly />,
+    refusal: () => <SignatureDemo.CannotSign />,
+    locked: () => <SignatureDemo.Locked />,
+    pending: () => <SignatureDemo.AwaitingCountersignature />,
+    revoked: () => <SignatureDemo.Withdrawn />,
+    "provenance-bundle": () => <SignatureDemo.ProvenanceBundle />,
+    "ink-in-any-theme": () => <SignatureDemo.InkInAnyTheme />,
   },
 
   "clinical-status": {
