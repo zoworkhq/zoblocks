@@ -7,6 +7,11 @@
  * demo source — never by a timer, which is the defect the component exists to
  * argue against. The source and the takes below also feed the gallery in
  * component-preview, so the two cannot drift apart.
+ *
+ * The chrome around the art — the signal switch, the console's host regions —
+ * is drawn in page tokens, not panel tokens. It sits on the light example
+ * panel, where the panel's muted ink measured 2.9:1 and the console's dark
+ * fill put the recorder's own clock at 1.1:1.
  */
 
 import * as React from "react";
@@ -113,7 +118,7 @@ export function RecLive({
   return (
     <div className="flex w-full flex-col gap-3">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="font-mono text-[0.62rem] uppercase tracking-[0.14em] text-panel-muted">
+        <span className="font-mono text-[0.62rem] uppercase tracking-[0.14em] text-graphite">
           Signal
         </span>
         {REC_MODES.map((m) => (
@@ -125,8 +130,8 @@ export function RecLive({
             className={[
               "rounded-lg px-2.5 py-1 font-mono text-[0.6875rem] uppercase tracking-wider transition-colors",
               m.id === mode
-                ? "bg-trace/12 text-trace ring-1 ring-trace/35"
-                : "text-panel-muted hover:bg-panel-fg/6 hover:text-panel-fg/85",
+                ? "bg-paper-sunk font-semibold text-ink ring-1 ring-ink/40"
+                : "text-graphite hover:bg-paper-sunk hover:text-ink",
             ].join(" ")}
           >
             {m.label}
@@ -143,7 +148,7 @@ export function RecLive({
            see what the component does about it. */
         silenceBudgetMs={3000}
       />
-      <p className="max-w-prose text-xs text-panel-muted">{active?.note}</p>
+      <p className="max-w-prose text-xs text-graphite">{active?.note}</p>
     </div>
   );
 }
@@ -163,16 +168,16 @@ export function RecConsole() {
   const stamp = React.useRef(0);
 
   return (
-    <div className="w-full overflow-hidden rounded-xl border border-rule bg-panel">
+    <div className="w-full overflow-hidden rounded-xl border border-rule bg-paper">
       <div className="flex flex-wrap items-center gap-2 border-b border-rule bg-paper-sunk px-3 py-2">
         <span className="zb-rec-tell">Recording</span>
-        <span className="rounded border border-rule px-1.5 py-0.5 font-mono text-[0.6rem] uppercase tracking-wider text-panel-muted">
+        <span className="rounded border border-rule px-1.5 py-0.5 font-mono text-[0.6rem] uppercase tracking-wider text-graphite">
           Consent 09:11
         </span>
-        <span className="rounded border border-rule px-1.5 py-0.5 font-mono text-[0.6rem] uppercase tracking-wider text-panel-muted">
+        <span className="rounded border border-rule px-1.5 py-0.5 font-mono text-[0.6rem] uppercase tracking-wider text-graphite">
           42 CFR Part 2
         </span>
-        <span className="ms-auto font-mono text-[0.6rem] uppercase tracking-wider text-panel-muted">
+        <span className="ms-auto font-mono text-[0.6rem] uppercase tracking-wider text-graphite">
           3 in room · Jabra Link 380
         </span>
       </div>
@@ -211,7 +216,7 @@ export function RecConsole() {
           }}
         />
       </div>
-      <p className="border-t border-rule bg-paper-sunk px-3 py-2 text-[0.7rem] text-panel-muted">
+      <p className="border-t border-rule bg-paper-sunk px-3 py-2 text-[0.7rem] text-graphite">
         Audio stays in-region. Transcription is on-premise for Part 2 records. Retention 30 days,
         then transcript only.
       </p>
@@ -246,8 +251,8 @@ export function RecDispositionCycle() {
             className={[
               "rounded-lg px-2.5 py-1 font-mono text-[0.6875rem] uppercase tracking-wider transition-colors",
               i === index
-                ? "bg-trace/12 text-trace ring-1 ring-trace/35"
-                : "text-panel-muted hover:bg-panel-fg/6 hover:text-panel-fg/85",
+                ? "bg-paper-sunk font-semibold text-ink ring-1 ring-ink/40"
+                : "text-graphite hover:bg-paper-sunk hover:text-ink",
             ].join(" ")}
           >
             {s.state}
