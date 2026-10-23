@@ -84,9 +84,8 @@ Rules that matter when generating code with these components:
   fhir: Encounter, Appointment, Communication, Observation, DiagnosticReport, Procedure, MedicationRequest, Immunization, DocumentReference, QuestionnaireResponse, Consent, Provenance
   states: Newest first, grouped by month, Planned, above the now marker, Lapsed — planned, and nothing recorded against it, Cancelled, Attempted and did not connect, Amended, with what changed, Entered in error, retained and struck, Restricted — it exists and you may not read it, Consent-gated, A thread with its own steps, A cluster, and a critical event promoted out of one, A stated gap in coverage, A source that could not be reached, Filtered, with the hidden count stated, New since last reviewed, An imprecise date, kept imprecise, No record · none in this window · none you may see, Patient-facing, with a result not yet reviewed
   status: experimental
-- Chart Accordion: A record's sections with their headers composed to the house rules, so a severity can never reach the screen without the words that explain it.
+- [Chart Accordion](https://zoblocks.design/components/chart-accordion): A record's sections with their headers composed to the house rules, so a severity can never reach the screen without the words that explain it.
   install: npx @zoblocks/cli add chart-accordion
-  docs: no page yet — this component installs from the registry today
   states: Closed, with summaries, Expanded, Severity across the scale, Consent gate, Withheld section, Section that failed to load, No sections
   status: beta
 - Chart Command Palette: A command palette that understands clinical verbs, scopes every search to a treatment relationship, and audits the searches it refuses.
