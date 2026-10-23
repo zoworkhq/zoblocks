@@ -106,9 +106,8 @@ Rules that matter when generating code with these components:
   fhir: Patient, Encounter, EpisodeOfCare
   states: Expanded, Collapsed to the safety strip, No encounter is open, Three encounters open — choose one, Sex parameter, with its context, Sex parameter not recorded, on an order screen, Sex parameter withheld on an overview screen, Allergies not asked, Code status not recorded, Isolation and fall risk, Involuntary hold, with its expiry, Hold expired, Program and week, With actions
   status: stable
-- Clinical Note: A clinical note editor that records where every character came from, and refuses to let anyone sign what they have not read.
+- [Clinical Note](https://zoblocks.design/components/clinical-note): A clinical note editor that records where every character came from, and refuses to let anyone sign what they have not read.
   install: npx @zoblocks/cli add clinical-note
-  docs: no page yet — this component installs from the registry today
   fhir: Composition, DocumentReference, Provenance, Narrative
   states: Empty draft, In progress, Origins ribbon, Unreviewed AI, Copied forward, Unfilled blanks, Stale pulled value, Gate blocking, Gate clear, Offline draft, Save failed, Signed, Signed with addendum, Awaiting countersignature
   status: experimental
