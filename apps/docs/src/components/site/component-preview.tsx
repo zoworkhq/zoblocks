@@ -479,7 +479,7 @@ function RecordBehind({ children }: { children: React.ReactNode }) {
   return (
     <div className="overflow-hidden rounded-xl border border-[var(--zb-border)] bg-[var(--zb-bg)]">
       {children}
-      <div aria-hidden="true" className="pointer-events-none select-none px-4 py-3 opacity-40">
+      <div aria-hidden="true" className="pointer-events-none select-none px-4 py-3">
         <div className="flex gap-4 border-b border-[var(--zb-border)] pb-2">
           {["Summary", "Results", "Medications", "Notes"].map((tab, i) => (
             <span

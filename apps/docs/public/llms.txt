@@ -100,9 +100,8 @@ Rules that matter when generating code with these components:
   fhir: Patient, MedicationRequest, Observation, DocumentReference, AuditEvent
   states: Routine actions only, A recorded action, saying what it writes, A clinical action, first activation, A clinical action, second step, A disclosure, reasons offered, Unavailable, with the reason in place, Withheld by policy, counted, An availability check still pending, A masked subject, A multiple selection, Checkbox and radio view state, A submenu, open beside its row, This record supports no actions, Every action withheld from this role
   status: beta
-- Chart Header: Persistent patient context that collapses to a safety bar rather than to a name, and never renders administrative gender beside a dose.
+- [Chart Header](https://zoblocks.design/components/chart-header): Persistent patient context that collapses to a safety bar rather than to a name, and never renders administrative gender beside a dose.
   install: npx @zoblocks/cli add chart-header
-  docs: no page yet — this component installs from the registry today
   fhir: Patient, Encounter, EpisodeOfCare
   states: Expanded, Collapsed to the safety strip, No encounter is open, Three encounters open — choose one, Sex parameter, with its context, Sex parameter not recorded, on an order screen, Sex parameter withheld on an overview screen, Allergies not asked, Code status not recorded, Isolation and fall risk, Involuntary hold, with its expiry, Hold expired, Program and week, With actions
   status: stable
