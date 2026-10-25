@@ -101,19 +101,17 @@
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.67.0",
     "vitest": "^4.1.11",
-    "zod": "^3.24.1"
+    "zod": "^4.6.7"
   },
   "pnpm": {
     "//overrides": "Transitive advisories we cannot reach through a direct dependency. Each entry is the patched floor from the advisory, not a pin — remove it once the parent package ships the fix itself. `pnpm audit --audit-level=high` in CI is what tells us when that has happened.",
     "overrides": {
       "nanoid@<3.3.18": ">=3.3.18",
-      "fast-uri@<3.1.6": ">=3.1.6 <4",
+      "fast-uri@>=3.0.0 <3.1.8": ">=3.1.8 <4",
       "js-yaml@<4.3.2": ">=4.3.2",
       "devalue@<5.9.1": ">=5.9.2",
-      "undici@>=8.1.0 <8.10.2": ">=8.10.2",
-      "undici@>=8.0.0 <8.10.2": ">=8.10.2",
-      "undici@>=8.10.0 <8.10.2": ">=8.10.2",
-      "fast-uri@>=3.0.0 <3.1.8": ">=3.1.8",
+      "undici@>=8.0.0 <8.12.2": ">=8.12.2",
+      "ajv@8.20.0>fast-uri": "3.1.9",
       "ip-address@<=10.7.0": ">=10.7.1",
       "brace-expansion@>=4.0.0 <5.0.12": ">=5.0.12",
       "brace-expansion@>=4.0.0 <5.0.11": ">=5.0.11",
@@ -130,7 +128,8 @@
       "@vitest/mocker@>=2.1.0-beta.7 <4.1.12": ">=4.1.12",
       "@vitest/mocker@>=4.1.11 <4.1.12": ">=4.1.12",
       "next@>=16.0.0 <=16.4.0": ">=16.4.1",
-      "ip-address@<=10.7.3": ">=10.7.4"
+      "ip-address@<=10.7.3": ">=10.7.4",
+      "zod@<4.6.6": "4.6.7"
     },
     "//auditConfig": "Advisories with no patched release, ignored by GHSA so a new advisory on the same package still fails CI. GHSA-vfj7-8cjw-p6xm (braces <=3.0.3, no fix published): reached only through the dev-only @next/eslint-plugin-next > fast-glob > micromatch, which expands this repo's own lint globs, never untrusted patterns. Remove once braces ships a fix or the plugin drops fast-glob 3.",
     "auditConfig": {

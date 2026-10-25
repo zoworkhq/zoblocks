@@ -532,7 +532,7 @@ function HostChart({ children, tall }: { children: React.ReactNode; tall?: boole
       </div>
 
       <div className={cn("relative px-4 pb-4 pt-3", tall ? "min-h-[34rem]" : "min-h-[26rem]")}>
-        <div aria-hidden="true" className="pointer-events-none select-none opacity-45">
+        <div aria-hidden="true" className="pointer-events-none select-none">
           <p className="m-0 mb-3 text-sm font-semibold text-[var(--zb-text)]">
             Amara Okonkwo{" "}
             <span className="font-mono text-xs font-normal text-[var(--zb-text-muted)]">
