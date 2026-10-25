@@ -535,7 +535,7 @@ export const componentMetaSchema = z
     for (const [framework, relation] of Object.entries(meta.frameworks)) {
       if (relation.policy === "wrapping" && !relation.inherits?.length) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           path: ["frameworks", framework, "inherits"],
           message:
             `policy is "wrapping" for ${framework}, so inherits must name the behaviour being inherited. ` +
@@ -544,7 +544,7 @@ export const componentMetaSchema = z
       }
       if (relation.policy !== "wrapping" && relation.inherits?.length) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           path: ["frameworks", framework, "policy"],
           message: `inherits is set for ${framework} but the policy is "${relation.policy}". Only a wrapping component inherits behaviour.`,
         });
@@ -553,7 +553,7 @@ export const componentMetaSchema = z
 
     if (meta.distribution === "package" && !meta.packageName?.trim()) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["packageName"],
         message:
           'distribution is "package", so packageName is required — it is what a consumer installs',
@@ -561,7 +561,7 @@ export const componentMetaSchema = z
     }
     if (meta.distribution === "registry" && meta.packageName) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["packageName"],
         message:
           'packageName is only meaningful when distribution is "package"; a registry component is copied as source, not installed',
@@ -572,7 +572,7 @@ export const componentMetaSchema = z
     // someone to `zoblocks add` a component that ships on npm.
     if (meta.distribution === "package" && meta.registryDependencies.length > 0) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["registryDependencies"],
         message:
           "a package component cannot have registry dependencies — express them as npm `dependencies` instead",
@@ -587,7 +587,7 @@ export const componentMetaSchema = z
       if (typeof value === "string") {
         if (value.startsWith("TODO")) {
           ctx.addIssue({
-            code: z.ZodIssueCode.custom,
+            code: "custom",
             path: at,
             message: "still a scaffolded placeholder — replace it or remove the field",
           });
@@ -606,7 +606,7 @@ export const componentMetaSchema = z
 
     if (meta.status === "deprecated" && !meta.deprecation) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["deprecation"],
         message:
           'status is "deprecated" but no deprecation block is present. A deprecation needs a removeIn version and a reason, or consumers cannot plan.',
@@ -614,7 +614,7 @@ export const componentMetaSchema = z
     }
     if (meta.status !== "deprecated" && meta.deprecation) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["status"],
         message: 'a deprecation block is present but status is not "deprecated".',
       });
@@ -630,7 +630,7 @@ export const componentMetaSchema = z
     if (meta.status !== "stable") return;
 
     const require = (ok: boolean, path: (string | number)[], message: string) => {
-      if (!ok) ctx.addIssue({ code: z.ZodIssueCode.custom, path, message });
+      if (!ok) ctx.addIssue({ code: "custom", path, message });
     };
     const at = (label: string) => `${label} — required to be stable`;
 
@@ -665,7 +665,7 @@ export const componentMetaSchema = z
     (meta.a11yChecks ?? []).forEach((check, i) => {
       if (check.status !== "not-applicable" && !check.evidence?.trim()) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           path: ["a11yChecks", i, "evidence"],
           message: `${check.wcag} claims "${check.status}" with no evidence. Cite the test id, or mark it not-applicable.`,
         });
@@ -676,7 +676,7 @@ export const componentMetaSchema = z
     (meta.examples ?? []).forEach((example, i) => {
       if (example.fixture && !(meta.fixtures ?? []).includes(example.fixture)) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           path: ["examples", i, "fixture"],
           message: `fixture "${example.fixture}" is not declared in fixtures[]`,
         });
@@ -691,7 +691,7 @@ export const componentMetaSchema = z
     );
     if (clinical && meta.fhir.length === 0 && !meta.domain?.clinicalContext?.trim()) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["domain", "clinicalContext"],
         message:
           "a clinical component must declare either the FHIR resources it reads or a clinicalContext explaining why it reads none",
@@ -703,7 +703,7 @@ export const componentMetaSchema = z
     for (const key of ["builtWith", "usedIn"] as const) {
       if ((meta.relationships?.[key] ?? []).length > 0) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           path: ["relationships", key],
           message: `relationships.${key} is derived from imports by the generator and must not be authored by hand`,
         });

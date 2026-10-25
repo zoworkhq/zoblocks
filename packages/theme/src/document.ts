@@ -76,7 +76,7 @@ function isClinicalPath(path: string): boolean {
  * theme-invariant override would therefore fail the gate for most real brands,
  * and the only way out would be to weaken the gate.
  */
-const overrideLayer = <T extends z.ZodTypeAny>(value: T) =>
+const overrideLayer = <T extends z.ZodType>(value: T) =>
   z.object({
     light: z.record(z.string(), value).default({}),
     dark: z.record(z.string(), value).default({}),
@@ -123,7 +123,7 @@ export const themeTokensSchema = z
       for (const path of Object.keys(entries)) {
         if (!isClinicalPath(path)) continue;
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           path: ["semantic", theme, path],
           message:
             `${path} carries a clinical meaning and cannot be overridden. Status and identity ` +
@@ -138,7 +138,7 @@ export const themeTokensSchema = z
       for (const name of Object.keys(entries)) {
         if (!name.startsWith("--zb-")) {
           ctx.addIssue({
-            code: z.ZodIssueCode.custom,
+            code: "custom",
             path: ["component", theme, name],
             message: `${name} is not a ZoBlocks custom property. Component overrides are keyed by the property exactly as the surface manifest declares it.`,
           });
@@ -146,7 +146,7 @@ export const themeTokensSchema = z
         }
         if (CLINICAL_COMPONENT.has(name)) {
           ctx.addIssue({
-            code: z.ZodIssueCode.custom,
+            code: "custom",
             path: ["component", theme, name],
             message: `${name} resolves to clinical status or an identity flag and cannot be overridden.`,
           });
@@ -318,7 +318,7 @@ export const themeDocumentSchema = z
     version: z.number().int().min(1),
     status: themeStatusSchema,
     tokens: themeTokensSchema,
-    assets: themeAssetsSchema.default({ fonts: [], brand: [] }),
+    assets: themeAssetsSchema.default({ fonts: [], brand: [], icons: [] }),
     validation: validationRecordSchema.optional(),
     audit: z.object({
       createdBy: z.string().min(1),
@@ -334,7 +334,7 @@ export const themeDocumentSchema = z
     // ever checked, which is the whole failure this system exists to prevent.
     if (theme.status === "published" && !theme.validation) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["validation"],
         message:
           "a published theme must carry the validation record that let it publish. Without it there is no evidence the palette was ever checked.",
@@ -346,14 +346,14 @@ export const themeDocumentSchema = z
       theme.validation.contrastPairs.failed > 0
     ) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["status"],
         message: `cannot publish with ${theme.validation.contrastPairs.failed} failing contrast pair(s).`,
       });
     }
     if (theme.audit.publishedAt && !theme.audit.publishedBy) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["audit", "publishedBy"],
         message: "a publish is attributable or it is not a publish.",
       });
