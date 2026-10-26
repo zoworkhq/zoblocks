@@ -619,6 +619,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                       importName={importName}
                       importFrom={importFrom}
                       links={hostedDemo}
+                      chrome
                     />
                   </HostStage>
                 ) : (

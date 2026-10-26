@@ -90,7 +90,19 @@ export function OnThisPage({ entries }: { entries: readonly TocEntry[] }) {
                   if (!el) return;
                   event.preventDefault();
                   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-                  el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+                  /*
+                   * Glide a short hop; jump a long one. A component page runs
+                   * to ten thousand pixels, and a smooth scroll that far is
+                   * seconds of travel past previews that mount as they enter
+                   * view and move the target while it is underway — WebKit
+                   * stops short of it outright. The same reasoning as the
+                   * `scroll-behavior` note in globals.css, applied here.
+                   */
+                  const far = Math.abs(el.getBoundingClientRect().top) > window.innerHeight * 1.5;
+                  el.scrollIntoView({
+                    behavior: reduce || far ? "auto" : "smooth",
+                    block: "start",
+                  });
                   history.replaceState(null, "", `#${entry.id}`);
                   setActive(entry.id);
                 }}
