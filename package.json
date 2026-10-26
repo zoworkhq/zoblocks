@@ -113,7 +113,7 @@
       "undici@>=8.1.0 <8.10.2": ">=8.10.2",
       "undici@>=8.0.0 <8.10.2": ">=8.10.2",
       "undici@>=8.10.0 <8.10.2": ">=8.10.2",
-      "fast-uri@>=3.0.0 <3.1.8": ">=3.1.8",
+      "fast-uri@>=3.0.0 <3.1.8": ">=4.2.3",
       "ip-address@<=10.7.0": ">=10.7.1",
       "brace-expansion@>=4.0.0 <5.0.12": ">=5.0.12",
       "brace-expansion@>=4.0.0 <5.0.11": ">=5.0.11",
@@ -123,12 +123,21 @@
       "@vue/server-renderer@<3.5.42": ">=3.5.42",
       "prosemirror-view@<1.42.3": ">=1.42.3",
       "sharp@<0.35.5": ">=0.35.5",
-      "shell-quote@>=1.8.4 <1.11.0": ">=1.11.0"
+      "shell-quote@>=1.8.4 <1.11.0": ">=1.11.0",
+      "follow-redirects@>=1.16.0 <1.16.1": ">=1.16.1",
+      "vite@>=8.2.0 <=8.2.3": ">=8.2.4",
+      "launch-editor@<=2.14.1": ">=2.14.2",
+      "@vitest/mocker@>=2.1.0-beta.7 <4.1.12": ">=4.1.12",
+      "@vitest/mocker@>=4.1.11 <4.1.12": ">=4.1.12",
+      "next@>=16.0.0 <=16.4.0": ">=16.4.1",
+      "ip-address@<=10.7.3": ">=10.7.4",
+      "undici@>=8.0.0 <8.12.2": ">=8.12.2"
     },
-    "//auditConfig": "Advisories with no patched release, ignored by GHSA so a new advisory on the same package still fails CI. GHSA-vfj7-8cjw-p6xm (braces <=3.0.3, no fix published): reached only through the dev-only @next/eslint-plugin-next > fast-glob > micromatch, which expands this repo's own lint globs, never untrusted patterns. Remove once braces ships a fix or the plugin drops fast-glob 3.",
+    "//auditConfig": "Advisories with no usable patched release, ignored by GHSA so a new advisory on the same package still fails CI. GHSA-vfj7-8cjw-p6xm (braces <=3.0.3, no fix published): reached only through the dev-only @next/eslint-plugin-next > fast-glob > micromatch, which expands this repo's own lint globs, never untrusted patterns. Remove once braces ships a fix or the plugin drops fast-glob 3. GHSA-mrhx-c7xc-m3w5 (zod <4.6.6, high, memory exhaustion validating oversized constrained collections): the patch exists only in zod 4, which breaks the typecheck of packages/theme (zod 3 API), so zod stays on 3.25.x until theme is migrated. Remove once packages/theme is on zod 4.",
     "auditConfig": {
       "ignoreGhsas": [
-        "GHSA-vfj7-8cjw-p6xm"
+        "GHSA-vfj7-8cjw-p6xm",
+        "GHSA-mrhx-c7xc-m3w5"
       ]
     }
   },

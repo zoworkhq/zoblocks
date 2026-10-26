@@ -55,9 +55,8 @@ Rules that matter when generating code with these components:
   install: npx @zoblocks/cli add switch
   states: On, Off, Unknown (absence, with a reason), Pending — the write is in flight, Committed, Reverted — the write failed, Blocked — refused before trying, Queued — offline, Stale — changed by someone else, Read-only, with a reason, Disabled, Time-boxed (until), Awaiting confirmation, Segmented — both answers visible, Chip — a filter bar, Row — the whole row is the target
   status: experimental
-- Timeline: Ant Design v6's Timeline, prop for prop, with the accessible name and the ordered-list semantics it does not ship.
+- [Timeline](https://zoblocks.design/components/timeline): Ant Design v6's Timeline, prop for prop, with the accessible name and the ordered-list semantics it does not ship.
   install: npx @zoblocks/cli add timeline
-  docs: no page yet — this component installs from the registry today
   states: Vertical, the default, Alternate, items on both sides, Horizontal, Filled and outlined variants, Custom node icons, Preset and custom node colours, A loading node, Reversed, Ant Design v5 prop names, still accepted
   status: experimental
 - [Tabs](https://zoblocks.design/components/tabs): Tabs that know what they are: a view switch, a link list, a form value or a wizard — four accessibility trees behind one silhouette.
