@@ -38,7 +38,8 @@ import { DatePickerPlayground, datePickerPlaygroundAttrs } from "./date-picker-d
 import { DataGridPlayground } from "./data-grid-demos";
 import { CareTimelinePlayground } from "./care-timeline-demos";
 import type { DatePickerVariant } from "@/registry/zoblocks/date-picker/date-picker";
-import { PLAYGROUND_COMPONENTS } from "./playground-registry";
+import { HostChrome } from "./host-chrome";
+import { PLAYGROUND_COMPONENTS, playgroundChrome } from "./playground-registry";
 import { useSiteTheme } from "./use-site-theme";
 import { useAntdBrandTokens } from "./language-antd-theme";
 import { jsxAttr, jsxElement } from "@/lib/highlight";
@@ -636,6 +637,7 @@ export function Playground({
   importName,
   importFrom,
   links = [],
+  chrome = false,
 }: {
   name: string;
   controls: readonly Control[];
@@ -644,6 +646,13 @@ export function Playground({
   /** Where the code imports it from. Defaults to the registry path. */
   importFrom?: string;
   links?: readonly DemoLink[];
+  /**
+   * Draw the host-chrome band — the design language's own buttons, inputs and
+   * tabs — above the component, for the components `playgroundChrome` admits. The
+   * page opts in; a test rendering the playground alone does not, so the band
+   * can never stand in for a component that rendered nothing.
+   */
+  chrome?: boolean;
 }) {
   if (process.env.NODE_ENV !== "production") {
     // The server decides whether to render this section from
@@ -734,7 +743,16 @@ export function Playground({
             className="zb-stage scroll-thin flex min-h-[360px] min-w-0 flex-1 items-center justify-center overflow-x-auto px-7 py-11"
             style={dark ? { colorScheme: "dark" } : undefined}
           >
-            <div className="w-full min-w-0">
+            <div className="flex w-full min-w-0 flex-col gap-6">
+              {/*
+                The real framework, beside the component. Choosing "Ant Design"
+                re-themes the component through the bridge, and this band is
+                antd's own Button, Input and Tabs — what the page owes a reader
+                comparing frameworks, and what a reproduction could not draw.
+                It was the Preview stage's job; the playground took that stage
+                over, so it takes the band too.
+              */}
+              {chrome && playgroundChrome(name) ? <HostChrome /> : null}
               {/*
                 The accent follows the design language. Under "Ant Design" an
                 AA failure in antd's own blue is shown rather than corrected,

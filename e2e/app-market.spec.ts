@@ -102,7 +102,10 @@ test.describe("@app the catalogue", () => {
 
   test("says the purchase belongs to the organisation, not the buyer", async ({ page }) => {
     await signIn(page);
-    await page.goto(`${BASE}/market/${EMPTY_STATES}`);
+    // An item no test grants. EMPTY_STATES is granted by "owning something",
+    // and once owned the page says "Version line" instead — so this read the
+    // terms only when it happened to run first.
+    await page.goto(`${BASE}/market/${NEVER_BOUGHT}`);
     await expect(page.getByText("one-time · whole organisation")).toBeVisible();
   });
 });
