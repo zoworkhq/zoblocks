@@ -114,6 +114,8 @@
       "undici@>=8.0.0 <8.10.2": ">=8.10.2",
       "undici@>=8.10.0 <8.10.2": ">=8.10.2",
       "fast-uri@>=3.0.0 <3.1.8": ">=3.1.8",
+      "fast-uri@>=4.0.0 <4.2.3": ">=4.2.3",
+      "undici@>=8.0.0 <8.12.2": ">=8.12.2",
       "ip-address@<=10.7.3": ">=10.7.4",
       "brace-expansion@>=4.0.0 <5.0.12": ">=5.0.12",
       "brace-expansion@>=4.0.0 <5.0.11": ">=5.0.11",
@@ -128,10 +130,11 @@
       "launch-editor@<=2.14.1": ">=2.14.2",
       "follow-redirects@>=1.16.0 <1.16.1": ">=1.16.1 <2"
     },
-    "//auditConfig": "Advisories with no patched release, ignored by GHSA so a new advisory on the same package still fails CI. GHSA-vfj7-8cjw-p6xm (braces <=3.0.3, no fix published): reached only through the dev-only @next/eslint-plugin-next > fast-glob > micromatch, which expands this repo's own lint globs, never untrusted patterns. Remove once braces ships a fix or the plugin drops fast-glob 3.",
+    "//auditConfig": "Advisories with no patched release, ignored by GHSA so a new advisory on the same package still fails CI. GHSA-vfj7-8cjw-p6xm (braces <=3.0.3, no fix published): reached only through the dev-only @next/eslint-plugin-next > fast-glob > micromatch, which expands this repo's own lint globs, never untrusted patterns. Remove once braces ships a fix or the plugin drops fast-glob 3. GHSA-mrhx-c7xc-m3w5 (zod <4.6.6, unbounded issue accumulation on oversized arrays; no 3.x fix, ignored 2026-10-26): every zod parse of untrusted input runs in an apps/app or apps/hq Server Action, whose body Next caps at 1 MB by default (neither app raises bodySizeLimit), which bounds the array and the issues it can produce; packages/component-meta parses this repo's own metadata at build time. Remove when zod moves to 4.6.6+.",
     "auditConfig": {
       "ignoreGhsas": [
-        "GHSA-vfj7-8cjw-p6xm"
+        "GHSA-vfj7-8cjw-p6xm",
+        "GHSA-mrhx-c7xc-m3w5"
       ]
     }
   },
