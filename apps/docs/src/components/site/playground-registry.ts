@@ -40,6 +40,7 @@ export const PLAYGROUND_COMPONENTS: ReadonlySet<string> = new Set([
   "safety-plan",
   "timeline",
   "copilot",
+  "chart-command-palette",
 ]);
 
 export function hasPlayground(name: string): boolean {

@@ -82,6 +82,7 @@ import {
   type CopilotEvent,
   type Source,
 } from "@zoblocks/copilot-core";
+import { ChartCommandPalettePlayground } from "./chart-command-palette-demos";
 import { Switch, type SwitchProps } from "@/registry/zoblocks/switch/switch";
 import { Accordion } from "@/registry/zoblocks/accordion/accordion";
 import { CHART_ITEMS } from "./accordion-demos";
@@ -757,6 +758,7 @@ const RENDERERS: Record<string, (props: Props) => React.ReactNode> = {
       <CopilotPlaygroundDemo {...(props as Partial<CopilotProps>)} />
     </div>
   ),
+  "chart-command-palette": (props) => <ChartCommandPalettePlayground {...props} />,
 };
 
 /**
@@ -861,6 +863,7 @@ const FIXED_ATTRS: Record<string, readonly string[] | ((props: Props) => readonl
     'actor={{ display: "Dr Amara Okafor", credential: "MD", reference: "Practitioner/7" }}',
     'anchor="inline"',
   ],
+  "chart-command-palette": ["items={items}", "scope={scope}", "open"],
 };
 
 function resolveFixed(

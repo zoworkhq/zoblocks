@@ -172,8 +172,9 @@ import "@/styles/zoblocks-palette.css";
   ],
 
   controls: [
-    { prop: "open", control: "switch", label: "Open", defaultValue: true },
+    { prop: "placeholder", control: "text", label: "Placeholder" },
     { prop: "onRun", control: "event", label: "onRun" },
+    { prop: "onClose", control: "event", label: "onClose" },
     { prop: "onSearchAudit", control: "event", label: "onSearchAudit" },
   ],
 
