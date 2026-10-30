@@ -1197,4 +1197,113 @@ export const unknownTotal: Bundle = {
   entry: [{ resource: observationPotassiumCritical }],
 };
 
+// ---------------------------------------------------------------------------
+// Recent Patient Stack
+// ---------------------------------------------------------------------------
+
+/**
+ * Synthetic open-chart shape used by the Recent Patient Stack examples.
+ * Every person, identifier, label and timestamp below is invented.
+ */
+export interface RecentPatientStackChartFixture {
+  id: string;
+  display: string;
+  identifier?: string;
+  photo?: string;
+  reason?: string;
+  lastActiveAt?: string;
+  pinned?: boolean;
+  work?: Array<{
+    kind: "draft-order" | "unsigned-note" | "unacknowledged-result" | "pending-task";
+    since?: string;
+    label?: string;
+  }>;
+}
+
+/** Several synthetic charts with an active chart, a pin, and varied outstanding work. */
+export const recentPatientStackRoutine: RecentPatientStackChartFixture[] = [
+  {
+    id: "syn-chart-ember-17",
+    display: "Mira Solano",
+    identifier: "EX-204-711",
+    reason: "Care review",
+    lastActiveAt: "2026-08-24T09:58:00Z",
+  },
+  {
+    id: "syn-chart-cedar-42",
+    display: "Noel Hartwell",
+    identifier: "EX-204-928",
+    reason: "Follow-up note",
+    lastActiveAt: "2026-08-24T09:30:00Z",
+    work: [{ kind: "unsigned-note", label: "Visit summary", since: "2026-08-21T09:00:00Z" }],
+  },
+  {
+    id: "syn-chart-lumen-08",
+    display: "Ivo Bellamy",
+    identifier: "EX-204-356",
+    reason: "Result review",
+    lastActiveAt: "2026-08-24T08:00:00Z",
+    work: [{ kind: "unacknowledged-result", label: "Example panel" }],
+  },
+  {
+    id: "syn-chart-orbit-63",
+    display: "Tali Wren",
+    identifier: "EX-204-583",
+    reason: "Planning",
+    lastActiveAt: "2026-08-23T17:00:00Z",
+    pinned: true,
+  },
+];
+
+/** Two deliberately similar synthetic names demonstrate identifier disambiguation. */
+export const recentPatientStackSimilarNames: RecentPatientStackChartFixture[] = [
+  {
+    id: "syn-chart-similar-1",
+    display: "Ari Bell",
+    identifier: "EX-771-204",
+    reason: "Review",
+    lastActiveAt: "2026-08-24T09:00:00Z",
+  },
+  {
+    id: "syn-chart-similar-2",
+    display: "Ari Bellamy",
+    identifier: "EX-771-928",
+    reason: "Follow-up",
+    lastActiveAt: "2026-08-24T08:30:00Z",
+  },
+  {
+    id: "syn-chart-similar-3",
+    display: "Sora Vale",
+    identifier: "EX-771-356",
+    reason: "Intake",
+    lastActiveAt: "2026-08-24T08:00:00Z",
+  },
+];
+
+/** Synthetic protected work states for safe-close and blocked-close examples. */
+export const recentPatientStackCloseStates: RecentPatientStackChartFixture[] = [
+  {
+    id: "syn-chart-clean-12",
+    display: "Juniper Quill",
+    reason: "Routine review",
+    lastActiveAt: "2026-08-24T09:00:00Z",
+  },
+  {
+    id: "syn-chart-note-29",
+    display: "Pax Linden",
+    reason: "Documentation",
+    lastActiveAt: "2026-08-24T08:30:00Z",
+    work: [
+      { kind: "unsigned-note", label: "Synthetic progress note", since: "2026-08-23T11:00:00Z" },
+    ],
+  },
+  {
+    id: "syn-chart-order-54",
+    display: "Eli Fenwick",
+    reason: "Order review",
+    lastActiveAt: "2026-08-24T08:00:00Z",
+    work: [{ kind: "draft-order", label: "Example lab request" }],
+  },
+];
+
 export const worklists = { caseloadPhq9, unknownTotal };

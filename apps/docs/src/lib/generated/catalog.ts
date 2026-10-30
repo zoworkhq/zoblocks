@@ -10728,28 +10728,15 @@ export const CATALOG: ComponentDoc[] = [
     "since": "0.4.0",
     "layer": "clinical",
     "distribution": "registry",
-    "summary": "A multi-chart workspace that makes the active patient unmistakable, because the alternative is eleven identical browser tabs.",
+    "summary": "A compact chart switcher that keeps open patient records, active status, and unfinished work visible together.",
     "tagline": "A multi-chart workspace where the active patient is unmistakable.",
-    "description": "Each open chart gets a hue derived from its id, so it is the same colour in every session. Two charts whose names look alike both grow an identifier. Per-chart badges carry the unfinished work, closing is graded rather than binary, and returning after fifteen minutes away re-asserts who the chart belongs to.",
+    "description": "Recent Patient Stack displays open patient charts in a compact, selectable workspace so clinicians can see which chart is active and what work remains. Use it in a clinical application shell when users move between several charts; it keeps chart identity and status visible and helps reduce wrong-chart actions.",
     "rationale": "Clinicians work several charts at once and the tooling pretends they do not. The state of the art is a dropdown of names, or worse, eleven browser tabs whose titles truncate to \"Chart — Riverside…\". Wrong-patient documentation survives every amount of staff training because it is not a training problem: it is two charts that look identical, one keyboard shortcut, and an interruption. A stack does three things a dropdown cannot — it makes the set visible without being opened, it gives each chart a persistent visual identity, and it carries per-chart state. The identity has to be derived from the chart rather than handed out in arrival order, or a clinician who has learned \"Okonkwo is the green one\" has learned something that will be false tomorrow.",
     "categories": [
       "Clinical",
       "Navigation"
     ],
-    "fhir": [
-      {
-        "name": "Patient",
-        "url": "https://hl7.org/fhir/R4/patient.html",
-        "note": "Identity per chart. The accent is derived from the chart id rather than from the patient, so a merged record does not silently change colour."
-      },
-      {
-        "name": "Task",
-        "url": "https://hl7.org/fhir/R4/task.html",
-        "note": "Outstanding work per chart — a draft order, an unsigned note, an unacknowledged result — ranked by consequence rather than by age."
-      }
-    ],
-    "resource": "Patient",
-    "resourceUrl": "https://hl7.org/fhir/R4/patient.html",
+    "fhir": [],
     "states": [
       "Four charts, one active",
       "A pinned chart",
@@ -10770,56 +10757,56 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "charts",
         "type": "readonly OpenChart[]",
-        "description": "The open charts, most recent first. Each carries enough to tell two patients apart, which eleven identical browser tabs do not.",
+        "description": "Required. Open chart records, sorted by recency after pinned charts. Each record needs a stable `id` and display name; optional identifiers, photo URLs, reasons, activity times, pin state, and outstanding work enrich the tab and expanded panel. See `OpenChart`.",
         "required": true
       },
       {
         "name": "activeId",
         "type": "string",
-        "description": "Which chart is in front. The active patient has to be unmistakable — this is a wrong-patient control, not a tab bar.",
+        "description": "ID of the active chart. Optional; when omitted or unmatched, the first ordered tab remains keyboard-focusable, but no tab is marked selected. The host owns and updates this value.",
         "required": false
-      },
-      {
-        "name": "expanded",
-        "type": "boolean",
-        "description": "Start expanded, showing the panel rather than the avatar row.",
-        "required": false,
-        "default": "false"
       },
       {
         "name": "now",
         "type": "string",
-        "description": "ISO 8601 from the host. Decides whether returning re-asserts identity.",
+        "description": "Optional ISO 8601 timestamp for the host's current time. When omitted, every activation requests identity re-assertion because elapsed time cannot be determined.",
         "required": false
       },
       {
         "name": "onActivate",
         "type": "((chart: OpenChart, options: { reassert: boolean; }) => void)",
-        "description": "Switch to a chart. Called with `reassert: true` when the clinician has been away long enough that the host should confirm the patient before showing the chart. Fifteen minutes is roughly the length of an interruption you do not remember.",
+        "description": "Optional activation callback. Called with the selected `OpenChart` and `{ reassert }`; `reassert` is true when the last activity is missing/invalid, no `now` was supplied, or the chart has been inactive for at least 15 minutes. The host performs any confirmation and switches the active chart; this component does not change `activeId` itself.",
         "required": false
       },
       {
         "name": "onClose",
         "type": "((chart: OpenChart) => void)",
-        "description": "Close a chart. Called only when `canClose` returns `close` or the host confirmed a `confirm`. A `refuse` never reaches here.",
-        "required": false
-      },
-      {
-        "name": "onExpandedChange",
-        "type": "((expanded: boolean) => void)",
-        "description": "Fired when the stack expands or collapses.",
+        "description": "Optional close callback. Called immediately for charts with no protected outstanding work, or after the user confirms closing with an unsigned note. A draft order blocks closing; unacknowledged results and pending tasks are not blocked by the close rule. The host should remove the chart from its `charts` value after this callback.",
         "required": false
       },
       {
         "name": "onPin",
         "type": "((chart: OpenChart, pinned: boolean) => void)",
-        "description": "Fired when a chart is pinned, so it survives the recency ordering.",
+        "description": "Optional pin callback. Called with the chart and its proposed next pin state. Update `charts` in the host to apply it.",
         "required": false
       },
       {
         "name": "onReorder",
         "type": "((charts: OpenChart[]) => void)",
-        "description": "Keyboard reordering, the equivalent of a drag (WCAG 2.5.7).",
+        "description": "Optional keyboard-reorder callback. Alt+ArrowUp/Alt+ArrowDown proposes the new ordered chart array. Update `charts` in the host to persist the order; pinned charts cannot be moved across the pinned/unpinned boundary.",
+        "required": false
+      },
+      {
+        "name": "expanded",
+        "type": "boolean",
+        "description": "Whether the per-chart action panel is initially shown. Defaults to `false`. Host-controlled.",
+        "required": false,
+        "default": "false"
+      },
+      {
+        "name": "onExpandedChange",
+        "type": "((expanded: boolean) => void)",
+        "description": "Optional controlled-state callback. When provided, renders the toggle; call it with the proposed state and update `expanded` in the host.",
         "required": false
       }
     ],
@@ -10831,63 +10818,63 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "charts",
             "type": "readonly OpenChart[]",
-            "description": "The open charts, most recent first. Each carries enough to tell two patients apart, which eleven identical browser tabs do not.",
+            "description": "Required. Open chart records, sorted by recency after pinned charts. Each record needs a stable `id` and display name; optional identifiers, photo URLs, reasons, activity times, pin state, and outstanding work enrich the tab and expanded panel. See `OpenChart`.",
             "required": true
           },
           {
             "name": "activeId",
             "type": "string",
-            "description": "Which chart is in front. The active patient has to be unmistakable — this is a wrong-patient control, not a tab bar.",
+            "description": "ID of the active chart. Optional; when omitted or unmatched, the first ordered tab remains keyboard-focusable, but no tab is marked selected. The host owns and updates this value.",
             "required": false
-          },
-          {
-            "name": "expanded",
-            "type": "boolean",
-            "description": "Start expanded, showing the panel rather than the avatar row.",
-            "required": false,
-            "default": "false"
           },
           {
             "name": "now",
             "type": "string",
-            "description": "ISO 8601 from the host. Decides whether returning re-asserts identity.",
+            "description": "Optional ISO 8601 timestamp for the host's current time. When omitted, every activation requests identity re-assertion because elapsed time cannot be determined.",
             "required": false
           },
           {
             "name": "onActivate",
             "type": "((chart: OpenChart, options: { reassert: boolean; }) => void)",
-            "description": "Switch to a chart. Called with `reassert: true` when the clinician has been away long enough that the host should confirm the patient before showing the chart. Fifteen minutes is roughly the length of an interruption you do not remember.",
+            "description": "Optional activation callback. Called with the selected `OpenChart` and `{ reassert }`; `reassert` is true when the last activity is missing/invalid, no `now` was supplied, or the chart has been inactive for at least 15 minutes. The host performs any confirmation and switches the active chart; this component does not change `activeId` itself.",
             "required": false
           },
           {
             "name": "onClose",
             "type": "((chart: OpenChart) => void)",
-            "description": "Close a chart. Called only when `canClose` returns `close` or the host confirmed a `confirm`. A `refuse` never reaches here.",
-            "required": false
-          },
-          {
-            "name": "onExpandedChange",
-            "type": "((expanded: boolean) => void)",
-            "description": "Fired when the stack expands or collapses.",
+            "description": "Optional close callback. Called immediately for charts with no protected outstanding work, or after the user confirms closing with an unsigned note. A draft order blocks closing; unacknowledged results and pending tasks are not blocked by the close rule. The host should remove the chart from its `charts` value after this callback.",
             "required": false
           },
           {
             "name": "onPin",
             "type": "((chart: OpenChart, pinned: boolean) => void)",
-            "description": "Fired when a chart is pinned, so it survives the recency ordering.",
+            "description": "Optional pin callback. Called with the chart and its proposed next pin state. Update `charts` in the host to apply it.",
             "required": false
           },
           {
             "name": "onReorder",
             "type": "((charts: OpenChart[]) => void)",
-            "description": "Keyboard reordering, the equivalent of a drag (WCAG 2.5.7).",
+            "description": "Optional keyboard-reorder callback. Alt+ArrowUp/Alt+ArrowDown proposes the new ordered chart array. Update `charts` in the host to persist the order; pinned charts cannot be moved across the pinned/unpinned boundary.",
+            "required": false
+          },
+          {
+            "name": "expanded",
+            "type": "boolean",
+            "description": "Whether the per-chart action panel is initially shown. Defaults to `false`. Host-controlled.",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "onExpandedChange",
+            "type": "((expanded: boolean) => void)",
+            "description": "Optional controlled-state callback. When provided, renders the toggle; call it with the proposed state and update `expanded` in the host.",
             "required": false
           }
         ],
         "extendsType": "Omit< React.HTMLAttributes<HTMLDivElement>, \"children\" | \"onSelect\" >"
       }
     ],
-    "usage": "import { RecentPatientStack } from \"@/components/zoblocks/recent-patient-stack\";\nimport \"@/styles/zoblocks-workspace.css\";\n\n<RecentPatientStack\n  charts={open}\n  activeId={activeId}\n  now={serverTime}\n  onActivate={(chart, { reassert }) =>\n    reassert ? confirmIdentity(chart) : switchTo(chart)\n  }\n  onClose={closeChart}\n  onReorder={setOrder}\n/>",
+    "usage": "import { useState } from \"react\";\nimport { RecentPatientStack, type OpenChart } from \"@/components/zoblocks/recent-patient-stack\";\nimport \"@/styles/zoblocks-workspace.css\";\n\nconst initialCharts: OpenChart[] = [\n  {\n    id: \"syn-chart-ember-17\",\n    display: \"Mira Solano\",\n    identifier: \"EX-204-711\",\n    reason: \"Care review\",\n    lastActiveAt: \"2026-08-24T09:58:00Z\",\n  },\n  {\n    id: \"syn-chart-cedar-42\",\n    display: \"Noel Hartwell\",\n    identifier: \"EX-204-928\",\n    reason: \"Follow-up note\",\n    lastActiveAt: \"2026-08-24T09:30:00Z\",\n    work: [{ kind: \"unsigned-note\", label: \"Visit summary\", since: \"2026-08-21T09:00:00Z\" }],\n  },\n];\n\nfunction WorkspaceStack() {\n  const [charts, setCharts] = useState(initialCharts);\n  const [activeId, setActiveId] = useState(\"syn-chart-ember-17\");\n  const [expanded, setExpanded] = useState(false);\n\n  return (\n    <RecentPatientStack\n      charts={charts}\n      activeId={activeId}\n      now={new Date().toISOString()}\n      expanded={expanded}\n      onActivate={(chart, { reassert }) => {\n        if (!reassert || window.confirm(\"Confirm chart for \" + chart.display + \"?\")) setActiveId(chart.id);\n      }}\n      onClose={(chart) => setCharts((open) => open.filter((item) => item.id !== chart.id))}\n      onPin={(chart, pinned) => setCharts((open) => open.map((item) => item.id === chart.id ? { ...item, pinned } : item))}\n      onReorder={setCharts}\n      onExpandedChange={setExpanded}\n    />\n  );\n}",
     "guidance": {
       "use": [
         "In the top bar of a clinical workspace, above the chart header rather than inside it.",
@@ -10905,7 +10892,7 @@ export const CATALOG: ComponentDoc[] = [
     "accessibility": [
       {
         "label": "A tablist with roving focus",
-        "detail": "One tab stop for the whole stack; arrows move within it, Home and End jump to the ends. A workspace with eleven tab stops is a workspace a keyboard user leaves."
+        "detail": "The named Open charts tablist has a roving tab stop. Arrow keys move focus through tabs (without activating them); Home and End move to the first and last tab. Tab enters the stack at the active chart, or the first tab if activeId is missing or unmatched, and native tab order continues to later controls. Enter and Space activate a focused native button tab."
       },
       {
         "label": "Every drag has a keyboard equivalent",
@@ -10921,7 +10908,7 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "label": "Refusal is not dressed as a question",
-        "detail": "Closing a chart with a draft order opens an alertdialog with one way out and no confirm button. A dialogue with only one exit that offers two is how people learn to click through the ones that matter."
+        "detail": "A refused close and a close needing confirmation render a role=alertdialog with an accessible name and a reason. Confirmation offers Close and lose the draft; refusal offers only Back to the chart. The alertdialog's action buttons are native buttons."
       },
       {
         "label": "Small screens get one legible chart",
@@ -10933,7 +10920,9 @@ export const CATALOG: ComponentDoc[] = [
       "The similarity pass is deliberately blunt: it compares folded names and their first four letters. A false positive costs a visible identifier on a row and a false negative costs a note in the wrong chart, so it is tuned to over-report.",
       "Re-assertion is reported, not performed. The component says the clinician has been away long enough; showing the confirmation is the host's, because only the host knows what the chart is about to reveal.",
       "No LRU eviction, no refetch on restore. Both belong to the workspace store — and a nine-hour-old vitals set that looks live is a hazard the store has to prevent, not the tab strip.",
-      "Pointer drag reordering is not implemented; the keyboard path is. A drag with no keyboard equivalent fails WCAG 2.5.7, and shipping the accessible half first is the order that cannot produce an inaccessible release."
+      "Pointer drag reordering is not implemented; the keyboard path is. A drag with no keyboard equivalent fails WCAG 2.5.7, and shipping the accessible half first is the order that cannot produce an inaccessible release.",
+      "The close alertdialog does not move focus into itself, trap focus, close on Escape, or restore focus to the initiating close button. It also has no aria-describedby link to its reason. Hosts should account for this gap; the current implementation does not provide modal focus management.",
+      "The tablist describes the selectable chart tabs, while the host renders the active chart content separately. The component does not connect tabs to tabpanels with aria-controls or aria-labelledby; hosts should provide the chart view and its accessible context."
     ],
     "related": [
       "identity",
@@ -11066,7 +11055,7 @@ export const CATALOG: ComponentDoc[] = [
         "wcag": "3.2.2",
         "name": "On input",
         "status": "pass",
-        "how": "Moving focus across the stack never activates a chart; activation is a click or Enter. Arrowing past a chart must not open it.",
+        "how": "Moving focus across the stack never activates a chart; activation is a click or native button Enter/Space. Arrowing past a chart must not open it.",
         "evidence": "recent-patient-stack.test.tsx"
       },
       {
@@ -11093,38 +11082,52 @@ export const CATALOG: ComponentDoc[] = [
     ],
     "examples": [
       {
+        "id": "workspace",
+        "title": "Show recently opened charts in the workspace shell",
+        "description": "Pass the workspace's open chart records and active chart id. The component keeps pinned charts first and otherwise sorts by last activity, while the host remains the source of truth.",
+        "fixture": "recentPatientStackRoutine",
+        "code": "<RecentPatientStack\n  charts={openCharts}\n  activeId={activeChartId}\n  now={serverTime}\n  onActivate={(chart, { reassert }) => {\n    if (reassert) confirmPatientIdentity(chart);\n    else setActiveChartId(chart.id);\n  }}\n/>"
+      },
+      {
+        "id": "manage-open-charts",
+        "title": "Pin, reorder, and close from the expanded panel",
+        "description": "Expanded mode exposes pin and close actions when their callbacks are provided. Pin and reorder callbacks report proposed state; the host updates its chart list. Closing an unsigned note asks first, while a draft order blocks closing.",
+        "fixture": "recentPatientStackCloseStates",
+        "code": "<RecentPatientStack\n  charts={openCharts}\n  activeId={activeChartId}\n  expanded\n  onPin={(chart, pinned) => updatePin(chart.id, pinned)}\n  onReorder={saveChartOrder}\n  onClose={(chart) => removeChart(chart.id)}\n/>"
+      },
+      {
         "id": "identity",
         "title": "The hue is derived, not handed out",
         "description": "A chart that was blue this morning must be blue this afternoon. The accent is an FNV-1a hash of the chart id modulo eight, so it is stable across sessions and machines — and it is never the only identity, because a clinician who has learned \"Okonkwo is the green one\" has learned something no new colleague knows.",
-        "fixture": "patientRoutine",
-        "code": "chartAccent(\"chart-okonkwo\");   // → 3, today and next month\nchartAccent(\"chart-okonkwo-2\"); // → a different slot, deterministically"
+        "fixture": "recentPatientStackRoutine",
+        "code": "chartAccent(\"syn-chart-ember-17\"); // stable accent for this synthetic chart\nchartAccent(\"syn-chart-cedar-42\"); // derived independently from its stable id"
       },
       {
         "id": "similar",
         "title": "Two charts that look alike both grow an identifier",
         "description": "Marking only the newcomer would leave the reader comparing a row that has an identifier against a row that does not, which is a harder comparison than two that both do. The pass is deliberately over-eager: a false positive costs a visible MRN and a false negative costs a note in the wrong chart.",
-        "fixture": "patients",
-        "code": "needsIdentifier([\n  { id: \"a\", display: \"J. Okonkwo\", identifier: \"093-441-208\" },\n  { id: \"b\", display: \"J. Okonjo\",  identifier: \"093-118-774\" },\n]);\n// → Set { \"a\", \"b\" }"
+        "fixture": "recentPatientStackSimilarNames",
+        "code": "needsIdentifier([\n  { id: \"syn-chart-similar-1\", display: \"Ari Bell\", identifier: \"EX-771-204\" },\n  { id: \"syn-chart-similar-2\", display: \"Ari Bellamy\", identifier: \"EX-771-928\" },\n]);\n// → Set { \"syn-chart-similar-1\", \"syn-chart-similar-2\" }"
       },
       {
         "id": "closing",
         "title": "Closing is graded, not binary",
         "description": "A clean chart closes. One with an unsigned note asks, because losing the draft is a real loss that a person may still choose. One with a draft order refuses, because an order that vanishes with its tab is an order somebody believes they placed and nothing downstream will show its absence.",
-        "fixture": "patientRestricted",
+        "fixture": "recentPatientStackCloseStates",
         "code": "canClose(clean);     // { kind: \"close\" }\ncanClose(withNote);  // { kind: \"confirm\", reason: \"… Close and lose the draft?\" }\ncanClose(withOrder); // { kind: \"refuse\",  reason: \"… Sign it or discard it first.\" }"
       },
       {
         "id": "return",
         "title": "Coming back re-asserts who the chart belongs to",
         "description": "Fifteen minutes, because that is roughly the length of an interruption you do not remember having — and that is the interruption that produces the wrong-chart note. A chart with no recorded activity re-asserts too: not knowing how long you were away is not the same as having just left.",
-        "fixture": "patientRoutine",
+        "fixture": "recentPatientStackRoutine",
         "code": "needsReassertion({ id, display, lastActiveAt: \"10:00\" }, \"10:20\"); // true\nneedsReassertion({ id, display, lastActiveAt: \"10:00\" }, \"10:05\"); // false\nneedsReassertion({ id, display }, \"10:05\");                        // true"
       }
     ],
     "fixtures": [
-      "patientRoutine",
-      "patientRestricted",
-      "patients"
+      "recentPatientStackRoutine",
+      "recentPatientStackSimilarNames",
+      "recentPatientStackCloseStates"
     ],
     "seo": {
       "slug": "recent-patient-stack",

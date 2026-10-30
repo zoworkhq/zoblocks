@@ -971,7 +971,7 @@
       "name": "recent-patient-stack",
       "type": "zoblocks:component",
       "title": "Recent Patient Stack",
-      "description": "Each open chart gets a hue derived from its id, so it is the same colour in every session. Two charts whose names look alike both grow an identifier. Per-chart badges carry the unfinished work, closing is graded rather than binary, and returning after fifteen minutes away re-asserts who the chart belongs to.",
+      "description": "Recent Patient Stack displays open patient charts in a compact, selectable workspace so clinicians can see which chart is active and what work remains. Use it in a clinical application shell when users move between several charts; it keeps chart identity and status visible and helps reduce wrong-chart actions.",
       "categories": [
         "clinical",
         "navigation"

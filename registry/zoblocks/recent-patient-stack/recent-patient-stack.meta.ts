@@ -10,28 +10,18 @@ export default defineComponentMeta({
   layer: "clinical",
 
   summary:
-    "A multi-chart workspace that makes the active patient unmistakable, because the alternative is eleven identical browser tabs.",
+    "A compact chart switcher that keeps open patient records, active status, and unfinished work visible together.",
 
   tagline: "A multi-chart workspace where the active patient is unmistakable.",
   description:
-    "Each open chart gets a hue derived from its id, so it is the same colour in every session. Two charts whose names look alike both grow an identifier. Per-chart badges carry the unfinished work, closing is graded rather than binary, and returning after fifteen minutes away re-asserts who the chart belongs to.",
+    "Recent Patient Stack displays open patient charts in a compact, selectable workspace so clinicians can see which chart is active and what work remains. Use it in a clinical application shell when users move between several charts; it keeps chart identity and status visible and helps reduce wrong-chart actions.",
   rationale:
     'Clinicians work several charts at once and the tooling pretends they do not. The state of the art is a dropdown of names, or worse, eleven browser tabs whose titles truncate to "Chart — Riverside…". Wrong-patient documentation survives every amount of staff training because it is not a training problem: it is two charts that look identical, one keyboard shortcut, and an interruption. A stack does three things a dropdown cannot — it makes the set visible without being opened, it gives each chart a persistent visual identity, and it carries per-chart state. The identity has to be derived from the chart rather than handed out in arrival order, or a clinician who has learned "Okonkwo is the green one" has learned something that will be false tomorrow.',
 
   categories: ["Clinical", "Navigation"],
 
-  fhir: [
-    {
-      name: "Patient",
-      url: "https://hl7.org/fhir/R4/patient.html",
-      note: "Identity per chart. The accent is derived from the chart id rather than from the patient, so a merged record does not silently change colour.",
-    },
-    {
-      name: "Task",
-      url: "https://hl7.org/fhir/R4/task.html",
-      note: "Outstanding work per chart — a draft order, an unsigned note, an unacknowledged result — ranked by consequence rather than by age.",
-    },
-  ],
+  // The component consumes its OpenChart view model; the host maps FHIR data into it.
+  fhir: [],
 
   states: [
     "Four charts, one active",
@@ -54,7 +44,7 @@ export default defineComponentMeta({
     {
       label: "A tablist with roving focus",
       detail:
-        "One tab stop for the whole stack; arrows move within it, Home and End jump to the ends. A workspace with eleven tab stops is a workspace a keyboard user leaves.",
+        "The named Open charts tablist has a roving tab stop. Arrow keys move focus through tabs (without activating them); Home and End move to the first and last tab. Tab enters the stack at the active chart, or the first tab if activeId is missing or unmatched, and native tab order continues to later controls. Enter and Space activate a focused native button tab.",
     },
     {
       label: "Every drag has a keyboard equivalent",
@@ -74,7 +64,7 @@ export default defineComponentMeta({
     {
       label: "Refusal is not dressed as a question",
       detail:
-        "Closing a chart with a draft order opens an alertdialog with one way out and no confirm button. A dialogue with only one exit that offers two is how people learn to click through the ones that matter.",
+        "A refused close and a close needing confirmation render a role=alertdialog with an accessible name and a reason. Confirmation offers Close and lose the draft; refusal offers only Back to the chart. The alertdialog's action buttons are native buttons.",
     },
     {
       label: "Small screens get one legible chart",
@@ -89,6 +79,8 @@ export default defineComponentMeta({
     "Re-assertion is reported, not performed. The component says the clinician has been away long enough; showing the confirmation is the host's, because only the host knows what the chart is about to reveal.",
     "No LRU eviction, no refetch on restore. Both belong to the workspace store — and a nine-hour-old vitals set that looks live is a hazard the store has to prevent, not the tab strip.",
     "Pointer drag reordering is not implemented; the keyboard path is. A drag with no keyboard equivalent fails WCAG 2.5.7, and shipping the accessible half first is the order that cannot produce an inaccessible release.",
+    "The close alertdialog does not move focus into itself, trap focus, close on Escape, or restore focus to the initiating close button. It also has no aria-describedby link to its reason. Hosts should account for this gap; the current implementation does not provide modal focus management.",
+    "The tablist describes the selectable chart tabs, while the host renders the active chart content separately. The component does not connect tabs to tabpanels with aria-controls or aria-labelledby; hosts should provide the chart view and its accessible context.",
   ],
 
   related: ["identity", "chart-header", "chart-command-palette"],
@@ -96,19 +88,49 @@ export default defineComponentMeta({
   dependencies: ["clsx", "tailwind-merge"],
   registryDependencies: ["utils", "tokens", "workspace-core"],
 
-  usage: `import { RecentPatientStack } from "@/components/zoblocks/recent-patient-stack";
+  usage: `import { useState } from "react";
+import { RecentPatientStack, type OpenChart } from "@/components/zoblocks/recent-patient-stack";
 import "@/styles/zoblocks-workspace.css";
 
-<RecentPatientStack
-  charts={open}
-  activeId={activeId}
-  now={serverTime}
-  onActivate={(chart, { reassert }) =>
-    reassert ? confirmIdentity(chart) : switchTo(chart)
-  }
-  onClose={closeChart}
-  onReorder={setOrder}
-/>`,
+const initialCharts: OpenChart[] = [
+  {
+    id: "syn-chart-ember-17",
+    display: "Mira Solano",
+    identifier: "EX-204-711",
+    reason: "Care review",
+    lastActiveAt: "2026-08-24T09:58:00Z",
+  },
+  {
+    id: "syn-chart-cedar-42",
+    display: "Noel Hartwell",
+    identifier: "EX-204-928",
+    reason: "Follow-up note",
+    lastActiveAt: "2026-08-24T09:30:00Z",
+    work: [{ kind: "unsigned-note", label: "Visit summary", since: "2026-08-21T09:00:00Z" }],
+  },
+];
+
+function WorkspaceStack() {
+  const [charts, setCharts] = useState(initialCharts);
+  const [activeId, setActiveId] = useState("syn-chart-ember-17");
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <RecentPatientStack
+      charts={charts}
+      activeId={activeId}
+      now={new Date().toISOString()}
+      expanded={expanded}
+      onActivate={(chart, { reassert }) => {
+        if (!reassert || window.confirm("Confirm chart for " + chart.display + "?")) setActiveId(chart.id);
+      }}
+      onClose={(chart) => setCharts((open) => open.filter((item) => item.id !== chart.id))}
+      onPin={(chart, pinned) => setCharts((open) => open.map((item) => item.id === chart.id ? { ...item, pinned } : item))}
+      onReorder={setCharts}
+      onExpandedChange={setExpanded}
+    />
+  );
+}`,
 
   guidance: {
     use: [
@@ -218,7 +240,7 @@ import "@/styles/zoblocks-workspace.css";
       wcag: "3.2.2",
       name: "On input",
       status: "pass",
-      how: "Moving focus across the stack never activates a chart; activation is a click or Enter. Arrowing past a chart must not open it.",
+      how: "Moving focus across the stack never activates a chart; activation is a click or native button Enter/Space. Arrowing past a chart must not open it.",
       evidence: "recent-patient-stack.test.tsx",
     },
     {
@@ -244,36 +266,71 @@ import "@/styles/zoblocks-workspace.css";
     },
   ],
 
-  fixtures: ["patientRoutine", "patientRestricted", "patients"],
+  fixtures: [
+    "recentPatientStackRoutine",
+    "recentPatientStackSimilarNames",
+    "recentPatientStackCloseStates",
+  ],
 
   examples: [
+    {
+      id: "workspace",
+      title: "Show recently opened charts in the workspace shell",
+      description:
+        "Pass the workspace's open chart records and active chart id. The component keeps pinned charts first and otherwise sorts by last activity, while the host remains the source of truth.",
+      fixture: "recentPatientStackRoutine",
+      code: `<RecentPatientStack
+  charts={openCharts}
+  activeId={activeChartId}
+  now={serverTime}
+  onActivate={(chart, { reassert }) => {
+    if (reassert) confirmPatientIdentity(chart);
+    else setActiveChartId(chart.id);
+  }}
+/>`,
+    },
+    {
+      id: "manage-open-charts",
+      title: "Pin, reorder, and close from the expanded panel",
+      description:
+        "Expanded mode exposes pin and close actions when their callbacks are provided. Pin and reorder callbacks report proposed state; the host updates its chart list. Closing an unsigned note asks first, while a draft order blocks closing.",
+      fixture: "recentPatientStackCloseStates",
+      code: `<RecentPatientStack
+  charts={openCharts}
+  activeId={activeChartId}
+  expanded
+  onPin={(chart, pinned) => updatePin(chart.id, pinned)}
+  onReorder={saveChartOrder}
+  onClose={(chart) => removeChart(chart.id)}
+/>`,
+    },
     {
       id: "identity",
       title: "The hue is derived, not handed out",
       description:
         'A chart that was blue this morning must be blue this afternoon. The accent is an FNV-1a hash of the chart id modulo eight, so it is stable across sessions and machines — and it is never the only identity, because a clinician who has learned "Okonkwo is the green one" has learned something no new colleague knows.',
-      fixture: "patientRoutine",
-      code: `chartAccent("chart-okonkwo");   // → 3, today and next month
-chartAccent("chart-okonkwo-2"); // → a different slot, deterministically`,
+      fixture: "recentPatientStackRoutine",
+      code: `chartAccent("syn-chart-ember-17"); // stable accent for this synthetic chart
+chartAccent("syn-chart-cedar-42"); // derived independently from its stable id`,
     },
     {
       id: "similar",
       title: "Two charts that look alike both grow an identifier",
       description:
         "Marking only the newcomer would leave the reader comparing a row that has an identifier against a row that does not, which is a harder comparison than two that both do. The pass is deliberately over-eager: a false positive costs a visible MRN and a false negative costs a note in the wrong chart.",
-      fixture: "patients",
+      fixture: "recentPatientStackSimilarNames",
       code: `needsIdentifier([
-  { id: "a", display: "J. Okonkwo", identifier: "093-441-208" },
-  { id: "b", display: "J. Okonjo",  identifier: "093-118-774" },
+  { id: "syn-chart-similar-1", display: "Ari Bell", identifier: "EX-771-204" },
+  { id: "syn-chart-similar-2", display: "Ari Bellamy", identifier: "EX-771-928" },
 ]);
-// → Set { "a", "b" }`,
+// → Set { "syn-chart-similar-1", "syn-chart-similar-2" }`,
     },
     {
       id: "closing",
       title: "Closing is graded, not binary",
       description:
         "A clean chart closes. One with an unsigned note asks, because losing the draft is a real loss that a person may still choose. One with a draft order refuses, because an order that vanishes with its tab is an order somebody believes they placed and nothing downstream will show its absence.",
-      fixture: "patientRestricted",
+      fixture: "recentPatientStackCloseStates",
       code: `canClose(clean);     // { kind: "close" }
 canClose(withNote);  // { kind: "confirm", reason: "… Close and lose the draft?" }
 canClose(withOrder); // { kind: "refuse",  reason: "… Sign it or discard it first." }`,
@@ -283,7 +340,7 @@ canClose(withOrder); // { kind: "refuse",  reason: "… Sign it or discard it fi
       title: "Coming back re-asserts who the chart belongs to",
       description:
         "Fifteen minutes, because that is roughly the length of an interruption you do not remember having — and that is the interruption that produces the wrong-chart note. A chart with no recorded activity re-asserts too: not knowing how long you were away is not the same as having just left.",
-      fixture: "patientRoutine",
+      fixture: "recentPatientStackRoutine",
       code: `needsReassertion({ id, display, lastActiveAt: "10:00" }, "10:20"); // true
 needsReassertion({ id, display, lastActiveAt: "10:00" }, "10:05"); // false
 needsReassertion({ id, display }, "10:05");                        // true`,
@@ -298,6 +355,18 @@ needsReassertion({ id, display }, "10:05");                        // true`,
       { ref: "chart-header", when: "there is one chart and the question is who the patient is" },
     ],
   },
+
+  props: [
+    { name: "charts", order: 1 },
+    { name: "activeId", order: 2 },
+    { name: "now", order: 3 },
+    { name: "onActivate", order: 4 },
+    { name: "onClose", order: 5 },
+    { name: "onPin", order: 6 },
+    { name: "onReorder", order: 7 },
+    { name: "expanded", order: 8 },
+    { name: "onExpandedChange", order: 9 },
+  ],
 
   seo: {
     slug: "recent-patient-stack",

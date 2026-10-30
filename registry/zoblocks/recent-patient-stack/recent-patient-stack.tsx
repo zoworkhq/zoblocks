@@ -94,39 +94,46 @@ export interface RecentPatientStackProps extends Omit<
   "children" | "onSelect"
 > {
   /**
-   * The open charts, most recent first. Each carries enough to tell two patients apart, which
-   * eleven identical browser tabs do not.
+   * Required. Open chart records, sorted by recency after pinned charts. Each record needs a
+   * stable `id` and display name; optional identifiers, photo URLs, reasons, activity times,
+   * pin state, and outstanding work enrich the tab and expanded panel. See `OpenChart`.
    */
   charts: readonly OpenChart[];
   /**
-   * Which chart is in front. The active patient has to be unmistakable — this is a
-   * wrong-patient control, not a tab bar.
+   * ID of the active chart. Optional; when omitted or unmatched, the first ordered tab remains
+   * keyboard-focusable, but no tab is marked selected. The host owns and updates this value.
    */
   activeId?: string;
-  /** ISO 8601 from the host. Decides whether returning re-asserts identity. */
+  /**
+   * Optional ISO 8601 timestamp for the host's current time. When omitted, every activation
+   * requests identity re-assertion because elapsed time cannot be determined.
+   */
   now?: string;
   /**
-   * Switch to a chart.
-   *
-   * Called with `reassert: true` when the clinician has been away long enough
-   * that the host should confirm the patient before showing the chart. Fifteen
-   * minutes is roughly the length of an interruption you do not remember.
+   * Optional activation callback. Called with the selected `OpenChart` and `{ reassert }`;
+   * `reassert` is true when the last activity is missing/invalid, no `now` was supplied, or the
+   * chart has been inactive for at least 15 minutes. The host performs any confirmation and
+   * switches the active chart; this component does not change `activeId` itself.
    */
   onActivate?: (chart: OpenChart, options: { reassert: boolean }) => void;
   /**
-   * Close a chart.
-   *
-   * Called only when `canClose` returns `close` or the host confirmed a
-   * `confirm`. A `refuse` never reaches here.
+   * Optional close callback. Called immediately for charts with no protected outstanding work,
+   * or after the user confirms closing with an unsigned note. A draft order blocks closing;
+   * unacknowledged results and pending tasks are not blocked by the close rule. The host should
+   * remove the chart from its `charts` value after this callback.
    */
   onClose?: (chart: OpenChart) => void;
-  /** Fired when a chart is pinned, so it survives the recency ordering. */
+  /** Optional pin callback. Called with the chart and its proposed next pin state. Update `charts` in the host to apply it. */
   onPin?: (chart: OpenChart, pinned: boolean) => void;
-  /** Keyboard reordering, the equivalent of a drag (WCAG 2.5.7). */
+  /**
+   * Optional keyboard-reorder callback. Alt+ArrowUp/Alt+ArrowDown proposes the new ordered
+   * chart array. Update `charts` in the host to persist the order; pinned charts cannot be moved
+   * across the pinned/unpinned boundary.
+   */
   onReorder?: (charts: OpenChart[]) => void;
-  /** Start expanded, showing the panel rather than the avatar row. */
+  /** Whether the per-chart action panel is initially shown. Defaults to `false`. Host-controlled. */
   expanded?: boolean;
-  /** Fired when the stack expands or collapses. */
+  /** Optional controlled-state callback. When provided, renders the toggle; call it with the proposed state and update `expanded` in the host. */
   onExpandedChange?: (expanded: boolean) => void;
 }
 

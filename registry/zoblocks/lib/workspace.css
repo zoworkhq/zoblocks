@@ -147,11 +147,11 @@
   block-size: 1.5rem;
   border-radius: 999px;
   /*
-   * The hue at low opacity behind the initials, so the chip reads as this
-   * chart's colour without the initials losing contrast against it.
+   * The hue at low opacity behind the initials; the text stays on the normal
+   * foreground token so every chart accent retains readable text contrast.
    */
   background: color-mix(in srgb, var(--zb-stack-accent) 16%, transparent);
-  color: var(--zb-stack-accent);
+  color: var(--zb-text, inherit);
   font-size: var(--zb-text-2xs, 0.6875rem);
   font-weight: 700;
   overflow: hidden;
