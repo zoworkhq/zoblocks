@@ -3709,8 +3709,8 @@ packages:
     resolution: {integrity: sha512-kWWXztvZ5SBQV+eRgKFeh8q5sLuZY2+8WUIzlxWVTg+oGwY14qylx1KbKzHd8P6ZYkAg0xyIDU9JMHhyJMZ1jw==}
     engines: {node: '>=10'}
 
-  chromedriver@156.0.0:
-    resolution: {integrity: sha512-C1YDo5DHMNdQ5w5i4lz9htZ7ZQPnLTkQcnaQio8NKN1nPudJXhervWf9rr1othlT58QGTNVLhDDjp9Jel0kQLQ==}
+  chromedriver@156.0.2:
+    resolution: {integrity: sha512-tnbStQXrModzo3nvGeEIA7tQxmO2Xsa6ZU7B5ghKjnzOLNF33SyFUTpfK339hjY5Uw5bPuQdc4u28pftgZDd0g==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -5913,7 +5913,7 @@ snapshots:
     dependencies:
       '@axe-core/webdriverjs': 4.12.1(selenium-webdriver@4.44.0)
       axe-core: 4.12.1
-      chromedriver: 156.0.0
+      chromedriver: 156.0.2
       colors: 1.4.0
       commander: 9.5.0
       dotenv: 17.4.2
@@ -8029,7 +8029,7 @@ snapshots:
 
   char-regex@1.0.2: {}
 
-  chromedriver@156.0.0:
+  chromedriver@156.0.2:
     dependencies:
       '@testim/chrome-version': 1.1.4
       adm-zip: 0.6.1

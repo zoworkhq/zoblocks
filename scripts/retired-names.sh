@@ -48,6 +48,7 @@
 #
 # Run: pnpm check:names
 set -uo pipefail
+export LC_ALL=C
 cd "$(git rev-parse --show-toplevel)"
 
 # `git grep -I` skips binary files. That is a real hole: a file with a stray NUL

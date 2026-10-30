@@ -4875,7 +4875,11 @@ button.zb-prov:focus-visible,
 .zb-trend__unit {
   margin-inline-start: 0.0625rem;
   font-weight: 400;
-  color: var(--zb-text-subtle, var(--zb-text-muted, inherit));
+  color: #475569;
+}
+
+.dark .zb-trend__unit {
+  color: #cbd5e1;
 }
 
 /* ---------------------------------------------------------------- */
