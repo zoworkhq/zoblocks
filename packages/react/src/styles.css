@@ -1803,7 +1803,7 @@
 
 .zb-chart-accordion__count,
 .zb-chart-accordion__time {
-  color: var(--zb-text-subtle);
+  color: var(--zb-text-muted);
   font-size: var(--zb-text-sm);
   font-variant-numeric: tabular-nums;
 }
