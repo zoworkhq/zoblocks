@@ -215,7 +215,6 @@ export const DOCUMENTED_ORDER: readonly string[] = [
   "allergy-chip",
   "care-team-presence",
   "chart-accordion",
-  "chart-command-palette",
   "chart-header",
   "clinical-note",
   "copilot",

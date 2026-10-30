@@ -13,7 +13,7 @@
  * change, because customers style against these names. The manifest is
  * committed so that change shows up as a reviewable diff.
  *
- * 361 tokens across 32 components:
+ * 362 tokens across 32 components:
  *
  *   switch          55
  *   tabs            44
@@ -41,10 +41,10 @@
  *   value            3
  *   care-timeline    2
  *   presence         2
+ *   prov             2
  *   allergy          1
  *   chart-header     1
  *   patient-chip     1
- *   prov             1
  *   risk             1
  *   stack            1
  *
@@ -2331,6 +2331,15 @@ export const TOKEN_SURFACE: readonly SurfaceEntry[] = [
     "bridgeable": true
   },
   {
+    "name": "--zb-prov-text",
+    "component": "prov",
+    "source": "packages/react/src/styles.css",
+    "kind": "color",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
     "name": "--zb-range-band",
     "component": "range",
     "source": "packages/tokens/tokens/component.json",
@@ -3941,6 +3950,7 @@ export const BRIDGEABLE: readonly string[] = [
   "--zb-patient-chip-rail",
   "--zb-presence-avatar",
   "--zb-prov-glyph",
+  "--zb-prov-text",
   "--zb-range-height",
   "--zb-range-marker",
   "--zb-range-track",
