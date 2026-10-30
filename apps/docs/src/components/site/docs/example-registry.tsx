@@ -30,6 +30,7 @@ import * as DateDemo from "../date-picker-demos";
 import * as GridDemo from "../data-grid-demos";
 import * as TimelineDemo from "../care-timeline-demos";
 import * as RecDemo from "../recorder-demos";
+import * as RiskDemo from "../risk-indicator-demos";
 
 /* ------------------------------------------------------------------ */
 /* Stand-ins for the host application                                  */
@@ -428,6 +429,13 @@ export const EXAMPLE_PREVIEWS: Readonly<
     "known-progress": () => <InfusionLoader showLabel label="Importing records" progress={62} />,
     "live-import": () => <LiveImport />,
     "before-the-total": () => <InfusionLoader showLabel label="Preparing the export" />,
+  },
+
+  "risk-indicator": {
+    "the-three-failures": () => <RiskDemo.TheThreeFailures />,
+    expired: () => <RiskDemo.ExpiredNotOld />,
+    unscored: () => <RiskDemo.NotScoredIsNotLow />,
+    concentration: () => <RiskDemo.ConcentrationDominance />,
   },
 };
 
