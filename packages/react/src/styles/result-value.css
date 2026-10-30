@@ -184,7 +184,10 @@
   color: var(--zb-status-provisional, #0e7490);
 }
 
-.zb-rv__age,
+.zb-rv__age {
+  color: var(--zb-text-muted, inherit);
+}
+
 .zb-rv__note {
   color: var(--zb-text-subtle, var(--zb-text-muted, inherit));
 }

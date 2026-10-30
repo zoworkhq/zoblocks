@@ -68,7 +68,7 @@
     "@zoblocks/bridge-core": "workspace:*",
     "@zoblocks/bridge-mui": "workspace:*",
     "@zoblocks/tokens": "workspace:*",
-    "zod": "^3.24.1"
+    "zod": "^4.6.7"
   },
   "peerDependencies": {
     "react": "^18.2.0 || ^19.0.0"

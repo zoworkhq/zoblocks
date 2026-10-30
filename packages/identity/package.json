@@ -58,7 +58,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json && cp src/styles.css dist/styles.css",
-    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json",
+    "typecheck": "tsc -p tsconfig.build.json --noEmit && tsc -p tsconfig.test.json",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage"
   },
