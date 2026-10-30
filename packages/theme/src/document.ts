@@ -318,7 +318,7 @@ export const themeDocumentSchema = z
     version: z.number().int().min(1),
     status: themeStatusSchema,
     tokens: themeTokensSchema,
-    assets: themeAssetsSchema.default({ fonts: [], brand: [] }),
+    assets: themeAssetsSchema.default({ fonts: [], brand: [], icons: [] }),
     validation: validationRecordSchema.optional(),
     audit: z.object({
       createdBy: z.string().min(1),

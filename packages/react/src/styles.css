@@ -5182,7 +5182,7 @@ button.zb-prov:focus-visible,
 .zb-presence[data-zb-state="in-session"] .zb-presence__state,
 .zb-presence[data-zb-state="in-group"] .zb-presence__state,
 .zb-presence[data-zb-state="degraded"] .zb-presence__state {
-  color: var(--zb-status-high, #b45309);
+  color: var(--zb-status-provisional, #92400e);
 }
 
 .zb-presence[data-zb-state="on-call"] .zb-presence__state {
@@ -5197,7 +5197,7 @@ button.zb-prov:focus-visible,
 
 .zb-presence__detail,
 .zb-presence__until {
-  color: var(--zb-text-subtle, var(--zb-text-muted, #64748b));
+  color: var(--zb-text-muted, var(--zb-text-muted, #64748b));
 }
 
 /*
