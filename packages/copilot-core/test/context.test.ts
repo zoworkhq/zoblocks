@@ -229,7 +229,7 @@ describe("assembleRequest — guarantee 2: record content stays in the data chan
     const block = request.contextBlocks[0];
     expect(block?.label).toBeTypeOf("string");
     expect(block?.resourceType).toBe("Condition");
-    expect(block?.text).not.toContain(block?.label ?? " ");
+    expect(block?.text).not.toContain(block?.label ?? "\u0000");
   });
 });
 

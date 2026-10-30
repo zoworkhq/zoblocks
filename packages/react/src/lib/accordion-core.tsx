@@ -347,7 +347,7 @@ function useControllableSet(
 
   // A fresh Set each render would be a new identity every time; the join is
   // stable, so the memo actually holds.
-  const controlledKey = controlled ? controlled.join(" ") : undefined;
+  const controlledKey = controlled ? controlled.join("\u0000") : undefined;
   const resolved = React.useMemo(
     () => (controlled ? new Set(controlled) : internal),
     // eslint-disable-next-line react-hooks/exhaustive-deps -- controlledKey is the stable identity of `controlled`
