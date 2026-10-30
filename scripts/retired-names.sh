@@ -58,7 +58,6 @@ BINARY=$(comm -13 \
   <(git grep -I -l '^' -- . 2>/dev/null | LC_ALL=C sort) \
   <(git ls-files | LC_ALL=C sort) \
   | grep -vE '\.(png|jpg|jpeg|gif|ico|svg|woff2?|ttf|otf|pdf|zip|mp4|webm|webp|avif)$' || true)
-
 HITS=$(git grep -I -n -i -E 'oxygen' -- . \
     ':!content/archive' \
     ':!packages/codemod/src/oxygen-to-zoblocks.ts' \
