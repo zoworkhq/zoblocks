@@ -98,6 +98,10 @@ export default defineConfig({
         replacement: path.join(root, "../../registry/zoblocks/lib/risk.ts"),
       },
       {
+        find: /^@\/lib\/zoblocks-palette$/,
+        replacement: path.join(root, "../../registry/zoblocks/lib/palette.ts"),
+      },
+      {
         find: /^@\/lib\/zoblocks-clinical-note$/,
         replacement: path.join(root, "../../registry/zoblocks/lib/clinical-note.tsx"),
       },
