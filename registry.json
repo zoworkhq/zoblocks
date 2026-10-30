@@ -787,7 +787,7 @@
       "name": "copilot",
       "type": "zoblocks:component",
       "title": "Copilot",
-      "description": "Model-agnostic clinical assistant with mode-level scope contracts, inline source attribution, a deterministic crisis interrupt, and FHIR audit output. The engine and the accessibility behaviour ship as npm packages; this item is the Tailwind skin over them.",
+      "description": "A clinician-facing assistant dock that sends questions to a host-provided endpoint and displays streamed answers, sources, safety states, and audit events. Configure its modes and optional chart context to control what each request may read.",
       "categories": [
         "patterns",
         "ai"

@@ -71,8 +71,8 @@ export interface CopilotProps extends UseCopilotOptions {
    */
   shortcuts?: readonly CopilotShortcut[];
   /**
-   * ARIA role for the dock. Defaults to `complementary`, so the copilot is findable and
-   * skippable rather than an unnamed div.
+   * Role used to filter shortcuts that declare `roles`. It is not an ARIA role and defaults
+   * to no role filter, so shortcuts with no role restriction remain available.
    */
   role?: string;
   /** Where the dock sits. `inline` renders it in flow for a surface that has its own layout. */

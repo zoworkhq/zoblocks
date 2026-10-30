@@ -115,9 +115,9 @@ export interface UseCopilotOptions {
    * helpline number is the worst output this component could produce.
    */
   readonly crisisLines?: Readonly<Record<string, readonly CrisisLine[]>>;
-  /** Injected for tests. Defaults to real implementations. */
+  /** Clock for audit timestamps. Defaults to the current time in ISO 8601 format. */
   readonly now?: () => string;
-  /** Injected for tests, so ids are deterministic in snapshots. Defaults to a real generator. */
+  /** ID generator for messages and threads. Defaults to crypto.randomUUID with a local fallback. */
   readonly newId?: () => string;
 }
 

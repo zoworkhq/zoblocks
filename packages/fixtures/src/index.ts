@@ -34,6 +34,45 @@ import type {
 export const MRN_SYSTEM = "http://example.org/fhir/sid/mrn";
 
 // ---------------------------------------------------------------------------
+// Copilot scenarios
+// ---------------------------------------------------------------------------
+
+/** Scripted, non-patient reference question used in Copilot examples. */
+export const copilotReferenceLookup = {
+  id: "syn-copilot-reference-lookup",
+  modeId: "look-up",
+  question: "Where can I review the current local guidance?",
+  answer: "Check the current local guideline before applying it to a specific case.",
+  source: {
+    id: "syn-source-local-guidance",
+    title: "Example Local Guidance",
+    version: "demo-1",
+    passage: "Review local guidance and patient-specific factors before making a decision.",
+  },
+} as const;
+
+/** Fictional chart-context scenario; all identifiers are explicitly synthetic. */
+export const copilotRecordSummary = {
+  id: "syn-copilot-record-summary",
+  modeId: "prepare",
+  subject: { reference: "Patient/syn-demo-204", display: "Riley Example" },
+  actor: { display: "Jordan Lee", credential: "MD" },
+  question: "Summarise the documented issues for handoff.",
+  answer: "Summarise only the permitted, documented information and verify it in the chart.",
+  withheldCount: 1,
+} as const;
+
+/** Safety escalation demonstration with invented text and a non-real patient. */
+export const copilotCrisisEscalation = {
+  id: "syn-copilot-crisis-escalation",
+  modeId: "look-up",
+  subject: { reference: "Patient/syn-demo-205", display: "Morgan Sample" },
+  question: "The fictional chart says: 'I want to kill myself and have a plan.'",
+  expectedStatus: "crisis",
+  expectedAction: "Run the host's risk protocol and show configured local resources.",
+} as const;
+
+// ---------------------------------------------------------------------------
 // Patients
 // ---------------------------------------------------------------------------
 

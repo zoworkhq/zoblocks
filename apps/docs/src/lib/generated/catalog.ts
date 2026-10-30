@@ -5544,9 +5544,9 @@ export const CATALOG: ComponentDoc[] = [
         "divergences": []
       }
     },
-    "summary": "A floating clinical copilot: a dock above the chart that takes a question and opens into a sourced, auditable thread.",
+    "summary": "A clinician-facing assistant dock for scoped questions, sourced answers, and auditable conversations alongside the chart.",
     "tagline": "A chart dock that answers with sources and an audit trail.",
-    "description": "Model-agnostic clinical assistant with mode-level scope contracts, inline source attribution, a deterministic crisis interrupt, and FHIR audit output. The engine and the accessibility behaviour ship as npm packages; this item is the Tailwind skin over them.",
+    "description": "A clinician-facing assistant dock that sends questions to a host-provided endpoint and displays streamed answers, sources, safety states, and audit events. Configure its modes and optional chart context to control what each request may read.",
     "rationale": "The floating dock and the streaming text are two weeks of work and compete with a hundred free widgets. The parts that are hard are deciding what the model may see, proving where an answer came from, keeping chart text from being read as instructions, and knowing whether the thing makes clinicians better or worse. Those are what a digital-health team cannot build in a sprint, and they are what this component is. The design target is not a better answer — it is verification that costs less than acceptance, because automation bias is an effort asymmetry rather than a character flaw, and incorrect decision support has been measured making clinicians worse than no decision support at all.",
     "categories": [
       "Patterns",
@@ -5584,21 +5584,100 @@ export const CATALOG: ComponentDoc[] = [
     ],
     "props": [
       {
-        "name": "modes",
-        "type": "readonly CopilotMode[]",
-        "description": "The scope contracts. Each declares what it may read, what tools it may call, what it may output and what risk it carries — enforced in code rather than described in a prompt.",
-        "required": true
-      },
-      {
         "name": "provider",
         "type": "CopilotProvider",
         "description": "Where answers come from. Targets your endpoint, never a model vendor — there is no `apiKey` prop and no way to add one.",
         "required": true
       },
       {
+        "name": "modes",
+        "type": "readonly CopilotMode[]",
+        "description": "The scope contracts. Each declares what it may read, what tools it may call, what it may output and what risk it carries — enforced in code rather than described in a prompt.",
+        "required": true
+      },
+      {
+        "name": "initialModeId",
+        "type": "string",
+        "description": "Which mode opens first. Defaults to the first in `modes`.",
+        "required": false
+      },
+      {
+        "name": "context",
+        "type": "CopilotContextResolver",
+        "description": "Resolves what the copilot may see for this reader and this patient, returning a redacted view — so a mode cannot widen its own scope.",
+        "required": false
+      },
+      {
+        "name": "subject",
+        "type": "Reference",
+        "description": "The patient this session is about, as a FHIR reference. Stamped on every audit event; a question asked with no subject is not attributable to a chart.",
+        "required": false
+      },
+      {
         "name": "actor",
         "type": "Actor",
         "description": "Who is asking, and in what role. Decides what `context` resolves and is stamped on every audit event.",
+        "required": false
+      },
+      {
+        "name": "onAudit",
+        "type": "AuditSink",
+        "description": "Every question, answer, citation, refusal and escalation as a FHIR AuditEvent. This is the record that makes the feature defensible; without it the host has an unlogged clinical assistant.",
+        "required": false
+      },
+      {
+        "name": "onTelemetry",
+        "type": "TelemetrySink",
+        "description": "Latency, token counts and refusal reasons, for operating the thing. Deliberately separate from `onAudit`, which is the clinical record.",
+        "required": false
+      },
+      {
+        "name": "classifiers",
+        "type": "SafetyClassifiers",
+        "description": "Safety checks run over the reader's question and the model's answer before either is shown. Crisis detection routes to `crisisLines` rather than to a model.",
+        "required": false
+      },
+      {
+        "name": "crisisLines",
+        "type": "Readonly<Record<string, readonly CrisisLine[]>>",
+        "description": "Crisis resources by region. Rendered directly and never generated, because a hallucinated helpline number is the worst output this component could produce.",
+        "required": false
+      },
+      {
+        "name": "surface",
+        "type": "'patient' | 'clinician'",
+        "description": "Which surface this is. `patient` throws for every built-in mode.",
+        "required": false
+      },
+      {
+        "name": "locale",
+        "type": "string",
+        "description": "BCP 47 tag for generated strings and crisis-line selection.",
+        "required": false
+      },
+      {
+        "name": "announcementMode",
+        "type": "AnnouncementMode",
+        "description": "How streamed answers reach assistive technology. Token-by-token is unreadable, so the default announces at sentence boundaries.",
+        "required": false
+      },
+      {
+        "name": "suppressed",
+        "type": "boolean",
+        "description": "Law 5, and the FDA's time-critical clause in criterion 4. When true the hook refuses to submit and the skin renders nothing at all.",
+        "required": false
+      },
+      {
+        "name": "shortcuts",
+        "type": "readonly CopilotShortcut[]",
+        "description": "Prompts offered before the reader types. They are starting points, not commands — each still runs through its mode's contract.",
+        "required": false,
+        "default": "[]"
+      },
+      {
+        "name": "role",
+        "type": "string",
+        "description": "Role used to filter shortcuts that declare `roles`. It is not an ARIA role and defaults to no role filter, so shortcuts with no role restriction remain available.",
         "required": false
       },
       {
@@ -5609,63 +5688,9 @@ export const CATALOG: ComponentDoc[] = [
         "default": "\"bottom-center\""
       },
       {
-        "name": "announcementMode",
-        "type": "AnnouncementMode",
-        "description": "How streamed answers reach assistive technology. Token-by-token is unreadable, so the default announces at sentence boundaries.",
-        "required": false
-      },
-      {
-        "name": "classifiers",
-        "type": "SafetyClassifiers",
-        "description": "Safety checks run over the reader's question and the model's answer before either is shown. Crisis detection routes to `crisisLines` rather than to a model.",
-        "required": false
-      },
-      {
         "name": "className",
         "type": "string",
         "description": "Applied to the dock's outer element.",
-        "required": false
-      },
-      {
-        "name": "context",
-        "type": "CopilotContextResolver",
-        "description": "Resolves what the copilot may see for this reader and this patient, returning a redacted view — so a mode cannot widen its own scope.",
-        "required": false
-      },
-      {
-        "name": "crisisLines",
-        "type": "Readonly<Record<string, readonly CrisisLine[]>>",
-        "description": "Crisis resources by region. Rendered directly and never generated, because a hallucinated helpline number is the worst output this component could produce.",
-        "required": false
-      },
-      {
-        "name": "initialModeId",
-        "type": "string",
-        "description": "Which mode opens first. Defaults to the first in `modes`.",
-        "required": false
-      },
-      {
-        "name": "locale",
-        "type": "string",
-        "description": "BCP 47 tag for generated strings and crisis-line selection.",
-        "required": false
-      },
-      {
-        "name": "newId",
-        "type": "(() => string)",
-        "description": "Injected for tests, so ids are deterministic in snapshots. Defaults to a real generator.",
-        "required": false
-      },
-      {
-        "name": "now",
-        "type": "(() => string)",
-        "description": "Injected for tests. Defaults to real implementations.",
-        "required": false
-      },
-      {
-        "name": "onAudit",
-        "type": "AuditSink",
-        "description": "Every question, answer, citation, refusal and escalation as a FHIR AuditEvent. This is the record that makes the feature defensible; without it the host has an unlogged clinical assistant.",
         "required": false
       },
       {
@@ -5681,40 +5706,15 @@ export const CATALOG: ComponentDoc[] = [
         "required": false
       },
       {
-        "name": "onTelemetry",
-        "type": "TelemetrySink",
-        "description": "Latency, token counts and refusal reasons, for operating the thing. Deliberately separate from `onAudit`, which is the clinical record.",
+        "name": "now",
+        "type": "(() => string)",
+        "description": "Clock for audit timestamps. Defaults to the current time in ISO 8601 format.",
         "required": false
       },
       {
-        "name": "role",
-        "type": "string",
-        "description": "ARIA role for the dock. Defaults to `complementary`, so the copilot is findable and skippable rather than an unnamed div.",
-        "required": false
-      },
-      {
-        "name": "shortcuts",
-        "type": "readonly CopilotShortcut[]",
-        "description": "Prompts offered before the reader types. They are starting points, not commands — each still runs through its mode's contract.",
-        "required": false,
-        "default": "[]"
-      },
-      {
-        "name": "subject",
-        "type": "Reference",
-        "description": "The patient this session is about, as a FHIR reference. Stamped on every audit event; a question asked with no subject is not attributable to a chart.",
-        "required": false
-      },
-      {
-        "name": "suppressed",
-        "type": "boolean",
-        "description": "Law 5, and the FDA's time-critical clause in criterion 4. When true the hook refuses to submit and the skin renders nothing at all.",
-        "required": false
-      },
-      {
-        "name": "surface",
-        "type": "'patient' | 'clinician'",
-        "description": "Which surface this is. `patient` throws for every built-in mode.",
+        "name": "newId",
+        "type": "(() => string)",
+        "description": "ID generator for messages and threads. Defaults to crypto.randomUUID with a local fallback.",
         "required": false
       }
     ],
@@ -5724,21 +5724,100 @@ export const CATALOG: ComponentDoc[] = [
         "name": "Copilot",
         "props": [
           {
-            "name": "modes",
-            "type": "readonly CopilotMode[]",
-            "description": "The scope contracts. Each declares what it may read, what tools it may call, what it may output and what risk it carries — enforced in code rather than described in a prompt.",
-            "required": true
-          },
-          {
             "name": "provider",
             "type": "CopilotProvider",
             "description": "Where answers come from. Targets your endpoint, never a model vendor — there is no `apiKey` prop and no way to add one.",
             "required": true
           },
           {
+            "name": "modes",
+            "type": "readonly CopilotMode[]",
+            "description": "The scope contracts. Each declares what it may read, what tools it may call, what it may output and what risk it carries — enforced in code rather than described in a prompt.",
+            "required": true
+          },
+          {
+            "name": "initialModeId",
+            "type": "string",
+            "description": "Which mode opens first. Defaults to the first in `modes`.",
+            "required": false
+          },
+          {
+            "name": "context",
+            "type": "CopilotContextResolver",
+            "description": "Resolves what the copilot may see for this reader and this patient, returning a redacted view — so a mode cannot widen its own scope.",
+            "required": false
+          },
+          {
+            "name": "subject",
+            "type": "Reference",
+            "description": "The patient this session is about, as a FHIR reference. Stamped on every audit event; a question asked with no subject is not attributable to a chart.",
+            "required": false
+          },
+          {
             "name": "actor",
             "type": "Actor",
             "description": "Who is asking, and in what role. Decides what `context` resolves and is stamped on every audit event.",
+            "required": false
+          },
+          {
+            "name": "onAudit",
+            "type": "AuditSink",
+            "description": "Every question, answer, citation, refusal and escalation as a FHIR AuditEvent. This is the record that makes the feature defensible; without it the host has an unlogged clinical assistant.",
+            "required": false
+          },
+          {
+            "name": "onTelemetry",
+            "type": "TelemetrySink",
+            "description": "Latency, token counts and refusal reasons, for operating the thing. Deliberately separate from `onAudit`, which is the clinical record.",
+            "required": false
+          },
+          {
+            "name": "classifiers",
+            "type": "SafetyClassifiers",
+            "description": "Safety checks run over the reader's question and the model's answer before either is shown. Crisis detection routes to `crisisLines` rather than to a model.",
+            "required": false
+          },
+          {
+            "name": "crisisLines",
+            "type": "Readonly<Record<string, readonly CrisisLine[]>>",
+            "description": "Crisis resources by region. Rendered directly and never generated, because a hallucinated helpline number is the worst output this component could produce.",
+            "required": false
+          },
+          {
+            "name": "surface",
+            "type": "'patient' | 'clinician'",
+            "description": "Which surface this is. `patient` throws for every built-in mode.",
+            "required": false
+          },
+          {
+            "name": "locale",
+            "type": "string",
+            "description": "BCP 47 tag for generated strings and crisis-line selection.",
+            "required": false
+          },
+          {
+            "name": "announcementMode",
+            "type": "AnnouncementMode",
+            "description": "How streamed answers reach assistive technology. Token-by-token is unreadable, so the default announces at sentence boundaries.",
+            "required": false
+          },
+          {
+            "name": "suppressed",
+            "type": "boolean",
+            "description": "Law 5, and the FDA's time-critical clause in criterion 4. When true the hook refuses to submit and the skin renders nothing at all.",
+            "required": false
+          },
+          {
+            "name": "shortcuts",
+            "type": "readonly CopilotShortcut[]",
+            "description": "Prompts offered before the reader types. They are starting points, not commands — each still runs through its mode's contract.",
+            "required": false,
+            "default": "[]"
+          },
+          {
+            "name": "role",
+            "type": "string",
+            "description": "Role used to filter shortcuts that declare `roles`. It is not an ARIA role and defaults to no role filter, so shortcuts with no role restriction remain available.",
             "required": false
           },
           {
@@ -5749,63 +5828,9 @@ export const CATALOG: ComponentDoc[] = [
             "default": "\"bottom-center\""
           },
           {
-            "name": "announcementMode",
-            "type": "AnnouncementMode",
-            "description": "How streamed answers reach assistive technology. Token-by-token is unreadable, so the default announces at sentence boundaries.",
-            "required": false
-          },
-          {
-            "name": "classifiers",
-            "type": "SafetyClassifiers",
-            "description": "Safety checks run over the reader's question and the model's answer before either is shown. Crisis detection routes to `crisisLines` rather than to a model.",
-            "required": false
-          },
-          {
             "name": "className",
             "type": "string",
             "description": "Applied to the dock's outer element.",
-            "required": false
-          },
-          {
-            "name": "context",
-            "type": "CopilotContextResolver",
-            "description": "Resolves what the copilot may see for this reader and this patient, returning a redacted view — so a mode cannot widen its own scope.",
-            "required": false
-          },
-          {
-            "name": "crisisLines",
-            "type": "Readonly<Record<string, readonly CrisisLine[]>>",
-            "description": "Crisis resources by region. Rendered directly and never generated, because a hallucinated helpline number is the worst output this component could produce.",
-            "required": false
-          },
-          {
-            "name": "initialModeId",
-            "type": "string",
-            "description": "Which mode opens first. Defaults to the first in `modes`.",
-            "required": false
-          },
-          {
-            "name": "locale",
-            "type": "string",
-            "description": "BCP 47 tag for generated strings and crisis-line selection.",
-            "required": false
-          },
-          {
-            "name": "newId",
-            "type": "(() => string)",
-            "description": "Injected for tests, so ids are deterministic in snapshots. Defaults to a real generator.",
-            "required": false
-          },
-          {
-            "name": "now",
-            "type": "(() => string)",
-            "description": "Injected for tests. Defaults to real implementations.",
-            "required": false
-          },
-          {
-            "name": "onAudit",
-            "type": "AuditSink",
-            "description": "Every question, answer, citation, refusal and escalation as a FHIR AuditEvent. This is the record that makes the feature defensible; without it the host has an unlogged clinical assistant.",
             "required": false
           },
           {
@@ -5821,40 +5846,15 @@ export const CATALOG: ComponentDoc[] = [
             "required": false
           },
           {
-            "name": "onTelemetry",
-            "type": "TelemetrySink",
-            "description": "Latency, token counts and refusal reasons, for operating the thing. Deliberately separate from `onAudit`, which is the clinical record.",
+            "name": "now",
+            "type": "(() => string)",
+            "description": "Clock for audit timestamps. Defaults to the current time in ISO 8601 format.",
             "required": false
           },
           {
-            "name": "role",
-            "type": "string",
-            "description": "ARIA role for the dock. Defaults to `complementary`, so the copilot is findable and skippable rather than an unnamed div.",
-            "required": false
-          },
-          {
-            "name": "shortcuts",
-            "type": "readonly CopilotShortcut[]",
-            "description": "Prompts offered before the reader types. They are starting points, not commands — each still runs through its mode's contract.",
-            "required": false,
-            "default": "[]"
-          },
-          {
-            "name": "subject",
-            "type": "Reference",
-            "description": "The patient this session is about, as a FHIR reference. Stamped on every audit event; a question asked with no subject is not attributable to a chart.",
-            "required": false
-          },
-          {
-            "name": "suppressed",
-            "type": "boolean",
-            "description": "Law 5, and the FDA's time-critical clause in criterion 4. When true the hook refuses to submit and the skin renders nothing at all.",
-            "required": false
-          },
-          {
-            "name": "surface",
-            "type": "'patient' | 'clinician'",
-            "description": "Which surface this is. `patient` throws for every built-in mode.",
+            "name": "newId",
+            "type": "(() => string)",
+            "description": "ID generator for messages and threads. Defaults to crypto.randomUUID with a local fallback.",
             "required": false
           }
         ],
@@ -5878,7 +5878,7 @@ export const CATALOG: ComponentDoc[] = [
         ]
       }
     ],
-    "usage": "import { Copilot } from \"@/components/zoblocks/copilot\";\nimport { lookUp, prepare } from \"@zoblocks/copilot-core\";\n\n// Safest first deployment: reference lookup, no patient data anywhere.\n<Copilot provider={ourEndpoint} modes={[lookUp]} />\n\n// With the chart, once a resolver is wired.\n<Copilot\n  provider={ourEndpoint}\n  modes={[lookUp, prepare]}\n  subject={{ reference: \"Patient/123\", display: \"Amara Okonkwo\" }}\n  context={resolver}\n  actor={{ display: \"Dr Okafor\", reference: \"Practitioner/7\" }}\n  onAudit={(event) => auditSink.write(event)}\n  // The most valuable prop in the API.\n  suppressed={isAdministeringMedication || isSigningOrders}\n/>",
+    "usage": "import { Copilot } from \"@/components/zoblocks/copilot\";\nimport { createStaticProvider, lookUp, prepare, minimalDisclosure } from \"@zoblocks/copilot-core\";\n\n// Replace this scripted provider with an adapter for your own endpoint.\nconst provider = createStaticProvider({\n  events: [\n    { type: \"delta\", text: \"Check the current local guideline before applying it.\" },\n    { type: \"done\", finish: \"stop\" },\n  ],\n  disclosure: minimalDisclosure(\"demo-model@1\", { developer: \"Example Health\" }),\n});\n\n// Safest first deployment: reference lookup, no patient data anywhere.\n<Copilot provider={provider} modes={[lookUp]} />\n\n// With the chart, once a resolver is wired.\n<Copilot\n  provider={provider}\n  modes={[lookUp, prepare]}\n  subject={{ reference: \"Patient/syn-demo-204\", display: \"Riley Example\" }}\n  context={resolver}\n  actor={{ display: \"Jordan Lee\", credential: \"MD\", reference: \"Practitioner/syn-pr-204\" }}\n  onAudit={(event) => auditSink.write(event)}\n  // The most valuable prop in the API.\n  suppressed={isAdministeringMedication || isSigningOrders}\n/>",
     "guidance": {
       "use": [
         "Clinician-facing reference lookup, where no patient data reaches the model at all. This is the safest first deployment and needs no BAA covering PHI in the model call.",
@@ -5899,11 +5899,15 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "label": "The dock is a landmark, not a floating div",
-        "detail": "role=complementary with an accessible name, so it can be found and — more importantly — skipped. The panel does not trap focus, because a clinician has to keep working in the chart with it open, but focus returns to the opener on close."
+        "detail": "The resting dock uses a complementary landmark named 'Clinical assistant'; the conversation is a named section. The panel does not trap focus. Cmd/Ctrl+K focuses the question field. Closing or collapsing does not currently restore focus to the control that opened it."
       },
       {
         "label": "The slash menu is a real combobox",
-        "detail": "Focus stays in the input; arrow keys move aria-activedescendant. Escape closes the menu and leaves the typed text alone, so a free-text question that begins with a slash is not destroyed."
+        "detail": "The input is a labelled combobox with aria-expanded, aria-controls, aria-autocomplete=list and aria-activedescendant. Arrow Up/Down cycle options, Home/End move to the first/last, Enter selects, and Escape closes the menu without clearing the draft. Enter submits when the menu is closed."
+      },
+      {
+        "label": "Status and answer changes are announced separately",
+        "detail": "A polite role=status region announces state transitions and completion word/source counts. The answer uses aria-live=off and aria-busy while streaming, so tokens are not read automatically; progressive mode announces only complete sentences. Buttons and the follow-up field have accessible names."
       },
       {
         "label": "Citations are named, not numbered",
@@ -5945,7 +5949,63 @@ export const CATALOG: ComponentDoc[] = [
           "progressive"
         ],
         "defaultValue": "summary"
+      },
+      {
+        "prop": "anchor",
+        "control": "segmented",
+        "label": "Dock position",
+        "options": [
+          "bottom-center",
+          "bottom-right",
+          "inline"
+        ],
+        "defaultValue": "bottom-center"
+      },
+      {
+        "prop": "suppressed",
+        "control": "switch",
+        "label": "Suppress assistant",
+        "defaultValue": false
       }
+    ],
+    "examples": [
+      {
+        "id": "reference-lookup",
+        "title": "Start with reference lookup and no chart context",
+        "description": "Use a mode that reads no patient data for a guideline question. The scripted provider makes this example deterministic; a production integration supplies its own endpoint adapter.",
+        "fixture": "copilotReferenceLookup",
+        "group": "Configurations",
+        "code": "import { Copilot } from \"@/components/zoblocks/copilot\";\nimport { createStaticProvider, lookUp, minimalDisclosure } from \"@zoblocks/copilot-core\";\n\nconst provider = createStaticProvider({\n  events: [\n    { type: \"delta\", text: \"Review the current local guidance before applying it.\" },\n    { type: \"done\", finish: \"stop\" },\n  ],\n  disclosure: minimalDisclosure(\"demo-model@1\", { developer: \"Example Health\" }),\n});\n\n<Copilot provider={provider} modes={[lookUp]} anchor=\"bottom-right\" />"
+      },
+      {
+        "id": "scoped-record-summary",
+        "title": "Add a resolver for a scoped record summary",
+        "description": "Reading modes need a subject and a context resolver. The mode contract limits resource categories, and the provider must explicitly permit patient context before it can be sent.",
+        "fixture": "copilotRecordSummary",
+        "group": "Configurations",
+        "code": "import { Copilot } from \"@/components/zoblocks/copilot\";\nimport { lookUp, prepare } from \"@zoblocks/copilot-core\";\n\n<Copilot\n  provider={coveredProvider}\n  modes={[lookUp, prepare]}\n  initialModeId=\"prepare\"\n  subject={{ reference: \"Patient/syn-demo-204\", display: \"Riley Example\" }}\n  context={contextResolver}\n  actor={{ display: \"Jordan Lee\", credential: \"MD\" }}\n  onAudit={(event) => auditSink.write(event)}\n  onInsert={(text) => noteEditor.insertText(text)}\n/>"
+      },
+      {
+        "id": "quiet-during-procedure",
+        "title": "Suppress the dock during a time-critical task",
+        "description": "The host can remove Copilot completely while a clinician is administering medication or signing an order, then restore it when the task ends.",
+        "fixture": "copilotReferenceLookup",
+        "group": "Configurations",
+        "code": "<Copilot\n  provider={provider}\n  modes={[lookUp]}\n  suppressed={isAdministeringMedication || isSigningOrder}\n/>"
+      },
+      {
+        "id": "role-specific-shortcuts",
+        "title": "Offer shortcuts to selected roles",
+        "description": "Shortcuts are filtered by the optional role prop. Each shortcut may select a mode and places its question in the composer; it does not bypass that mode's contract.",
+        "fixture": "copilotRecordSummary",
+        "group": "Configurations",
+        "code": "<Copilot\n  provider={provider}\n  modes={[lookUp, prepare]}\n  role=\"nurse\"\n  shortcuts={[\n    {\n      id: \"handoff\",\n      label: \"Prepare handoff\",\n      keyword: \"handoff\",\n      description: \"Draft a concise handoff from the permitted record context.\",\n      modeId: \"prepare\",\n      question: \"Summarise the documented issues for handoff.\",\n      roles: [\"nurse\"],\n    },\n  ]}\n/>"
+      }
+    ],
+    "fixtures": [
+      "copilotReferenceLookup",
+      "copilotRecordSummary",
+      "copilotCrisisEscalation"
     ]
   },
   {
