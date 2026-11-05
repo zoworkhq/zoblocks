@@ -10161,10 +10161,10 @@ export const CATALOG: ComponentDoc[] = [
     "examples": [
       {
         "id": "six-provenances",
-        "title": "One value, six provenances",
-        "description": "The same 128/76, six times. Each supports a different decision, and only the affix says which — the clinic reading is actionable, the HIE row carries a document date rather than an observation date, and the extracted row states that nobody has looked at it.",
+        "title": "One value, different provenances",
+        "description": "The same clinical value shown with different provenance records. Each source supports a different decision, and the affix identifies where the value came from and whether a human has reviewed it.",
         "fixture": "observationPotassiumCritical",
-        "code": "<ProvenanceChip record={{ source: \"clinic\", observedAt: t12min,\n  performer: { display: \"M. Adeyemi\", role: \"MA\" }, device: \"Welch Allyn 6000\" }} now={now} />\n\n<ProvenanceChip record={{ source: \"device\", observedAt: t4days,\n  device: \"Omron BP7450\", deviceNote: \"unvalidated cuff size, median of 3\" }} now={now} />\n\n<ProvenanceChip record={{ source: \"ai-extracted\", model: \"zb-extract-3\",\n  span: { document: \"Scanned referral\", page: 2, line: 14 }, confirmed: false }} />"
+        "code": "<ProvenanceChip record={{ source: \"clinic\", observedAt: t12min,\n  performer: { display: \"M. Adeyemi\", role: \"MA\" }, device: \"Welch Allyn 6000\" }} now={now} />\n\n<ProvenanceChip record={{ source: \"device\", observedAt: t4days,\n  device: \"Omron BP7450\", deviceNote: \"unvalidated cuff size, median of 3\" }} now={now} />\n\n<ProvenanceChip record={{ source: \"ai-extracted\", model: \"zb-extract-3\",\n  span: { document: \"Scanned referral\", page: 2, line: 14 }, confirmed: false }} />\n\n<ProvenanceChip record={{ source: \"patient-reported\", observedAt: \"2026-08-11T20:15:00Z\" }} now={now} />\n\n<ProvenanceChip record={{ source: \"ai-extracted\", observedAt: \"2026-08-10T09:00:00Z\",\n  model: \"zb-extract-3\", span: { document: \"Scanned referral\", page: 2, line: 14 },\n  confirmed: true, confirmedBy: { display: \"Dr. R. Okafor\", role: \"Attending\" } }} now={now} />"
       },
       {
         "id": "document-vintage",
@@ -10186,6 +10186,27 @@ export const CATALOG: ComponentDoc[] = [
         "description": "Four days is nothing for a problem list and a lot for a blood pressure, so the threshold is injected per datum type. Without a policy the chip says nothing about age rather than assuming one — a wrong threshold is worse than no threshold.",
         "fixture": "practitionerSigner",
         "code": "const policy: StalenessPolicy = (record) => {\n  if (record.source === \"device\") return 48 * 3600_000;   // two days\n  if (record.source === \"patient-reported\") return 30 * 86400_000;\n  return null;  // no opinion, and the chip says nothing rather than guessing\n};"
+      },
+      {
+        "id": "glyph-only-grid",
+        "title": "Glyph only in a dense grid",
+        "description": "Six provenance source classes displayed as compact glyphs beside clinical values, keeping the grid readable without losing source context.",
+        "fixture": "observationPotassiumCritical",
+        "code": "<div style={{ display: \"grid\", gridTemplateColumns: \"repeat(2, minmax(0, 1fr))\", gap: 12 }}>\n  <div>\n    <span>Blood pressure · 128/76</span>\n    <ProvenanceChip glyphOnly now={now} record={{ source: \"clinic\", observedAt: \"2026-08-12T09:48:00Z\" }} />\n  </div>\n  <div>\n    <span>Heart rate · 72 bpm</span>\n    <ProvenanceChip glyphOnly now={now} record={{ source: \"device\", device: \"Omron BP7450\", observedAt: \"2026-08-08T08:10:00Z\" }} />\n  </div>\n  <div>\n    <span>Pain score · 3/10</span>\n    <ProvenanceChip glyphOnly now={now} record={{ source: \"patient-reported\", observedAt: \"2026-08-11T20:15:00Z\" }} />\n  </div>\n  <div>\n    <span>Diagnosis · Hypertension</span>\n    <ProvenanceChip glyphOnly now={now} record={{ source: \"external\", exchange: \"Carequality\", observedAt: \"2026-08-10T09:00:00Z\" }} />\n  </div>\n  <div>\n    <span>Potassium · 4.2 mmol/L</span>\n    <ProvenanceChip glyphOnly now={now} record={{ source: \"ai-extracted\", model: \"zb-extract-3\", observedAt: \"2026-08-11T08:00:00Z\" }} />\n  </div>\n  <div>\n    <span>Medication · Metformin</span>\n    <ProvenanceChip glyphOnly now={now} record={{ source: \"amended\", observedAt: \"2026-08-11T10:00:00Z\", supersedes: { value: \"Previous medication entry\" } }} />\n  </div>\n</div>"
+      },
+      {
+        "id": "no-ledger-entry",
+        "title": "No ledger entry",
+        "description": "When the ledger has no matching provenance record, the chip renders nothing rather than displaying misleading or unknown provenance.",
+        "fixture": "provenanceLateEntry",
+        "code": "const ledger = ledgerFrom({});\n\n<ProvenanceChip\n  resourceId=\"obs-missing\"\n  ledger={ledger}\n  now={now}\n/>"
+      },
+      {
+        "id": "chain-and-span",
+        "title": "Provenance chain and source span",
+        "description": "The provenance chip exposes callbacks to access the provenance chain and the original source span of an AI-extracted value.",
+        "fixture": "observationPotassiumCritical",
+        "code": "<ProvenanceChip\n  now={now}\n  record={{\n    source: \"ai-extracted\",\n    observedAt: \"2026-08-11T09:00:00Z\",\n    model: \"zb-extract-3\",\n    span: { document: \"Scanned referral\", page: 2, line: 14 },\n    confirmed: false,\n  }}\n  onOpenChain={(record) => console.log(record)}\n  onOpenSpan={(span, record) => console.log(span, record)}\n/>"
       }
     ],
     "fixtures": [

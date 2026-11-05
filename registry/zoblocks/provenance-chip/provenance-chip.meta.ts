@@ -239,9 +239,9 @@ const ledger = ledgerFrom(records);
   examples: [
     {
       id: "six-provenances",
-      title: "One value, six provenances",
+      title: "One value, different provenances",
       description:
-        "The same 128/76, six times. Each supports a different decision, and only the affix says which — the clinic reading is actionable, the HIE row carries a document date rather than an observation date, and the extracted row states that nobody has looked at it.",
+        "The same clinical value shown with different provenance records. Each source supports a different decision, and the affix identifies where the value came from and whether a human has reviewed it.",
       fixture: "observationPotassiumCritical",
       code: `<ProvenanceChip record={{ source: "clinic", observedAt: t12min,
   performer: { display: "M. Adeyemi", role: "MA" }, device: "Welch Allyn 6000" }} now={now} />
@@ -250,7 +250,13 @@ const ledger = ledgerFrom(records);
   device: "Omron BP7450", deviceNote: "unvalidated cuff size, median of 3" }} now={now} />
 
 <ProvenanceChip record={{ source: "ai-extracted", model: "zb-extract-3",
-  span: { document: "Scanned referral", page: 2, line: 14 }, confirmed: false }} />`,
+  span: { document: "Scanned referral", page: 2, line: 14 }, confirmed: false }} />
+
+<ProvenanceChip record={{ source: "patient-reported", observedAt: "2026-08-11T20:15:00Z" }} now={now} />
+
+<ProvenanceChip record={{ source: "ai-extracted", observedAt: "2026-08-10T09:00:00Z",
+  model: "zb-extract-3", span: { document: "Scanned referral", page: 2, line: 14 },
+  confirmed: true, confirmedBy: { display: "Dr. R. Okafor", role: "Attending" } }} now={now} />`,
     },
     {
       id: "document-vintage",
@@ -295,6 +301,72 @@ const ledger = ledgerFrom(records);
   if (record.source === "patient-reported") return 30 * 86400_000;
   return null;  // no opinion, and the chip says nothing rather than guessing
 };`,
+    },
+    {
+      id: "glyph-only-grid",
+      title: "Glyph only in a dense grid",
+      description:
+        "Six provenance source classes displayed as compact glyphs beside clinical values, keeping the grid readable without losing source context.",
+      fixture: "observationPotassiumCritical",
+      code: `<div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 12 }}>
+  <div>
+    <span>Blood pressure · 128/76</span>
+    <ProvenanceChip glyphOnly now={now} record={{ source: "clinic", observedAt: "2026-08-12T09:48:00Z" }} />
+  </div>
+  <div>
+    <span>Heart rate · 72 bpm</span>
+    <ProvenanceChip glyphOnly now={now} record={{ source: "device", device: "Omron BP7450", observedAt: "2026-08-08T08:10:00Z" }} />
+  </div>
+  <div>
+    <span>Pain score · 3/10</span>
+    <ProvenanceChip glyphOnly now={now} record={{ source: "patient-reported", observedAt: "2026-08-11T20:15:00Z" }} />
+  </div>
+  <div>
+    <span>Diagnosis · Hypertension</span>
+    <ProvenanceChip glyphOnly now={now} record={{ source: "external", exchange: "Carequality", observedAt: "2026-08-10T09:00:00Z" }} />
+  </div>
+  <div>
+    <span>Potassium · 4.2 mmol/L</span>
+    <ProvenanceChip glyphOnly now={now} record={{ source: "ai-extracted", model: "zb-extract-3", observedAt: "2026-08-11T08:00:00Z" }} />
+  </div>
+  <div>
+    <span>Medication · Metformin</span>
+    <ProvenanceChip glyphOnly now={now} record={{ source: "amended", observedAt: "2026-08-11T10:00:00Z", supersedes: { value: "Previous medication entry" } }} />
+  </div>
+</div>`,
+    },
+    {
+      id: "no-ledger-entry",
+      title: "No ledger entry",
+      description:
+        "When the ledger has no matching provenance record, the chip renders nothing rather than displaying misleading or unknown provenance.",
+      fixture: "provenanceLateEntry",
+      code: `const ledger = ledgerFrom({});
+
+<ProvenanceChip
+  resourceId="obs-missing"
+  ledger={ledger}
+  now={now}
+/>`,
+    },
+    {
+      id: "chain-and-span",
+      title: "Provenance chain and source span",
+      description:
+        "The provenance chip exposes callbacks to access the provenance chain and the original source span of an AI-extracted value.",
+      fixture: "observationPotassiumCritical",
+      code: `<ProvenanceChip
+  now={now}
+  record={{
+    source: "ai-extracted",
+    observedAt: "2026-08-11T09:00:00Z",
+    model: "zb-extract-3",
+    span: { document: "Scanned referral", page: 2, line: 14 },
+    confirmed: false,
+  }}
+  onOpenChain={(record) => console.log(record)}
+  onOpenSpan={(span, record) => console.log(span, record)}
+/>`,
     },
   ],
 

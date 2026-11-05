@@ -470,6 +470,9 @@ export const EXAMPLE_PREVIEWS: Readonly<
     "document-vintage": () => <PcDemo.DocumentVintage />,
     ledger: () => <PcDemo.OneSubscription />,
     "staleness-policy": () => <PcDemo.FourDaysDiffersByDatum />,
+    "glyph-only-grid": () => <PcDemo.GlyphOnlyGrid />,
+    "no-ledger-entry": () => <PcDemo.NoLedgerEntry />,
+    "chain-and-span": () => <PcDemo.ChainAndSpanReachable />,
   },
 
   "recent-patient-stack": {
