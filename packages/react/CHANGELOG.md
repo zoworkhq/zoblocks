@@ -1,5 +1,15 @@
 # @zoblocks/react
 
+## 0.2.3
+
+### Patch Changes
+
+- 764b55d: Fixed three WCAG AA color-contrast failures the a11y audit flagged. `AllergyChip`'s refuted/entered-in-error verification affix and its past-reaction text were rendered inside the inactive state's 0.75-opacity dimming on top of an already-muted color, dropping under 4.5:1 — both now use the full-strength text color for that state so the opacity alone carries the "quieter" signal. `ChartAccordion`'s count/time badge used the same low-contrast token on a tinted background as a prior `care-timeline` fix and is now switched to the same safer one. `RecentPatientStack`'s avatar initials, drawn in the full-strength accent over a 16%-opacity tint of that hue, cleared 4.5:1 for only one of its eight accents in light theme; initials now use a darkened variant of the accent in light theme only, verified to hold 4.5:1+ across all eight (dark and high-contrast already passed undarkened).
+- 8dea66f: `Copilot`'s icon-only "New chat" button now keeps a 24×24px minimum target (`min-w-6 shrink-0`, like the collapse button beside it). In a crowded header it could be squeezed to 18px wide, failing WCAG 2.5.8 target size.
+- 56979a1: A range picked from the panel now shows in the field. `DateRangeField` and `TimeRangeField` updated their value, their `onChange` and their span badge when a range was chosen from the calendar or the time columns, but left both typed halves empty — the field treated its own write as an echo to ignore. Typed entry was unaffected.
+- 9a9ec76: Stale availability is marked rather than faded. `TimeSlotGrid` dimmed the whole slot list to 55% opacity once its data passed `staleAfterSeconds`, which took every time and heading below text contrast (2.6:1 on white) while the slots stayed bookable. The age line still says how old the data is; the list now takes a dashed frame and dashed slot edges at full contrast. The billing-code text in a chip is no longer faded either (4.0:1 → full chip contrast).
+- 20850d8: A disabled `Switch` fades its control, not its words. The whole switch used to drop to 45% opacity, so its label and state word ("Enabled") fell to 2:1 in light and 3.3:1 in dark. Now only the track, chip or segments fade; the label, description and state word keep full contrast, and the faded control and not-allowed cursor still say the switch is unavailable.
+
 ## 0.2.2
 
 ### Patch Changes
