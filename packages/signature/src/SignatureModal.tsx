@@ -186,14 +186,25 @@ export function SignatureModal({
    * runs the transition never fires it. jsdom 30 is such an environment, and
    * the regression it caused was silent: the dialog opened, everything
    * rendered, and focus simply stayed on the trigger. The effect below covers
-   * that. Both target the same element, so whichever runs last is harmless.
+   * that. Both target the same element, so whichever runs last is harmless —
+   * provided neither runs once the signer has started. The transition can end
+   * late on a loaded device, after the name was focused and the signer had
+   * tabbed on; focusing then yanked them back mid-word and split what they
+   * typed across two fields. Where focus sits cannot tell the two apart —
+   * antd's trap lands on the close button, a real control — so the signer's
+   * first key or pointer press inside the dialog is what ends the claim.
    */
+  const signerActed = React.useRef(false);
   const focusName = React.useCallback(() => {
-    nameRef.current?.focus();
+    if (!signerActed.current) nameRef.current?.focus();
+  }, []);
+  const markSignerActed = React.useCallback(() => {
+    signerActed.current = true;
   }, []);
 
   React.useEffect(() => {
     if (!open) return;
+    signerActed.current = false;
     // A frame later: the modal body mounts before antd's trap moves focus, so
     // focusing synchronously here would just be overridden.
     const frame = requestAnimationFrame(focusName);
@@ -460,6 +471,8 @@ export function SignatureModal({
         <div
           aria-labelledby={titleId}
           aria-describedby={attestation ? `${base}-attestation` : undefined}
+          onKeyDownCapture={markSignerActed}
+          onPointerDownCapture={markSignerActed}
         >
           {node}
         </div>

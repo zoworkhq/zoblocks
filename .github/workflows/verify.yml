@@ -288,9 +288,19 @@ jobs:
         if: inputs.tier == 'full' && steps.pw-cache.outputs.cache-hit != 'true'
         run: pnpm exec playwright install chromium firefox webkit
 
+      # On 6 Nov the runner's apt mirror stalled and this step took 19 minutes:
+      # each stuck package waited out apt's default timeout before falling back
+      # to archive.ubuntu.com. That left e2e 10 minutes before the job limit
+      # killed it. A short timeout with retries gets past a stalled mirror in
+      # seconds, and the step's own limit means a mirror that is truly down
+      # fails here, by name, rather than as a cancelled browser suite.
       - name: Install Playwright system dependencies
         if: inputs.tier == 'full'
-        run: pnpm exec playwright install-deps chromium firefox webkit
+        timeout-minutes: 10
+        run: |
+          printf 'Acquire::http::Timeout "15";\nAcquire::https::Timeout "15";\nAcquire::Retries "5";\n' \
+            | sudo tee /etc/apt/apt.conf.d/99ci-timeouts > /dev/null
+          pnpm exec playwright install-deps chromium firefox webkit
 
       # The server plumbing lives in scripts/verify-a11y.sh so this and
       # `pnpm verify --ci` run the same code. The site publishes a WCAG 2.2 AA

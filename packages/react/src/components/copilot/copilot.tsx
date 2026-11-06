@@ -536,7 +536,7 @@ function CopilotPanel({
         <button
           type="button"
           onClick={api.newThread}
-          className="min-h-6 rounded-lg border border-[var(--zb-border)] px-2 py-0.5 text-xs"
+          className="min-h-6 min-w-6 shrink-0 rounded-lg border border-[var(--zb-border)] px-2 py-0.5 text-xs"
         >
           <NewChatIcon />
           <span className="sr-only">New chat</span>
