@@ -81,14 +81,14 @@
   "devDependencies": {
     "@testing-library/react": "^16",
     "@types/react": "^19.0.2",
-    "@vitest/coverage-v8": "^4.1.12",
+    "@vitest/coverage-v8": "^5.1.0",
     "@zoblocks/bridge-antd": "workspace:*",
     "@zoblocks/bridge-mui": "workspace:*",
     "@zoblocks/tsconfig": "workspace:*",
-    "jsdom": "^30",
+    "jsdom": "^31",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "typescript": "^5.7.2",
-    "vitest": "^4.1.12"
+    "vitest": "^5.1.0"
   }
 }
