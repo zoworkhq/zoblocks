@@ -4,9 +4,9 @@
  * The code surfaces on a component page, as pieces.
  *
  * The playground footer, an example card and a plain usage snippet all draw
- * the same three things — a copy button, the "open online" links and the
- * highlighted lines — inside different chrome. So the pieces are exported
- * separately and `CodeBlock` is just the commonest assembly of them.
+ * the same things — a copy button and the highlighted lines, plus the "open
+ * online" button on an example card — inside different chrome. So the pieces
+ * are exported separately and `CodeBlock` is just the commonest assembly of them.
  */
 
 import * as React from "react";
@@ -74,11 +74,10 @@ export function PlatformLinks({ links }: { links: readonly DemoLink[] }) {
     <>
       <span aria-hidden="true" className="mx-1 h-4 w-px bg-rule" />
       {links.map((link) => (
-        <a
+        <button
           key={link.id}
-          href={link.href}
-          target="_blank"
-          rel="noreferrer"
+          type="button"
+          onClick={link.open}
           title={link.title}
           aria-label={link.title}
           className={BAR_BUTTON}
@@ -93,7 +92,7 @@ export function PlatformLinks({ links }: { links: readonly DemoLink[] }) {
           <span aria-hidden="true" className="text-[10.5px]">
             ↗
           </span>
-        </a>
+        </button>
       ))}
     </>
   );
@@ -152,12 +151,11 @@ export function CodeLines({
   );
 }
 
-/** A file name, the copy button and optional demo links, over highlighted code. */
+/** A file name and the copy button, over highlighted code. */
 export function CodeBlock({
   code,
   lang = "tsx",
   file,
-  links = [],
   numbered = true,
   className,
   bodyClassName,
@@ -165,7 +163,6 @@ export function CodeBlock({
   code: string;
   lang?: Lang;
   file: string;
-  links?: readonly DemoLink[];
   numbered?: boolean;
   className?: string;
   bodyClassName?: string;
@@ -178,7 +175,6 @@ export function CodeBlock({
         <span className="min-w-0 truncate font-mono text-xs text-graphite">{file}</span>
         <div className="flex flex-none items-center gap-0.5">
           <CopyButton text={code} />
-          <PlatformLinks links={links} />
         </div>
       </div>
       <CodeLines
