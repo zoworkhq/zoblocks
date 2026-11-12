@@ -44,6 +44,7 @@ import {
   IdentityWorklistDemo,
 } from "../identity-demo";
 import * as AllergyDemo from "../allergy-chip-demos";
+import * as SafetyPlanDemo from "../safety-plan-demos";
 
 /* ------------------------------------------------------------------ */
 /* Stand-ins for the host application                                  */
@@ -505,6 +506,13 @@ export const EXAMPLE_PREVIEWS: Readonly<
     "two-empty-states": () => <AllergyDemo.TwoEmptyStates />,
     intolerance: () => <AllergyDemo.Intolerance />,
     refuted: () => <AllergyDemo.Refuted />,
+  },
+
+  "safety-plan": {
+    "complete-patient-plan": () => <SafetyPlanDemo.CompletePatientPlan />,
+    "unfinished-plan": () => <SafetyPlanDemo.UnfinishedPlan />,
+    "empty-plan": () => <SafetyPlanDemo.EmptyPlan />,
+    "clinician-editing": () => <SafetyPlanDemo.ClinicianEditing />,
   },
 };
 
