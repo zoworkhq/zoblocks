@@ -37,6 +37,7 @@ import * as PcDemo from "../provenance-chip-demos";
 import * as RpsDemo from "../recent-patient-stack-demos";
 import * as RvDemo from "../result-value-demos";
 import * as RiskDemo from "../risk-indicator-demos";
+import * as ChartAccordionDemo from "../chart-accordion-demos";
 import {
   IdentityDisclosureDemo,
   IdentityGuardDemo,
@@ -491,6 +492,17 @@ export const EXAMPLE_PREVIEWS: Readonly<
     expired: () => <RiskDemo.ExpiredNotOld />,
     unscored: () => <RiskDemo.NotScoredIsNotLow />,
     concentration: () => <RiskDemo.ConcentrationDominance />,
+  },
+
+  "chart-accordion": {
+    "closed-with-summaries": () => <ChartAccordionDemo.ClosedWithSummaries />,
+    expanded: () => <ChartAccordionDemo.Expanded />,
+    "severity-scale": () => <ChartAccordionDemo.SeverityScale />,
+    "expand-collapse-all": () => <ChartAccordionDemo.ExpandCollapseAll />,
+    "consent-gate": () => <ChartAccordionDemo.ConsentGate />,
+    "withheld-section": () => <ChartAccordionDemo.WithheldSection />,
+    "failed-section": () => <ChartAccordionDemo.FailedSection />,
+    "no-sections": () => <ChartAccordionDemo.NoSections />,
   },
 
   identity: {

@@ -103,6 +103,170 @@ export default defineComponentMeta({
   ]}
 />`,
 
+  examples: [
+    {
+      id: "closed-with-summaries",
+      title: "The closed record already tells you where to look",
+      description:
+        "Five sections, none opened. Severity, status, counts and timestamps make the record legible before the reader expands anything. The summary is the point, not decoration around the disclosure.",
+      code: `<ChartAccordion
+  toolbarLabel="Ada Lovelace · 38 · MRN 4471902"
+  headingLevel={3}
+  sections={[
+    {
+      key: "risk",
+      label: "Risk & suicidality",
+      severity: "critical",
+      status: "C-SSRS positive",
+      updatedAt: "2026-08-13T09:12:00+05:30",
+      children: <RiskPanel />,
+    },
+    {
+      key: "meds",
+      label: "Medications",
+      severity: "high",
+      status: "Clozapine ANC due 18 Aug",
+      count: "4 active",
+      children: <MedicationList />,
+    },
+    {
+      key: "notes",
+      label: "Progress notes",
+      count: "142 encounters",
+      updatedAt: "2026-08-13",
+      children: <ProgressNotes />,
+    },
+  ]}
+/>`,
+    },
+    {
+      id: "expanded",
+      title: "Open the sections that need attention",
+      description:
+        "A record can start with selected sections open. The reader gets the relevant detail immediately without losing the summaries or the ability to expand the rest.",
+      code: `<ChartAccordion
+  toolbarLabel="Ada Lovelace · 38 · MRN 4471902"
+  headingLevel={3}
+  defaultOpenKeys={["risk", "assessments"]}
+  sections={sections}
+/>`,
+    },
+    {
+      id: "severity-scale",
+      title: "Every severity arrives with its words",
+      description:
+        "Critical, high, normal and unknown all carry a status. The closed header never relies on colour alone to communicate clinical meaning.",
+      code: `<ChartAccordion
+  sections={[
+    { key: "risk", label: "Risk", severity: "critical",
+      status: "C-SSRS positive" },
+    { key: "meds", label: "Medications", severity: "high",
+      status: "ANC due 18 Aug" },
+    { key: "plan", label: "Safety plan", severity: "normal",
+      status: "Current" },
+    { key: "audit", label: "AUDIT", severity: "unknown",
+      status: "Not asked this visit" },
+  ]}
+/>`,
+    },
+    {
+      id: "expand-collapse-all",
+      title: "Expand the record, without crossing a boundary",
+      description:
+        "The toolbar opens every section the reader may access and closes them again. A withheld section stays closed: expand all is a chart action, not permission to disclose.",
+      code: `<ChartAccordion
+  toolbarLabel="Ada Lovelace · 38 · MRN 4471902"
+  sections={[
+    ...sections,
+    {
+      key: "psychotherapy",
+      label: "Psychotherapy notes",
+      access: {
+        kind: "withheld",
+        reason: "Kept separately by the author",
+      },
+    },
+  ]}
+/>`,
+    },
+    {
+      id: "consent-gate",
+      title: "Consent is checked before protected content appears",
+      description:
+        "A governed section names its policy in the closed summary and at the gate. The disclosure callback lets the host application decide whether access can proceed; the component does not grant consent by itself.",
+      code: `<ChartAccordion
+  defaultOpenKeys={["sud"]}
+  onDisclose={async (event) => audit.record(event)}
+  sections={[
+    {
+      key: "sud",
+      label: "Substance use treatment",
+      severity: "unknown",
+      status: "42 CFR Part 2",
+      access: {
+        kind: "consent",
+        policy: "42 CFR Part 2",
+        state: "granted",
+      },
+      children: <SubstanceUsePanel />,
+    },
+  ]}
+/>`,
+    },
+    {
+      id: "withheld-section",
+      title: "Withheld means withheld, not empty",
+      description:
+        "A separately retained section says that it is restricted and why. It has no hidden children to reveal, and expanding the rest of the record does not change that boundary.",
+      code: `<ChartAccordion
+  sections={[
+    {
+      key: "psychotherapy",
+      label: "Psychotherapy notes",
+      access: {
+        kind: "withheld",
+        reason: "Kept separately by the author",
+      },
+    },
+  ]}
+/>`,
+    },
+    {
+      id: "failed-section",
+      title: "One failed section does not take down the record",
+      description:
+        "A failed care-team section identifies its own incomplete content. The other sections remain available, and the reader is not left guessing whether the entire record loaded.",
+      code: `<ChartAccordion
+  defaultOpenKeys={["team"]}
+  sections={[
+    ...sections,
+    {
+      key: "team",
+      label: "Care team",
+      severity: "critical",
+      status: "Could not load",
+      children: (
+        <p>
+          Could not load the care team. This list may be incomplete.
+          The rest of this record loaded normally.
+        </p>
+      ),
+    },
+  ]}
+/>`,
+    },
+    {
+      id: "no-sections",
+      title: "An empty record still has an identity",
+      description:
+        "With no sections to display, the toolbar label still identifies whose record is being viewed. An empty result is distinguishable from a component that failed to render.",
+      code: `<ChartAccordion
+  toolbarLabel="Ada Lovelace · 38 · MRN 4471902"
+  sections={[]}
+/>`,
+    },
+  ],
+
   controls: [
     { prop: "toolbar", control: "switch", label: "Toolbar", defaultValue: true },
     {
