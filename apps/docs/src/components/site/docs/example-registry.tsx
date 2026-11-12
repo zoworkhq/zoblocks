@@ -37,6 +37,7 @@ import * as PcDemo from "../provenance-chip-demos";
 import * as RpsDemo from "../recent-patient-stack-demos";
 import * as RvDemo from "../result-value-demos";
 import * as RiskDemo from "../risk-indicator-demos";
+import * as TrendDemo from "../trend-indicator-examples";
 import {
   IdentityDisclosureDemo,
   IdentityGuardDemo,
@@ -491,6 +492,13 @@ export const EXAMPLE_PREVIEWS: Readonly<
     expired: () => <RiskDemo.ExpiredNotOld />,
     unscored: () => <RiskDemo.NotScoredIsNotLow />,
     concentration: () => <RiskDemo.ConcentrationDominance />,
+  },
+
+  "trend-indicator": {
+    valence: () => <TrendDemo.ValencePreview />,
+    comparability: () => <TrendDemo.ComparabilityPreview />,
+    noise: () => <TrendDemo.NoisePreview />,
+    "too-few": () => <TrendDemo.TooFewPreview />,
   },
 
   identity: {
