@@ -19,6 +19,36 @@ export default defineComponentMeta({
 
   categories: ["Disclosure", "Clinical"],
   fhir: [],
+  examples: [
+    {
+      id: "complete-patient-plan",
+      title: "Complete patient plan",
+      description:
+        "A completed six-step patient-facing safety plan. The crisis contacts remain visible in the pinned-open step.",
+      code: '<SafetyPlan steps={steps} revisedAt="2026-08-11" headingLevel={3} />',
+    },
+    {
+      id: "unfinished-plan",
+      title: "Unfinished plan",
+      description:
+        "Only some steps have been completed. The remaining steps stay visible and are identified as unfinished.",
+      code: '<SafetyPlan steps={{ warningSigns: { entries: ["Sleeping less than four hours"] } }} />',
+    },
+    {
+      id: "empty-plan",
+      title: "Empty plan",
+      description:
+        "An empty plan still displays all six steps, including the pinned-open crisis step.",
+      code: "<SafetyPlan steps={{}} />",
+    },
+    {
+      id: "clinician-editing",
+      title: "Clinician editing view",
+      description:
+        "The clinician editing view disables crisis-step pinning and uses standard density.",
+      code: '<SafetyPlan steps={steps} pinCrisisStep={false} density="standard" />',
+    },
+  ],
 
   states: [
     "Complete plan",
