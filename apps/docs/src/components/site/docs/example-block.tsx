@@ -13,7 +13,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { CodeLines, CopyButton, PlatformLinks } from "./code-block";
 import { examplePreview } from "./example-registry";
-import type { DemoLink } from "./sandbox";
+import { exampleLinks } from "./sandbox";
 import { HostStage } from "../host-stage";
 
 export interface ExampleBlockProps {
@@ -23,7 +23,8 @@ export interface ExampleBlockProps {
   description: string;
   code: string;
   fixture?: string;
-  links?: readonly DemoLink[];
+  /** The package a package-distributed component installs from; read when the example opens in StackBlitz. */
+  packageName?: string;
   /** Overrides the registry lookup; used by tests and by callers with a preview in hand. */
   preview?: React.ReactNode;
   /** h4 when the example sits under a group heading. */
@@ -43,7 +44,7 @@ export function ExampleBlock({
   description,
   code,
   fixture,
-  links = [],
+  packageName,
   preview,
   level = 3,
 }: ExampleBlockProps) {
@@ -53,6 +54,10 @@ export function ExampleBlock({
   const [tab, setTab] = React.useState<"preview" | "code">("preview");
   const baseId = `ex-${id}`;
   const showing = live ? tab : "code";
+  const links = React.useMemo(
+    () => exampleLinks({ component, id, title, code, packageName }),
+    [component, id, title, code, packageName],
+  );
 
   return (
     <div id={baseId} data-toc={baseId} className="flex flex-col gap-3.5">

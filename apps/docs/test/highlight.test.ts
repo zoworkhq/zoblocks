@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { jsxAttr, jsxElement, showLineNumbers, tokenize } from "@/lib/highlight";
 import { DOCUMENTED_ORDER } from "@zoblocks/component-meta";
-import { HOSTED_DEMOS, demoLinks } from "@/components/site/docs/sandbox";
+import { CATALOG } from "@/lib/generated/catalog";
+import {
+  RUNNABLE_EXAMPLES,
+  exampleModule,
+  stackBlitzProject,
+} from "@/components/site/docs/sandbox";
 
 const kinds = (line: string, lang: "tsx" | "css" | "sh" = "tsx") =>
   tokenize(line, lang)[0]!
@@ -82,17 +87,59 @@ describe("jsx", () => {
   });
 });
 
-describe("hosted demos", () => {
-  it("only links demos for components that have a page", () => {
-    for (const name of HOSTED_DEMOS) expect(DOCUMENTED_ORDER).toContain(name);
+describe("StackBlitz projects", () => {
+  it("only offers examples that are on a component page", () => {
+    const shown = new Set(
+      CATALOG.filter((c) => DOCUMENTED_ORDER.includes(c.name)).flatMap((c) =>
+        (c.examples ?? []).map((e) => `${c.name}/${e.id}`),
+      ),
+    );
+    for (const key of RUNNABLE_EXAMPLES) expect(shown, key).toContain(key);
   });
 
-  it("points at the demo folder on both platforms", () => {
-    const links = demoLinks("switch", "Switch");
-    expect(links.map((l) => l.href)).toEqual([
-      "https://stackblitz.com/github/md-nabas-pm/zoblocks-examples/tree/main/demos/switch?file=src/App.tsx",
-      "https://codesandbox.io/p/devbox/github/md-nabas-pm/zoblocks-examples/tree/main/demos/switch",
-    ]);
-    expect(demoLinks("signature", "Signature")).toEqual([]);
+  it("leaves a full module alone but for the registry path", () => {
+    const code = `import { Switch } from "@/components/zoblocks/switch";\n\nexport default function Example() {\n  return <Switch label="Smoker" />;\n}\n`;
+    expect(exampleModule(code)).toBe(
+      code.replace("@/components/zoblocks/switch", "@zoblocks/react"),
+    );
+  });
+
+  it("wraps a bare snippet and imports what it renders from the component's package", () => {
+    const code = `const items = [{ value: "a", label: "A" }];\n\n// Two of them.\n<Tabs aria-label="One" items={items} />\n<Tabs aria-label="Two" items={items} />;`;
+    expect(exampleModule(code, "@zoblocks/tabs")).toBe(
+      `import { Tabs } from "@zoblocks/tabs";\n\nconst items = [{ value: "a", label: "A" }];\n\n// Two of them.\n\nexport default function Example() {\n  return (\n    <>\n      <Tabs aria-label="One" items={items} />\n      <Tabs aria-label="Two" items={items} />\n    </>\n  );\n}\n`,
+    );
+  });
+
+  it("turns a top-level comment inside the JSX into a JSX comment", () => {
+    expect(exampleModule(`<Switch label="A" />\n// then\n<Switch label="B" />`)).toContain(
+      "      {/* then */}\n",
+    );
+  });
+
+  it("builds the boilerplate StackBlitz needs to run the example", () => {
+    const project = stackBlitzProject({
+      component: "tabs",
+      id: "underline",
+      title: "Underline",
+      code: `<Tabs aria-label="Results" items={[]} />`,
+      packageName: "@zoblocks/tabs",
+    });
+    expect(project.template).toBe("create-react-app");
+    expect(JSON.parse(project.files["tsconfig.json"]!).compilerOptions.jsx).toBe("react-jsx");
+    expect(project.dependencies).toMatchObject({
+      react: "^19.0.0",
+      "@zoblocks/react": expect.any(String),
+      "@zoblocks/tokens": expect.any(String),
+      "@zoblocks/identity": expect.any(String),
+      "@zoblocks/copilot-react": expect.any(String),
+      "@zoblocks/recorder-core": expect.any(String),
+      "@zoblocks/tabs": expect.any(String),
+    });
+    expect(project.files["src/index.tsx"]).toContain('import "@zoblocks/react/styles.css";');
+    expect(project.files["src/index.tsx"]).toContain(
+      'import "@zoblocks/tokens/zoblocks-tokens.css";',
+    );
+    expect(project.files["src/index.tsx"]).toContain('import "@zoblocks/tabs/styles.css";');
   });
 });

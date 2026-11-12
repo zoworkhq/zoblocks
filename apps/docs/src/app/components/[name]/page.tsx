@@ -18,12 +18,12 @@ import { Playground } from "@/components/site/playground";
 import { hasPlayground } from "@/components/site/playground-registry";
 import { isReady, readyRank } from "@/lib/readiness";
 import { ComponentNav, type NavItem } from "@/components/site/component-nav";
-import { CodeBlock, PlatformLinks } from "@/components/site/docs/code-block";
+import { CodeBlock } from "@/components/site/docs/code-block";
 import { DocSection, DocSubsection } from "@/components/site/docs/doc-section";
 import { ExampleBlock } from "@/components/site/docs/example-block";
 import { InstallPill } from "@/components/site/docs/install-pill";
 import { OnThisPage, type TocEntry } from "@/components/site/docs/on-this-page";
-import { demoLinks } from "@/components/site/docs/sandbox";
+import { isRunnable } from "@/components/site/docs/sandbox";
 
 export function generateStaticParams() {
   return CATALOG.filter((component) => isReady(component.name)).map((component) => ({
@@ -357,7 +357,6 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
    * so an entry can never point at a section that did not render — the bug the
    * old tab bar had with Related on Tabs.
    */
-  const hostedDemo = demoLinks(component.name, component.title);
   const isPackage = component.distribution === "package";
   const installLine = isPackage
     ? `pnpm add ${component.packageName}`
@@ -618,7 +617,6 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                       controls={controls}
                       importName={importName}
                       importFrom={importFrom}
-                      links={hostedDemo}
                     />
                   </HostStage>
                 ) : (
@@ -626,16 +624,6 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                     <div className="zb-stage p-4 sm:p-6">
                       <ComponentPreview name={component.name} states={component.states} />
                     </div>
-                    {hostedDemo.length > 0 ? (
-                      <div className="flex h-11 items-center justify-between gap-2 border-t border-rule bg-paper-sunk pl-3.5 pr-1.5">
-                        <span className="min-w-0 truncate text-xs text-graphite">
-                          Run it yourself
-                        </span>
-                        <div className="flex flex-none items-center gap-0.5">
-                          <PlatformLinks links={hostedDemo} />
-                        </div>
-                      </div>
-                    ) : null}
                   </div>
                 )}
               </DocSection>
@@ -657,8 +645,8 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                   id="examples"
                   title="Examples"
                   lead={
-                    hostedDemo.length
-                      ? "The cases worth copying. Open any of them in a sandbox to run the component with its dependencies installed."
+                    examples.some((example) => isRunnable(component.name, example.id))
+                      ? "The cases worth copying. Open one in StackBlitz to run it with its dependencies installed."
                       : "The cases worth copying."
                   }
                 >
@@ -693,7 +681,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                               description={example.description}
                               code={example.code}
                               fixture={example.fixture}
-                              links={hostedDemo}
+                              packageName={isPackage ? component.packageName : undefined}
                               level={4}
                             />
                           ))}
@@ -711,7 +699,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                           description={example.description}
                           code={example.code}
                           fixture={example.fixture}
-                          links={hostedDemo}
+                          packageName={isPackage ? component.packageName : undefined}
                         />
                       ))}
                     </div>

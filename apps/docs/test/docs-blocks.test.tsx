@@ -1,9 +1,11 @@
 import * as React from "react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import sdk from "@stackblitz/sdk";
 import { ExampleBlock } from "@/components/site/docs/example-block";
 import { CodeBlock } from "@/components/site/docs/code-block";
-import { demoLinks } from "@/components/site/docs/sandbox";
+
+vi.mock("@stackblitz/sdk", () => ({ default: { openProject: vi.fn() } }));
 
 afterEach(cleanup);
 
@@ -41,20 +43,28 @@ describe("ExampleBlock", () => {
     expect(screen.getByLabelText("Basic code")).toBeVisible();
   });
 
-  it("links the hosted demo from the card bar", () => {
+  it("opens a runnable example in StackBlitz from the card bar", () => {
+    vi.mocked(sdk.openProject).mockClear();
     render(
-      <ExampleBlock
-        component="switch"
-        id="basic"
-        title="Basic"
-        description="d"
-        code={code}
-        links={demoLinks("switch", "Switch")}
-      />,
+      <ExampleBlock component="switch" id="tones" title="Tones" description="d" code={code} />,
     );
-    expect(
-      screen.getByRole("link", { name: "Open the Switch demo in StackBlitz" }),
-    ).toHaveAttribute("href", expect.stringContaining("/demos/switch"));
+    fireEvent.click(screen.getByRole("button", { name: "Open the Tones example in StackBlitz" }));
+    expect(sdk.openProject).toHaveBeenCalledWith(
+      expect.objectContaining({
+        template: "create-react-app",
+        files: expect.objectContaining({
+          "src/Example.tsx": expect.stringContaining('from "@zoblocks/react"'),
+        }),
+      }),
+      { openFile: "src/Example.tsx", newWindow: true },
+    );
+  });
+
+  it("offers no StackBlitz button on an example that cannot run", () => {
+    render(
+      <ExampleBlock component="switch" id="basic" title="Basic" description="d" code={code} />,
+    );
+    expect(screen.queryByRole("button", { name: /StackBlitz/ })).toBeNull();
   });
 });
 
