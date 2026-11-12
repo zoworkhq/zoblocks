@@ -15,19 +15,17 @@
  *     browser can check it.
  *   - forced colours is where a band carried only by a tint would disappear.
  *
- * The docs page is the fixture host, as ADR 0007 intends.
- *
- * DRAFT: written without running against the docs site. Before relying on it,
- * run `pnpm e2e -- risk-indicator` and check that the scenario tab label in
- * `EXPIRED` matches what the page actually renders.
+ * The docs page is the fixture host, as ADR 0007 intends. It is a Playground
+ * page: the expired state these tests need is the `expired` Example, mounted
+ * in its own `#ex-expired-panel-preview` tabpanel.
  */
 
 import { expect, test, type Page } from "@playwright/test";
 
 const PAGE = "/components/risk-indicator";
 
-/** The tab for the expired scenario. Matches the state name in the meta. */
-const EXPIRED = /Expired/;
+/** The Example that documents an expired score. Its id in `example-registry.tsx`. */
+const EXPIRED = "expired";
 
 async function openIndicator(page: Page) {
   await page.goto(PAGE);
@@ -38,17 +36,17 @@ async function openIndicator(page: Page) {
 }
 
 /**
- * Switch the preview to a named scenario. The page shows one at a time, so a
- * test that only visits the page asserts against whichever is first. Selecting
- * is the fix; guarding with `test.skip` would skip on every run.
+ * Open a documented Example and return its tabpanel. The page's first
+ * indicator is the Playground's, so a test that only visits the page asserts
+ * against whatever the knobs default to; opening the Example is the fix.
  */
-async function selectScenario(page: Page, label: RegExp) {
+async function openExample(page: Page, exampleId: string) {
   await page.goto(PAGE);
   await page.waitForLoadState("networkidle");
-  await page.getByRole("tab", { name: label }).click();
-  const indicator = page.locator("[data-zb-risk]").first();
-  await expect(indicator).toBeVisible();
-  return indicator;
+  const panel = page.locator(`#ex-${exampleId}-panel-preview`);
+  await panel.scrollIntoViewIfNeeded();
+  await expect(panel.locator("[data-zb-risk]").first()).toBeVisible();
+  return panel;
 }
 
 test.describe("@a11y risk indicator", () => {
@@ -75,8 +73,8 @@ test.describe("@a11y risk indicator", () => {
   });
 
   test("an expired score offers recompute or acknowledge and nothing else", async ({ page }) => {
-    await selectScenario(page, EXPIRED);
-    const indicator = page.locator("[data-zb-risk][data-zb-freshness='expired']").first();
+    const panel = await openExample(page, EXPIRED);
+    const indicator = panel.locator("[data-zb-risk][data-zb-freshness='expired']").first();
     await expect(indicator).toBeVisible();
     await expect(indicator.getByRole("button", { name: /dismiss|close|hide/i })).toHaveCount(0);
   });
@@ -85,8 +83,8 @@ test.describe("@a11y risk indicator", () => {
 test.describe("@a11y target size", () => {
   test("recompute and acknowledge hold 24px at both densities", async ({ page }) => {
     // WCAG 2.5.8. The meta claims this, and jsdom cannot measure it.
-    await selectScenario(page, EXPIRED);
-    const actions = page.locator(".zb-risk__action");
+    const panel = await openExample(page, EXPIRED);
+    const actions = panel.locator(".zb-risk__action");
     const count = await actions.count();
     expect(count).toBeGreaterThan(0);
     for (let index = 0; index < count; index += 1) {

@@ -164,6 +164,12 @@ export function CommandMenu() {
   React.useEffect(() => {
     function onKey(event: KeyboardEvent) {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        // A component on the page already claimed the shortcut — Copilot's
+        // summon is ⌘K too, and listens on `document`, so it runs first. Opening
+        // the site search as well put a modal over the composer it had just
+        // focused, so on the Copilot page ⌘K summoned two things and the reader
+        // got the wrong one. The page's own component wins.
+        if (event.defaultPrevented) return;
         event.preventDefault();
         setOpen((v) => !v);
         return;

@@ -1,23 +1,29 @@
 /**
  * SafetyPlan in a real browser.
  *
- * The docs gallery is the fixture host. The plan is interactive, and its
+ * The docs Playground is the fixture host. The plan is interactive, and its
  * crisis step must remain available without requiring the person to expand it.
- * These tests cover the rendered plan, the pinned accordion behaviour, the
- * unfinished state, and visual regression.
+ * These tests cover the rendered plan, the pinned accordion behaviour, and
+ * visual regression.
+ *
+ * The page used to offer "Complete" and "Unfinished" scenario tabs. It is now
+ * a Playground page that renders the complete six-step plan only, so the
+ * unfinished state has no host here; it is covered by the unit suite
+ * (`registry/zoblocks/safety-plan/safety-plan.test.tsx`: "says a step is
+ * unfinished rather than dropping it" and the two empty-plan cases).
  */
 
 import { expect, test, type Page } from "@playwright/test";
 
 const PAGE = "/components/safety-plan";
 
-async function openSafetyPlan(page: Page, scenario: "Complete" | "Unfinished" = "Complete") {
+async function openSafetyPlan(page: Page) {
   await page.goto(PAGE);
   await page.waitForLoadState("networkidle");
 
-  await page.getByRole("tab", { name: scenario, exact: true }).click();
-
-  const plan = page.locator(".zb-safety-plan").first();
+  const playground = page.locator("#playground");
+  await playground.scrollIntoViewIfNeeded();
+  const plan = playground.locator(".zb-safety-plan").first();
   await expect(plan).toBeVisible();
 
   return plan;
@@ -64,39 +70,6 @@ test.describe("@a11y safety plan", () => {
     await expect(crisisStep).toHaveAttribute("data-open", "true");
   });
 
-  test("identifies incomplete steps instead of leaving them blank", async ({ page }) => {
-    const plan = await openSafetyPlan(page, "Unfinished");
-
-    const warningSigns = plan
-      .locator(".zb-accordion__item")
-      .filter({
-        has: page.getByRole("button", {
-          name: /Signs that things are getting harder/,
-        }),
-      })
-      .first();
-
-    await warningSigns.getByRole("button").click();
-    await expect(warningSigns).toContainText("Sleeping less than four hours");
-
-    const crisisStep = plan.locator('[data-pinned="true"]');
-    await expect(crisisStep).toContainText("988");
-
-    const internalCoping = plan
-      .locator(".zb-accordion__item")
-      .filter({
-        has: page.getByRole("button", {
-          name: /Things I can do on my own/,
-        }),
-      })
-      .first();
-
-    await internalCoping.getByRole("button").click();
-    await expect(internalCoping).toContainText(
-      "Not filled in yet. You can add to this with your clinician.",
-    );
-  });
-
   test("allows an ordinary step to expand and collapse", async ({ page }) => {
     const plan = await openSafetyPlan(page);
     const step = plan
@@ -118,12 +91,7 @@ test.describe("@a11y safety plan", () => {
 
 test.describe("visual regression @vrt", () => {
   test("complete plan", async ({ page }) => {
-    const plan = await openSafetyPlan(page, "Complete");
+    const plan = await openSafetyPlan(page);
     await expect(plan).toHaveScreenshot("safety-plan-complete.png");
-  });
-
-  test("unfinished plan", async ({ page }) => {
-    const plan = await openSafetyPlan(page, "Unfinished");
-    await expect(plan).toHaveScreenshot("safety-plan-unfinished.png");
   });
 });

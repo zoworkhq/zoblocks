@@ -13,11 +13,11 @@
  * change, because customers style against these names. The manifest is
  * committed so that change shows up as a reviewable diff.
  *
- * 362 tokens across 32 components:
+ * 363 tokens across 32 components:
  *
  *   switch          55
  *   tabs            44
- *   banner          39
+ *   banner          40
  *   accordion       29
  *   datetime        27
  *   badge           16
@@ -1067,6 +1067,18 @@ export const TOKEN_SURFACE: readonly SurfaceEntry[] = [
     ],
     "fallback": true,
     "bridgeable": false
+  },
+  {
+    "name": "--zb-identity-on-accent",
+    "component": "banner",
+    "source": "packages/identity/src/styles.css",
+    "kind": "color",
+    "semantic": "--zb-text-on-accent",
+    "frameworks": [
+      "--ant-color-text-light-solid"
+    ],
+    "fallback": true,
+    "bridgeable": true
   },
   {
     "name": "--zb-identity-radius",
@@ -3841,6 +3853,7 @@ export const BRIDGEABLE: readonly string[] = [
   "--zb-identity-fill",
   "--zb-identity-fill-subtle",
   "--zb-identity-loop-skeleton",
+  "--zb-identity-on-accent",
   "--zb-identity-radius",
   "--zb-identity-radius-lg",
   "--zb-identity-surface",

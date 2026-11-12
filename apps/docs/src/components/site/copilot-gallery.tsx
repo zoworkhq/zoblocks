@@ -104,7 +104,10 @@ function ModeContracts() {
   const modes = defaultModes as readonly CopilotMode[];
 
   return (
-    <div className="overflow-x-auto">
+    // Wider than the column on most screens, so it scrolls: focusable and
+    // named, the same as the two code samples below, or a keyboard user cannot
+    // reach the columns past the fold (WCAG 2.1.1, axe scrollable-region-focusable).
+    <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Mode contracts">
       <table className="w-full min-w-[46rem] border-collapse text-sm">
         <thead>
           <tr className="border-b border-[var(--zb-border)] text-start">

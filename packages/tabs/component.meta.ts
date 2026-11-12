@@ -493,7 +493,6 @@ export default function Example() {
     { value: "ship", label: "Shipments", count: 3, children: <Shipments /> },
     { value: "returns", label: "Returns", count: 1, tone: "high", children: <Returns /> },
     { value: "invoices", label: "Invoices", children: <Invoices /> },
-    { value: "audit", label: "Audit log", children: <AuditLog /> },
   ]}
 />`,
     },

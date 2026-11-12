@@ -6,7 +6,10 @@ test.describe("@a11y care team presence", () => {
 
     await expect(page.getByRole("heading", { name: "Care Team Presence", level: 1 })).toBeVisible();
 
-    await expect(page.locator("#preview")).toBeVisible();
+    // A Playground page: the live demo is `#playground`, not the old `#preview`.
+    await expect(
+      page.locator("#playground [data-zb-presence], #playground .zb-stage").first(),
+    ).toBeVisible();
   });
 });
 

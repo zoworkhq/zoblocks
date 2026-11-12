@@ -82,3 +82,26 @@
 .dark .zb-stage {
   background-color: var(--color-paper);
 }
+
+/* `--*-panel-*` are the dark instrument's tokens: luminous text for a near-black
+   ground. On the white stage they measured 2.87:1 (light) and 1.45:1 (high
+   contrast) for a demo's own `text-panel-muted` captions. A stage is page
+   paper, so point the panel tokens at the page's, as `.instrument-demo` does.
+   Dark is excluded: there the page and the panel tokens are already both dark.
+   Both spellings — utilities read `--site-*`, hand-written rules `--color-*`. */
+html:not(.dark) .zb-stage {
+  --color-panel: var(--site-paper-sunk);
+  --color-panel-raised: var(--site-paper);
+  --color-panel-rule: var(--site-rule);
+  --color-panel-fg: var(--site-ink);
+  --color-panel-muted: var(--site-graphite);
+  --color-trace: var(--site-trace-text);
+  --color-critical-lum: var(--site-critical-text);
+  --site-panel: var(--site-paper-sunk);
+  --site-panel-raised: var(--site-paper);
+  --site-panel-rule: var(--site-rule);
+  --site-panel-fg: var(--site-ink);
+  --site-panel-muted: var(--site-graphite);
+  --site-trace: var(--site-trace-text);
+  --site-critical-lum: var(--site-critical-text);
+}

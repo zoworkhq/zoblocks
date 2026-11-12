@@ -249,7 +249,9 @@ export function Underline() {
           children: <Panel title="Returns">1 open RMA.</Panel>,
         },
         { value: "invoices", label: "Invoices", children: <Panel title="Invoices" /> },
-        { value: "audit", label: "Audit log", children: <Panel title="Audit log" /> },
+        // Five, not six: a sixth ("Audit log") fit macOS's system font and
+        // overflowed by ~44px in Linux's, so the variants chapter showed the
+        // strip already scrolled — the overflow behaviour, not the variant.
       ]}
     />
   );

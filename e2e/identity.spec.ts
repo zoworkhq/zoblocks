@@ -125,10 +125,15 @@ test.describe("Identity component", () => {
 
   test("@reflow keeps the patient banner within a narrow viewport", async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 800 });
-    await openIdentity(page);
-    await selectScenario(page, "The banner");
+    // A Playground page: the "identity states" rail this file's other helpers
+    // select from is gone, and the banner in its default, ready state is the
+    // Playground's.
+    await page.goto(PAGE);
+    await page.waitForLoadState("networkidle");
+    const playground = page.locator("#playground");
+    await playground.scrollIntoViewIfNeeded();
 
-    const banner = page.locator('[data-zb-banner="ready"]');
+    const banner = playground.locator('[data-zb-banner="ready"]');
     await expect(banner).toBeVisible();
 
     const bounds = await banner.boundingBox();

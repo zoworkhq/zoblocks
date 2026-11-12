@@ -119,9 +119,16 @@ async function arrowTo(
   limit = 5,
 ) {
   for (let i = 0; i < limit; i++) {
+    // Wait for the press to land before judging it. Checking straight away
+    // read a late focus move as a lost key under CI load, so the next press
+    // carried focus past the target — round a three-tab list, every time.
+    const before = await page.evaluateHandle(() => document.activeElement);
     await page.keyboard.press(key);
+    await page
+      .waitForFunction((prev) => document.activeElement !== prev, before, { timeout: 1_000 })
+      .catch(() => {}); // a dropped key: press again
+    await before.dispose();
     if (await target.evaluate((el) => el === document.activeElement).catch(() => false)) return;
-    await page.waitForTimeout(50);
   }
   throw new Error(`focus never reached ${await target.textContent()} with ${limit} ${key} presses`);
 }
@@ -255,8 +262,12 @@ test.describe("accessibility in a real layout engine", () => {
     // Walk in from the top of the document rather than focusing the button
     // directly — reaching it is half of what is being claimed.
     await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+    // The cap only stops a runaway loop; the walk ends as soon as it arrives.
+    // It was 60, and the trigger moved to stop 62 once the sidebar listed
+    // thirty components and the Playground (with its own signature) landed
+    // above this demo — a failure about page growth, not reachability.
     let reached = false;
-    for (let i = 0; i < 60 && !reached; i++) {
+    for (let i = 0; i < 200 && !reached; i++) {
       await page.keyboard.press("Tab");
       reached = await trigger.evaluate((el) => el === document.activeElement);
     }

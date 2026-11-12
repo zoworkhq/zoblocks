@@ -10,7 +10,7 @@
 import { expect, test, type ConsoleMessage, type Locator, type Page } from "@playwright/test";
 import { source as AXE_SOURCE } from "axe-core";
 
-const PAGE = "/components/copilot?state=rest";
+const PAGE = "/components/copilot";
 const QUESTION = "Where can I review the current local guidance?";
 const WCAG_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 
@@ -37,7 +37,10 @@ async function openCopilot(page: Page) {
       .querySelectorAll<HTMLElement>("[data-reveal]")
       .forEach((item) => item.setAttribute("data-revealed", "true"));
   });
-  const demo = page.getByRole("tabpanel", { name: "At rest" });
+  // A Playground page: the scripted demo is the playground's stage. The old
+  // states rail (and its "At rest" tabpanel) is gone — every state these tests
+  // need, including crisis, is reached by using the composer.
+  const demo = playground.locator(".zb-stage");
   await expect(demo).toBeVisible();
 
   const copilot = demo.locator("[data-zb-copilot]");
@@ -45,7 +48,16 @@ async function openCopilot(page: Page) {
   return { demo, copilot };
 }
 
-function collectBrowserErrors(page: Page) {
+async function collectBrowserErrors(page: Page) {
+  /*
+   * Vercel Web Analytics and Speed Insights load from `/_vercel/*`, which only
+   * a Vercel deployment serves. Under `next start` — locally and in CI — both
+   * 404, and the browser logs each as a console error the page did not cause.
+   * Stub them so this collector still fails on anything the page itself does.
+   */
+  await page.route("**/_vercel/**", (route) =>
+    route.fulfill({ status: 200, contentType: "text/javascript", body: "" }),
+  );
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(`pageerror: ${error.message}`));
   page.on("console", (message: ConsoleMessage) => {
@@ -74,7 +86,7 @@ async function auditCopilotRegion(region: Locator) {
 
 test.describe("Copilot live demo @a11y", () => {
   test("loads the real example and exposes its named dock and controls", async ({ page }) => {
-    const errors = collectBrowserErrors(page);
+    const errors = await collectBrowserErrors(page);
     const { demo } = await openCopilot(page);
 
     await expect(demo.getByRole("complementary", { name: "Clinical assistant" })).toBeVisible();
@@ -91,7 +103,7 @@ test.describe("Copilot live demo @a11y", () => {
   });
 
   test("submits a synthetic question and renders the scripted sourced answer", async ({ page }) => {
-    const errors = collectBrowserErrors(page);
+    const errors = await collectBrowserErrors(page);
     const { demo } = await openCopilot(page);
     const field = demo.getByRole("combobox", { name: "Clinical assistant" });
 
@@ -124,6 +136,9 @@ test.describe("Copilot live demo @a11y", () => {
   });
 
   test("has no axe WCAG A/AA violations in its supported interactive states", async ({ page }) => {
+    // Six full axe audits across six UI states. Alone it takes ~10s; under a
+    // full parallel run WebKit spent the default 30s before the fifth state.
+    test.slow();
     const { demo, copilot } = await openCopilot(page);
     await page.evaluate(AXE_SOURCE);
     const violations: string[] = [];
@@ -158,10 +173,12 @@ test.describe("Copilot live demo @a11y", () => {
     await check("Copilot gallery", gallery);
 
     // Expanded mode tray.
-    await demo.getByRole("button", { name: "Look up" }).click();
+    // The trigger, by its disclosure state: once the tray is open its "Look up"
+    // option shares the trigger's name.
+    await demo.getByRole("button", { name: "Look up", expanded: false }).click();
     await expect(demo.getByRole("group", { name: "Change mode" })).toBeVisible();
     await check("mode tray");
-    await demo.getByRole("button", { name: "Look up" }).click();
+    await demo.getByRole("button", { name: "Look up", expanded: true }).click();
 
     // The microphone is a local dictation state in this demo; no device or
     // external speech service is contacted.

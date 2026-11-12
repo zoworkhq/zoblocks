@@ -11,17 +11,30 @@
  *
  * The docs page is used as the fixture host so this tests the same
  * ChartHeader example that is shown to users.
+ *
+ * The page is a Playground page: the first header on it is the playground's,
+ * whose collapse is a knob rather than the component's own state. So each test
+ * opens the region that documents what it checks — the `collapse` Example for
+ * the disclosure, and the Playground for the encounter select, the one place
+ * the page offers a live `onSelectEncounter`.
  */
 
 import { expect, test, type Page } from "@playwright/test";
 
 const PAGE = "/components/chart-header";
 
-async function openChartHeader(page: Page) {
+/** The Example tabpanel (`#ex-<id>-panel-preview`), or the Playground. */
+type Region = "collapse" | "playground";
+
+async function openChartHeader(page: Page, region: Region = "collapse") {
   await page.goto(PAGE);
   await page.waitForLoadState("networkidle");
 
-  const header = page.locator("[data-zb-chart-header]").first();
+  const host = page.locator(
+    region === "playground" ? "#playground" : `#ex-${region}-panel-preview`,
+  );
+  await host.scrollIntoViewIfNeeded();
+  const header = host.locator("[data-zb-chart-header]").first();
 
   await expect(header).toBeVisible();
 
@@ -79,7 +92,7 @@ test.describe("@a11y chart header", () => {
 
 test.describe("@a11y encounter selection", () => {
   test("allows the user to select an encounter", async ({ page }) => {
-    const header = await openChartHeader(page);
+    const header = await openChartHeader(page, "playground");
 
     const select = header.locator(".zb-chart-header__encounter-select");
 
@@ -100,7 +113,7 @@ test.describe("@a11y encounter selection", () => {
   });
 
   test("shows no encounter selected when no encounter is chosen", async ({ page }) => {
-    const header = await openChartHeader(page);
+    const header = await openChartHeader(page, "playground");
 
     const select = header.locator(".zb-chart-header__encounter-select");
 

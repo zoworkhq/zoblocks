@@ -14,21 +14,12 @@
 
 export const DEMO_REPO = "md-nabas-pm/zoblocks-examples";
 
-export const HOSTED_DEMOS: ReadonlySet<string> = new Set([
-  "accordion",
-  "breath-loader",
-  "care-timeline",
-  "clinical-status",
-  "copilot",
-  "data-grid",
-  "date-picker",
-  "helix-loader",
-  "infusion-loader",
-  "pulse-loader",
-  "recorder",
-  "rhythm-loader",
-  "switch",
-]);
+/*
+ * Empty on purpose: the StackBlitz and CodeSandbox demos are on hold, so no
+ * component page offers them. `demoLinks` then returns nothing and the buttons
+ * do not render. Re-list a component here when its hosted demo comes back.
+ */
+export const HOSTED_DEMOS: ReadonlySet<string> = new Set<string>();
 
 export interface Platform {
   id: string;

@@ -1,35 +1,38 @@
 /**
  * RecentPatientStack in the docs site's real browser preview.
  *
- * The live preview owns three stable states (`stack`, `lookalikes`, and
- * `closing`) and accepts `?state=` deep links. Its chart data is documentation
- * fixture data, and its callbacks are intentionally controlled by the host.
- * These checks cover the rendered chart identity, controlled selection,
- * keyboard focus movement, and the close verdicts the component implements.
+ * The page is a Playground page. Its Playground holds the default stack — a
+ * pinned chart (R. Vance), the active one (A. Okonkwo), and one with an unsigned
+ * note (T. Boateng) — and each documented Example (`#ex-<id>-panel-preview`)
+ * mounts its own: `similar` for two names four letters apart, and `closing`
+ * for one chart per close verdict (clean, unsigned note, draft order). The old
+ * `?state=` scenarios and their tabpanels are gone. Chart data is documentation
+ * fixture data, and activation is controlled by the host. These checks cover
+ * the rendered chart identity, controlled selection, keyboard focus movement,
+ * and the close verdicts the component implements.
  */
 
 import { expect, test, type Page } from "@playwright/test";
 
 const PAGE = "/components/recent-patient-stack";
 
-const SCENARIO_LABELS: Record<string, string> = {
-  stack: "Eleven tabs, or four charts",
-  lookalikes: "Two names four letters apart",
-  closing: "Closing is graded, not binary",
-};
+/** The Playground, or an Example by its registry id. */
+type Region = "playground" | "similar" | "closing";
 
-async function openStack(page: Page, state = "stack") {
+async function openStack(page: Page, region: Region = "playground") {
   const pageErrors: string[] = [];
   page.on("pageerror", (error) => pageErrors.push(error.message));
 
-  const response = await page.goto(`${PAGE}?state=${state}`);
+  const response = await page.goto(PAGE);
   expect(response?.status()).toBe(200);
   await page.waitForLoadState("networkidle");
   await expect(
     page.getByRole("heading", { name: "Recent Patient Stack", exact: true }),
   ).toBeVisible();
 
-  const panel = page.getByRole("tabpanel", { name: SCENARIO_LABELS[state] });
+  const panel = page.locator(
+    region === "playground" ? "#playground" : `#ex-${region}-panel-preview`,
+  );
   await panel.scrollIntoViewIfNeeded();
   const tablist = panel.getByRole("tablist", { name: "Open charts" });
   await expect(tablist).toBeVisible();
@@ -68,20 +71,20 @@ test.describe("@a11y recent patient stack", () => {
   test("renders the synthetic open charts, active chart, and outstanding work", async ({
     page,
   }) => {
-    const { panel, tablist, pageErrors } = await openStack(page);
+    const { tablist, pageErrors } = await openStack(page);
     const tabs = tablist.getByRole("tab");
 
-    await expect(tabs).toHaveCount(4);
-    await expect(panel.getByRole("button", { name: "4 charts" })).toBeVisible();
+    await expect(tabs).toHaveCount(3);
     await expect(tablist.getByRole("tab", { name: /A\. Okonkwo/, selected: true })).toBeVisible();
     await expect(tablist.getByRole("tab", { name: /T\. Boateng.*Unsigned note/ })).toBeVisible();
-    await expect(tablist.getByRole("tab", { name: /L\. Marsh.*Draft order/ })).toBeVisible();
     await expect(tablist.getByRole("tab", { name: /R\. Vance.*Pinned/ })).toBeVisible();
+    // The Playground drives expansion with its "Expanded" knob rather than
+    // `onExpandedChange`, so the component renders no "N charts" button here.
     expect(pageErrors).toEqual([]);
   });
 
   test("similar synthetic names both display their identifiers", async ({ page }) => {
-    const { panel, pageErrors } = await openStack(page, "lookalikes");
+    const { panel, pageErrors } = await openStack(page, "similar");
 
     await expect(panel).toContainText("J. Okonkwo");
     await expect(panel).toContainText("093-441-208");
@@ -115,8 +118,9 @@ test.describe("@a11y recent patient stack", () => {
   }) => {
     const { panel, pageErrors } = await openStack(page, "closing");
 
-    await panel.getByRole("button", { name: "Close R. Vance" }).click();
-    await expect(panel.getByRole("alertdialog")).toHaveCount(0);
+    // A. Okonkwo is the `closing` Example's clean chart: nothing outstanding.
+    await panel.getByRole("button", { name: "Close A. Okonkwo" }).click();
+    await expect(page.getByRole("alertdialog")).toHaveCount(0);
 
     await panel.getByRole("button", { name: "Close T. Boateng" }).click();
     const confirmation = page.getByRole("alertdialog", { name: "Close this chart?" });

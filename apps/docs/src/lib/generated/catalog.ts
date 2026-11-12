@@ -15569,7 +15569,61 @@ export const CATALOG: ComponentDoc[] = [
     "dependencies": [
       "@zoblocks/identity-core"
     ],
-    "install": "pnpm add @zoblocks/identity"
+    "install": "pnpm add @zoblocks/identity",
+    "controls": [
+      {
+        "prop": "context",
+        "control": "segmented",
+        "label": "context",
+        "options": [
+          "navigation",
+          "action",
+          "verification"
+        ],
+        "defaultValue": "action"
+      },
+      {
+        "prop": "ward",
+        "control": "text",
+        "label": "ward",
+        "defaultValue": "4B / bay 2"
+      },
+      {
+        "prop": "onReveal",
+        "control": "event",
+        "label": "onReveal"
+      }
+    ],
+    "examples": [
+      {
+        "id": "worklist",
+        "title": "Two patients, one name",
+        "description": "A worklist wrapped in IdentitySet reads what is actually on screen and adds the minimum that separates each collided row — full given name, then date of birth, then identifier — stopping at the first rung that works. Rows with no collision are left untouched.",
+        "group": "Identifying",
+        "code": "import { IdentityProvider, IdentitySet, IdentitySetNotice, PatientChip } from \"@zoblocks/identity\";\n\nexport default function Worklist({ patients }: { patients: Patient[] }) {\n  return (\n    <IdentityProvider disclosure=\"clinical\" photos=\"deny\">\n      <IdentitySet>\n        <ul>\n          {patients.map((patient) => (\n            <li key={patient.id}>\n              <PatientChip patient={patient} block />\n            </li>\n          ))}\n        </ul>\n        <IdentitySetNotice />\n      </IdentitySet>\n    </IdentityProvider>\n  );\n}"
+      },
+      {
+        "id": "verify",
+        "title": "Confirm before ordering",
+        "description": "Adelman et al. (JAMIA 2013, 901,776 ordering sessions): a dismissible 'check the patient' alert cut wrong-patient orders with an odds ratio of 0.84; making the clinician re-enter the patient's initials cut them with an odds ratio of 0.60. PatientVerify is the second one — a banner that is answered rather than only read.",
+        "group": "Identifying",
+        "code": "import { PatientVerify, useIdentity } from \"@zoblocks/identity\";\n\nfunction ConfirmBeforeOrdering({ patient }: { patient: Patient }) {\n  const identity = useIdentity(patient);\n  if (!identity) return null;\n\n  return (\n    <PatientVerify\n      identity={identity}\n      action=\"ordering Clozapine 25 mg\"\n      onConfirm={() => placeOrder()}\n    />\n  );\n}"
+      },
+      {
+        "id": "disclosure",
+        "title": "One resource, four audiences",
+        "description": "The same record renders four ways under one IdentityProvider. A waiting-room screen carries enough for the named person to recognise themselves and no more; a clinician gets full clinical detail, with sensitivity categories held behind an audited reveal.",
+        "group": "Access",
+        "code": "import { IdentityProvider, PatientBanner } from \"@zoblocks/identity\";\n\n// Waiting room: enough to recognise yourself, no more.\n<IdentityProvider disclosure=\"public\" photos=\"deny\">\n  <PatientBanner patient={patient} context=\"navigation\" />\n</IdentityProvider>\n\n// Clinician: full clinical detail. Sensitivity categories wait behind a reveal.\n<IdentityProvider disclosure=\"clinical\" photos=\"deny\" onSensitiveReveal={audit.write}>\n  <PatientBanner patient={patient} context=\"navigation\" />\n</IdentityProvider>"
+      },
+      {
+        "id": "guard",
+        "title": "Wrong patient, refused",
+        "description": "The coupling that makes a banner a control rather than a heading. The form knows which patient it was opened for; the banner knows which chart is on screen; PatientGuard refuses to render when those disagree, in every environment, not only a development build.",
+        "group": "Access",
+        "code": "import { IdentityProvider, PatientBanner, PatientGuard } from \"@zoblocks/identity\";\n\n<IdentityProvider disclosure=\"clinical\" photos=\"deny\">\n  <PatientBanner patient={chartOnScreen} context=\"navigation\">\n    <PatientGuard expect={openedFor.id} expectName={openedFor.name}>\n      <OrderForm />\n    </PatientGuard>\n  </PatientBanner>\n</IdentityProvider>"
+      }
+    ]
   },
   {
     "name": "signature",
@@ -17030,7 +17084,7 @@ export const CATALOG: ComponentDoc[] = [
         "title": "Underline",
         "description": "The workhorse: more than four items, labels of unequal length, panels that are whole screens. The rail is an inset shadow rather than a border, so the 2px indicator overlaps it exactly at any zoom.",
         "group": "Variants",
-        "code": "<Tabs\n  as=\"tabs\"\n  variant=\"underline\"\n  aria-label=\"Order\"\n  defaultValue=\"summary\"\n  items={[\n    { value: \"summary\", label: \"Summary\", children: <OrderSummary /> },\n    { value: \"lines\", label: \"Line items\", count: 24, children: <LineItems /> },\n    { value: \"ship\", label: \"Shipments\", count: 3, children: <Shipments /> },\n    { value: \"returns\", label: \"Returns\", count: 1, tone: \"high\", children: <Returns /> },\n    { value: \"invoices\", label: \"Invoices\", children: <Invoices /> },\n    { value: \"audit\", label: \"Audit log\", children: <AuditLog /> },\n  ]}\n/>"
+        "code": "<Tabs\n  as=\"tabs\"\n  variant=\"underline\"\n  aria-label=\"Order\"\n  defaultValue=\"summary\"\n  items={[\n    { value: \"summary\", label: \"Summary\", children: <OrderSummary /> },\n    { value: \"lines\", label: \"Line items\", count: 24, children: <LineItems /> },\n    { value: \"ship\", label: \"Shipments\", count: 3, children: <Shipments /> },\n    { value: \"returns\", label: \"Returns\", count: 1, tone: \"high\", children: <Returns /> },\n    { value: \"invoices\", label: \"Invoices\", children: <Invoices /> },\n  ]}\n/>"
       },
       {
         "id": "pill-filters",

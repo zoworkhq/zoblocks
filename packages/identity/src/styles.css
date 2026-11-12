@@ -13,7 +13,7 @@
  *      window in which two states are simultaneously legible.
  */
 
-:where(.zb-banner, .zb-patient-chip, .zb-avatar, .zb-verify, .zb-guard) {
+:where(.zb-banner, .zb-patient-chip, .zb-avatar, .zb-verify, .zb-guard, .zb-identity-notice) {
   /*
    * Three tiers, one reference rule.
    *
@@ -71,6 +71,9 @@
   --zb-identity-ok-bg: var(--zb-status-normal-bg, var(--ant-color-success-bg, #e6f6ee));
   --zb-identity-ok-border: var(--zb-status-normal-border, var(--ant-color-success-border, #a9dcc3));
   --zb-identity-accent: var(--zb-accent, var(--ant-color-primary, #059478));
+  /* Text on an accent fill. Never a literal white: dark themes lift the accent
+     to a luminous tone, and white on it measured 1.5:1. */
+  --zb-identity-on-accent: var(--zb-text-on-accent, var(--ant-color-text-light-solid, #ffffff));
 
   /* ---- record flags: already semantic, read straight through ---------- */
   --zb-identity-restricted: var(--zb-flag-restricted, #7c3aed);
@@ -350,7 +353,7 @@
   border-block-start: 1px solid var(--zb-identity-border-subtle);
   background: var(--zb-identity-warn-bg, #fffbe6);
   font-size: 12px;
-  color: var(--zb-identity-warn, #ad6800);
+  color: var(--zb-identity-warn, #8a5300);
 }
 
 /* --------------------------------------------------------------------- */
@@ -384,7 +387,7 @@
 .zb-tag--warn {
   background: var(--zb-identity-warn-bg, #fffbe6);
   border-color: var(--zb-identity-warn-border, #ffe58f);
-  color: var(--zb-identity-warn, #ad6800);
+  color: var(--zb-identity-warn, #8a5300);
 }
 .zb-tag--error {
   background: var(--zb-identity-critical-bg, #fff2f0);
@@ -656,7 +659,7 @@
 .zb-btn--primary {
   background: var(--zb-identity-accent, #1677ff);
   border-color: var(--zb-identity-accent, #1677ff);
-  color: #fff;
+  color: var(--zb-identity-on-accent, #fff);
 }
 
 /* --------------------------------------------------------------------- */

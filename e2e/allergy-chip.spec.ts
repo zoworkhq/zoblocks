@@ -15,11 +15,21 @@ import { expect, test, type Page } from "@playwright/test";
 
 const PAGE = "/components/allergy-chip";
 
+/*
+ * The page leads with a Playground whose chip is interactive — a `button`, not
+ * the `role="group"` a read-only chip takes, and a different fixture. The
+ * documented chip these tests describe is the first in the
+ * `criticality-is-not-severity` Example: Penicillin G, critical, mild urticaria.
+ */
+const EXAMPLE = "#ex-criticality-is-not-severity-panel-preview";
+
 async function openAllergyChip(page: Page) {
   await page.goto(PAGE);
   await page.waitForLoadState("networkidle");
 
-  const chip = page.locator("[data-zb-allergy]").first();
+  const example = page.locator(EXAMPLE);
+  await example.scrollIntoViewIfNeeded();
+  const chip = example.locator("[data-zb-allergy]").first();
   await expect(chip).toBeVisible();
 
   return chip;
@@ -45,7 +55,8 @@ test.describe("@a11y allergy chip", () => {
   test("the documented chip is keyboard safe when interactive", async ({ page }) => {
     const chip = await openAllergyChip(page);
 
-    const interactive = page.locator("[data-zb-allergy] button");
+    // An interactive chip is itself the button (the Playground's), or holds one.
+    const interactive = page.locator("button[data-zb-allergy], [data-zb-allergy] button");
 
     if (await interactive.count()) {
       const button = interactive.first();

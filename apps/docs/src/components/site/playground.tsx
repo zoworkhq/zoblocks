@@ -20,7 +20,11 @@
 import * as React from "react";
 import type { Control } from "@zoblocks/component-meta";
 import {
+  allergyHighRisk,
   allergyList,
+  allergyModerate,
+  allergyRefuted,
+  allergyUnconfirmed,
   medicationList,
   observationCorrected,
   observationDeclined,
@@ -32,6 +36,17 @@ import {
 import { Tabs, type TabsItemProps, type TabsProps } from "@zoblocks/tabs";
 import { ConfigProvider, Form, theme } from "antd";
 import { Signature, signatureRequired, type SignatureProps } from "@zoblocks/signature";
+import {
+  IdentityProvider,
+  PatientBanner,
+  type IdentifierSpec,
+  type PatientBannerProps,
+} from "@zoblocks/identity";
+import {
+  AllergyChip,
+  fromAllergyIntolerance,
+  type AllergyRecord,
+} from "@/registry/zoblocks/allergy-chip/allergy-chip";
 import { PLAYGROUND_COMPONENTS } from "./playground-registry";
 import { PulseLoader } from "@/registry/zoblocks/pulse-loader/pulse-loader";
 import { RhythmLoader } from "@/registry/zoblocks/rhythm-loader/rhythm-loader";
@@ -120,6 +135,33 @@ function PlaygroundSwitch(props: Partial<SwitchProps>) {
         }}
       />
     </Centered>
+  );
+}
+
+/*
+ * `selectedEncounterId` is controlled, and the playground's event handlers only
+ * log that they fired. With nothing holding the choice, the select reverted to
+ * "No encounter selected" on every pick: a control that looks operable and
+ * ignores the person using it. The renderer keeps the selection, as
+ * `PlaygroundSwitch` keeps `checked`, and still reports to the event log.
+ */
+function PlaygroundChartHeader({ onSelectEncounter, ...props }: Props) {
+  const [encounterId, setEncounterId] = React.useState<string | undefined>();
+  const report = onSelectEncounter as ((id: string | undefined) => void) | undefined;
+  return (
+    <ChartHeader
+      patient={CH_PATIENT}
+      identifiers={CH_IDENTIFIERS}
+      now="2026-08-24T10:00:00Z"
+      safety={CH_SAFETY}
+      encounters={CH_ENCOUNTERS}
+      {...props}
+      selectedEncounterId={encounterId}
+      onSelectEncounter={(id) => {
+        setEncounterId(id);
+        report?.(id);
+      }}
+    />
   );
 }
 
@@ -314,6 +356,14 @@ const RESULT_OBSERVATIONS = {
   observationDeclined,
 } as const;
 
+/** Same reasoning as `RESULT_OBSERVATIONS`: the `record` knob names a raw fixture, adapted on render. */
+const ALLERGY_INTOLERANCES = {
+  allergyHighRisk,
+  allergyModerate,
+  allergyUnconfirmed,
+  allergyRefuted,
+} as const;
+
 /** A 30-day readmission score, with six drivers so `driverCount` has a real ceiling to reach. */
 const RI_ASSESSMENT: RiskAssessment = {
   id: "ri1",
@@ -472,6 +522,41 @@ function CopilotPlaygroundDemo(props: Partial<CopilotProps>) {
     />
   );
 }
+
+/** A fixed clock, so age never moves between one render and the next. */
+const IDENTITY_NOW = new Date("2026-08-12T10:00:00Z");
+
+/**
+ * Carries both an NHS number and a confidentiality label, so the knobs always
+ * have a second identifier to show under `context="action"` and a sensitivity
+ * row to reveal regardless of which context is selected.
+ */
+const IDENTITY_PATIENT: Patient = {
+  resourceType: "Patient",
+  id: "syn-identity-playground",
+  active: true,
+  meta: {
+    security: [
+      {
+        system: "http://terminology.hl7.org/CodeSystem/v3-Confidentiality",
+        code: "R",
+        display: "Restricted",
+      },
+    ],
+  },
+  name: [{ use: "official", given: ["Amara"], family: "Okonkwo" }],
+  birthDate: "1985-03-08",
+  identifier: [
+    { use: "official", system: "http://example.org/fhir/sid/mrn", value: "093-441-208" },
+    { use: "official", system: "https://fhir.nhs.uk/Id/nhs-number", value: "943 476 5919" },
+  ],
+};
+
+/** `context="action"` enforces two identifiers at the type level. */
+const IDENTITY_IDENTIFIERS: readonly [IdentifierSpec, IdentifierSpec] = [
+  { kind: "mrn" },
+  { kind: "nhs" },
+];
 
 const RENDERERS: Record<string, (props: Props) => React.ReactNode> = {
   /*
@@ -636,13 +721,8 @@ const RENDERERS: Record<string, (props: Props) => React.ReactNode> = {
    * knob needs a remount to be seen, the same `key` trick Switch uses.
    */
   "chart-header": (props) => (
-    <ChartHeader
+    <PlaygroundChartHeader
       key={`${String(props.collapsed ?? false)}-${String(props.surface ?? "overview")}`}
-      patient={CH_PATIENT}
-      identifiers={CH_IDENTIFIERS}
-      now="2026-08-24T10:00:00Z"
-      safety={CH_SAFETY}
-      encounters={CH_ENCOUNTERS}
       {...props}
     />
   ),
@@ -691,6 +771,20 @@ const RENDERERS: Record<string, (props: Props) => React.ReactNode> = {
           value={fromObservation(observation)}
           now={now ? now : "2026-08-12T10:00:00Z"}
         />
+      </Centered>
+    );
+  },
+  /** Same reasoning as Result Value's `value` knob: `record` names a fixture rather than carrying one. */
+  "allergy-chip": (props) => {
+    const { record, ...rest } = props as { record?: string } & Props;
+    const intolerance =
+      ALLERGY_INTOLERANCES[record as keyof typeof ALLERGY_INTOLERANCES] ?? allergyHighRisk;
+    // Non-null: `fromAllergyIntolerance` returns null only for a no-known-allergy
+    // code, which none of the four fixture options carry.
+    const adapted = fromAllergyIntolerance(intolerance) as AllergyRecord;
+    return (
+      <Centered>
+        <AllergyChip {...rest} record={adapted} />
       </Centered>
     );
   },
@@ -759,6 +853,29 @@ const RENDERERS: Record<string, (props: Props) => React.ReactNode> = {
     </div>
   ),
   "chart-command-palette": (props) => <ChartCommandPalettePlayground {...props} />,
+  /*
+   * `identifiers` is required under `context="action"` and `"verification"`
+   * and absent under `"navigation"` — a two-or-more tuple, enforced by the
+   * type, so it is resolved from the context knob rather than taken as a prop
+   * a knob could set to one.
+   */
+  identity: (props) => {
+    const { context, ...rest } = props as { context?: PatientBannerProps["context"] } & Props;
+    const resolvedContext = context ?? "action";
+    return (
+      <div className="mx-auto w-full max-w-lg">
+        <IdentityProvider now={IDENTITY_NOW} disclosure="clinical" photos="deny">
+          <PatientBanner
+            patient={IDENTITY_PATIENT}
+            {...rest}
+            {...(resolvedContext === "navigation"
+              ? { context: "navigation" }
+              : { context: resolvedContext, identifiers: IDENTITY_IDENTIFIERS })}
+          />
+        </IdentityProvider>
+      </div>
+    );
+  },
 };
 
 /**
@@ -864,6 +981,10 @@ const FIXED_ATTRS: Record<string, readonly string[] | ((props: Props) => readonl
     'anchor="inline"',
   ],
   "chart-command-palette": ["items={items}", "scope={scope}", "open"],
+  identity: (props) =>
+    props.context === "navigation"
+      ? ["patient={patient}"]
+      : ["patient={patient}", 'identifiers={[{ kind: "mrn" }, { kind: "nhs" }]}'],
 };
 
 function resolveFixed(

@@ -167,4 +167,99 @@ import "@zoblocks/identity/styles.css";
 
   dependencies: ["@zoblocks/identity-core"],
   registryDependencies: [],
+
+  controls: [
+    {
+      prop: "context",
+      control: "segmented",
+      label: "context",
+      options: ["navigation", "action", "verification"],
+      defaultValue: "action",
+    },
+    { prop: "ward", control: "text", label: "ward", defaultValue: "4B / bay 2" },
+    { prop: "onReveal", control: "event", label: "onReveal" },
+  ],
+
+  examples: [
+    {
+      id: "worklist",
+      title: "Two patients, one name",
+      group: "Identifying",
+      description:
+        "A worklist wrapped in IdentitySet reads what is actually on screen and adds the minimum that separates each collided row — full given name, then date of birth, then identifier — stopping at the first rung that works. Rows with no collision are left untouched.",
+      code: `import { IdentityProvider, IdentitySet, IdentitySetNotice, PatientChip } from "@zoblocks/identity";
+
+export default function Worklist({ patients }: { patients: Patient[] }) {
+  return (
+    <IdentityProvider disclosure="clinical" photos="deny">
+      <IdentitySet>
+        <ul>
+          {patients.map((patient) => (
+            <li key={patient.id}>
+              <PatientChip patient={patient} block />
+            </li>
+          ))}
+        </ul>
+        <IdentitySetNotice />
+      </IdentitySet>
+    </IdentityProvider>
+  );
+}`,
+    },
+    {
+      id: "verify",
+      title: "Confirm before ordering",
+      group: "Identifying",
+      description:
+        "Adelman et al. (JAMIA 2013, 901,776 ordering sessions): a dismissible 'check the patient' alert cut wrong-patient orders with an odds ratio of 0.84; making the clinician re-enter the patient's initials cut them with an odds ratio of 0.60. PatientVerify is the second one — a banner that is answered rather than only read.",
+      code: `import { PatientVerify, useIdentity } from "@zoblocks/identity";
+
+function ConfirmBeforeOrdering({ patient }: { patient: Patient }) {
+  const identity = useIdentity(patient);
+  if (!identity) return null;
+
+  return (
+    <PatientVerify
+      identity={identity}
+      action="ordering Clozapine 25 mg"
+      onConfirm={() => placeOrder()}
+    />
+  );
+}`,
+    },
+    {
+      id: "disclosure",
+      title: "One resource, four audiences",
+      group: "Access",
+      description:
+        "The same record renders four ways under one IdentityProvider. A waiting-room screen carries enough for the named person to recognise themselves and no more; a clinician gets full clinical detail, with sensitivity categories held behind an audited reveal.",
+      code: `import { IdentityProvider, PatientBanner } from "@zoblocks/identity";
+
+// Waiting room: enough to recognise yourself, no more.
+<IdentityProvider disclosure="public" photos="deny">
+  <PatientBanner patient={patient} context="navigation" />
+</IdentityProvider>
+
+// Clinician: full clinical detail. Sensitivity categories wait behind a reveal.
+<IdentityProvider disclosure="clinical" photos="deny" onSensitiveReveal={audit.write}>
+  <PatientBanner patient={patient} context="navigation" />
+</IdentityProvider>`,
+    },
+    {
+      id: "guard",
+      title: "Wrong patient, refused",
+      group: "Access",
+      description:
+        "The coupling that makes a banner a control rather than a heading. The form knows which patient it was opened for; the banner knows which chart is on screen; PatientGuard refuses to render when those disagree, in every environment, not only a development build.",
+      code: `import { IdentityProvider, PatientBanner, PatientGuard } from "@zoblocks/identity";
+
+<IdentityProvider disclosure="clinical" photos="deny">
+  <PatientBanner patient={chartOnScreen} context="navigation">
+    <PatientGuard expect={openedFor.id} expectName={openedFor.name}>
+      <OrderForm />
+    </PatientGuard>
+  </PatientBanner>
+</IdentityProvider>`,
+    },
+  ],
 });

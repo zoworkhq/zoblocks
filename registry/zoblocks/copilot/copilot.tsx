@@ -528,7 +528,7 @@ function CopilotPanel({
         <button
           type="button"
           onClick={api.newThread}
-          className="min-h-6 rounded-lg border border-[var(--zb-border)] px-2 py-0.5 text-xs"
+          className="min-h-6 min-w-6 shrink-0 rounded-lg border border-[var(--zb-border)] px-2 py-0.5 text-xs"
         >
           <NewChatIcon />
           <span className="sr-only">New chat</span>
@@ -572,10 +572,14 @@ function CopilotPanel({
                   data-register={message.answer.register}
                   className={cn(
                     "self-start rounded px-1.5 py-0.5 text-[0.65rem] uppercase tracking-wide",
+                    // The status token's own paired ground, not a 15% mix of
+                    // the hue over whatever is behind it: on the docs panel the
+                    // mix measured 4.43:1 for this 10px label. The `-bg` tokens
+                    // are what the token build gates each status colour against.
                     message.answer.register === "grounded" &&
-                      "bg-[color-mix(in_oklab,var(--zb-status-normal)_15%,transparent)] text-[var(--zb-status-normal)]",
+                      "bg-[var(--zb-status-normal-bg)] text-[var(--zb-status-normal)]",
                     message.answer.register === "general" &&
-                      "bg-[color-mix(in_oklab,var(--zb-status-high)_15%,transparent)] text-[var(--zb-status-high)]",
+                      "bg-[var(--zb-status-high-bg)] text-[var(--zb-status-high)]",
                     message.answer.register === "declined" &&
                       "bg-[var(--zb-bg-subtle)] text-[var(--zb-text-muted)]",
                   )}

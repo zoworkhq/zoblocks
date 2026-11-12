@@ -10,7 +10,16 @@
  *     code-split chunk resolving after hydration, not an import;
  *   · the token bridge writes custom properties that a *stylesheet* then has to
  *     resolve, and jsdom has no cascade worth the name;
- *   · MUI's ripple is a mounted DOM node driven by real pointer events.
+ *
+ * The docs used to draw a band of framework chrome — antd and MUI buttons,
+ * inputs and a select — above every preview, and these tests asserted on it.
+ * That band was removed (e88f930) and the pages now render only the component
+ * being documented, so there is no `.ant-btn` or `.MuiButton-root` left on
+ * them to find. What is still observable is the bridge itself: the lazy host
+ * replaces the ZoBlocks fallback and marks its subtree with `data-zb-bridge`
+ * only once its chunk has executed, which is the same "the real library
+ * arrived" claim, read from the attribute rather than from its buttons. The
+ * adapters' own controls are covered in `packages/host-react/src/hosts.test.tsx`.
  *
  * Tagged `@bridge` because every project in `playwright.config.ts` carries a
  * `grep`, and a tag with no project matches nothing while the run still reports
@@ -46,14 +55,9 @@ function hosted(page: Page) {
   return page.locator("[data-zb-bridge], [data-zb-host]").first();
 }
 
-/**
- * Reveal is an IntersectionObserver fade, and until it finishes the paragraph
- * above the preview still overlays the buttons — Playwright reports the click
- * as intercepted by a `[data-reveal]` element, which reads as a layout bug and
- * is not one. Same helper as `docs-site.spec.ts`.
- */
-async function settle(page: Page) {
-  await page.waitForTimeout(500);
+/** The lazy host has executed: its subtree is marked with its own bridge. */
+async function expectBridge(page: Page, bridge: "antd" | "mui") {
+  await expect(hosted(page)).toHaveAttribute("data-zb-bridge", bridge);
 }
 
 test.describe("@bridge design language switch", () => {
@@ -68,46 +72,14 @@ test.describe("@bridge design language switch", () => {
     await expect(page.locator(".MuiButton-root")).toHaveCount(0);
 
     await choose(page, "Ant Design");
-    // `.ant-btn-primary` is emitted by antd itself. A reproduction cannot
-    // produce it, which is what makes this an assertion about the real library.
-    await expect(page.locator(".ant-btn-primary").first()).toBeVisible();
-    await expect(hosted(page)).toHaveAttribute("data-zb-bridge", "antd");
+    // The ZoBlocks host is the Suspense fallback, so this attribute appears
+    // only once antd's chunk has been fetched and executed.
+    await expectBridge(page, "antd");
 
     await choose(page, "Material UI");
-    await expect(page.locator(".MuiButton-contained").first()).toBeVisible();
-    await expect(page.locator(".MuiOutlinedInput-notchedOutline").first()).toBeAttached();
-    await expect(hosted(page)).toHaveAttribute("data-zb-bridge", "mui");
+    await expectBridge(page, "mui");
     // Switching hosts must unmount the previous one rather than layering it.
-    await expect(page.locator(".ant-btn")).toHaveCount(0);
-  });
-
-  test("keeps MUI's ripple, which a reproduction cannot have", async ({ page }) => {
-    await page.goto(PAGE);
-    await choose(page, "Material UI");
-
-    const button = page.locator(".MuiButton-contained").first();
-    await expect(button).toBeVisible();
-    await button.scrollIntoViewIfNeeded();
-    await settle(page);
-
-    // MUI mounts `TouchRipple` lazily on first interaction, so asserting before
-    // the press fails against a perfectly working button.
-    await expect(page.locator(".MuiTouchRipple-root")).toHaveCount(0);
-
-    /*
-     * `dispatchEvent` rather than `click`, deliberately.
-     *
-     * The page's reveal fades and the preview's settle animation keep the
-     * stage moving, so Playwright's actionability check reports "element is
-     * not stable" until it times out — a property of the docs page, not of the
-     * button. Click actionability is already covered by the radio clicks in
-     * every other test here; what this one is about is whether MUI's real
-     * `ButtonBase` is underneath, and its ripple starts on `mousedown`.
-     */
-    await button.dispatchEvent("mousedown");
-    await expect(page.locator(".MuiTouchRipple-root").first()).toBeAttached();
-    // The ripple itself, not just its container: proof the animation ran.
-    await expect(page.locator(".MuiTouchRipple-ripple").first()).toBeAttached();
+    await expect(page.locator('[data-zb-bridge="antd"]')).toHaveCount(0);
   });
 
   test("re-themes the component but never its clinical colours", async ({ page }) => {
@@ -143,7 +115,7 @@ test.describe("@bridge design language switch", () => {
 
   test("is linkable and survives a reload", async ({ page }) => {
     await page.goto(`${PAGE}?lang=mui`);
-    await expect(page.locator(".MuiButton-contained").first()).toBeVisible();
+    await expectBridge(page, "mui");
     await expect(control(page).getByRole("radio", { name: "Material UI" })).toHaveAttribute(
       "aria-checked",
       "true",
@@ -151,7 +123,7 @@ test.describe("@bridge design language switch", () => {
 
     // Chosen, not linked: the cookie is what carries it to the next page.
     await page.goto(PAGE);
-    await expect(page.locator(".MuiButton-contained").first()).toBeVisible();
+    await expectBridge(page, "mui");
   });
 
   test("is one tab stop, with arrows moving inside it", async ({ page }) => {
@@ -172,6 +144,6 @@ test.describe("@bridge design language switch", () => {
       "aria-checked",
       "true",
     );
-    await expect(page.locator(".ant-btn-primary").first()).toBeVisible();
+    await expectBridge(page, "antd");
   });
 });
