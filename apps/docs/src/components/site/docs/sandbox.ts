@@ -19,6 +19,7 @@ export const HOSTED_DEMOS: ReadonlySet<string> = new Set([
   "breath-loader",
   "care-timeline",
   "clinical-status",
+  "copilot",
   "data-grid",
   "date-picker",
   "helix-loader",
