@@ -147,4 +147,170 @@ export default defineComponentMeta({
   controls: [
     { prop: "canSign", control: "switch", label: "Policy permits signing", defaultValue: true },
   ],
+
+  examples: [
+    {
+      id: "empty-progress-draft",
+      title: "Empty Progress Draft",
+      description:
+        "Shows the default Progress Note and required-section findings. Content is fictional and illustrative.",
+      code: `import { ClinicalNote } from "@/components/zoblocks/clinical-note";
+
+const now = new Date("2026-08-16T14:38:00+05:30");
+
+export function EmptyProgressDraft() {
+  return (
+    <section>
+      <p>Fictional synthetic data for interface demonstration only; not clinical advice.</p>
+      <ClinicalNote
+        subject={{ reference: "Patient/DEMO-001", display: "FICTIONAL SAMPLE", identifier: "DEMO-001", detail: "Synthetic demo record" }}
+        author={{ display: "Example Author", role: "Demonstration only" }}
+        noteType="progress"
+        now={now}
+      />
+    </section>
+  );
+}`,
+    },
+    {
+      id: "origin-visibility",
+      title: "Origin and Copy-Forward Visibility",
+      description:
+        "Shows fictional typed, dictated, pulled, and copied ranges with the composition summary; provenance does not validate content.",
+      code: `import { ClinicalNote, mixed, noteDoc, noteSection, para } from "@/components/zoblocks/clinical-note";
+import { NOTE_TYPES } from "@zoblocks/clinical-note-core";
+
+const now = new Date("2026-08-16T14:38:00+05:30");
+const progress = noteDoc(...NOTE_TYPES.progress.sections.map((section) => {
+  const content = section.code === "10164-2"
+    ? [mixed(
+        ["Fictional placeholder text ", "typed"],
+        ["with a dictated sample range ", "dictated", { confidence: 0.96 }],
+        ["and a pulled sample range ", "pulled", { source: "Observation/DEMO-001", at: "2026-08-16T14:30:00+05:30" }],
+        ["plus copied sample text", "copied", { source: "Composition/DEMO-PRIOR" }],
+      )]
+    : section.code === "51847-2"
+      ? [para("Fictional placeholder text for interface demonstration only.")]
+      : [];
+  return noteSection({ code: section.code, title: section.title, required: section.required }, ...content);
+}));
+
+export function OriginVisibility() {
+  return (
+    <section>
+      <p>Fictional synthetic data for interface demonstration only; provenance does not validate content.</p>
+      <ClinicalNote
+        subject={{ reference: "Patient/DEMO-001", display: "FICTIONAL SAMPLE", identifier: "DEMO-001", detail: "Synthetic demo record" }}
+        author={{ display: "Example Author", role: "Demonstration only" }}
+        noteType="progress"
+        value={progress}
+        now={now}
+      />
+    </section>
+  );
+}`,
+    },
+    {
+      id: "sign-gate",
+      title: "What Blocks Signing",
+      description:
+        "Compares empty required sections with a schema-complete fictional note and displays actual onCommit arguments; nothing is persisted or cryptographically signed.",
+      code: `import * as React from "react";
+import { ClinicalNote, noteDoc, noteSection, para } from "@/components/zoblocks/clinical-note";
+import { NOTE_TYPES } from "@zoblocks/clinical-note-core";
+
+const now = new Date("2026-08-16T14:38:00+05:30");
+const completeProgress = noteDoc(...NOTE_TYPES.progress.sections.map((section) => noteSection(
+  { code: section.code, title: section.title, required: section.required },
+  ...(section.required ? [para("Fictional placeholder text for interface demonstration only.")] : []),
+)));
+
+export function WhatBlocksSigning() {
+  const [complete, setComplete] = React.useState(false);
+  const [callbackArgs, setCallbackArgs] = React.useState<unknown>();
+  return (
+    <section>
+      <p>Fictional synthetic data; this demonstration does not persist notes or create a cryptographic signature.</p>
+      <button type="button" onClick={() => setComplete((current) => !current)}>
+        {complete ? "Show empty draft" : "Show schema-complete draft"}
+      </button>
+      <ClinicalNote
+        key={complete ? "complete" : "empty"}
+        subject={{ reference: "Patient/DEMO-001", display: "FICTIONAL SAMPLE", identifier: "DEMO-001", detail: "Synthetic demo record" }}
+        author={{ display: "Example Author", role: "Demonstration only" }}
+        noteType="progress"
+        value={complete ? completeProgress : undefined}
+        now={now}
+        attestation="I reviewed this fictional example for interface demonstration."
+        onCommit={(kind, doc, acknowledged) => setCallbackArgs({ kind, doc: doc.toJSON(), acknowledged })}
+      />
+      <pre aria-live="polite">{callbackArgs === undefined ? "No callback received yet." : JSON.stringify(callbackArgs, null, 2)}</pre>
+    </section>
+  );
+}`,
+    },
+    {
+      id: "template-blanks",
+      title: "Template Blanks and F2 Navigation",
+      description:
+        "Uses core wildcard expansion and the component’s F2 and next-blank navigation; no phrase picker is implied.",
+      code: `import { ClinicalNote, noteDoc, noteSection, para } from "@/components/zoblocks/clinical-note";
+import { expand, NOTE_TYPES } from "@zoblocks/clinical-note-core";
+import type { Node as PMNode } from "prosemirror-model";
+
+const now = new Date("2026-08-16T14:38:00+05:30");
+const expansion = expand("Fictional placeholder ***sample***", {
+  provenance: { origin: "template", source: "Phrase/DEMO" },
+});
+const blankParagraphs: PMNode[] = [];
+expansion.content.forEach((node) => blankParagraphs.push(node));
+const progress = noteDoc(...NOTE_TYPES.progress.sections.map((section) => noteSection(
+  { code: section.code, title: section.title, required: section.required },
+  ...(section.code === "10164-2" ? blankParagraphs : section.code === "51847-2" ? [para("Fictional placeholder text for interface demonstration only.")] : []),
+)));
+
+export function TemplateBlanks() {
+  return (
+    <section>
+      <p>Fictional synthetic data. F2 and the visible next-blank control navigate between wildcard blanks; they do not fill them.</p>
+      <ClinicalNote
+        subject={{ reference: "Patient/DEMO-001", display: "FICTIONAL SAMPLE", identifier: "DEMO-001", detail: "Synthetic demo record" }}
+        author={{ display: "Example Author", role: "Demonstration only" }}
+        noteType="progress"
+        value={progress}
+        now={now}
+      />
+    </section>
+  );
+}`,
+    },
+    {
+      id: "signed-reader",
+      title: "Signed Reader with Attestations and Addenda",
+      description:
+        "Displays a fictional note with supplied attestation and addendum rows; the reader does not verify signatures or create legal supersession.",
+      code: `import { ClinicalNote, noteDoc, noteSection, para } from "@/components/zoblocks/clinical-note";
+import { NOTE_TYPES } from "@zoblocks/clinical-note-core";
+
+const progress = noteDoc(...NOTE_TYPES.progress.sections.map((section) => noteSection(
+  { code: section.code, title: section.title, required: section.required },
+  ...(section.required ? [para("Fictional placeholder text for interface demonstration only.")] : []),
+)));
+
+export function SignedReader() {
+  return (
+    <section>
+      <p>Fictional synthetic display data. Attestations and addenda are supplied; this reader does not verify them.</p>
+      <ClinicalNote.Reader
+        subject={{ reference: "Patient/DEMO-001", display: "FICTIONAL SAMPLE", identifier: "DEMO-001", detail: "Synthetic demo record" }}
+        title="Illustrative progress note"
+        doc={progress}
+        attestations={[{ who: "Example Author", role: "Demonstration only", when: "16 Aug 2026, 14:38 IST (UTC+05:30)", statement: "Illustrative supplied attestation text." }]}
+        addenda={[{ author: "Example Author", when: "16 Aug 2026, 14:42 IST (UTC+05:30)", text: "Fictional addendum text for interface demonstration only." }]}
+      />
+    </section>
+  );
+}`,
+    },
+  ],
 });
