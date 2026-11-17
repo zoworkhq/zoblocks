@@ -127,6 +127,37 @@
   max-inline-size: 78ch;
 }
 
+/* ---------------------------------------------------------------- */
+/* Toolbar, criteria and filter panel — caller-owned content         */
+/* ---------------------------------------------------------------- */
+
+.zb-grid__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  padding: 0.5rem var(--zb-grid-pad-x);
+  border-block-end: 1px solid var(--zb-grid-rule);
+}
+
+.zb-grid__criteria {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem 0.5rem;
+  min-width: 0;
+  padding: 0.45rem var(--zb-grid-pad-x);
+  border-block-end: 1px solid var(--zb-grid-rule);
+}
+
+.zb-grid__filter-panel {
+  min-width: 0;
+  padding: 0.75rem var(--zb-grid-pad-x);
+  border-block-end: 1px solid var(--zb-grid-rule);
+  background: var(--zb-grid-sunk);
+}
+
 /*
  * The identity line holds its space when there is nothing to say in it.
  *
@@ -830,6 +861,9 @@
   .zb-grid__td,
   .zb-grid__tr,
   .zb-grid__masthead,
+  .zb-grid__toolbar,
+  .zb-grid__criteria,
+  .zb-grid__filter-panel,
   .zb-grid__strip,
   .zb-grid__held,
   .zb-grid__foot {
@@ -919,6 +953,9 @@
   }
 
   .zb-grid__masthead,
+  .zb-grid__toolbar,
+  .zb-grid__criteria,
+  .zb-grid__filter-panel,
   .zb-grid__foot {
     border-color: #000;
   }
