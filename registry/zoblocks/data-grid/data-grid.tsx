@@ -195,6 +195,16 @@ export interface DataGridProps<Row> {
   /** The right-hand side of the masthead: a window, a source, a role. */
   note?: React.ReactNode;
 
+  /**
+   * Optional layout slots above the grid.
+   *
+   * These are presentation-only: the caller supplies the controls and owns
+   * their state and behavior. The grid provides their placement and styling.
+   */
+  toolbar?: React.ReactNode;
+  criteria?: React.ReactNode;
+  filterPanel?: React.ReactNode;
+
   /** The columns, in display order. Typed objects rather than JSX children, so a saved view can carry them. */
   columns: readonly DataGridColumn<Row>[];
   /** The rows on screen. The grid never fetches, filters or merges — this is exactly what it draws. */
@@ -384,6 +394,9 @@ export function DataGrid<Row>({
   caption,
   title,
   note,
+  toolbar,
+  criteria,
+  filterPanel,
   columns,
   rows,
   rowKey,
@@ -727,6 +740,12 @@ export function DataGrid<Row>({
           ) : null}
         </header>
       ) : null}
+
+      {toolbar != null ? <div className="zb-grid__toolbar">{toolbar}</div> : null}
+
+      {filterPanel != null ? <div className="zb-grid__filter-panel">{filterPanel}</div> : null}
+
+      {criteria != null ? <div className="zb-grid__criteria">{criteria}</div> : null}
 
       {/*
         One strip above the header, with two things that can occupy it.

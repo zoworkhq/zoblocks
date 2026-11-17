@@ -66,6 +66,7 @@ export default defineComponentMeta({
     "Pinned identity, scrolled sideways",
     "Loading more, and the end of what is known",
     "Framed by the host, not by itself",
+    "Toolbar, criteria and filter panel",
     "The predicate matched nobody",
   ],
 
@@ -117,7 +118,7 @@ export default defineComponentMeta({
     "One sort column. Multi-column sort is a real requirement in a worklist and is not here yet.",
     "No column resize, reorder, pinning or grouping. Columns are typed objects precisely so a saved view can carry those later; today the caller sets width and order.",
     "No selection model and no row expansion. A grid that owns selection also owns the bulk-action confirmation, which is ChartContextMenu's job.",
-    "Filtering is the caller's. The grid renders the predicate as a sentence and never composes one — a component that owned the filter would also own the query, and no ZoBlocks package makes a network call.",
+    "Filtering remains caller-owned. The toolbar, criteria and filter-panel slots provide shared placement for caller-supplied controls and content; they do not compose predicates or own query state.",
     "The export helper produces delimited text, not XLSX. Typed cells are the stronger answer to formula injection; the quote prefix is what is available without a writer dependency.",
     "`status` columns sort by a declared order that the caller supplies. There is no terminology binding, so a mis-declared order sorts wrongly and nothing catches it.",
     "Strings are English and not routed through @zoblocks/intl — true of every registry component today.",
@@ -167,6 +168,9 @@ const columns: DataGridColumn<Row>[] = [
     noun: "clients on this team's caseload",
     predicate: "PHQ-9 of 10 or more, or a risk screen in the last 14 days.",
   }}
+  toolbar={<ToolbarControls />}
+  filterPanel={showFilters ? <FilterEditor /> : null}
+  criteria={<CriteriaSummary />}
   identify={(row) => ({ primary: row.name, secondary: \`MRN \${row.mrn}\` })}
   arrivals={held}
   onAdmitArrivals={admit}
@@ -179,6 +183,7 @@ const columns: DataGridColumn<Row>[] = [
       "With `derived` on every column whose values a model produced. The footnote is generated from it, so the alternative to filling it in is a page that presents a prediction as an observation.",
       "With `identify` wherever a row leads to an action. It is the line that re-states who the row is about at the point of action, which is the control the wrong-patient literature actually supports.",
       "With `arrivals` rather than by mutating `rows` when results stream in. The component's whole claim about live data is that it does not act on it until asked.",
+      "Use the layout slots when the host needs a consistent place for its own toolbar, active criteria and filter editor. The host supplies the content and owns state and behavior.",
     ],
     avoid: [
       "As a layout table. It is a grid with a keyboard model and a coverage claim; for two columns of static text a `<table>` is correct and cheaper.",
@@ -320,6 +325,22 @@ const columns: DataGridColumn<Row>[] = [
   fixtures: ["caseloadPhq9", "unknownTotal"],
 
   examples: [
+    /* ---------------------------------------------------------------- */
+    /* Layout — caller-owned controls, placed by the grid                */
+    /* ---------------------------------------------------------------- */
+    {
+      id: "toolbar-layout",
+      group: "Layout",
+      title: "Controls supplied by the host, placed by the grid",
+      description:
+        "The grid provides a shared place for toolbar controls, active criteria and an optional filter panel. The host supplies the content and owns its state and behavior; the grid only places and styles them above the rows.",
+      code: `<DataGrid
+  {...props}
+  toolbar={<ToolbarControls />}
+  filterPanel={showFilters ? <FilterEditor /> : null}
+  criteria={<CriteriaSummary />}
+/>`,
+    },
     /* ---------------------------------------------------------------- */
     /* Coverage — what the grid claims about the rows it is not showing   */
     /* ---------------------------------------------------------------- */
