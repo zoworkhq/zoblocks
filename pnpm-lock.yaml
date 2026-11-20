@@ -643,6 +643,9 @@ importers:
 
   examples:
     dependencies:
+      '@zoblocks/clinical-note-core':
+        specifier: workspace:*
+        version: link:../packages/clinical-note-core
       '@zoblocks/copilot-core':
         specifier: workspace:*
         version: link:../packages/copilot-core
@@ -673,6 +676,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      prosemirror-model:
+        specifier: ^1.25.1
+        version: 1.25.12
       react:
         specifier: ^19.0.0
         version: 19.2.8
@@ -9403,7 +9409,7 @@ snapshots:
 
   prosemirror-transform@1.12.0:
     dependencies:
-      prosemirror-model: 1.25.11
+      prosemirror-model: 1.25.12
 
   prosemirror-view@1.42.6:
     dependencies:

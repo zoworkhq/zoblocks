@@ -76,6 +76,11 @@ export const SANDBOXES: ReadonlySet<string> = new Set<string>([
   "chart-header/spcu",
   "chart-header/encounter",
   "chart-header/absence",
+  "clinical-note/empty-progress-draft",
+  "clinical-note/origin-visibility",
+  "clinical-note/sign-gate",
+  "clinical-note/template-blanks",
+  "clinical-note/signed-reader",
   "clinical-status/criticality-from-fhir",
   "clinical-status/restricted-is-not-absent",
   "clinical-status/nine-scales",
@@ -84,6 +89,12 @@ export const SANDBOXES: ReadonlySet<string> = new Set<string>([
   "clinical-status/grid-affix",
   "clinical-status/patient-register",
   "clinical-status/both-registers",
+  "copilot/mode-scope",
+  "copilot/grounded-citations",
+  "copilot/out-of-scope",
+  "copilot/untrusted-chart-content",
+  "copilot/crisis-interruption",
+  "copilot/fhir-audit-event",
   "data-grid/coverage",
   "data-grid/unknown-total",
   "data-grid/everything",
@@ -234,16 +245,4 @@ export const SANDBOXES: ReadonlySet<string> = new Set<string>([
 ]);
 
 /** Examples without one, and why. */
-export const NOT_RUNNABLE: Readonly<Record<string, string>> = {
-  "clinical-note/empty-progress-draft": "Written inline in clinical-note's metadata; move it to examples/clinical-note/empty-progress-draft.tsx to run it.",
-  "clinical-note/origin-visibility": "Written inline in clinical-note's metadata; move it to examples/clinical-note/origin-visibility.tsx to run it.",
-  "clinical-note/sign-gate": "Written inline in clinical-note's metadata; move it to examples/clinical-note/sign-gate.tsx to run it.",
-  "clinical-note/template-blanks": "Written inline in clinical-note's metadata; move it to examples/clinical-note/template-blanks.tsx to run it.",
-  "clinical-note/signed-reader": "Written inline in clinical-note's metadata; move it to examples/clinical-note/signed-reader.tsx to run it.",
-  "copilot/mode-scope": "Written inline in copilot's metadata; move it to examples/copilot/mode-scope.tsx to run it.",
-  "copilot/grounded-citations": "Written inline in copilot's metadata; move it to examples/copilot/grounded-citations.tsx to run it.",
-  "copilot/out-of-scope": "Written inline in copilot's metadata; move it to examples/copilot/out-of-scope.tsx to run it.",
-  "copilot/untrusted-chart-content": "Written inline in copilot's metadata; move it to examples/copilot/untrusted-chart-content.tsx to run it.",
-  "copilot/crisis-interruption": "Written inline in copilot's metadata; move it to examples/copilot/crisis-interruption.tsx to run it.",
-  "copilot/fhir-audit-event": "Written inline in copilot's metadata; move it to examples/copilot/fhir-audit-event.tsx to run it."
-};
+export const NOT_RUNNABLE: Readonly<Record<string, string>> = {};

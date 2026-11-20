@@ -8,6 +8,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@zoblocks/clinical-note-core": "workspace:*",
     "@zoblocks/copilot-core": "workspace:*",
     "@zoblocks/copilot-react": "workspace:*",
     "@zoblocks/fhir": "workspace:*",
@@ -18,6 +19,7 @@
     "@zoblocks/tabs": "workspace:*",
     "antd": "^6.6.0",
     "clsx": "^2.1.1",
+    "prosemirror-model": "^1.25.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwind-merge": "^2.5.5"
