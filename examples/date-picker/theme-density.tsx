@@ -31,13 +31,13 @@ export default function EveryThemeAgainstEveryDensityExample() {
   ] as const;
 
   return (
-    <main className="mx-auto w-full max-w-7xl space-y-6 p-6">
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+    <main className="mx-auto w-full max-w-7xl">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,17rem),1fr))] gap-4">
         {themes.map((theme) =>
           densities.map((density) => (
             <section
               key={`${theme.value}-${density.value}`}
-              className="space-y-3 rounded-lg border p-4"
+              className="space-y-3 rounded-lg border border-[var(--zb-border)] p-3"
             >
               <h3 className="text-sm font-semibold">
                 {theme.label} · {density.label}

@@ -147,7 +147,7 @@ export default function TwoPatientsOneName() {
           <IdentitySetNotice />
         </IdentitySet>
 
-        <p className="mt-4 text-sm text-gray-600">
+        <p className="mt-4 text-sm text-[var(--zb-text-muted)]">
           {disambiguate
             ? "On, each collided row gains the minimum that separates it and Ada Lovelace is left alone."
             : "Off, four rows are indistinguishable — two Okonkwos, two Nguyens separated only by diacritics, and twins sharing a surname and a date of birth."}

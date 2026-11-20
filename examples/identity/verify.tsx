@@ -60,7 +60,7 @@ function ConfirmBeforeOrdering() {
         onConfirm={() => setConfirmed(true)}
       />
 
-      <p className="text-sm text-gray-600">
+      <p className="text-sm text-[var(--zb-text-muted)]">
         Type <code>AO</code> to continue. A dismissible “check the patient” alert reduced
         wrong-patient orders with an odds ratio of 0.84 in Adelman et al.; re-entering the initials
         reduced them with an odds ratio of 0.60. Everyone ships the first.

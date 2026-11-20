@@ -40,7 +40,10 @@ export default function SignificantActionConfirmation() {
         <div className="mt-5 grid gap-4 md:grid-cols-2">
           <div>
             <h3 className="mb-2 text-sm font-semibold text-[var(--zb-text)]">Helper outcomes</h3>
-            <pre className="overflow-x-auto rounded-md border border-[var(--zb-border)] bg-[var(--zb-surface-raised)] p-3 text-xs text-[var(--zb-text)]">
+            <pre
+              tabIndex={0}
+              className="overflow-x-auto rounded-md border border-[var(--zb-border)] bg-[var(--zb-surface-raised)] p-3 text-xs text-[var(--zb-text)]"
+            >
               {JSON.stringify(
                 {
                   "outcomeFor(discontinue)": outcomeFor(discontinue),

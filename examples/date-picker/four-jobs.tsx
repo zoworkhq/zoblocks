@@ -202,7 +202,7 @@ export default function FourJobsFourVariantsExample() {
     <div className="mx-auto w-full max-w-4xl space-y-8">
       {/* 1. RECALL */}
       <section className="space-y-4">
-        <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+        <p className="text-xs font-semibold uppercase tracking-wider text-[var(--zb-text-muted)]">
           variant=&quot;field&quot; — recall
         </p>
 
@@ -216,17 +216,19 @@ export default function FourJobsFourVariantsExample() {
         />
       </section>
 
-      <hr className="border-gray-200" />
+      <hr className="border-[var(--zb-border)]" />
 
       {/* 2. CHOOSE */}
       <section className="space-y-4">
-        <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+        <p className="text-xs font-semibold uppercase tracking-wider text-[var(--zb-text-muted)]">
           variant=&quot;slots&quot; — choose
         </p>
 
         <h2 className="text-lg font-semibold">Available times</h2>
 
-        <p className="text-sm text-gray-500">Choose one of the available appointment times.</p>
+        <p className="text-sm text-[var(--zb-text-muted)]">
+          Choose one of the available appointment times.
+        </p>
 
         <DatePicker
           variant="slots"
@@ -238,7 +240,7 @@ export default function FourJobsFourVariantsExample() {
         />
 
         {selectedSlotDetails && (
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-[var(--zb-text-muted)]">
             Selected time:{" "}
             <strong>
               {String(selectedSlotDetails.start.h % 12 || 12)}:
@@ -249,17 +251,19 @@ export default function FourJobsFourVariantsExample() {
         )}
       </section>
 
-      <hr className="border-gray-200" />
+      <hr className="border-[var(--zb-border)]" />
 
       {/* 3. CONSTRUCT */}
       <section className="space-y-4">
-        <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+        <p className="text-xs font-semibold uppercase tracking-wider text-[var(--zb-text-muted)]">
           variant=&quot;session&quot; — construct
         </p>
 
         <h2 className="text-lg font-semibold">Individual therapy</h2>
 
-        <p className="text-sm text-gray-500">The end time follows the held duration.</p>
+        <p className="text-sm text-[var(--zb-text-muted)]">
+          The end time follows the held duration.
+        </p>
 
         <DatePicker
           variant="session"
@@ -270,17 +274,19 @@ export default function FourJobsFourVariantsExample() {
         />
       </section>
 
-      <hr className="border-gray-200" />
+      <hr className="border-[var(--zb-border)]" />
 
       {/* 4. WITNESS */}
       <section className="space-y-4">
-        <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+        <p className="text-xs font-semibold uppercase tracking-wider text-[var(--zb-text-muted)]">
           variant=&quot;readout&quot; — witness
         </p>
 
         <h2 className="text-lg font-semibold">Recorded timestamp</h2>
 
-        <p className="text-sm text-gray-500">A read-only assertion about when an event occurred.</p>
+        <p className="text-sm text-[var(--zb-text-muted)]">
+          A read-only assertion about when an event occurred.
+        </p>
 
         <DatePicker variant="readout" as="time" value={signedAt} now={today} showZone />
       </section>

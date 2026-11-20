@@ -33,7 +33,10 @@ export default function EveryPatientSearchRecorded() {
             <h3 className="mb-2 text-sm font-semibold text-[var(--zb-text)]">
               Latest emitted audit
             </h3>
-            <pre className="min-h-24 overflow-x-auto rounded-md border border-[var(--zb-border)] bg-[var(--zb-surface-raised)] p-3 text-xs text-[var(--zb-text)]">
+            <pre
+              tabIndex={0}
+              className="min-h-24 overflow-x-auto rounded-md border border-[var(--zb-border)] bg-[var(--zb-surface-raised)] p-3 text-xs text-[var(--zb-text)]"
+            >
               {latestAudit
                 ? JSON.stringify(latestAudit, null, 2)
                 : "No patient search audit yet. Type in the palette to emit one."}
@@ -41,7 +44,10 @@ export default function EveryPatientSearchRecorded() {
           </div>
           <div>
             <h3 className="mb-2 text-sm font-semibold text-[var(--zb-text)]">Helper examples</h3>
-            <pre className="overflow-x-auto rounded-md border border-[var(--zb-border)] bg-[var(--zb-surface-raised)] p-3 text-xs text-[var(--zb-text)]">
+            <pre
+              tabIndex={0}
+              className="overflow-x-auto rounded-md border border-[var(--zb-border)] bg-[var(--zb-surface-raised)] p-3 text-xs text-[var(--zb-text)]"
+            >
               {JSON.stringify(
                 {
                   'auditFor("okonkwo", results, true)': okonkwoAudit,

@@ -567,6 +567,11 @@
   color: var(--zb-absent-fg);
 }
 
+/* Subtle text drops below 4.5:1 on the crisis tint, so it steps up to muted there. */
+.zb-safety-plan .zb-accordion__item[data-pinned="true"] .zb-safety-plan__empty {
+  color: var(--zb-text-muted);
+}
+
 /* ------------------------------------------------------------------ */
 /* Motion                                                              */
 /* ------------------------------------------------------------------ */

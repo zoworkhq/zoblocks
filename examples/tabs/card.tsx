@@ -4,7 +4,7 @@ function Option({ title, body }: { title: string; body: string }) {
   return (
     <div className="space-y-2 text-left">
       <h3 className="text-sm font-semibold">{title}</h3>
-      <p className="text-xs leading-relaxed text-gray-600">{body}</p>
+      <p className="text-xs leading-relaxed text-[var(--zb-text-muted)]">{body}</p>
     </div>
   );
 }

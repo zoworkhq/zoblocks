@@ -116,10 +116,24 @@ function examplePreviewNode(component: string, id: string): React.ReactNode {
   if (!File) return null;
   return (
     <React.Suspense fallback={null}>
-      <File />
+      {ANTD_BACKED.has(component) || ANTD_BACKED.has(`${component}/${id}`) ? (
+        <AntdExampleFrame>
+          <File />
+        </AntdExampleFrame>
+      ) : (
+        <File />
+      )}
     </React.Suspense>
   );
 }
+
+/**
+ * Components built on antd, or single examples that mount antd themselves,
+ * whose previews need antd themed to match the site.
+ */
+const ANTD_BACKED = new Set(["signature", "tabs/segmented-filter"]);
+
+const AntdExampleFrame = React.lazy(() => import("./antd-example-frame"));
 
 export function ExampleBlock({
   component,

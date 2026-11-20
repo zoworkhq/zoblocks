@@ -80,7 +80,7 @@ function NoteIcon() {
 
 function Panel({ children }: { children: React.ReactNode }) {
   return (
-    <div className="rounded-xl border border-dashed border-gray-300 bg-[#F8FAFC] p-4">
+    <div className="rounded-xl border border-dashed border-[var(--zb-border)] bg-[var(--zb-bg-subtle)] p-4">
       {children}
     </div>
   );
