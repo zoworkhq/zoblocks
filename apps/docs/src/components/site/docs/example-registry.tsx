@@ -47,6 +47,7 @@ import {
   IdentityWorklistDemo,
 } from "../identity-demo";
 import * as AllergyDemo from "../allergy-chip-demos";
+import * as ClinicalNoteDemo from "../clinical-note-demos";
 import * as SafetyPlanDemo from "../safety-plan-demos";
 
 /* ------------------------------------------------------------------ */
@@ -535,6 +536,14 @@ export const EXAMPLE_PREVIEWS: Readonly<
     "two-empty-states": () => <AllergyDemo.TwoEmptyStates />,
     intolerance: () => <AllergyDemo.Intolerance />,
     refuted: () => <AllergyDemo.Refuted />,
+  },
+
+  "clinical-note": {
+    "empty-progress-draft": () => <ClinicalNoteDemo.EmptyProgressDraft />,
+    "origin-visibility": () => <ClinicalNoteDemo.OriginVisibility />,
+    "sign-gate": () => <ClinicalNoteDemo.WhatBlocksSigning />,
+    "template-blanks": () => <ClinicalNoteDemo.TemplateBlanks />,
+    "signed-reader": () => <ClinicalNoteDemo.SignedReader />,
   },
 
   "safety-plan": {
