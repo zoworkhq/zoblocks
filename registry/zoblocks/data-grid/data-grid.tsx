@@ -192,8 +192,23 @@ export interface DataGridProps<Row> {
    * grid cannot, such as which filter to drop.
    */
   empty?: React.ReactNode;
+  /**
+   * Optional status row inside the table body, displayed alongside existing
+   * rows. Useful when a refresh fails but the previous results are retained.
+   */
+  bodyStatus?: React.ReactNode;
   /** The right-hand side of the masthead: a window, a source, a role. */
   note?: React.ReactNode;
+
+  /**
+   * Optional layout slots above the grid.
+   *
+   * These are presentation-only: the caller supplies the controls and owns
+   * their state and behavior. The grid provides their placement and styling.
+   */
+  toolbar?: React.ReactNode;
+  criteria?: React.ReactNode;
+  filterPanel?: React.ReactNode;
 
   /** The columns, in display order. Typed objects rather than JSX children, so a saved view can carry them. */
   columns: readonly DataGridColumn<Row>[];
@@ -384,6 +399,9 @@ export function DataGrid<Row>({
   caption,
   title,
   note,
+  toolbar,
+  criteria,
+  filterPanel,
   columns,
   rows,
   rowKey,
@@ -400,6 +418,7 @@ export function DataGrid<Row>({
   masthead = true,
   footer = true,
   empty,
+  bodyStatus,
   selectedKeys,
   onSelectionChange,
   bulkActions,
@@ -728,6 +747,12 @@ export function DataGrid<Row>({
         </header>
       ) : null}
 
+      {toolbar != null ? <div className="zb-grid__toolbar">{toolbar}</div> : null}
+
+      {filterPanel != null ? <div className="zb-grid__filter-panel">{filterPanel}</div> : null}
+
+      {criteria != null ? <div className="zb-grid__criteria">{criteria}</div> : null}
+
       {/*
         One strip above the header, with two things that can occupy it.
 
@@ -924,9 +949,29 @@ export function DataGrid<Row>({
             {ordered.length === 0 ? (
               <tr role="row" aria-rowindex={2}>
                 <td className="zb-grid__emptycell" colSpan={columns.length + (selectable ? 1 : 0)}>
-                  <p className="zb-grid__empty" role="status">
-                    {empty ?? `No ${coverage.noun ?? "rows"} match.`}
-                  </p>
+                  {empty !== undefined && empty !== null ? (
+                    <div
+                      className="zb-grid__emptycontent"
+                      role={
+                        React.isValidElement(empty) && (empty.props as { role?: string }).role
+                          ? undefined
+                          : "status"
+                      }
+                    >
+                      {empty}
+                    </div>
+                  ) : (
+                    <p className="zb-grid__empty" role="status">
+                      No {coverage.noun ?? "rows"} match.
+                    </p>
+                  )}
+                </td>
+              </tr>
+            ) : null}
+            {bodyStatus !== undefined && bodyStatus !== null ? (
+              <tr role="row">
+                <td className="zb-grid__emptycell" colSpan={columns.length + (selectable ? 1 : 0)}>
+                  <div className="zb-grid__emptycontent">{bodyStatus}</div>
                 </td>
               </tr>
             ) : null}
