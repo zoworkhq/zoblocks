@@ -11,10 +11,11 @@ import { existsSync } from "node:fs";
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { componentMetaSchema, type ComponentMeta } from "@zoblocks/component-meta";
+import { componentMetaSchema, type ComponentMeta, type Example } from "@zoblocks/component-meta";
 import {
   COMPONENTS_DIR,
   CONSUMER_COMPONENT_DIR,
+  EXAMPLES_DIR,
   NON_COMPONENT_DIRS,
   ROOT,
   SUPPORT_ITEM_NAMES,
@@ -69,6 +70,16 @@ export interface LoadedComponent {
    * are computed here from what each component actually depends on.
    */
   derived: { builtWith: string[]; usedIn: string[] };
+  /**
+   * The documented examples, each with its code.
+   *
+   * `meta.examples` is the examples as written, where `code` may be left to a
+   * file. These are the examples as read: the file's text is the code, so
+   * every emitter downstream sees one shape whichever way it was authored.
+   */
+  examples: Example[];
+  /** Absolute path of each example's file, by example id, for the examples that have one. */
+  exampleFiles: ReadonlyMap<string, string>;
 }
 
 export class MetaError extends Error {
@@ -184,6 +195,8 @@ export async function loadComponents(): Promise<LoadedComponent[]> {
       hasStory: existsSync(path.join(dir, `${name}.stories.tsx`)),
       hasTest: existsSync(path.join(dir, `${name}.test.tsx`)),
       derived: { builtWith: [], usedIn: [] },
+      examples: [],
+      exampleFiles: new Map(),
     });
   }
 
@@ -262,6 +275,8 @@ export async function loadComponents(): Promise<LoadedComponent[]> {
       // workspace, so its presence is the honest signal for the coverage gate.
       hasTest: existsSync(path.join(dir, "test")) || existsSync(path.join(dir, "src", "__tests__")),
       derived: { builtWith: [], usedIn: [] },
+      examples: [],
+      exampleFiles: new Map(),
     });
   }
 
@@ -427,7 +442,79 @@ export async function loadComponents(): Promise<LoadedComponent[]> {
     }
   }
 
+  problems.push(...(await resolveExamples(loaded)));
+
   if (problems.length) throw new MetaError(problems);
 
   return loaded;
+}
+
+/**
+ * Reads each example's code from `examples/<component>/<id>.tsx` when the file
+ * exists, and refuses the two ways that can go quietly wrong.
+ *
+ * An example with both a file and a `code` string shows one on the page and
+ * runs the other. A file whose id no example names is never shown at all — it
+ * typechecks, it sits in the tree, and nobody notices it is not on the site.
+ */
+async function resolveExamples(loaded: LoadedComponent[]): Promise<string[]> {
+  const problems: string[] = [];
+  const names = new Set(loaded.map((c) => c.meta.name));
+
+  for (const component of loaded) {
+    const dir = path.join(EXAMPLES_DIR, component.meta.name);
+    const files = new Map<string, string>();
+
+    for (const example of component.meta.examples) {
+      const file = path.join(dir, `${example.id}.tsx`);
+      const hasFile = existsSync(file);
+
+      if (hasFile && example.code !== undefined) {
+        problems.push(
+          `${component.meta.name}: example "${example.id}" has both ${rel(file)} and a \`code\` string — delete the string, the file is the example`,
+        );
+        continue;
+      }
+      if (!hasFile && example.code === undefined) {
+        problems.push(
+          `${component.meta.name}: example "${example.id}" has no code — add ${rel(file)} or a \`code\` string`,
+        );
+        continue;
+      }
+
+      const code = hasFile ? (await readFile(file, "utf8")).trimEnd() : (example.code as string);
+      if (hasFile) files.set(example.id, file);
+      component.examples.push({ ...example, code });
+    }
+
+    component.exampleFiles = files;
+
+    if (existsSync(dir)) {
+      const ids = new Set(component.meta.examples.map((e) => e.id));
+      for (const entry of await readdir(dir, { withFileTypes: true })) {
+        if (!entry.isFile() || !entry.name.endsWith(".tsx")) continue;
+        const id = entry.name.slice(0, -".tsx".length);
+        if (!ids.has(id)) {
+          problems.push(
+            `${rel(path.join(dir, entry.name))}: no example in ${component.meta.name}'s metadata has the id "${id}" — add one, or move the file under _shared/ if it is a helper`,
+          );
+        }
+      }
+    }
+  }
+
+  if (existsSync(EXAMPLES_DIR)) {
+    for (const entry of await readdir(EXAMPLES_DIR, { withFileTypes: true })) {
+      if (
+        entry.isDirectory() &&
+        !entry.name.startsWith("_") &&
+        entry.name !== "node_modules" &&
+        !names.has(entry.name)
+      ) {
+        problems.push(`examples/${entry.name}: no component is named "${entry.name}"`);
+      }
+    }
+  }
+
+  return problems;
 }

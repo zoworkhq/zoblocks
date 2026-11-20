@@ -78,9 +78,12 @@ export function PlatformLinks({ links }: { links: readonly DemoLink[] }) {
           key={link.id}
           type="button"
           onClick={link.open}
+          onPointerEnter={link.prepare}
+          onFocus={link.prepare}
           title={link.title}
           aria-label={link.title}
-          className={BAR_BUTTON}
+          aria-busy={link.status === "loading" || undefined}
+          className={cn(BAR_BUTTON, link.status === "loading" && "cursor-progress opacity-60")}
         >
           <span
             aria-hidden="true"

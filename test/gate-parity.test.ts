@@ -94,6 +94,7 @@ const GATE_COMMANDS: Record<string, string> = {
   "Browser accessibility and cross-framework smoke": "pnpm e2e:ci",
   "Bundle budgets": "pnpm size",
   "Architecture rules": "pnpm deps",
+  "Example sandboxes compile": "pnpm sandboxes:check",
   "Scan for non-synthetic identifiers": "scripts/no-phi.sh",
   "Scan for the retired name": "scripts/retired-names.sh",
 };

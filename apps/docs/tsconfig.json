@@ -15,6 +15,9 @@
       "@/*": ["./src/*"],
       "@/lib/utils": ["./src/lib/utils.ts"],
       "@/registry/*": ["../../registry/*"],
+      // Documented examples, one file each — rendered by the Preview tab and
+      // opened in StackBlitz. See scripts/gen/emit/sandboxes.ts.
+      "@examples/*": ["../../examples/*"],
       // Registry components import each other, and their shared library, by the
       // paths the ZoBlocks CLI writes in a consumer's project. Mapped back to the
       // registry source so the previews render the real files, unedited.

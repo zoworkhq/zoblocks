@@ -17,6 +17,17 @@ export const REGISTRY_NAME = "zoblocks";
 /** Where component source lives today. Phase 1 moves this to packages/react/src/components. */
 export const COMPONENTS_DIR = path.join(ROOT, "registry", "zoblocks");
 
+/**
+ * Documented examples, one file per example: `examples/<component>/<id>.tsx`.
+ *
+ * Outside the registry on purpose. An example is a demo — it may reach for
+ * antd or the host bridges to show the component inside a real form — and
+ * the registry's rules (self-contained, no host frameworks, coverage over
+ * every file) are about source that ships to customers, which examples are not.
+ * Directories starting with `_` hold helpers the examples import.
+ */
+export const EXAMPLES_DIR = path.join(ROOT, "examples");
+
 /** Directories under COMPONENTS_DIR that are not components. */
 export const NON_COMPONENT_DIRS = new Set(["lib"]);
 
@@ -82,6 +93,20 @@ export const paths = {
   tailwindSources: path.join(ROOT, "apps", "docs", "src", "app", "generated-sources.css"),
   llmsTxt: path.join(ROOT, "apps", "docs", "public", "llms.txt"),
   coverage: path.join(ROOT, "apps", "docs", "public", "r", "coverage.json"),
+  /** One StackBlitz project per runnable example, at `<component>/<id>.json`. */
+  sandboxOut: path.join(ROOT, "apps", "docs", "public", "sandbox"),
+  /** Which examples have a sandbox, and why the others do not. */
+  docsSandboxes: path.join(ROOT, "apps", "docs", "src", "lib", "generated", "sandboxes.ts"),
+  /** Lazy imports of every example file, for the docs Preview tab. */
+  docsExampleModules: path.join(
+    ROOT,
+    "apps",
+    "docs",
+    "src",
+    "lib",
+    "generated",
+    "example-modules.ts",
+  ),
   /** The npm React channel, generated from the registry source. */
   reactPackage: path.join(ROOT, "packages", "react"),
 } as const;

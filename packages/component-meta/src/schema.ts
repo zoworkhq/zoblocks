@@ -304,7 +304,22 @@ export const exampleSchema = z.object({
    * plain list.
    */
   group: z.string().optional(),
-  code: nonEmpty("example code"),
+  /**
+   * The example's source, for an example that has no file.
+   *
+   * Leave it out when `examples/<component>/<id>.tsx` exists: the generator
+   * reads that file instead, so the code on the page, the preview and the
+   * StackBlitz project are one file rather than three copies. Setting both is
+   * a build error.
+   */
+  code: nonEmpty("example code").optional(),
+  /**
+   * Why this example cannot open in StackBlitz, in one sentence.
+   *
+   * Every example either gets a generated sandbox or says why not, so a new
+   * example cannot lose its button without anyone deciding it should.
+   */
+  notRunnable: nonEmpty("notRunnable reason").optional(),
 });
 
 export const alternativeSchema = z.object({
@@ -735,7 +750,10 @@ export type SearchIntent = z.infer<typeof searchIntentSchema>;
 export type Variant = z.infer<typeof variantSchema>;
 export type Control = z.infer<typeof controlSchema>;
 export type A11yCheck = z.infer<typeof a11yCheckSchema>;
-export type Example = z.infer<typeof exampleSchema>;
+/** An example as authored: `code` may be left to its file. */
+export type ExampleSource = z.infer<typeof exampleSchema>;
+/** An example once loaded: `code` is always present, read from its file when it has one. */
+export type Example = ExampleSource & { code: string };
 export type Domain = z.infer<typeof domainSchema>;
 export type Relationships = z.infer<typeof relationshipsSchema>;
 export type Alternative = z.infer<typeof alternativeSchema>;

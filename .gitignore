@@ -17,6 +17,9 @@ build/
 # `pnpm gen`. The manifest (registry.json) and the other generated artifacts
 # ARE committed, and CI fails if they are stale.
 apps/docs/public/r/*.json
+# Same reason: each sandbox inlines its example's source. Small, but an edit to
+# an example would otherwise land in two files.
+apps/docs/public/sandbox/
 
 # env & secrets — never commit
 .env

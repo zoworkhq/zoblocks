@@ -641,6 +641,49 @@ importers:
         specifier: '>=8.2.4 <8.3'
         version: 8.2.4(@types/node@22.20.1)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)
 
+  examples:
+    dependencies:
+      '@zoblocks/host-react':
+        specifier: workspace:*
+        version: link:../packages/host-react
+      '@zoblocks/identity':
+        specifier: workspace:*
+        version: link:../packages/identity
+      '@zoblocks/signature':
+        specifier: workspace:*
+        version: link:../packages/signature
+      '@zoblocks/tabs':
+        specifier: workspace:*
+        version: link:../packages/tabs
+      antd:
+        specifier: ^6.6.0
+        version: 6.6.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      react:
+        specifier: ^19.0.0
+        version: 19.2.8
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.2.8(react@19.2.8)
+      tailwind-merge:
+        specifier: ^2.5.5
+        version: 2.6.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.2
+        version: 19.2.18
+      '@types/react-dom':
+        specifier: ^19.0.2
+        version: 19.2.4(@types/react@19.2.18)
+      '@zoblocks/tsconfig':
+        specifier: workspace:*
+        version: link:../packages/tsconfig
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
   packages/bridge-antd:
     dependencies:
       '@zoblocks/bridge-core':
@@ -3710,8 +3753,8 @@ packages:
     resolution: {integrity: sha512-kWWXztvZ5SBQV+eRgKFeh8q5sLuZY2+8WUIzlxWVTg+oGwY14qylx1KbKzHd8P6ZYkAg0xyIDU9JMHhyJMZ1jw==}
     engines: {node: '>=10'}
 
-  chromedriver@156.0.2:
-    resolution: {integrity: sha512-tnbStQXrModzo3nvGeEIA7tQxmO2Xsa6ZU7B5ghKjnzOLNF33SyFUTpfK339hjY5Uw5bPuQdc4u28pftgZDd0g==}
+  chromedriver@158.0.0:
+    resolution: {integrity: sha512-JATTHrwH8KluyjW2mGnShg6psaKD5C3u0lyB946jlMrj82WZO0WoFbpTE8pS6Wp3Qrpkj2ZfzUG6wUrpiN2EPQ==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -5905,7 +5948,7 @@ snapshots:
     dependencies:
       '@axe-core/webdriverjs': 4.12.1(selenium-webdriver@4.44.0)
       axe-core: 4.12.1
-      chromedriver: 156.0.2
+      chromedriver: 158.0.0
       colors: 1.4.0
       commander: 9.5.0
       dotenv: 17.4.2
@@ -8023,7 +8066,7 @@ snapshots:
 
   char-regex@1.0.2: {}
 
-  chromedriver@156.0.2:
+  chromedriver@158.0.0:
     dependencies:
       '@testim/chrome-version': 1.1.4
       adm-zip: 0.6.1
