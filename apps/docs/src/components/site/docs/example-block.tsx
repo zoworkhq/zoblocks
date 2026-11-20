@@ -12,9 +12,16 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { CodeLines, CopyButton, PlatformLinks } from "./code-block";
-import { examplePreview } from "./example-registry";
-import { exampleLinks } from "./sandbox";
+import {
+  isRunnable,
+  openSandbox,
+  prepareSandbox,
+  type DemoLink,
+  type DemoLinkStatus,
+  type PreparedSandbox,
+} from "./sandbox";
 import { HostStage } from "../host-stage";
+import { EXAMPLE_MODULES } from "@/lib/generated/example-modules";
 
 export interface ExampleBlockProps {
   component: string;
@@ -23,8 +30,6 @@ export interface ExampleBlockProps {
   description: string;
   code: string;
   fixture?: string;
-  /** The package a package-distributed component installs from; read when the example opens in StackBlitz. */
-  packageName?: string;
   /** Overrides the registry lookup; used by tests and by callers with a preview in hand. */
   preview?: React.ReactNode;
   /** h4 when the example sits under a group heading. */
@@ -37,6 +42,85 @@ export function fileNameFor(title: string): string {
   return `${name || "Example"}.tsx`;
 }
 
+/**
+ * The StackBlitz button for one example, or none when it cannot run.
+ *
+ * The project is fetched when the card comes near the viewport, so by the time
+ * a reader reaches the button it is ready and the click can open it directly —
+ * a browser only lets a new tab open inside the click itself.
+ */
+function useSandboxLinks(
+  component: string,
+  id: string,
+  title: string,
+  card: React.RefObject<HTMLElement | null>,
+): DemoLink[] {
+  const runnable = isRunnable(component, id);
+  const [status, setStatus] = React.useState<DemoLinkStatus>("idle");
+  const ready = React.useRef<PreparedSandbox | null>(null);
+
+  const prepare = React.useCallback(() => {
+    if (!runnable || ready.current) return;
+    setStatus("loading");
+    prepareSandbox(component, id).then(
+      (sandbox) => {
+        ready.current = sandbox;
+        setStatus("ready");
+      },
+      () => setStatus("error"),
+    );
+  }, [runnable, component, id]);
+
+  React.useEffect(() => {
+    const element = card.current;
+    if (!runnable || !element || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          prepare();
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "600px 0px" },
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [runnable, card, prepare]);
+
+  return React.useMemo(() => {
+    if (!runnable) return [];
+    return [
+      {
+        id: "stackblitz",
+        label: "StackBlitz",
+        mark: "SB",
+        title:
+          status === "error"
+            ? `The ${title} example could not be loaded. Try StackBlitz again`
+            : `Open the ${title} example in StackBlitz`,
+        status,
+        prepare,
+        open: () => (ready.current ? openSandbox(ready.current) : prepare()),
+      },
+    ];
+  }, [runnable, status, title, prepare]);
+}
+
+/**
+ * The example's own file, rendered — the same file the Code tab shows and
+ * StackBlitz opens. An example still written as a `code` string has none, and
+ * shows its code alone.
+ */
+function examplePreviewNode(component: string, id: string): React.ReactNode {
+  const File = EXAMPLE_MODULES[`${component}/${id}`];
+  if (!File) return null;
+  return (
+    <React.Suspense fallback={null}>
+      <File />
+    </React.Suspense>
+  );
+}
+
 export function ExampleBlock({
   component,
   id,
@@ -44,23 +128,19 @@ export function ExampleBlock({
   description,
   code,
   fixture,
-  packageName,
   preview,
   level = 3,
 }: ExampleBlockProps) {
   const Heading = level === 4 ? "h4" : "h3";
-  const render = examplePreview(component, id);
-  const live = preview ?? (render ? render() : null);
+  const live = preview ?? examplePreviewNode(component, id);
   const [tab, setTab] = React.useState<"preview" | "code">("preview");
   const baseId = `ex-${id}`;
   const showing = live ? tab : "code";
-  const links = React.useMemo(
-    () => exampleLinks({ component, id, title, code, packageName }),
-    [component, id, title, code, packageName],
-  );
+  const card = React.useRef<HTMLDivElement>(null);
+  const links = useSandboxLinks(component, id, title, card);
 
   return (
-    <div id={baseId} data-toc={baseId} className="flex flex-col gap-3.5">
+    <div ref={card} id={baseId} data-toc={baseId} className="flex flex-col gap-3.5">
       <div className="flex flex-col gap-1">
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
           <Heading className="m-0 text-[17px] font-semibold tracking-[-0.01em] text-ink">

@@ -686,10 +686,24 @@ function unresolvedImports(
   return problems;
 }
 
+/** One published item with its files' contents, as a consumer's project receives it. */
+export interface BuiltRegistryItem {
+  name: string;
+  dependencies: string[];
+  registryDependencies: string[];
+  files: Array<{ path: string; type: string; target: string; content: string }>;
+}
+
+export interface RegistryBuild {
+  problems: string[];
+  /** Every published item. Empty when there are problems: nothing was emitted. */
+  items: BuiltRegistryItem[];
+}
+
 export async function emitRegistry(
   components: LoadedComponent[],
   emitter: Emitter,
-): Promise<string[]> {
+): Promise<RegistryBuild> {
   const problems: string[] = [];
 
   // The two lists must agree: config.ts names what a component may depend on,
@@ -796,7 +810,7 @@ export async function emitRegistry(
 
   problems.push(...unresolvedImports(built, items));
 
-  if (problems.length) return problems;
+  if (problems.length) return { problems, items: [] };
 
   // registry.json — the manifest, now an output rather than a hand-edited input.
   await emitter.emit(
@@ -860,5 +874,13 @@ export async function emitRegistry(
     ),
   );
 
-  return [];
+  return {
+    problems: [],
+    items: built.map((item) => ({
+      name: item.name as string,
+      dependencies: (item.dependencies as string[] | undefined) ?? [],
+      registryDependencies: (item.registryDependencies as string[] | undefined) ?? [],
+      files: item.files as BuiltRegistryItem["files"],
+    })),
+  };
 }

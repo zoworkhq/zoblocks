@@ -251,17 +251,6 @@ import "@/styles/zoblocks-allergy.css";
       description:
         "Both patients reacted with mild urticaria. Only the criticality field separates them, and it is the field most implementations drop — so the two rows render as identical warnings and a prescriber treats them the same.",
       fixture: "allergyHighRisk",
-      code: `<AllergyChip record={{
-  id: "1", substance: "Penicillin G", kind: "allergy",
-  criticality: "high", verification: "confirmed",
-  reactions: [{ manifestation: "Urticaria", severity: "mild", onset: "1998", note: "age 6" }],
-}} />
-
-<AllergyChip record={{
-  id: "2", substance: "Amoxicillin", kind: "allergy",
-  criticality: "low", verification: "unconfirmed",
-  reactions: [{ manifestation: "Urticaria", severity: "mild", onset: "2019" }],
-}} />`,
     },
     {
       id: "two-empty-states",
@@ -269,12 +258,6 @@ import "@/styles/zoblocks-allergy.css";
       description:
         "A no-known assertion is a positive clinical finding with an author and a date, and it is safe to prescribe against. An unrecorded status is neither. Supply an assertion without its author and the component renders the second, because that is what an unattributed assertion is worth.",
       fixture: "allergyList",
-      code: `// Safe to prescribe against.
-<AllergyList noneKnown={{ asserter: "R. Okafor, RN", assertedAt: "14 Aug 2026",
-                          context: "reconciled at intake" }} />
-
-// Degrades to "Allergy status not recorded": no author, no assertion.
-<AllergyList noneKnown={{ assertedAt: "14 Aug 2026" }} onAsk={openIntake} />`,
     },
     {
       id: "intolerance",
@@ -282,12 +265,6 @@ import "@/styles/zoblocks-allergy.css";
       description:
         "Akathisia on aripiprazole and sedation on quetiapine dominate psychotropic histories and are the entries most often lost, because somebody decided they were not real allergies. The kind is rendered as its own class.",
       fixture: "allergyModerate",
-      code: `<AllergyChip record={{
-  id: "3", substance: "Lithium carbonate", kind: "intolerance",
-  criticality: "unable-to-assess", verification: "confirmed",
-  reactions: [{ manifestation: "Tremor, polyuria", severity: "moderate",
-                note: "ongoing at therapeutic level" }],
-}} />`,
     },
     {
       id: "refuted",
@@ -295,11 +272,6 @@ import "@/styles/zoblocks-allergy.css";
       description:
         "Struck through and dimmed rather than deleted. A refuted allergy that vanishes gets re-reported at the next intake, and the rechallenge that disproved it is the most useful thing in the chart.",
       fixture: "allergyRefuted",
-      code: `<AllergyChip record={{
-  id: "4", substance: "Sulfa drugs", kind: "allergy",
-  verification: "refuted",
-  note: "Rechallenged 2024 · tolerated · refuted by allergist",
-}} />`,
     },
   ],
 

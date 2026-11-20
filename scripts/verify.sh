@@ -108,6 +108,9 @@ if [ "$FAST" -eq 0 ]; then
   # script never did, so a blown budget could only be discovered from a red
   # pipeline — which is exactly how the last one was found.
   step "bundle budgets"     "trim it, or raise the budget"  pnpm size
+  # Installs from npm, so it stays out of --fast. Every docs StackBlitz button
+  # opens one of these projects.
+  step "example sandboxes"  "see scripts/sandboxes-check.ts" pnpm sandboxes:check
 fi
 
 # The browser tier. Only under --ci, because it needs a production build and a

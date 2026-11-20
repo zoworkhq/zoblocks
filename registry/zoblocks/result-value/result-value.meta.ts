@@ -269,12 +269,6 @@ import "@/styles/zoblocks-result-value.css";
       description:
         "The adapter leaves undefined everything it cannot determine. A missing referenceRange becomes no range — not an empty one, and not a silent assumption of normality.",
       fixture: "observationPotassiumCritical",
-      code: `import { ResultValue, fromObservation } from "@/components/zoblocks/result-value";
-import { observationPotassiumCritical } from "@zoblocks/fixtures";
-
-// \`now\` is the host's, never a clock this component reads: a relative time
-// computed at render silently ages on a ward workstation left open all shift.
-<ResultValue value={fromObservation(observationPotassiumCritical)} now={serverTime} />;`,
     },
     {
       id: "absence",
@@ -282,10 +276,6 @@ import { observationPotassiumCritical } from "@zoblocks/fixtures";
       description:
         "An em dash is indistinguishable from a rendering bug, and it asks the reader to guess between three answers with three different next actions. Restricted is the one that is not a gap: a value exists and the reader may not see it.",
       fixture: "observationMasked",
-      code: `<ResultValue value={{ id: "hba1c", analyte: "HbA1c", absent: "not-ordered" }} />
-<ResultValue value={{ id: "tsh", analyte: "TSH", absent: "specimen-problem",
-                      absentDetail: "Haemolysed. Recollection requested." }} />
-<ResultValue value={{ id: "bh", analyte: "Toxicology", absent: "masked" }} />`,
     },
     {
       id: "correction",
@@ -293,15 +283,6 @@ import { observationPotassiumCritical } from "@zoblocks/fixtures";
       description:
         'A badge saying "corrected" does not address the hazard, which is that somebody read the old value an hour ago and wrote it into a note. The old number, struck through, with the time it changed, does.',
       fixture: "observationCorrected",
-      code: `<ResultValue
-  value={{
-    id: "trop", versionId: "2",
-    analyte: "Troponin I", value: 0.09, unit: "ng/mL",
-    range: { high: 0.04 },
-    status: "corrected",
-    superseded: { value: "<0.04", at: "14:22 today" },
-  }}
-/>;`,
     },
     {
       id: "delta-suppressed",
@@ -309,14 +290,6 @@ import { observationPotassiumCritical } from "@zoblocks/fixtures";
       description:
         "Two numbers from two assays subtracted from each other is not a delta. Flagging the method change and annotating the number anyway would not help — an annotated wrong number still gets read as a number — so the delta disappears entirely.",
       fixture: "observationPreliminary",
-      code: `<ResultValue
-  value={{
-    id: "tsh", analyte: "TSH", value: 6.4, unit: "mIU/L",
-    range: { low: 0.4, high: 4.0 },
-    // Same analyte, different assay. No delta is drawn.
-    prior: { value: 3.1, at: "2026-02-01T09:00:00Z", differentMethod: true },
-  }}
-/>;`,
     },
   ],
 

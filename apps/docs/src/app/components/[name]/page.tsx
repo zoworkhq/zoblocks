@@ -681,7 +681,6 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                               description={example.description}
                               code={example.code}
                               fixture={example.fixture}
-                              packageName={isPackage ? component.packageName : undefined}
                               level={4}
                             />
                           ))}
@@ -699,7 +698,6 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                           description={example.description}
                           code={example.code}
                           fixture={example.fixture}
-                          packageName={isPackage ? component.packageName : undefined}
                         />
                       ))}
                     </div>

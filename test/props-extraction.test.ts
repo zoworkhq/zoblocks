@@ -125,6 +125,8 @@ function componentFor(name: string): LoadedComponent {
     // The relationship graph is computed across the whole catalog; a fixture
     // that exists for one file has no neighbours to derive it from.
     derived: { builtWith: [], usedIn: [] },
+    examples: [],
+    exampleFiles: new Map(),
   };
 }
 
