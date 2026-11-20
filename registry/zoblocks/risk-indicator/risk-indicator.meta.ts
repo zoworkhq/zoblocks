@@ -248,27 +248,6 @@ import "@/styles/zoblocks-risk.css";
       description:
         "All three are structural. `validUntil` comes from the model's own window rather than a shared constant, drivers are part of the value type, and the framing is a required prop — because every product that made it optional shipped without it.",
       fixture: "patientRoutine",
-      code: `<RiskIndicator
-  now={serverTime}
-  notADiagnosis="A statistical estimate from historical patterns. Not a diagnosis."
-  assessment={{
-    id: "readmit-30",
-    outcome: "30-day readmission",
-    band: "high",
-    probability: 0.31,
-    percentile: 94,
-    cohort: "adult medicine",
-    computedAt: "2026-08-12T04:12:00Z",
-    validUntil: "2026-08-13T04:12:00Z",
-    drivers: [
-      { label: "3 admissions / 6 mo", weight: 11.2 },
-      { label: "Lives alone", weight: 4.8 },
-      { label: "No PCP visit < 90 d", weight: 3.9 },
-      { label: "Adherent to statin", weight: -2.1 },
-    ],
-    model: { name: "Readmit-v4", auc: 0.71 },
-  }}
-/>;`,
     },
     {
       id: "expired",
@@ -276,13 +255,6 @@ import "@/styles/zoblocks-risk.css";
       description:
         "Past its validity window the score stops being stale and starts being something the model no longer stands behind. There are two ways out and no third: a dismiss action would leave a waved-away score on the panel looking current.",
       fixture: "encounterRoutine",
-      code: `<RiskIndicator
-  now="2026-08-14T09:00:00Z"
-  notADiagnosis="A statistical estimate, not a diagnosis."
-  assessment={{ ...deterioration, validUntil: "2026-08-13T04:12:00Z" }}
-  onRecompute={requestRecompute}
-  onAcknowledge={recordAcknowledgement}
-/>;`,
     },
     {
       id: "unscored",
@@ -290,16 +262,6 @@ import "@/styles/zoblocks-risk.css";
       description:
         'Missing features, outside the training population, a service that timed out — all produce a fact, and it is not "low". Rendering it as the bottom band is how a patient the model cannot see becomes a patient the panel does not call.',
       fixture: "patientRoutine",
-      code: `<RiskIndicator
-  now={serverTime}
-  notADiagnosis="A statistical estimate, not a diagnosis."
-  assessment={{
-    id: "readmit-30",
-    outcome: "30-day readmission",
-    band: "unknown",
-    computedAt: "2026-08-12T04:12:00Z",
-  }}
-/>;`,
     },
     {
       id: "concentration",
@@ -307,12 +269,6 @@ import "@/styles/zoblocks-risk.css";
       description:
         "A model whose top driver carries most of the total attribution is not modelling a patient; it is reporting one event. The component says so, because a clinician who knows that reads the number correctly and one who does not treats it as a synthesis.",
       fixture: "observationPotassiumCritical",
-      code: `// 78% of the attribution sits on one driver, and the card says so.
-drivers: [
-  { label: "ED visit, 18 months ago", weight: 14.0 },
-  { label: "Lives alone", weight: 2.1 },
-  { label: "No PCP visit < 90 d", weight: 1.8 },
-]`,
     },
   ],
 

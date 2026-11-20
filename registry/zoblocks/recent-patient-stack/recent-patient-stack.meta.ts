@@ -253,8 +253,6 @@ import "@/styles/zoblocks-workspace.css";
       description:
         'A chart that was blue this morning must be blue this afternoon. The accent is an FNV-1a hash of the chart id modulo eight, so it is stable across sessions and machines — and it is never the only identity, because a clinician who has learned "Okonkwo is the green one" has learned something no new colleague knows.',
       fixture: "patientRoutine",
-      code: `chartAccent("chart-okonkwo");   // → 3, today and next month
-chartAccent("chart-okonkwo-2"); // → a different slot, deterministically`,
     },
     {
       id: "similar",
@@ -262,11 +260,6 @@ chartAccent("chart-okonkwo-2"); // → a different slot, deterministically`,
       description:
         "Marking only the newcomer would leave the reader comparing a row that has an identifier against a row that does not, which is a harder comparison than two that both do. The pass is deliberately over-eager: a false positive costs a visible MRN and a false negative costs a note in the wrong chart.",
       fixture: "patients",
-      code: `needsIdentifier([
-  { id: "a", display: "J. Okonkwo", identifier: "093-441-208" },
-  { id: "b", display: "J. Okonjo",  identifier: "093-118-774" },
-]);
-// → Set { "a", "b" }`,
     },
     {
       id: "closing",
@@ -274,9 +267,6 @@ chartAccent("chart-okonkwo-2"); // → a different slot, deterministically`,
       description:
         "A clean chart closes. One with an unsigned note asks, because losing the draft is a real loss that a person may still choose. One with a draft order refuses, because an order that vanishes with its tab is an order somebody believes they placed and nothing downstream will show its absence.",
       fixture: "patientRestricted",
-      code: `canClose(clean);     // { kind: "close" }
-canClose(withNote);  // { kind: "confirm", reason: "… Close and lose the draft?" }
-canClose(withOrder); // { kind: "refuse",  reason: "… Sign it or discard it first." }`,
     },
     {
       id: "return",
@@ -284,9 +274,6 @@ canClose(withOrder); // { kind: "refuse",  reason: "… Sign it or discard it fi
       description:
         "Fifteen minutes, because that is roughly the length of an interruption you do not remember having — and that is the interruption that produces the wrong-chart note. A chart with no recorded activity re-asserts too: not knowing how long you were away is not the same as having just left.",
       fixture: "patientRoutine",
-      code: `needsReassertion({ id, display, lastActiveAt: "10:00" }, "10:20"); // true
-needsReassertion({ id, display, lastActiveAt: "10:00" }, "10:05"); // false
-needsReassertion({ id, display }, "10:05");                        // true`,
     },
   ],
 

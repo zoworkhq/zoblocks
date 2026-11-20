@@ -334,23 +334,6 @@ import "@zoblocks/signature/styles.css";
       description:
         'The common case. Submit it empty and the field says so; decline and the form submits, because `signatureRequired()` treats a decline as a valid answer — a rule demanding outcome === "signed" would make refusal impossible to submit.',
       fixture: "patientRoutine",
-      code: `import { Button, Form } from "antd";
-import { Signature, signatureRequired } from "@zoblocks/signature";
-import "@zoblocks/signature/styles.css";
-
-<Form layout="vertical" onFinish={save}>
-  <Form.Item name="consent" label="Patient signature" rules={[signatureRequired()]}>
-    <Signature
-      now={serverTime}
-      meaning="consent"
-      attestation="I agree to go ahead with the procedure."
-      subject={{ display: "Randall, Josh", reference: "Patient/4471902" }}
-      recordedBy={{ name: "A. Okafor", credential: "RN" }}
-      outcomes={["declined", "unable"]}
-    />
-  </Form.Item>
-  <Button type="primary" htmlType="submit">Submit</Button>
-</Form>`,
     },
     {
       id: "keyboard",
@@ -358,12 +341,6 @@ import "@zoblocks/signature/styles.css";
       title: "Signed with the keyboard alone",
       description:
         "Drawing is a path-dependent input, and WCAG 2.1.1 (Level A) requires the function behind it — recording assent — to work from a keyboard. The typed path is that mechanism, not a fallback. Tab in, type a name, confirm.",
-      code: `<Signature
-  now={serverTime}
-  meaning="consent"
-  attestation="I agree to go ahead with the procedure."
-  methods={["type"]}
-/>`,
     },
 
     /* ---------------------------------------------------------------- */
@@ -376,25 +353,6 @@ import "@zoblocks/signature/styles.css";
       description:
         "Seven outcomes, not two. A refusal and an unopened form are different clinical facts, and the value is a union that makes it impossible to record them the same way. Unable and verbal both require a witness — the type says so, and so does the option text.",
       fixture: "consentDeclined",
-      code: `<Signature
-  now={serverTime}
-  meaning="consent"
-  attestation="I agree to go ahead with the procedure."
-  outcomes={["declined", "unable", "verbal", "on-paper"]}
-  onChange={(value) => {
-    // A discriminated union: this compiles only if every outcome is handled,
-    // including the ones that are not "signed".
-    switch (value.outcome) {
-      case "signed":   return file(value.ink, value.recordedAt);
-      case "declined": return recordRefusal(value.reason, value.recordedAt);
-      case "unable":   return recordUnable(value.reason, value.witness);
-      case "verbal":   return recordVerbal(value.witness);
-      case "on-paper": return awaitScan();
-      case "pending":  return null;
-      case "revoked":  return revoke(value.revokedAt);
-    }
-  }}
-/>`,
     },
 
     /* ---------------------------------------------------------------- */
@@ -406,7 +364,6 @@ import "@zoblocks/signature/styles.css";
       title: "A submitted form stays legible",
       description:
         "Read-only, printable, and plain about what it is: the manifest states that a PNG of a mark is not a cryptographic signature — the row every other library omits.",
-      code: `<Signature now={serverTime} value={storedSignature} disabled />`,
     },
     {
       id: "pending",
@@ -414,18 +371,6 @@ import "@zoblocks/signature/styles.css";
       title: "Awaiting countersignature",
       description:
         "Signed by the patient, waiting on the clinician. A form that is neither empty nor complete is the state a boolean cannot hold, and it is the normal case for anything that needs a countersignature.",
-      code: `<Signature
-  now={serverTime}
-  disabled
-  value={{
-    outcome: "pending",
-    awaiting: "clinician",
-    since: patientSignedAt,
-    soFar: [patientSignature],
-    recordedAt: patientSignedAt,
-    recordedBy: { name: "A. Okafor", credential: "RN" },
-  }}
-/>`,
     },
     {
       id: "revoked",
@@ -433,19 +378,6 @@ import "@zoblocks/signature/styles.css";
       title: "Consent withdrawn, the original kept",
       description:
         "The original is struck through, not deleted. Consent given and later withdrawn is a different fact from consent never given, and both belong in the record.",
-      code: `<Signature
-  now={serverTime}
-  disabled
-  value={{
-    outcome: "revoked",
-    original: storedSignature,
-    revokedBy: { name: "Josh Randall" },
-    revokedAt: withdrawnAt,
-    reason: "Changed their mind after speaking with their daughter.",
-    recordedAt: withdrawnAt,
-    recordedBy: { name: "A. Okafor", credential: "RN" },
-  }}
-/>`,
     },
 
     /* ---------------------------------------------------------------- */
@@ -458,18 +390,6 @@ import "@zoblocks/signature/styles.css";
       description:
         "Consent carries no signature element in R4 or R5 — only Provenance.signature does. So the component emits a transaction Bundle: the Consent and the Provenance that signs it, posted together or not at all.",
       fixture: "provenanceConsent",
-      code: `import { toFhirBundle } from "@zoblocks/signature";
-
-const bundle = toFhirBundle(value, {
-  release: "R4",
-  subject: { display: "Randall, Josh", reference: "Patient/4471902" },
-});
-
-// bundle.entry[0] → POST Consent
-// bundle.entry[1] → POST Provenance, carrying Provenance.signature
-//
-// The signer travels on the value, not in these options: who signed is part
-// of what was captured, and re-supplying it here would let the two disagree.`,
     },
     {
       id: "ink-in-any-theme",
@@ -477,12 +397,6 @@ const bundle = toFhirBundle(value, {
       title: "Stored ink, legible in any theme",
       description:
         "The ink is kept as strokes and drawn as SVG in currentColor, so a signature captured in light mode is still legible on a dark screen years later. A bitmap freezes the colour of the day it was taken.",
-      code: `import { SignatureInk } from "@zoblocks/signature";
-
-// value.ink is what Signature captured; the colour comes from the surface.
-<div style={{ color: "var(--zb-text)" }}>
-  <SignatureInk ink={value.ink} label="Josh Randall's signature" height={56} />
-</div>`,
     },
   ],
 

@@ -112,48 +112,18 @@ export default defineComponentMeta({
       title: "Known progress",
       description:
         "A number from 0 to 100 makes the loader determinate: role=progressbar with a value, rather than a status that is re-announced.",
-      code: `import { InfusionLoader } from "@/components/zoblocks/infusion-loader";
-
-export default function Example() {
-  return <InfusionLoader showLabel label="Importing records" progress={62} />;
-}`,
     },
     {
       id: "live-import",
       title: "Progress from your import",
       description:
         "The application owns progress; the loader only renders it. Feed it the real count, and drop progress when the total is not known yet.",
-      code: `import { useEffect, useState } from "react";
-import { InfusionLoader } from "@/components/zoblocks/infusion-loader";
-
-export default function Example() {
-  const [done, setDone] = useState(0);
-  const total = 240;
-
-  useEffect(() => {
-    const id = setInterval(() => setDone((n) => (n >= total ? 0 : n + 12)), 400);
-    return () => clearInterval(id);
-  }, []);
-
-  return (
-    <InfusionLoader
-      showLabel
-      label={\`Importing \${done} of \${total} records\`}
-      progress={(done / total) * 100}
-    />
-  );
-}`,
     },
     {
       id: "before-the-total",
       title: "Before the total is known",
       description:
         "Without progress the line runs indeterminate. Switch to a number as soon as one exists, rather than inventing one.",
-      code: `import { InfusionLoader } from "@/components/zoblocks/infusion-loader";
-
-export default function Example() {
-  return <InfusionLoader showLabel label="Preparing the export" />;
-}`,
     },
   ],
 

@@ -276,15 +276,6 @@ import "@/styles/zoblocks-chart-header.css";
       description:
         "Forty-four pixels carrying allergies, code status, isolation, fall risk, legal status and alerts. The detail moves behind a disclosure rather than out of the DOM, so a screen-reader user is never worse off than a sighted one.",
       fixture: "patientRoutine",
-      code: `const [collapsed, setCollapsed] = useState(false);
-
-<ChartHeader
-  patient={patient}
-  identifiers={[{ kind: "mrn" }, { kind: "nhs" }]}
-  collapsed={collapsed}
-  onCollapsedChange={setCollapsed}
-  safety={safety}
-/>`,
     },
     {
       id: "spcu",
@@ -292,14 +283,6 @@ import "@/styles/zoblocks-chart-header.css";
       description:
         "On an order screen it is shown with what it applies to. On an overview screen it is not shown at all, because out of context it is a demographic wearing a clinical name. Where the surface calls for it and nothing is recorded, the header says so rather than leaving the space that invites somebody to reach for Patient.gender.",
       fixture: "patientRoutine",
-      code: `resolveSpcu(patient, "orders");
-// → { value: "female", context: "for medication dosing", recorded: true }
-
-resolveSpcu(patient, "overview");
-// → null — not a demographic
-
-resolveSpcu({ extension: [] }, "orders");
-// → { recorded: false } — "not recorded. Do not substitute the administrative gender."`,
     },
     {
       id: "encounter",
@@ -307,14 +290,6 @@ resolveSpcu({ extension: [] }, "orders");
       description:
         "One open encounter is chosen, because there is nothing to choose between. Three open encounters are not, because a note filed into an encounter nobody read is the most common misfiling in the building — and a selection that no longer matches an open encounter reverts to none rather than sliding to the first.",
       fixture: "encounterRoutine",
-      code: `resolveEncounterContext(three);
-// → { kind: "none", reason: "3 encounters are open — choose one before documenting" }
-
-resolveEncounterContext(three, "enc-2");
-// → { kind: "selected", encounter: … }
-
-resolveEncounterContext(three, "enc-closed");
-// → { kind: "none", reason: "The selected encounter is no longer open" }`,
     },
     {
       id: "absence",
@@ -322,9 +297,6 @@ resolveEncounterContext(three, "enc-closed");
       description:
         "Allergy status and code status appear whether or not the host supplied them, because their absence is the finding. Everything else appears only when it exists — an isolation chip on every chart in the hospital is noise, and noise here is what makes the two rows that matter invisible.",
       fixture: "allergyHighRisk",
-      code: `safetyStrip({});
-// → [{ kind: "allergy",     label: "Allergies not asked",     tone: "absent" },
-//    { kind: "code-status", label: "Code status not recorded", tone: "absent" }]`,
     },
   ],
 

@@ -364,31 +364,6 @@ import "@zoblocks/tabs/styles.css";
       description:
         "The common case: a view switch over a patient chart, with a critical count on Labs that reaches the accessible name as a word.",
       fixture: "patientRoutine",
-      code: `import { Tabs } from "@zoblocks/tabs";
-import { allergyList, medicationList, observationPanel } from "@zoblocks/fixtures";
-import "@zoblocks/tabs/styles.css";
-
-const critical = observationPanel.filter(isCritical);
-
-<Tabs
-  as="tabs"
-  aria-label="Chart sections"
-  defaultValue="summary"
-  items={[
-    { value: "summary", label: "Summary", children: <Summary /> },
-    {
-      value: "labs",
-      label: "Labs",
-      // Counted from the data, never typed in. A tone is a claim about the
-      // patient, so it has to come from the same place the panel does.
-      count: critical.length,
-      tone: critical.length ? "critical" : "neutral",
-      children: <Labs observations={observationPanel} />,
-    },
-    { value: "meds", label: "Medications", count: medicationList.length, children: <Meds /> },
-    { value: "allergies", label: "Allergies", count: allergyList.length, children: <Allergies /> },
-  ]}
-/>;`,
     },
     {
       id: "restricted-section",
@@ -397,25 +372,6 @@ const critical = observationPanel.filter(isCritical);
       description:
         "A disabled tab requires a reason. Omitting the section entirely would tell the clinician it does not exist; greying it silently tells them nothing.",
       fixture: "patientRestricted",
-      code: `import { patientRestricted } from "@zoblocks/fixtures";
-
-<Tabs
-  as="tabs"
-  aria-label="Chart sections"
-  defaultValue="summary"
-  items={[
-    { value: "summary", label: "Summary", children: <Summary /> },
-    {
-      value: "bh",
-      label: "Behavioural health",
-      disabled: true,
-      // Mandatory. aria-disabled, never the disabled attribute — a keyboard
-      // user has to be able to reach it to find out why they cannot open it.
-      disabledReason:
-        "Restricted. Opening it records an access event and notifies the record owner.",
-    },
-  ]}
-/>;`,
     },
     /* ---------------------------------------------------------------- */
     /* Variants — eleven skins, one accessibility tree                   */
@@ -426,23 +382,6 @@ const critical = observationPanel.filter(isCritical);
       title: "Segmented",
       description:
         "The control the whole system started from. The thumb is one transformed element, so it moves position and width together and never repaints the track. Click either half, or focus it and press ← / →.",
-      code: `import { Tabs } from "@zoblocks/tabs";
-
-export default function Example() {
-  return (
-    <Tabs
-      as="tabs"
-      variant="segmented"
-      fill="equal"
-      aria-label="Document scope"
-      defaultValue="personal"
-      items={[
-        { value: "personal", label: "Personal", children: <p>14 documents only you can see.</p> },
-        { value: "shared", label: "Shared", children: <p>6 documents shared with your care team.</p> },
-      ]}
-    />
-  );
-}`,
     },
     {
       id: "segmented-rich",
@@ -450,31 +389,6 @@ export default function Example() {
       title: "Segmented with icons, counts and tone",
       description:
         "The count reads as a number, not a label: “Needs action, 3 abnormal”. Archive is aria-disabled rather than disabled, so a keyboard user can find it and learn why it is unavailable.",
-      code: `<Tabs
-  as="tabs"
-  variant="segmented"
-  aria-label="Inbox filter"
-  defaultValue="all"
-  items={[
-    { value: "all", label: "All", icon: <MailIcon />, count: 128, children: <Inbox filter="all" /> },
-    { value: "unread", label: "Unread", icon: <BellIcon />, count: 12, children: <Inbox filter="unread" /> },
-    {
-      value: "action",
-      label: "Needs action",
-      icon: <ShieldIcon />,
-      count: 3,
-      tone: "high",
-      children: <Inbox filter="action" />,
-    },
-    {
-      value: "archive",
-      label: "Archive",
-      icon: <DocIcon />,
-      disabled: true,
-      disabledReason: "Archive is disabled for this mailbox",
-    },
-  ]}
-/>`,
     },
     {
       id: "underline",
@@ -482,19 +396,6 @@ export default function Example() {
       title: "Underline",
       description:
         "The workhorse: more than four items, labels of unequal length, panels that are whole screens. The rail is an inset shadow rather than a border, so the 2px indicator overlaps it exactly at any zoom.",
-      code: `<Tabs
-  as="tabs"
-  variant="underline"
-  aria-label="Order"
-  defaultValue="summary"
-  items={[
-    { value: "summary", label: "Summary", children: <OrderSummary /> },
-    { value: "lines", label: "Line items", count: 24, children: <LineItems /> },
-    { value: "ship", label: "Shipments", count: 3, children: <Shipments /> },
-    { value: "returns", label: "Returns", count: 1, tone: "high", children: <Returns /> },
-    { value: "invoices", label: "Invoices", children: <Invoices /> },
-  ]}
-/>`,
     },
     {
       id: "pill-filters",
@@ -502,21 +403,6 @@ export default function Example() {
       title: "Pill filters",
       description:
         "Pills are the only variant allowed to wrap, and only as a radiogroup — once a tablist wraps, “the next tab” stops being a direction. There is no indicator, because a line break leaves no path for one to travel along.",
-      code: `<Tabs
-  as="radiogroup"
-  variant="pill"
-  overflow="wrap"
-  aria-label="Filter documents by type"
-  defaultValue="all"
-  items={[
-    { value: "all", label: "Everything", count: 241 },
-    { value: "referrals", label: "Referrals", icon: <DocIcon />, count: 38 },
-    { value: "labs", label: "Lab reports", icon: <FlaskIcon />, count: 96 },
-    { value: "imaging", label: "Imaging", icon: <ImageIcon />, count: 22 },
-    { value: "consent", label: "Consent forms", icon: <ShieldIcon />, count: 14 },
-    { value: "letters", label: "Correspondence", icon: <MailIcon />, count: 71 },
-  ]}
-/>`,
     },
     {
       id: "enclosed-editable",
@@ -524,42 +410,6 @@ export default function Example() {
       title: "Enclosed, with add and close",
       description:
         "The × is aria-hidden and the keyboard path is Delete on the tab, because a control inside role=tab is invalid ARIA. After a close, focus moves to the neighbour — never to <body>.",
-      code: `import { useState } from "react";
-import { Tabs } from "@zoblocks/tabs";
-
-export default function Example() {
-  const [items, setItems] = useState([
-    { value: "note", label: "Progress note", icon: <NoteIcon />, dot: "dirty", closable: true },
-    { value: "cmp", label: "CMP 2026-08-14", icon: <FlaskIcon />, closable: true },
-    { value: "ct", label: "CT abdomen", icon: <ImageIcon />, closable: true },
-  ]);
-  const [value, setValue] = useState("note");
-
-  return (
-    <Tabs
-      as="tabs"
-      variant="enclosed"
-      aria-label="Open documents"
-      value={value}
-      onChange={setValue}
-      items={items.map((item) => ({ ...item, children: <Document id={item.value} /> }))}
-      editable={{
-        onClose: (target) => {
-          const index = items.findIndex((item) => item.value === target);
-          const rest = items.filter((item) => item.value !== target);
-          setItems(rest);
-          // Next, else previous: the rule the APG pattern leaves out.
-          if (value === target) setValue((rest[index] ?? rest[rest.length - 1])?.value ?? "");
-        },
-        onAdd: () => {
-          const next = "new-" + Date.now();
-          setItems((current) => [...current, { value: next, label: "Untitled", closable: true }]);
-          setValue(next);
-        },
-      }}
-    />
-  );
-}`,
     },
     {
       id: "rail",
@@ -567,26 +417,6 @@ export default function Example() {
       title: "Rail",
       description:
         "Vertical means ↑ / ↓, not ← / →. Setting aria-orientation without rebinding the keys would lie to the screen reader, so both come from one prop.",
-      code: `<Tabs
-  as="tabs"
-  variant="rail"
-  orientation="vertical"
-  aria-label="Settings"
-  defaultValue="profile"
-  items={[
-    { value: "profile", label: "Profile", icon: <UsersIcon />, children: <Profile /> },
-    { value: "notifications", label: "Notifications", icon: <BellIcon />, count: 4, children: <Notifications /> },
-    { value: "security", label: "Security", icon: <LockIcon />, children: <Security /> },
-    { value: "members", label: "Members", icon: <UsersIcon />, count: 32, children: <Members /> },
-    {
-      value: "api",
-      label: "API keys",
-      icon: <CogIcon />,
-      disabled: true,
-      disabledReason: "Not enabled for this workspace",
-    },
-  ]}
-/>`,
     },
     {
       id: "ghost",
@@ -594,17 +424,6 @@ export default function Example() {
       title: "Ghost",
       description:
         "No track, no rail, no indicator element — so no measurement pass and no ResizeObserver. For dense toolbars and popovers, where a second bordered box would compete with the one already there.",
-      code: `<Tabs
-  as="tabs"
-  variant="ghost"
-  aria-label="Preview mode"
-  defaultValue="rendered"
-  items={[
-    { value: "rendered", label: "Rendered", children: <Rendered /> },
-    { value: "source", label: "Source", children: <Source /> },
-    { value: "diff", label: "Diff", children: <Diff /> },
-  ]}
-/>`,
     },
     {
       id: "command",
@@ -612,31 +431,6 @@ export default function Example() {
       title: "Command",
       description:
         "Two radiogroups, not one toolbar: layout and density are independent values, and merging them would lose the “checked, 1 of 4” that tells a screen-reader user the current view. Every icon carries a textLabel.",
-      code: `<div style={{ display: "flex", gap: 12 }}>
-  <Tabs
-    as="radiogroup"
-    variant="command"
-    aria-label="Layout"
-    defaultValue="list"
-    items={[
-      { value: "list", label: <ListIcon />, textLabel: "List view" },
-      { value: "grid", label: <GridIcon />, textLabel: "Grid view" },
-      { value: "board", label: <BoardIcon />, textLabel: "Board view" },
-      { value: "calendar", label: <CalendarIcon />, textLabel: "Calendar view" },
-    ]}
-  />
-  <Tabs
-    as="radiogroup"
-    variant="command"
-    size="sm"
-    aria-label="Density"
-    defaultValue="compact"
-    items={[
-      { value: "comfy", label: "Comfy" },
-      { value: "compact", label: "Compact" },
-    ]}
-  />
-</div>`,
     },
     {
       id: "stepper",
@@ -644,24 +438,6 @@ export default function Example() {
       title: "Stepper",
       description:
         "Backwards is free, forwards is earned. Completed steps stay reachable — locking them forces a restart to fix a typo. Review is locked, focusable, and says why.",
-      code: `<Tabs
-  as="steps"
-  variant="stepper"
-  aria-label="Patient intake"
-  defaultValue="consent"
-  items={[
-    { value: "identity", label: "Identity", state: "done", children: <Identity /> },
-    { value: "insurance", label: "Insurance", state: "done", children: <Insurance /> },
-    { value: "consent", label: "Consent", state: "current", children: <Consent /> },
-    {
-      value: "review",
-      label: "Review",
-      state: "locked",
-      disabled: true,
-      disabledReason: "Complete the consent step first",
-    },
-  ]}
-/>`,
     },
     {
       id: "card",
@@ -669,29 +445,6 @@ export default function Example() {
       title: "Card",
       description:
         "When choosing wrong has a consequence the label cannot carry, the option needs a sentence, and a sentence does not fit in a pill. Same accessibility tree as the filters, three times the surface.",
-      code: `<Tabs
-  as="radiogroup"
-  variant="card"
-  aria-label="How should this result be released?"
-  defaultValue="immediate"
-  items={[
-    {
-      value: "immediate",
-      textLabel: "Immediate",
-      label: <Option title="Immediate" body="Visible in the patient portal as soon as it is verified." />,
-    },
-    {
-      value: "reviewed",
-      textLabel: "After review",
-      label: <Option title="After review" body="Held until a clinician marks it reviewed. Median delay 6 h." />,
-    },
-    {
-      value: "scheduled",
-      textLabel: "Scheduled",
-      label: <Option title="Scheduled" body="Released at a fixed time you choose, review or not." />,
-    },
-  ]}
-/>`,
     },
     {
       id: "stat",
@@ -699,38 +452,6 @@ export default function Example() {
       title: "Stat",
       description:
         "Arrow and colour disagree on purpose: “No-show rate ▲” is bad and “Median wait ▼” is good, so direction alone cannot carry meaning. The accessible name says better or worse in words.",
-      code: `<Tabs
-  as="tabs"
-  variant="stat"
-  aria-label="Metric"
-  defaultValue="appts"
-  items={[
-    {
-      value: "appts",
-      textLabel: "Appointments, 1,284, better than last week",
-      label: <Stat name="Appointments" value="1,284" delta="▲ 6.2 % vs last week" good />,
-      children: <Trend metric="appts" />,
-    },
-    {
-      value: "noshow",
-      textLabel: "No-show rate, 7.4 %, worse than last week",
-      label: <Stat name="No-show rate" value="7.4 %" delta="▲ 1.1 pt vs last week" />,
-      children: <Trend metric="noshow" />,
-    },
-    {
-      value: "wait",
-      textLabel: "Median wait, 12 m, better than last week",
-      label: <Stat name="Median wait" value="12 m" delta="▼ 3 m vs last week" good />,
-      children: <Trend metric="wait" />,
-    },
-    {
-      value: "portal",
-      textLabel: "Portal messages, 612, worse than last week",
-      label: <Stat name="Portal messages" value="612" delta="▲ 18 % vs last week" />,
-      children: <Trend metric="portal" />,
-    },
-  ]}
-/>`,
     },
 
     /* ---------------------------------------------------------------- */
@@ -744,19 +465,6 @@ export default function Example() {
         'Not every tab strip is a view switch. A filter is a form control and belongs in a Form.Item, which is what `as="radiogroup"` declares.',
       // No fixture: a density filter is a preference, not patient data, and
       // dressing it in a chart would misrepresent what the mode is for.
-      code: `import { Form } from "antd";
-
-<Form.Item name="density" label="Density">
-  <Tabs
-    as="radiogroup"
-    variant="segmented"
-    items={[
-      { value: "compact", label: "Compact" },
-      { value: "default", label: "Default" },
-      { value: "comfortable", label: "Comfortable" },
-    ]}
-  />
-</Form.Item>;`,
     },
     {
       id: "nav-links",
@@ -764,19 +472,6 @@ export default function Example() {
       title: "Navigation with real links",
       description:
         'as="nav" renders a <nav> of real anchors: announced as “Overview, link, current page”, no arrow-key hijack, and cmd-click opens a new tab. Hover one and the browser shows the URL.',
-      code: `<Tabs
-  as="nav"
-  variant="underline"
-  aria-label="Project"
-  value={currentSection}
-  items={[
-    { value: "overview", label: "Overview", href: "/project" },
-    { value: "issues", label: "Issues", href: "/project/issues", count: 31 },
-    { value: "pulls", label: "Pull requests", href: "/project/pulls", count: 7 },
-    { value: "actions", label: "Actions", href: "/project/actions" },
-    { value: "insights", label: "Insights", href: "/project/insights" },
-  ]}
-/>`,
     },
 
     /* ---------------------------------------------------------------- */
@@ -788,14 +483,6 @@ export default function Example() {
       title: "Scroll",
       description:
         "The default. Fade masks, nudge buttons and scroll-snap. The nudges are tabindex=-1: arrow keys already move selection and scroll follows, so two more tab stops would do nothing for a keyboard user.",
-      code: `<Tabs
-  as="tabs"
-  variant="underline"
-  overflow="scroll"
-  aria-label="Chart section"
-  defaultValue="summary"
-  items={chartSections}
-/>`,
     },
     {
       id: "overflow-menu",
@@ -803,14 +490,6 @@ export default function Example() {
       title: "Priority-plus menu",
       description:
         "Widths are measured once and cached. Tabs that no longer fit move into a real role=menu, and the selected tab is pinned so it can never be the one that disappears. Resize the window to watch it.",
-      code: `<Tabs
-  as="tabs"
-  variant="underline"
-  overflow="menu"
-  aria-label="Chart section"
-  defaultValue="summary"
-  items={chartSections}
-/>`,
     },
     {
       id: "overflow-collapse",
@@ -818,16 +497,6 @@ export default function Example() {
       title: "Collapse to a select",
       description:
         "Below a container width the strip becomes a native <select>, the one picker that already works on every phone. Driven by the container, not the viewport: tabs in a 380px drawer need it on a 1440px monitor too.",
-      code: `<div style={{ maxWidth: 320 }}>
-  <Tabs
-    as="tabs"
-    variant="underline"
-    overflow="collapse"
-    aria-label="Chart section"
-    defaultValue="summary"
-    items={chartSections}
-  />
-</div>`,
     },
 
     /* ---------------------------------------------------------------- */
@@ -839,27 +508,6 @@ export default function Example() {
       title: "Unsaved-changes guard",
       description:
         "onBeforeChange may return a promise, because vetoing usually means asking a person. While it is pending the strip is inert and aria-busy. Cancel, and focus returns to where you were.",
-      code: `<Tabs
-  as="tabs"
-  variant="segmented"
-  aria-label="Note editor"
-  defaultValue="compose"
-  onBeforeChange={() => (isDirty ? confirmLeave() : true)}
-  items={[
-    { value: "compose", label: "Compose", dot: isDirty ? "dirty" : undefined, children: <Compose /> },
-    { value: "preview", label: "Preview", children: <Preview /> },
-    { value: "history", label: "History", children: <History /> },
-  ]}
-/>
-
-// Resolves when the clinician answers the dialog.
-function confirmLeave(): Promise<boolean> {
-  return openDialog({
-    title: "This note has unsigned changes",
-    confirm: "Switch, keep draft",
-    cancel: "Stay and sign",
-  });
-}`,
     },
     {
       id: "restricted-stale",
@@ -867,26 +515,6 @@ function confirmLeave(): Promise<boolean> {
       title: "Restricted and stale",
       description:
         "Hiding a restricted section teaches clinicians the record is complete when it is not. Vitals is stale rather than missing: a clinician reading cached observations needs to know they are cached.",
-      code: `<Tabs
-  as="tabs"
-  variant="rail"
-  orientation="vertical"
-  aria-label="Sections"
-  defaultValue="summary"
-  items={[
-    { value: "summary", label: "Summary", icon: <DocIcon />, children: <Summary /> },
-    {
-      value: "bh",
-      label: "Behavioural health",
-      icon: <LockIcon />,
-      disabled: true,
-      disabledReason:
-        "Restricted. Opening it records an access event against your account and notifies the record owner.",
-    },
-    { value: "meds", label: "Medications", icon: <PillIcon />, children: <Meds /> },
-    { value: "vitals", label: "Vitals", icon: <HeartIcon />, availability: "stale", children: <Vitals /> },
-  ]}
-/>`,
     },
     {
       id: "severity",
@@ -894,26 +522,6 @@ function confirmLeave(): Promise<boolean> {
       title: "Severity in the strip",
       description:
         "A clinician scanning five tabs must see where the problem is without opening each. The red 2 carries a border and a hidden “2 critical”, and the panel repeats it as text. Tabs are never reordered by severity — position is memory.",
-      code: `<Tabs
-  as="tabs"
-  variant="underline"
-  aria-label="Chart sections"
-  defaultValue="summary"
-  items={[
-    { value: "summary", label: "Summary", icon: <DocIcon />, children: <Summary /> },
-    { value: "vitals", label: "Vitals", icon: <HeartIcon />, children: <Vitals /> },
-    {
-      value: "labs",
-      label: "Labs",
-      icon: <FlaskIcon />,
-      count: criticalResults.length,
-      tone: "critical",
-      children: <Labs />,
-    },
-    { value: "meds", label: "Medications", icon: <PillIcon />, count: 9, children: <Meds /> },
-    { value: "notes", label: "Notes", icon: <NoteIcon />, children: <Notes /> },
-  ]}
-/>`,
     },
     {
       id: "every-variant",
@@ -921,25 +529,6 @@ function confirmLeave(): Promise<boolean> {
       title: "Every variant, one tree",
       description:
         "The same items in all eleven skins. Tab into any of them and the keyboard model is identical, because the skin is CSS and the mode is the accessibility tree.",
-      code: `const VARIANTS = [
-  "segmented", "underline", "pill", "enclosed", "rail", "ghost",
-  "stepper", "command", "card", "stat", "unstyled",
-] as const;
-
-VARIANTS.map((variant) => (
-  <Tabs
-    key={variant}
-    as="tabs"
-    variant={variant}
-    aria-label={variant + " example"}
-    defaultValue="a"
-    items={[
-      { value: "a", label: "Personal" },
-      { value: "b", label: "Shared" },
-      { value: "c", label: "Archived" },
-    ]}
-  />
-));`,
     },
 
     /* ---------------------------------------------------------------- */
@@ -951,32 +540,6 @@ VARIANTS.map((variant) => (
       title: "Nine combinations at once",
       description:
         "Light, dark and high contrast against patient, standard and clinical density. The theme and density are attributes on any ancestor; nothing in the component changes. All nine side by side is how a token bug gets caught.",
-      code: `{["light", "dark", "high-contrast"].map((theme) =>
-  ["patient", "standard", "clinical"].map((density) => (
-    <div key={theme + density} data-zb-theme={theme} data-zb-density={density}>
-      <Tabs
-        as="radiogroup"
-        variant="segmented"
-        aria-label="Scope"
-        defaultValue="personal"
-        items={[
-          { value: "personal", label: "Personal" },
-          { value: "shared", label: "Shared" },
-        ]}
-      />
-      <Tabs
-        as="tabs"
-        variant="underline"
-        aria-label="Results"
-        defaultValue="labs"
-        items={[
-          { value: "labs", label: "Labs", count: 2, tone: "critical" },
-          { value: "meds", label: "Meds", count: 9 },
-        ]}
-      />
-    </div>
-  )),
-)}`,
     },
   ],
 

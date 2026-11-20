@@ -253,11 +253,6 @@ import "@/styles/zoblocks-trend.css";
       description:
         "The same shape, twice. A falling PHQ-9 is improvement; a falling eGFR is not. Valence is a required prop because a library that guesses gets half of all clinical measures wrong, silently, in green.",
       fixture: "observationPanel",
-      code: `<TrendIndicator series={{ id: "phq9", label: "PHQ-9", valence: "higher-is-worse",
-  significantChange: 5, points: phq9 }} />
-
-<TrendIndicator series={{ id: "egfr", label: "eGFR", valence: "higher-is-better",
-  unit: "mL/min", points: egfr }} />`,
     },
     {
       id: "comparability",
@@ -265,13 +260,6 @@ import "@/styles/zoblocks-trend.css";
       description:
         'A lab switching immunoassay platforms shifts every ferritin by 20% with no clinical change at all. Two separate paths say "these are not the same series" without a legend; a dashed gap says it only to somebody who already knows the convention.',
       fixture: "observationCorrected",
-      code: `points: [
-  { at: "2026-01-04", value: 180 },
-  { at: "2026-03-02", value: 176 },
-  // Everything after this is on a different scale.
-  { at: "2026-05-09", value: 212, breaksComparability: "switched to Roche Elecsys" },
-  { at: "2026-07-11", value: 218 },
-]`,
     },
     {
       id: "noise",
@@ -279,15 +267,6 @@ import "@/styles/zoblocks-trend.css";
       description:
         "Below the reliable-change threshold the trend renders flat and neutral, whatever the arithmetic says. That is the clinical rule for the instrument, not a softening of a real move.",
       fixture: "observationPotassiumCritical",
-      code: `<TrendIndicator
-  series={{
-    id: "phq9", label: "PHQ-9", valence: "higher-is-worse",
-    // The reliable-change index for the PHQ-9. Below it, noise.
-    significantChange: 5,
-    points: [{ at: "2026-05-02", value: 14 }, { at: "2026-06-06", value: 13 },
-             { at: "2026-07-04", value: 12 }],
-  }}
-/>;`,
     },
     {
       id: "too-few",
@@ -295,9 +274,6 @@ import "@/styles/zoblocks-trend.css";
       description:
         "It is a rhetorical device. Below three comparable points the component draws no line and says how many it has — because an absent trend and a trend that did not move are different facts, and drawing the second for the first is the lie it exists to refuse.",
       fixture: "observationPanel",
-      code: `// Renders "2 results. A trend needs at least 3." — no line.
-<TrendIndicator series={{ id: "cr", label: "Creatinine", valence: "higher-is-worse",
-  points: [{ at: "2026-06-01", value: 88 }, { at: "2026-07-01", value: 104 }] }} />`,
     },
   ],
 

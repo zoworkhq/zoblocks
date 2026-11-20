@@ -12,7 +12,6 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { CodeLines, CopyButton, PlatformLinks } from "./code-block";
-import { examplePreview } from "./example-registry";
 import {
   isRunnable,
   openSandbox,
@@ -107,18 +106,19 @@ function useSandboxLinks(
   }, [runnable, status, title, prepare]);
 }
 
-/** The example's own file, rendered, when it has one; else a hand-written preview. */
+/**
+ * The example's own file, rendered — the same file the Code tab shows and
+ * StackBlitz opens. An example still written as a `code` string has none, and
+ * shows its code alone.
+ */
 function examplePreviewNode(component: string, id: string): React.ReactNode {
   const File = EXAMPLE_MODULES[`${component}/${id}`];
-  if (File) {
-    return (
-      <React.Suspense fallback={null}>
-        <File />
-      </React.Suspense>
-    );
-  }
-  const render = examplePreview(component, id);
-  return render ? render() : null;
+  if (!File) return null;
+  return (
+    <React.Suspense fallback={null}>
+      <File />
+    </React.Suspense>
+  );
 }
 
 export function ExampleBlock({

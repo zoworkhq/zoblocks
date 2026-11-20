@@ -330,19 +330,6 @@ const columns: DataGridColumn<Row>[] = [
       description:
         "The claim goes above the rows it is about: 6 of 312, and the predicate that produced them. Rendering the page size as the total is the one failure this type exists to prevent — and aria-rowcount says 313, so a screen reader hears the same number.",
       fixture: "caseloadPhq9",
-      code: `<DataGrid
-  caption="Clients on this team's caseload with a raised PHQ-9 or a recent risk screen"
-  title="Caseload · adult outpatient"
-  columns={columns}
-  rows={rows}
-  rowKey={(row) => row.mrn}
-  coverage={{
-    shown: rows.length,
-    total: 312,
-    noun: "clients on this team's caseload",
-    predicate: "PHQ-9 of 10 or more, or a risk screen in the last 14 days.",
-  }}
-/>`,
     },
     {
       id: "unknown-total",
@@ -351,11 +338,6 @@ const columns: DataGridColumn<Row>[] = [
       description:
         "Bundle.total is optional in FHIR, so “the server did not say” is the common case, not an edge. The grid says so in words and sets aria-rowcount to -1 rather than inventing a denominator.",
       fixture: "unknownTotal",
-      code: `<DataGrid
-  {...props}
-  coverage={{ shown: rows.length, total: "unknown", noun: "clients" }}
-/>
-// → "6 clients shown. The source did not say how many match."`,
     },
     {
       id: "everything",
@@ -363,7 +345,6 @@ const columns: DataGridColumn<Row>[] = [
       title: "Everything, with nothing hidden",
       description:
         "When every match is on screen the grid says that too — “All 6 referrals” — because silence would leave the reader to guess whether there is more.",
-      code: `<DataGrid {...props} coverage={{ shown: 6, total: 6, noun: "referrals" }} />`,
     },
     {
       id: "empty",
@@ -371,7 +352,6 @@ const columns: DataGridColumn<Row>[] = [
       title: "The predicate matched nobody",
       description:
         "Zero rows is an answer, stated as one — “No clients match.” — with the column headers still drawn, so the reader can see what was being looked for.",
-      code: `<DataGrid {...props} rows={[]} coverage={{ shown: 0, total: 0, noun: "clients" }} />`,
     },
     {
       id: "refusal",
@@ -380,11 +360,6 @@ const columns: DataGridColumn<Row>[] = [
       description:
         "Above the ceiling the grid refuses rather than degrading, and says what to do instead. Twenty thousand is the measured default — where a forty-column model on a shared ward workstation stops being usable; the example sets 4 to show it.",
       fixture: "unknownTotal",
-      code: `<DataGrid
-  {...props}
-  ceiling={4}            // default 20,000
-  coverage={{ shown: 6, total: 1438, noun: "patients" }}
-/>`,
     },
 
     /* ---------------------------------------------------------------- */
@@ -397,14 +372,6 @@ const columns: DataGridColumn<Row>[] = [
       description:
         "Awaiting, restricted, not recorded, declined, not known — five absences, each in words with its reason in the foot. A PHQ-9 the client has not completed is not a PHQ-9 of zero, so absences sort after every value whichever way the column runs.",
       fixture: "caseloadPhq9",
-      code: `const phq9 = {
-  key: "phq9",
-  header: "PHQ-9",
-  kind: "measure",
-  value: (row) => row.phq9,    // a number, or { absent: "awaiting" | "restricted" | … }
-};
-
-<DataGrid {...props} columns={[name, phq9, …]} defaultSort={{ key: "phq9", direction: "ascending" }} />`,
     },
     {
       id: "derived",
@@ -413,20 +380,6 @@ const columns: DataGridColumn<Row>[] = [
       description:
         "The derivation travels with the column, so the footnote is generated rather than remembered. Sorting by it promotes the footnote to a statement under the table: “Sorted by a prediction — see note 1.”",
       fixture: "caseloadPhq9",
-      code: `const risk = {
-  key: "risk",
-  header: "Disengagement",
-  kind: "number",
-  value: (row) => row.risk,
-  derived: {
-    model: "disengagement",
-    version: "v1.8",
-    validatedOn: "9,140 outpatient episodes",
-    population: "adults, English-language intake only",
-  },
-};
-
-<DataGrid {...props} defaultSort={{ key: "risk", direction: "descending" }} />`,
     },
     {
       id: "arrivals",
@@ -435,14 +388,6 @@ const columns: DataGridColumn<Row>[] = [
       description:
         "The grid counts what has landed and holds it: “3 results arrived at 11:47 — nothing moved.” Merging is the reader's decision, taken when they ask, because a row that jumps under a pointer is a row somebody acts on by mistake.",
       fixture: "caseloadPhq9",
-      code: `<DataGrid
-  {...props}
-  rows={rows}
-  arrivals={held}
-  arrivalsAt="11:47"
-  onAdmitArrivals={(arrived) => setRows(merge(rows, arrived))}
-/>
-// rows never changes until the reader asks.`,
     },
 
     /* ---------------------------------------------------------------- */
@@ -454,11 +399,6 @@ const columns: DataGridColumn<Row>[] = [
       title: "The row the reader is on",
       description:
         "A real grid with two-dimensional navigation. Click a cell and use the arrows: the foot re-states who the row is about — “Row 2 of 312 — Adeyemi, R., MRN 4471902” — at the point of action, where a wrong-patient error happens.",
-      code: `<DataGrid
-  {...props}
-  identify={(row) => ({ primary: row.name, secondary: \`MRN \${row.mrn}\` })}
-  onRowActivate={(row) => openChart(row.mrn)}
-/>`,
     },
     {
       id: "selected",
@@ -466,17 +406,6 @@ const columns: DataGridColumn<Row>[] = [
       title: "Selected, with the verbs that reach them",
       description:
         "Selection is controlled, and only exists when there is something to do with it: omit selectedKeys and there is no checkbox column at all. The bulk bar names how many rows it will act on.",
-      code: `<DataGrid
-  {...props}
-  selectedKeys={selected}
-  onSelectionChange={setSelected}
-  bulkActions={(rows) => (
-    <>
-      <button type="button">Assign clinician</button>
-      <button type="button">Schedule contact · {rows.length}</button>
-    </>
-  )}
-/>`,
     },
     {
       id: "pinned",
@@ -484,7 +413,6 @@ const columns: DataGridColumn<Row>[] = [
       title: "Pinned identity, scrolled sideways",
       description:
         "Scroll the grid to the right: the client's name stays. A measure that has scrolled away from the name it belongs to is a number about nobody.",
-      code: `<DataGrid {...props} columns={wideColumns} pinnedColumns={1} maxHeight="18rem" />`,
     },
     {
       id: "loading",
@@ -492,15 +420,6 @@ const columns: DataGridColumn<Row>[] = [
       title: "Loading more, and the end of what is known",
       description:
         "Scroll to the bottom: the grid asks, the host appends, and when there is no more it says so instead of waiting forever. It follows FHIR's link.next rather than a pager, because “page 4 of 7” cannot be built against a server that will not give a total.",
-      code: `<DataGrid
-  {...props}
-  rows={loaded}
-  coverage={{ shown: loaded.length, total: "unknown", noun: "clients" }}
-  maxHeight="16rem"
-  onReachEnd={fetchNext}        // follow Bundle.link.next
-  loadingMore={fetching}
-  exhausted={!nextLink}
-/>`,
     },
 
     /* ---------------------------------------------------------------- */
@@ -512,7 +431,6 @@ const columns: DataGridColumn<Row>[] = [
       title: "Framed by the host, not by itself",
       description:
         "Inside an application screen that already names the list and its filters, the masthead and foot are the same claim twice. Turn them off; the caption still names the grid for a screen reader, and `describeGridCoverage(coverage)` is the one line the host places instead.",
-      code: `<DataGrid {...props} masthead={false} footer={false} />`,
     },
     {
       id: "export",
@@ -521,11 +439,6 @@ const columns: DataGridColumn<Row>[] = [
       description:
         "A preferred name is free text from a registration desk. Every cell that would start a formula is neutralised — full-width lookalikes too — and row 1 of the file is the coverage sentence, because an export outlives its screen. Nothing turns this off.",
       fixture: "caseloadPhq9",
-      code: `import { toGridDelimited } from "@/lib/zoblocks-grid";
-
-const csv = toGridDelimited(rows, columns, { coverage });
-// Row 1: "6 of 312 clients on this team's caseload. PHQ-9 of 10 or more, …"
-// '=HYPERLINK(…)  ← the leading quote keeps a spreadsheet from running it`,
     },
   ],
 

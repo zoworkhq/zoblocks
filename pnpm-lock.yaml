@@ -643,12 +643,24 @@ importers:
 
   examples:
     dependencies:
+      '@zoblocks/copilot-core':
+        specifier: workspace:*
+        version: link:../packages/copilot-core
+      '@zoblocks/copilot-react':
+        specifier: workspace:*
+        version: link:../packages/copilot-react
+      '@zoblocks/fhir':
+        specifier: workspace:*
+        version: link:../packages/fhir
       '@zoblocks/host-react':
         specifier: workspace:*
         version: link:../packages/host-react
       '@zoblocks/identity':
         specifier: workspace:*
         version: link:../packages/identity
+      '@zoblocks/recorder-core':
+        specifier: workspace:*
+        version: link:../packages/recorder-core
       '@zoblocks/signature':
         specifier: workspace:*
         version: link:../packages/signature

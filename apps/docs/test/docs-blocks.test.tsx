@@ -105,41 +105,14 @@ describe("CodeBlock", () => {
 });
 
 describe("example previews", () => {
-  it("only preview examples that exist in the catalogue", async () => {
-    const { EXAMPLE_PREVIEWS } = await import("@/components/site/docs/example-registry");
+  it("render every documented example from its own file", async () => {
+    const { EXAMPLE_MODULES } = await import("@/lib/generated/example-modules");
     const { CATALOG } = await import("@/lib/generated/catalog");
-    for (const [name, previews] of Object.entries(EXAMPLE_PREVIEWS)) {
-      const ids = (CATALOG.find((c) => c.name === name)?.examples ?? []).map((e) => e.id);
-      for (const id of Object.keys(previews)) {
-        expect(ids, `${name} has no example "${id}"`).toContain(id);
-      }
-    }
-  });
-
-  it("previews every loader, Tabs, Switch, Accordion, Clinical Status, Chart Context Menu, Signature, Date Picker, Data Grid, Care Timeline, Recorder and Copilot example", async () => {
-    const { EXAMPLE_PREVIEWS } = await import("@/components/site/docs/example-registry");
-    const { CATALOG } = await import("@/lib/generated/catalog");
-    for (const name of [
-      "pulse-loader",
-      "rhythm-loader",
-      "breath-loader",
-      "helix-loader",
-      "infusion-loader",
-      "tabs",
-      "switch",
-      "accordion",
-      "clinical-status",
-      "chart-context-menu",
-      "signature",
-      "date-picker",
-      "data-grid",
-      "care-timeline",
-      "recorder",
-      "copilot",
-    ]) {
-      const ids = (CATALOG.find((c) => c.name === name)?.examples ?? []).map((e) => e.id);
-      expect(ids.length).toBeGreaterThanOrEqual(3);
-      expect(Object.keys(EXAMPLE_PREVIEWS[name] ?? {}).sort()).toEqual([...ids].sort());
-    }
+    const missing = CATALOG.flatMap((c) =>
+      (c.examples ?? []).map((e) => `${c.name}/${e.id}`).filter((key) => !(key in EXAMPLE_MODULES)),
+    );
+    // An inline `code` string renders as code alone; every example has moved
+    // to examples/<component>/<id>.tsx, and a new one should start there.
+    expect(missing).toEqual([]);
   });
 });
