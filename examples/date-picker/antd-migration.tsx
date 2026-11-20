@@ -54,13 +54,13 @@ export default function AppointmentDateExample() {
         load={load}
       />
 
-      <p className="mt-3 text-sm text-gray-500">
+      <p className="mt-3 text-sm text-[var(--zb-text-muted)]">
         {date
           ? `Selected date: ${date.y}-${String(date.m).padStart(2, "0")}-${String(date.d).padStart(2, "0")}`
           : "value = null"}
       </p>
 
-      <p className="mt-2 text-xs text-gray-400">
+      <p className="mt-2 text-xs text-[var(--zb-text-muted)]">
         Demo availability: the clinic is closed on Sundays. Other dates show sample appointment slot
         counts.
       </p>

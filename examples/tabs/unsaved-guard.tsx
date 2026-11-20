@@ -59,10 +59,12 @@ export default function UnsavedChangesGuardExample() {
               label: "Compose",
               dot: isDirty ? "dirty" : undefined,
               children: (
-                <div className="rounded-xl border border-dashed border-gray-300 bg-[#F8FAFC] p-4">
+                <div className="rounded-xl border border-dashed border-[var(--zb-border)] bg-[var(--zb-bg-subtle)] p-4">
                   <div className="mb-3 flex items-center justify-between">
                     <h3 className="font-medium">Clinical note</h3>
-                    {isDirty && <span className="text-xs text-amber-700">Unsaved changes</span>}
+                    {isDirty && (
+                      <span className="text-xs text-[var(--zb-status-high)]">Unsaved changes</span>
+                    )}
                   </div>
 
                   <textarea
@@ -70,13 +72,13 @@ export default function UnsavedChangesGuardExample() {
                     defaultValue="Patient reports feeling better today. Follow-up planned."
                     onChange={() => setIsDirty(true)}
                     rows={3}
-                    className="w-full resize-y rounded-md border border-gray-300 bg-white p-3 text-sm outline-none focus:border-teal-700"
+                    className="w-full resize-y rounded-md border border-[var(--zb-border)] bg-[var(--zb-surface)] p-3 text-sm outline-none focus:border-[var(--zb-accent)]"
                   />
 
                   <button
                     type="button"
                     onClick={() => setIsDirty(false)}
-                    className="mt-3 rounded-md border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-100"
+                    className="mt-3 rounded-md border border-[var(--zb-border)] px-3 py-1.5 text-sm hover:bg-[var(--zb-bg-subtle)]"
                   >
                     Mark as saved
                   </button>
@@ -87,9 +89,11 @@ export default function UnsavedChangesGuardExample() {
               value: "preview",
               label: "Preview",
               children: (
-                <div className="rounded-xl border border-dashed border-gray-300 bg-[#F8FAFC] p-4">
+                <div className="rounded-xl border border-dashed border-[var(--zb-border)] bg-[var(--zb-bg-subtle)] p-4">
                   <h3 className="font-medium">Note preview</h3>
-                  <p className="mt-2 text-sm text-gray-600">Review the note before signing.</p>
+                  <p className="mt-2 text-sm text-[var(--zb-text-muted)]">
+                    Review the note before signing.
+                  </p>
                 </div>
               ),
             },
@@ -97,9 +101,11 @@ export default function UnsavedChangesGuardExample() {
               value: "history",
               label: "History",
               children: (
-                <div className="rounded-xl border border-dashed border-gray-300 bg-[#F8FAFC] p-4">
+                <div className="rounded-xl border border-dashed border-[var(--zb-border)] bg-[var(--zb-bg-subtle)] p-4">
                   <h3 className="font-medium">Version history</h3>
-                  <p className="mt-2 text-sm text-gray-600">No previous versions available.</p>
+                  <p className="mt-2 text-sm text-[var(--zb-text-muted)]">
+                    No previous versions available.
+                  </p>
                 </div>
               ),
             },
@@ -110,13 +116,13 @@ export default function UnsavedChangesGuardExample() {
           <div
             role="dialog"
             aria-labelledby="unsaved-dialog-title"
-            className="rounded-xl border border-amber-200 bg-amber-50 p-4 shadow-sm"
+            className="rounded-xl border border-[var(--zb-status-high-border)] bg-[var(--zb-status-high-bg)] p-4 shadow-sm"
           >
-            <h3 id="unsaved-dialog-title" className="text-base font-semibold text-gray-900">
+            <h3 id="unsaved-dialog-title" className="text-base font-semibold text-[var(--zb-text)]">
               This note has unsigned changes
             </h3>
 
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-[var(--zb-text-muted)]">
               You have unsaved changes. Would you like to switch tabs and keep your draft?
             </p>
 
@@ -125,7 +131,7 @@ export default function UnsavedChangesGuardExample() {
                 type="button"
                 autoFocus
                 onClick={() => finishDialog(false)}
-                className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-100"
+                className="rounded-md border border-[var(--zb-border)] bg-[var(--zb-surface)] px-3 py-2 text-sm hover:bg-[var(--zb-bg-subtle)]"
               >
                 Stay and sign
               </button>

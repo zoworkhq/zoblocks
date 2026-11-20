@@ -991,9 +991,12 @@ export function ClinicalNote({
             aria-describedby={api.gate.canSign ? undefined : blockedId}
             className={cn(
               "inline-flex h-9 items-center gap-2 rounded-md px-4 text-sm font-medium",
-              "bg-[var(--zb-accent)] text-[var(--zb-text-on-accent)] hover:bg-[var(--zb-accent-hover)]",
               "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--zb-focus-ring)]",
-              !api.gate.canSign && "opacity-60",
+              // Outlined rather than faded while blocked: the button still opens the gate, so
+              // its label has to keep full contrast — opacity took it below 3:1.
+              api.gate.canSign
+                ? "bg-[var(--zb-accent)] text-[var(--zb-text-on-accent)] hover:bg-[var(--zb-accent-hover)]"
+                : "border border-[var(--zb-border-strong)] bg-[var(--zb-surface)] text-[var(--zb-text)] hover:bg-[var(--zb-bg-subtle)]",
             )}
           >
             <ShieldIcon />

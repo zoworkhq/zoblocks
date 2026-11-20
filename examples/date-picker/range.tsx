@@ -26,8 +26,8 @@ export default function TwoClickRangeExample() {
   };
 
   return (
-    <section className="mx-auto w-full max-w-6xl space-y-6 p-6">
-      <div className="rounded-xl border border-slate-200 bg-white p-5">
+    <section className="mx-auto w-full max-w-6xl">
+      <div className="rounded-xl border border-[var(--zb-border)] bg-[var(--zb-surface)] p-3">
         <Calendar
           mode="range"
           months={2}

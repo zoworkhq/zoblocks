@@ -92,7 +92,7 @@ function Inbox({ filter }: { filter: string }) {
   };
 
   return (
-    <div className="rounded-xl border border-dashed border-gray-300 bg-[#F8FAFC] p-4">
+    <div className="rounded-xl border border-dashed border-[var(--zb-border)] bg-[var(--zb-bg-subtle)] p-4">
       <p className="text-sm">{messages[filter]}</p>
     </div>
   );

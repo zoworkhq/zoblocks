@@ -20,7 +20,7 @@ export default function EveryVariantOneTreeExample() {
       <div className="space-y-6">
         {VARIANTS.map((variant) => (
           <div key={variant} className="space-y-2">
-            <h3 className="text-sm font-semibold capitalize text-gray-700">{variant}</h3>
+            <h3 className="text-sm font-semibold capitalize text-[var(--zb-text)]">{variant}</h3>
 
             <Tabs
               as="tabs"

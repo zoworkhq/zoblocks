@@ -10,8 +10,8 @@ type StatProps = {
 function Stat({ name, value, delta, good = false }: StatProps) {
   return (
     <div className="min-w-32 space-y-1 text-left">
-      <p className="text-xs font-medium text-gray-500">{name}</p>
-      <p className="text-xl font-semibold text-gray-900">{value}</p>
+      <p className="text-xs font-medium text-[var(--zb-text-muted)]">{name}</p>
+      <p className="text-xl font-semibold text-[var(--zb-text)]">{value}</p>
       <p className={`text-xs font-medium ${good ? "text-green-700" : "text-red-700"}`}>{delta}</p>
     </div>
   );
@@ -48,7 +48,7 @@ function Trend({ metric }: { metric: string }) {
   const range = maxValue - minValue;
 
   return (
-    <div className="rounded-xl border border-dashed border-gray-300 bg-[#F8FAFC] p-4">
+    <div className="rounded-xl border border-dashed border-[var(--zb-border)] bg-[var(--zb-bg-subtle)] p-4">
       <div className="flex h-40 items-end gap-3">
         {chart.values.map((value, index) => {
           const height = range === 0 ? 60 : 20 + ((value - minValue) / range) * 80;

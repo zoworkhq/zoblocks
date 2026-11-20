@@ -68,7 +68,7 @@ function HeartIcon() {
 
 function Summary() {
   return (
-    <div className="rounded-xl border border-dashed border-gray-300 bg-[#F8FAFC] p-4">
+    <div className="rounded-xl border border-dashed border-[var(--zb-border)] bg-[var(--zb-bg-subtle)] p-4">
       <strong>Summary</strong> — Problems, allergies, recent encounters.
     </div>
   );
@@ -76,7 +76,7 @@ function Summary() {
 
 function Meds() {
   return (
-    <div className="rounded-xl border border-dashed border-gray-300 bg-[#F8FAFC] p-4">
+    <div className="rounded-xl border border-dashed border-[var(--zb-border)] bg-[var(--zb-bg-subtle)] p-4">
       <strong>Medications</strong> — 9 active.
     </div>
   );
@@ -84,7 +84,7 @@ function Meds() {
 
 function Vitals() {
   return (
-    <div className="rounded-xl border border-dashed border-gray-300 bg-[#F8FAFC] p-4">
+    <div className="rounded-xl border border-dashed border-[var(--zb-border)] bg-[var(--zb-bg-subtle)] p-4">
       <strong>Vitals</strong> — Cached — last synced 14 minutes ago.
     </div>
   );

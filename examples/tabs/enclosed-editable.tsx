@@ -83,7 +83,7 @@ function Document({ id }: { id: string }) {
   const document = documents[id];
 
   return (
-    <div className="rounded-xl border border-dashed border-gray-300 bg-[#F8FAFC] p-4">
+    <div className="rounded-xl border border-dashed border-[var(--zb-border)] bg-[var(--zb-bg-subtle)] p-4">
       {document ? (
         <p className="text-sm">
           <strong>{document.title}</strong> — {document.description}
@@ -163,8 +163,8 @@ export default function EnclosedAddCloseExample() {
           },
         }}
       />
-      <div className="rounded-xl border border-gray-300 bg-[#F8FAFC] p-4">
-        <p className="text-xs text-gray-500">Close a tab, or press ＋.</p>
+      <div className="rounded-xl border border-[var(--zb-border)] bg-[var(--zb-bg-subtle)] p-4">
+        <p className="text-xs text-[var(--zb-text-muted)]">Close a tab, or press ＋.</p>
       </div>
     </section>
   );
