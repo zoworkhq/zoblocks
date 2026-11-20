@@ -49,6 +49,14 @@ export const SANDBOXES: ReadonlySet<string> = new Set<string>([
   "care-timeline/imprecise",
   "care-timeline/register",
   "care-timeline/patient",
+  "chart-accordion/closed-with-summaries",
+  "chart-accordion/expanded",
+  "chart-accordion/severity-scale",
+  "chart-accordion/expand-collapse-all",
+  "chart-accordion/consent-gate",
+  "chart-accordion/withheld-section",
+  "chart-accordion/failed-section",
+  "chart-accordion/no-sections",
   "chart-command-palette/counted",
   "chart-command-palette/audit",
   "chart-command-palette/verbs",
@@ -226,4 +234,16 @@ export const SANDBOXES: ReadonlySet<string> = new Set<string>([
 ]);
 
 /** Examples without one, and why. */
-export const NOT_RUNNABLE: Readonly<Record<string, string>> = {};
+export const NOT_RUNNABLE: Readonly<Record<string, string>> = {
+  "clinical-note/empty-progress-draft": "Written inline in clinical-note's metadata; move it to examples/clinical-note/empty-progress-draft.tsx to run it.",
+  "clinical-note/origin-visibility": "Written inline in clinical-note's metadata; move it to examples/clinical-note/origin-visibility.tsx to run it.",
+  "clinical-note/sign-gate": "Written inline in clinical-note's metadata; move it to examples/clinical-note/sign-gate.tsx to run it.",
+  "clinical-note/template-blanks": "Written inline in clinical-note's metadata; move it to examples/clinical-note/template-blanks.tsx to run it.",
+  "clinical-note/signed-reader": "Written inline in clinical-note's metadata; move it to examples/clinical-note/signed-reader.tsx to run it.",
+  "copilot/mode-scope": "Written inline in copilot's metadata; move it to examples/copilot/mode-scope.tsx to run it.",
+  "copilot/grounded-citations": "Written inline in copilot's metadata; move it to examples/copilot/grounded-citations.tsx to run it.",
+  "copilot/out-of-scope": "Written inline in copilot's metadata; move it to examples/copilot/out-of-scope.tsx to run it.",
+  "copilot/untrusted-chart-content": "Written inline in copilot's metadata; move it to examples/copilot/untrusted-chart-content.tsx to run it.",
+  "copilot/crisis-interruption": "Written inline in copilot's metadata; move it to examples/copilot/crisis-interruption.tsx to run it.",
+  "copilot/fhir-audit-event": "Written inline in copilot's metadata; move it to examples/copilot/fhir-audit-event.tsx to run it."
+};
