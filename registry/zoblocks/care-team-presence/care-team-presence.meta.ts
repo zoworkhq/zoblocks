@@ -259,16 +259,6 @@ import "@/styles/zoblocks-presence.css";
       description:
         "Both of these people are at a computer and both would be a green dot. One must not be interrupted; the other is simply the wrong person, and the right one is named on the next line.",
       fixture: "careTeamNightCoverage",
-      code: `<PresenceChip presence={{ clinician: marsh, state: "in-session", until: "15:50" }} />
-
-<PresenceChip
-  presence={{
-    clinician: vance,
-    state: "signed-out",
-    coveredBy: boateng,
-    until: "07:00",
-  }}
-/>`,
     },
     {
       id: "coverage-gap",
@@ -276,11 +266,6 @@ import "@/styles/zoblocks-presence.css";
       description:
         "Nothing covers 07:00–09:00. The resolver returns null rather than the nearest window, because filling a gap with a plausible name is how a page goes to somebody who is asleep.",
       fixture: "careTeamCoverageGap",
-      code: `const windows = coverageFromCareTeam(careTeamCoverageGap.participant ?? []);
-
-// 08:00 falls between the two windows.
-<CoverageCard windows={windows} now="2026-08-24T08:00:00+05:30" />
-// → "Nobody is covering right now. Escalate to the on-call supervisor."`,
     },
     {
       id: "escalation",
@@ -288,11 +273,6 @@ import "@/styles/zoblocks-presence.css";
       description:
         "A clinician in a group session with cover offers the cover. The same clinician with nobody covering offers an override — a second, deliberate action the host logs. Interrupting a group reaches eight patients rather than one, and the default has to reflect that.",
       fixture: "practitionerSigner",
-      code: `resolveEscalation({ clinician: marsh, state: "in-group", coveredBy: okafor });
-// → { kind: "covering", clinician: okafor, instead: marsh, reason: "L. Marsh, LCSW is in group" }
-
-resolveEscalation({ clinician: marsh, state: "in-group" });
-// → { kind: "override-required", … }`,
     },
     {
       id: "co-presence",
@@ -300,16 +280,6 @@ resolveEscalation({ clinician: marsh, state: "in-group" });
       description:
         "A second note in the same encounter is a merge problem once both exist. Announced before the first keystroke, it is a choice between three reasonable options — and none of them is highlighted, because which is right depends on facts the component does not have.",
       fixture: "careTeamNightCoverage",
-      code: `<ChartCoPresence
-  others={[
-    { clinician: marsh, activity: "documenting", since: "2026-08-24T09:12:00+05:30",
-      target: "Progress note", unsigned: true },
-  ]}
-  now={serverTime}
-  onOpenTheirs={openReadOnly}
-  onRequestHandoff={requestHandoff}
-  onSeparateAddendum={startAddendum}
-/>`,
     },
   ],
 

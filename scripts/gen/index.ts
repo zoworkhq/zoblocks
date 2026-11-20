@@ -25,6 +25,7 @@ import { buildCatalog, emitCatalog } from "./emit/catalog";
 import { buildCoverage, emitCoverage } from "./emit/coverage";
 import { emitReactPackage, ensureReactPackageDirs } from "./emit/react-package";
 import { emitRegistry } from "./emit/registry";
+import { emitSandboxes } from "./emit/sandboxes";
 import { emitSchemas } from "./emit/schema";
 import {
   buildSurface,
@@ -124,9 +125,17 @@ async function main() {
   // new file kind cannot reach the registry without reaching the schema too.
   await emitSchemas(emitter);
 
-  const registryProblems = await emitRegistry(registryComponents, emitter);
-  if (registryProblems.length) {
-    report(`${registryProblems.length} registry problem(s)`, registryProblems);
+  const registry = await emitRegistry(registryComponents, emitter);
+  if (registry.problems.length) {
+    report(`${registry.problems.length} registry problem(s)`, registry.problems);
+    process.exit(1);
+  }
+
+  // One StackBlitz project per example, built from the items just published,
+  // so a sandbox runs exactly what `zoblocks add` would write.
+  const sandboxProblems = await emitSandboxes(components, registry.items, emitter);
+  if (sandboxProblems.length) {
+    report(`${sandboxProblems.length} example sandbox problem(s)`, sandboxProblems);
     process.exit(1);
   }
 

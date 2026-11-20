@@ -1,0 +1,14 @@
+{
+  // The registry's path mappings: an example imports a component by the path
+  // the ZoBlocks CLI writes it to in a consumer's project, exactly as the
+  // registry source does.
+  "extends": ["../packages/tsconfig/base.json", "../tsconfig.generated.json"],
+  "compilerOptions": {
+    "noEmit": true,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false
+  },
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
+}

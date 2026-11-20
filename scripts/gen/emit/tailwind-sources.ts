@@ -12,7 +12,8 @@
  */
 
 import path from "node:path";
-import { ROOT, banner, paths } from "../config";
+import { existsSync } from "node:fs";
+import { EXAMPLES_DIR, ROOT, banner, paths } from "../config";
 import type { LoadedComponent } from "../load";
 import type { Emitter } from "../write";
 
@@ -22,8 +23,13 @@ export async function emitTailwindSources(
 ): Promise<void> {
   // Distinct parent directories of every component. One today; one per
   // component package once Phase 1 splits them out.
+  // The example files too: the Preview tab renders them, so their utilities
+  // have to be in the docs stylesheet as much as the components' are.
   const roots = [
-    ...new Set(components.map((c) => path.dirname(path.dirname(c.sourceFile)))),
+    ...new Set([
+      ...components.map((c) => path.dirname(path.dirname(c.sourceFile))),
+      ...(existsSync(EXAMPLES_DIR) ? [EXAMPLES_DIR] : []),
+    ]),
   ].sort();
 
   const from = path.dirname(paths.tailwindSources);

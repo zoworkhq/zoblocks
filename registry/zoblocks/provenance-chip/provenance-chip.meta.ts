@@ -243,14 +243,6 @@ const ledger = ledgerFrom(records);
       description:
         "The same 128/76, six times. Each supports a different decision, and only the affix says which — the clinic reading is actionable, the HIE row carries a document date rather than an observation date, and the extracted row states that nobody has looked at it.",
       fixture: "observationPotassiumCritical",
-      code: `<ProvenanceChip record={{ source: "clinic", observedAt: t12min,
-  performer: { display: "M. Adeyemi", role: "MA" }, device: "Welch Allyn 6000" }} now={now} />
-
-<ProvenanceChip record={{ source: "device", observedAt: t4days,
-  device: "Omron BP7450", deviceNote: "unvalidated cuff size, median of 3" }} now={now} />
-
-<ProvenanceChip record={{ source: "ai-extracted", model: "zb-extract-3",
-  span: { document: "Scanned referral", page: 2, line: 14 }, confirmed: false }} />`,
     },
     {
       id: "document-vintage",
@@ -258,17 +250,6 @@ const ledger = ledgerFrom(records);
       description:
         "A C-CDA authored on 11 March may carry a reading measured in January. Rendering the document's date as the observation's is how a nine-week-old value is acted on as current, so the two are separate fields and the age is measured from the first.",
       fixture: "documentLateEntry",
-      code: `<ProvenanceChip
-  now={now}
-  record={{
-    source: "external",
-    organisation: "Northgate Family Med",
-    exchange: "Carequality",
-    document: "C-CDA, authored 11 Mar",
-    observedAt: "2026-01-14T09:00:00Z", // the reading
-    recordedAt: "2026-03-11T00:00:00Z", // the document
-  }}
-/>;`,
     },
     {
       id: "ledger",
@@ -276,13 +257,6 @@ const ledger = ledgerFrom(records);
       description:
         "Components never fetch their own provenance. A chart with two hundred values would make two hundred requests and every chip would settle at a different moment, so the host subscribes once and the chips are pure.",
       fixture: "provenanceLateEntry",
-      code: `const ledger = ledgerFrom({
-  "obs-1": { source: "clinic", observedAt: t },
-  // Versioned first: an amended value and its original are two provenances.
-  "obs-1@2": { source: "amended", supersedes: { value: "182/76", reason: "typo" } },
-});
-
-<ProvenanceChip resourceId="obs-1" versionId="2" ledger={ledger} now={now} />;`,
     },
     {
       id: "staleness-policy",
@@ -290,11 +264,6 @@ const ledger = ledgerFrom(records);
       description:
         "Four days is nothing for a problem list and a lot for a blood pressure, so the threshold is injected per datum type. Without a policy the chip says nothing about age rather than assuming one — a wrong threshold is worse than no threshold.",
       fixture: "practitionerSigner",
-      code: `const policy: StalenessPolicy = (record) => {
-  if (record.source === "device") return 48 * 3600_000;   // two days
-  if (record.source === "patient-reported") return 30 * 86400_000;
-  return null;  // no opinion, and the chip says nothing rather than guessing
-};`,
     },
   ],
 

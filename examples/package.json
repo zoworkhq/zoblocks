@@ -1,0 +1,33 @@
+{
+  "name": "@zoblocks/examples",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Documented examples, one file each: the Code tab, the Preview tab and the StackBlitz project on zoblocks.design.",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@zoblocks/clinical-note-core": "workspace:*",
+    "@zoblocks/copilot-core": "workspace:*",
+    "@zoblocks/copilot-react": "workspace:*",
+    "@zoblocks/fhir": "workspace:*",
+    "@zoblocks/host-react": "workspace:*",
+    "@zoblocks/identity": "workspace:*",
+    "@zoblocks/recorder-core": "workspace:*",
+    "@zoblocks/signature": "workspace:*",
+    "@zoblocks/tabs": "workspace:*",
+    "antd": "^6.6.0",
+    "clsx": "^2.1.1",
+    "prosemirror-model": "^1.25.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tailwind-merge": "^2.5.5"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "@zoblocks/tsconfig": "workspace:*",
+    "typescript": "^5.7.2"
+  }
+}

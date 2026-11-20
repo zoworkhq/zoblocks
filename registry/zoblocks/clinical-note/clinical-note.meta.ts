@@ -147,4 +147,37 @@ export default defineComponentMeta({
   controls: [
     { prop: "canSign", control: "switch", label: "Policy permits signing", defaultValue: true },
   ],
+
+  examples: [
+    {
+      id: "empty-progress-draft",
+      title: "Empty Progress Draft",
+      description:
+        "Shows the default Progress Note and required-section findings. Content is fictional and illustrative.",
+    },
+    {
+      id: "origin-visibility",
+      title: "Origin and Copy-Forward Visibility",
+      description:
+        "Shows fictional typed, dictated, pulled, and copied ranges with the composition summary; provenance does not validate content.",
+    },
+    {
+      id: "sign-gate",
+      title: "What Blocks Signing",
+      description:
+        "Compares empty required sections with a schema-complete fictional note and displays actual onCommit arguments; nothing is persisted or cryptographically signed.",
+    },
+    {
+      id: "template-blanks",
+      title: "Template Blanks and F2 Navigation",
+      description:
+        "Uses core wildcard expansion and the component’s F2 and next-blank navigation; no phrase picker is implied.",
+    },
+    {
+      id: "signed-reader",
+      title: "Signed Reader with Attestations and Addenda",
+      description:
+        "Displays a fictional note with supplied attestation and addendum rows; the reader does not verify signatures or create legal supersession.",
+    },
+  ],
 });

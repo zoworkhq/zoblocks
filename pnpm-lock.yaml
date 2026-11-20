@@ -41,7 +41,7 @@ importers:
         version: 1.2.3
       prosemirror-model:
         specifier: ^1.25.1
-        version: 1.25.11
+        version: 1.25.12
       prosemirror-state:
         specifier: ^1.4.4
         version: 1.4.4
@@ -323,6 +323,9 @@ importers:
       '@mui/material':
         specifier: ^9.3.1
         version: 9.3.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react@19.2.8))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@stackblitz/sdk':
+        specifier: ^1.11.1
+        version: 1.11.1
       '@vercel/analytics':
         specifier: ^2.0.1
         version: 2.0.1(next@16.4.2(@babel/core@7.29.7)(@playwright/test@1.62.1)(@types/node@22.20.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)(svelte@5.56.9(@typescript-eslint/types@8.67.0))(vue@3.5.41(typescript@5.9.3))
@@ -638,6 +641,67 @@ importers:
         specifier: '>=8.2.4 <8.3'
         version: 8.2.4(@types/node@22.20.1)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)
 
+  examples:
+    dependencies:
+      '@zoblocks/clinical-note-core':
+        specifier: workspace:*
+        version: link:../packages/clinical-note-core
+      '@zoblocks/copilot-core':
+        specifier: workspace:*
+        version: link:../packages/copilot-core
+      '@zoblocks/copilot-react':
+        specifier: workspace:*
+        version: link:../packages/copilot-react
+      '@zoblocks/fhir':
+        specifier: workspace:*
+        version: link:../packages/fhir
+      '@zoblocks/host-react':
+        specifier: workspace:*
+        version: link:../packages/host-react
+      '@zoblocks/identity':
+        specifier: workspace:*
+        version: link:../packages/identity
+      '@zoblocks/recorder-core':
+        specifier: workspace:*
+        version: link:../packages/recorder-core
+      '@zoblocks/signature':
+        specifier: workspace:*
+        version: link:../packages/signature
+      '@zoblocks/tabs':
+        specifier: workspace:*
+        version: link:../packages/tabs
+      antd:
+        specifier: ^6.6.0
+        version: 6.6.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      prosemirror-model:
+        specifier: ^1.25.1
+        version: 1.25.12
+      react:
+        specifier: ^19.0.0
+        version: 19.2.8
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.2.8(react@19.2.8)
+      tailwind-merge:
+        specifier: ^2.5.5
+        version: 2.6.1
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.2
+        version: 19.2.18
+      '@types/react-dom':
+        specifier: ^19.0.2
+        version: 19.2.4(@types/react@19.2.18)
+      '@zoblocks/tsconfig':
+        specifier: workspace:*
+        version: link:../packages/tsconfig
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
   packages/bridge-antd:
     dependencies:
       '@zoblocks/bridge-core':
@@ -777,7 +841,7 @@ importers:
     dependencies:
       prosemirror-model:
         specifier: ^1.25.1
-        version: 1.25.11
+        version: 1.25.12
       prosemirror-transform:
         specifier: ^1.10.4
         version: 1.12.0
@@ -2973,6 +3037,9 @@ packages:
     peerDependencies:
       size-limit: 13.0.3
 
+  '@stackblitz/sdk@1.11.1':
+    resolution: {integrity: sha512-5wl1j3IhtmE7POTl2W9VGQdbQyBQrRsF3jcYBK+0V353AuO8H2GFZkiFNyTRxL+TDY3HIFCHc3G983Osmg76Lg==}
+
   '@standard-schema/spec@1.1.0':
     resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
 
@@ -3704,8 +3771,8 @@ packages:
     resolution: {integrity: sha512-kWWXztvZ5SBQV+eRgKFeh8q5sLuZY2+8WUIzlxWVTg+oGwY14qylx1KbKzHd8P6ZYkAg0xyIDU9JMHhyJMZ1jw==}
     engines: {node: '>=10'}
 
-  chromedriver@156.0.2:
-    resolution: {integrity: sha512-tnbStQXrModzo3nvGeEIA7tQxmO2Xsa6ZU7B5ghKjnzOLNF33SyFUTpfK339hjY5Uw5bPuQdc4u28pftgZDd0g==}
+  chromedriver@158.0.0:
+    resolution: {integrity: sha512-JATTHrwH8KluyjW2mGnShg6psaKD5C3u0lyB946jlMrj82WZO0WoFbpTE8pS6Wp3Qrpkj2ZfzUG6wUrpiN2EPQ==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -5059,9 +5126,6 @@ packages:
   prosemirror-keymap@1.2.3:
     resolution: {integrity: sha512-4HucRlpiLd1IPQQXNqeo81BGtkY8Ai5smHhKW9jjPKRc2wQIxksg7Hl1tTI2IfT2B/LgX6bfYvXxEpJl7aKYKw==}
 
-  prosemirror-model@1.25.11:
-    resolution: {integrity: sha512-QWg9RhnpLlogAmp3p96uEFrE5txQpFynd4vhBAELkwgOCWQs/X0yCzB3/hrHqiPwf91RG5KyWq6553zs9JqIOQ==}
-
   prosemirror-model@1.25.12:
     resolution: {integrity: sha512-Ue2gTmXMa7EhpLNhC7J+h4+ykD8ha12K6rrZFFKKJHBForfIStw5gJ6Zrf1mqqAa9NmpmEB4wp9bKmA4eUVjWg==}
 
@@ -5899,7 +5963,7 @@ snapshots:
     dependencies:
       '@axe-core/webdriverjs': 4.12.1(selenium-webdriver@4.44.0)
       axe-core: 4.12.1
-      chromedriver: 156.0.2
+      chromedriver: 158.0.0
       colors: 1.4.0
       commander: 9.5.0
       dotenv: 17.4.2
@@ -7240,6 +7304,8 @@ snapshots:
       '@size-limit/file': 13.0.3(size-limit@13.0.3)
       size-limit: 13.0.3
 
+  '@stackblitz/sdk@1.11.1': {}
+
   '@standard-schema/spec@1.1.0': {}
 
   '@sveltejs/acorn-typescript@1.0.13(acorn@8.18.0)':
@@ -8015,7 +8081,7 @@ snapshots:
 
   char-regex@1.0.2: {}
 
-  chromedriver@156.0.2:
+  chromedriver@158.0.0:
     dependencies:
       '@testim/chrome-version': 1.1.4
       adm-zip: 0.6.1
@@ -9308,7 +9374,7 @@ snapshots:
 
   prosemirror-commands@1.7.2:
     dependencies:
-      prosemirror-model: 1.25.11
+      prosemirror-model: 1.25.12
       prosemirror-state: 1.4.4
       prosemirror-transform: 1.12.0
 
@@ -9324,23 +9390,19 @@ snapshots:
       prosemirror-state: 1.4.4
       w3c-keyname: 2.2.8
 
-  prosemirror-model@1.25.11:
-    dependencies:
-      orderedmap: 2.1.1
-
   prosemirror-model@1.25.12:
     dependencies:
       orderedmap: 2.1.1
 
   prosemirror-state@1.4.4:
     dependencies:
-      prosemirror-model: 1.25.11
+      prosemirror-model: 1.25.12
       prosemirror-transform: 1.12.0
       prosemirror-view: 1.42.6
 
   prosemirror-transform@1.12.0:
     dependencies:
-      prosemirror-model: 1.25.11
+      prosemirror-model: 1.25.12
 
   prosemirror-view@1.42.6:
     dependencies:

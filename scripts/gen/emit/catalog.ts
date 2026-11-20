@@ -109,7 +109,7 @@ export function buildCatalog(
       ...(meta.variants.length ? { variants: meta.variants } : {}),
       ...(meta.controls.length ? { controls: meta.controls } : {}),
       ...(meta.a11yChecks.length ? { a11yChecks: meta.a11yChecks } : {}),
-      ...(meta.examples.length ? { examples: meta.examples } : {}),
+      ...(component.examples.length ? { examples: component.examples } : {}),
       ...(meta.fixtures.length ? { fixtures: meta.fixtures } : {}),
       ...(meta.seo.primaryKeyword ? { seo: meta.seo } : {}),
       // `builtWith` and `usedIn` come from the loader, which derived them from

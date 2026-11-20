@@ -112,8 +112,7 @@ import type { DatePickerVariant } from "@/registry/zoblocks/date-picker/date-pic
 import { useSiteTheme } from "./use-site-theme";
 import { useAntdBrandTokens } from "./language-antd-theme";
 import { jsxAttr, jsxElement } from "@/lib/highlight";
-import { CodeLines, CopyButton, PlatformLinks } from "./docs/code-block";
-import type { DemoLink } from "./docs/sandbox";
+import { CodeLines, CopyButton } from "./docs/code-block";
 
 type Props = Record<string, unknown>;
 
@@ -1264,7 +1263,6 @@ export function Playground({
   controls,
   importName,
   importFrom,
-  links = [],
 }: {
   name: string;
   controls: readonly Control[];
@@ -1272,7 +1270,6 @@ export function Playground({
   importName?: string;
   /** Where the code imports it from. Defaults to the registry path. */
   importFrom?: string;
-  links?: readonly DemoLink[];
 }) {
   if (process.env.NODE_ENV !== "production") {
     // The server decides whether to render this section from
@@ -1445,7 +1442,6 @@ export function Playground({
           <span className="min-w-0 truncate font-mono text-xs text-graphite">Playground.tsx</span>
           <div className="flex flex-none items-center gap-0.5">
             <CopyButton text={source} what="playground code" />
-            <PlatformLinks links={links} />
           </div>
         </div>
         <CodeLines code={source} label="Playground code" />

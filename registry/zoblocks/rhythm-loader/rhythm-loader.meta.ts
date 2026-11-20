@@ -98,49 +98,18 @@ export default defineComponentMeta({
       title: "Inside a button",
       description:
         "At sm the strip fits a line of text. The button keeps its own label and sets aria-busy; the loader's label stays visually hidden so the wait is announced once.",
-      code: `import { RhythmLoader } from "@/components/zoblocks/rhythm-loader";
-
-export default function Example() {
-  return (
-    <button type="button" aria-busy="true" disabled>
-      <RhythmLoader size="sm" label="Saving the note" />
-      Saving
-    </button>
-  );
-}`,
     },
     {
       id: "cadence",
       title: "Cadence is a prop, and clamped",
       description:
         "bpm runs from 40 to 100 and anything outside is clamped, so the fastest sweep stays well under the three-flash limit. The rate is decorative: it is never a patient's.",
-      code: `import { RhythmLoader } from "@/components/zoblocks/rhythm-loader";
-
-export default function Example() {
-  return (
-    <div style={{ display: "flex", gap: 40 }}>
-      <RhythmLoader bpm={40} showLabel label="40 bpm" />
-      <RhythmLoader bpm={60} showLabel label="60 bpm" />
-      <RhythmLoader bpm={100} showLabel label="100 bpm" />
-    </div>
-  );
-}`,
     },
     {
       id: "reduced-motion",
       title: "Reduced motion is a designed state",
       description:
         "The default follows the operating system. Reduced draws the full strip and breathes it in opacity; nothing travels. Full opts out of the preference and should be rare.",
-      code: `import { RhythmLoader } from "@/components/zoblocks/rhythm-loader";
-
-export default function Example() {
-  return (
-    <div style={{ display: "flex", gap: 40 }}>
-      <RhythmLoader motion="full" showLabel label="Full motion" />
-      <RhythmLoader motion="reduced" showLabel label="Reduced motion" />
-    </div>
-  );
-}`,
     },
   ],
 

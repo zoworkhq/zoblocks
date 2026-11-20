@@ -140,6 +140,16 @@ jobs:
             exit 1
           fi
 
+      # Every "Open in StackBlitz" button on the docs opens a project generated
+      # by `pnpm gen` above. This installs those projects' dependencies from npm
+      # and typechecks each one, and builds a rotating few with Vite, so a
+      # button never opens a red screen in someone else's editor. Full tier
+      # only: it needs the network and takes a few minutes.
+      # See scripts/sandboxes-check.ts.
+      - name: Example sandboxes compile
+        if: inputs.tier == 'full'
+        run: pnpm sandboxes:check
+
       # A high-or-worse advisory in the toolchain fails the build rather than
       # waiting for a procurement reviewer to run it. (The threshold is `high`,
       # not `critical` — the comment used to say critical, which understated

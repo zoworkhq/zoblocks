@@ -246,11 +246,6 @@ import "@/styles/zoblocks-palette.css";
       description:
         "Typing a name into a global patient search is a privacy event whether or not you open the chart. Matches outside your treatment relationships are rendered as a number, so the reader learns the search was not empty without learning who — and the row sits in the list rather than under it, because a reader who misses it concludes the search was empty.",
       fixture: "patients",
-      code: `applyScope(rank("okon", items), { inScope: new Set(["p-mine"]) });
-// → { visible: [ … 1 patient … ], withheld: 3 }
-
-describeWithheld(3, { breakGlass: true });
-// → "3 further matches outside your patients — break-glass required"`,
     },
     {
       id: "audit",
@@ -258,11 +253,6 @@ describeWithheld(3, { breakGlass: true });
       description:
         "A search that found nobody is still a search that was made, and in a privacy review the empty ones are the interesting ones. The component produces the record and the host keeps it; a term that never reached the patient index produces nothing, because there is nothing to record.",
       fixture: "patientRestricted",
-      code: `auditFor("okonkwo", results, /* searchedPatients */ true);
-// → { term: "okonkwo", shown: 1, withheld: 3, empty: false }
-
-auditFor("zzzz", empty, true);   // → { …, shown: 0, withheld: 0, empty: true }
-auditFor("dark mode", results, false); // → null — the index was never touched`,
     },
     {
       id: "verbs",
@@ -270,11 +260,6 @@ auditFor("dark mode", results, false); // → null — the index was never touch
       description:
         "The gap between a group and the next is deliberately larger than anything frequency can close. A palette where a much-visited document outranks the verb somebody just typed has stopped being a command palette — and behavioral-health verbs are first-class here, including the one with consequences: a Part 2 disclosure request routes to consent, never to a file.",
       fixture: "patientRoutine",
-      code: `rank("phq", [
-  { id: "doc", kind: "chart-resource", label: "PHQ-9 result, 12 Aug" },
-  { id: "run", kind: "action",         label: "Start PHQ-9" },
-])[0].item.id;
-// → "run"`,
     },
     {
       id: "second-enter",
@@ -282,9 +267,6 @@ auditFor("dark mode", results, false); // → null — the index was never touch
       description:
         "The confirmation is a row inside the palette rather than a modal, because a modal takes the keyboard away from the surface that was built for it. The marker is on the row before it is chosen, so the second Enter is not a surprise mid-keystroke.",
       fixture: "patientRoutine",
-      code: `outcomeFor(discontinue);        // { kind: "confirm", prompt: "… press Enter again" }
-outcomeFor(discontinue, true);  // { kind: "run" }
-outcomeFor(offlineOrder);       // { kind: "blocked", reason: "Offline" }`,
     },
   ],
 

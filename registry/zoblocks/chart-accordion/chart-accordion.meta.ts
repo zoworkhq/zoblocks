@@ -103,6 +103,57 @@ export default defineComponentMeta({
   ]}
 />`,
 
+  examples: [
+    {
+      id: "closed-with-summaries",
+      title: "The closed record already tells you where to look",
+      description:
+        "Five sections, none opened. Severity, status, counts and timestamps make the record legible before the reader expands anything. The summary is the point, not decoration around the disclosure.",
+    },
+    {
+      id: "expanded",
+      title: "Open the sections that need attention",
+      description:
+        "A record can start with selected sections open. The reader gets the relevant detail immediately without losing the summaries or the ability to expand the rest.",
+    },
+    {
+      id: "severity-scale",
+      title: "Every severity arrives with its words",
+      description:
+        "Critical, high, normal and unknown all carry a status. The closed header never relies on colour alone to communicate clinical meaning.",
+    },
+    {
+      id: "expand-collapse-all",
+      title: "Expand the record, without crossing a boundary",
+      description:
+        "The toolbar opens every section the reader may access and closes them again. A withheld section stays closed: expand all is a chart action, not permission to disclose.",
+    },
+    {
+      id: "consent-gate",
+      title: "Consent is checked before protected content appears",
+      description:
+        "A governed section names its policy in the closed summary and at the gate. The disclosure callback lets the host application decide whether access can proceed; the component does not grant consent by itself.",
+    },
+    {
+      id: "withheld-section",
+      title: "Withheld means withheld, not empty",
+      description:
+        "A separately retained section says that it is restricted and why. It has no hidden children to reveal, and expanding the rest of the record does not change that boundary.",
+    },
+    {
+      id: "failed-section",
+      title: "One failed section does not take down the record",
+      description:
+        "A failed care-team section identifies its own incomplete content. The other sections remain available, and the reader is not left guessing whether the entire record loaded.",
+    },
+    {
+      id: "no-sections",
+      title: "An empty record still has an identity",
+      description:
+        "With no sections to display, the toolbar label still identifies whose record is being viewed. An empty result is distinguishable from a component that failed to render.",
+    },
+  ],
+
   controls: [
     { prop: "toolbar", control: "switch", label: "Toolbar", defaultValue: true },
     {

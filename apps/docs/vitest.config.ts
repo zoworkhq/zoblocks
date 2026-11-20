@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
@@ -14,109 +15,37 @@ import react from "@vitejs/plugin-react";
  */
 const root = path.dirname(fileURLToPath(import.meta.url));
 
+/** `@/components/zoblocks/*` and `@/lib/zoblocks-*`, one exact alias each. */
+function generatedAliases() {
+  const config = JSON.parse(readFileSync(path.join(root, "tsconfig.generated.json"), "utf8")) as {
+    compilerOptions: { paths: Record<string, string[]> };
+  };
+  return (
+    Object.entries(config.compilerOptions.paths)
+      // The docs app has its own `cn`; the `@` catch-all below finds it.
+      .filter(([specifier]) => specifier !== "@/lib/utils")
+      .map(([specifier, [target]]) => ({
+        find: new RegExp(`^${specifier.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&")}$`),
+        replacement: path.join(root, target as string),
+      }))
+  );
+}
+
 export default defineConfig({
   plugins: [react()],
   resolve: {
     /*
-     * Mirrors the tsconfig paths the registry components need: they import
-     * each other and their shared core by the paths the CLI writes in a
-     * consumer's project. More specific entries first — Vite takes the first
-     * alias that matches.
+     * The tsconfig paths the registry components need: they import each other
+     * and their shared core by the paths the CLI writes in a consumer's
+     * project. Read from tsconfig.generated.json rather than repeated here — a
+     * hand-kept copy missed `@/lib/zoblocks-allergy`, and every suite that
+     * reached the allergy chip failed to load. Exact matches come before the
+     * `@` catch-all, because Vite takes the first alias that matches.
      */
     alias: [
       { find: /^@\/registry\/(.*)$/, replacement: path.join(root, "../../registry/$1") },
-      {
-        find: /^@\/lib\/zoblocks-loader$/,
-        replacement: path.join(root, "../../registry/zoblocks/lib/loader.tsx"),
-      },
-      {
-        find: /^@\/lib\/zoblocks-clinical-status$/,
-        replacement: path.join(root, "../../registry/zoblocks/lib/clinical-status.ts"),
-      },
-      {
-        find: /^@\/lib\/zoblocks-accordion$/,
-        replacement: path.join(root, "../../registry/zoblocks/lib/accordion-core.tsx"),
-      },
-      {
-        find: /^@\/lib\/zoblocks-(datetime(?:-field|-parts)?|availability|recurrence)$/,
-        replacement: path.join(root, "../../registry/zoblocks/lib/$1"),
-      },
-      {
-        find: /^@\/lib\/zoblocks-grid$/,
-        replacement: path.join(root, "../../registry/zoblocks/lib/grid.ts"),
-      },
-      {
-        find: /^@\/lib\/timeline-(core|fhir)$/,
-        replacement: path.join(root, "../../registry/zoblocks/lib/timeline-$1.ts"),
-      },
-      {
-        find: /^@\/components\/zoblocks\/timeline$/,
-        replacement: path.join(root, "../../registry/zoblocks/timeline/timeline.tsx"),
-      },
-      {
-        find: /^@\/components\/zoblocks\/clinical-status$/,
-        replacement: path.join(root, "../../registry/zoblocks/clinical-status/clinical-status.tsx"),
-      },
-      {
-        find: /^@\/components\/zoblocks\/accordion$/,
-        replacement: path.join(root, "../../registry/zoblocks/accordion/accordion.tsx"),
-      },
-      {
-        find: /^@\/lib\/zoblocks-recorder$/,
-        replacement: path.join(root, "../../registry/zoblocks/lib/recorder.tsx"),
-      },
-      {
-        find: /^@\/lib\/zoblocks-trend$/,
-        replacement: path.join(root, "../../registry/zoblocks/lib/trend.ts"),
-      },
-      {
-        find: /^@\/lib\/zoblocks-presence$/,
-        replacement: path.join(root, "../../registry/zoblocks/lib/presence.ts"),
-      },
-      {
-        find: /^@\/lib\/zoblocks-clock$/,
-        replacement: path.join(root, "../../registry/zoblocks/lib/clock.ts"),
-      },
-      {
-        find: /^@\/lib\/zoblocks-chart-header$/,
-        replacement: path.join(root, "../../registry/zoblocks/lib/chart-header.ts"),
-      },
-      {
-        find: /^@\/lib\/zoblocks-provenance$/,
-        replacement: path.join(root, "../../registry/zoblocks/lib/provenance.ts"),
-      },
-      {
-        find: /^@\/lib\/zoblocks-workspace$/,
-        replacement: path.join(root, "../../registry/zoblocks/lib/workspace.ts"),
-      },
-      {
-        find: /^@\/lib\/zoblocks-result-value$/,
-        replacement: path.join(root, "../../registry/zoblocks/lib/result-value.ts"),
-      },
-      {
-        find: /^@\/lib\/zoblocks-risk$/,
-        replacement: path.join(root, "../../registry/zoblocks/lib/risk.ts"),
-      },
-      {
-        find: /^@\/lib\/zoblocks-palette$/,
-        replacement: path.join(root, "../../registry/zoblocks/lib/palette.ts"),
-      },
-      {
-        find: /^@\/lib\/zoblocks-clinical-note$/,
-        replacement: path.join(root, "../../registry/zoblocks/lib/clinical-note.tsx"),
-      },
-      {
-        find: /^@\/lib\/zoblocks-menu$/,
-        replacement: path.join(root, "../../registry/zoblocks/lib/menu.ts"),
-      },
-      {
-        find: /^@\/lib\/zoblocks-switch$/,
-        replacement: path.join(root, "../../registry/zoblocks/lib/switch.tsx"),
-      },
-      {
-        find: /^@\/components\/zoblocks\/([a-z-]+-loader)$/,
-        replacement: path.join(root, "../../registry/zoblocks/$1/$1.tsx"),
-      },
+      { find: /^@examples\/(.*)$/, replacement: path.join(root, "../../examples/$1") },
+      ...generatedAliases(),
       { find: "@", replacement: path.join(root, "src") },
     ],
   },

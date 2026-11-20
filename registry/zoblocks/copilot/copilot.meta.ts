@@ -132,6 +132,45 @@ import { lookUp, prepare } from "@zoblocks/copilot-core";
   suppressed={isAdministeringMedication || isSigningOrders}
 />`,
 
+  examples: [
+    {
+      id: "mode-scope",
+      title: "Mode switching and scope disclosure",
+      description:
+        "Switch between Look up, which reads no patient data, and Prepare, whose host resolver returns one fictional Observation within its declared categories and exclusions and reports disclosable withheld records. Submit a request after switching to see the scope strip. Displayed scope is not authorization enforcement.",
+    },
+    {
+      id: "grounded-citations",
+      title: "Grounded answer with citations",
+      description:
+        "A fixed response cites an explicitly illustrative source record. Open Show sources to inspect its title, passage, and highlighted text; the fixture is not clinical guidance and makes no claim about source accuracy.",
+    },
+    {
+      id: "out-of-scope",
+      title: "Out-of-scope refusal",
+      description:
+        "In Look up mode, submit the documented patient-specific current-medications request. The scope heuristic shows the refusal UI before the scripted provider is called; this is not a complete authorization or safety system.",
+    },
+    {
+      id: "untrusted-chart-content",
+      title: "Untrusted chart content",
+      description:
+        "Submit a summary request against a fictional record containing instruction-shaped text. The pipeline fences and scans record context; this fixture reaches the component’s blocked-context result and audit metadata. This does not guarantee complete prompt-injection protection.",
+    },
+    {
+      id: "crisis-interruption",
+      title: "Crisis interruption",
+      description:
+        "Type the documented test trigger “I want to kill myself.” The local classifier interrupts before the provider runs; the existing wording, en-US development resource, disabled composer, and terminal session state are visible. Crisis wording and regional resources require clinical-safety and localization review; this is not crisis assessment or a safety guarantee.",
+    },
+    {
+      id: "fhir-audit-event",
+      title: "FHIR AuditEvent callback",
+      description:
+        "A deterministic completed exchange renders the actual pipeline-generated FHIR R4 AuditEvent received by onAudit as an in-memory callback preview. Emission is best-effort: some stopped exchanges and error paths may not produce an event. The host is responsible for persistence and transmission; coverage is not complete.",
+    },
+  ],
+
   controls: [
     {
       prop: "announcementMode",

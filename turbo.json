@@ -17,7 +17,7 @@
       // so the next move is to change something else — and the browser suite
       // spent three rounds failing against a build that predated the fix it
       // was testing.
-      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/registry/**"],
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/registry/**", "$TURBO_ROOT$/examples/**"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
     // Builds workspace dependencies first, like every other task here. The docs

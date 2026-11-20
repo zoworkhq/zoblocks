@@ -156,33 +156,6 @@ export default defineComponentMeta({
       title: "A record that reads while closed",
       description:
         "Collapsed is not absent. Each header carries the fact that would change what the reader does next, and severity sits on the leading edge paired with a summary in words, never colour alone.",
-      code: `import { Accordion } from "@/components/zoblocks/accordion";
-
-export default function Example() {
-  return (
-    <Accordion
-      headingLevel={3}
-      items={[
-        {
-          key: "risk",
-          label: "Risk & suicidality",
-          severity: "critical",
-          summary: "C-SSRS positive · 13 Aug",
-          children: <RiskPanel />,
-        },
-        {
-          key: "meds",
-          label: "Medications",
-          severity: "high",
-          summary: "Clozapine ANC due 18 Aug",
-          children: <Medications />,
-        },
-        { key: "plan", label: "Safety plan", severity: "normal", summary: "Current · revised 11 Aug", children: <SafetyPlan /> },
-        { key: "audit", label: "AUDIT", severity: "unknown", summary: "Not asked this visit", children: <Audit /> },
-      ]}
-    />
-  );
-}`,
     },
     {
       id: "pinned",
@@ -190,21 +163,6 @@ export default function Example() {
       title: "A section that cannot be closed",
       description:
         "The crisis step of a safety plan. Someone opening it at 2am should reach a phone number without making a single correct decision about a chevron. Pinned stays focusable, so nobody tabs past it.",
-      code: `<Accordion
-  headingLevel={3}
-  items={[
-    { key: "signs", label: "1 · Signs that things are getting harder", children: <Signs /> },
-    { key: "coping", label: "2 · Things I can do on my own", children: <Coping /> },
-    {
-      key: "crisis",
-      label: "3 · If none of that is working",
-      pinned: true,
-      severity: "critical",
-      summary: "Always open",
-      children: <CrisisContacts />,
-    },
-  ]}
-/>`,
     },
     {
       id: "single-open",
@@ -212,7 +170,6 @@ export default function Example() {
       title: "One section at a time",
       description:
         "accordion changes the state policy and nothing else. The roles are identical to the multi-open case — there is no tablist in any configuration, which is the defect Ant Design's accordion mode has.",
-      code: `<Accordion accordion headingLevel={3} defaultActiveKey={["risk"]} items={chartSections} />`,
     },
 
     /* ---------------------------------------------------------------- */
@@ -224,18 +181,6 @@ export default function Example() {
       title: "The reader chooses when to see it",
       description:
         "An advisory gate costs nothing but a choice and records nothing. Progressive disclosure at the reader's own pace is the core trauma-informed move: the point is that they decide, not that the content is concealed.",
-      code: `<Accordion
-  headingLevel={3}
-  onDisclose={() => true}
-  items={[
-    {
-      key: "note",
-      label: "Your session summary — 13 August",
-      access: { kind: "advisory", notice: "This summary talks about self-harm" },
-      children: <SessionSummary />,
-    },
-  ]}
-/>`,
     },
     {
       id: "reason",
@@ -243,30 +188,6 @@ export default function Example() {
       title: "Break the glass, with a reason",
       description:
         "Permitted, but recorded. The reason is collected before the access, not after it, and onDisclose receives the code so the application can write the audit event.",
-      code: `<Accordion
-  headingLevel={3}
-  onDisclose={async (event) => {
-    await audit.record({ section: event.key, reason: event.reasonCode, at: event.at });
-    return true;
-  }}
-  items={[
-    {
-      key: "external",
-      label: "Records from another organisation",
-      severity: "high",
-      summary: "Access is recorded",
-      access: {
-        kind: "reason",
-        reasons: [
-          { code: "emergency", label: "Emergency treatment" },
-          { code: "covering", label: "Covering clinician" },
-          { code: "coordination", label: "Care coordination" },
-        ],
-      },
-      children: <ExternalRecords />,
-    },
-  ]}
-/>`,
     },
     {
       id: "consent",
@@ -274,20 +195,6 @@ export default function Example() {
       title: "A consent gate",
       description:
         "Expanding a section and disclosing its content are separate events. The governing policy is named in the header, so a closed section says it too, and an expiry is stated before it lapses.",
-      code: `<Accordion
-  headingLevel={3}
-  onDisclose={() => true}
-  items={[
-    {
-      key: "sud",
-      label: "Substance use treatment",
-      summary: "42 CFR Part 2",
-      access: { kind: "consent", policy: "42 CFR Part 2", state: "granted", expiresAt: "2027-02-02" },
-      children: <SudTreatment />,
-    },
-    { key: "notes", label: "Progress notes", summary: "142 encounters", children: <ProgressNotes /> },
-  ]}
-/>`,
     },
     {
       id: "consent-refused",
@@ -295,18 +202,6 @@ export default function Example() {
       title: "When the application refuses",
       description:
         "onDisclose returns false. The component says what did not happen and keeps the content where it was — the gate is an affordance for a policy the application owns, not the policy itself.",
-      code: `<Accordion
-  headingLevel={3}
-  onDisclose={() => false}
-  items={[
-    {
-      key: "sud",
-      label: "Substance use treatment",
-      access: { kind: "consent", policy: "42 CFR Part 2", state: "missing" },
-      children: <SudTreatment />,
-    },
-  ]}
-/>`,
     },
     {
       id: "withheld",
@@ -314,25 +209,6 @@ export default function Example() {
       title: "Withheld, and saying so",
       description:
         "Content this reader cannot obtain still gets a row. Deleting it would claim the record is complete. A withheld item cannot take children at all, so the content never reaches the bundle.",
-      code: `<Accordion
-  headingLevel={3}
-  items={[
-    { key: "notes", label: "Progress notes", summary: "142 encounters", children: <ProgressNotes /> },
-    {
-      key: "psychotherapy",
-      label: "Psychotherapy notes",
-      access: { kind: "withheld", reason: "Kept separately by the author" },
-    },
-    {
-      key: "sealed",
-      label: "Adolescent visit, 2019",
-      access: {
-        kind: "withheld",
-        reason: "Sealed under state minor-consent law. Not releasable to this account.",
-      },
-    },
-  ]}
-/>`,
     },
 
     /* ---------------------------------------------------------------- */
@@ -344,26 +220,6 @@ export default function Example() {
       title: "Nested, with heading levels",
       description:
         "The outline is the navigation model. Every trigger sits inside a real heading, so the nested accordion steps down a level and a screen reader's heading list shows the plan's shape.",
-      code: `<Accordion
-  headingLevel={2}
-  items={[
-    {
-      key: "plan",
-      label: "Treatment plan",
-      summary: "2 problems · 5 goals",
-      children: (
-        <Accordion
-          headingLevel={3}
-          variant="ghost"
-          items={[
-            { key: "mdd", label: "Major depressive disorder, recurrent, severe", summary: "3 goals", children: <Goals problem="mdd" /> },
-            { key: "aud", label: "Alcohol use disorder, moderate", summary: "2 goals", children: <Goals problem="aud" /> },
-          ]}
-        />
-      ),
-    },
-  ]}
-/>`,
     },
     {
       id: "variants",
@@ -371,9 +227,6 @@ export default function Example() {
       title: "Three variants",
       description:
         "Bordered for a panel of its own, separate for sections that are cards, ghost for an accordion inside something that already has a border. The keyboard model and the markup are the same in all three.",
-      code: `<Accordion variant="bordered" headingLevel={3} items={items} />
-<Accordion variant="separate" headingLevel={3} items={items} />
-<Accordion variant="ghost" headingLevel={3} items={items} />`,
     },
     {
       id: "density",
@@ -381,9 +234,6 @@ export default function Example() {
       title: "Density is spacing, never content",
       description:
         "Patient, standard and clinical change padding and type size. No density ever drops the summary or the severity, because which clinical facts appear is not a layout decision.",
-      code: `<Accordion density="patient" headingLevel={3} items={items} />
-<Accordion density="standard" headingLevel={3} items={items} />
-<Accordion density="clinical" headingLevel={3} items={items} />`,
     },
     {
       id: "disclosure",
@@ -391,16 +241,6 @@ export default function Example() {
       title: "A single disclosure",
       description:
         "One section on its own is a Disclosure: the same trigger, heading and findable panel, without the list around it.",
-      code: `import { Disclosure } from "@/components/zoblocks/accordion";
-
-<Disclosure
-  headingLevel={3}
-  item={{
-    key: "why",
-    label: "Why are we asking this?",
-    children: <p>Your answers help your care team spot changes early.</p>,
-  }}
-/>`,
     },
   ],
 

@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { jsxAttr, jsxElement, showLineNumbers, tokenize } from "@/lib/highlight";
 import { DOCUMENTED_ORDER } from "@zoblocks/component-meta";
-import { HOSTED_DEMOS, demoLinks } from "@/components/site/docs/sandbox";
+import { CATALOG } from "@/lib/generated/catalog";
+import { NOT_RUNNABLE, SANDBOXES } from "@/lib/generated/sandboxes";
+import { assembleProject } from "@/lib/sandbox-project";
 
 const kinds = (line: string, lang: "tsx" | "css" | "sh" = "tsx") =>
   tokenize(line, lang)[0]!
@@ -82,17 +84,46 @@ describe("jsx", () => {
   });
 });
 
-describe("hosted demos", () => {
-  it("only links demos for components that have a page", () => {
-    for (const name of HOSTED_DEMOS) expect(DOCUMENTED_ORDER).toContain(name);
+describe("StackBlitz projects", () => {
+  const shown = CATALOG.filter((c) => DOCUMENTED_ORDER.includes(c.name)).flatMap((c) =>
+    (c.examples ?? []).map((e) => `${c.name}/${e.id}`),
+  );
+
+  it("either runs every example on a component page or says why not", () => {
+    for (const key of shown) {
+      expect(SANDBOXES.has(key) || key in NOT_RUNNABLE, key).toBe(true);
+    }
   });
 
-  it("points at the demo folder on both platforms", () => {
-    const links = demoLinks("switch", "Switch");
-    expect(links.map((l) => l.href)).toEqual([
-      "https://stackblitz.com/github/md-nabas-pm/zoblocks-examples/tree/main/demos/switch?file=src/App.tsx",
-      "https://codesandbox.io/p/devbox/github/md-nabas-pm/zoblocks-examples/tree/main/demos/switch",
-    ]);
-    expect(demoLinks("signature", "Signature")).toEqual([]);
+  it("never both runs an example and says it cannot", () => {
+    for (const key of SANDBOXES) expect(NOT_RUNNABLE, key).not.toHaveProperty(key);
+  });
+
+  it("lays registry files out where the CLI writes them, under the example", () => {
+    const project = assembleProject(
+      {
+        title: "t",
+        description: "d",
+        openFile: "src/examples/switch/tones.tsx",
+        items: ["switch"],
+        files: { "src/examples/switch/tones.tsx": "example", "src/lib/utils.ts": "mine" },
+      },
+      [
+        {
+          name: "switch",
+          files: [
+            { target: "components/zoblocks/switch.tsx", content: "component" },
+            { target: "lib/utils.ts", content: "registry" },
+          ],
+        },
+      ],
+    );
+    expect(project.template).toBe("node");
+    expect(project.files).toEqual({
+      "src/components/zoblocks/switch.tsx": "component",
+      "src/examples/switch/tones.tsx": "example",
+      // The manifest's own files win over anything an item installs.
+      "src/lib/utils.ts": "mine",
+    });
   });
 });
