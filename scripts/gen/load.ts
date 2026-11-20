@@ -507,7 +507,8 @@ async function resolveExamples(loaded: LoadedComponent[]): Promise<string[]> {
     for (const entry of await readdir(EXAMPLES_DIR, { withFileTypes: true })) {
       if (
         entry.isDirectory() &&
-        !entry.name.startsWith("_") &&
+        // `_shared` helpers; `node_modules` and tool caches (`.turbo`) are not components.
+        !/^[_.]/.test(entry.name) &&
         entry.name !== "node_modules" &&
         !names.has(entry.name)
       ) {
