@@ -111,7 +111,11 @@ function useSandboxLinks(
  * StackBlitz opens. An example still written as a `code` string has none, and
  * shows its code alone.
  */
-function examplePreviewNode(component: string, id: string): React.ReactNode {
+function examplePreviewNode(
+  component: string,
+  id: string,
+  onHydrated: () => void,
+): React.ReactNode {
   const File = EXAMPLE_MODULES[`${component}/${id}`];
   if (!File) return null;
   return (
@@ -123,8 +127,24 @@ function examplePreviewNode(component: string, id: string): React.ReactNode {
       ) : (
         <File />
       )}
+      <Hydrated onHydrated={onHydrated} />
     </React.Suspense>
   );
+}
+
+/**
+ * Reports that the example beside it has hydrated.
+ *
+ * The example is lazy, so until its chunk arrives the preview is
+ * server-rendered markup with no handlers attached, and a click in that gap is
+ * lost — about two seconds in WebKit. This shares the example's Suspense
+ * boundary, so its effect runs only once that boundary has hydrated. Surfaced
+ * as `data-hydrated` on the preview panel purely so tests can wait for it, as
+ * the signature demo does.
+ */
+function Hydrated({ onHydrated }: { onHydrated: () => void }) {
+  React.useEffect(() => onHydrated(), [onHydrated]);
+  return null;
 }
 
 /**
@@ -146,7 +166,9 @@ export function ExampleBlock({
   level = 3,
 }: ExampleBlockProps) {
   const Heading = level === 4 ? "h4" : "h3";
-  const live = preview ?? examplePreviewNode(component, id);
+  const [hydrated, setHydrated] = React.useState(false);
+  const markHydrated = React.useCallback(() => setHydrated(true), []);
+  const live = preview ?? examplePreviewNode(component, id, markHydrated);
   const [tab, setTab] = React.useState<"preview" | "code">("preview");
   const baseId = `ex-${id}`;
   const showing = live ? tab : "code";
@@ -223,6 +245,7 @@ export function ExampleBlock({
             id={`${baseId}-panel-preview`}
             aria-labelledby={`${baseId}-tab-preview`}
             hidden={showing !== "preview"}
+            data-hydrated={hydrated || undefined}
             className="zb-stage flex min-h-[220px] items-center justify-center px-7 py-11"
           >
             <HostStage className="flex w-full min-w-0 flex-col items-center">{live}</HostStage>

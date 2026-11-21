@@ -66,15 +66,10 @@ export default function UnderlineVariantExample() {
               </OrderPanel>
             ),
           },
-          {
-            value: "audit",
-            label: "Audit log",
-            children: (
-              <OrderPanel>
-                <strong>Audit log</strong>
-              </OrderPanel>
-            ),
-          },
+          // Five, not six: a sixth ("Audit log") fit Windows's and macOS's
+          // system fonts and overflowed by 20–44px in Linux's, so the variants
+          // chapter showed the strip already scrolled — the overflow
+          // behaviour, not the variant.
         ]}
       />
     </section>

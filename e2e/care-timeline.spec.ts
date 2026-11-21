@@ -46,6 +46,9 @@ async function openExample(page: Page, id: string) {
   await page.waitForLoadState("networkidle");
   const panel = page.locator(`#ex-${id}-panel-preview`);
   await panel.scrollIntoViewIfNeeded();
+  // Examples are lazy: until this is set the preview is server-rendered markup
+  // with no handlers, and a change made in that gap is lost.
+  await panel.and(page.locator("[data-hydrated]")).waitFor({ state: "attached" });
   const timeline = panel.locator("[data-zb-care-timeline]").first();
   await expect(timeline).toBeVisible();
   return panel;

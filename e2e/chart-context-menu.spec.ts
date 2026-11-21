@@ -38,9 +38,16 @@ const PAGE = "/components/chart-context-menu";
  * then a result, then a restricted note. The page now leads with the
  * playground and lists the examples after it, so positional rows land on the
  * wrong subjects; each is addressed by the example that shows it instead.
+ *
+ * Examples are lazy, so a row is server-rendered markup until its example
+ * hydrates, and a right-click before then reaches nothing — about two
+ * seconds in WebKit. The panel's `data-hydrated` says the handlers are on.
  */
-const exampleRow = (page: Page, example: string) =>
-  page.locator(`#ex-${example}-panel-preview [data-zb-menu]`).first();
+async function exampleRow(page: Page, example: string) {
+  const panel = page.locator(`#ex-${example}-panel-preview`);
+  await panel.and(page.locator("[data-hydrated]")).waitFor({ state: "attached" });
+  return panel.locator("[data-zb-menu]").first();
+}
 
 /**
  * Put a row at a chosen fraction of the viewport and summon its menu there.
@@ -107,6 +114,15 @@ test.describe("@a11y the pointer never lands on a verb", () => {
     await page.goto(PAGE);
     await page.waitForLoadState("networkidle");
     await expect(page.locator("[data-zb-menu]").first()).toBeVisible();
+    // Rows past the playground sit in lazy examples, and a menu summoned on
+    // one before it hydrates never opens. Wait for each row's example panel.
+    for (let index = 0; index < 3; index += 1) {
+      const panel = await page
+        .locator("[data-zb-menu]")
+        .nth(index)
+        .evaluate((row) => row.closest("[id$='-panel-preview']")?.id ?? null);
+      if (panel) await page.locator(`#${panel}[data-hydrated]`).waitFor({ state: "attached" });
+    }
   });
 
   for (const [name, fraction] of [
@@ -152,7 +168,7 @@ test.describe("@a11y the subject survives a real layout engine", () => {
   });
 
   test("names the popup, and a masked row keeps its name back", async ({ page }) => {
-    await exampleRow(page, "subject").click({ button: "right" });
+    await (await exampleRow(page, "subject")).click({ button: "right" });
 
     const menu = page.locator(".zb-menu");
     await expect(menu).toBeVisible();
@@ -168,7 +184,7 @@ test.describe("@a11y the subject survives a real layout engine", () => {
 
     // The third row is a 42 CFR Part 2 note rendered masked. The menu may say
     // less than its trigger; it may never say more.
-    await exampleRow(page, "masked").click({ button: "right" });
+    await (await exampleRow(page, "masked")).click({ button: "right" });
     await expect(menu.locator(".zb-menu__subject")).toContainText("Restricted record");
     await expect(menu).not.toContainText("Nwosu");
   });
@@ -238,7 +254,7 @@ test.describe("@a11y a submenu is a menu, not a chevron", () => {
 
   test("opens beside its row and runs a child", async ({ page }) => {
     // The result row: "Trend" is the only submenu on the page.
-    await exampleRow(page, "submenu").click({ button: "right" });
+    await (await exampleRow(page, "submenu")).click({ button: "right" });
 
     const parent = page.locator(".zb-menu").first();
     const trigger = parent.getByRole("menuitem", { name: /Trend/ });
@@ -272,7 +288,7 @@ test.describe("@a11y a submenu is a menu, not a chevron", () => {
   test("opens on hover after an intent delay, and survives the gap between menus", async ({
     page,
   }) => {
-    await exampleRow(page, "submenu").click({ button: "right" });
+    await (await exampleRow(page, "submenu")).click({ button: "right" });
     const parent = page.locator(".zb-menu").first();
     const trigger = parent.getByRole("menuitem", { name: /Trend/ });
 
@@ -293,7 +309,7 @@ test.describe("@a11y a submenu is a menu, not a chevron", () => {
   });
 
   test("ArrowRight opens it, ArrowLeft gives the row back", async ({ page }) => {
-    const row = exampleRow(page, "submenu");
+    const row = await exampleRow(page, "submenu");
     await row.focus();
     await page.keyboard.press("Shift+F10");
     await expect(page.locator(".zb-menu").first()).toBeVisible();
