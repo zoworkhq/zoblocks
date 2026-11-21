@@ -1,5 +1,12 @@
 # @zoblocks/signature
 
+## 0.2.1
+
+### Patch Changes
+
+- 5f805eb: `SignatureModal` no longer pulls focus back to the name field after the signer has started. The deferred focus that runs when antd's open transition ends could land late on a loaded device, after the signer had already typed and tabbed on, and split what they typed across two fields. It now stands down once the signer presses a key or the pointer inside the dialog.
+- d5e749d: `SignatureManifest` status words are set in the body text colour; only the `●` beside them takes the tone. antd's warning and error hues are signal colours, and as text they measured 1.9:1 and 3.3:1 on white — below WCAG's 4.5:1 for the words that carry the status.
+
 ## 0.2.0
 
 ### Minor Changes
