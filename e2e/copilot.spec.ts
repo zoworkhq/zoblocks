@@ -107,9 +107,12 @@ test.describe("Copilot live demo @a11y", () => {
     const { demo } = await openCopilot(page);
     const field = demo.getByRole("combobox", { name: "Clinical assistant" });
 
-    // Cmd/Ctrl+K focuses the composer when focus is outside another field.
+    // Cmd/Ctrl+K focuses a composer when focus is outside another field. The
+    // page mounts the playground and every example, and each summons its own,
+    // so which one wins is down to the page rather than the component.
     await page.keyboard.press("Control+k");
-    await expect(field).toBeFocused();
+    await expect(page.locator(":focus")).toHaveAttribute("aria-label", "Clinical assistant");
+    await field.focus();
     await field.fill(QUESTION);
     await field.press("Enter");
 
