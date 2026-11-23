@@ -508,6 +508,34 @@ import { SessionTimeField } from "@/components/zoblocks/date-picker";`,
         "Tab to the grid and move with the arrows; PageUp/PageDown change month, with Shift the year — which the legend exists to tell you. Exactly one cell is reachable by Tab, and every cell is named as its whole date plus its state: “Wednesday, 26 August 2026, 8 times available”, not “26”.",
     },
     {
+      id: "recommendations-events",
+      group: "Calendars",
+      title: "Recommended dates and scheduled events",
+      description:
+        "Recommended dates are highlighted with an outline and expose the reason, availability, and conflicts. Scheduled events are marked on their dates, with details available on interaction. A date can show both a recommendation and an event.",
+      code: `<Calendar
+  now={today}
+  defaultValue={plainDate(2026, 11, 2)}
+  defaultMonth={{ y: 2026, m: 11 }}
+  recommendedDates={[
+    {
+      date: plainDate(2026, 11, 8),
+      reason: "Patient preference",
+      availability: "Morning appointments available",
+    },
+  ]}
+  events={[
+    {
+      date: plainDate(2026, 9, 10),
+      title: "Follow-up appointment",
+      time: "09:30 AM",
+    },
+  ]}
+  hints
+  commit="explicit"
+/>`,
+    },
+    {
       id: "multiple",
       group: "Calendars",
       title: "Several dates that are not a range",

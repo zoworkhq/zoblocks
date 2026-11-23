@@ -407,6 +407,8 @@
   justify-content: space-between;
   gap: 0.25rem;
   margin-block-end: 0.75rem;
+  padding-block-end: 0.75rem;
+  border-bottom: 1px solid var(--border-tertiary, #f2f3f5);
 }
 
 .zb-dt-cal__nav,
@@ -562,6 +564,121 @@
   min-block-size: 1.5rem;
 }
 
+/* ---- Recommended date variants -------------------------------- */
+
+/* Common recommendation styling */
+.zb-dt-cal__day--recommended {
+  position: relative;
+  outline: none;
+}
+
+/* Outline variant (default) */
+.zb-dt-cal__day--recommended-outline::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid transparent;
+  border-radius: inherit;
+  background: linear-gradient(133.55deg, #ff9cd1 2.41%, #b795ff 100%) border-box;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) padding-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Fill variant */
+.zb-dt-cal__day--recommended-fill {
+  background: linear-gradient(133.55deg, rgb(255 156 209 / 18%) 2.41%, rgb(183 149 255 / 18%) 100%);
+  border: 1px solid #b795ff;
+}
+
+/* AI sparkle icon for recommended dates */
+.zb-dt-cal__day .zb-dt-cal__day-recommendation-icon {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 10px;
+  height: 10px;
+  display: block;
+  color: #b795ff;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.zb-dt-cal__day-recommendation-icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: none;
+}
+
+.zb-dt-cal__day-recommendation-icon svg path {
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* AI icon on the tooltip of recommended dates*/
+.zb-dt-cal__ai-icon {
+  width: 15px;
+  height: 15px;
+  color: #b795ff;
+  display: inline-block;
+  vertical-align: -2px;
+  margin-right: 5px;
+  flex-shrink: 0;
+}
+
+/* Dates with scheduled events have a separate indicator. */
+.zb-dt-cal__event-marker {
+  position: absolute;
+  inset-block-end: 0.2rem;
+  inline-size: 4px;
+  block-size: 4px;
+  border-radius: 50%;
+  background: var(--zb-datetime-event-marker, #2563eb);
+  pointer-events: none;
+}
+
+/* ---- Date picker recommendations: dark mode -------------------- */
+
+.dark .zb-dt-recommendations-demo__view,
+.dark .zb-dt-recommendations-demo__today {
+  color: #ffffff !important;
+}
+
+.dark .zb-dt-recommendations-demo__view[data-active="true"],
+.dark .zb-dt-recommendations-demo__today[data-active="true"] {
+  color: #000000 !important;
+}
+
+/* Dark mode: recommended date variants */
+
+/* Outline */
+.dark .zb-dt-cal__day--recommended-outline::after {
+  background: linear-gradient(133.55deg, #ff0089 2.41%, #5100ff 100%) border-box;
+}
+
+/* Fill */
+.dark .zb-dt-cal__day--recommended-fill {
+  background: linear-gradient(133.55deg, rgb(255 0 137 / 20%) 2.41%, rgb(81 0 255 / 20%) 100%);
+  border-color: #5100ff;
+}
+
+/* Icon */
+.dark .zb-dt-cal__day--recommended-icon::before {
+  background: #a78bfa;
+}
+
+/* Keep the event marker visible on selected dates. */
+.zb-dt-cal__day--selected .zb-dt-cal__event-marker {
+  background: currentColor;
+}
+
 .zb-dt-cal__day--outside {
   color: var(--zb-datetime-cell-muted-fg, #64748b);
 }
@@ -682,6 +799,107 @@
 
 .zb-dt-cal__day--selected .zb-dt-cal__load i {
   background: currentColor;
+}
+
+/* Information tooltip for recommended dates and scheduled events. */
+.zb-dt-cal__day-tooltip {
+  position: absolute;
+  inset-block-start: calc(100% + 0.5rem);
+  inset-inline-start: 0;
+  z-index: 50;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  inline-size: max-content;
+  max-inline-size: 20rem;
+  padding: 0.625rem 0.75rem;
+
+  border: 1px solid var(--zb-datetime-tooltip-border, #334155);
+  border-radius: var(--zb-radius-md, 0.5rem);
+
+  background: var(--zb-datetime-tooltip-bg, #0f172a);
+  color: var(--zb-datetime-tooltip-fg, #f8fafc);
+
+  font-size: var(--zb-text-xs, 0.75rem);
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: start;
+
+  box-shadow: var(--zb-shadow-lg, 0 14px 34px -10px rgb(15 23 42 / 0.2));
+
+  transform: none;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+
+  transition:
+    opacity var(--zb-duration-fast, 90ms) var(--zb-ease, ease),
+    visibility var(--zb-duration-fast, 90ms) var(--zb-ease, ease);
+}
+
+/* Display the tooltip on pointer hover and keyboard focus. */
+.zb-dt-cal__day:hover .zb-dt-cal__day-tooltip,
+.zb-dt-cal__day:focus-visible .zb-dt-cal__day-tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Separate recommendation and event information. */
+.zb-dt-cal__tooltip-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.zb-dt-cal__tooltip-section strong {
+  color: var(--zb-datetime-tooltip-fg, #f8fafc);
+  font-weight: 600;
+}
+
+/* Recommended date reason with green check indicator. */
+.zb-dt-cal__tooltip-reason {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.375rem;
+  color: #31ef80;
+}
+
+.zb-dt-cal__tooltip-check {
+  position: relative;
+  flex: 0 0 0.75rem;
+  inline-size: 0.75rem;
+  block-size: 0.75rem;
+  margin-block-start: 0.125rem;
+}
+
+.zb-dt-cal__tooltip-check::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 0.05rem;
+  inset-inline-start: 0.2rem;
+  inline-size: 0.3rem;
+  block-size: 0.5rem;
+  border-inline-end: 1.17px solid #31ef80;
+  border-block-end: 1.17px solid #31ef80;
+  transform: rotate(45deg);
+}
+
+/* Individual scheduled events. */
+.zb-dt-cal__tooltip-event {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.zb-dt-cal__tooltip-event-dot {
+  flex: 0 0 4px;
+  inline-size: 4px;
+  block-size: 6px;
+  margin-block-start: 0;
+  border-radius: 50%;
+  background: var(--bg-warning-solid, #bb4d00);
 }
 
 /*
@@ -1319,6 +1537,7 @@
     opacity: 0;
     translate: 0 14px;
   }
+
   to {
     opacity: 1;
     translate: 0 0;
@@ -1353,6 +1572,7 @@
     opacity: 0;
     translate: 0 4px;
   }
+
   to {
     opacity: 1;
     translate: 0 0;
@@ -1364,6 +1584,7 @@
     opacity: 0;
     translate: 0 -4px;
   }
+
   to {
     opacity: 1;
     translate: 0;
@@ -2113,6 +2334,7 @@
     color: HighlightText;
     forced-color-adjust: none;
   }
+
   .zb-dt-series > li[data-zb-occurrence="conflict"] {
     box-shadow: inset 2px 0 0 0 CanvasText;
   }

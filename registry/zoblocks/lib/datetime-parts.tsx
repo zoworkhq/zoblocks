@@ -81,6 +81,8 @@ import {
   type FieldSegment,
   type SegmentedFieldHandle,
   type SegmentValues,
+  type CalendarDateRecommendation,
+  type CalendarDayEvent,
 } from "@/lib/zoblocks-datetime-field";
 import {
   groupSlots,
@@ -684,6 +686,9 @@ export interface CalendarProps extends Omit<
    */
   months?: number;
 
+  /** Hide dates outside the inclusive min/max range. */
+  hideOutsideRange?: boolean;
+
   /**
    * The day marked "today". Required to mark one — the component reads no
    * clock, so a calendar without `now` simply has no today, which is correct
@@ -706,6 +711,14 @@ export interface CalendarProps extends Omit<
   /** Open-slot count under the numeral, so density is visible before a click. */
   load?: (date: ZbDate) => number | null;
 
+  /** Dates recommended by the host, with an explanation for each. */
+  recommendedDates?: readonly CalendarDateRecommendation[];
+
+  /** Events associated with individual dates. Multiple events per date are supported. */
+  events?: readonly CalendarDayEvent[];
+
+  /** Visual treatment for recommended dates. */
+  recommendationVariant?: "outline" | "fill" | "icon";
   /**
    * Named periods down the side — "This month", "Last week".
    *
@@ -833,11 +846,15 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
       defaultMonth,
       onMonthChange,
       months = 1,
+      hideOutsideRange = false,
       now = null,
       min,
       max,
       unavailable,
       load,
+      recommendedDates,
+      events,
+      recommendationVariant = "outline",
       presets,
       shortcuts,
       showCustomPreset,
@@ -1141,8 +1158,12 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
           today={now}
           min={min}
           max={max}
+          hideOutsideRange={hideOutsideRange}
           unavailable={isUnavailable}
           load={load}
+          recommendedDates={recommendedDates}
+          events={events}
+          recommendationVariant={recommendationVariant}
           weekStart={weekStart}
           weekdayLabels={weekdayLabels}
           weekdayNames={weekdayNames}

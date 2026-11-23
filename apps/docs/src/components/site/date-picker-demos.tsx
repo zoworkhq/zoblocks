@@ -323,6 +323,188 @@ function CalendarDemo() {
   );
 }
 
+/** Demonstrates recommended dates and scheduled events in the month grid. */
+function RecommendationsEventsDemo() {
+  const [month, setMonth] = React.useState({ y: 2026, m: 11 });
+  const [activeView, setActiveView] = React.useState<"calendar" | "recommended" | "today">(
+    "calendar",
+  );
+
+  // Recommendation rules for different event types
+  const recommendationConfig = {
+    procedure_follow_up: {
+      minDays: 7,
+      maxDays: 14,
+    },
+    medication_review: {
+      minDays: 14,
+      maxDays: 30,
+    },
+    lab_monitoring: {
+      minDays: 7,
+      maxDays: 30,
+    },
+  } as const;
+
+  // Temporary mock backend event
+  const backendEvent: {
+    type: keyof typeof recommendationConfig;
+    name: string;
+    procedureDate: ZbDate;
+  } = {
+    type: "procedure_follow_up",
+    name: "Follow-up",
+    procedureDate: plainDate(2026, 11, 18),
+  };
+
+  const currentRecommendation = recommendationConfig[backendEvent.type];
+
+  /* Date calculation starting from the procedure date */
+  const addDays = (date: ZbDate, days: number): ZbDate => {
+    const result = new Date(date.y, date.m - 1, date.d + days);
+
+    return plainDate(result.getFullYear(), result.getMonth() + 1, result.getDate());
+  };
+
+  const procedureDate = backendEvent.procedureDate;
+
+  const recommendationStartDate = addDays(procedureDate, currentRecommendation.minDays);
+
+  const recommendationEndDate = addDays(procedureDate, currentRecommendation.maxDays);
+
+  const formatProcedureDate = (date: typeof procedureDate) => {
+    const suffix =
+      date.d % 10 === 1 && date.d !== 11
+        ? "st"
+        : date.d % 10 === 2 && date.d !== 12
+          ? "nd"
+          : date.d % 10 === 3 && date.d !== 13
+            ? "rd"
+            : "th";
+
+    const monthName = new Date(date.y, date.m - 1, 1).toLocaleString("en-US", {
+      month: "long",
+    });
+
+    return `${date.d}${suffix} ${monthName} ${date.y}`;
+  };
+
+  const recommendedDates = [
+    {
+      date: addDays(recommendationStartDate, 2),
+      reason: "Patient preference",
+      availability: "Morning appointments available",
+    },
+    {
+      date: addDays(recommendationStartDate, 7),
+      reason: "Best match for the care plan",
+      availability: "Several appointment slots available",
+      conflicts: ["Limited provider availability in the afternoon"],
+    },
+  ];
+
+  const events = [
+    {
+      date: plainDate(2026, 11, 10),
+      title: "Follow-up appointment",
+      time: "09:30 AM",
+    },
+    {
+      date: plainDate(2026, 11, 15),
+      title: "Care-team review",
+      time: "10:00 AM",
+    },
+    {
+      date: plainDate(2026, 11, 15),
+      title: "Medication review",
+      time: "02:00 PM",
+    },
+    {
+      date: plainDate(2026, 11, 18),
+      title: "Therapy session",
+      time: "11:00 AM",
+    },
+  ];
+
+  return (
+    <div className="zb-dt-recommendations-demo" data-view={activeView}>
+      <div className="zb-dt-recommendations-demo__toolbar">
+        <div className="zb-dt-recommendations-demo__views" role="group" aria-label="Calendar view">
+          <button
+            type="button"
+            className="zb-dt-recommendations-demo__view"
+            data-active={activeView === "calendar"}
+            aria-pressed={activeView === "calendar"}
+            onClick={() => setActiveView("calendar")}
+          >
+            Calendar
+          </button>
+
+          <button
+            type="button"
+            className="zb-dt-recommendations-demo__view"
+            data-active={activeView === "recommended"}
+            aria-pressed={activeView === "recommended"}
+            onClick={() => {
+              setMonth({
+                y: recommendationStartDate.y,
+                m: recommendationStartDate.m,
+              });
+              setActiveView("recommended");
+            }}
+          >
+            Recommended
+          </button>
+        </div>
+
+        <button
+          type="button"
+          className="zb-dt-recommendations-demo__today"
+          data-active={activeView === "today"}
+          aria-pressed={activeView === "today"}
+          onClick={() => {
+            setMonth({ y: TODAY.y, m: TODAY.m });
+            setActiveView("today");
+          }}
+        >
+          Today
+        </button>
+      </div>
+      {activeView === "recommended" && (
+        <div className="zb-dt-recommendations-demo__message">
+          {backendEvent.name} is recommended {currentRecommendation.minDays}–
+          {currentRecommendation.maxDays} days after the procedure date on{" "}
+          {formatProcedureDate(procedureDate)}.
+        </div>
+      )}
+      <Calendar
+        now={TODAY}
+        defaultValue={procedureDate}
+        month={month}
+        months={
+          activeView === "recommended" &&
+          (recommendationStartDate.m !== recommendationEndDate.m ||
+            recommendationStartDate.y !== recommendationEndDate.y)
+            ? 2
+            : 1
+        }
+        onMonthChange={setMonth}
+        min={activeView === "recommended" ? recommendationStartDate : undefined}
+        max={activeView === "recommended" ? recommendationEndDate : undefined}
+        hideOutsideRange={activeView === "recommended"}
+        events={events}
+        recommendedDates={recommendedDates}
+        recommendationVariant="fill"
+        unavailable={(date) =>
+          date.y === 2026 && date.m === 11 && date.d === 21 ? "Provider unavailable" : null
+        }
+        hints
+        commit="explicit"
+      />
+    </div>
+  );
+}
+
 /** v05, v06 — range and multiple. */
 function RangeDemo() {
   return (
@@ -1222,6 +1404,7 @@ export const FromAntd = staged(FromAntdDemo);
 // Calendars
 export const Anatomy = staged(AnatomyDemo, true);
 export const MonthCalendar = staged(CalendarDemo);
+export const RecommendationsEvents = staged(RecommendationsEventsDemo);
 export const Multiple = staged(MultipleDemo);
 export const Range = staged(RangeDemo, true);
 export const RangePanel = staged(RangePanelDemo, true);

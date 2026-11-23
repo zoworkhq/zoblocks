@@ -694,6 +694,35 @@ export interface DateRangeValue {
   end: ZbDate | null;
 }
 
+/**
+ * Additional context for a date recommended by the host application.
+ */
+export interface CalendarDateRecommendation {
+  date: ZbDate;
+  reason: string;
+  availability?: string;
+  conflicts?: readonly string[];
+}
+
+/**
+ * An event associated with a calendar date.
+ * Multiple events can belong to the same date.
+ */
+export interface CalendarDayEvent {
+  date: ZbDate;
+  title: string;
+  time?: string;
+}
+
+/* Date fill variations variant */
+export type RecommendationVariant = "outline" | "fill" | "icon";
+
+const RECOMMENDATION_VARIANT_CLASS: Record<RecommendationVariant, string> = {
+  outline: "zb-dt-cal__day--recommended-outline",
+  fill: "zb-dt-cal__day--recommended-fill",
+  icon: "zb-dt-cal__day--recommended-icon",
+};
+
 export interface CalendarGridProps {
   mode?: CalendarMode;
   value?: ZbDate | null;
@@ -729,6 +758,8 @@ export interface CalendarGridProps {
    * documentation calls the most common one in a date picker.
    */
   showOutsideDays?: boolean;
+  /** Hide dates outside the inclusive min/max range. */
+  hideOutsideRange?: boolean;
   /** Earliest month reachable by the header controls. */
   min?: ZbDate;
   /** Latest month reachable by the header controls. */
@@ -746,6 +777,12 @@ export interface CalendarGridProps {
   aside?: React.ReactNode;
   maxSelectable?: number;
   className?: string;
+  /** Dates recommended by the host, with an explanation for each. */
+  recommendedDates?: readonly CalendarDateRecommendation[];
+  /** Events associated with individual dates. */
+  events?: readonly CalendarDayEvent[];
+  /** Visual treatment for recommended dates. */
+  recommendationVariant?: RecommendationVariant;
 }
 
 /** Months between two `MonthRef`s, signed. */
@@ -770,9 +807,13 @@ export function CalendarGrid(props: CalendarGridProps) {
     onSelect,
     months: monthCountProp = 1,
     showOutsideDays,
+    hideOutsideRange = false,
     today = null,
     unavailable,
     load,
+    recommendedDates = [],
+    events = [],
+    recommendationVariant = "outline",
     min,
     max,
     weekStart = 0,
@@ -785,6 +826,32 @@ export function CalendarGrid(props: CalendarGridProps) {
     aside,
     className,
   } = props;
+
+  const calendarId = React.useId();
+
+  const recommendationsByDate = React.useMemo(() => {
+    const map = new Map<string, CalendarDateRecommendation>();
+
+    for (const item of recommendedDates) {
+      map.set(formatPlainDate(item.date, "iso"), item);
+    }
+
+    return map;
+  }, [recommendedDates]);
+
+  const eventsByDate = React.useMemo(() => {
+    const map = new Map<string, CalendarDayEvent[]>();
+
+    for (const item of events) {
+      const key = formatPlainDate(item.date, "iso");
+      const existing = map.get(key) ?? [];
+
+      existing.push(item);
+      map.set(key, existing);
+    }
+
+    return map;
+  }, [events]);
 
   // A bottom sheet on a phone has room for one month, whatever the host asked
   // for: a second month side by side is 600px wide, and stacked is a scroll.
@@ -940,6 +1007,18 @@ export function CalendarGrid(props: CalendarGridProps) {
     const reason = unavailable?.(cell.date) ?? null;
     const selected = isSelected(cell.date);
     const focused = isSameDate(cell.date, effectiveFocus);
+
+    const dateKey = formatPlainDate(cell.date, "iso");
+
+    // Find recommendation information for this date. Unavailable dates will not be marked recommended
+    const recommendation = reason ? null : (recommendationsByDate.get(dateKey) ?? null);
+
+    // Find all events associated with this date.
+    const dayEvents = eventsByDate.get(dateKey) ?? [];
+
+    const hasDateDetails = Boolean(recommendation || dayEvents.length);
+    const tooltipId = `${calendarId}-day-info-${formatPlainDate(cell.date, "iso")}`;
+
     const inRange = Boolean(
       rangeBounds &&
       compareDates(cell.date, rangeBounds.lo) >= 0 &&
@@ -958,6 +1037,24 @@ export function CalendarGrid(props: CalendarGridProps) {
     else if (isHi) name += ", end of the selected range";
     else if (inRange) name += ", within the selected range";
     if (reason) name += `, unavailable, ${reason}`;
+    if (recommendation) {
+      name += `, recommended date. ${recommendation.reason}`;
+
+      if (recommendation.availability) {
+        name += ` ${recommendation.availability}`;
+      }
+
+      if (recommendation.conflicts?.length) {
+        name += ` Scheduling conflicts: ${recommendation.conflicts.join(", ")}`;
+      }
+    }
+
+    if (dayEvents.length) {
+      name += `, ${dayEvents.length} scheduled event${dayEvents.length === 1 ? "" : "s"}. `;
+      name += dayEvents
+        .map((item) => `${item.time ? `${item.time}, ` : ""}${item.title}`)
+        .join("; ");
+    }
     if (openings != null) {
       name +=
         openings === 0 ? ", no times" : `, ${openings} time${openings === 1 ? "" : "s"} available`;
@@ -971,6 +1068,7 @@ export function CalendarGrid(props: CalendarGridProps) {
         tabIndex={focused ? 0 : -1}
         data-zb-dt-focus={focused ? "true" : undefined}
         aria-label={name}
+        aria-describedby={hasDateDetails ? tooltipId : undefined}
         aria-selected={mode === "multiple" ? selected : selected || undefined}
         aria-disabled={reason ? true : undefined}
         title={reason ?? undefined}
@@ -978,6 +1076,9 @@ export function CalendarGrid(props: CalendarGridProps) {
           "zb-dt-cal__day",
           !cell.inMonth && "zb-dt-cal__day--outside",
           reason && "zb-dt-cal__day--unavailable",
+          recommendation && "zb-dt-cal__day--recommended",
+          recommendation && RECOMMENDATION_VARIANT_CLASS[recommendationVariant],
+          dayEvents.length > 0 && "zb-dt-cal__day--has-events",
           isSameDate(cell.date, today) && "zb-dt-cal__day--today",
           selected && "zb-dt-cal__day--selected",
           /*
@@ -1009,6 +1110,73 @@ export function CalendarGrid(props: CalendarGridProps) {
             {Array.from({ length: Math.min(3, openings) }, (_, i) => (
               <i key={i} />
             ))}
+          </span>
+        ) : null}
+
+        {dayEvents.length > 0 ? (
+          <span className="zb-dt-cal__event-marker" aria-hidden="true" />
+        ) : null}
+
+        {recommendation && recommendationVariant === "icon" ? (
+          <span className="zb-dt-cal__day-recommendation-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m12 3 1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2L12 3Z" />
+              <path d="m19 14 1.1 2.9L23 18l-2.9 1.1L19 22l-1.1-2.9L15 18l2.9-1.1L19 14Z" />
+            </svg>
+          </span>
+        ) : null}
+
+        {hasDateDetails ? (
+          <span id={tooltipId} role="tooltip" className="zb-dt-cal__day-tooltip">
+            {recommendation ? (
+              <span className="zb-dt-cal__tooltip-section">
+                <strong>
+                  <svg
+                    className="zb-dt-cal__ai-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="m12 3 1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2L12 3Z" />
+                    <path d="m19 14 1.1 2.9L23 18l-2.9 1.1L19 22l-1.1-2.9L15 18l2.9-1.1L19 14Z" />
+                  </svg>
+                  Why this date?
+                </strong>
+
+                {recommendation.availability ? <span>{recommendation.availability}</span> : null}
+
+                {recommendation.conflicts?.map((conflict, index) => (
+                  <span key={index}>{conflict}</span>
+                ))}
+
+                <span className="zb-dt-cal__tooltip-reason">
+                  <span className="zb-dt-cal__tooltip-check" aria-hidden="true" />
+                  <span>{recommendation.reason}</span>
+                </span>
+              </span>
+            ) : null}
+
+            {dayEvents.length > 0 ? (
+              <span className="zb-dt-cal__tooltip-section">
+                <strong>
+                  {dayEvents.length} {dayEvents.length === 1 ? "event" : "events"} scheduled
+                </strong>
+
+                {dayEvents.map((item, index) => (
+                  <span key={index} className="zb-dt-cal__tooltip-event">
+                    <span className="zb-dt-cal__tooltip-event-dot" aria-hidden="true" />
+                    <span>
+                      {item.time ? `${item.time} – ` : ""}
+                      {item.title}
+                    </span>
+                  </span>
+                ))}
+              </span>
+            ) : null}
           </span>
         ) : null}
       </button>
@@ -1089,7 +1257,17 @@ export function CalendarGrid(props: CalendarGridProps) {
 
   function renderMonth(ref: MonthRef, index: number) {
     const cells = buildMonthGrid(ref, weekStart);
-    const weeks = Array.from({ length: 6 }, (_, i) => cells.slice(i * 7, i * 7 + 7));
+    const allWeeks = Array.from({ length: 6 }, (_, i) => cells.slice(i * 7, i * 7 + 7));
+    const weeks =
+      hideOutsideRange && (min || max)
+        ? allWeeks.filter((week) =>
+            week.some(
+              (cell) =>
+                (!min || compareDates(cell.date, min) >= 0) &&
+                (!max || compareDates(cell.date, max) <= 0),
+            ),
+          )
+        : allWeeks;
     const title = titleOf(ref);
     const paneOpen = pane !== "days" && paneIndex === index;
 
@@ -1142,20 +1320,22 @@ export function CalendarGrid(props: CalendarGridProps) {
 
             {weeks.map((week, weekIndex) => (
               <div role="row" className="zb-dt-cal__row" key={`week-${weekIndex}`}>
-                {week.map((cell, position) =>
-                  showOutside || cell.inMonth ? (
+                {week.map((cell, position) => {
+                  const outsideRange =
+                    hideOutsideRange &&
+                    ((min != null && compareDates(cell.date, min) < 0) ||
+                      (max != null && compareDates(cell.date, max) > 0));
+
+                  return !outsideRange && (showOutside || cell.inMonth) ? (
                     renderCell(cell, position)
                   ) : (
-                    // The cell still exists, so the row keeps seven columns and
-                    // the weekday headers stay over the right days. It is just
-                    // not a date, here.
                     <div
                       key={formatPlainDate(cell.date, "iso")}
                       role="gridcell"
                       className="zb-dt-cal__blank"
                     />
-                  ),
-                )}
+                  );
+                })}
               </div>
             ))}
           </div>
