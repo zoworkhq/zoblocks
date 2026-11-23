@@ -1256,3 +1256,68 @@ describe("an export is an attack surface", () => {
     expect(csv).toContain('"Okonkwo, A. said ""no"""');
   });
 });
+
+/* ------------------------------------------------------------------ */
+/* Toolbar and criteria layout                                         */
+/* ------------------------------------------------------------------ */
+
+describe("toolbar and criteria layout", () => {
+  it("renders caller-owned content in all three layout slots", () => {
+    render(
+      <DataGrid
+        {...base}
+        coverage={CASELOAD_COVERAGE}
+        toolbar={<button type="button">Filter</button>}
+        criteria={<span>PHQ-9 above 10</span>}
+        filterPanel={<div>Filter editor</div>}
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: "Filter" })).toBeTruthy();
+    expect(screen.getByText("PHQ-9 above 10")).toBeTruthy();
+    expect(screen.getByText("Filter editor")).toBeTruthy();
+  });
+
+  it("places the slots before the existing arrivals strip and grid", () => {
+    const view = render(
+      <DataGrid
+        {...base}
+        coverage={CASELOAD_COVERAGE}
+        toolbar={<button type="button">Filter</button>}
+        criteria={<span>Active criteria</span>}
+        filterPanel={<div>Filter editor</div>}
+        arrivals={ARRIVALS}
+        onAdmitArrivals={() => {}}
+      />,
+    );
+
+    const grid = view.container.querySelector(".zb-grid");
+    const toolbar = view.container.querySelector(".zb-grid__toolbar");
+    const criteria = view.container.querySelector(".zb-grid__criteria");
+    const filterPanel = view.container.querySelector(".zb-grid__filter-panel");
+    const strip = view.container.querySelector(".zb-grid__strip");
+    const scroll = view.container.querySelector(".zb-grid__scroll");
+
+    expect(grid).toBeTruthy();
+    expect(toolbar).toBeTruthy();
+    expect(criteria).toBeTruthy();
+    expect(filterPanel).toBeTruthy();
+    expect(strip).toBeTruthy();
+    expect(scroll).toBeTruthy();
+
+    const children = Array.from(grid!.children);
+
+    expect(children.indexOf(toolbar!)).toBeLessThan(children.indexOf(filterPanel!));
+    expect(children.indexOf(filterPanel!)).toBeLessThan(children.indexOf(criteria!));
+    expect(children.indexOf(criteria!)).toBeLessThan(children.indexOf(strip!));
+    expect(children.indexOf(strip!)).toBeLessThan(children.indexOf(scroll!));
+  });
+
+  it("does not render empty wrappers when slots are omitted", () => {
+    const view = render(<DataGrid {...base} coverage={CASELOAD_COVERAGE} />);
+
+    expect(view.container.querySelector(".zb-grid__toolbar")).toBeNull();
+    expect(view.container.querySelector(".zb-grid__criteria")).toBeNull();
+    expect(view.container.querySelector(".zb-grid__filter-panel")).toBeNull();
+  });
+});
