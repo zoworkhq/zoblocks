@@ -10,7 +10,7 @@
  * cheapest to keep true.
  */
 
-import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { expectStatedInWords, itMeetsTheContract } from "../../../test/contract";
@@ -327,6 +327,415 @@ describe("sorting by a model is ranking a prediction", () => {
     render(<DataGrid {...base} coverage={CASELOAD_COVERAGE} />);
     const headers = screen.getAllByRole("columnheader");
     expect(headers.every((header) => header.hasAttribute("aria-sort"))).toBe(true);
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* Committed multi-column sorting                                     */
+/* ------------------------------------------------------------------ */
+
+describe("committed multi-column sorting", () => {
+  const sortRanks = [
+    { key: "name", direction: "ascending" as const },
+    { key: "phq9", direction: "descending" as const },
+    { key: "risk", direction: "descending" as const },
+  ];
+
+  it("shows the committed precedence ranks on their headers", () => {
+    render(<DataGrid {...base} coverage={CASELOAD_COVERAGE} sortRanks={sortRanks} />);
+
+    const phqHeader = screen.getByRole("columnheader", { name: /PHQ-9/ });
+    const riskHeader = screen.getByRole("columnheader", { name: /Disengagement risk/ });
+
+    expect(within(phqHeader).getByText("2")).toBeTruthy();
+    expect(within(riskHeader).getByText("3")).toBeTruthy();
+  });
+
+  it("clears one field and displays compacted ranks when the caller updates committed rules", async () => {
+    const user = userEvent.setup();
+    const onClearSort = vi.fn();
+
+    const view = render(
+      <DataGrid
+        {...base}
+        coverage={CASELOAD_COVERAGE}
+        sortRanks={sortRanks}
+        onClearSort={onClearSort}
+      />,
+    );
+
+    const phqHeader = screen.getByRole("columnheader", { name: /PHQ-9/ });
+
+    fireEvent.contextMenu(phqHeader, { clientX: 100, clientY: 100 });
+
+    await user.click(screen.getByRole("menuitem", { name: "Sort" }));
+
+    await user.click(await screen.findByRole("menuitem", { name: "Clear sort" }));
+
+    expect(onClearSort).toHaveBeenCalledWith("phq9");
+
+    view.rerender(
+      <DataGrid
+        {...base}
+        coverage={CASELOAD_COVERAGE}
+        sortRanks={[
+          { key: "name", direction: "ascending" },
+          { key: "risk", direction: "descending" },
+        ]}
+        onClearSort={onClearSort}
+      />,
+    );
+
+    expect(
+      within(screen.getByRole("columnheader", { name: /Disengagement risk/ })).getByText("2"),
+    ).toBeTruthy();
+  });
+
+  it("restores keyboard focus to the Sort button after Escape", async () => {
+    render(
+      <DataGrid
+        {...base}
+        coverage={CASELOAD_COVERAGE}
+        sortRanks={sortRanks}
+        onClearSort={vi.fn()}
+      />,
+    );
+
+    const phqHeader = screen.getByRole("columnheader", { name: /PHQ-9/ });
+    const sortButton = within(phqHeader).getByRole("button", { name: "Sort" });
+
+    sortButton.focus();
+    fireEvent.keyDown(sortButton, { key: "F10", shiftKey: true });
+
+    const menu = screen.getByRole("menu", { name: "Column actions" });
+    fireEvent.keyDown(menu, { key: "Escape" });
+
+    await waitFor(() => {
+      expect(document.activeElement).toBe(sortButton);
+    });
+  });
+
+  it("closes the submenu first on Escape and returns focus to its trigger", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <DataGrid
+        {...base}
+        coverage={CASELOAD_COVERAGE}
+        sortRanks={sortRanks}
+        onClearSort={vi.fn()}
+      />,
+    );
+
+    const phqHeader = screen.getByRole("columnheader", { name: /PHQ-9/ });
+    fireEvent.contextMenu(phqHeader, { clientX: 100, clientY: 100 });
+
+    const sortMenuItem = await screen.findByRole("menuitem", { name: "Sort" });
+    await user.click(sortMenuItem);
+
+    const sortSubmenu = await screen.findByRole("menu", { name: "sort options" });
+    expect(sortSubmenu).toBeInTheDocument();
+
+    fireEvent.keyDown(sortSubmenu, { key: "Escape" });
+
+    await waitFor(() => {
+      expect(screen.queryByRole("menu", { name: "sort options" })).toBeNull();
+      expect(sortMenuItem).toHaveFocus();
+    });
+
+    expect(screen.getByRole("menu", { name: "Column actions" })).toBeInTheDocument();
+  });
+
+  it("requests the host filter editor directly from the column menu", async () => {
+    const user = userEvent.setup();
+    const onFilterColumn = vi.fn();
+
+    const columns: DataGridColumn<CaseloadRow>[] = [
+      {
+        key: "cssrs",
+        header: "Risk screen",
+        kind: "status",
+        value: (row) => row.cssrs,
+        filterable: true,
+      },
+    ];
+
+    render(
+      <DataGrid
+        {...base}
+        columns={columns}
+        coverage={CASELOAD_COVERAGE}
+        onFilterColumn={onFilterColumn}
+      />,
+    );
+
+    const header = screen.getByRole("columnheader", { name: /Risk screen/ });
+    fireEvent.contextMenu(header, { clientX: 100, clientY: 100 });
+
+    const filterItem = await screen.findByRole("menuitem", { name: "Filter" });
+    await user.click(filterItem);
+
+    expect(onFilterColumn).toHaveBeenCalledTimes(1);
+    expect(onFilterColumn).toHaveBeenCalledWith("cssrs");
+    expect(screen.queryByRole("menu", { name: "Column actions" })).toBeNull();
+  });
+
+  it("opens the Group submenu with ArrowRight and returns with ArrowLeft", async () => {
+    const columns: DataGridColumn<CaseloadRow>[] = [
+      {
+        key: "program",
+        header: "Program",
+        kind: "text",
+        value: (row) => row.program,
+        groupable: true,
+      },
+    ];
+
+    render(
+      <DataGrid {...base} columns={columns} coverage={CASELOAD_COVERAGE} onGroupChange={vi.fn()} />,
+    );
+
+    const header = screen.getByRole("columnheader", { name: /Program/ });
+    fireEvent.contextMenu(header, { clientX: 100, clientY: 100 });
+
+    const groupTrigger = await screen.findByRole("menuitem", { name: "Group" });
+    groupTrigger.focus();
+    fireEvent.keyDown(groupTrigger, { key: "ArrowRight" });
+
+    const groupSubmenu = await screen.findByRole("menu", { name: "group options" });
+    const ascendingOption = within(groupSubmenu).getByRole("menuitemradio", {
+      name: "A to Z",
+    });
+
+    await waitFor(() => {
+      expect(ascendingOption).toHaveFocus();
+    });
+
+    fireEvent.keyDown(ascendingOption, { key: "ArrowLeft" });
+
+    await waitFor(() => {
+      expect(screen.queryByRole("menu", { name: "group options" })).toBeNull();
+      expect(groupTrigger).toHaveFocus();
+    });
+  });
+
+  it("ignores the browser contextmenu event after Shift+F10", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <DataGrid
+        {...base}
+        coverage={CASELOAD_COVERAGE}
+        sortRanks={sortRanks}
+        onClearSort={vi.fn()}
+      />,
+    );
+
+    const phqHeader = screen.getByRole("columnheader", { name: /PHQ-9/ });
+    const sortButton = within(phqHeader).getByRole("button", { name: "Sort" });
+
+    sortButton.focus();
+    fireEvent.keyDown(sortButton, { key: "F10", shiftKey: true });
+
+    const menu = await screen.findByRole("menu", { name: "Column actions" });
+    const sortMenuItem = screen.getByRole("menuitem", { name: "Sort" });
+
+    await waitFor(() => {
+      expect(sortMenuItem).toHaveFocus();
+    });
+
+    await user.click(sortMenuItem);
+
+    const clearSortItem = await screen.findByRole("menuitem", { name: "Clear sort" });
+
+    fireEvent.contextMenu(phqHeader);
+
+    expect(screen.getByRole("menu", { name: "Column actions" })).toBe(menu);
+    expect(clearSortItem).toBeInTheDocument();
+
+    await user.keyboard("{Escape}");
+  });
+
+  it("opens the sort menu with the ContextMenu key", async () => {
+    render(
+      <DataGrid
+        {...base}
+        coverage={CASELOAD_COVERAGE}
+        sortRanks={sortRanks}
+        onClearSort={vi.fn()}
+      />,
+    );
+
+    const phqHeader = screen.getByRole("columnheader", { name: /PHQ-9/ });
+    const sortButton = within(phqHeader).getByRole("button", { name: "Sort" });
+
+    sortButton.focus();
+    fireEvent.keyDown(sortButton, { key: "ContextMenu" });
+
+    expect(await screen.findByRole("menu", { name: "Column actions" })).toBeTruthy();
+  });
+
+  it("requests ascending and descending grouping from the host", async () => {
+    const user = userEvent.setup();
+    const onGroupChange = vi.fn();
+
+    const columns: DataGridColumn<CaseloadRow>[] = [
+      {
+        key: "program",
+        header: "Program",
+        kind: "text",
+        value: (row) => row.program,
+        groupable: true,
+      },
+    ];
+
+    render(
+      <DataGrid
+        {...base}
+        columns={columns}
+        coverage={CASELOAD_COVERAGE}
+        onGroupChange={onGroupChange}
+      />,
+    );
+
+    const header = screen.getByRole("columnheader", { name: /Program/ });
+    fireEvent.contextMenu(header, { clientX: 100, clientY: 100 });
+
+    await user.click(screen.getByRole("menuitem", { name: "Group" }));
+    await user.click(await screen.findByRole("menuitemradio", { name: "A to Z" }));
+
+    expect(onGroupChange).toHaveBeenLastCalledWith({
+      key: "program",
+      direction: "ascending",
+    });
+
+    fireEvent.contextMenu(header, { clientX: 100, clientY: 100 });
+    await user.click(screen.getByRole("menuitem", { name: "Group" }));
+    await user.click(await screen.findByRole("menuitemradio", { name: "Z to A" }));
+
+    expect(onGroupChange).toHaveBeenLastCalledWith({
+      key: "program",
+      direction: "descending",
+    });
+  });
+
+  it("offers Clear group only for the currently grouped column", async () => {
+    const user = userEvent.setup();
+    const onGroupChange = vi.fn();
+
+    const columns: DataGridColumn<CaseloadRow>[] = [
+      {
+        key: "program",
+        header: "Program",
+        kind: "text",
+        value: (row) => row.program,
+        groupable: true,
+      },
+    ];
+
+    render(
+      <DataGrid
+        {...base}
+        columns={columns}
+        coverage={CASELOAD_COVERAGE}
+        group={{ key: "program", direction: "ascending" }}
+        onGroupChange={onGroupChange}
+      />,
+    );
+
+    const header = screen.getByRole("columnheader", { name: /Program/ });
+    fireEvent.contextMenu(header, { clientX: 100, clientY: 100 });
+
+    await user.click(screen.getByRole("menuitem", { name: "Group" }));
+    await user.click(await screen.findByRole("menuitem", { name: "Clear group" }));
+
+    expect(onGroupChange).toHaveBeenCalledWith(null);
+  });
+
+  it("requests left and right pinning and can unpin the column", async () => {
+    const user = userEvent.setup();
+    const onColumnPinningChange = vi.fn();
+
+    const columns: DataGridColumn<CaseloadRow>[] = [
+      {
+        key: "program",
+        header: "Program",
+        kind: "text",
+        value: (row) => row.program,
+        pinnable: true,
+      },
+    ];
+
+    const view = render(
+      <DataGrid
+        {...base}
+        columns={columns}
+        coverage={CASELOAD_COVERAGE}
+        columnPinning={{}}
+        onColumnPinningChange={onColumnPinningChange}
+      />,
+    );
+
+    const header = screen.getByRole("columnheader", { name: /Program/ });
+    fireEvent.contextMenu(header, { clientX: 100, clientY: 100 });
+
+    await user.click(screen.getByRole("menuitem", { name: "Pin column" }));
+    await user.click(await screen.findByRole("menuitemradio", { name: "Pin left" }));
+
+    expect(onColumnPinningChange).toHaveBeenLastCalledWith({ program: "left" });
+
+    view.rerender(
+      <DataGrid
+        {...base}
+        columns={columns}
+        coverage={CASELOAD_COVERAGE}
+        columnPinning={{ program: "left" }}
+        onColumnPinningChange={onColumnPinningChange}
+      />,
+    );
+
+    fireEvent.contextMenu(header, { clientX: 100, clientY: 100 });
+    await user.click(screen.getByRole("menuitem", { name: "Pin column" }));
+    await user.click(await screen.findByRole("menuitemradio", { name: "Pin right" }));
+
+    expect(onColumnPinningChange).toHaveBeenLastCalledWith({ program: "right" });
+
+    fireEvent.contextMenu(header, { clientX: 100, clientY: 100 });
+    await user.click(screen.getByRole("menuitem", { name: "Pin column" }));
+    await user.click(await screen.findByRole("menuitem", { name: "Unpin column" }));
+
+    expect(onColumnPinningChange).toHaveBeenLastCalledWith({});
+  });
+
+  it("requests the host to hide the selected column", async () => {
+    const user = userEvent.setup();
+    const onHideColumn = vi.fn();
+
+    const columns: DataGridColumn<CaseloadRow>[] = [
+      {
+        key: "program",
+        header: "Program",
+        kind: "text",
+        value: (row) => row.program,
+        hideable: true,
+      },
+    ];
+
+    render(
+      <DataGrid
+        {...base}
+        columns={columns}
+        coverage={CASELOAD_COVERAGE}
+        onHideColumn={onHideColumn}
+      />,
+    );
+
+    const header = screen.getByRole("columnheader", { name: /Program/ });
+    fireEvent.contextMenu(header, { clientX: 100, clientY: 100 });
+
+    await user.click(screen.getByRole("menuitem", { name: "Hide column" }));
+
+    expect(onHideColumn).toHaveBeenCalledWith("program");
   });
 });
 
@@ -704,6 +1113,96 @@ describe("the parts of the API nothing was exercising", () => {
     expect(stops).toHaveLength(1);
     expect(stops[0]?.closest("thead")).not.toBeNull();
   });
+
+  it("places the Sort target before a right-aligned header label", () => {
+    const columns: DataGridColumn<CaseloadRow>[] = [
+      {
+        key: "nextContact",
+        header: "Next Contact",
+        kind: "text",
+        align: "end",
+        value: (row) => row.name,
+      },
+    ];
+
+    render(<DataGrid {...base} columns={columns} coverage={CASELOAD_COVERAGE} />);
+
+    const header = screen.getByRole("columnheader");
+    const sort = header.querySelector(".zb-grid__sort");
+    const label = header.querySelector(".zb-grid__label");
+
+    expect(header).toHaveClass("zb-grid__th--end");
+    expect(sort).not.toBeNull();
+    expect(label).not.toBeNull();
+    expect(
+      Boolean(
+        sort && label && sort.compareDocumentPosition(label) & Node.DOCUMENT_POSITION_FOLLOWING,
+      ),
+    ).toBe(true);
+    expect(sort).toHaveAttribute("title", "Sort");
+  });
+
+  it("adds the full-label tooltip only when the header text is truncated", () => {
+    const columns: DataGridColumn<CaseloadRow>[] = [
+      {
+        key: "nextContact",
+        header: "Next Contact",
+        kind: "text",
+        align: "end",
+        value: (row) => row.name,
+      },
+    ];
+
+    const { rerender } = render(
+      <DataGrid {...base} columns={columns} coverage={CASELOAD_COVERAGE} density="regular" />,
+    );
+
+    const label = document.querySelector('[data-zb-grid-label="nextContact"]') as HTMLElement;
+
+    Object.defineProperties(label, {
+      clientWidth: { configurable: true, value: 40 },
+      scrollWidth: { configurable: true, value: 120 },
+    });
+
+    rerender(
+      <DataGrid {...base} columns={columns} coverage={CASELOAD_COVERAGE} density="comfortable" />,
+    );
+
+    expect(label).toHaveAttribute("title", "Next Contact");
+    expect(screen.getByRole("columnheader").querySelector(".zb-grid__sort")).toHaveAttribute(
+      "title",
+      "Sort",
+    );
+  });
+
+  it("does not add a full-label tooltip when the header text fits", () => {
+    const columns: DataGridColumn<CaseloadRow>[] = [
+      {
+        key: "nextContact",
+        header: "Next Contact",
+        kind: "text",
+        align: "end",
+        value: (row) => row.name,
+      },
+    ];
+
+    const { rerender } = render(
+      <DataGrid {...base} columns={columns} coverage={CASELOAD_COVERAGE} density="regular" />,
+    );
+
+    const label = document.querySelector('[data-zb-grid-label="nextContact"]') as HTMLElement;
+
+    Object.defineProperties(label, {
+      clientWidth: { configurable: true, value: 120 },
+      scrollWidth: { configurable: true, value: 120 },
+    });
+
+    rerender(
+      <DataGrid {...base} columns={columns} coverage={CASELOAD_COVERAGE} density="comfortable" />,
+    );
+
+    expect(label).not.toHaveAttribute("title");
+  });
 });
 
 /* ------------------------------------------------------------------ */
@@ -901,9 +1400,60 @@ describe("the pinned column, measured rather than guessed", () => {
     expect(headers.at(-1)).toHaveClass("zb-grid__pin--edge");
   });
 
-  it("says when something has scrolled under the pinned column, and only when it changes", () => {
+  it("pins explicitly selected columns on both sides and leaves others unpinned", () => {
+    render(
+      <DataGrid
+        {...base}
+        coverage={CASELOAD_COVERAGE}
+        columnPinning={{ name: "left", phq9: "right" }}
+      />,
+    );
+
+    const name = screen.getByRole("columnheader", { name: /Client/ });
+    const phq9 = screen.getByRole("columnheader", { name: /PHQ-9/ });
+    const risk = screen.getByRole("columnheader", { name: /Disengagement risk/ });
+
+    expect(name).toHaveClass("zb-grid__pin", "zb-grid__pin--edge");
+    expect(phq9).toHaveClass("zb-grid__pin", "zb-grid__pin--edge--right");
+    expect(risk).not.toHaveClass("zb-grid__pin");
+
+    const firstRow = screen.getAllByRole("row")[1]!;
+    const cells = within(firstRow).getAllByRole("gridcell");
+
+    expect(cells[0]).toHaveClass("zb-grid__pin", "zb-grid__pin--edge");
+    expect(cells[2]).toHaveClass("zb-grid__pin", "zb-grid__pin--edge--right");
+    expect(cells[1]).not.toHaveClass("zb-grid__pin");
+  });
+
+  it("keeps the selection column pinned in explicit pinning mode", () => {
+    render(
+      <DataGrid
+        {...base}
+        coverage={CASELOAD_COVERAGE}
+        columnPinning={{ phq9: "right" }}
+        selectedKeys={[]}
+        onSelectionChange={() => {}}
+        bulkActions={() => null}
+      />,
+    );
+
+    const selectAll = screen.getByRole("checkbox", { name: /Select all/ });
+    const selectRow = screen.getByRole("checkbox", { name: "Select row 1" });
+
+    expect(selectAll.closest("th")).toHaveClass("zb-grid__pin");
+    expect(selectRow.closest("td")).toHaveClass("zb-grid__pin");
+
+    const phq9 = screen.getByRole("columnheader", { name: /PHQ-9/ });
+    expect(phq9).toHaveClass("zb-grid__pin", "zb-grid__pin--edge--right");
+  });
+
+  it("tracks left and right scroll edges for pinned-column seams", () => {
     render(<DataGrid {...base} coverage={CASELOAD_COVERAGE} />);
     const scroller = document.querySelector(".zb-grid__scroll") as HTMLElement;
+
+    Object.defineProperty(scroller, "scrollWidth", { configurable: true, value: 1000 });
+    Object.defineProperty(scroller, "clientWidth", { configurable: true, value: 500 });
+
     const scrollTo = (left: number) => {
       Object.defineProperty(scroller, "scrollLeft", { configurable: true, value: left });
       fireEvent.scroll(scroller);
@@ -911,13 +1461,27 @@ describe("the pinned column, measured rather than guessed", () => {
 
     scrollTo(200);
     expect(scroller.dataset.zbScrolled).toBe("true");
+    expect(scroller.dataset.zbScrolledLeft).toBe("true");
+    expect(scroller.dataset.zbScrolledRight).toBe("true");
+
     scrollTo(240);
-    expect(scroller.dataset.zbScrolled).toBe("true");
+    expect(scroller.dataset.zbScrolledLeft).toBe("true");
+    expect(scroller.dataset.zbScrolledRight).toBe("true");
+
     // RTL reports a negative scrollLeft; it is still scrolled.
     scrollTo(-40);
     expect(scroller.dataset.zbScrolled).toBe("true");
+    expect(scroller.dataset.zbScrolledLeft).toBe("true");
+    expect(scroller.dataset.zbScrolledRight).toBe("true");
+
+    scrollTo(500);
+    expect(scroller.dataset.zbScrolledLeft).toBe("true");
+    expect(scroller.dataset.zbScrolledRight).toBe("false");
+
     scrollTo(0);
     expect(scroller.dataset.zbScrolled).toBe("false");
+    expect(scroller.dataset.zbScrolledLeft).toBe("false");
+    expect(scroller.dataset.zbScrolledRight).toBe("true");
   });
 
   it("takes a tap on the area around a checkbox, not only on its 15px box", async () => {
@@ -1254,5 +1818,70 @@ describe("an export is an attack surface", () => {
     ];
     const csv = toGridDelimited([{ note: 'Okonkwo, A. said "no"' }], columns, {});
     expect(csv).toContain('"Okonkwo, A. said ""no"""');
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* Toolbar and criteria layout                                         */
+/* ------------------------------------------------------------------ */
+
+describe("toolbar and criteria layout", () => {
+  it("renders caller-owned content in all three layout slots", () => {
+    render(
+      <DataGrid
+        {...base}
+        coverage={CASELOAD_COVERAGE}
+        toolbar={<button type="button">Filter</button>}
+        criteria={<span>PHQ-9 above 10</span>}
+        filterPanel={<div>Filter editor</div>}
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: "Filter" })).toBeTruthy();
+    expect(screen.getByText("PHQ-9 above 10")).toBeTruthy();
+    expect(screen.getByText("Filter editor")).toBeTruthy();
+  });
+
+  it("places the slots before the existing arrivals strip and grid", () => {
+    const view = render(
+      <DataGrid
+        {...base}
+        coverage={CASELOAD_COVERAGE}
+        toolbar={<button type="button">Filter</button>}
+        criteria={<span>Active criteria</span>}
+        filterPanel={<div>Filter editor</div>}
+        arrivals={ARRIVALS}
+        onAdmitArrivals={() => {}}
+      />,
+    );
+
+    const grid = view.container.querySelector(".zb-grid");
+    const toolbar = view.container.querySelector(".zb-grid__toolbar");
+    const criteria = view.container.querySelector(".zb-grid__criteria");
+    const filterPanel = view.container.querySelector(".zb-grid__filter-panel");
+    const strip = view.container.querySelector(".zb-grid__strip");
+    const scroll = view.container.querySelector(".zb-grid__scroll");
+
+    expect(grid).toBeTruthy();
+    expect(toolbar).toBeTruthy();
+    expect(criteria).toBeTruthy();
+    expect(filterPanel).toBeTruthy();
+    expect(strip).toBeTruthy();
+    expect(scroll).toBeTruthy();
+
+    const children = Array.from(grid!.children);
+
+    expect(children.indexOf(toolbar!)).toBeLessThan(children.indexOf(filterPanel!));
+    expect(children.indexOf(filterPanel!)).toBeLessThan(children.indexOf(criteria!));
+    expect(children.indexOf(criteria!)).toBeLessThan(children.indexOf(strip!));
+    expect(children.indexOf(strip!)).toBeLessThan(children.indexOf(scroll!));
+  });
+
+  it("does not render empty wrappers when slots are omitted", () => {
+    const view = render(<DataGrid {...base} coverage={CASELOAD_COVERAGE} />);
+
+    expect(view.container.querySelector(".zb-grid__toolbar")).toBeNull();
+    expect(view.container.querySelector(".zb-grid__criteria")).toBeNull();
+    expect(view.container.querySelector(".zb-grid__filter-panel")).toBeNull();
   });
 });

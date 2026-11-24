@@ -7,7 +7,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 //
-// Generated from registry/zoblocks/data-grid/data-grid.tsx. Edit that file, not this one.
+// Generated from registry\zoblocks\data-grid\data-grid.tsx. Edit that file, not this one.
 /**
  * DataGrid — a worklist that states what it is showing, out of what.
  *
@@ -62,6 +62,22 @@
  */
 
 import * as React from "react";
+import {
+  ArrowDown,
+  ArrowDownUp,
+  ArrowUp,
+  ArrowRight,
+  ArrowLeft,
+  ChevronRight,
+  EyeOff,
+  Filter,
+  Layers,
+  Pin,
+  PinOff,
+  RotateCcw,
+  X,
+} from "lucide-react";
+import { createPortal } from "react-dom";
 import { cn } from "../../lib/utils";
 import {
   describeGridArrivals,
@@ -85,6 +101,7 @@ import {
   type GridCoverage,
   type GridIdentity,
   type GridSort,
+  type GridSortDirection,
   type GridValue,
 } from "../../lib/grid";
 
@@ -139,6 +156,12 @@ export {
  * impossible — which is the feature every worklist product is eventually
  * asked for.
  */
+export type DataGridGroup = {
+  key: string;
+  direction: GridSortDirection;
+};
+
+export type DataGridColumnPinning = Readonly<Record<string, "left" | "right">>;
 export interface DataGridColumn<Row> extends GridColumnSpec<Row> {
   /**
    * How the value is drawn. Returns nodes; there is no path here that takes a
@@ -155,6 +178,14 @@ export interface DataGridColumn<Row> extends GridColumnSpec<Row> {
   align?: "start" | "end";
   /** Anything the header cannot say in two words. Printed as a footnote. */
   footnote?: string;
+  /** Whether the host can open filtering for this column. */
+  filterable?: boolean;
+  /** Whether the host supports categorical grouping for this column. */
+  groupable?: boolean;
+  /** Whether the host allows this column to be pinned left or right. */
+  pinnable?: boolean;
+  /** Whether the host allows this column to be hidden. */
+  hideable?: boolean;
 }
 
 export interface DataGridProps<Row> {
@@ -200,8 +231,23 @@ export interface DataGridProps<Row> {
    * grid cannot, such as which filter to drop.
    */
   empty?: React.ReactNode;
+  /**
+   * Optional status row inside the table body, displayed alongside existing
+   * rows. Useful when a refresh fails but the previous results are retained.
+   */
+  bodyStatus?: React.ReactNode;
   /** The right-hand side of the masthead: a window, a source, a role. */
   note?: React.ReactNode;
+
+  /**
+   * Optional layout slots above the grid.
+   *
+   * These are presentation-only: the caller supplies the controls and owns
+   * their state and behavior. The grid provides their placement and styling.
+   */
+  toolbar?: React.ReactNode;
+  criteria?: React.ReactNode;
+  filterPanel?: React.ReactNode;
 
   /** The columns, in display order. Typed objects rather than JSX children, so a saved view can carry them. */
   columns: readonly DataGridColumn<Row>[];
@@ -224,6 +270,28 @@ export interface DataGridProps<Row> {
   defaultSort?: GridSort | null;
   /** Fires on every sort change, including the third activation that clears it back to your order. */
   onSortChange?: (sort: GridSort | null) => void;
+  /**
+   * Ordered, committed sort rules. Used to show multi-sort precedence;
+   * the grid continues to own only its existing single-sort behavior.
+   */
+  sortRanks?: readonly GridSort[];
+  /** Clear one committed sort field by column key. */
+  onClearSort?: (columnKey: string) => void;
+  /** Open the host's filter UI for one column. */
+  onFilterColumn?: (columnKey: string) => void;
+
+  /** The currently grouped column and its direction. */
+  group?: DataGridGroup | null;
+  /** Change or clear the grouped column. */
+  onGroupChange?: (group: DataGridGroup | null) => void;
+
+  /** Per-column pin placement. Omit to retain legacy pinnedColumns behavior. */
+  columnPinning?: DataGridColumnPinning;
+  /** Change per-column pin placement. */
+  onColumnPinningChange?: (pinning: DataGridColumnPinning) => void;
+
+  /** Hide one column; the host removes it from the displayed column list. */
+  onHideColumn?: (columnKey: string) => void;
 
   /**
    * Results that have landed and are being held.
@@ -392,6 +460,9 @@ export function DataGrid<Row>({
   caption,
   title,
   note,
+  toolbar,
+  criteria,
+  filterPanel,
   columns,
   rows,
   rowKey,
@@ -399,6 +470,14 @@ export function DataGrid<Row>({
   sort: sortProp,
   defaultSort = null,
   onSortChange,
+  sortRanks = [],
+  onClearSort,
+  onFilterColumn,
+  group,
+  onGroupChange,
+  columnPinning,
+  onColumnPinningChange,
+  onHideColumn,
   arrivals,
   arrivalsAt,
   onAdmitArrivals,
@@ -408,6 +487,7 @@ export function DataGrid<Row>({
   masthead = true,
   footer = true,
   empty,
+  bodyStatus,
   selectedKeys,
   onSelectionChange,
   bulkActions,
@@ -446,6 +526,194 @@ export function DataGrid<Row>({
 
   const bodyRef = React.useRef<HTMLTableSectionElement>(null);
   const headRef = React.useRef<HTMLTableRowElement>(null);
+  const [truncatedHeaders, setTruncatedHeaders] = React.useState<Set<string>>(() => new Set());
+  const [sortMenu, setSortMenu] = React.useState<{
+    columnKey: string;
+    x: number;
+    y: number;
+  } | null>(null);
+
+  const [activeSubmenu, setActiveSubmenu] = React.useState<{
+    type: "group" | "sort" | "pin";
+    x: number;
+    y: number;
+  } | null>(null);
+
+  const sortMenuRef = React.useRef<HTMLDivElement>(null);
+  const sortSubmenuRef = React.useRef<HTMLDivElement>(null);
+  React.useLayoutEffect(() => {
+    if (!activeSubmenu || !sortSubmenuRef.current) return;
+
+    const submenu = sortSubmenuRef.current;
+    const rect = submenu.getBoundingClientRect();
+    const triggerRect = submenuTriggerRef.current?.getBoundingClientRect();
+
+    if (!triggerRect) return;
+
+    const viewportPadding = 8;
+    const openLeft = triggerRect.right + rect.width > window.innerWidth - viewportPadding;
+
+    const maxLeft = window.innerWidth - rect.width - viewportPadding;
+    const nextLeft = Math.max(
+      viewportPadding,
+      Math.min(openLeft ? triggerRect.left - rect.width : triggerRect.right, maxLeft),
+    );
+
+    const maxTop = window.innerHeight - rect.height - viewportPadding;
+    const nextTop = Math.max(viewportPadding, Math.min(triggerRect.top, maxTop));
+
+    if (nextLeft !== activeSubmenu.x || nextTop !== activeSubmenu.y) {
+      setActiveSubmenu((current) => (current ? { ...current, x: nextLeft, y: nextTop } : current));
+    }
+  }, [activeSubmenu]);
+  const submenuTriggerRef = React.useRef<HTMLElement | null>(null);
+  const sortMenuTriggerRef = React.useRef<HTMLElement | null>(null);
+  const sortMenuOpenedByKeyboard = React.useRef(false);
+
+  const sortRankByKey = new Map(
+    sortRanks.map((rule, index) => [rule.key, { rank: index + 1, direction: rule.direction }]),
+  );
+
+  const openSortMenu = (
+    columnKey: string,
+    trigger: HTMLElement,
+    x: number,
+    y: number,
+    fromKeyboard = false,
+  ) => {
+    sortMenuTriggerRef.current = trigger;
+    sortMenuOpenedByKeyboard.current = fromKeyboard;
+    setSortMenu({ columnKey, x, y });
+  };
+
+  const closeSortMenu = (restoreFocus = false) => {
+    setSortMenu(null);
+    setActiveSubmenu(null);
+    sortMenuOpenedByKeyboard.current = false;
+
+    if (restoreFocus) {
+      requestAnimationFrame(() => sortMenuTriggerRef.current?.focus());
+    }
+  };
+  React.useEffect(() => {
+    if (!sortMenu) return;
+
+    sortMenuRef.current?.querySelector<HTMLButtonElement>('[role="menuitem"]')?.focus();
+
+    const handleOutsidePointer = (event: PointerEvent) => {
+      const target = event.target as Node;
+
+      const insideMainMenu = sortMenuRef.current?.contains(target);
+      const insideSubmenu = sortSubmenuRef.current?.contains(target);
+
+      if (!insideMainMenu && !insideSubmenu) {
+        closeSortMenu(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handleOutsidePointer);
+
+    return () => {
+      document.removeEventListener("pointerdown", handleOutsidePointer);
+    };
+  }, [sortMenu]);
+
+  const handleSortMenuKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    const activeMenu = (event.target as HTMLElement).closest<HTMLElement>('[role="menu"]');
+
+    const items = activeMenu
+      ? Array.from(
+          activeMenu.querySelectorAll<HTMLButtonElement>(
+            '[role="menuitem"], [role="menuitemradio"]',
+          ),
+        ).filter((item) => !item.disabled)
+      : [];
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+
+      if (activeSubmenu) {
+        setActiveSubmenu(null);
+        requestAnimationFrame(() => submenuTriggerRef.current?.focus());
+        return;
+      }
+
+      closeSortMenu(true);
+      return;
+    }
+
+    if (!items.length) return;
+
+    const currentIndex = items.indexOf(document.activeElement as HTMLButtonElement);
+
+    let nextIndex: number | null = null;
+
+    if (event.key === "ArrowRight") {
+      const trigger = document.activeElement as HTMLButtonElement;
+      const submenuType = trigger.dataset.submenu as "group" | "sort" | "pin" | undefined;
+
+      if (submenuType) {
+        event.preventDefault();
+        openSubmenu(submenuType, trigger);
+
+        requestAnimationFrame(() => {
+          sortSubmenuRef.current
+            ?.querySelector<HTMLButtonElement>('[role="menuitem"], [role="menuitemradio"]')
+            ?.focus();
+        });
+      }
+
+      return;
+    } else if (event.key === "ArrowLeft" && activeSubmenu) {
+      event.preventDefault();
+      setActiveSubmenu(null);
+      requestAnimationFrame(() => submenuTriggerRef.current?.focus());
+      return;
+    } else if (event.key === "ArrowDown") {
+      nextIndex = (currentIndex + 1) % items.length;
+    } else if (event.key === "ArrowUp") {
+      nextIndex = (currentIndex - 1 + items.length) % items.length;
+    } else if (event.key === "Home") {
+      nextIndex = 0;
+    } else if (event.key === "End") {
+      nextIndex = items.length - 1;
+    }
+
+    if (nextIndex !== null) {
+      event.preventDefault();
+      items[nextIndex]?.focus();
+    }
+  };
+
+  React.useLayoutEffect(() => {
+    const head = headRef.current;
+    if (!head) return;
+
+    const labels = [...head.querySelectorAll<HTMLElement>("[data-zb-grid-label]")];
+
+    const measure = () => {
+      const next = new Set(
+        labels
+          .filter((label) => label.scrollWidth > label.clientWidth)
+          .map((label) => label.dataset.zbGridLabel)
+          .filter((key): key is string => Boolean(key)),
+      );
+
+      setTruncatedHeaders((current) => {
+        if (current.size === next.size && [...current].every((key) => next.has(key))) {
+          return current;
+        }
+        return next;
+      });
+    };
+
+    measure();
+
+    const observer = new ResizeObserver(measure);
+    labels.forEach((label) => observer.observe(label));
+
+    return () => observer.disconnect();
+  }, [columns, density]);
   const wantsFocus = React.useRef(false);
 
   /*
@@ -469,8 +737,22 @@ export function DataGrid<Row>({
    */
   const onScroll = React.useCallback((event: React.UIEvent<HTMLDivElement>) => {
     const node = event.currentTarget;
-    const scrolled = Math.abs(node.scrollLeft) > 0 ? "true" : "false";
-    if (node.dataset.zbScrolled !== scrolled) node.dataset.zbScrolled = scrolled;
+    const maxScroll = node.scrollWidth - node.clientWidth;
+    const scrollLeft = Math.abs(node.scrollLeft);
+
+    const scrolled = scrollLeft > 0 ? "true" : "false";
+    const scrolledLeft = scrollLeft > 0 ? "true" : "false";
+    const scrolledRight = scrollLeft < maxScroll ? "true" : "false";
+
+    if (node.dataset.zbScrolled !== scrolled) {
+      node.dataset.zbScrolled = scrolled;
+    }
+    if (node.dataset.zbScrolledLeft !== scrolledLeft) {
+      node.dataset.zbScrolledLeft = scrolledLeft;
+    }
+    if (node.dataset.zbScrolledRight !== scrolledRight) {
+      node.dataset.zbScrolledRight = scrolledRight;
+    }
   }, []);
 
   const selectable = Boolean(selectedKeys && onSelectionChange);
@@ -488,31 +770,92 @@ export function DataGrid<Row>({
    * container changes width or the density control moves.
    */
   const [pinOffsets, setPinOffsets] = React.useState<number[]>([]);
+  const [columnPinStyles, setColumnPinStyles] = React.useState<Record<string, React.CSSProperties>>(
+    {},
+  );
+
   React.useLayoutEffect(() => {
     const head = headRef.current;
-    if (!head || pinned <= 0) {
+
+    if (!head) {
       setPinOffsets([]);
+      setColumnPinStyles({});
       return;
     }
+
     const measure = () => {
       const cells = [...head.children] as HTMLElement[];
-      const offsets: number[] = [];
-      let running = 0;
-      for (let i = 0; i < pinned + (selectable ? 1 : 0); i += 1) {
-        offsets.push(running);
-        running += cells[i]?.offsetWidth ?? 0;
+
+      // Legacy leading-column pinning.
+      const legacyOffsets: number[] = [];
+      let legacyRunning = 0;
+
+      if (columnPinning === undefined) {
+        for (let i = 0; i < pinned + (selectable ? 1 : 0); i += 1) {
+          legacyOffsets.push(legacyRunning);
+          legacyRunning += cells[i]?.offsetWidth ?? 0;
+        }
       }
+
+      // Explicit per-column pinning.
+      const nextStyles: Record<string, React.CSSProperties> = {};
+
+      if (columnPinning !== undefined) {
+        let leftRunning = selectable ? (cells[0]?.offsetWidth ?? 0) : 0;
+
+        for (let index = 0; index < columns.length; index += 1) {
+          const column = columns[index];
+          if (!column) continue;
+
+          if (columnPinning[column.key] !== "left") continue;
+
+          nextStyles[column.key] = { left: leftRunning };
+          leftRunning += cells[index + (selectable ? 1 : 0)]?.offsetWidth ?? 0;
+        }
+        let rightRunning = 0;
+
+        for (let index = columns.length - 1; index >= 0; index -= 1) {
+          const column = columns[index];
+          if (!column) continue;
+
+          if (columnPinning[column.key] !== "right") continue;
+
+          nextStyles[column.key] = { right: rightRunning };
+          rightRunning += cells[index + (selectable ? 1 : 0)]?.offsetWidth ?? 0;
+        }
+      }
+
       setPinOffsets((current) =>
-        current.length === offsets.length && current.every((v, i) => v === offsets[i])
+        current.length === legacyOffsets.length &&
+        current.every((value, index) => value === legacyOffsets[index])
           ? current
-          : offsets,
+          : legacyOffsets,
       );
+
+      setColumnPinStyles((current) => {
+        const keys = Object.keys(nextStyles);
+        if (
+          keys.length === Object.keys(current).length &&
+          keys.every(
+            (key) =>
+              current[key]?.left === nextStyles[key]?.left &&
+              current[key]?.right === nextStyles[key]?.right,
+          )
+        ) {
+          return current;
+        }
+
+        return nextStyles;
+      });
     };
+
     measure();
+
     const observer = new ResizeObserver(measure);
     observer.observe(head);
+
     return () => observer.disconnect();
-  }, [pinned, selectable, columns, density]);
+  }, [pinned, selectable, columns, density, columnPinning]);
 
   const refusal = gridCapacityRefusal(rows.length, ceiling);
 
@@ -611,11 +954,22 @@ export function DataGrid<Row>({
 
   const applySort = React.useCallback(
     (column: DataGridColumn<Row>) => {
-      const next = nextGridSort(sort, column);
+      const multiSortEnabled = Boolean(onClearSort);
+      const current = multiSortEnabled
+        ? (sortRanks.find((rule) => rule.key === column.key) ?? null)
+        : sort;
+
+      const next = nextGridSort(current, column);
+
+      if (multiSortEnabled && current && !next) {
+        onClearSort?.(column.key);
+        return;
+      }
+
       if (sortProp === undefined) setUncontrolledSort(next);
       onSortChange?.(next);
     },
-    [onSortChange, sort, sortProp],
+    [onClearSort, onSortChange, sort, sortProp, sortRanks],
   );
 
   const onKeyDown = React.useCallback(
@@ -690,8 +1044,116 @@ export function DataGrid<Row>({
      changes the height of anything below it. */
   const stripVisible = held > 0 || Boolean(selectable && bulkActions);
   const pinnedCount = pinned + (selectable ? 1 : 0);
-  const pinStyle = (index: number) =>
-    index < pinOffsets.length ? { left: pinOffsets[index] } : undefined;
+
+  const isColumnPinned = (column: DataGridColumn<Row>, index: number) =>
+    columnPinning === undefined
+      ? index < pinned
+      : columnPinning[column.key] === "left" || columnPinning[column.key] === "right";
+
+  const columnPinStyle = (column: DataGridColumn<Row>, index: number) =>
+    columnPinning === undefined
+      ? pinOffsets[index + (selectable ? 1 : 0)] !== undefined
+        ? { left: pinOffsets[index + (selectable ? 1 : 0)] }
+        : undefined
+      : columnPinStyles[column.key];
+
+  const pinStyle = (index: number): React.CSSProperties | undefined => {
+    if (columnPinning !== undefined) {
+      return selectable && index === 0 ? { left: 0 } : undefined;
+    }
+
+    const left = pinOffsets[index];
+    return left === undefined ? undefined : { left };
+  };
+
+  const leftPinnedKeys =
+    columnPinning === undefined
+      ? columns.slice(0, pinned).map((column) => column.key)
+      : columns
+          .filter((column) => columnPinning[column.key] === "left")
+          .map((column) => column.key);
+
+  const rightPinnedKeys =
+    columnPinning === undefined
+      ? []
+      : columns
+          .filter((column) => columnPinning[column.key] === "right")
+          .map((column) => column.key);
+
+  const leftPinEdgeKey = leftPinnedKeys.at(-1);
+  const rightPinEdgeKey = rightPinnedKeys[0];
+
+  const openSubmenu = (type: "group" | "sort" | "pin", trigger: HTMLElement) => {
+    submenuTriggerRef.current = trigger;
+
+    const rect = trigger.getBoundingClientRect();
+
+    setActiveSubmenu({
+      type,
+      x: rect.right,
+      y: rect.top,
+    });
+  };
+  const menuColumn = sortMenu
+    ? columns.find((column) => column.key === sortMenu.columnKey)
+    : undefined;
+
+  const menuSort = sortMenu ? sortRankByKey.get(sortMenu.columnKey) : undefined;
+
+  const canFilter = Boolean(menuColumn?.filterable);
+  const canGroup = Boolean(menuColumn?.groupable);
+
+  const canSort = Boolean(
+    menuColumn &&
+    menuColumn.sortable !== false &&
+    typeof menuColumn.value === "function" &&
+    (onSortChange || sortProp === undefined),
+  );
+
+  const canPin = Boolean(menuColumn?.pinnable);
+
+  const canHide = Boolean(menuColumn?.hideable);
+  const menuSortDirection =
+    menuSort?.direction ?? (sort?.key === menuColumn?.key ? sort?.direction : undefined);
+
+  const canClearSort = Boolean(
+    menuSortDirection && (onClearSort || onSortChange || sortProp === undefined),
+  );
+
+  const canClearGroup = Boolean(menuColumn && group?.key === menuColumn.key);
+
+  const currentPin = menuColumn ? columnPinning?.[menuColumn.key] : undefined;
+  const setMenuSortDirection = (direction: GridSortDirection) => {
+    if (!menuColumn) return;
+
+    const next: GridSort = {
+      key: menuColumn.key,
+      direction,
+    };
+
+    if (sortProp === undefined) {
+      setUncontrolledSort(next);
+    }
+
+    onSortChange?.(next);
+    closeSortMenu(true);
+  };
+
+  const clearMenuSort = () => {
+    if (!menuColumn) return;
+
+    if (onClearSort) {
+      onClearSort(menuColumn.key);
+    } else {
+      if (sortProp === undefined) {
+        setUncontrolledSort(null);
+      }
+
+      onSortChange?.(null);
+    }
+
+    closeSortMenu(true);
+  };
 
   return (
     <section
@@ -735,6 +1197,12 @@ export function DataGrid<Row>({
           ) : null}
         </header>
       ) : null}
+
+      {toolbar != null ? <div className="zb-grid__toolbar">{toolbar}</div> : null}
+
+      {filterPanel != null ? <div className="zb-grid__filter-panel">{filterPanel}</div> : null}
+
+      {criteria != null ? <div className="zb-grid__criteria">{criteria}</div> : null}
 
       {/*
         One strip above the header, with two things that can occupy it.
@@ -837,7 +1305,10 @@ export function DataGrid<Row>({
               {selectable ? (
                 <th
                   scope="col"
-                  className={cn("zb-grid__th zb-grid__th--select", pinnedCount && "zb-grid__pin")}
+                  className={cn(
+                    "zb-grid__th zb-grid__th--select",
+                    (columnPinning !== undefined || pinnedCount > 0) && "zb-grid__pin",
+                  )}
                   style={pinStyle(0)}
                 >
                   <label className="zb-grid__hit">
@@ -859,6 +1330,7 @@ export function DataGrid<Row>({
                 const mark = marks.get(column.key);
                 const tab = cursor.row === HEADER_ROW && cursor.column === index ? 0 : -1;
                 const sortable = column.sortable !== false && Boolean(column.value);
+                const committedRank = sortRankByKey.get(column.key);
 
                 return (
                   <th
@@ -873,46 +1345,127 @@ export function DataGrid<Row>({
                       "zb-grid__th",
                       ALIGN_CLASS[defaultAlign(column)].th,
                       active && "zb-grid__th--sorted",
-                      index < pinned && "zb-grid__pin",
-                      index === pinned - 1 && "zb-grid__pin--edge",
+                      isColumnPinned(column, index) && "zb-grid__pin",
+                      column.key === leftPinEdgeKey && "zb-grid__pin--edge",
+                      column.key === rightPinEdgeKey && "zb-grid__pin--edge--right",
                     )}
                     style={{
                       ...(column.width ? { width: column.width } : null),
-                      ...pinStyle(index + (selectable ? 1 : 0)),
+                      ...columnPinStyle(column, index),
+                    }}
+                    onContextMenu={(event) => {
+                      event.preventDefault();
+                      if (sortMenuOpenedByKeyboard.current) return;
+                      const trigger =
+                        event.currentTarget.querySelector<HTMLButtonElement>(".zb-grid__sort") ??
+                        event.currentTarget;
+
+                      openSortMenu(column.key, trigger, event.clientX, event.clientY);
+                    }}
+                    onClick={(event) => {
+                      const target = event.target as HTMLElement;
+
+                      if (
+                        target.closest(".zb-grid__sort") ||
+                        target.closest("[data-zb-grid-resize]")
+                      ) {
+                        return;
+                      }
+
+                      const rect = event.currentTarget.getBoundingClientRect();
+                      openSortMenu(column.key, event.currentTarget, rect.left, rect.bottom);
+                    }}
+                    onKeyDown={(event) => {
+                      if ((event.shiftKey && event.key === "F10") || event.key === "ContextMenu") {
+                        event.preventDefault();
+
+                        const rect = event.currentTarget.getBoundingClientRect();
+
+                        const trigger =
+                          event.currentTarget.querySelector<HTMLButtonElement>(".zb-grid__sort") ??
+                          event.currentTarget;
+
+                        openSortMenu(column.key, trigger, rect.left, rect.bottom, true);
+                      }
                     }}
                   >
-                    {sortable ? (
-                      <button
-                        type="button"
-                        data-zb-cell=""
-                        data-zb-col={index}
-                        tabIndex={tab}
-                        className="zb-grid__sort"
-                        onClick={() => {
-                          place({ row: HEADER_ROW, column: index });
-                          applySort(column);
-                        }}
-                      >
-                        <span className="zb-grid__label">{column.header}</span>
-                        {mark ? <sup className="zb-grid__mark">{mark}</sup> : null}
-                        {/* A glyph, not a colour, and it is absent rather than
-                            dimmed when the column is not the sorted one — an
-                            arrow on every header teaches nothing. */}
-                        <span aria-hidden="true" className="zb-grid__arrow">
-                          {active ? (sort?.direction === "ascending" ? "↑" : "↓") : ""}
+                    <div className="zb-grid__header-content">
+                      {sortable ? (
+                        <>
+                          {defaultAlign(column) === "end" ? (
+                            <button
+                              type="button"
+                              data-zb-cell=""
+                              data-zb-col={index}
+                              tabIndex={tab}
+                              className="zb-grid__sort"
+                              aria-label="Sort"
+                              title="Sort"
+                              onClick={() => {
+                                place({ row: HEADER_ROW, column: index });
+                                applySort(column);
+                              }}
+                            >
+                              <span aria-hidden="true" className="zb-grid__sort-icon">
+                                {active ? (sort?.direction === "ascending" ? "↑" : "↓") : "↕"}
+                              </span>
+                            </button>
+                          ) : null}
+
+                          <span className="zb-grid__label">
+                            <span
+                              className="zb-grid__label-text"
+                              data-zb-grid-label={column.key}
+                              title={truncatedHeaders.has(column.key) ? column.header : undefined}
+                            >
+                              {column.header}
+                            </span>
+
+                            {committedRank ? (
+                              <sup
+                                className="zb-grid__sort-rank"
+                                aria-label={`Sort rank ${committedRank.rank}, ${committedRank.direction}`}
+                                title={`Sort rank ${committedRank.rank}`}
+                              >
+                                {committedRank.rank}
+                              </sup>
+                            ) : null}
+
+                            {mark ? <sup className="zb-grid__mark">{mark}</sup> : null}
+                          </span>
+
+                          {defaultAlign(column) === "start" ? (
+                            <button
+                              type="button"
+                              data-zb-cell=""
+                              data-zb-col={index}
+                              tabIndex={tab}
+                              className="zb-grid__sort"
+                              aria-label="Sort"
+                              title="Sort"
+                              onClick={() => {
+                                place({ row: HEADER_ROW, column: index });
+                                applySort(column);
+                              }}
+                            >
+                              <span aria-hidden="true" className="zb-grid__sort-icon">
+                                {active ? (sort?.direction === "ascending" ? "↑" : "↓") : "↕"}
+                              </span>
+                            </button>
+                          ) : null}
+                        </>
+                      ) : (
+                        <span
+                          data-zb-cell=""
+                          data-zb-col={index}
+                          tabIndex={tab}
+                          className="zb-grid__static"
+                        >
+                          <span className="zb-grid__static-label">{column.header}</span>
+                          {mark ? <sup className="zb-grid__mark">{mark}</sup> : null}
                         </span>
-                      </button>
-                    ) : (
-                      <span
-                        data-zb-cell=""
-                        data-zb-col={index}
-                        tabIndex={tab}
-                        className="zb-grid__static"
-                      >
-                        <span className="zb-grid__label">{column.header}</span>
-                        {mark ? <sup className="zb-grid__mark">{mark}</sup> : null}
-                      </span>
-                    )}
+                      )}
+                    </div>
                   </th>
                 );
               })}
@@ -932,9 +1485,29 @@ export function DataGrid<Row>({
             {ordered.length === 0 ? (
               <tr role="row" aria-rowindex={2}>
                 <td className="zb-grid__emptycell" colSpan={columns.length + (selectable ? 1 : 0)}>
-                  <p className="zb-grid__empty" role="status">
-                    {empty ?? `No ${coverage.noun ?? "rows"} match.`}
-                  </p>
+                  {empty !== undefined && empty !== null ? (
+                    <div
+                      className="zb-grid__emptycontent"
+                      role={
+                        React.isValidElement(empty) && (empty.props as { role?: string }).role
+                          ? undefined
+                          : "status"
+                      }
+                    >
+                      {empty}
+                    </div>
+                  ) : (
+                    <p className="zb-grid__empty" role="status">
+                      No {coverage.noun ?? "rows"} match.
+                    </p>
+                  )}
+                </td>
+              </tr>
+            ) : null}
+            {bodyStatus !== undefined && bodyStatus !== null ? (
+              <tr role="row">
+                <td className="zb-grid__emptycell" colSpan={columns.length + (selectable ? 1 : 0)}>
+                  <div className="zb-grid__emptycontent">{bodyStatus}</div>
                 </td>
               </tr>
             ) : null}
@@ -995,10 +1568,11 @@ export function DataGrid<Row>({
                           "zb-grid__td",
                           ALIGN_CLASS[defaultAlign(column)].td,
                           column.kind && KIND_CLASS[column.kind],
-                          index < pinned && "zb-grid__pin",
-                          index === pinned - 1 && "zb-grid__pin--edge",
+                          isColumnPinned(column, index) && "zb-grid__pin",
+                          column.key === leftPinEdgeKey && "zb-grid__pin--edge",
+                          column.key === rightPinEdgeKey && "zb-grid__pin--edge--right",
                         )}
-                        style={pinStyle(index + (selectable ? 1 : 0))}
+                        style={columnPinStyle(column, index)}
                       >
                         <Cell value={value} marks={marks}>
                           {column.cell?.(row)}
@@ -1099,6 +1673,334 @@ export function DataGrid<Row>({
           ) : null}
         </footer>
       ) : null}
+
+      {sortMenu
+        ? createPortal(
+            <div
+              ref={sortMenuRef}
+              className="zb-menu zb-menu--anchored"
+              role="menu"
+              tabIndex={-1}
+              aria-label="Column actions"
+              aria-orientation="vertical"
+              onKeyDown={handleSortMenuKeyDown}
+              style={{
+                position: "fixed",
+                left: sortMenu.x,
+                top: sortMenu.y,
+              }}
+            >
+              <div className="zb-menu__list">
+                {canFilter && (
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="zb-menu__item"
+                    onClick={() => {
+                      if (!menuColumn) return;
+                      closeSortMenu(false);
+                      onFilterColumn?.(menuColumn.key);
+                    }}
+                  >
+                    <span className="zb-menu__icon" aria-hidden="true">
+                      <Filter size={16} strokeWidth={1.8} />
+                    </span>
+                    <span className="zb-menu__label">Filter</span>
+                    <span className="zb-menu__shortcut" />
+                  </button>
+                )}
+
+                {canGroup && (
+                  <button
+                    type="button"
+                    role="menuitem"
+                    data-submenu="group"
+                    aria-haspopup="menu"
+                    aria-expanded={activeSubmenu?.type === "group"}
+                    className="zb-menu__item"
+                    onClick={(event) => openSubmenu("group", event.currentTarget)}
+                  >
+                    <Layers size={16} strokeWidth={1.8} />
+                    <span className="zb-menu__label">Group</span>
+                    <span className="zb-menu__chevron" aria-hidden="true">
+                      <ChevronRight size={16} strokeWidth={2} />
+                    </span>
+                  </button>
+                )}
+
+                {canSort && (
+                  <button
+                    type="button"
+                    role="menuitem"
+                    data-submenu="sort"
+                    aria-haspopup="menu"
+                    aria-expanded={activeSubmenu?.type === "sort"}
+                    className="zb-menu__item"
+                    onClick={(event) => openSubmenu("sort", event.currentTarget)}
+                  >
+                    <ArrowDownUp size={16} strokeWidth={1.8} />
+                    <span className="zb-menu__label">Sort</span>
+                    <span className="zb-menu__chevron" aria-hidden="true">
+                      <ChevronRight size={16} strokeWidth={2} />
+                    </span>
+                  </button>
+                )}
+
+                {canPin && (
+                  <button
+                    type="button"
+                    role="menuitem"
+                    data-submenu="pin"
+                    aria-haspopup="menu"
+                    aria-expanded={activeSubmenu?.type === "pin"}
+                    className="zb-menu__item"
+                    onClick={(event) => openSubmenu("pin", event.currentTarget)}
+                  >
+                    <Pin size={16} strokeWidth={1.8} />
+                    <span className="zb-menu__label">Pin column</span>
+                    <span className="zb-menu__chevron" aria-hidden="true">
+                      <ChevronRight size={16} strokeWidth={2} />
+                    </span>
+                  </button>
+                )}
+
+                {canHide && <div className="zb-menu__separator" role="separator" />}
+
+                <button type="button" role="menuitem" className="zb-menu__item">
+                  <RotateCcw size={16} strokeWidth={1.8} />
+                  <span className="zb-menu__label">Reset column width</span>
+                  <span className="zb-menu__shortcut" />
+                </button>
+
+                {canHide && (
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="zb-menu__item"
+                    onClick={() => {
+                      if (menuColumn) {
+                        onHideColumn?.(menuColumn.key);
+                      }
+                    }}
+                  >
+                    <EyeOff size={16} strokeWidth={1.8} />
+                    <span className="zb-menu__label">Hide column</span>
+                    <span className="zb-menu__shortcut" />
+                  </button>
+                )}
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
+      {activeSubmenu && menuColumn
+        ? createPortal(
+            <div
+              ref={sortSubmenuRef}
+              className="zb-menu zb-menu--sub"
+              role="menu"
+              tabIndex={-1}
+              onKeyDown={handleSortMenuKeyDown}
+              aria-label={`${activeSubmenu.type} options`}
+              aria-orientation="vertical"
+              style={{
+                position: "fixed",
+                left: activeSubmenu.x,
+                top: activeSubmenu.y,
+              }}
+            >
+              <div className="zb-menu__list">
+                {activeSubmenu.type === "sort" && canSort && (
+                  <>
+                    <button
+                      type="button"
+                      className="zb-menu__item"
+                      role="menuitem"
+                      onClick={() => setMenuSortDirection("ascending")}
+                    >
+                      <span className="zb-menu__icon" aria-hidden="true">
+                        <ArrowUp size={16} strokeWidth={1.8} />
+                      </span>
+                      <span className="zb-menu__label">Low to high</span>
+                      <span className="zb-menu__shortcut">
+                        {menuSortDirection === "ascending" ? "✓" : ""}
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="zb-menu__item"
+                      role="menuitem"
+                      onClick={() => setMenuSortDirection("descending")}
+                    >
+                      <span className="zb-menu__icon" aria-hidden="true">
+                        <ArrowDown size={16} strokeWidth={1.8} />
+                      </span>
+                      <span className="zb-menu__label">High to low</span>
+                      <span className="zb-menu__shortcut">
+                        {menuSortDirection === "descending" ? "✓" : ""}
+                      </span>
+                    </button>
+                    {canClearSort && (
+                      <>
+                        <div className="zb-menu__separator" role="separator" />
+
+                        <button
+                          type="button"
+                          className="zb-menu__item"
+                          role="menuitem"
+                          onClick={clearMenuSort}
+                        >
+                          <span className="zb-menu__icon" aria-hidden="true">
+                            <X size={16} strokeWidth={1.8} />
+                          </span>
+                          <span className="zb-menu__label">Clear sort</span>
+                          <span className="zb-menu__shortcut" />
+                        </button>
+                      </>
+                    )}
+                  </>
+                )}
+                {activeSubmenu.type === "group" && canGroup && (
+                  <>
+                    <button
+                      type="button"
+                      className="zb-menu__item"
+                      role="menuitemradio"
+                      aria-checked={
+                        group?.key === menuColumn?.key && group.direction === "ascending"
+                      }
+                      onClick={() => {
+                        if (menuColumn) {
+                          onGroupChange?.({ key: menuColumn.key, direction: "ascending" });
+                        }
+                      }}
+                    >
+                      <span className="zb-menu__icon" aria-hidden="true">
+                        <ArrowDown size={16} strokeWidth={1.8} />
+                      </span>
+                      <span className="zb-menu__label">A to Z</span>
+                      <span className="zb-menu__shortcut">
+                        {group?.key === menuColumn?.key && group.direction === "ascending"
+                          ? "✓"
+                          : ""}
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="zb-menu__item"
+                      role="menuitemradio"
+                      aria-checked={
+                        group?.key === menuColumn?.key && group.direction === "descending"
+                      }
+                      onClick={() => {
+                        if (menuColumn) {
+                          onGroupChange?.({ key: menuColumn.key, direction: "descending" });
+                        }
+                      }}
+                    >
+                      <span className="zb-menu__icon" aria-hidden="true">
+                        <ArrowUp size={16} strokeWidth={1.8} />
+                      </span>
+                      <span className="zb-menu__label">Z to A</span>
+                      <span className="zb-menu__shortcut">
+                        {group?.key === menuColumn?.key && group.direction === "descending"
+                          ? "✓"
+                          : ""}
+                      </span>
+                    </button>
+
+                    {canClearGroup && (
+                      <>
+                        <div className="zb-menu__separator" role="separator" />
+                        <button
+                          type="button"
+                          className="zb-menu__item"
+                          role="menuitem"
+                          onClick={() => onGroupChange?.(null)}
+                        >
+                          <span className="zb-menu__icon" aria-hidden="true">
+                            <X size={16} strokeWidth={1.8} />
+                          </span>
+                          <span className="zb-menu__label">Clear group</span>
+                          <span className="zb-menu__shortcut" />
+                        </button>
+                      </>
+                    )}
+                  </>
+                )}
+                {activeSubmenu.type === "pin" && canPin && (
+                  <>
+                    <button
+                      type="button"
+                      className="zb-menu__item"
+                      role="menuitemradio"
+                      aria-checked={currentPin === "left"}
+                      onClick={() => {
+                        if (menuColumn) {
+                          onColumnPinningChange?.({
+                            ...columnPinning,
+                            [menuColumn.key]: "left",
+                          });
+                        }
+                      }}
+                    >
+                      <span className="zb-menu__icon" aria-hidden="true">
+                        <ArrowLeft size={16} strokeWidth={1.8} />
+                      </span>
+                      <span className="zb-menu__label">Pin left</span>
+                      <span className="zb-menu__shortcut">{currentPin === "left" ? "✓" : ""}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="zb-menu__item"
+                      role="menuitemradio"
+                      aria-checked={currentPin === "right"}
+                      onClick={() => {
+                        if (menuColumn) {
+                          onColumnPinningChange?.({
+                            ...columnPinning,
+                            [menuColumn.key]: "right",
+                          });
+                        }
+                      }}
+                    >
+                      <span className="zb-menu__icon" aria-hidden="true">
+                        <ArrowRight size={16} strokeWidth={1.8} />
+                      </span>
+                      <span className="zb-menu__label">Pin right</span>
+                      <span className="zb-menu__shortcut">{currentPin === "right" ? "✓" : ""}</span>
+                    </button>
+
+                    <div className="zb-menu__separator" role="separator" />
+
+                    <button
+                      type="button"
+                      className="zb-menu__item"
+                      role="menuitem"
+                      onClick={() => {
+                        if (menuColumn) {
+                          const nextPinning = { ...columnPinning };
+                          delete nextPinning[menuColumn.key];
+                          onColumnPinningChange?.(nextPinning);
+                        }
+                      }}
+                    >
+                      <span className="zb-menu__icon" aria-hidden="true">
+                        <PinOff size={16} strokeWidth={1.8} />
+                      </span>
+                      <span className="zb-menu__label">Unpin column</span>
+                      <span className="zb-menu__shortcut" />
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
     </section>
   );
 }

@@ -6126,6 +6126,7 @@ export const CATALOG: ComponentDoc[] = [
       "Pinned identity, scrolled sideways",
       "Loading more, and the end of what is known",
       "Framed by the host, not by itself",
+      "Toolbar, criteria and filter panel",
       "The predicate matched nobody"
     ],
     "props": [
@@ -6172,6 +6173,12 @@ export const CATALOG: ComponentDoc[] = [
         "required": false
       },
       {
+        "name": "bodyStatus",
+        "type": "React.ReactNode",
+        "description": "Optional status row inside the table body, displayed alongside existing rows. Useful when a refresh fails but the previous results are retained.",
+        "required": false
+      },
+      {
         "name": "bulkActions",
         "type": "((selected: readonly Row[]) => React.ReactNode)",
         "description": "What can be done to a selection, rendered in a bar above the table. Receives the selected rows rather than their keys, because the verbs a host offers usually depend on what was picked — and because handing back keys makes every caller re-derive the rows the grid already has.",
@@ -6187,6 +6194,18 @@ export const CATALOG: ComponentDoc[] = [
         "name": "className",
         "type": "string",
         "description": "Merged onto the outer element.",
+        "required": false
+      },
+      {
+        "name": "columnPinning",
+        "type": "Readonly<Record<string, 'left' | 'right'>>",
+        "description": "Per-column pin placement. Omit to retain legacy pinnedColumns behavior.",
+        "required": false
+      },
+      {
+        "name": "criteria",
+        "type": "React.ReactNode",
+        "description": "",
         "required": false
       },
       {
@@ -6217,11 +6236,23 @@ export const CATALOG: ComponentDoc[] = [
         "default": "false"
       },
       {
+        "name": "filterPanel",
+        "type": "React.ReactNode",
+        "description": "",
+        "required": false
+      },
+      {
         "name": "footer",
         "type": "boolean",
         "description": "Draw the foot — the reading line, the sort citation and the footnotes. On by default, for the same reason as the masthead: a grid standing alone has to carry its own provenance, and a derived column with no note beside it is a number with no author. Turning it off does not make an absent cell lie. The absence keeps its word — \"Not recorded\", \"Restricted\" — and only loses the superscript that pointed at the note, because the note is no longer on the page. Turn it off only where the host carries provenance itself.",
         "required": false,
         "default": "true"
+      },
+      {
+        "name": "group",
+        "type": "DataGridGroup | null",
+        "description": "The currently grouped column and its direction.",
+        "required": false
       },
       {
         "name": "id",
@@ -6268,6 +6299,36 @@ export const CATALOG: ComponentDoc[] = [
         "required": false
       },
       {
+        "name": "onClearSort",
+        "type": "((columnKey: string) => void)",
+        "description": "Clear one committed sort field by column key.",
+        "required": false
+      },
+      {
+        "name": "onColumnPinningChange",
+        "type": "((pinning: DataGridColumnPinning) => void)",
+        "description": "Change per-column pin placement.",
+        "required": false
+      },
+      {
+        "name": "onFilterColumn",
+        "type": "((columnKey: string) => void)",
+        "description": "Open the host's filter UI for one column.",
+        "required": false
+      },
+      {
+        "name": "onGroupChange",
+        "type": "((group: DataGridGroup | null) => void)",
+        "description": "Change or clear the grouped column.",
+        "required": false
+      },
+      {
+        "name": "onHideColumn",
+        "type": "((columnKey: string) => void)",
+        "description": "Hide one column; the host removes it from the displayed column list.",
+        "required": false
+      },
+      {
         "name": "onReachEnd",
         "type": "(() => void)",
         "description": "The reader has reached the end of what is loaded. Fetch the next batch. This replaced a numbered pager, and not for taste: FHIR search returns opaque `link.next` URLs, the spec forbids constructing paging URLs by hand, and `Bundle.total` is optional. \"Page 4 of 7\" is therefore a control that cannot be built against a conformant server — the count is not derivable and the jump target is not addressable. Following `next` until it stops is the shape the protocol has. The grid never fetches. It watches a sentinel below the last row and says when it comes into view; appending to `rows` is the caller's.",
@@ -6311,9 +6372,22 @@ export const CATALOG: ComponentDoc[] = [
         "required": false
       },
       {
+        "name": "sortRanks",
+        "type": "readonly GridSort[]",
+        "description": "Ordered, committed sort rules. Used to show multi-sort precedence; the grid continues to own only its existing single-sort behavior.",
+        "required": false,
+        "default": "[]"
+      },
+      {
         "name": "title",
         "type": "React.ReactNode",
         "description": "The masthead line. Falls back to `caption`.",
+        "required": false
+      },
+      {
+        "name": "toolbar",
+        "type": "React.ReactNode",
+        "description": "Optional layout slots above the grid. These are presentation-only: the caller supplies the controls and owns their state and behavior. The grid provides their placement and styling.",
         "required": false
       }
     ],
@@ -6364,6 +6438,12 @@ export const CATALOG: ComponentDoc[] = [
             "required": false
           },
           {
+            "name": "bodyStatus",
+            "type": "React.ReactNode",
+            "description": "Optional status row inside the table body, displayed alongside existing rows. Useful when a refresh fails but the previous results are retained.",
+            "required": false
+          },
+          {
             "name": "bulkActions",
             "type": "((selected: readonly Row[]) => React.ReactNode)",
             "description": "What can be done to a selection, rendered in a bar above the table. Receives the selected rows rather than their keys, because the verbs a host offers usually depend on what was picked — and because handing back keys makes every caller re-derive the rows the grid already has.",
@@ -6379,6 +6459,18 @@ export const CATALOG: ComponentDoc[] = [
             "name": "className",
             "type": "string",
             "description": "Merged onto the outer element.",
+            "required": false
+          },
+          {
+            "name": "columnPinning",
+            "type": "Readonly<Record<string, 'left' | 'right'>>",
+            "description": "Per-column pin placement. Omit to retain legacy pinnedColumns behavior.",
+            "required": false
+          },
+          {
+            "name": "criteria",
+            "type": "React.ReactNode",
+            "description": "",
             "required": false
           },
           {
@@ -6409,11 +6501,23 @@ export const CATALOG: ComponentDoc[] = [
             "default": "false"
           },
           {
+            "name": "filterPanel",
+            "type": "React.ReactNode",
+            "description": "",
+            "required": false
+          },
+          {
             "name": "footer",
             "type": "boolean",
             "description": "Draw the foot — the reading line, the sort citation and the footnotes. On by default, for the same reason as the masthead: a grid standing alone has to carry its own provenance, and a derived column with no note beside it is a number with no author. Turning it off does not make an absent cell lie. The absence keeps its word — \"Not recorded\", \"Restricted\" — and only loses the superscript that pointed at the note, because the note is no longer on the page. Turn it off only where the host carries provenance itself.",
             "required": false,
             "default": "true"
+          },
+          {
+            "name": "group",
+            "type": "DataGridGroup | null",
+            "description": "The currently grouped column and its direction.",
+            "required": false
           },
           {
             "name": "id",
@@ -6460,6 +6564,36 @@ export const CATALOG: ComponentDoc[] = [
             "required": false
           },
           {
+            "name": "onClearSort",
+            "type": "((columnKey: string) => void)",
+            "description": "Clear one committed sort field by column key.",
+            "required": false
+          },
+          {
+            "name": "onColumnPinningChange",
+            "type": "((pinning: DataGridColumnPinning) => void)",
+            "description": "Change per-column pin placement.",
+            "required": false
+          },
+          {
+            "name": "onFilterColumn",
+            "type": "((columnKey: string) => void)",
+            "description": "Open the host's filter UI for one column.",
+            "required": false
+          },
+          {
+            "name": "onGroupChange",
+            "type": "((group: DataGridGroup | null) => void)",
+            "description": "Change or clear the grouped column.",
+            "required": false
+          },
+          {
+            "name": "onHideColumn",
+            "type": "((columnKey: string) => void)",
+            "description": "Hide one column; the host removes it from the displayed column list.",
+            "required": false
+          },
+          {
             "name": "onReachEnd",
             "type": "(() => void)",
             "description": "The reader has reached the end of what is loaded. Fetch the next batch. This replaced a numbered pager, and not for taste: FHIR search returns opaque `link.next` URLs, the spec forbids constructing paging URLs by hand, and `Bundle.total` is optional. \"Page 4 of 7\" is therefore a control that cannot be built against a conformant server — the count is not derivable and the jump target is not addressable. Following `next` until it stops is the shape the protocol has. The grid never fetches. It watches a sentinel below the last row and says when it comes into view; appending to `rows` is the caller's.",
@@ -6503,22 +6637,36 @@ export const CATALOG: ComponentDoc[] = [
             "required": false
           },
           {
+            "name": "sortRanks",
+            "type": "readonly GridSort[]",
+            "description": "Ordered, committed sort rules. Used to show multi-sort precedence; the grid continues to own only its existing single-sort behavior.",
+            "required": false,
+            "default": "[]"
+          },
+          {
             "name": "title",
             "type": "React.ReactNode",
             "description": "The masthead line. Falls back to `caption`.",
+            "required": false
+          },
+          {
+            "name": "toolbar",
+            "type": "React.ReactNode",
+            "description": "Optional layout slots above the grid. These are presentation-only: the caller supplies the controls and owns their state and behavior. The grid provides their placement and styling.",
             "required": false
           }
         ]
       }
     ],
-    "usage": "import { DataGrid, type DataGridColumn } from \"@/components/zoblocks/data-grid\";\nimport \"@/styles/zoblocks-grid.css\";\n\nconst columns: DataGridColumn<Row>[] = [\n  { key: \"name\", header: \"Patient\", kind: \"text\", value: (r) => r.name },\n  { key: \"mrn\", header: \"MRN\", kind: \"identifier\", value: (r) => r.mrn },\n  {\n    key: \"phq9\",\n    header: \"PHQ-9\",\n    kind: \"measure\",\n    // An absence is a value, not a hole. There is no null to pass here.\n    value: (r) => r.phq9 ?? { absent: \"awaiting\" },\n  },\n  {\n    key: \"risk\",\n    header: \"Disengagement risk\",\n    kind: \"number\",\n    value: (r) => r.risk,\n    derived: {\n      model: \"disengagement\",\n      version: \"v1.8\",\n      validatedOn: \"9,140 outpatient episodes\",\n      population: \"adults, English-language intake only\",\n    },\n  },\n];\n\n<DataGrid\n  caption=\"Clients on this team's caseload with a raised PHQ-9 or a recent risk screen\"\n  title=\"Caseload · PHQ-9 raised or risk screened\"\n  columns={columns}\n  rows={rows}\n  rowKey={(row) => row.mrn}\n  coverage={{\n    shown: rows.length,\n    total: cohortTotal,\n    noun: \"clients on this team's caseload\",\n    predicate: \"PHQ-9 of 10 or more, or a risk screen in the last 14 days.\",\n  }}\n  identify={(row) => ({ primary: row.name, secondary: `MRN ${row.mrn}` })}\n  arrivals={held}\n  onAdmitArrivals={admit}\n/>",
+    "usage": "import { DataGrid, type DataGridColumn } from \"@/components/zoblocks/data-grid\";\nimport \"@/styles/zoblocks-grid.css\";\n\nconst columns: DataGridColumn<Row>[] = [\n  { key: \"name\", header: \"Patient\", kind: \"text\", value: (r) => r.name },\n  { key: \"mrn\", header: \"MRN\", kind: \"identifier\", value: (r) => r.mrn },\n  {\n    key: \"phq9\",\n    header: \"PHQ-9\",\n    kind: \"measure\",\n    // An absence is a value, not a hole. There is no null to pass here.\n    value: (r) => r.phq9 ?? { absent: \"awaiting\" },\n  },\n  {\n    key: \"risk\",\n    header: \"Disengagement risk\",\n    kind: \"number\",\n    value: (r) => r.risk,\n    derived: {\n      model: \"disengagement\",\n      version: \"v1.8\",\n      validatedOn: \"9,140 outpatient episodes\",\n      population: \"adults, English-language intake only\",\n    },\n  },\n];\n\n<DataGrid\n  caption=\"Clients on this team's caseload with a raised PHQ-9 or a recent risk screen\"\n  title=\"Caseload · PHQ-9 raised or risk screened\"\n  columns={columns}\n  rows={rows}\n  rowKey={(row) => row.mrn}\n  coverage={{\n    shown: rows.length,\n    total: cohortTotal,\n    noun: \"clients on this team's caseload\",\n    predicate: \"PHQ-9 of 10 or more, or a risk screen in the last 14 days.\",\n  }}\n  toolbar={<ToolbarControls />}\n  filterPanel={showFilters ? <FilterEditor /> : null}\n  criteria={<CriteriaSummary />}\n  identify={(row) => ({ primary: row.name, secondary: `MRN ${row.mrn}` })}\n  arrivals={held}\n  onAdmitArrivals={admit}\n/>",
     "guidance": {
       "use": [
         "For any list somebody will act from — a worklist, a queue, a cohort, a results review. The coverage line is what makes it safe to act from, and it is the reason to reach for this rather than a table.",
         "With `coverage` computed from the query, not from the array. `shown` is the array; `total` is what the predicate matches, and if the source will not say, pass \"unknown\" rather than the array length again.",
         "With `derived` on every column whose values a model produced. The footnote is generated from it, so the alternative to filling it in is a page that presents a prediction as an observation.",
         "With `identify` wherever a row leads to an action. It is the line that re-states who the row is about at the point of action, which is the control the wrong-patient literature actually supports.",
-        "With `arrivals` rather than by mutating `rows` when results stream in. The component's whole claim about live data is that it does not act on it until asked."
+        "With `arrivals` rather than by mutating `rows` when results stream in. The component's whole claim about live data is that it does not act on it until asked.",
+        "Use the layout slots when the host needs a consistent place for its own toolbar, active criteria and filter editor. The host supplies the content and owns state and behavior."
       ],
       "avoid": [
         "As a layout table. It is a grid with a keyboard model and a coverage claim; for two columns of static text a `<table>` is correct and cheaper.",
@@ -6567,7 +6715,7 @@ export const CATALOG: ComponentDoc[] = [
       "One sort column. Multi-column sort is a real requirement in a worklist and is not here yet.",
       "No column resize, reorder, pinning or grouping. Columns are typed objects precisely so a saved view can carry those later; today the caller sets width and order.",
       "No selection model and no row expansion. A grid that owns selection also owns the bulk-action confirmation, which is ChartContextMenu's job.",
-      "Filtering is the caller's. The grid renders the predicate as a sentence and never composes one — a component that owned the filter would also own the query, and no ZoBlocks package makes a network call.",
+      "Filtering remains caller-owned. The toolbar, criteria and filter-panel slots provide shared placement for caller-supplied controls and content; they do not compose predicates or own query state.",
       "The export helper produces delimited text, not XLSX. Typed cells are the stronger answer to formula injection; the quote prefix is what is available without a writer dependency.",
       "`status` columns sort by a declared order that the caller supplies. There is no terminology binding, so a mis-declared order sorts wrongly and nothing catches it.",
       "Strings are English and not routed through @zoblocks/intl — true of every registry component today."
@@ -6759,6 +6907,13 @@ export const CATALOG: ComponentDoc[] = [
       }
     ],
     "examples": [
+      {
+        "id": "toolbar-layout",
+        "title": "Controls supplied by the host, placed by the grid",
+        "description": "The grid provides a shared place for toolbar controls, active criteria and an optional filter panel. The host supplies the content and owns its state and behavior; the grid only places and styles them above the rows.",
+        "group": "Layout",
+        "code": "<DataGrid\n  {...props}\n  toolbar={<ToolbarControls />}\n  filterPanel={showFilters ? <FilterEditor /> : null}\n  criteria={<CriteriaSummary />}\n/>"
+      },
       {
         "id": "coverage",
         "title": "Coverage is arithmetic, not a footer note",

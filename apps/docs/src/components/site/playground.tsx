@@ -105,7 +105,11 @@ import { ClinicalStatus } from "@/registry/zoblocks/clinical-status/clinical-sta
 import { SCALES, type ScaleName } from "@/lib/zoblocks-clinical-status";
 import { BUPRENORPHINE, MenuRow, PLAYGROUND_ACTIONS } from "./chart-context-menu-demos";
 import { DatePickerPlayground, datePickerPlaygroundAttrs } from "./date-picker-demos";
-import { DataGridPlayground } from "./data-grid-demos";
+import {
+  DataGridPlayground,
+  type SearchableFieldKey,
+  type SearchScopeConfig,
+} from "./data-grid-demos";
 import { CareTimelinePlayground } from "./care-timeline-demos";
 import { RecorderPlayground, recorderPlaygroundAttrs } from "./recorder-demos";
 import type { DatePickerVariant } from "@/registry/zoblocks/date-picker/date-picker";
@@ -1297,13 +1301,39 @@ export function Playground({
   }, [knobs, name]);
 
   const [props, setProps] = React.useState<Props>(initial);
+  const [dataGridSearchSelection, setDataGridSearchSelection] = React.useState<
+    readonly SearchableFieldKey[]
+  >(["name", "mrn"]);
+  const [dataGridSimulateSearchFailure, setDataGridSimulateSearchFailure] = React.useState(false);
   const [log, setLog] = React.useState<string[]>([]);
   const dark = useSiteTheme();
   // The playground mounts antd directly for the renderers that need it, so it
   // needs the same language-aware brand the Signature demo does — otherwise
   // this is the one panel on the page the switcher does not reach.
   const brand = useAntdBrandTokens(dark);
+  const dataGridSearchScope: SearchScopeConfig = {
+    fields: [
+      { key: "name", label: "Patient name" },
+      { key: "mrn", label: "Patient identifier" },
+      { key: "program", label: "Program" },
+    ],
+    selected: dataGridSearchSelection,
+    zeroSelectedBehavior: "allow",
+    rerunOnSelectionChange: true,
+    onSelectionChange: setDataGridSearchSelection,
+    onSearch: async (query, selected) => {
+      if (dataGridSimulateSearchFailure) {
+        throw new Error("Simulated search failure");
+      }
 
+      setLog((previous) =>
+        [
+          `Search executed for "${query}" across ${selected.length} permitted fields`,
+          ...previous,
+        ].slice(0, 4),
+      );
+    },
+  };
   const render = RENDERERS[name];
   if (!render) return null;
 
@@ -1373,7 +1403,11 @@ export function Playground({
                 }}
               >
                 <PlaygroundBoundary resetKey={JSON.stringify(props)}>
-                  {render(withHandlers)}
+                  {render(
+                    name === "data-grid"
+                      ? { ...withHandlers, searchScope: dataGridSearchScope }
+                      : withHandlers,
+                  )}
                 </PlaygroundBoundary>
               </ConfigProvider>
             </div>
@@ -1415,6 +1449,18 @@ export function Playground({
                 />
               );
             })}
+
+            {name === "data-grid" && (
+              <label className="flex cursor-pointer items-center gap-2 text-xs text-graphite">
+                <input
+                  type="checkbox"
+                  checked={dataGridSimulateSearchFailure}
+                  onChange={(event) => setDataGridSimulateSearchFailure(event.target.checked)}
+                  className="h-3.5 w-3.5 accent-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                />
+                Simulate search failure
+              </label>
+            )}
 
             {events.length > 0 && (
               <div className="flex flex-col gap-1">
