@@ -127,6 +127,37 @@
   max-inline-size: 78ch;
 }
 
+/* ---------------------------------------------------------------- */
+/* Toolbar, criteria and filter panel — caller-owned content         */
+/* ---------------------------------------------------------------- */
+
+.zb-grid__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  padding: 0.5rem var(--zb-grid-pad-x);
+  border-block-end: 1px solid var(--zb-grid-rule);
+}
+
+.zb-grid__criteria {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem 0.5rem;
+  min-width: 0;
+  padding: 0.45rem var(--zb-grid-pad-x);
+  border-block-end: 1px solid var(--zb-grid-rule);
+}
+
+.zb-grid__filter-panel {
+  min-width: 0;
+  padding: 0.75rem var(--zb-grid-pad-x);
+  border-block-end: 1px solid var(--zb-grid-rule);
+  background: var(--zb-grid-sunk);
+}
+
 /*
  * The identity line holds its space when there is nothing to say in it.
  *
@@ -319,10 +350,10 @@
 
 .zb-grid__table {
   inline-size: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   text-align: start;
 }
-
 /* Present to a screen reader, absent from the page: the masthead already says
    this in larger type, and printing it twice is what makes a caption look
    like a mistake. */
@@ -406,6 +437,22 @@
   opacity: 1;
 }
 
+.zb-grid__scroll[data-zb-scrolled-right="true"] .zb-grid__pin--edge--right::after {
+  opacity: 1;
+}
+
+.zb-grid__pin--edge--right::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  right: 100%;
+  inline-size: 6px;
+  pointer-events: none;
+  border-inline-end: 1px solid var(--zb-grid-rule);
+  background: linear-gradient(to left, rgb(0 0 0 / 0.12), transparent);
+  opacity: 0;
+}
+
 .zb-grid__tr--current > .zb-grid__pin {
   background: var(--zb-grid-sunk);
 }
@@ -478,29 +525,25 @@
   border-inline-end: 0;
 }
 
-/* The header cell's content is the tab stop, so the button and the static
-   span have to be the same box. */
-.zb-grid__sort,
-.zb-grid__static {
+/* Header content: 34px total height, with 12px horizontal insets. */
+.zb-grid__header-content {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem;
+  inline-size: 100%;
+  block-size: 33px;
+  box-sizing: border-box;
+  padding-inline: var(--zb-grid-pad-x);
+}
+
+.zb-grid__label,
+.zb-grid__static-label {
+  display: inline-flex;
   align-items: baseline;
   gap: 0.3rem;
-  inline-size: 100%;
-  /*
-   * 1.75rem, not the density target.
-   *
-   * `--zb-density-target` is 2.75rem at standard density — a pointer target
-   * for a control somebody taps. A column header is a 10px label, and giving
-   * it a 44px box put half an inch of nothing above every worklist. 28px
-   * clears the 24px floor SC 2.5.8 asks for with room to spare, which is what
-   * the token was being borrowed for.
-   */
-  min-block-size: 1.75rem;
-  padding: 0.3rem var(--zb-grid-pad-x);
-  border: 0;
-  background: none;
+  min-inline-size: 0;
   color: var(--zb-grid-muted);
-  font: inherit;
   font-family: var(--zb-font-mono, ui-monospace, monospace);
   font-size: var(--zb-text-2xs, 0.625rem);
   font-weight: 600;
@@ -509,38 +552,84 @@
   text-align: inherit;
 }
 
+.zb-grid__label {
+  flex: 1 1 auto;
+}
+
+.zb-grid__label-text {
+  display: block;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .zb-grid__sort {
+  display: grid;
+  flex: 0 0 24px;
+  place-items: center;
+  inline-size: 24px;
+  block-size: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 0.25rem;
+  background: none;
+  color: var(--zb-grid-muted);
+  font: inherit;
+  font-size: 0.875rem;
+  line-height: 1;
   cursor: pointer;
+  opacity: 0;
 }
 
-@media (hover: hover) {
-  .zb-grid__sort:hover {
-    color: var(--zb-grid-ink);
-    background: var(--zb-grid-sunk);
-  }
-}
-
-.zb-grid__th--end .zb-grid__sort,
-.zb-grid__th--end .zb-grid__static {
-  justify-content: flex-end;
-}
-
-/* Sorted columns take the ink and the weight, and carry a glyph. Three cues,
-   none of them a colour. */
+.zb-grid__sort:hover,
+.zb-grid__sort:focus-visible,
 .zb-grid__th--sorted .zb-grid__sort {
+  color: var(--zb-grid-ink);
+  opacity: 1;
+}
+
+.zb-grid__th:hover .zb-grid__label,
+.zb-grid__th:focus-within .zb-grid__label {
   color: var(--zb-grid-ink);
 }
 
-.zb-grid__arrow {
-  font-family: var(--zb-font-sans, inherit);
+.zb-grid__th--end .zb-grid__header-content {
+  justify-content: flex-end;
+}
+
+.zb-grid__th--end .zb-grid__label {
+  justify-content: flex-end;
+  text-align: end;
+}
+
+.zb-grid__th--sorted .zb-grid__label {
+  color: var(--zb-grid-ink);
 }
 
 .zb-grid__mark {
+  flex: 0 0 auto;
   font-family: var(--zb-font-mono, ui-monospace, monospace);
   font-size: 0.85em;
   font-weight: 600;
   line-height: 0;
   color: var(--zb-grid-accent);
+}
+
+.zb-grid__sort-rank {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 1.125rem;
+  block-size: 1.125rem;
+  margin-inline-start: 0.25rem;
+  border-radius: 999px;
+  background: var(--zb-grid-sunk);
+  color: var(--zb-grid-muted);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1;
 }
 
 .zb-grid__tr {
@@ -830,6 +919,9 @@
   .zb-grid__td,
   .zb-grid__tr,
   .zb-grid__masthead,
+  .zb-grid__toolbar,
+  .zb-grid__criteria,
+  .zb-grid__filter-panel,
   .zb-grid__strip,
   .zb-grid__held,
   .zb-grid__foot {
@@ -919,6 +1011,9 @@
   }
 
   .zb-grid__masthead,
+  .zb-grid__toolbar,
+  .zb-grid__criteria,
+  .zb-grid__filter-panel,
   .zb-grid__foot {
     border-color: #000;
   }
